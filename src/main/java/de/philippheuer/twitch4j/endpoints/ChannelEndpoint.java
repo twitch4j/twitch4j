@@ -47,7 +47,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Gets a list of teams to which a specified channel belongs.
 	 * Requires Scope: None
 	 */
-	public List<Follow> getTeams() {
+	public List<Team> getTeams() {
 		// REST Request
 		String requestUrl = String.format("%s/channels/%s/teams", getApi().getTwitchEndpoint(), getChannelId());
 		TeamList responseObject = getRestTemplate().getForObject(requestUrl, TeamList.class);
@@ -61,7 +61,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Gets a list of users subscribed to a specified channel, sorted by the date when they subscribed.
 	 * Requires Scope: channel_subscriptions
 	 */
-	public List<Follow> getSubscriptions() {
+	public List<Subscription> getSubscriptions() {
 		// REST Request
 		String requestUrl = String.format("%s/channels/%s/subscriptions", getApi().getTwitchEndpoint(), getChannelId());
 		SubscriptionList responseObject = getRestTemplate().getForObject(requestUrl, SubscriptionList.class);
