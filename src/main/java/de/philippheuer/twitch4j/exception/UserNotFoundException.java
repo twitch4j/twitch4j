@@ -2,7 +2,6 @@ package de.philippheuer.twitch4j.exception;
 
 import lombok.*;
 
-@NoArgsConstructor
 public class UserNotFoundException extends Exception {
 	/**
 	 * 
