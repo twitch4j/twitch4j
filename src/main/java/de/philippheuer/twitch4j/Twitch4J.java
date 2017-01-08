@@ -1,6 +1,5 @@
 package de.philippheuer.twitch4j;
 
-import de.philippheuer.twitch4j.helper.HttpClient;
 import lombok.*;
 
 @Getter
@@ -16,11 +15,6 @@ public class Twitch4J {
 	 * Twitch API Version
 	 */
 	public final int twitchEndpointVersion = 5;
-	
-	/**
-	 * HTTP Client
-	 */
-	protected final HttpClient httpClient = new HttpClient();
 	
     /**
      * Twitch Client Id
@@ -42,11 +36,4 @@ public class Twitch4J {
         setClientSecret(clientSecret);
     }
     
-    /**
-     * Endpoint: GetUserIdFromUserName
-     */
-    public String getUserIdFromUserName(String userName) {
-    	
-    	return "";
-    }
 }

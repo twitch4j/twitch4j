@@ -16,6 +16,7 @@ import de.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import lombok.*;
 
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.web.client.RestTemplate;
 
 @Getter
 @Setter
@@ -37,17 +38,13 @@ public class AbstractTwitchEndpoint {
 	private List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
     
 	/**
-	 * Holds the Jackson ObjectMapper to resolve JSON into the Models
+	 * AbstractTwitchEndpoint
+	 * @TODO: Description
+	 * @param api
 	 */
-	protected final ObjectMapper objectMapper = new ObjectMapper();
-	
 	public AbstractTwitchEndpoint(Twitch4J api) {
 		// Properties
 		setApi(api);
-		
-		// Configure Jackson Naming Strategy
-		getObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-		
 		
 		// Setup Interceptors
 		// - Header
@@ -59,5 +56,13 @@ public class AbstractTwitchEndpoint {
 	
 	public Logger getLogger() {
 		return logger;
+	}
+	
+	public RestTemplate getRestTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.setInterceptors(getRestInterceptors());
+		// restTemplate.setErrorHandler(errorHandler);
+		
+		return restTemplate;
 	}
 }
