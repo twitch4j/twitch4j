@@ -9,22 +9,11 @@ import de.philippheuer.twitch4j.model.*;
 public class UserEndpoint extends AbstractTwitchEndpoint {
 	
 	/**
-	 * Get User by Name
+	 * Get UserEndpoint
+	 * @throws UserNotFoundException 
 	 */
-	public UserEndpoint(Twitch4J api, String userName) {
+	public UserEndpoint(Twitch4J api) {
 		super(api);
-		
-		Long userId = getUserIdByUserName(userName);
-		
-	}
-
-	/**
-	 * Get User by UserId
-	 */
-	public UserEndpoint(Twitch4J api, Integer userId) {
-		super(api);
-		
-		
 	}
 	
 	/**
@@ -38,8 +27,6 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		String requestUrl = String.format("%s/users?login=%s", getApi().getTwitchEndpoint(), userName);
 		UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
 		List<User> userList = responseObject.getUsers();
-		
-		getLogger().info("UserId OF " + responseObject.toString());
 		
 		// User found?
 		if(userList.size() == 1) {

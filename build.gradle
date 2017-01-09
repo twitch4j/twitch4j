@@ -35,6 +35,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework:spring-web")
     
+    // WebSocket Client for Twitch PubSub
+    compile('com.neovisionaries:nv-websocket-client:1.31')
+    
     // JSON
     compile("com.fasterxml.jackson.core:jackson-databind:2.8.5")
     
