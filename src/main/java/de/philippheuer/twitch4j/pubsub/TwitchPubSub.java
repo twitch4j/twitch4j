@@ -64,20 +64,8 @@ public class TwitchPubSub {
 			 */
 	        @Override
 	        public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
-	            // Authenticate and Subscribe to Topics
-	        	/*
-	        	ObjectMapper mapper = new ObjectMapper();
-				ObjectNode objectNode = mapper.createObjectNode();
-				objectNode.put("type", "LISTEN");
-				objectNode.put("nonce", "channelId");
-				
-				Map<String, String> dataMap = new HashMap<String, String>();
-				dataMap.put("auth_token", "");
-				dataMap.put("topics", {"text"});
-				objectNode.put("data", dataMap);
-				
-				webSocket.sendText(objectNode.toString());
-				*/
+	            // Subscribe to Topics
+	        	registerTopicListener();
 	        }
 	        
 	        /**
@@ -90,18 +78,29 @@ public class TwitchPubSub {
                 	ObjectMapper mapper = new ObjectMapper();
                     JsonNode jsonNode = mapper.readTree(message);
                     
-                    // Check for NULL
+                    // Only Handle Messages with a Type
                     if(jsonNode.get("type") == null) {
                     	ws.disconnect();
                     	return;
                     }
                     
-                    // Handle PONG
+                    /**
+                     * Handle: PONG
+                     *  If a client does not receive a PONG message within 10 seconds
+                     *  of issuing a PING command, it should reconnect to the server.
+                     */
                     if(jsonNode.get("type").textValue().equalsIgnoreCase("pong")) {
                     	getLogger().debug("Recieved PONG Response from Twitch PubSub.");
                     }
                     
-                    // Handle Reconnect
+                    /**
+                     * Handle: Reconnect
+                     *  Clients may receive a RECONNECT message at any time.
+                     *  This indicates that the server is about to restart (typically for maintenance)
+                     *  and will disconnect the client within 30 seconds.
+                     *  During this time, we recommend that clients reconnect to the server.
+                     *  Otherwise, the client will be forcibly disconnected.
+                     */
                     if(jsonNode.get("type").textValue().equalsIgnoreCase("reconnect")) {
                     	getLogger().debug("Twitch PubSub is forcing us to reconnect ...");
                     	reconnect();
@@ -173,13 +172,12 @@ public class TwitchPubSub {
 			public void run() {
 				// Prepare JSON Ping Message
 				try {
-					
 					ObjectMapper mapper = new ObjectMapper();
 					ObjectNode objectNode = mapper.createObjectNode();
 					objectNode.put("type", "PING");
 					
 					webSocket.sendText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
-					logger.debug("Send Ping to Twitch PubSub. (Keep-Connection-Alive");
+					logger.debug("Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
 				} catch (Exception ex) {
 					logger.error("Failed to Ping Twitch PubSub. (Connection Lost)");
 					reconnect();
@@ -199,7 +197,19 @@ public class TwitchPubSub {
 	
 	
 	public void registerTopicListener() {
-		getWebSocket().sendText("{'type': 'PING'}");
+		/*
+    	ObjectMapper mapper = new ObjectMapper();
+		ObjectNode objectNode = mapper.createObjectNode();
+		objectNode.put("type", "LISTEN");
+		objectNode.put("nonce", "channelId");
+		
+		Map<String, String> dataMap = new HashMap<String, String>();
+		dataMap.put("auth_token", "");
+		dataMap.put("topics", {"text"});
+		objectNode.put("data", dataMap);
+		
+		webSocket.sendText(objectNode.toString());
+		*/
 	}
 	
 }

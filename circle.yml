@@ -1,0 +1,6 @@
+#
+# Build configuration for Circle CI
+#
+checkout:
+  post:
+    - chmod +x /home/ubuntu/twitch4j/gradlew

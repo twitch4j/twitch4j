@@ -59,6 +59,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Endpoint: Get Channel Subscribers
 	 * Gets a list of users subscribed to a specified channel, sorted by the date when they subscribed.
+	 * This is not related to the user messages, subscriptions are visible immediately.
 	 * Requires Scope: channel_subscriptions
 	 */
 	public List<Subscription> getSubscriptions() {
