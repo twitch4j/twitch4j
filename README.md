@@ -16,6 +16,7 @@ This project is still in development, check out #features and #changelog to foll
 - [Features](#features)
 - [Changelog](#changelog)
 - [Credits](#credits)
+- [Examples](#examples)
 
 ## Dependencies
  * Java 1.8+
@@ -36,4 +37,7 @@ This project is still in development, check out #features and #changelog to foll
 
 
 ## Credits
+ - Credits for the data models to [urgrue](https://github.com/urgrue/Java-Twitch-Api-Wrapper)
+ 
+## Examples
  - To Be Added

@@ -4,6 +4,8 @@ import java.util.List;
 
 import java.util.Optional;
 
+import org.springframework.util.Assert;
+
 import de.philippheuer.twitch4j.Twitch4J;
 import de.philippheuer.twitch4j.model.*;
 
@@ -24,6 +26,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @throws UserNotFoundException 
 	 */
 	public Optional<Long> getUserIdByUserName(String userName) {
+		// Validate Arguments
+		Assert.notNull(userName, "Please provide a Username!");
+		
 		// REST Request
 		String requestUrl = String.format("%s/users?login=%s", getApi().getTwitchEndpoint(), userName);
 		UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
@@ -42,10 +47,18 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * 
 	 * https://api.twitch.tv/kraken/users?login=USERNAME
 	 */
-	public User getUser(String userName) {
-		// REST Request
-		// ...
+	public Optional<User> getUser(Long userId) {
+		// Validate Arguments
+		Assert.notNull(userId, "Please provide a User ID!");
 		
-		return null;
+		// REST Request
+		try {
+			String requestUrl = String.format("%s/users/%d", getApi().getTwitchEndpoint(), userId);
+			User responseObject = getRestTemplate().getForObject(requestUrl, User.class);
+			
+			return Optional.ofNullable(responseObject);
+		} catch (Exception ex) {
+			return Optional.empty();
+		}
 	}
 }
