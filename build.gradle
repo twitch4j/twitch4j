@@ -46,3 +46,11 @@ dependencies {
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.12")
 }
+
+task stage {
+	dependsOn installDist
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
+}
