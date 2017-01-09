@@ -4,4 +4,4 @@
 checkout:
   post:
     - chmod +x /home/ubuntu/twitch4j/gradlew
-	- chmod +x /home/ubuntu/twitch4j/gradle/wrapper/gradle-wrapper.jar
+    - chmod +x /home/ubuntu/twitch4j/gradle/wrapper/gradle-wrapper.jar
