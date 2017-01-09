@@ -30,7 +30,18 @@ This project is still in development, check out #features and #changelog to foll
  * Lombok (Getter & Setter)
 
 ## Features
- - [x] retrieve channel information
+#### Twitch REST Endpoints
+ - [ ] Channel Feed
+ - [x] Channels
+ - [ ] Chat
+ - [x] Games
+ - [ ] Ingests
+ - [ ] Search
+ - [ ] Streams
+ - [x] Teams
+ - [.] Users
+ - [ ] Videos
+#### Other
  - To Be Added
 
 ## Changelog

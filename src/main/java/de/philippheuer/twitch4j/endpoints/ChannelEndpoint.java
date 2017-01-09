@@ -7,8 +7,6 @@ import java.util.Optional;
 
 import org.springframework.util.Assert;
 
-import com.google.common.primitives.Longs;
-
 import de.philippheuer.twitch4j.Twitch4J;
 import de.philippheuer.twitch4j.model.*;
 
@@ -40,7 +38,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Process Arguments
 		setChannelId(channelId);
 	}
-	
 	
 	/**
 	 * Endpoint: Get Channel
@@ -185,6 +182,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		Assert.isTrue(getValidCommercialLengths().contains(length), "Please provide a valid length! List: ");
 		
 		// @TODO: Implementation
+		// and check response for success
 		
 		return false;
 	}

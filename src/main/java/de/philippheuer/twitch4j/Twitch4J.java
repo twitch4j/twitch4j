@@ -64,4 +64,11 @@ public class Twitch4J {
     public ChannelEndpoint getChannelEndpoint(Long channelId) {
     	return new ChannelEndpoint(this, channelId);
     }
+    
+    /**
+     * Get Game Endpoint
+     */
+    public GameEndpoint getGameEndpoint() {
+    	return new GameEndpoint(this);
+    }
 }
