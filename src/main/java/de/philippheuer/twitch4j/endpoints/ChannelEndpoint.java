@@ -3,7 +3,6 @@ package de.philippheuer.twitch4j.endpoints;
 import java.util.List;
 
 import de.philippheuer.twitch4j.Twitch4J;
-import de.philippheuer.twitch4j.exception.*;
 import de.philippheuer.twitch4j.model.*;
 
 import lombok.*;

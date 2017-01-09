@@ -2,8 +2,9 @@ package de.philippheuer.twitch4j.endpoints;
 
 import java.util.List;
 
+import java.util.Optional;
+
 import de.philippheuer.twitch4j.Twitch4J;
-import de.philippheuer.twitch4j.exception.*;
 import de.philippheuer.twitch4j.model.*;
 
 public class UserEndpoint extends AbstractTwitchEndpoint {
@@ -22,7 +23,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * https://api.twitch.tv/kraken/users?login=USERNAME
 	 * @throws UserNotFoundException 
 	 */
-	public Long getUserIdByUserName(String userName) throws UserNotFoundException {
+	public Optional<Long> getUserIdByUserName(String userName) {
 		// REST Request
 		String requestUrl = String.format("%s/users?login=%s", getApi().getTwitchEndpoint(), userName);
 		UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
@@ -30,9 +31,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		
 		// User found?
 		if(userList.size() == 1) {
-			return userList.get(0).getId();
+			return Optional.ofNullable(userList.get(0).getId());
 		} else {
-			throw new UserNotFoundException();
+			return Optional.empty();
 		}
 	}
 	
