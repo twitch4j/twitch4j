@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.util.Assert;
 
-import de.philippheuer.twitch4j.Twitch4J;
+import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.model.*;
 
 import lombok.*;
@@ -29,7 +29,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get User by UserId
 	 */
-	public ChannelEndpoint(Twitch4J api, Long channelId) {
+	public ChannelEndpoint(TwitchClient api, Long channelId) {
 		super(api);
 		
 		// Validate Arguments

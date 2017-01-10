@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.util.Assert;
 
-import de.philippheuer.twitch4j.Twitch4J;
+import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.model.*;
 
 public class UserEndpoint extends AbstractTwitchEndpoint {
@@ -15,7 +15,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Get UserEndpoint
 	 * @throws UserNotFoundException 
 	 */
-	public UserEndpoint(Twitch4J api) {
+	public UserEndpoint(TwitchClient api) {
 		super(api);
 	}
 	

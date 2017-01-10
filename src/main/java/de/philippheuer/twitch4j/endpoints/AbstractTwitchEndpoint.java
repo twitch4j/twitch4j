@@ -5,7 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.philippheuer.twitch4j.Twitch4J;
+import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 
 import lombok.*;
@@ -25,7 +25,7 @@ public class AbstractTwitchEndpoint {
 	/**
 	 * Holds the API Instance
 	 */
-	private Twitch4J api;
+	private TwitchClient api;
 	
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
@@ -37,7 +37,7 @@ public class AbstractTwitchEndpoint {
 	 * @TODO: Description
 	 * @param api
 	 */
-	public AbstractTwitchEndpoint(Twitch4J api) {
+	public AbstractTwitchEndpoint(TwitchClient api) {
 		// Properties
 		setApi(api);
 		

@@ -6,7 +6,7 @@ import lombok.*;
 
 @Getter
 @Setter
-public class Twitch4J {
+public class TwitchClient {
 	
 	/**
 	 * Twitch API Endpoint
@@ -41,7 +41,7 @@ public class Twitch4J {
     /**
      * Constructs a Twitch application instance.
      */
-    public Twitch4J(String clientId, String clientSecret) {
+    public TwitchClient(String clientId, String clientSecret) {
         super();
         
         setClientId(clientId);

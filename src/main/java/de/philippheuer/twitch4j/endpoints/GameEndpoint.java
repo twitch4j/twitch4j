@@ -3,7 +3,7 @@ package de.philippheuer.twitch4j.endpoints;
 import java.util.List;
 import java.util.Optional;
 
-import de.philippheuer.twitch4j.Twitch4J;
+import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.model.*;
 
 import lombok.*;
@@ -15,7 +15,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get User by UserId
 	 */
-	public GameEndpoint(Twitch4J api) {
+	public GameEndpoint(TwitchClient api) {
 		super(api);
 	}
 	

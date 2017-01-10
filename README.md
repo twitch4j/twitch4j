@@ -1,11 +1,14 @@
 # Twitch Java API - V5
 
-## Branch: Master
-[![CircleCI](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master.svg?style=svg&circle-token=515c6c6d5f45fee23ab4d56f886597f8a9e1228e)](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master)
+[![CircleCI](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master.svg?style=svg)](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master)
+[![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
+[![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
+
+--------
 
 ## A quick note:
 Retrieve information from the Twitch API.
-This project is still in development, check out #features and #changelog to follow progress.
+This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
 --------
 
@@ -39,11 +42,17 @@ This project is still in development, check out #features and #changelog to foll
  - [ ] Search
  - [ ] Streams
  - [x] Teams
- - [.] Users
+ - [ ] Users
  - [ ] Videos
-#### Other
- - To Be Added
 
+#### Twitch PubSub
+ - [ ] Bits
+ - [ ] Whispers
+ 
+#### Twitch IRC
+ - [ ] Follows
+ - [ ] Subscriptions
+ 
 ## Changelog
 
 

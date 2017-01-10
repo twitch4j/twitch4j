@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.*;
 
-import de.philippheuer.twitch4j.Twitch4J;
+import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.endpoints.AbstractTwitchEndpoint;
 import lombok.*;
 
@@ -32,7 +32,7 @@ public class TwitchPubSub {
 	/**
 	 * Holds the API Instance
 	 */
-	private Twitch4J api;
+	private TwitchClient api;
 	
 	/**
 	 * WebSocketFactory
@@ -47,7 +47,7 @@ public class TwitchPubSub {
 	/**
 	 * Constructor
 	 */
-	public TwitchPubSub(Twitch4J api) {
+	public TwitchPubSub(TwitchClient api) {
 		setApi(api);
 		
 		// Connect to twitch pubsub server
