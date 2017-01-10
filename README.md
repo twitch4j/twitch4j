@@ -26,7 +26,8 @@ This project is still in development, check out [Features](#features) and [Chang
 
 ## Integrations
  * Continuous Integration using Circle.CI
-
+ * VersionEye Monitoring of dependencies
+ 
 ## Libraries
  * Spring Boot (Rest Requests)
  * Jackson (JSON)
@@ -54,10 +55,10 @@ This project is still in development, check out [Features](#features) and [Chang
  - [ ] Subscriptions
  
 ## Changelog
-
+Changes ... no release version yet.
 
 ## Credits
- - Credits for the data models to [urgrue](https://github.com/urgrue/Java-Twitch-Api-Wrapper)
+Click [here](CONTRIBUTORS.md) to view the projects contributors and credits.
  
 ## Examples
  - To Be Added
