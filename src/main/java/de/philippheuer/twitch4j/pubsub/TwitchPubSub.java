@@ -141,7 +141,7 @@ public class TwitchPubSub {
 	}
 	
 	private Boolean connect() {
-		getLogger().debug(String.format("Connecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
+		getLogger().info(String.format("Connecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
 
         try { 
             getWebSocket().connect();
@@ -156,7 +156,7 @@ public class TwitchPubSub {
 	}
 	
 	private void reconnect() {
-		getLogger().debug(String.format("Reconnecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
+		getLogger().info(String.format("Reconnecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
 		
 		cancelTasks();
 		if(connect()) {

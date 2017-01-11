@@ -1,5 +1,6 @@
 package de.philippheuer.twitch4j;
 
+import de.philippheuer.twitch4j.chat.IrcClient;
 import de.philippheuer.twitch4j.endpoints.*;
 import de.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import lombok.*;
@@ -22,6 +23,16 @@ public class TwitchClient {
 	 * Twitch PubSub Endpoint
 	 */
 	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv";
+	
+	/**
+	 * Twitch IRC Endpoint
+	 */
+	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
+	
+	/**
+	 * IRC Client
+	 */
+	private IrcClient ircClient;
 	
     /**
      * Twitch Client Id
@@ -46,6 +57,9 @@ public class TwitchClient {
         
         setClientId(clientId);
         setClientSecret(clientSecret);
+        
+        // Connect to IRC
+        setIrcClient(new IrcClient(this));
         
         // Init PubSub API
         setPubSub(new TwitchPubSub(this));

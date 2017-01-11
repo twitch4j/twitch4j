@@ -37,6 +37,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		
 		// Process Arguments
 		setChannelId(channelId);
+		
+		
+		
+		
 	}
 	
 	/**

@@ -40,8 +40,14 @@ dependencies {
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
     
+    // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
+    compile('org.kitteh.irc:client-lib:3.0.1');
+    
     // JSON
     compile("com.fasterxml.jackson.core:jackson-databind:2.8.5")
+    
+    // Expiring Map
+    compile("net.jodah:expiringmap:0.5.7")
     
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.12")

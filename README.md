@@ -14,7 +14,6 @@ This project is still in development, check out [Features](#features) and [Chang
 
 ## Table of Contents
 - [Dependencies](#dependencies)
-- [Integrations](#integrations)
 - [Libraries](#libraries)
 - [Features](#features)
 - [Changelog](#changelog)
@@ -23,10 +22,6 @@ This project is still in development, check out [Features](#features) and [Chang
 
 ## Dependencies
  * Java 1.8+
-
-## Integrations
- * Continuous Integration using Circle.CI
- * VersionEye Monitoring of dependencies
  
 ## Libraries
  * Spring Boot (Rest Requests)

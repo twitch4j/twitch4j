@@ -2,6 +2,9 @@ package de.philippheuer.twitch4j.endpoints;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +12,8 @@ import de.philippheuer.twitch4j.TwitchClient;
 import de.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 
 import lombok.*;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +21,14 @@ import org.springframework.web.client.RestTemplate;
 @Getter
 @Setter
 public class AbstractTwitchEndpoint {
+	
+	/**
+	 * Cache - Objects
+	 */
+	static protected Map<String, Object> restObjectCache = ExpiringMap.builder()
+			.expiration(1, TimeUnit.MINUTES)
+			.expirationPolicy(ExpirationPolicy.ACCESSED)
+			.build();
 	
 	/**
 	 * Logger

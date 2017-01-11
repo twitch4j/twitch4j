@@ -17,6 +17,12 @@ public class Subscription {
 	private Long id;
 	
     private Date createdAt;
+    
+    private Integer streak;
 	
+    private String message;
+    
+    private Boolean isPrimeSub;
+    
 	private User user;
 }

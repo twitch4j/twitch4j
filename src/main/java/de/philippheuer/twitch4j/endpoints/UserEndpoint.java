@@ -1,7 +1,6 @@
 package de.philippheuer.twitch4j.endpoints;
 
 import java.util.List;
-
 import java.util.Optional;
 
 import org.springframework.util.Assert;
@@ -27,12 +26,16 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Long> getUserIdByUserName(String userName) {
 		// Validate Arguments
-		Assert.notNull(userName, "Please provide a Username!");
+		Assert.hasLength(userName, "Please provide a Username!");
 		
 		// REST Request
 		String requestUrl = String.format("%s/users?login=%s", getApi().getTwitchEndpoint(), userName);
-		UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
-		List<User> userList = responseObject.getUsers();
+		if(!restObjectCache.containsKey(requestUrl)) {
+			UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
+			restObjectCache.put(requestUrl, responseObject);
+		}
+		
+		List<User> userList = ((UserList)restObjectCache.get(requestUrl)).getUsers();
 		
 		// User found?
 		if(userList.size() == 1) {
@@ -54,9 +57,12 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/users/%d", getApi().getTwitchEndpoint(), userId);
-			User responseObject = getRestTemplate().getForObject(requestUrl, User.class);
+			if(!restObjectCache.containsKey(requestUrl)) {
+				User responseObject = getRestTemplate().getForObject(requestUrl, User.class);
+				restObjectCache.put(requestUrl, responseObject);
+			}
 			
-			return Optional.ofNullable(responseObject);
+			return Optional.ofNullable((User)restObjectCache.get(requestUrl));
 		} catch (Exception ex) {
 			return Optional.empty();
 		}
