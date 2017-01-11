@@ -47,7 +47,7 @@ This project is still in development, check out [Features](#features) and [Chang
  
 #### Twitch IRC
  - [ ] Follows
- - [ ] Subscriptions
+ - [X] Subscriptions
  
 ## Changelog
 Changes ... no release version yet.

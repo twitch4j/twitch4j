@@ -33,6 +33,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+	// Logging
+    compile("ch.qos.logback:logback-classic:1.1.8")
+    
     // Spring Boot
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework:spring-web")

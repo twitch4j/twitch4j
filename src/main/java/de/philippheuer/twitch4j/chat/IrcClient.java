@@ -2,6 +2,7 @@ package de.philippheuer.twitch4j.chat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
 import org.kitteh.irc.client.library.Client;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class IrcClient {
 	/**
 	 * IRC Client Library
 	 */
-	Client client;
+	private Client client;
 	
 	/**
 	 * Constructor
@@ -65,6 +66,22 @@ public class IrcClient {
         	getClient().sendRawLine("CAP REQ :twitch.tv/tags");
         	getClient().sendRawLine("CAP REQ :twitch.tv/membership");
         	getClient().sendRawLine("CAP REQ :twitch.tv/commands");
+        	
+        	// Exception Handling
+        	getClient().setExceptionListener(new Consumer<Exception>() {
+
+				@Override
+				public void accept(Exception ex) {
+					// Filter Exceptions
+					if(ex.getMessage().length() > 0 && ex.getMessage().contains("Server version missing")) {
+						// Suppress Server version missing exception for twitch compability.
+					} else {
+						ex.printStackTrace();
+					}
+					
+				}
+        		
+        	});
         	
         	getLogger().info(String.format("Connected to Twitch IRC [%s]", getApi().getTwitchIrcEndpoint()));
         	
