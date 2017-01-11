@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.philippheuer.twitch4j.TwitchClient;
+import de.philippheuer.twitch4j.events.event.SubscriptionEvent;
 import de.philippheuer.twitch4j.model.Subscription;
 import lombok.*;
 import net.engio.mbassy.listener.Handler;
@@ -24,17 +25,17 @@ import net.jodah.expiringmap.ExpiringMap;
 
 @Getter
 @Setter
-public class IrcEventManager {
+public class IrcEventHandler {
 	
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(IrcEventManager.class);
+	private final Logger logger = LoggerFactory.getLogger(IrcEventHandler.class);
 	
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient api;
+	private TwitchClient client;
 	
 	/**
 	 * Holds the API Instance
@@ -52,8 +53,8 @@ public class IrcEventManager {
 	/**
 	 * Constructor
 	 */
-	public IrcEventManager(TwitchClient api, IrcClient ircClient) {
-		setApi(api);
+	public IrcEventHandler(TwitchClient client, IrcClient ircClient) {
+		setClient(client);
 		setIrcClient(ircClient);
 	}
 	
@@ -137,7 +138,7 @@ public class IrcEventManager {
 		sub.setMessage(streak > 1 ? message : ""); // You can't write a message for the first sub.
 		sub.setIsPrimeSub(isPrime);
 		sub.setStreak(streak);
-		sub.setUser(getApi().getUserEndpoint().getUser(getApi().getUserEndpoint().getUserIdByUserName(userName).orElse(null)).orElse(null));
+		sub.setUser(getClient().getUserEndpoint().getUser(getClient().getUserEndpoint().getUserIdByUserName(userName).orElse(null)).orElse(null));
 		
 		// Prevent multi-firing of the same 
 		String subHistoryKey = String.format("%s|%s", sub.getUser().getId(), sub.getStreak());
@@ -152,7 +153,6 @@ public class IrcEventManager {
 		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", sub.getUser().getDisplayName(), channel, sub.getStreak(), sub.getIsPrimeSub(), sub.getMessage()));
 		
 		// Fire Event
-		// @TODO:
-		
+		getClient().getDispatcher().dispatch(new SubscriptionEvent(sub));
 	}
 }

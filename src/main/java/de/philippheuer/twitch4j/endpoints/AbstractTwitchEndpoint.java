@@ -38,7 +38,7 @@ public class AbstractTwitchEndpoint {
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient api;
+	private TwitchClient client;
 	
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
@@ -50,15 +50,15 @@ public class AbstractTwitchEndpoint {
 	 * @TODO: Description
 	 * @param api
 	 */
-	public AbstractTwitchEndpoint(TwitchClient api) {
+	public AbstractTwitchEndpoint(TwitchClient client) {
 		// Properties
-		setApi(api);
+		setClient(client);
 		
 		// Setup Interceptors
 		// - Header
 		restInterceptors.add(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		restInterceptors.add(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getApi().getTwitchEndpointVersion())));
-		restInterceptors.add(new HeaderRequestInterceptor("Client-ID", getApi().getClientId()));
+		restInterceptors.add(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getClient().getTwitchEndpointVersion())));
+		restInterceptors.add(new HeaderRequestInterceptor("Client-ID", getClient().getClientId()));
 		//restInterceptors.add(new HeaderRequestInterceptor("Authorization", "OAuth cfabdegwdoklmawdzdo98xt2fo512y"));
 	}
 	

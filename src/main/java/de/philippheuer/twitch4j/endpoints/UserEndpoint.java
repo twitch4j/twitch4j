@@ -14,8 +14,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Get UserEndpoint
 	 * @throws UserNotFoundException 
 	 */
-	public UserEndpoint(TwitchClient api) {
-		super(api);
+	public UserEndpoint(TwitchClient client) {
+		super(client);
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.hasLength(userName, "Please provide a Username!");
 		
 		// REST Request
-		String requestUrl = String.format("%s/users?login=%s", getApi().getTwitchEndpoint(), userName);
+		String requestUrl = String.format("%s/users?login=%s", getClient().getTwitchEndpoint(), userName);
 		if(!restObjectCache.containsKey(requestUrl)) {
 			UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
 			restObjectCache.put(requestUrl, responseObject);
@@ -56,7 +56,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/users/%d", getApi().getTwitchEndpoint(), userId);
+			String requestUrl = String.format("%s/users/%d", getClient().getTwitchEndpoint(), userId);
 			if(!restObjectCache.containsKey(requestUrl)) {
 				User responseObject = getRestTemplate().getForObject(requestUrl, User.class);
 				restObjectCache.put(requestUrl, responseObject);

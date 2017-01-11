@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.philippheuer.twitch4j.TwitchClient;
+
 import lombok.*;
 
 @Getter
@@ -58,10 +59,9 @@ public class IrcClient {
         		.serverPassword("oauth:xxx")
         		.nick("xxx")
         		.build());
-        	getClient().getEventManager().registerEventListener(new IrcEventManager(getApi(), this));
+        	getClient().getEventManager().registerEventListener(new IrcEventHandler(getApi(), this));
         	
-        	// Request Capabilties
-        	//  Listening to twitch notifications (Subs, ...)
+        	// Request Capabilities
         	getClient().sendRawLine("CAP REQ :twitch.tv/tags");
         	getClient().sendRawLine("CAP REQ :twitch.tv/membership");
         	getClient().sendRawLine("CAP REQ :twitch.tv/commands");
@@ -75,5 +75,17 @@ public class IrcClient {
         }
 	}
 	
-	
+	/**
+	 * Method: Check IRC Client Status
+	 */
+	public Boolean checkEndpointStatus() {
+		// @TODO: Check for UserName and OAUTH Token
+		/*
+		if() {
+			
+		}
+		*/
+		
+		return true;
+	}
 }

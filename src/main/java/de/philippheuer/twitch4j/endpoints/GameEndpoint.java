@@ -15,8 +15,8 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get User by UserId
 	 */
-	public GameEndpoint(TwitchClient api) {
-		super(api);
+	public GameEndpoint(TwitchClient client) {
+		super(client);
 	}
 	
 	/**
@@ -27,7 +27,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<TopGame>> getTopGames() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/games/top", getApi().getTwitchEndpoint());
+			String requestUrl = String.format("%s/games/top", getClient().getTwitchEndpoint());
 			TopGameList responseObject = getRestTemplate().getForObject(requestUrl, TopGameList.class);
 			
 			return Optional.ofNullable(responseObject.getTop());

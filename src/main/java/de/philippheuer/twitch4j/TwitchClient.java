@@ -1,13 +1,26 @@
 package de.philippheuer.twitch4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.philippheuer.twitch4j.chat.IrcClient;
 import de.philippheuer.twitch4j.endpoints.*;
+import de.philippheuer.twitch4j.events.EventDispatcher;
 import de.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import lombok.*;
 
 @Getter
 @Setter
 public class TwitchClient {
+	/**
+	 * Logger
+	 */
+	private final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
+	
+	/**
+	 * Event Dispatcher
+	 */
+	private EventDispatcher dispatcher;
 	
 	/**
 	 * Twitch API Endpoint
@@ -40,7 +53,7 @@ public class TwitchClient {
     private String clientId;
     
     /**
-     * Twitch Client Id
+     * Twitch Client Secret
      */
     private String clientSecret;
     
@@ -57,6 +70,9 @@ public class TwitchClient {
         
         setClientId(clientId);
         setClientSecret(clientSecret);
+        
+        // EventManager
+        setDispatcher(new EventDispatcher(this));
         
         // Connect to IRC
         setIrcClient(new IrcClient(this));

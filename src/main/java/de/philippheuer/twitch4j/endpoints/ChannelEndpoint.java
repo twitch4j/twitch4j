@@ -29,18 +29,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get User by UserId
 	 */
-	public ChannelEndpoint(TwitchClient api, Long channelId) {
-		super(api);
+	public ChannelEndpoint(TwitchClient client, Long channelId) {
+		super(client);
 		
 		// Validate Arguments
 		Assert.notNull(channelId, "Please provide a Channel ID!");
 		
 		// Process Arguments
 		setChannelId(channelId);
-		
-		
-		
-		
 	}
 	
 	/**
@@ -51,7 +47,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<Channel> getChannel() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s", getClient().getTwitchEndpoint(), getChannelId());
 			Channel responseObject = getRestTemplate().getForObject(requestUrl, Channel.class);
 			
 			return Optional.ofNullable(responseObject);
@@ -68,7 +64,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<User>> getEditors() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/editors", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/editors", getClient().getTwitchEndpoint(), getChannelId());
 			UserList responseObject = getRestTemplate().getForObject(requestUrl, UserList.class);
 			
 			return Optional.ofNullable(responseObject.getUsers());
@@ -85,7 +81,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<Follow>> getFollowers() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/follows", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/follows", getClient().getTwitchEndpoint(), getChannelId());
 			FollowList responseObject = getRestTemplate().getForObject(requestUrl, FollowList.class);
 			
 			return Optional.ofNullable(responseObject.getFollows());
@@ -102,7 +98,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<Team>> getTeams() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/teams", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/teams", getClient().getTwitchEndpoint(), getChannelId());
 			TeamList responseObject = getRestTemplate().getForObject(requestUrl, TeamList.class);
 			
 			return Optional.ofNullable(responseObject.getTeams());
@@ -120,7 +116,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<Subscription>> getSubscriptions() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/subscriptions", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/subscriptions", getClient().getTwitchEndpoint(), getChannelId());
 			SubscriptionList responseObject = getRestTemplate().getForObject(requestUrl, SubscriptionList.class);
 			
 			return Optional.ofNullable(responseObject.getSubscriptions());
@@ -138,7 +134,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<Video>> getVideos() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/videos", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/videos", getClient().getTwitchEndpoint(), getChannelId());
 			VideoList responseObject = getRestTemplate().getForObject(requestUrl, VideoList.class);
 			
 			return Optional.ofNullable(responseObject.getVideos());
@@ -162,7 +158,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/subscriptions/%d", getApi().getTwitchEndpoint(), getChannelId(), user.getId());
+			String requestUrl = String.format("%s/channels/%s/subscriptions/%d", getClient().getTwitchEndpoint(), getChannelId(), user.getId());
 			Subscription responseObject = getRestTemplate().getForObject(requestUrl, Subscription.class);
 			
 			getLogger().debug(String.format("Found Subscription for Channel %s [%s] for User %s [%s].", channel.getDisplayName(), channel.getId(), responseObject.getUser().getDisplayName(), responseObject.getUser().getId()));
@@ -205,7 +201,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/stream_key", getApi().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/stream_key", getClient().getTwitchEndpoint(), getChannelId());
 			getRestTemplate().delete(requestUrl);
 			
 			getLogger().warn(String.format("Deleted Stream Key for Channel %s [%s]!", channel.getDisplayName(), channel.getId()));
@@ -214,5 +210,31 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		} catch (Exception ex) {
 			return false;
 		}
+	}
+	
+	/**
+	 * Central Endpoint: Register Channel Event Listener
+	 *  IRC: Subscriptions
+	 *  PubSub: Bits
+	 * 
+	 */
+	public void registerThingy() {
+		// Check Rest API
+		
+		
+		// Check IRC
+		if(!getClient().getIrcClient().checkEndpointStatus()) {
+			getLogger().warn("IRC Client not operating. You will not recieve any subscription events!");
+			return;
+		}
+		
+		// Check PubSub
+		
+		
+		// Register Listener
+		
+		
+		
+		
 	}
 }
