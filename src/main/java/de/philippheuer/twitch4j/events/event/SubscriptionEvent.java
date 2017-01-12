@@ -2,6 +2,7 @@ package de.philippheuer.twitch4j.events.event;
 
 import de.philippheuer.twitch4j.events.Event;
 import de.philippheuer.twitch4j.model.*;
+
 import lombok.*;
 
 @Getter

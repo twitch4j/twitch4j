@@ -2,14 +2,17 @@ package de.philippheuer.twitch4j.chat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.kitteh.irc.client.library.Client;
+import org.kitteh.irc.client.library.exception.KittehConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import de.philippheuer.twitch4j.TwitchClient;
-
+import de.philippheuer.twitch4j.auth.TwitchCredential;
 import lombok.*;
 
 @Getter
@@ -24,28 +27,34 @@ public class IrcClient {
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient api;
+	private TwitchClient client;
 	
 	/**
 	 * IRC Client Library
 	 */
-	private Client client;
+	private Client ircClient;
 	
 	/**
 	 * Constructor
 	 */
-	public IrcClient(TwitchClient api) {
-		setApi(api);
+	public IrcClient(TwitchClient client) {
+		setClient(client);
 		
 		connect();
 	}
 	
 	
 	private Boolean connect() {
-		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getApi().getTwitchIrcEndpoint()));
+		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
+		// Get Credentials
+		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getForIRC();
+		
+		// Check
+		Assert.isTrue(twitchCredential.isPresent(), "IRC needs valid Credentials from the CredentialManager.");
+		
         try {
-        	URI uri = new URI("irc://" + getApi().getTwitchIrcEndpoint()); // may throw URISyntaxException
+        	URI uri = new URI("irc://" + getClient().getTwitchIrcEndpoint()); // may throw URISyntaxException
         	String host = uri.getHost();
         	Integer port = uri.getPort();
         	
@@ -53,22 +62,21 @@ public class IrcClient {
         		throw new URISyntaxException(uri.toString(), "URI must have host and port parts");
         	}
         	
-        	setClient(Client.builder()
+        	setIrcClient(Client.builder()
         		.serverHost(host)
         		.serverPort(port)
-        		.stsStorageManager(null)
-        		.serverPassword("oauth:xxx")
-        		.nick("xxx")
+        		.serverPassword("oauth:"+twitchCredential.get().getOAuthToken())
+        		.nick(twitchCredential.get().getUserName())
         		.build());
-        	getClient().getEventManager().registerEventListener(new IrcEventHandler(getApi(), this));
+        	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getClient(), this));
         	
         	// Request Capabilities
-        	getClient().sendRawLine("CAP REQ :twitch.tv/tags");
-        	getClient().sendRawLine("CAP REQ :twitch.tv/membership");
-        	getClient().sendRawLine("CAP REQ :twitch.tv/commands");
+        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/tags");
+        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/membership"); // NAMES, JOIN, PART, MODE
+        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/commands");
         	
         	// Exception Handling
-        	getClient().setExceptionListener(new Consumer<Exception>() {
+        	getIrcClient().setExceptionListener(new Consumer<Exception>() {
 
 				@Override
 				public void accept(Exception ex) {
@@ -76,6 +84,11 @@ public class IrcClient {
 					if(ex.getMessage().length() > 0 && ex.getMessage().contains("Server version missing")) {
 						// Suppress Server version missing exception for twitch compability.
 					} else {
+						if(ex instanceof KittehConnectionException) {
+							getLogger().warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));
+							reconnect();
+						}
+						
 						ex.printStackTrace();
 					}
 					
@@ -83,13 +96,23 @@ public class IrcClient {
         		
         	});
         	
-        	getLogger().info(String.format("Connected to Twitch IRC [%s]", getApi().getTwitchIrcEndpoint()));
+        	getLogger().info(String.format("Connected to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
         	
         	return true;
         } catch (Exception ex) {
-        	getLogger().error(String.format("Connection to Twitch IRC [%s] Failed: %s", getApi().getTwitchIrcEndpoint(), ex.getMessage()));
+        	getLogger().error(String.format("Connection to Twitch IRC [%s] Failed: %s", getClient().getTwitchIrcEndpoint(), ex.getMessage()));
             return false;
         }
+	}
+	
+	/**
+	 * Reconnects only if the connection was lost.
+	 */
+	public void reconnect() {
+		getLogger().info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
+		
+		getIrcClient().shutdown();
+		connect();
 	}
 	
 	/**

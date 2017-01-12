@@ -1,19 +1,20 @@
 package de.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.*;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RestError {
+public class StreamSummary {
 	
-	private String error;
-	
-	private String status;
+	// Total amount of streams that are live.
+    private Integer channels;
     
-    private String message;
+    // Total amount of viewers watcing over all channels.
+    private Integer viewers;
+    
 }

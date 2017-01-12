@@ -48,7 +48,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/channels/%s", getClient().getTwitchEndpoint(), getChannelId());
-			Channel responseObject = getRestTemplate().getForObject(requestUrl, Channel.class);
+			if(!restObjectCache.containsKey(requestUrl)) {
+				Channel responseObject = getRestTemplate().getForObject(requestUrl, Channel.class);
+				restObjectCache.put(requestUrl, responseObject);
+			}
+			
+			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
 			
 			return Optional.ofNullable(responseObject);
 		} catch (Exception ex) {
@@ -119,6 +124,11 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			String requestUrl = String.format("%s/channels/%s/subscriptions", getClient().getTwitchEndpoint(), getChannelId());
 			SubscriptionList responseObject = getRestTemplate().getForObject(requestUrl, SubscriptionList.class);
 			
+			// Add Channel
+			for(Subscription sub : responseObject.getSubscriptions()) {
+				sub.setChannel(getChannel().orElse(null));
+			}
+			
 			return Optional.ofNullable(responseObject.getSubscriptions());
 		} catch (Exception ex) {
 			return Optional.empty();
@@ -179,7 +189,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean startCommercial(Long length) {
 		// Validate Arguments
-		Assert.isTrue(getValidCommercialLengths().contains(length), "Please provide a valid length! List: ");
+		Assert.isTrue(getValidCommercialLengths().contains(length), "Please provide a valid length! Valid: " + getValidCommercialLengths().toString());
 		
 		// @TODO: Implementation
 		// and check response for success
@@ -218,23 +228,34 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 *  PubSub: Bits
 	 * 
 	 */
-	public void registerThingy() {
-		// Check Rest API
+	public void setChannelEventListener(Object annotationListener) {
+		// Check that the channel exists
+		// TODO
 		
+		// Check Endpoint Status
+		// - Check Rest API
 		
-		// Check IRC
+		// - Check IRC
 		if(!getClient().getIrcClient().checkEndpointStatus()) {
-			getLogger().warn("IRC Client not operating. You will not recieve any subscription events!");
+			getLogger().warn("IRC Client not operating. You will not recieve any irc events!");
 			return;
 		}
+		// - Check PubSub
+		if(!getClient().getPubSub().checkEndpointStatus()) {
+			// We can ignore this right now, because we will reconnect as soon as pubsub is back up.
+			getLogger().warn("PubSub Client not operating. You will not recieve any pubsub events!");
+		}
 		
-		// Check PubSub
-		
+		// Listener
+		Channel channel = getChannel().get();
+		channel.setTwitchCredential(getClient().getCredentialManager().getForChannel(channel));
+		// - Listen: IRC
+		getClient().getIrcClient().getIrcClient().addChannel(String.format("#%s", channel.getName()));
+		// - Listen: PUBSUB (Requires Credentials)
+		// TODO
+		// getClient().getPubSub().addChannel(channel);
 		
 		// Register Listener
-		
-		
-		
-		
+		getClient().getDispatcher().registerListener(annotationListener);
 	}
 }

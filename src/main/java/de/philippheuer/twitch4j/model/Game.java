@@ -14,7 +14,7 @@ import lombok.*;
 public class Game {
 	
 	@JsonProperty("_id")
-    private long id;
+    private Long id;
     
 	private String name;
     

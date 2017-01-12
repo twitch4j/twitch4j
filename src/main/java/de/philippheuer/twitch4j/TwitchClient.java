@@ -1,8 +1,11 @@
 package de.philippheuer.twitch4j;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.philippheuer.twitch4j.auth.CredentialManager;
 import de.philippheuer.twitch4j.chat.IrcClient;
 import de.philippheuer.twitch4j.endpoints.*;
 import de.philippheuer.twitch4j.events.EventDispatcher;
@@ -20,8 +23,23 @@ public class TwitchClient {
 	/**
 	 * Event Dispatcher
 	 */
-	private EventDispatcher dispatcher;
+	private final EventDispatcher dispatcher = new EventDispatcher(this);
 	
+	/**
+     * Credential Manager
+     */
+    private final CredentialManager credentialManager = new CredentialManager();
+	
+    /**
+	 * IRC Client
+	 */
+	private IrcClient ircClient;
+	
+	/**
+     * PubSub Service
+     */
+    private TwitchPubSub pubSub;
+    
 	/**
 	 * Twitch API Endpoint
 	 */
@@ -42,25 +60,16 @@ public class TwitchClient {
 	 */
 	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
 	
-	/**
-	 * IRC Client
-	 */
-	private IrcClient ircClient;
-	
     /**
      * Twitch Client Id
+     *  Default Value: Twitch
      */
-    private String clientId;
+    private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
     
     /**
      * Twitch Client Secret
      */
     private String clientSecret;
-    
-    /**
-     * PubSub Service
-     */
-    private TwitchPubSub pubSub;
     
     /**
      * Constructs a Twitch application instance.
@@ -70,10 +79,22 @@ public class TwitchClient {
         
         setClientId(clientId);
         setClientSecret(clientSecret);
+    }
+    
+    /**
+     * Constructs a Twitch application instance using a configuration file.
+     */
+    public TwitchClient(File file) {
+    	super();
         
-        // EventManager
-        setDispatcher(new EventDispatcher(this));
-        
+        // TODO Load Configuration ApacheConfiguration2
+    }
+    
+    
+    /**
+     * Init Client
+     */
+    public void connect() {
         // Connect to IRC
         setIrcClient(new IrcClient(this));
         

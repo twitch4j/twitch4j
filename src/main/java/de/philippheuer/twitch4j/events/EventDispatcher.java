@@ -202,6 +202,7 @@ public class EventDispatcher {
 			getClient().getLogger().trace("Dispatching event of type {}", event.getClass().getSimpleName());
 			event.setClient(client);
 			
+			// Method Listener
 			methodListeners.entrySet().stream()
 					.filter(e -> e.getKey().isAssignableFrom(event.getClass()))
 					.map(Map.Entry::getValue)
@@ -209,7 +210,10 @@ public class EventDispatcher {
 							m.forEach((k, v) ->
 									v.forEach(o -> {
 										try {
+											// Invoke Event
 											k.invoke(o.listener, event);
+											
+											// Remove Temporary Listener
 											if (o.isTemporary) {
 												unregisterListener(o.listener);
 											}
@@ -222,13 +226,16 @@ public class EventDispatcher {
 										}
 									})));
 
+			// Class Listener
 			classListeners.entrySet().stream()
 					.filter(e -> e.getKey().isAssignableFrom(event.getClass()))
 					.map(Map.Entry::getValue)
 					.forEach(s -> s.forEach(l -> {
 						try {
+							// Invoke Event
 							l.listener.handle(event);
-
+							
+							// Remove Temporary Listener
 							if (l.isTemporary)
 								unregisterListener(l.listener);
 						} catch (ClassCastException e) {
@@ -252,6 +259,7 @@ public class EventDispatcher {
 		 * True if a temporary listener, false if otherwise.
 		 */
 		final boolean isTemporary;
+		
 		/**
 		 * The actual listener object instance.
 		 */

@@ -4,6 +4,9 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import de.philippheuer.twitch4j.auth.TwitchCredential;
+
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import lombok.*;
@@ -14,7 +17,7 @@ import lombok.*;
 public class Channel {
 	
 	@JsonProperty("_id")
-    private long id;
+    private Long id;
 	
 	private String broadcasterLanguage;
 	
@@ -53,4 +56,7 @@ public class Channel {
     private String videoBanner;
     
     private long views;
+    
+    // Holds related Credentials
+    private Optional<TwitchCredential> twitchCredential;
 }

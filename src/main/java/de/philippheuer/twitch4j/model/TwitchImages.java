@@ -1,19 +1,21 @@
 package de.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.*;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RestError {
+public class TwitchImages {
 	
-	private String error;
+	private String small;
 	
-	private String status;
+    private String medium;
     
-    private String message;
+    private String large;
+    
+    private String template;
 }

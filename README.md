@@ -36,7 +36,7 @@ This project is still in development, check out [Features](#features) and [Chang
  - [x] Games
  - [ ] Ingests
  - [ ] Search
- - [ ] Streams
+ - [X] Streams
  - [x] Teams
  - [ ] Users
  - [ ] Videos
@@ -48,6 +48,7 @@ This project is still in development, check out [Features](#features) and [Chang
 #### Twitch IRC
  - [ ] Follows
  - [X] Subscriptions
+ - [X] Cheers (Bits)
  
 ## Changelog
 Changes ... no release version yet.

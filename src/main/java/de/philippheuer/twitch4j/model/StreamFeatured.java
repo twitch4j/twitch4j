@@ -1,19 +1,27 @@
 package de.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.*;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RestError {
+public class StreamFeatured {
 	
-	private String error;
 	
-	private String status;
+	private String text;
+	
+    private String image;
     
-    private String message;
+    private boolean sponsored;
+    
+    private int priority;
+    
+    private boolean scheduled;
+    
+    private Stream stream;
+	
 }

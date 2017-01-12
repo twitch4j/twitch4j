@@ -11,20 +11,22 @@ import lombok.*;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Subscription {
+public class Stream {
 	
 	@JsonProperty("_id")
-	private Long id;
+    private long id;
 	
-    private Optional<Date> createdAt;
-    
-    private Optional<Integer> streak;
+	private String game;
 	
-    private Optional<String> message;
+    private int viewers;
     
-    private Optional<Boolean> isPrimeSub;
+    private Date createdAt;
     
-	private User user;
-	
-	private Channel channel;
+    private int videoHeight;
+    
+    private double averageFps;
+    
+    private TwitchImages preview;
+    
+    private Channel channel;
 }
