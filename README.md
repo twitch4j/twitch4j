@@ -3,6 +3,7 @@
 [![CircleCI](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master.svg?style=svg)](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master)
 [![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
 [![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
+[![](https://jitpack.io/v/philippheuer/twitch4j.svg)](https://jitpack.io/#philippheuer/twitch4j)
 
 --------
 
