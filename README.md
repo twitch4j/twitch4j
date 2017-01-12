@@ -10,6 +10,22 @@
 Retrieve information from the Twitch API.
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
+## Gradle
+Add it to your build.gradle with:
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+and:
+
+```gradle
+dependencies {
+    compile 'com.github.PhilippHeuer:twitch4j:master-SNAPSHOT'
+}
+```
 --------
 
 ## Table of Contents
@@ -22,6 +38,7 @@ This project is still in development, check out [Features](#features) and [Chang
 
 ## Dependencies
  * Java 1.8+
+ 
  
 ## Libraries
  * Spring Boot (Rest Requests)
