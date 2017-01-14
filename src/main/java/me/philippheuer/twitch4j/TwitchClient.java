@@ -11,6 +11,7 @@ import me.philippheuer.twitch4j.chat.IrcClient;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
+import me.philippheuer.twitch4j.streamlabs.StreamLabsClient;
 
 @Getter
 @Setter
@@ -39,6 +40,11 @@ public class TwitchClient {
      * PubSub Service
      */
     private TwitchPubSub pubSub;
+    
+    /**
+     * StreamLabs API
+     */
+    private StreamLabsClient streamLabsClient;
     
 	/**
 	 * Twitch API Endpoint
@@ -100,6 +106,9 @@ public class TwitchClient {
         
         // Init PubSub API
         setPubSub(new TwitchPubSub(this));
+        
+        // Init StreamLabs Client
+        setStreamLabsClient(new StreamLabsClient(this));
     }
     
     /**

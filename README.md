@@ -8,7 +8,8 @@
 --------
 
 ## A quick note:
-Retrieve information from the Twitch API.
+This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like StreamLabs are integrated to give you all information you need to twitch related services.
+
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
 ## Gradle
@@ -67,6 +68,9 @@ dependencies {
  - [ ] Follows
  - [X] Subscriptions
  - [X] Cheers (Bits)
+ 
+#### StreamLabs Integration
+ - [ ] Donations
  
 ## Changelog
 Changes ... no release version yet.
