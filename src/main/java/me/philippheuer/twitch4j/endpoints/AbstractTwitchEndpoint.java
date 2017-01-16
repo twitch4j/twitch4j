@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import me.philippheuer.twitch4j.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import org.springframework.web.client.RestTemplate;
 @Getter
 @Setter
 public class AbstractTwitchEndpoint {
-	
+
 	/**
 	 * Cache - Objects
 	 */
@@ -28,48 +29,28 @@ public class AbstractTwitchEndpoint {
 			.expiration(1, TimeUnit.MINUTES)
 			.expirationPolicy(ExpirationPolicy.ACCESSED)
 			.build();
-	
+
 	/**
 	 * Logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(AbstractTwitchEndpoint.class);
-	
+
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient client;
-	
-	/**
-	 * REST Request Interceptors (adding header-values to requests)
-	 */
-	private List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
-    
+	private TwitchClient twitchClient;
+
 	/**
 	 * AbstractTwitchEndpoint
 	 * @TODO: Description
-	 * @param api
+	 * @param twitchClient
 	 */
-	public AbstractTwitchEndpoint(TwitchClient client) {
+	public AbstractTwitchEndpoint(TwitchClient twitchClient) {
 		// Properties
-		setClient(client);
-		
-		// Setup Interceptors
-		// - Header
-		restInterceptors.add(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		restInterceptors.add(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getClient().getTwitchEndpointVersion())));
-		restInterceptors.add(new HeaderRequestInterceptor("Client-ID", getClient().getClientId()));
-		//restInterceptors.add(new HeaderRequestInterceptor("Authorization", "OAuth cfabdegwdoklmawdzdo98xt2fo512y"));
+		setTwitchClient(twitchClient);
 	}
-	
+
 	public Logger getLogger() {
 		return logger;
-	}
-	
-	public RestTemplate getRestTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setInterceptors(getRestInterceptors());
-		// restTemplate.setErrorHandler(errorHandler);
-		
-		return restTemplate;
 	}
 }

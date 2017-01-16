@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth;
+package me.philippheuer.twitch4j.auth.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,11 @@ import lombok.*;
 public class TwitchCredential {
 
 	String userName;
-	
+
 	String oAuthToken;
-	
+
 	List<String> oAuthScopes = new ArrayList<String>();
-	
+
 	/**
 	 * Constructor
 	 */

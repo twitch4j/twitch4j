@@ -10,14 +10,14 @@ import me.philippheuer.twitch4j.model.*;
 @Getter
 @Setter
 public class GameEndpoint extends AbstractTwitchEndpoint {
-	
+
 	/**
 	 * Get User by UserId
 	 */
 	public GameEndpoint(TwitchClient client) {
 		super(client);
 	}
-	
+
 	/**
 	 * Endpoint: Get Top Games
 	 *  Get games by number of current viewers on Twitch.
@@ -26,9 +26,9 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	public Optional<List<TopGame>> getTopGames() {
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/games/top", getClient().getTwitchEndpoint());
-			TopGameList responseObject = getRestTemplate().getForObject(requestUrl, TopGameList.class);
-			
+			String requestUrl = String.format("%s/games/top", getTwitchClient().getTwitchEndpoint());
+			TopGameList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, TopGameList.class);
+
 			return Optional.ofNullable(responseObject.getTop());
 		} catch (Exception ex) {
 			return Optional.empty();

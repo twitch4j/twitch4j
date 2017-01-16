@@ -8,7 +8,7 @@
 --------
 
 ## A quick note:
-This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like StreamLabs are integrated to give you all information you need to twitch related services.
+This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like StreamLabs are integrated.
 
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
@@ -69,7 +69,7 @@ dependencies {
  - [X] Subscriptions
  - [X] Cheers (Bits)
  
-#### StreamLabs Integration
+#### StreamLabs
  - [ ] Donations
  
 ## Changelog
