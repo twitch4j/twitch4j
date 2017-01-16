@@ -10,12 +10,12 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Cheer {
-	
+
     private String message;
-    
+
 	private User user;
-	
+
 	private Integer bits;
-	
+
 	private Channel channel;
 }

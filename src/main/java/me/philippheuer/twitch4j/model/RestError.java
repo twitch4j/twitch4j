@@ -10,10 +10,10 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestError {
-	
+
 	private String error;
-	
+
 	private String status;
-    
+
     private String message;
 }

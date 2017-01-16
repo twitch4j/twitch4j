@@ -9,7 +9,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
 
 /**
- * 
+ *
  * @author http://stackoverflow.com/users/912950/ammar
  * @link http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request
  */

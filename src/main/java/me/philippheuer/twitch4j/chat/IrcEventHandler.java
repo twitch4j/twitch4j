@@ -31,22 +31,22 @@ import net.jodah.expiringmap.ExpiringMap;
 @Getter
 @Setter
 public class IrcEventHandler {
-	
+
 	/**
 	 * Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(IrcEventHandler.class);
-	
+
 	/**
 	 * Holds the API Instance
 	 */
 	private TwitchClient client;
-	
+
 	/**
 	 * Holds the API Instance
 	 */
 	private IrcClient ircClient;
-	
+
 	/**
 	 * Holds recent Subscriptions
 	 */
@@ -54,7 +54,7 @@ public class IrcEventHandler {
 			.expiration(15, TimeUnit.MINUTES)
 			.expirationPolicy(ExpirationPolicy.CREATED)
 			.build();
-	
+
 	/**
 	 * Constructor
 	 */
@@ -62,7 +62,7 @@ public class IrcEventHandler {
 		setClient(client);
 		setIrcClient(ircClient);
 	}
-	
+
 	/**
 	 * Event: onClientReceiveCommand
 	 *  Gets executed on NOTICE, USERNOTICE and simelar events.
@@ -72,7 +72,7 @@ public class IrcEventHandler {
 		if(event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG")) {
 			// Get Channel on IRC
 			String channel = event.getParameters().get(0).replace("#", "");
-			
+
 			// Build Map from Tags
 			Map<String, String> tagMap = new HashMap<>();
 			for(MessageTag tag :  event.getServerMessage().getTags()) {
@@ -80,14 +80,14 @@ public class IrcEventHandler {
 					tagMap.put(tag.getName(), tag.getValue().get());
 				}
 			}
-			
+
 			if(event.getCommand().equals("PRIVMSG")) {
 				// First Subscribers Subscriptions
 				String rawMessage = event.getServerMessage().getMessage();
 				if(event.getServerMessage().getMessage().startsWith(":twitchnotify")) {
 					Pattern regExpr = null;
 					Matcher matcher = null;
-					
+
 					// Subscription: Normal
 					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed!$");
 					matcher = regExpr.matcher(rawMessage);
@@ -96,7 +96,7 @@ public class IrcEventHandler {
 						onSubscription(userId, matcher.group("channel"), 1, false, "");
 						return;
 					}
-					
+
 					// Subscription: Twitch Prime
 					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with Twitch Prime!$");
 					matcher = regExpr.matcher(rawMessage);
@@ -106,13 +106,13 @@ public class IrcEventHandler {
 						return;
 					}
 				}
-				
+
 				// Cheers
 				if(tagMap.containsKey("bits")) {
 					onCheer(Long.parseLong(tagMap.get("user-id")), channel, tagMap.get("bits"), event.getParameters().get(1));
 				}
 			}
-			
+
 			// Resubscriptions
 			if(event.getCommand().equals("USERNOTICE")) {
 				// Get SubMessage if user wrote one
@@ -120,12 +120,12 @@ public class IrcEventHandler {
 				if(event.getParameters().size() > 1) {
 					subMessage = Optional.ofNullable(event.getParameters().get(1));
 				}
-				
+
 				// Check Tags
 				if(tagMap.containsKey("msg-id") && tagMap.containsKey("msg-param-months") && tagMap.containsKey("display-name") && tagMap.containsKey("system-msg")) {
 					if(tagMap.get("msg-id").equals("resub") && Integer.parseInt(tagMap.get("msg-param-months")) > 1) {
 						Boolean isPrime = tagMap.get("system-msg").toLowerCase().contains("twitch prime");
-						
+
 						onSubscription(Long.parseLong(tagMap.get("user-id")), channel, Integer.parseInt(tagMap.get("msg-param-months")), isPrime, subMessage.orElse(""));
 						return;
 					}
@@ -133,7 +133,7 @@ public class IrcEventHandler {
 			}
 		}
 	}
-	
+
 	/**
 	 * Gets called when a new subscription is announced to the stream.
 	 */
@@ -146,7 +146,7 @@ public class IrcEventHandler {
 		entity.setStreak(Optional.ofNullable(streak));
 		entity.setUser(getClient().getUserEndpoint().getUser(userId).orElse(null));
 		entity.setChannel(getClient().getChannelEndpoint(getClient().getUserEndpoint().getUserIdByUserName(channel).get()).getChannel().get());
-		
+
 		// Prevent multi-firing of the same subscription (is sometimes send 2. times)
 		String subHistoryKey = String.format("%s|%s", entity.getUser().getId(), entity.getStreak());
 		if(subscriptionHistory.containsKey(subHistoryKey)) {
@@ -155,14 +155,14 @@ public class IrcEventHandler {
 		} else {
 			subscriptionHistory.put(subHistoryKey, entity);
 		}
-		
+
 		// Debug
 		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel, entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
-		
+
 		// Fire Event
 		getClient().getDispatcher().dispatch(new SubscriptionEvent(entity));
 	}
-	
+
 	/**
 	 * Gets called when a new cheer is announced to the stream.
 	 */
@@ -173,10 +173,10 @@ public class IrcEventHandler {
 		entity.setMessage(message);
 		entity.setUser(getClient().getUserEndpoint().getUser(userId).get());
 		entity.setChannel(getClient().getChannelEndpoint(getClient().getUserEndpoint().getUserIdByUserName(channel).get()).getChannel().get());
-		
+
 		// Debug
 		getLogger().debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel, bits.toString(), entity.getMessage()));
-		
+
 		// Fire Event
 		getClient().getDispatcher().dispatch(new CheerEvent(entity));
 	}

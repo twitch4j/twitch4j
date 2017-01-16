@@ -10,14 +10,14 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoResolutions {
-	
+
 	private String medium;
-	
+
     private String mobile;
-    
+
     private String high;
-    
+
     private String low;
-    
+
     private String chunked;
 }

@@ -16,12 +16,12 @@ public class StreamLabsClient {
 	 * Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-	
+
 	/**
 	 * Holds the API Instance
 	 */
 	private TwitchClient twitchClient;
-	
+
 	/**
 	 * Constructor
 	 */

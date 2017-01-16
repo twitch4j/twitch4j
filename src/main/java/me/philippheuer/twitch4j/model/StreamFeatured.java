@@ -10,18 +10,17 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamFeatured {
-	
-	
+
 	private String text;
-	
+
     private String image;
-    
+
     private boolean sponsored;
-    
+
     private int priority;
-    
+
     private boolean scheduled;
-    
+
     private Stream stream;
-	
+
 }

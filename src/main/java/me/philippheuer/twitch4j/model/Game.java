@@ -12,20 +12,20 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
-	
+
 	@JsonProperty("_id")
     private Long id;
-    
+
 	private String name;
-    
+
     private GameBox box;
-    
+
     private GameLogo logo;
-    
+
     private long giantbombId;
-    
+
     private int popularity; // From search results
-    
+
     @Data
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,7 +35,7 @@ public class Game {
         private String small;
         private String template;
     }
-    
+
     @Data
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)

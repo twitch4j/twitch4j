@@ -16,5 +16,5 @@ public class FollowList {
 	 * List of Entity
 	 */
     private List<Follow> follows;
-    
+
 }

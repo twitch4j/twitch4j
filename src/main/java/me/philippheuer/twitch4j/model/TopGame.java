@@ -10,10 +10,10 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TopGame {
-	
+
 	private Game game;
-	
+
     private int viewers;
-    
+
     private int channels;
 }

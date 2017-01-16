@@ -12,22 +12,22 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-	
+
 	@JsonProperty("_id")
     private long id;
-	
+
 	private String name;
-    
+
     private String displayName;
-    
+
     private String logo;
-    
+
     private String type;
-    
+
     private String bio;
-    
+
     private Date updatedAt;
-    
+
     private Date createdAt;
-    
+
 }

@@ -16,5 +16,5 @@ public class TeamList {
 	 * List of Entity
 	 */
     private List<Team> teams;
-    
+
 }

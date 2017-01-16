@@ -14,5 +14,5 @@ public class StreamSingle {
 	 * List of Entity
 	 */
     private Stream stream;
-    
+
 }

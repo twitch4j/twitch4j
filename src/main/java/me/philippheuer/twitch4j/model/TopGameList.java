@@ -12,8 +12,8 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TopGameList {
-	
+
 	private int total;
-	
+
 	private List<TopGame> top;
 }

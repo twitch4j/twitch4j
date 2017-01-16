@@ -12,19 +12,19 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Subscription {
-	
+
 	@JsonProperty("_id")
 	private Long id;
-	
+
     private Optional<Date> createdAt;
-    
+
     private Optional<Integer> streak;
-	
+
     private Optional<String> message;
-    
+
     private Optional<Boolean> isPrimeSub;
-    
+
 	private User user;
-	
+
 	private Channel channel;
 }

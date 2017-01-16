@@ -16,5 +16,5 @@ public class VideoList {
 	 * List of Entity
 	 */
     private List<Video> videos;
-    
+
 }

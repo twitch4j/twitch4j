@@ -12,21 +12,21 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
-	
+
 	@JsonProperty("_id")
     private long id;
-	
+
 	private String game;
-	
+
     private int viewers;
-    
+
     private Date createdAt;
-    
+
     private int videoHeight;
-    
+
     private double averageFps;
-    
+
     private TwitchImages preview;
-    
+
     private Channel channel;
 }

@@ -16,5 +16,5 @@ public class UserList {
 	 * List of Entity
 	 */
     private List<User> users;
-    
+
 }

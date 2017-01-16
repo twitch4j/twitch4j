@@ -10,16 +10,16 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoFramerates {
-	
+
 	private double audioOnly;
-	
+
     private double medium;
-    
+
     private double mobile;
-    
+
     private double high;
-    
+
     private double low;
-    
+
     private double chunked;
 }

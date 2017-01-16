@@ -14,4 +14,5 @@ public interface IListener <T extends Event> {
 	 * @param event The event object.
 	 */
 	void handle(T event);
+
 }

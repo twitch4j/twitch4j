@@ -23,7 +23,7 @@ public class EventDispatcher {
 		thread.setDaemon(true);
 		return thread;
 	});
-	
+
 	private TwitchClient client;
 
 	public EventDispatcher(TwitchClient client) {
@@ -142,7 +142,7 @@ public class EventDispatcher {
 					if (methodListeners.containsKey(eventClass)) {
 						if (methodListeners.get(eventClass).containsKey(method)) {
 							methodListeners.get(eventClass).get(method).removeIf((ListenerPair pair) -> pair.listener == listener); //Yes, the == is intentional. We want the exact same instance.
-							
+
 							getClient().getLogger().trace("Unregistered method listener {}", listener.getClass().getSimpleName(), method.toString());
 						}
 					}
@@ -165,7 +165,7 @@ public class EventDispatcher {
 					if (methodListeners.containsKey(eventClass))
 						if (methodListeners.get(eventClass).containsKey(method)) {
 							methodListeners.get(eventClass).get(method).removeIf((ListenerPair pair) -> pair.listener == null); // null for static listener
-							
+
 							getClient().getLogger().trace("Unregistered class method listener {}", clazz.getSimpleName(), method.toString());
 						}
 				}
@@ -184,7 +184,7 @@ public class EventDispatcher {
 		if (Event.class.isAssignableFrom(rawType)) {
 			if (classListeners.containsKey(rawType)) {
 				classListeners.get(rawType).removeIf((ListenerPair pair) -> pair.listener == listener); //Yes, the == is intentional. We want the exact same instance.
-				
+
 				getClient().getLogger().trace("Unregistered IListener {}", listener.getClass().getSimpleName());
 			}
 		}
@@ -200,7 +200,7 @@ public class EventDispatcher {
 		eventExecutor.submit(() -> {
 			getClient().getLogger().trace("Dispatching event of type {}", event.getClass().getSimpleName());
 			event.setClient(client);
-			
+
 			// Method Listener
 			methodListeners.entrySet().stream()
 					.filter(e -> e.getKey().isAssignableFrom(event.getClass()))
@@ -211,7 +211,7 @@ public class EventDispatcher {
 										try {
 											// Invoke Event
 											k.invoke(o.listener, event);
-											
+
 											// Remove Temporary Listener
 											if (o.isTemporary) {
 												unregisterListener(o.listener);
@@ -233,7 +233,7 @@ public class EventDispatcher {
 						try {
 							// Invoke Event
 							l.listener.handle(event);
-							
+
 							// Remove Temporary Listener
 							if (l.isTemporary)
 								unregisterListener(l.listener);
@@ -258,7 +258,7 @@ public class EventDispatcher {
 		 * True if a temporary listener, false if otherwise.
 		 */
 		final boolean isTemporary;
-		
+
 		/**
 		 * The actual listener object instance.
 		 */

@@ -10,12 +10,12 @@ import lombok.*;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TwitchImages {
-	
+
 	private String small;
-	
+
     private String medium;
-    
+
     private String large;
-    
+
     private String template;
 }

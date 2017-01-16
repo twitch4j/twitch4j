@@ -24,45 +24,45 @@ import me.philippheuer.twitch4j.model.Channel;
 @Getter
 @Setter
 public class TwitchPubSub {
-	
+
 	/**
 	 * Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-	
+
 	/**
 	 * Holds the API Instance
 	 */
 	private TwitchClient api;
-	
+
 	/**
 	 * WebSocketFactory
 	 */
 	private WebSocket webSocket;
-	
+
 	/**
 	 * List fo subscribed channels
 	 */
 	private final List<Channel> registeredChannels = new ArrayList<Channel>();
-	
+
 	/**
 	 * Timer for Scheduler Tasks
 	 */
 	private final Timer timer = new Timer();
-	
+
 	/**
 	 * Constructor
 	 */
 	public TwitchPubSub(TwitchClient api) {
 		setApi(api);
-		
+
 		// Connect to twitch pubsub server
 		try {
 			setWebSocket(new WebSocketFactory().createSocket(getApi().getTwitchPubSubEndpoint()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Register Listener
 		getWebSocket().addListener(new WebSocketAdapter() {
 			/**
@@ -75,7 +75,7 @@ public class TwitchPubSub {
 	        		subscribeToBitsTopic(channel);
 	        	}
 	        }
-	        
+
 	        /**
 	         * Event: Message Received
 	         */
@@ -85,12 +85,12 @@ public class TwitchPubSub {
                 try {
                 	ObjectMapper mapper = new ObjectMapper();
                     JsonNode jsonNode = mapper.readTree(message);
-                    
+
                     // Only Handle Messages with a Type
                     if(jsonNode.get("type") == null) {
                     	return;
                     }
-                    
+
                     /**
                      * Handle: PONG
                      *  If a client does not receive a PONG message within 10 seconds
@@ -99,7 +99,7 @@ public class TwitchPubSub {
                     if(jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("pong")) {
                     	getLogger().debug("Recieved PONG Response from Twitch PubSub.");
                     }
-                    
+
                     /**
                      * Handle: Reconnect
                      *  Clients may receive a RECONNECT message at any time.
@@ -112,23 +112,23 @@ public class TwitchPubSub {
                     	getLogger().debug("Twitch PubSub is forcing us to reconnect ...");
                     	reconnect();
                     }
-                    
+
                     // Handle Error
                     if(jsonNode.has("error") && jsonNode.get("error") != null & jsonNode.get("error").textValue().length() > 0) {
                     	getLogger().debug(String.format("Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue()));
                     }
-                    
+
                     // Handle Message
                     if(jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("message")) {
                     	getLogger().debug(String.format("Recieved a message from Twitch PubSub [%s]", message));
                     	// TODO: parse Messages
                     }
-                    
+
                 } catch (Exception ex) {
                 	ex.printStackTrace();
                 }
             }
-            
+
             /**
              * Event: ConnectionClosed
              */
@@ -140,17 +140,17 @@ public class TwitchPubSub {
             	reconnect();
             }
         });
-		
+
 		// Connect
 		connect();
 	}
-	
+
 	private Boolean connect() {
 		getLogger().info(String.format("Connecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
 
-        try { 
+        try {
             getWebSocket().connect();
-            
+
             // Schedule Tasks
     		scheduleTasks();
             return true;
@@ -159,10 +159,10 @@ public class TwitchPubSub {
             return false;
         }
 	}
-	
+
 	private void reconnect() {
 		getLogger().info(String.format("Reconnecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
-		
+
 		cancelTasks();
 		if(connect()) {
 			scheduleTasks();
@@ -170,7 +170,7 @@ public class TwitchPubSub {
 			// Reconnect failed, wait xxx
 		}
 	}
-	
+
 	private void scheduleTasks() {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -180,18 +180,18 @@ public class TwitchPubSub {
 					ObjectMapper mapper = new ObjectMapper();
 					ObjectNode objectNode = mapper.createObjectNode();
 					objectNode.put("type", "PING");
-					
+
 					webSocket.sendText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
 					logger.debug("Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
 				} catch (Exception ex) {
 					logger.error("Failed to Ping Twitch PubSub. (Connection Lost)");
 					reconnect();
 				}
-				
+
 			}
 		}, 7000, 282000);
 	}
-	
+
 	/**
      * Purge the current tasks to prepare for a reconnect.
      */
@@ -199,43 +199,43 @@ public class TwitchPubSub {
         timer.cancel();
         timer.purge();
     }
-	
+
     /**
 	 * Subscribe to Bits Topic
 	 */
 	public void addChannel(Channel channel) {
 		// Validate Arguments
 		Assert.isTrue(channel.getTwitchCredential().isPresent(), "You need to provide twitch credentials with an oauth token to use pubsub.");
-		
+
 		// Add if new
 		if(!getRegisteredChannels().contains(channel)) {
 			getRegisteredChannels().add(channel);
 		}
-		
+
 		if(checkEndpointStatus()) {
 			subscribeToBitsTopic(channel);
 		}
 	}
-	
+
 	/**
 	 * Subscribe to Bits Topic
 	 */
 	private void subscribeToBitsTopic(Channel channel) {
     	ObjectMapper mapper = new ObjectMapper();
 		ObjectNode objectNode = mapper.createObjectNode();
-		
+
 		objectNode.put("type", "LISTEN");
 		objectNode.put("nonce", channel.getId()+".pubsub.bitevents");
-		
+
 		ObjectNode dataMap = objectNode.putObject("data");
 		dataMap.put("auth_token", channel.getTwitchCredential().get().getOAuthToken());
 		ArrayNode topicArray = dataMap.putArray("topics");
 		topicArray.add("channel-bitsevents." + channel.getId());
-		
+
 		getLogger().debug("Sending Subscription to PubSub: " + objectNode.toString());
 		webSocket.sendText(objectNode.toString());
 	}
-	
+
 	/**
 	 * Method: Check PubSub Socket Status
 	 */
@@ -244,9 +244,9 @@ public class TwitchPubSub {
 		if(!getWebSocket().getState().equals(WebSocketState.OPEN)) {
 			return false;
 		}
-		
+
 		// TODO
-		
+
 		return true;
 	}
 }

@@ -14,8 +14,9 @@ import lombok.*;
 public class Follow {
 
     private Date createdAt;
-	
+
     private Boolean notifications;
-    
+
 	private User user;
+
 }

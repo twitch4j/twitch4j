@@ -16,5 +16,5 @@ public class StreamList {
 	 * List of Entity
 	 */
     private List<Stream> streams;
-    
+
 }

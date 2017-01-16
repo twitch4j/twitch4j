@@ -16,5 +16,5 @@ public class StreamFeaturedList {
 	 * List of Entity
 	 */
     private List<StreamFeatured> featured;
-    
+
 }

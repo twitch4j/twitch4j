@@ -16,5 +16,5 @@ public class SubscriptionList {
 	 * List of Entity
 	 */
     private List<Subscription> subscriptions;
-    
+
 }
