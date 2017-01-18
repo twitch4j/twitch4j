@@ -1,5 +1,7 @@
 package me.philippheuer.twitch4j.auth.twitch;
 
+import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
+import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +13,8 @@ import me.philippheuer.twitch4j.auth.twitch.model.Authorize;
 import me.philippheuer.twitch4j.model.Scopes;
 
 import ratpack.server.*;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -126,9 +130,13 @@ public class OAuth {
 		// Rest Request
 		Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
 
-		System.out.println(responseObject.toString());
-		if(responseObject.getAccessToken() != null) {
-			// Success
-		}
+		TwitchCredential twitchCredential = new TwitchCredential();
+		twitchCredential.setOAuthToken(responseObject.getAccessToken());
+
+		User twitchUser = getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
+
+		twitchCredential.setUser(twitchUser);
+
+		getTwitchClient().getCredentialManager().addCredential(twitchUser.getId().toString(), twitchCredential);
     }
 }

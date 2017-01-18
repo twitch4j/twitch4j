@@ -9,10 +9,17 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.twitch.OAuth;
 import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import me.philippheuer.twitch4j.model.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 public class CredentialManager {
+
+	/**
+	 * Logger
+	 */
+	private final Logger logger = LoggerFactory.getLogger(CredentialManager.class);
 
 	/**
 	 * Holds the API Instance
@@ -39,6 +46,8 @@ public class CredentialManager {
 	 * @param twitchCredential Credential Instance
 	 */
 	public void addCredential(String key, TwitchCredential twitchCredential) {
+		getLogger().debug(String.format("Added Credentials with Key [%s] and data [%s]", key, twitchCredential.toString()));
+
 		getOAuthCredentials().put(key, twitchCredential);
 	}
 

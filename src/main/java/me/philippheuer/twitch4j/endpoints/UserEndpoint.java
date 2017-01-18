@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.endpoints;
 import java.util.List;
 import java.util.Optional;
 
+import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import org.springframework.util.Assert;
 
 import me.philippheuer.twitch4j.TwitchClient;
@@ -46,9 +47,29 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
+	 * Endpoint to get Privileged User Information
+	 *
+	 *
+	 */
+	public Optional<User> getUser(TwitchCredential twitchCredential) {
+		// Validate Arguments
+		Assert.notNull(twitchCredential, "Please provide Twitch Credentials!");
+
+		// REST Request
+		try {
+			String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
+			User responseObject = getTwitchClient().getRestClient().getPrivilegedRestTemplate(twitchCredential).getForObject(requestUrl, User.class);
+
+			return Optional.ofNullable(responseObject);
+		} catch (Exception ex) {
+			return Optional.empty();
+		}
+	}
+
+	/**
 	 * Endpoint to get User Information
 	 *
-	 * https://api.twitch.tv/kraken/users?login=USERNAME
+	 *
 	 */
 	public Optional<User> getUser(Long userId) {
 		// Validate Arguments

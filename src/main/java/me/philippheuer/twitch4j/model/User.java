@@ -14,7 +14,7 @@ import lombok.*;
 public class User {
 
 	@JsonProperty("_id")
-    private long id;
+    private Long id;
 
 	private String name;
 

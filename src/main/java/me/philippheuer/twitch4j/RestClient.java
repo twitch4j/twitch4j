@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j;
 
 import lombok.*;
 
+import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import me.philippheuer.twitch4j.endpoints.AbstractTwitchEndpoint;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import org.slf4j.Logger;
@@ -45,13 +46,28 @@ public class RestClient {
 		restInterceptors.add(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		restInterceptors.add(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchClient().getTwitchEndpointVersion())));
 		restInterceptors.add(new HeaderRequestInterceptor("Client-ID", getTwitchClient().getClientId()));
-		//restInterceptors.add(new HeaderRequestInterceptor("Authorization", "OAuth cfabdegwdoklmawdzdo98xt2fo512y"));
 	}
 
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setInterceptors(getRestInterceptors());
 		// restTemplate.setErrorHandler(errorHandler);
+
+		return restTemplate;
+	}
+
+	/**
+	 *
+	 * @param twitchCredential
+	 * @return
+	 */
+	public RestTemplate getPrivilegedRestTemplate(TwitchCredential twitchCredential) {
+		List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
+		localRestInterceptors.addAll(getRestInterceptors());
+		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", twitchCredential.getOAuthToken())));
+
+		RestTemplate restTemplate = getRestTemplate();
+		restTemplate.setInterceptors(localRestInterceptors);
 
 		return restTemplate;
 	}
