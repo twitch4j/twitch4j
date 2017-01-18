@@ -6,7 +6,8 @@ import java.util.Optional;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.TwitchCredential;
+import me.philippheuer.twitch4j.auth.twitch.OAuth;
+import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import me.philippheuer.twitch4j.model.Channel;
 
 @Getter

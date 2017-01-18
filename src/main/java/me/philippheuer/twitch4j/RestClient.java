@@ -55,4 +55,10 @@ public class RestClient {
 
 		return restTemplate;
 	}
+
+	public RestTemplate getPlainRestTemplate() {
+		RestTemplate restTemplate = new RestTemplate();
+
+		return restTemplate;
+	}
 }

@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.model;
+package me.philippheuer.twitch4j.auth.twitch.model;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

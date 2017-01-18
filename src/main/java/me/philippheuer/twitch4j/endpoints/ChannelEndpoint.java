@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import org.springframework.util.Assert;
 
 import lombok.*;
@@ -47,6 +48,31 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/channels/%s", getTwitchClient().getTwitchEndpoint(), getChannelId());
+			if(!restObjectCache.containsKey(requestUrl)) {
+				Channel responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, Channel.class);
+				restObjectCache.put(requestUrl, responseObject);
+			}
+
+			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
+
+			return Optional.ofNullable(responseObject);
+		} catch (Exception ex) {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Endpoint: Get Channel
+	 *  Get Channel returns more data than Get Channel by ID because Get Channel is privileged.
+	 * Requires Scope: none
+	 */
+	public Optional<Channel> getChannelPrivilegied() {
+		TwitchCredential twitchCredential = getTwitchClient().getCredentialManager().getForChannel(getChannel().get()).get();
+
+
+		// REST Request
+		try {
+			String requestUrl = String.format("%s/channel", getTwitchClient().getTwitchEndpoint());
 			if(!restObjectCache.containsKey(requestUrl)) {
 				Channel responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, Channel.class);
 				restObjectCache.put(requestUrl, responseObject);

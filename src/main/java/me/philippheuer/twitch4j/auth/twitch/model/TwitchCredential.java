@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.model;
+package me.philippheuer.twitch4j.auth.twitch.model;
 
 import java.util.ArrayList;
 import java.util.List;

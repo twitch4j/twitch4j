@@ -41,13 +41,16 @@ dependencies {
 ## Dependencies
  * Java 1.8+
  
- 
 ## Libraries
  * Spring Boot (Rest Requests)
  * Jackson (JSON)
  * Lombok (Getter & Setter)
 
 ## Features
+#### OAuth Authentication
+ - [ ] Twitch
+ - [ ] StreamLabs
+ 
 #### Twitch REST Endpoints
  - [ ] Channel Feed
  - [x] Channels

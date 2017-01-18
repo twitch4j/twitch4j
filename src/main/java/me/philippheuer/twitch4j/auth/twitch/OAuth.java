@@ -1,12 +1,13 @@
-package me.philippheuer.twitch4j.auth;
+package me.philippheuer.twitch4j.auth.twitch;
 
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
-import me.philippheuer.twitch4j.auth.model.Authorize;
-import me.philippheuer.twitch4j.auth.model.AuthorizeRequest;
+import me.philippheuer.twitch4j.auth.twitch.model.Authorize;
 import me.philippheuer.twitch4j.model.Scopes;
 
 import ratpack.server.*;
@@ -44,7 +45,7 @@ public class OAuth {
 	 */
 	public Boolean startLocalAuthorization() {
 		// Get OAuth URI
-		String requestUrl = getAuthenticationUrl(Scopes.USER_SUBSCRIPTIONS);
+		String requestUrl = getAuthenticationUrl(Scopes.USER_READ, Scopes.USER_SUBSCRIPTIONS);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -64,7 +65,7 @@ public class OAuth {
      * @return String	OAuth2 Uri
      */
     public String getAuthenticationUrl(Scopes... scopes) {
-        return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s",
+        return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
         		getTwitchClient().getTwitchEndpoint(), getTwitchClient().getClientId(), getRedirectUri(), Scopes.join(scopes), getUniqueState());
     }
 
@@ -83,11 +84,16 @@ public class OAuth {
 						//.get(":name", ctx -> ctx.render("Hello " + ctx.getPathTokens().get("name") + "!"))
 						.get("oauth_authorize",
 							ctx -> {
+								// Parse Parameters
+								String responseCode = ctx.getRequest().getQueryParams().get("code");
+								String responseScope = ctx.getRequest().getQueryParams().get("scope");
+								String responseState = ctx.getRequest().getQueryParams().get("state");
 
-								ctx.render("Hello " + ctx.getPathTokens().get("code") + "!");
-								System.out.println(ctx.getRequest().getQueryParams().toString());
+								// Handle Response
+								handleAuthenticationCodeResponse(responseCode);
 
-								handleAuthenticationCodeResponse(ctx.getPathTokens().get("code"));
+								// Show Result Site
+								ctx.render("Hello " + responseCode + "!");
 
 								// Response received, close listener
 								ctx.onClose(outcome -> new Thread(ctx.get(Stopper.class)::stop).start());
@@ -105,15 +111,24 @@ public class OAuth {
 
     private void handleAuthenticationCodeResponse(String authenticationCode) {
     	// Validate on Server
-    	String requestUrl = String.format("https://api.twitch.tv/kraken/oauth2/token");
-    	RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+    	String requestUrl = String.format("%s/oauth2/token", getTwitchClient().getTwitchEndpoint());
+    	RestTemplate restTemplate = getTwitchClient().getRestClient().getPlainRestTemplate();
 
-    	AuthorizeRequest authorizeRequest = new AuthorizeRequest(getTwitchClient().getClientId(), getTwitchClient().getClientSecret(), "authorization_code", getRedirectUri(), authenticationCode, getUniqueState());
-		Authorize responseObject = restTemplate.postForObject(requestUrl, authorizeRequest, Authorize.class);
+    	// Prepare HTTP Post Data
+		MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
+		postObject.add("client_id", getTwitchClient().getClientId());
+		postObject.add("client_secret", getTwitchClient().getClientSecret());
+		postObject.add("grant_type", "authorization_code");
+		postObject.add("redirect_uri", getRedirectUri());
+		postObject.add("code", authenticationCode);
+		postObject.add("state", getUniqueState());
+
+		// Rest Request
+		Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
 
 		System.out.println(responseObject.toString());
 		if(responseObject.getAccessToken() != null) {
-			System.out.println("Success?!");
+			// Success
 		}
     }
 }
