@@ -6,21 +6,22 @@ import java.util.List;
 import lombok.*;
 import me.philippheuer.twitch4j.model.User;
 
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
-public class TwitchCredential implements Cloneable {
+public class TwitchCredential {
 
-	String oAuthToken;
+	private String oAuthToken;
 
-	List<String> oAuthScopes = new ArrayList<String>();
+	private final List<String> oAuthScopes = new ArrayList<String>();
 
-	User user;
+	private User user;
 
 	/**
 	 * Constructor
 	 */
-	public TwitchCredential(String userName, String oAuthToken) {
+	public TwitchCredential(String oAuthToken) {
 		setOAuthToken(oAuthToken);
 	}
 
@@ -32,7 +33,8 @@ public class TwitchCredential implements Cloneable {
 	public void replaceTwitchCredential(TwitchCredential twitchCredential)
 	{
 		setOAuthToken(twitchCredential.getOAuthToken());
-		setOAuthScopes(twitchCredential.getOAuthScopes());
+		getOAuthScopes().clear();
+		getOAuthScopes().addAll(twitchCredential.getOAuthScopes());
 		setUser(twitchCredential.getUser());
 	}
 }

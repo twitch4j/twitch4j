@@ -112,11 +112,16 @@ public class OAuthTwitch {
 
     		ratpackServer.start();
 
+    		// Wait for User
+    		while(ratpackServer.isRunning()) {
+    			Thread.sleep(200);
+			}
+
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}
 
-    	if(twitchCredential.getOAuthToken().length() == 0) {
+    	if(twitchCredential.getOAuthToken() != null && twitchCredential.getOAuthToken().length() == 0) {
 			return Optional.empty();
 		}
 

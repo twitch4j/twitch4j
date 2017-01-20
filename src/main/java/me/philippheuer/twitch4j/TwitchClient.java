@@ -75,11 +75,13 @@ public class TwitchClient {
      * Twitch Client Id
      *  Default Value: Twitch
      */
+	@Singular
     private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
 
     /**
      * Twitch Client Secret
      */
+	@Singular
     private String clientSecret;
 
     /**
@@ -98,10 +100,21 @@ public class TwitchClient {
     /**
      * Constructs a Twitch application instance using a configuration file.
      */
-    public TwitchClient(File file) {
+    public TwitchClient() {
 		super();
 
-		// TODO Load Configuration ApacheConfiguration2
+		// Initialize REST Client
+		setRestClient(new RestClient(this));
+	}
+
+	@Builder(builderMethodName = "builder")
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret) {
+		final TwitchClient twitchClient = new TwitchClient();
+
+		twitchClient.setClientId(clientId);
+		twitchClient.setClientSecret(clientSecret);
+
+		return twitchClient;
 	}
 
     /**

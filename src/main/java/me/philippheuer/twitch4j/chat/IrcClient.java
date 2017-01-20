@@ -43,7 +43,6 @@ public class IrcClient {
 		connect();
 	}
 
-
 	private Boolean connect() {
 		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
@@ -66,7 +65,7 @@ public class IrcClient {
         		.serverHost(host)
         		.serverPort(port)
         		.serverPassword("oauth:"+twitchCredential.get().getOAuthToken())
-        		.nick(twitchCredential.get().getUserName())
+        		.nick(twitchCredential.get().getUser().getName())
         		.build());
         	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getClient(), this));
 
