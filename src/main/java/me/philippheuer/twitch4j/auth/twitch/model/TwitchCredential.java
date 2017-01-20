@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TwitchCredential {
+public class TwitchCredential implements Cloneable {
 
 	String oAuthToken;
 
@@ -22,5 +22,17 @@ public class TwitchCredential {
 	 */
 	public TwitchCredential(String userName, String oAuthToken) {
 		setOAuthToken(oAuthToken);
+	}
+
+	/**
+	 *
+	 * @param twitchCredential
+	 * @return
+	 */
+	public void replaceTwitchCredential(TwitchCredential twitchCredential)
+	{
+		setOAuthToken(twitchCredential.getOAuthToken());
+		setOAuthScopes(twitchCredential.getOAuthScopes());
+		setUser(twitchCredential.getUser());
 	}
 }

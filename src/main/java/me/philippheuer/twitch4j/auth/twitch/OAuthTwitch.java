@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Getter
 @Setter
-public class OAuth {
+public class OAuthTwitch {
 
 	/**
 	 * API Instance
@@ -39,7 +39,7 @@ public class OAuth {
 	/**
 	 * Constructor
 	 */
-	public OAuth(TwitchClient api) {
+	public OAuthTwitch(TwitchClient api) {
 		setTwitchClient(api);
 	}
 
@@ -48,7 +48,7 @@ public class OAuth {
 	 * @return Boolean Access Token received?
 	 */
 	public Boolean startLocalAuthorization() {
-		// Get OAuth URI
+		// Get OAuthTwitch URI
 		String requestUrl = getAuthenticationUrl(Scopes.USER_READ, Scopes.USER_SUBSCRIPTIONS);
 
 		// Open Authorization Page for User
@@ -77,7 +77,9 @@ public class OAuth {
     	return "HelloWorld";
     }
 
-    public void waitForAccessToken() {
+    public Optional<TwitchCredential> waitForAccessToken() {
+    	final TwitchCredential twitchCredential = new TwitchCredential();
+
     	try {
     		final RatpackServer ratpackServer = RatpackServer.of(s -> s
 					.serverConfig(c -> c
@@ -94,13 +96,15 @@ public class OAuth {
 								String responseState = ctx.getRequest().getQueryParams().get("state");
 
 								// Handle Response
-								handleAuthenticationCodeResponse(responseCode);
+								twitchCredential.replaceTwitchCredential(handleAuthenticationCodeResponse(responseCode));
 
 								// Show Result Site
 								ctx.render("Hello " + responseCode + "!");
 
 								// Response received, close listener
-								ctx.onClose(outcome -> new Thread(ctx.get(Stopper.class)::stop).start());
+								ctx.onClose(outcome -> {
+									new Thread(ctx.get(Stopper.class)::stop).start();
+								});
 							}
 						)
 					)
@@ -111,32 +115,47 @@ public class OAuth {
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}
+
+    	if(twitchCredential.getOAuthToken().length() == 0) {
+			return Optional.empty();
+		}
+
+		return Optional.ofNullable(twitchCredential);
     }
 
-    private void handleAuthenticationCodeResponse(String authenticationCode) {
-    	// Validate on Server
-    	String requestUrl = String.format("%s/oauth2/token", getTwitchClient().getTwitchEndpoint());
-    	RestTemplate restTemplate = getTwitchClient().getRestClient().getPlainRestTemplate();
+    private TwitchCredential handleAuthenticationCodeResponse(String authenticationCode) {
+    	try {
+			// Validate on Server
+			String requestUrl = String.format("%s/oauth2/token", getTwitchClient().getTwitchEndpoint());
+			RestTemplate restTemplate = getTwitchClient().getRestClient().getPlainRestTemplate();
 
-    	// Prepare HTTP Post Data
-		MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
-		postObject.add("client_id", getTwitchClient().getClientId());
-		postObject.add("client_secret", getTwitchClient().getClientSecret());
-		postObject.add("grant_type", "authorization_code");
-		postObject.add("redirect_uri", getRedirectUri());
-		postObject.add("code", authenticationCode);
-		postObject.add("state", getUniqueState());
+			// Prepare HTTP Post Data
+			MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
+			postObject.add("client_id", getTwitchClient().getClientId());
+			postObject.add("client_secret", getTwitchClient().getClientSecret());
+			postObject.add("grant_type", "authorization_code");
+			postObject.add("redirect_uri", getRedirectUri());
+			postObject.add("code", authenticationCode);
+			postObject.add("state", getUniqueState());
 
-		// Rest Request
-		Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
+			// Rest Request
+			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
 
-		TwitchCredential twitchCredential = new TwitchCredential();
-		twitchCredential.setOAuthToken(responseObject.getAccessToken());
+			TwitchCredential twitchCredential = new TwitchCredential();
+			twitchCredential.setOAuthToken(responseObject.getAccessToken());
 
-		User twitchUser = getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
+			User twitchUser = getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
 
-		twitchCredential.setUser(twitchUser);
+			twitchCredential.setUser(twitchUser);
 
-		getTwitchClient().getCredentialManager().addCredential(twitchUser.getId().toString(), twitchCredential);
+			getTwitchClient().getCredentialManager().addCredential(twitchUser.getId().toString(), twitchCredential);
+
+			return twitchCredential;
+
+		} catch (Exception ex) {
+    		ex.printStackTrace();
+
+    		return null;
+		}
     }
 }

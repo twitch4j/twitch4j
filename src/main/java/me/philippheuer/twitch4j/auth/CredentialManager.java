@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.twitch.OAuth;
+import me.philippheuer.twitch4j.auth.twitch.OAuthTwitch;
 import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import me.philippheuer.twitch4j.model.Channel;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class CredentialManager {
 	 * @param twitchCredential Credential Instance
 	 */
 	public void addCredential(String key, TwitchCredential twitchCredential) {
-		getLogger().debug(String.format("Added Credentials with Key [%s] and data [%s]", key, twitchCredential.toString()));
+		getLogger().debug(String.format("Added Credentials with key [%s] and data [%s]", key, twitchCredential.toString()));
 
 		getOAuthCredentials().put(key, twitchCredential);
 	}
@@ -54,7 +54,7 @@ public class CredentialManager {
 	/**
 	 * Get Twitch credentials for channel
 	 * @param channel Channel
-	 * @return Optional<TwitchCredential> credential with oauth token and acces scope.
+	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
 	public Optional<TwitchCredential> getForChannel(Channel channel) {
 		if(getOAuthCredentials().containsKey(channel.getId().toString())) {
@@ -66,14 +66,13 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials for irc
-	 * @return Optional<TwitchCredential> credential with oauth token and acces scope.
+	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
 	public Optional<TwitchCredential> getForIRC() {
 		return Optional.ofNullable(getOAuthCredentials().get(CREDENTIAL_IRC));
 	}
 
-
-	public OAuth getOAuth() {
-		return new OAuth(getTwitchClient());
+	public OAuthTwitch getTwitchOAuth() {
+		return new OAuthTwitch(getTwitchClient());
 	}
 }

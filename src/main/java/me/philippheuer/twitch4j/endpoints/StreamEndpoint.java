@@ -42,7 +42,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get All Streams
-	 *  Gets the list of live streams a user follows based on the OAuth token provided.
+	 *  Gets the list of live streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: none
 	 */
 	public Optional<List<Stream>> getAll() {
@@ -66,7 +66,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Followed Streams
-	 *  Gets the list of online streams a user follows based on the OAuth token provided.
+	 *  Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
 	 */
 	public Optional<List<Stream>> getFollowed() {
