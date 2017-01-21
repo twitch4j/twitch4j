@@ -35,26 +35,26 @@ targetCompatibility = 1.8
 dependencies {
 	// Logging
     compile("ch.qos.logback:logback-classic:1.1.8")
-    
+
     // Spring Boot
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework:spring-web")
-    
+
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
-    
+
     // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
     compile('org.kitteh.irc:client-lib:3.0.1');
-    
+
     // JSON
-    compile("com.fasterxml.jackson.core:jackson-databind:2.8.5")
-    
+    compile("com.fasterxml.jackson.core:jackson-databind:2.8.6")
+
     // Expiring Map
     compile("net.jodah:expiringmap:0.5.7")
-    
+
     // TypeTools
     compile("net.jodah:typetools:0.4.8")
-    
+
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.12")
 }
