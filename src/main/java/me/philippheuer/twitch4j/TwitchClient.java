@@ -12,6 +12,7 @@ import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.StreamLabsClient;
+import org.springframework.util.Assert;
 
 @Getter
 @Setter
@@ -115,13 +116,28 @@ public class TwitchClient {
 
 	@Builder(builderMethodName = "builder")
 	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave) {
+    	// Initalize instance
 		final TwitchClient twitchClient = new TwitchClient();
+
+		// Reqired Parameters
+		Assert.notNull(clientId, "You need to provide a client id!");
+		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
 		twitchClient.setClientId(clientId);
 		twitchClient.setClientSecret(clientSecret);
-		twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
-		twitchClient.setConfigurationDirectory(new File(configurationDirectory));
 
+		// Optional Parameters
+		if(configurationAutoSave != null) {
+			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
+		} else {
+			twitchClient.getCredentialManager().setSaveCredentials(false);
+		}
+
+		if(configurationDirectory != null) {
+			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
+		}
+
+		// Return builded instance
 		return twitchClient;
 	}
 

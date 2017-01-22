@@ -39,17 +39,17 @@ public class OAuthTwitch {
 	/**
 	 * Constructor
 	 */
-	public OAuthTwitch(TwitchClient api) {
-		setTwitchClient(api);
+	public OAuthTwitch(TwitchClient twitchClient) {
+		setTwitchClient(twitchClient);
 	}
 
 	/**
 	 *
 	 * @return Boolean Access Token received?
 	 */
-	public Boolean startLocalAuthorization() {
+	public Boolean requestPermissionsFor(Scopes... scopes) {
 		// Get OAuthTwitch URI
-		String requestUrl = getAuthenticationUrl(Scopes.USER_READ, Scopes.USER_SUBSCRIPTIONS);
+		String requestUrl = getAuthenticationUrl(scopes);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -67,7 +67,7 @@ public class OAuthTwitch {
      * @param scopes	Scopes to request access for
      * @return String	OAuth2 Uri
      */
-    public String getAuthenticationUrl(Scopes... scopes) {
+    private String getAuthenticationUrl(Scopes... scopes) {
         return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
         		getTwitchClient().getTwitchEndpoint(), getTwitchClient().getClientId(), getRedirectUri(), Scopes.join(scopes), getUniqueState());
     }
