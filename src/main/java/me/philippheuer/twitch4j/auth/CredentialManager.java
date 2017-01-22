@@ -59,6 +59,13 @@ public class CredentialManager {
 	 * @param twitchCredential Credential Instance
 	 */
 	public void addCredential(String key, TwitchCredential twitchCredential) {
+		// Remove value if it exists
+		if(getOAuthCredentials().containsKey(key)) {
+			getLogger().debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
+			getOAuthCredentials().remove(key);
+		}
+
+		// Add value
 		getLogger().debug(String.format("Added Credentials with key [%s] and data [%s]", key, twitchCredential.toString()));
 
 		getOAuthCredentials().put(key, twitchCredential);
@@ -101,6 +108,9 @@ public class CredentialManager {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+
+		// Try to load configuration
+		loadFromFile();
 	}
 
 	public void saveToFile() {
