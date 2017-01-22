@@ -76,7 +76,7 @@ public class OAuthTwitch {
     	return "HelloWorld";
     }
 
-    public Optional<TwitchCredential> waitForAccessToken() {
+    private Optional<TwitchCredential> waitForAccessToken() {
     	final TwitchCredential twitchCredential = new TwitchCredential();
 
     	try {

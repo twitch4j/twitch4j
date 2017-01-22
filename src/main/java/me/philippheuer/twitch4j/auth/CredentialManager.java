@@ -51,16 +51,6 @@ public class CredentialManager {
 		super();
 
 		setTwitchClient(twitchClient);
-
-		//
-		try {
-			File file = new File(getTwitchClient().getConfigurationDirectory().getAbsolutePath() + File.pathSeparator + "creds.json");
-			file.createNewFile();
-			setCredentialFile(file);
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	/**
@@ -102,29 +92,44 @@ public class CredentialManager {
 		return new OAuthTwitch(getTwitchClient());
 	}
 
-	public void saveToFile() {
+	public void configurationCreate() {
+		// Ensure that the file exists
 		try {
-			ObjectMapper mapper = new ObjectMapper();
-
-			mapper.writeValue(getCredentialFile(), oAuthCredentials);
-
-			getLogger().debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+			File file = new File(getTwitchClient().getConfigurationDirectory().getAbsolutePath() + File.separator + "credentials.json");
+			file.createNewFile();
+			setCredentialFile(file);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	public void saveToFile() {
+		if(getCredentialFile() != null) {
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+
+				mapper.writeValue(getCredentialFile(), oAuthCredentials);
+
+				getLogger().debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
 	public void loadFromFile() {
-		try {
-			ObjectMapper mapper = new ObjectMapper();
+		if(getCredentialFile() != null) {
+			try {
+				ObjectMapper mapper = new ObjectMapper();
 
-			getOAuthCredentials().clear();
-			getOAuthCredentials().putAll(mapper.readValue(getCredentialFile(), oAuthCredentials.getClass()));
+				getOAuthCredentials().clear();
+				getOAuthCredentials().putAll(mapper.readValue(getCredentialFile(), oAuthCredentials.getClass()));
 
-			getLogger().debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+				getLogger().debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }

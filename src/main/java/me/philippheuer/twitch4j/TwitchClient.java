@@ -107,7 +107,7 @@ public class TwitchClient {
     /**
      * Constructs a Twitch application instance using a configuration file.
      */
-    public TwitchClient() {
+    private TwitchClient() {
 		super();
 
 		// Initialize REST Client
@@ -136,6 +136,9 @@ public class TwitchClient {
 		if(configurationDirectory != null) {
 			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
 		}
+
+		// Initialize Managers dependening on the configuration
+		twitchClient.getCredentialManager().configurationCreate();
 
 		// Return builded instance
 		return twitchClient;
