@@ -32,23 +32,18 @@ dependencies {
 
 ## Table of Contents
 - [Dependencies](#dependencies)
-- [Libraries](#libraries)
 - [Features](#features)
+- [Getting Started](#gettingstarted)
 - [Changelog](#changelog)
 - [Credits](#credits)
-- [Examples](#examples)
+
 
 ## Dependencies
  * Java 1.8+
- 
-## Libraries
- * Spring Boot (Rest Requests)
- * Jackson (JSON)
- * Lombok (Getter & Setter)
 
 ## Features
 #### OAuth Authentication
- - [ ] Twitch
+ - [x] Twitch
  - [ ] StreamLabs
  
 #### Twitch REST Endpoints
@@ -74,12 +69,38 @@ dependencies {
  
 #### StreamLabs
  - [ ] Donations
- 
+
+## Getting Started
+Just some simple examples, visit the wiki for more details.
+
+### Client Builder
+```java
+TwitchClient twitchClient = TwitchClient.builder()
+	.clientId("***Twitch App Client ID***")
+	.clientSecret("***Twitch App Client SECRET***")
+	.build();
+```
+
+### Get Channel Follows
+```java
+// Channel Name to Channel ID (V5 API)
+Optional<Long> channelId = twitchClient.getUserEndpoint().getUserIdByUserName("cirouss");
+
+// Get the Channel Endpoint
+if(channelId.isPresent()) {
+	// Get Endpoint
+	ChannelEndpoint channelEndpoint = twitchClient.getChannelEndpoint(channelId.get());
+	
+	// Get Follows
+	// ...
+} else {
+	// User doesn't exist
+}
+```
+
 ## Changelog
 Changes ... no release version yet.
 
 ## Credits
 Click [here](CONTRIBUTORS.md) to view the projects contributors and credits.
  
-## Examples
- - To Be Added

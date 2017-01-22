@@ -1,9 +1,12 @@
 package me.philippheuer.twitch4j.auth;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.twitch.OAuthTwitch;
@@ -26,10 +29,20 @@ public class CredentialManager {
 	 */
 	private TwitchClient twitchClient;
 
+	/**
+	 * Save all credentials locally be default?
+	 */
+	private Boolean saveCredentials = false;
+
 	// IRC Key
 	public static String CREDENTIAL_IRC = "IRC";
 
 	private final Map<String, TwitchCredential> oAuthCredentials = new HashMap<>();
+
+	/**
+	 * Holds the credentials
+	 */
+	private File credentialFile;
 
 	/**
 	 * Constructor
@@ -38,6 +51,16 @@ public class CredentialManager {
 		super();
 
 		setTwitchClient(twitchClient);
+
+		//
+		try {
+			File file = new File(getTwitchClient().getConfigurationDirectory().getAbsolutePath() + File.pathSeparator + "creds.json");
+			file.createNewFile();
+			setCredentialFile(file);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	/**
@@ -49,6 +72,9 @@ public class CredentialManager {
 		getLogger().debug(String.format("Added Credentials with key [%s] and data [%s]", key, twitchCredential.toString()));
 
 		getOAuthCredentials().put(key, twitchCredential);
+
+		// Store
+		saveToFile();
 	}
 
 	/**
@@ -74,5 +100,31 @@ public class CredentialManager {
 
 	public OAuthTwitch getTwitchOAuth() {
 		return new OAuthTwitch(getTwitchClient());
+	}
+
+	public void saveToFile() {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+
+			mapper.writeValue(getCredentialFile(), oAuthCredentials);
+
+			getLogger().debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public void loadFromFile() {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+
+			getOAuthCredentials().clear();
+			getOAuthCredentials().putAll(mapper.readValue(getCredentialFile(), oAuthCredentials.getClass()));
+
+			getLogger().debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

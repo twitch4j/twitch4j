@@ -57,7 +57,6 @@ public class OAuthTwitch {
 		// Wait for Response
 		waitForAccessToken();
 
-
 		return true;
 	}
 

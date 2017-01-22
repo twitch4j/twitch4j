@@ -84,7 +84,13 @@ public class TwitchClient {
 	@Singular
     private String clientSecret;
 
-    /**
+	/**
+	 * Configuration Directory to save settings
+	 */
+	@Singular
+	private File configurationDirectory;
+
+	/**
      * Constructs a Twitch application instance.
      */
     public TwitchClient(String clientId, String clientSecret) {
@@ -108,11 +114,13 @@ public class TwitchClient {
 	}
 
 	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret) {
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave) {
 		final TwitchClient twitchClient = new TwitchClient();
 
 		twitchClient.setClientId(clientId);
 		twitchClient.setClientSecret(clientSecret);
+		twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
+		twitchClient.setConfigurationDirectory(new File(configurationDirectory));
 
 		return twitchClient;
 	}
