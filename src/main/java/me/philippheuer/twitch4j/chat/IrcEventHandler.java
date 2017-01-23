@@ -74,9 +74,11 @@ public class IrcEventHandler {
 	@Handler(priority=Integer.MAX_VALUE)
 	public void onClientReceiveCommand(ClientReceiveServerMessageEventBase event) {
 
+		/* For debugging
 		if(!event.getCommand().equals("PRIVMSG")) {
 			System.out.println(event.getCommand() + " | " + event.getServerMessage().toString());
 		}
+		*/
 
 		/**
 		 * About once every five minutes, you will receive a PING :tmi.twitch.tv from the server, in order to
@@ -113,11 +115,11 @@ public class IrcEventHandler {
 						// Timeout
 						Integer banDuration = Integer.parseInt(tagMap.get("ban-duration"));
 
-						Event dispatchEvent = new UserTimeout(channel, targetUser.get(), banDuration);
+						Event dispatchEvent = new UserTimeout(channel, targetUser.get(), banDuration, banReason);
 						getTwitchClient().getDispatcher().dispatch(dispatchEvent);
 					} else {
 						// Permanent Ban
-						Event dispatchEvent = new UserBan(channel, targetUser.get());
+						Event dispatchEvent = new UserBan(channel, targetUser.get(), banReason);
 						getTwitchClient().getDispatcher().dispatch(dispatchEvent);
 					}
 				}
@@ -220,11 +222,6 @@ public class IrcEventHandler {
 				else if(tagMap.get("msg-id").equals("unban_success")) {
 					// TODO: Trigger Event
 				}
-
-				// Unknown NOTICE
-				else {
-					System.out.println("UNHANDLED_NOTICE: "+event.getOriginalMessage().toString() + "|" + tagMap.toString());
-				}
 			}
 
 			else if(event.getCommand().equals("ROOMSTATE")) {
@@ -275,20 +272,6 @@ public class IrcEventHandler {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Event: onChannelNoticeEvent
-	 *  Executed in channel notices.
-	 */
-	@Handler
-	public void onCUserNoticeEvent(ServerNoticeEvent event) {
-		getLogger().error("GOT SRV NOTICE: " + event.getOriginalMessages().toString());
-	}
-
-	@Handler
-	public void onCUsPerNoticeEvent(PrivateNoticeEvent event) {
-		getLogger().error("GOT PRIV NOTICE: " + event.getOriginalMessages().toString());
 	}
 
 	/**

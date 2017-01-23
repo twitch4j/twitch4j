@@ -25,11 +25,20 @@ public class UserBan extends Event {
 	private final User user;
 
 	/**
-	 * Constructor
+	 * Reason for Punishment
 	 */
-	public UserBan(Channel channel, User user) {
+	private final String reason;
+
+	/**
+	 * Constructor
+	 * @param channel Channel
+	 * @param user Target User
+	 * @param reason Reason for Ban.
+	 */
+	public UserBan(Channel channel, User user, String reason) {
 		super();
 		this.channel = channel;
 		this.user = user;
+		this.reason = reason;
 	}
 }

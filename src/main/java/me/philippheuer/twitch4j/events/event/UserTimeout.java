@@ -30,13 +30,22 @@ public class UserTimeout extends Event {
 	private final Integer duration;
 
 	/**
-	 * Constructor
-	 * @param channel
+	 * Reason for Punishment
 	 */
-	public UserTimeout(Channel channel, User user, Integer duration) {
+	private final String reason;
+
+	/**
+	 * Constructor
+	 * @param channel Channel
+	 * @param user Target User
+	 * @param duration Timeout Duration in Minutes.
+	 * @param reason Reason for Timeout.
+	 */
+	public UserTimeout(Channel channel, User user, Integer duration, String reason) {
 		super();
 		this.channel = channel;
 		this.user = user;
 		this.duration = duration;
+		this.reason = reason;
 	}
 }
