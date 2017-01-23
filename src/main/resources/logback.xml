@@ -5,18 +5,17 @@
 	<logger name="org.eclipse.jetty" level="INFO" />
 	<logger name="io.netty" level="INFO" />
 	<logger name="org.springframework.web.client.RestTemplate" level="INFO" />
-	
-	
+
 	<!-- Configure Twitch4J logger level -->
 	<logger name="de.phlippheuer.twitch4j" level="DEBUG" />
-    
+
 	<!-- Appender Configuration [Console] -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
-	
+
 	<!-- Appender Configuration [File] -->
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder>
@@ -34,7 +33,7 @@
 	<!-- Appender Output Configuration -->
 	<root level="debug">
 		<appender-ref ref="CONSOLE" />
-		
+
 		<!-- Uncomment the next line to also log to a file -->
 		<appender-ref ref="FILE"/> -->
 	</root>

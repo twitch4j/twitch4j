@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
@@ -16,6 +17,8 @@ import org.kitteh.irc.client.library.event.abstractbase.ServerMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.*;
 import org.kitteh.irc.client.library.event.client.ClientReceiveCommandEvent;
 import org.kitteh.irc.client.library.event.helper.ClientReceiveServerMessageEvent;
+import org.kitteh.irc.client.library.event.user.PrivateNoticeEvent;
+import org.kitteh.irc.client.library.event.user.ServerNoticeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +71,25 @@ public class IrcEventHandler {
 	 * Event: onClientReceiveCommand
 	 *  Gets executed on NOTICE, USERNOTICE and simelar events.
 	 */
-	@Handler
-	public void onClientReceiveCommand(ClientReceiveCommandEvent event) {
-		if(event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG")|| event.getCommand().equals("NOTICE")) {
+	@Handler(priority=Integer.MAX_VALUE)
+	public void onClientReceiveCommand(ClientReceiveServerMessageEventBase event) {
+
+		if(!event.getCommand().equals("PRIVMSG")) {
+			System.out.println(event.getCommand() + " | " + event.getServerMessage().toString());
+		}
+
+		/**
+		 * About once every five minutes, you will receive a PING :tmi.twitch.tv from the server, in order to
+		 * ensure that your connection to the server is not prematurely terminated, you should reply with PONG :tmi.twitch.tv.
+		 */
+		if(event.getOriginalMessage().contains("PING :tmi.twitch.tv")) {
+			getIrcClient().getIrcClient().sendRawLine("PONG :tmi.twitch.tv");
+
+			getLogger().debug("Responded to PING from Twitch IRC.");
+		}
+
+		// Handle Messages
+		if(event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
 			// Get Channel on IRC
 			String channelName = event.getParameters().get(0).replace("#", "");
 			Channel channel = getTwitchClient().getChannelEndpoint(getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get()).getChannel().get();
@@ -80,6 +99,27 @@ public class IrcEventHandler {
 			for(MessageTag tag :  event.getServerMessage().getTags()) {
 				if(tag.getValue().isPresent()) {
 					tagMap.put(tag.getName(), tag.getValue().get());
+				}
+			}
+
+			// Bans/Timeouts
+			if(tagMap.containsKey("ban-reason")) {
+				String banReason = tagMap.get("ban-reason");
+				Long targetUserId = Long.parseLong(tagMap.get("target-user-id"));
+				Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUser(targetUserId);
+
+				if(targetUser.isPresent()) {
+					if(tagMap.containsKey("ban-duration")) {
+						// Timeout
+						Integer banDuration = Integer.parseInt(tagMap.get("ban-duration"));
+
+						Event dispatchEvent = new UserTimeout(channel, targetUser.get(), banDuration);
+						getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+					} else {
+						// Permanent Ban
+						Event dispatchEvent = new UserBan(channel, targetUser.get());
+						getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+					}
 				}
 			}
 
@@ -99,7 +139,7 @@ public class IrcEventHandler {
 						onSubscription(userId, channel, 1, false, "");
 						return;
 					}
-					
+
 					// Subscription: Twitch Prime
 					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with Twitch Prime!$");
 					matcher = regExpr.matcher(rawMessage);
@@ -118,7 +158,7 @@ public class IrcEventHandler {
 			}
 
 			// Resubscriptions
-			if(event.getCommand().equals("USERNOTICE")) {
+			else if(event.getCommand().equals("USERNOTICE")) {
 				// Get SubMessage if user wrote one
 				Optional<String> subMessage = Optional.empty();
 				if(event.getParameters().size() > 1) {
@@ -136,83 +176,119 @@ public class IrcEventHandler {
 				}
 			}
 
-			// Notices: Channel State Changed
-			if(event.getCommand().equals("NOTICE") && tagMap.containsKey("msg-id")) {
-				// This room is now in subscribers-only mode.
-				if(tagMap.get("msg-id").equals("subs_on")) {
-
-					Event dispatchEvent = new SubsOnlyEnabledEvent(channel);
-					getTwitchClient().getDispatcher().dispatch(dispatchEvent);
-				}
-
-				// This room is no longer in subscribers-only mode.
-				if(tagMap.get("msg-id").equals("subs_off")) {
-					Event dispatchEvent = new SubsOnlyDisabledEvent(channel);
-					getTwitchClient().getDispatcher().dispatch(dispatchEvent);
-				}
-
-				// This room is now in slow mode. You may send messages every slow_duration seconds.
-				if(tagMap.get("msg-id").equals("slow_on") && tagMap.containsKey("slow_duration")) {
-					Integer slowDuration = Integer.parseInt(tagMap.get("slow_duration"));
-					// TODO: Trigger Event
-				}
-
-				// This room is no longer in slow mode.
-				if(tagMap.get("msg-id").equals("slow_off")) {
-					// TODO: Trigger Event
-				}
-
-				// This room is now in r9k mode.
-				if(tagMap.get("msg-id").equals("r9k_on")) {
-					// TODO: Trigger Event
-				}
-
-				// This room is no longer in r9k mode.
-				if(tagMap.get("msg-id").equals("r9k_off")) {
-					// TODO: Trigger Event
-				}
+			else if(event.getOriginalMessage().toString().contains("NOTICE")) {
+				ServerMessage message = event.getServerMessage();
 
 				// Now hosting target_channel.
 				if(tagMap.get("msg-id").equals("host_on")) {
-					// TODO: Trigger Event
+					Event dispatchEvent = new HostOnEvent(channel, channel);
+					getTwitchClient().getDispatcher().dispatch(dispatchEvent);
 				}
 
 				// Exited host mode.
-				if(tagMap.get("msg-id").equals("host_off")) {
-					// TODO: Trigger Event
+				else if(tagMap.get("msg-id").equals("host_off")) {
+					Event dispatchEvent = new HostOffEvent(channel);
+					getTwitchClient().getDispatcher().dispatch(dispatchEvent);
 				}
 
 				// This room is now in emote-only mode.
-				if(tagMap.get("msg-id").equals("emote_only_on")) {
+				else if(tagMap.get("msg-id").equals("emote_only_on")) {
 					// TODO: Trigger Event
 				}
 
 				// This room is no longer in emote-only mode.
-				if(tagMap.get("msg-id").equals("emote_only_off")) {
+				else if(tagMap.get("msg-id").equals("emote_only_off")) {
 					// TODO: Trigger Event
 				}
 
 				// This channel has been suspended.
-				if(tagMap.get("msg-id").equals("msg_channel_suspended")) {
+				else if(tagMap.get("msg-id").equals("msg_channel_suspended")) {
 					// TODO: Trigger Event
 				}
 
 				// target_user has been timed out for ban_duration seconds.
-				if(tagMap.get("msg-id").equals("timeout_success")) {
+				else if(tagMap.get("msg-id").equals("timeout_success")) {
 					// TODO: Trigger Event
 				}
 
 				// target_user is now banned from this room.
-				if(tagMap.get("msg-id").equals("ban_success")) {
+				else if(tagMap.get("msg-id").equals("ban_success")) {
 					// TODO: Trigger Event
 				}
 
 				// target_user is no longer banned from this room.
-				if(tagMap.get("msg-id").equals("unban_success")) {
+				else if(tagMap.get("msg-id").equals("unban_success")) {
 					// TODO: Trigger Event
+				}
+
+				// Unknown NOTICE
+				else {
+					System.out.println("UNHANDLED_NOTICE: "+event.getOriginalMessage().toString() + "|" + tagMap.toString());
+				}
+			}
+
+			else if(event.getCommand().equals("ROOMSTATE")) {
+				System.out.println("ROOMSTATE: " + event.toString());
+
+				if(tagMap.containsKey("subs-only")) {
+					if(tagMap.get("subs-only").equals("0")) {
+						// This room is no longer in subscribers-only mode.
+
+					} else {
+						// This room is now in subscribers-only mode.
+
+					}
+				}
+
+				if(tagMap.containsKey("slow")) {
+					if(tagMap.get("slow").equals("0")) {
+						// This room is no longer in slow mode.
+					} else {
+						// This room is now in slow mode. You may send messages every slow_duration seconds.
+						Integer messageDelay = Integer.parseInt(tagMap.get("slow"));
+
+					}
+				}
+
+				if(tagMap.containsKey("r9k")) {
+					if(tagMap.get("r9k").equals("0")) {
+						// This room is no longer in r9k mode.
+					} else {
+						// This room is now in r9k mode.
+					}
+				}
+
+				if(tagMap.containsKey("emote-only")) {
+					if(tagMap.get("emote-only").equals("0")) {
+						// This room is no longer in emote-only mode.
+					} else {
+						// This room is now in emote-only mode.
+					}
+				}
+
+				if(tagMap.containsKey("followers-only")) {
+					if(tagMap.get("followers-only").equals("0")) {
+						// This room is no longer in followers-only mode.
+					} else {
+						// This room is now in followers-only mode.
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Event: onChannelNoticeEvent
+	 *  Executed in channel notices.
+	 */
+	@Handler
+	public void onCUserNoticeEvent(ServerNoticeEvent event) {
+		getLogger().error("GOT SRV NOTICE: " + event.getOriginalMessages().toString());
+	}
+
+	@Handler
+	public void onCUsPerNoticeEvent(PrivateNoticeEvent event) {
+		getLogger().error("GOT PRIV NOTICE: " + event.getOriginalMessages().toString());
 	}
 
 	/**
@@ -238,7 +314,7 @@ public class IrcEventHandler {
 		}
 
 		// Debug
-		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel, entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
+		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel.getName(), entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new SubscriptionEvent(entity));
@@ -256,7 +332,7 @@ public class IrcEventHandler {
 		entity.setChannel(channel);
 
 		// Debug
-		getLogger().debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel, bits.toString(), entity.getMessage()));
+		getLogger().debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel.getName(), bits.toString(), entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new CheerEvent(entity));

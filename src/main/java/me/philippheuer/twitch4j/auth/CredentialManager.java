@@ -2,10 +2,12 @@ package me.philippheuer.twitch4j.auth;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
@@ -37,7 +39,7 @@ public class CredentialManager {
 	// IRC Key
 	public static String CREDENTIAL_IRC = "IRC";
 
-	private final Map<String, TwitchCredential> oAuthCredentials = new HashMap<>();
+	private final Map<String, TwitchCredential> oAuthCredentials = new LinkedHashMap<>();
 
 	/**
 	 * Holds the credentials
@@ -79,7 +81,7 @@ public class CredentialManager {
 	 * @param channel Channel
 	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
-	public Optional<TwitchCredential> getForChannel(Channel channel) {
+	public Optional<TwitchCredential> getTwitchCredentialsForChannel(Channel channel) {
 		if(getOAuthCredentials().containsKey(channel.getId().toString())) {
 			return Optional.ofNullable(getOAuthCredentials().get(channel.getId().toString()));
 		} else {
@@ -91,8 +93,12 @@ public class CredentialManager {
 	 * Get Twitch credentials for irc
 	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
-	public Optional<TwitchCredential> getForIRC() {
-		return Optional.ofNullable(getOAuthCredentials().get(CREDENTIAL_IRC));
+	public Optional<TwitchCredential> getTwitchCredentialsForIRC() {
+		if(getOAuthCredentials().containsKey(CREDENTIAL_IRC)) {
+			return Optional.ofNullable(getOAuthCredentials().get(CREDENTIAL_IRC));
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	public OAuthTwitch getTwitchOAuth() {
@@ -133,7 +139,9 @@ public class CredentialManager {
 				ObjectMapper mapper = new ObjectMapper();
 
 				getOAuthCredentials().clear();
-				getOAuthCredentials().putAll(mapper.readValue(getCredentialFile(), oAuthCredentials.getClass()));
+
+				Map<String, TwitchCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, TwitchCredential>>(){});
+				getOAuthCredentials().putAll(loadedCredentials);
 
 				getLogger().debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
 

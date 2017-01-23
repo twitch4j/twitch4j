@@ -74,7 +74,7 @@ public class TwitchClient {
 
     /**
      * Twitch Client Id
-     *  Default Value: Twitch
+     *  Default Value: Twitch Client Id
      */
 	@Singular
     private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
@@ -140,6 +140,9 @@ public class TwitchClient {
 		// Initialize Managers dependening on the configuration
 		twitchClient.getCredentialManager().configurationCreate();
 
+		// Connect to API Endpoints
+		// twitchClient.connect();
+
 		// Return builded instance
 		return twitchClient;
 	}
@@ -159,13 +162,6 @@ public class TwitchClient {
     }
 
     /**
-     * Get User Endpoint
-     */
-    public UserEndpoint getUserEndpoint() {
-    	return new UserEndpoint(this);
-    }
-
-    /**
      * Get Channel Endpoint
      */
     public ChannelEndpoint getChannelEndpoint(Long channelId) {
@@ -178,4 +174,18 @@ public class TwitchClient {
     public GameEndpoint getGameEndpoint() {
     	return new GameEndpoint(this);
     }
+
+	/**
+	 * Get User Endpoint
+	 */
+	public StreamEndpoint getStreamEndpoint() {
+		return new StreamEndpoint(this);
+	}
+
+	/**
+	 * Get User Endpoint
+	 */
+	public UserEndpoint getUserEndpoint() {
+		return new UserEndpoint(this);
+	}
 }

@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.auth.twitch;
 
+import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.LinkedMultiValueMap;
@@ -45,9 +46,11 @@ public class OAuthTwitch {
 
 	/**
 	 *
+	 * @param type Type for Permission for the CredentialManager (IRC/CHANNEL)
+	 * @param scopes Scopes to request.
 	 * @return Boolean Access Token received?
 	 */
-	public Boolean requestPermissionsFor(Scopes... scopes) {
+	public Boolean requestPermissionsFor(String type, Scopes... scopes) {
 		// Get OAuthTwitch URI
 		String requestUrl = getAuthenticationUrl(scopes);
 
@@ -55,9 +58,26 @@ public class OAuthTwitch {
 		WebsiteUtils.openWebpage(requestUrl);
 
 		// Wait for Response
-		waitForAccessToken();
+		Optional<TwitchCredential> twitchCredential = waitForAccessToken();
 
-		return true;
+		if(twitchCredential.isPresent()) {
+			// Type: IRC
+			if(type.toLowerCase().equals("irc")) {
+				getTwitchClient().getCredentialManager().addCredential(CredentialManager.CREDENTIAL_IRC, twitchCredential.get());
+			}
+			// Type: CHANNEL
+			else if(type.toLowerCase().equals("channel")) {
+				getTwitchClient().getCredentialManager().addCredential(twitchCredential.get().getUser().getId().toString(), twitchCredential.get());
+			}
+			// Type: UNKNOWN
+			else {
+
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -151,8 +171,6 @@ public class OAuthTwitch {
 			User twitchUser = getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
 
 			twitchCredential.setUser(twitchUser);
-
-			getTwitchClient().getCredentialManager().addCredential(twitchUser.getId().toString(), twitchCredential);
 
 			return twitchCredential;
 

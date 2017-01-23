@@ -47,7 +47,7 @@ public class IrcClient {
 		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
 		// Get Credentials
-		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getForIRC();
+		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
 		// Check
 		Assert.isTrue(twitchCredential.isPresent(), "IRC needs valid Credentials from the CredentialManager.");
@@ -110,10 +110,21 @@ public class IrcClient {
 	public void reconnect() {
 		getLogger().info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
 
-		getIrcClient().shutdown();
+		disconnect();
 		connect();
 	}
 
+	public void disconnect() {
+		getIrcClient().shutdown();
+	}
+
+	public void joinChannel(String channelName) {
+		String ircChannel = String.format("#%s", channelName);
+		if(!getIrcClient().getChannels().contains(ircChannel)) {
+			getIrcClient().addChannel(ircChannel);
+			getLogger().info(String.format("Joined Channel %s using Twitch IRC [%s] ...", ircChannel, getClient().getTwitchIrcEndpoint()));
+		}
+	}
 	/**
 	 * Method: Check IRC Client Status
 	 */

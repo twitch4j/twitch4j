@@ -67,8 +67,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 */
 	public Optional<Channel> getChannelPrivilegied() {
-		TwitchCredential twitchCredential = getTwitchClient().getCredentialManager().getForChannel(getChannel().get()).get();
-
+		TwitchCredential twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannel().get()).get();
 
 		// REST Request
 		try {
@@ -273,11 +272,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Listener
 		Channel channel = getChannel().get();
-		channel.setTwitchCredential(getTwitchClient().getCredentialManager().getForChannel(channel));
+		channel.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(channel));
 		// - Listen: IRC
-		getTwitchClient().getIrcClient().getIrcClient().addChannel(String.format("#%s", channel.getName()));
-		// - Listen: PUBSUB (Requires Credentials)
-		// TODO
+		getTwitchClient().getIrcClient().joinChannel(channel.getName());
+		// - Listen: PubSub (Requires Credentials)
 		// getClient().getPubSub().addChannel(channel);
 
 		// Register Listener
