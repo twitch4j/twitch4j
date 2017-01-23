@@ -158,7 +158,6 @@ public class IrcEventHandler {
 					onCheer(Long.parseLong(tagMap.get("user-id")), channel, tagMap.get("bits"), event.getParameters().get(1));
 				}
 			}
-
 			// Resubscriptions
 			else if(event.getCommand().equals("USERNOTICE")) {
 				// Get SubMessage if user wrote one
@@ -177,7 +176,7 @@ public class IrcEventHandler {
 					}
 				}
 			}
-
+			// Notices
 			else if(event.getOriginalMessage().toString().contains("NOTICE")) {
 				ServerMessage message = event.getServerMessage();
 
@@ -223,10 +222,8 @@ public class IrcEventHandler {
 					// TODO: Trigger Event
 				}
 			}
-
+			// Roomstate
 			else if(event.getCommand().equals("ROOMSTATE")) {
-				System.out.println("ROOMSTATE: " + event.toString());
-
 				if(tagMap.containsKey("subs-only")) {
 					if(tagMap.get("subs-only").equals("0")) {
 						// This room is no longer in subscribers-only mode.

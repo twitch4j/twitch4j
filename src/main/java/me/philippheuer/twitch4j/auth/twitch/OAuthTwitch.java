@@ -50,7 +50,7 @@ public class OAuthTwitch {
 	 * @param scopes Scopes to request.
 	 * @return Boolean Access Token received?
 	 */
-	public Boolean requestPermissionsFor(String type, Scopes... scopes) {
+	public Optional<TwitchCredential> requestPermissionsFor(String type, Scopes... scopes) {
 		// Get OAuthTwitch URI
 		String requestUrl = getAuthenticationUrl(scopes);
 
@@ -73,11 +73,9 @@ public class OAuthTwitch {
 			else {
 
 			}
-
-			return true;
 		}
 
-		return false;
+		return twitchCredential;
 	}
 
 	/**
