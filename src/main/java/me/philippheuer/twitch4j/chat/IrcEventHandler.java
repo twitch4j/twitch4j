@@ -281,8 +281,7 @@ public class IrcEventHandler {
 		entity.setMessage(Optional.ofNullable(streak > 1 ? message : null)); // You can't write a message for the first sub.
 		entity.setIsPrimeSub(Optional.ofNullable(isPrime));
 		entity.setStreak(Optional.ofNullable(streak));
-		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).orElse(null));
-		entity.setChannel(channel);
+		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
 
 		// Prevent multi-firing of the same subscription (is sometimes send 2. times)
 		String subHistoryKey = String.format("%s|%s", entity.getUser().getId(), entity.getStreak());
@@ -297,7 +296,7 @@ public class IrcEventHandler {
 		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel.getName(), entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
 
 		// Fire Event
-		getTwitchClient().getDispatcher().dispatch(new SubscriptionEvent(entity));
+		getTwitchClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity));
 	}
 
 	/**
@@ -309,12 +308,11 @@ public class IrcEventHandler {
 		entity.setBits(Integer.parseInt(bits));
 		entity.setMessage(message);
 		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
-		entity.setChannel(channel);
 
 		// Debug
 		getLogger().debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel.getName(), bits.toString(), entity.getMessage()));
 
 		// Fire Event
-		getTwitchClient().getDispatcher().dispatch(new CheerEvent(entity));
+		getTwitchClient().getDispatcher().dispatch(new CheerEvent(channel, entity));
 	}
 }

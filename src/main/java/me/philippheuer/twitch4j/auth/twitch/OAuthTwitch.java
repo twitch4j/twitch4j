@@ -138,7 +138,7 @@ public class OAuthTwitch {
     		ex.printStackTrace();
     	}
 
-    	if(twitchCredential.getOAuthToken() != null && twitchCredential.getOAuthToken().length() == 0) {
+    	if(twitchCredential.getOAuthToken() == null || twitchCredential.getOAuthToken() != null && twitchCredential.getOAuthToken().length() == 0) {
 			return Optional.empty();
 		}
 

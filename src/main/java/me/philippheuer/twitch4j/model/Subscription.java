@@ -25,6 +25,4 @@ public class Subscription {
     private Optional<Boolean> isPrimeSub;
 
 	private User user;
-
-	private Channel channel;
 }

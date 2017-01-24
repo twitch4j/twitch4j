@@ -78,13 +78,15 @@ Just some simple examples, visit the wiki for more details.
 TwitchClient twitchClient = TwitchClient.builder()
 	.clientId("***Twitch App Client ID***")
 	.clientSecret("***Twitch App Client SECRET***")
+	.configurationAutoSave(true)
+	.configurationDirectory(new File("").getAbsolutePath())
 	.build();
 ```
 
 ### Get Channel Follows
 ```java
 // Channel Name to Channel ID (V5 API)
-Optional<Long> channelId = twitchClient.getUserEndpoint().getUserIdByUserName("cirouss");
+Optional<Long> channelId = twitchClient.getUserEndpoint().getUserIdByUserName("whynabit");
 
 // Get the Channel Endpoint
 if(channelId.isPresent()) {

@@ -148,11 +148,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			String requestUrl = String.format("%s/channels/%s/subscriptions", getTwitchClient().getTwitchEndpoint(), getChannelId());
 			SubscriptionList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, SubscriptionList.class);
 
-			// Add Channel
-			for(Subscription sub : responseObject.getSubscriptions()) {
-				sub.setChannel(getChannel().orElse(null));
-			}
-
 			return Optional.ofNullable(responseObject.getSubscriptions());
 		} catch (Exception ex) {
 			return Optional.empty();

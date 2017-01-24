@@ -16,6 +16,4 @@ public class Cheer {
 	private User user;
 
 	private Integer bits;
-
-	private Channel channel;
 }

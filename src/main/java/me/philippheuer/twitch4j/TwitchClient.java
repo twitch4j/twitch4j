@@ -151,7 +151,7 @@ public class TwitchClient {
      * Init Client
      */
     public void connect() {
-        // Connect to IRC
+        // Init IRC
         setIrcClient(new IrcClient(this));
 
         // Init PubSub API
