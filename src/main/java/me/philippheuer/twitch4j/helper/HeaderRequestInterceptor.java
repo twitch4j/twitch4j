@@ -14,19 +14,19 @@ import org.springframework.http.client.support.HttpRequestWrapper;
  * @link http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request
  */
 public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor {
-	private final String headerName;
+	private final String name;
 
-    private final String headerValue;
+    private final String value;
 
-    public HeaderRequestInterceptor(String headerName, String headerValue) {
-        this.headerName = headerName;
-        this.headerValue = headerValue;
+    public HeaderRequestInterceptor(String name, String value) {
+        this.name = name;
+        this.value = value;
     }
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         HttpRequest wrapper = new HttpRequestWrapper(request);
-        wrapper.getHeaders().set(headerName, headerValue);
+        wrapper.getHeaders().set(name, value);
         return execution.execute(wrapper, body);
     }
 }

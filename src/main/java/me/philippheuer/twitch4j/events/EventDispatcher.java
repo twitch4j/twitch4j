@@ -257,12 +257,12 @@ public class EventDispatcher {
 		 * Whether the listener is temporary.
 		 * True if a temporary listener, false if otherwise.
 		 */
-		final boolean isTemporary;
+		public final boolean isTemporary;
 
 		/**
 		 * The actual listener object instance.
 		 */
-		final V listener;
+		public final V listener;
 
 		private ListenerPair(boolean isTemporary, V listener) {
 			this.isTemporary = isTemporary;

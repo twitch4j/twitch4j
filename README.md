@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master.svg?style=svg)](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master)
 [![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669)](https://www.codacy.com/app/PhilippHeuer/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PhilippHeuer/twitch4j&amp;utm_campaign=Badge_Grade)
 [![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
 [![](https://jitpack.io/v/philippheuer/twitch4j.svg)](https://jitpack.io/#philippheuer/twitch4j)
 

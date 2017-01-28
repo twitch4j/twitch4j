@@ -2,6 +2,8 @@ package me.philippheuer.twitch4j;
 
 import java.io.File;
 
+import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
+import me.philippheuer.twitch4j.helper.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,7 @@ import me.philippheuer.twitch4j.chat.IrcClient;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
-import me.philippheuer.twitch4j.streamlabs.StreamLabsClient;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
 @Getter
@@ -35,7 +37,7 @@ public class TwitchClient {
 	/**
 	 * Rest Client
 	 */
-	private RestClient restClient;
+	private RestClient restClient = new RestClient();
 
 	/**
 	 * IRC Client
@@ -50,7 +52,7 @@ public class TwitchClient {
     /**
      * StreamLabs API
      */
-    private StreamLabsClient streamLabsClient;
+    private StreamlabsClient streamLabsClient;
 
 	/**
 	 * Twitch API Endpoint
@@ -101,30 +103,19 @@ public class TwitchClient {
         setClientSecret(clientSecret);
 
 		// Initialize REST Client
-		setRestClient(new RestClient(this));
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
     }
-
-    /**
-     * Constructs a Twitch application instance using a configuration file.
-     */
-    private TwitchClient() {
-		super();
-
-		// Initialize REST Client
-		setRestClient(new RestClient(this));
-	}
 
 	@Builder(builderMethodName = "builder")
 	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave) {
-    	// Initalize instance
-		final TwitchClient twitchClient = new TwitchClient();
-
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
-		twitchClient.setClientId(clientId);
-		twitchClient.setClientSecret(clientSecret);
+    	// Initalize instance
+		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
 
 		// Optional Parameters
 		if(configurationAutoSave != null) {
@@ -158,7 +149,7 @@ public class TwitchClient {
         setPubSub(new TwitchPubSub(this));
 
         // Init StreamLabs Client
-        setStreamLabsClient(new StreamLabsClient(this));
+        setStreamLabsClient(new StreamlabsClient(this));
     }
 
     /**

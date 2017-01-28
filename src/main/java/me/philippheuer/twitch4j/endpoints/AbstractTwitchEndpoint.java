@@ -1,22 +1,15 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import me.philippheuer.twitch4j.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
-
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.web.client.RestTemplate;
 
 @Getter
 @Setter
