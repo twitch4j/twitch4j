@@ -147,9 +147,6 @@ public class TwitchClient {
 
         // Init PubSub API
         setPubSub(new TwitchPubSub(this));
-
-        // Init StreamLabs Client
-        setStreamLabsClient(new StreamlabsClient(this));
     }
 
     /**
