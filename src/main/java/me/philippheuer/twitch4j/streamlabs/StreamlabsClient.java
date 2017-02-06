@@ -1,19 +1,17 @@
 package me.philippheuer.twitch4j.streamlabs;
 
-import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
+import lombok.Builder;
+import lombok.Singular;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
+import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
+import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.*;
-
-import me.philippheuer.twitch4j.TwitchClient;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
-import org.springframework.social.support.HttpRequestDecorator;
 import org.springframework.util.Assert;
-
-import java.io.File;
 
 @Getter
 @Setter
@@ -23,11 +21,6 @@ public class StreamlabsClient {
 	 * Logger
 	 */
 	private final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-
-	/**
-	 * Holds the API Instance
-	 */
-	private TwitchClient twitchClient;
 
 	/**
 	 * Rest Client
@@ -91,5 +84,19 @@ public class StreamlabsClient {
 	 */
 	public String getEndpointUrl() {
 		return String.format("%s/%s", getStreamlabsEndpoint(), getStreamlabsEndpointVersion());
+	}
+
+	/**
+	 * Get User Endpoint
+	 */
+	public UserEndpoint getUserEndpoint() {
+		return new UserEndpoint(this);
+	}
+
+	/**
+	 * Get User Endpoint
+	 */
+	public DonationEndpoint getDonationEndpoint() {
+		return new DonationEndpoint(this);
 	}
 }

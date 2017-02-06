@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.twitch.model;
+package me.philippheuer.twitch4j.auth.model.twitch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,8 @@ import me.philippheuer.twitch4j.model.User;
 public class TwitchCredential {
 
 	private String oAuthToken;
+
+	private String oAuthRefreshToken;
 
 	private final List<String> oAuthScopes = new ArrayList<String>();
 
@@ -30,9 +32,10 @@ public class TwitchCredential {
 	 * @param twitchCredential
 	 * @return
 	 */
-	public void replaceTwitchCredential(TwitchCredential twitchCredential)
+	public void replaceCredential(TwitchCredential twitchCredential)
 	{
 		setOAuthToken(twitchCredential.getOAuthToken());
+		setOAuthRefreshToken(twitchCredential.getOAuthRefreshToken());
 		getOAuthScopes().clear();
 		getOAuthScopes().addAll(twitchCredential.getOAuthScopes());
 		setUser(twitchCredential.getUser());

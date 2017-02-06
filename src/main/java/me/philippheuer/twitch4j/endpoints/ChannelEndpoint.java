@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 import org.springframework.util.Assert;
 
 import lombok.*;

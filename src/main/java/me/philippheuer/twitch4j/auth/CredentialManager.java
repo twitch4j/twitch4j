@@ -9,9 +9,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.twitch.OAuthTwitch;
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +25,29 @@ public class CredentialManager {
 	private final Logger logger = LoggerFactory.getLogger(CredentialManager.class);
 
 	/**
-	 * Holds the API Instance
+	 * Holds the Twitch Instance
 	 */
 	private TwitchClient twitchClient;
+
+	/**
+	 * Holds the Twitch Instance
+	 */
+	private StreamlabsClient streamlabsClient;
+
+	/**
+	 * OAuth Response Listener
+	 */
+	private OAuthHandler oAuthHandler;
+
+	/**
+	 * OAuth - Twitch
+	 */
+	private OAuthTwitch oAuthTwitch;
+
+	/**
+	 * OAuth - Streamlabs
+	 */
+	private OAuthStreamlabs oAuthStreamlabs;
 
 	/**
 	 * Save all credentials locally be default?
@@ -49,8 +69,17 @@ public class CredentialManager {
 	 */
 	public CredentialManager(TwitchClient twitchClient) {
 		super();
+		setOAuthHandler(new OAuthHandler(this));
+	}
 
+	public void provideTwitchClient(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
+		setOAuthTwitch(new OAuthTwitch(this));
+	}
+
+	public void provideStreamlabsClient(StreamlabsClient streamlabsClient) {
+		setStreamlabsClient(streamlabsClient);
+		setOAuthStreamlabs(new OAuthStreamlabs(this));
 	}
 
 	/**
@@ -59,6 +88,9 @@ public class CredentialManager {
 	 * @param twitchCredential Credential Instance
 	 */
 	public void addCredential(String key, TwitchCredential twitchCredential) {
+		// TwitchCredential Prefix
+		key = "TWITCH-" + key;
+
 		// Remove value if it exists
 		if(getOAuthCredentials().containsKey(key)) {
 			getLogger().debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
@@ -80,8 +112,8 @@ public class CredentialManager {
 	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
 	public Optional<TwitchCredential> getTwitchCredentialsForChannel(Channel channel) {
-		if(getOAuthCredentials().containsKey(channel.getId().toString())) {
-			return Optional.ofNullable(getOAuthCredentials().get(channel.getId().toString()));
+		if(getOAuthCredentials().containsKey("TWITCH-" + channel.getId().toString())) {
+			return Optional.ofNullable(getOAuthCredentials().get("TWITCH-" + channel.getId().toString()));
 		} else {
 			return Optional.empty();
 		}
@@ -92,15 +124,11 @@ public class CredentialManager {
 	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
 	public Optional<TwitchCredential> getTwitchCredentialsForIRC() {
-		if(getOAuthCredentials().containsKey(CREDENTIAL_IRC)) {
-			return Optional.ofNullable(getOAuthCredentials().get(CREDENTIAL_IRC));
+		if(getOAuthCredentials().containsKey("TWITCH-" + CREDENTIAL_IRC)) {
+			return Optional.ofNullable(getOAuthCredentials().get("TWITCH-" + CREDENTIAL_IRC));
 		} else {
 			return Optional.empty();
 		}
-	}
-
-	public OAuthTwitch getTwitchOAuth() {
-		return new OAuthTwitch(getTwitchClient());
 	}
 
 	public void configurationCreate() {

@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 
 @Getter
 @Setter

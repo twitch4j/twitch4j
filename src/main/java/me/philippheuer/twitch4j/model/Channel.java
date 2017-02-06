@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import lombok.*;
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)

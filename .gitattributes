@@ -1,0 +1,4 @@
+/.github export-ignore
+/.gitattributes export-ignore
+/.editorconfig export-ignore
+/circle.yml export-ignore
