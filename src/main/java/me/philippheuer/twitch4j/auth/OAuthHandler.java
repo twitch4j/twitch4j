@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.auth;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import ratpack.server.RatpackServer;
@@ -32,6 +33,7 @@ public class OAuthHandler {
 	 */
 	public OAuthHandler(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
+		start();
 	}
 
 	/**
@@ -60,9 +62,6 @@ public class OAuthHandler {
 										String responseScope = ctx.getRequest().getQueryParams().get("scope");
 										String responseState = ctx.getRequest().getQueryParams().get("state");
 
-										System.out.println(responseCode);
-										System.out.println(getCredentialManager() != null ? "T" : "F");
-
 										// Handle Response
 										TwitchCredential credential = getCredentialManager().getOAuthTwitch().handleAuthenticationCodeResponseTwitch(responseCode);
 
@@ -75,8 +74,6 @@ public class OAuthHandler {
 											ctx.render("Authentication failed!");
 										}
 
-
-
 										// Response received, close listener
 										ctx.onClose(outcome -> {
 											new Thread(ctx.get(Stopper.class)::stop).start();
@@ -88,14 +85,18 @@ public class OAuthHandler {
 									ctx -> {
 										// Parse Parameters
 										String responseCode = ctx.getRequest().getQueryParams().get("code");
-										String responseScope = ctx.getRequest().getQueryParams().get("scope");
-										String responseState = ctx.getRequest().getQueryParams().get("state");
 
 										// Handle Response
-										credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
+										StreamlabsCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
 
-										// Show Result Site
-										ctx.render("Hello " + responseCode + "!");
+										// Valid?
+										if(credential != null) {
+											getCredentialManager().addCredential(credential.getUser().getId().toString(), credential);
+
+											ctx.render("Welcome " + credential.getUser().getDisplayName() + "!");
+										} else {
+											ctx.render("Authentication failed!");
+										}
 
 										// Response received, close listener
 										ctx.onClose(outcome -> {

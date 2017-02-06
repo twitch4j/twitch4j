@@ -50,7 +50,10 @@ public class IrcClient {
 		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
 		// Check
-		Assert.isTrue(twitchCredential.isPresent(), "IRC needs valid Credentials from the CredentialManager.");
+		if(!twitchCredential.isPresent()) {
+			getLogger().warn("IRC needs valid Credentials from the CredentialManager.");
+			return false;
+		}
 
         try {
         	URI uri = new URI("irc://" + getClient().getTwitchIrcEndpoint()); // may throw URISyntaxException

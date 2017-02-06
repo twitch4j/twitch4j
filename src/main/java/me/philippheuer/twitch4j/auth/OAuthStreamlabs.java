@@ -54,7 +54,7 @@ public class OAuthStreamlabs {
      * @return String	OAuth2 Uri
      */
     private String getAuthenticationUrl(StreamlabsScopes... streamlabsScopes) {
-        return String.format("%s/authorize?client_id=%s&response_type=code&client_id=%s&redirect_uri=%s&scope=%s",
+        return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s",
         		getCredentialManager().getStreamlabsClient().getEndpointUrl(),
 				getCredentialManager().getStreamlabsClient().getClientId(),
 				getRedirectUri(),
@@ -80,7 +80,33 @@ public class OAuthStreamlabs {
 	 */
 	public StreamlabsCredential handleAuthenticationCodeResponseStreamlabs(String authenticationCode) {
 		try {
-			return null;
+			// Validate on Server
+			String requestUrl = String.format("%s/token", getCredentialManager().getStreamlabsClient().getEndpointUrl());
+			System.out.println(requestUrl);
+			RestTemplate restTemplate = getCredentialManager().getStreamlabsClient().getRestClient().getPlainRestTemplate();
+
+			// Prepare HTTP Post Data
+			MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
+			postObject.add("client_id", getCredentialManager().getStreamlabsClient().getClientId());
+			postObject.add("client_secret", getCredentialManager().getStreamlabsClient().getClientSecret());
+			postObject.add("grant_type", "authorization_code");
+			postObject.add("redirect_uri", getCredentialManager().getOAuthStreamlabs().getRedirectUri());
+			postObject.add("code", authenticationCode);
+
+			// Rest Request
+			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
+
+			StreamlabsCredential credential = new StreamlabsCredential();
+
+
+System.out.println(responseObject.toString());
+			credential.setOAuthToken(responseObject.getAccessToken());
+
+			//User twitchUser = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(credential).get();
+			//credential.setUser(twitchUser);
+
+			return credential;
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 
