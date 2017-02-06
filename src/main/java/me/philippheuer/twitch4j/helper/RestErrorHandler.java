@@ -24,16 +24,32 @@ public class RestErrorHandler implements ResponseErrorHandler {
 	public boolean hasError(ClientHttpResponse clienthttpresponse) throws IOException {
 
 		if (clienthttpresponse.getStatusCode() != HttpStatus.OK) {
-			logger.debug("Status code: " + clienthttpresponse.getStatusCode());
-			logger.debug("Response" + clienthttpresponse.getStatusText());
-			logger.debug(clienthttpresponse.getBody());
+			String content = convertStreamToString(clienthttpresponse.getBody());
+
+			logger.trace("Status code: " + clienthttpresponse.getStatusCode());
+			logger.trace("Response" + clienthttpresponse.getStatusText());
+			logger.trace("Content: " + content);
 
 			if (clienthttpresponse.getStatusCode() == HttpStatus.FORBIDDEN) {
-				logger.debug("Call returned a error 403 forbidden resposne ");
+				if(content.contains("used Cloudflare to restrict access")) {
+					logger.warn("Your current ip is banned by cloudflare, so you can't reach the target.");
+				} else {
+					logger.debug("Call returned a error 403 forbidden resposne ");
+				}
+
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Stupid Scanner Tricks ... to convert inputStream to String
+	 * @credits: http://stackoverflow.com/a/5445161
+	 */
+	static String convertStreamToString(java.io.InputStream is) {
+		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
 	}
 
 }

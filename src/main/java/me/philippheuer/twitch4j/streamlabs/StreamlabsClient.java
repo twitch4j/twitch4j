@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.streamlabs;
 
 import lombok.Builder;
 import lombok.Singular;
+import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
 import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
@@ -59,7 +60,8 @@ public class StreamlabsClient {
 		setClientSecret(clientSecret);
 
 		// Initialize REST Client
-		getRestClient().putRestInterceptor(new QueryRequestInterceptor("access_token", getClientId()));
+		// - Valid User Agent, because Cloudflare is between us and the api.
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36"));
 	}
 
 	/**

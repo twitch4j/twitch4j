@@ -31,19 +31,13 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 	 *  Fetch information about the authenticated user.
 	 * Requires Scope: none
 	 */
-	public Optional<User> getUser(StreamlabsCredential streamlabsCredential) {
+	public Optional<User> getUser(StreamlabsCredential credential) {
 		// REST Request
 		try {
 			// Prepare
-			String requestUrl = String.format("%s/user", getStreamlabsClient().getEndpointUrl());
+			String requestUrl = String.format("%s/user?access_token=%s", getStreamlabsClient().getEndpointUrl(), credential.getOAuthToken());
 			RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
-
-			// Query Parameters
-			List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
-			localRestInterceptors.addAll(getStreamlabsClient().getRestClient().getRestInterceptors());
-
-			localRestInterceptors.add(new QueryRequestInterceptor("access_token", streamlabsCredential.getOAuthToken()));
-			restTemplate.setInterceptors(localRestInterceptors);
+			System.out.println(credential.toString());
 
 			// Request
 			UserResponse responseObject = restTemplate.getForObject(requestUrl, UserResponse.class);

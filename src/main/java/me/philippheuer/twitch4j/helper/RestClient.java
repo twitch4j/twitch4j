@@ -18,7 +18,7 @@ public class RestClient {
 	/**
 	 * Logger
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(AbstractTwitchEndpoint.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
@@ -39,7 +39,7 @@ public class RestClient {
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setInterceptors(getRestInterceptors());
-		// restTemplate.setErrorHandler(errorHandler);
+		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;
 	}
@@ -62,6 +62,7 @@ public class RestClient {
 
 	public RestTemplate getPlainRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;
 	}

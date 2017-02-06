@@ -86,7 +86,7 @@ public class OAuthTwitch {
 		try {
 			// Validate on Server
 			String requestUrl = String.format("%s/oauth2/token", getCredentialManager().getTwitchClient().getTwitchEndpoint());
-			RestTemplate restTemplate = getCredentialManager().getTwitchClient().getRestClient().getPlainRestTemplate();
+			RestTemplate restTemplate = getCredentialManager().getTwitchClient().getRestClient().getRestTemplate();
 
 			// Prepare HTTP Post Data
 			MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
@@ -99,19 +99,19 @@ public class OAuthTwitch {
 			// Rest Request
 			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
 
+			// Credential
 			TwitchCredential twitchCredential = new TwitchCredential();
 			twitchCredential.setOAuthToken(responseObject.getAccessToken());
 
 			User twitchUser = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
-
 			twitchCredential.setUser(twitchUser);
 
 			return twitchCredential;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-
-			return null;
 		}
+
+		return null;
 	}
 }

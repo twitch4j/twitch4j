@@ -1,10 +1,10 @@
-package me.philippheuer.twitch4j.auth.model.twitch;
+package me.philippheuer.twitch4j.auth.model.streamlabs;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor

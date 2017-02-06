@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import me.philippheuer.twitch4j.model.User;
+import me.philippheuer.twitch4j.streamlabs.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

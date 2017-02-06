@@ -3,14 +3,20 @@ package me.philippheuer.twitch4j.auth;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
+import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsScopes;
 import me.philippheuer.twitch4j.streamlabs.model.User;
+import org.springframework.http.*;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -83,27 +89,40 @@ public class OAuthStreamlabs {
 			// Validate on Server
 			String requestUrl = String.format("%s/token", getCredentialManager().getStreamlabsClient().getEndpointUrl());
 			System.out.println(requestUrl);
-			RestTemplate restTemplate = getCredentialManager().getStreamlabsClient().getRestClient().getPlainRestTemplate();
+			System.out.println(authenticationCode);
+			RestTemplate restTemplate = getCredentialManager().getStreamlabsClient().getRestClient().getRestTemplate();
 
-			// Prepare HTTP Post Data
-			MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
-			postObject.add("client_id", getCredentialManager().getStreamlabsClient().getClientId());
-			postObject.add("client_secret", getCredentialManager().getStreamlabsClient().getClientSecret());
-			postObject.add("grant_type", "authorization_code");
-			postObject.add("redirect_uri", getCredentialManager().getOAuthStreamlabs().getRedirectUri());
-			postObject.add("code", authenticationCode);
+			// Headers
+			HttpHeaders postHeaders = new HttpHeaders();
+			// postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			// postHeaders.add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36");
+
+			// Post Data
+			MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<String, Object>();
+			postParameters.add("grant_type", "authorization_code");
+			postParameters.add("client_id", getCredentialManager().getStreamlabsClient().getClientId());
+			postParameters.add("client_secret", getCredentialManager().getStreamlabsClient().getClientSecret());
+			postParameters.add("redirect_uri", getCredentialManager().getOAuthStreamlabs().getRedirectUri());
+			postParameters.add("code", authenticationCode);
+			System.out.println(postParameters.toString());
 
 			// Rest Request
-			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
+			Authorize responseObject = restTemplate.postForObject(requestUrl, postParameters, Authorize.class);
 
+			// Credential
 			StreamlabsCredential credential = new StreamlabsCredential();
-
-
-System.out.println(responseObject.toString());
 			credential.setOAuthToken(responseObject.getAccessToken());
+			credential.setOAuthRefreshToken(responseObject.getRefreshToken());
 
-			//User twitchUser = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(credential).get();
-			//credential.setUser(twitchUser);
+			// Streamlabs - Get User Id
+			Optional<User> user = getCredentialManager().getStreamlabsClient().getUserEndpoint().getUser(credential);
+			if(user.isPresent()) {
+				credential.setUser(user.get());
+			} else {
+				// Logger.error
+			}
+
+			System.out.println(credential.toString());
 
 			return credential;
 
