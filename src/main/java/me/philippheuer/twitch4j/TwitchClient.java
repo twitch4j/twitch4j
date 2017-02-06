@@ -138,7 +138,7 @@ public class TwitchClient {
 		twitchClient.getCredentialManager().configurationCreate();
 
 		// Connect to API Endpoints
-		// twitchClient.connect();
+		twitchClient.connect();
 
 		// Return builded instance
 		return twitchClient;
@@ -161,7 +161,7 @@ public class TwitchClient {
     /**
      * Get Channel Endpoint
      */
-    public ChannelEndpoint getChannelEndpoint(Long channelId) {
+    public ChannelEndpoint getChannelEndpoint(Long channelId) throws Exception {
     	return new ChannelEndpoint(this, channelId);
     }
 

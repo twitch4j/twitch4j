@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.*;
@@ -28,7 +29,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 	 *  Fetch donations for the authenticated user. Results are ordered by creation date, descending.
 	 * Requires Scope: donations.read
 	 */
-	public Optional<List<Donation>> getDonations() {
+	public Optional<List<Donation>> getDonations(StreamlabsCredential credential) {
 		// REST Request
 		try {
 			// Prepare
@@ -38,8 +39,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 			// Query Parameters
 			List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 			localRestInterceptors.addAll(getStreamlabsClient().getRestClient().getRestInterceptors());
-			// TODO: Get access token from credential manager
-			localRestInterceptors.add(new HeaderRequestInterceptor("access_token", "value"));
+			localRestInterceptors.add(new HeaderRequestInterceptor("access_token", credential.getOAuthToken()));
 			localRestInterceptors.add(new HeaderRequestInterceptor("currency", "EUR"));
 			localRestInterceptors.add(new HeaderRequestInterceptor("limit", "50"));
 			restTemplate.setInterceptors(localRestInterceptors);

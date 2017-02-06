@@ -1,11 +1,10 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
+import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.FollowEvent;
 import org.springframework.util.Assert;
 
 import lombok.*;
@@ -27,9 +26,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	private final List<Long> validCommercialLengths = new ArrayList<Long>(Arrays.asList(30L, 60L, 90L, 120L, 150L, 180L));
 
 	/**
-	 * Get User by UserId
+	 * Event Timer
 	 */
-	public ChannelEndpoint(TwitchClient client, Long channelId) {
+	Timer eventTriggerTimer = new Timer(true);
+
+	/**
+	 * Constructor
+	 */
+	public ChannelEndpoint(TwitchClient client, Long channelId) throws Exception {
 		super(client);
 
 		// Validate Arguments
@@ -37,6 +41,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Process Arguments
 		setChannelId(channelId);
+
+		if(!getChannel().isPresent()) {
+			throw new Exception("Target Channel " + channelId + " does not exists!");
+		}
 	}
 
 	/**
@@ -242,11 +250,17 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
+	 * New Event Checker: Last Follow
+	 */
+	private Date lastFollow;
+
+	/**
 	 * Central Endpoint: Register Channel Event Listener
 	 *  IRC: Subscriptions
 	 *  PubSub: Bits
 	 *
 	 */
+
 	public void setChannelEventListener(Object annotationListener) {
 		// Check that the channel exists
 		// TODO
@@ -273,7 +287,31 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// - Listen: PubSub (Requires Credentials)
 		// getClient().getPubSub().addChannel(channel);
 
+		// Timer
+		eventTriggerTimer.scheduleAtFixedRate(
+			new TimerTask() {
+				public void run() {
+					// Followers
+					for(Follow follow : getFollowers().get()) {
+						if(follow.getCreatedAt().after(lastFollow)) {
+							Event dispatchEvent = new FollowEvent(channel, follow.getUser());
+							getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+						}
+					}
+					lastFollow = new Date();
+
+					// Donations
+				}
+			}, 0, 5 * 1000);
+
 		// Register Listener
 		getTwitchClient().getDispatcher().registerListener(annotationListener);
+	}
+
+	/**
+	 * Cancel Timer/Listeners
+	 */
+	public void cancel() {
+		eventTriggerTimer.cancel();
 	}
 }
