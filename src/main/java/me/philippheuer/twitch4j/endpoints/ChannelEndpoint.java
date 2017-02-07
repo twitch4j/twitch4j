@@ -5,9 +5,12 @@ import java.util.*;
 import com.sun.istack.internal.NotNull;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.FollowEvent;
-import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
+import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
+import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
+import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 
@@ -47,8 +50,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Process Arguments
 		setChannelId(channelId);
 
-		// Channel exists?
-		Assert.isTrue(getChannel().isPresent(), "Target Channel " + channelId + " does not exists!");
+		// Throw ChannelDoesNotExistException
+		if(getChannel() == null) {
+			throw new ChannelDoesNotExistException(channelId);
+		}
 	}
 
 	/**
@@ -56,49 +61,72 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 *  Gets a specified channel object.
 	 * Requires Scope: none
 	 */
-	public Optional<Channel> getChannel() {
+	public Channel getChannel() {
+		// Endpoint
+		String requestUrl = String.format("%s/channels/%s", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s", getTwitchClient().getTwitchEndpoint(), getChannelId());
 			if(!restObjectCache.containsKey(requestUrl)) {
-				Channel responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, Channel.class);
+				Channel responseObject = restTemplate.getForObject(requestUrl, Channel.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}
 
 			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
 
 			// Add twitch oauth credentials to channel object, if the credential manager has them
-			if(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject).isPresent()) {
-				responseObject.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject));
+			if(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject.getId()).isPresent()) {
+				responseObject.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject.getId()));
 			}
 
-			return Optional.ofNullable(responseObject);
+			return responseObject;
 		} catch (Exception ex) {
-			return Optional.empty();
+			ex.printStackTrace();
+			return null;
 		}
 	}
 
 	/**
 	 * Endpoint: Get Channel
 	 *  Get Channel returns more data than Get Channel by ID because Get Channel is privileged.
-	 * Requires Scope: none
+	 * Requires Scope: channel_read
 	 */
-	public Optional<Channel> getChannelPrivilegied() {
-		TwitchCredential twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannel().get()).get();
+	public Channel getChannelPrivilegied() {
+		// Check Scope
+		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		if(twitchCredential.isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_READ.getKey());
+			}};
+
+			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
+
+		// Endpoint
+		String requestUrl = String.format("%s/channel", getTwitchClient().getTwitchEndpoint());
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", getChannel().getTwitchCredential().get().getOAuthToken())));
 
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channel", getTwitchClient().getTwitchEndpoint());
+
 			if(!restObjectCache.containsKey(requestUrl)) {
 				Channel responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, Channel.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}
 
 			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
+System.out.println(responseObject.toString());
 
-			return Optional.ofNullable(responseObject);
+			return responseObject;
 		} catch (Exception ex) {
-			return Optional.empty();
+			ex.printStackTrace();
+			return null;
 		}
 	}
 
@@ -108,6 +136,18 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: channel_read
 	 */
 	public List<User> getEditors() {
+		// Check Scope
+		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		if(twitchCredential.isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_READ.getKey());
+			}};
+
+			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
+
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/editors", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
@@ -183,6 +223,18 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
 	public List<Subscription> getSubscriptions(@NotNull Optional<Integer> limit, @NotNull Optional<Integer> offset, @NotNull Optional<String> direction) {
+		// Check Scope
+		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		if(twitchCredential.isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
+			}};
+
+			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
+
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
@@ -211,11 +263,19 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * TODO: Handle error
 	 */
 	public Boolean getSubscriptionByUser(User user) {
+		// Check Scope
+		if(getChannel().getTwitchCredential().isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_CHECK_SUBSCRIPTION.getKey());
+			}};
+
+			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
+
 		// Validate Arguments
 		Assert.notNull(user, "Please provide a User!");
-
-		// Get Channel
-		Channel channel = getChannel().get();
 
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions/%d", getTwitchClient().getTwitchEndpoint(), getChannelId(), user.getId());
@@ -225,7 +285,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		try {
 			Subscription responseObject = restTemplate.getForObject(requestUrl, Subscription.class);
 
-			getLogger().debug(String.format("Found Subscription for Channel %s [%s] for User %s [%s].", channel.getDisplayName(), channel.getId(), responseObject.getUser().getDisplayName(), responseObject.getUser().getId()));
+
 
 			return true;
 		} catch (Exception ex) {
@@ -277,6 +337,17 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: channel_commercial
 	 */
 	public Boolean startCommercial(Long length) {
+		// Check Scope
+		if(getChannel().getTwitchCredential().isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_COMMERCIAL.getKey());
+			}};
+
+			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
+
 		// Validate Arguments
 		Assert.isTrue(getValidCommercialLengths().contains(length), "Please provide a valid length! Valid: " + getValidCommercialLengths().toString());
 
@@ -295,15 +366,21 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: channel_stream
 	 */
 	public Boolean deleteStreamKey() {
-		// Get Channel
-		Channel channel = getChannel().get();
+		// Check Scope
+		if(getChannel().getTwitchCredential().isPresent()) {
+			List<String> requiredScopes = new ArrayList<String>() {{
+				add(TwitchScopes.CHANNEL_STREAM.getKey());
+			}};
+
+			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
+		} else {
+			throw new ChannelCredentialMissingException(getChannelId());
+		}
 
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/channels/%s/stream_key", getTwitchClient().getTwitchEndpoint(), getChannelId());
 			getTwitchClient().getRestClient().getRestTemplate().delete(requestUrl);
-
-			getLogger().warn(String.format("Deleted Stream Key for Channel %s [%s]!", channel.getDisplayName(), channel.getId()));
 
 			return true;
 		} catch (Exception ex) {
@@ -318,10 +395,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean getStreamlabsDonations() {
 		// Get Channel
-		Channel channel = getChannel().get();
+		Channel channel = getChannel();
 
 		// Check for Streamlabs Credentials and Scope
-		Optional<StreamlabsCredential> streamlabsCredential = getTwitchClient().getCredentialManager().getStreamlabsCredentialsForChannel(channel);
+		Optional<StreamlabsCredential> streamlabsCredential = getTwitchClient().getCredentialManager().getStreamlabsCredentialsForChannel(channel.getId());
 		if(!streamlabsCredential.isPresent()) {
 			Assert.isTrue(false, "No Streamlabs Credentials fo");
 		}
@@ -365,7 +442,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		getTwitchClient().getDispatcher().registerListener(annotationListener);
 
 		// Get Channel Information
-		Channel channel = getChannel().get();
+		Channel channel = getChannel();
 		// - Listen: IRC
 		getTwitchClient().getIrcClient().joinChannel(channel.getName());
 		// - Listen: PubSub
@@ -391,14 +468,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 							}
 							creationDates.add(follow.getCreatedAt());
 						}
-					} else {
-						getLogger().warn("Couldn't get followers for the event dispatcher!");
-					}
 
-					// Get newest date from all follows
-					Date lastFollowNew = creationDates.stream().max(Date::compareTo).get();
-					if(lastFollow == null || lastFollowNew.after(lastFollow)) {
-						lastFollow = lastFollowNew;
+						// Get newest date from all follows
+						Date lastFollowNew = creationDates.stream().max(Date::compareTo).get();
+						if(lastFollow == null || lastFollowNew.after(lastFollow)) {
+							lastFollow = lastFollowNew;
+						}
 					}
 				}
 			}, 0, 5 * 1000);

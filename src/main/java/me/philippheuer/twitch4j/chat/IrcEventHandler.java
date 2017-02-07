@@ -95,7 +95,7 @@ public class IrcEventHandler {
 			// Get Channel on IRC
 			String channelName = event.getParameters().get(0).replace("#", "");
 			Long channelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get();
-			Channel channel = getTwitchClient().getChannelEndpoint(channelId).getChannel().get();
+			Channel channel = getTwitchClient().getChannelEndpoint(channelId).getChannel();
 
 			// Build Map from Tags
 			Map<String, String> tagMap = new HashMap<>();

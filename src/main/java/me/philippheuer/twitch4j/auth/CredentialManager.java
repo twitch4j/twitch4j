@@ -126,12 +126,12 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials for channel
-	 * @param channel Channel
+	 * @param channelId Channel ID
 	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
 	 */
-	public Optional<TwitchCredential> getTwitchCredentialsForChannel(Channel channel) {
-		if(getOAuthCredentials().containsKey("TWITCH-" + channel.getId().toString())) {
-			return Optional.ofNullable((TwitchCredential) getOAuthCredentials().get("TWITCH-" + channel.getId().toString()));
+	public Optional<TwitchCredential> getTwitchCredentialsForChannel(Long channelId) {
+		if(getOAuthCredentials().containsKey("TWITCH-" + channelId.toString())) {
+			return Optional.ofNullable((TwitchCredential) getOAuthCredentials().get("TWITCH-" + channelId.toString()));
 		} else {
 			return Optional.empty();
 		}
@@ -151,12 +151,12 @@ public class CredentialManager {
 
 	/**
 	 * Get Streamlabs credentials for channel
-	 * @param channel Channel
+	 * @param channelId Channel ID
 	 * @return Optional<StreamlabsCredential> credential with oauth token and access scope.
 	 */
-	public Optional<StreamlabsCredential> getStreamlabsCredentialsForChannel(Channel channel) {
-		if(getOAuthCredentials().containsKey("STREAMLABS-" + channel.getId().toString())) {
-			return Optional.ofNullable((StreamlabsCredential) getOAuthCredentials().get("STREAMLABS-" + channel.getId().toString()));
+	public Optional<StreamlabsCredential> getStreamlabsCredentialsForChannel(Long channelId) {
+		if(getOAuthCredentials().containsKey("STREAMLABS-" + channelId.toString())) {
+			return Optional.ofNullable((StreamlabsCredential) getOAuthCredentials().get("STREAMLABS-" + channelId.toString()));
 		} else {
 			return Optional.empty();
 		}
