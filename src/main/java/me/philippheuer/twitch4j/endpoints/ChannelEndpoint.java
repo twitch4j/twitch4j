@@ -62,6 +62,11 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
 
+			// Add twitch oauth credentials to channel object, if the credential manager has them
+			if(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject).isPresent()) {
+				responseObject.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject));
+			}
+
 			return Optional.ofNullable(responseObject);
 		} catch (Exception ex) {
 			return Optional.empty();
@@ -283,9 +288,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Register Listener Events
 		getTwitchClient().getDispatcher().registerListener(annotationListener);
 
-		//
+		// Get Channel Information
 		Channel channel = getChannel().get();
-		channel.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(channel));
 		// - Listen: IRC
 		getTwitchClient().getIrcClient().joinChannel(channel.getName());
 		// - Listen: PubSub
@@ -295,18 +299,27 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		eventTriggerTimer.scheduleAtFixedRate(
 			new TimerTask() {
 				public void run() {
-
 					// Followers
-					for(Follow follow : getFollowers().get()) {
-						System.out.println(follow);
-						if(follow.getCreatedAt().after(lastFollow)) {
-							Event dispatchEvent = new FollowEvent(channel, follow.getUser());
-							getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+					List<Date> creationDates = new ArrayList<Date>();
+					Optional<List<Follow>> followList = getFollowers();
+					if(followList.isPresent()) {
+						for(Follow follow : followList.get()) {
+							// dispatch event for new follows only
+							if(lastFollow != null && follow.getCreatedAt().after(lastFollow)) {
+								Event dispatchEvent = new FollowEvent(channel, follow.getUser());
+								getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+							}
+							creationDates.add(follow.getCreatedAt());
 						}
+					} else {
+						getLogger().warn("Couldn't get followers for the event dispatcher!");
 					}
-					lastFollow = new Date();
 
-					// Donations
+					// Get newest date from all follows
+					Date lastFollowNew = creationDates.stream().max(Date::compareTo).get();
+					if(lastFollow == null || lastFollowNew.after(lastFollow)) {
+						lastFollow = lastFollowNew;
+					}
 				}
 			}, 0, 5 * 1000);
 	}

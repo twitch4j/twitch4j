@@ -148,7 +148,7 @@ public class IrcClient {
 		if(!twitchCredential.isPresent()) {
 			return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials not present!");
 		} else {
-			if(!twitchCredential.get().getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN)) {
+			if(!twitchCredential.get().getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
 				return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
 			}
 		}
