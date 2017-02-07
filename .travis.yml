@@ -15,8 +15,8 @@ cache:
 
 # Before Install
 before_install:
-  - chmod +x $HOME/twitch4j/gradlew
-  - chmod +x $HOME/twitch4j/gradle/wrapper/gradle-wrapper.jar
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
 
 # Build
 script:
