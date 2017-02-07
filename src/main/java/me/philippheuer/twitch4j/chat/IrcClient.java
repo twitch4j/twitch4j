@@ -2,9 +2,12 @@ package me.philippheuer.twitch4j.chat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 import org.slf4j.Logger;
@@ -45,6 +48,12 @@ public class IrcClient {
 
 	private Boolean connect() {
 		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+
+		// Shutdown, if the client is still running
+		if(this.getIrcClient() != null) {
+			getLogger().debug(String.format("Shutting down old Twitch IRC instance."));
+			getIrcClient().shutdown();
+		}
 
 		// Get Credentials
 		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
@@ -110,14 +119,14 @@ public class IrcClient {
 	/**
 	 * Reconnects only if the connection was lost.
 	 */
-	public void reconnect() {
+	private void reconnect() {
 		getLogger().info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
 
 		disconnect();
 		connect();
 	}
 
-	public void disconnect() {
+	private void disconnect() {
 		getIrcClient().shutdown();
 	}
 
@@ -131,14 +140,19 @@ public class IrcClient {
 	/**
 	 * Method: Check IRC Client Status
 	 */
-	public Boolean checkEndpointStatus() {
-		// @TODO: Check for UserName and OAUTH Token
-		/*
-		if() {
+	public Map.Entry<Boolean, String> checkEndpointStatus() {
+		// Get Credentials
+		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
+		// Check
+		if(!twitchCredential.isPresent()) {
+			return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials not present!");
+		} else {
+			if(!twitchCredential.get().getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN)) {
+				return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
+			}
 		}
-		*/
 
-		return true;
+		return new AbstractMap.SimpleEntry<Boolean, String>(true, "");
 	}
 }

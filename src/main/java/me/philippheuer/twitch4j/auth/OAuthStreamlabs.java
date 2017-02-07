@@ -88,14 +88,7 @@ public class OAuthStreamlabs {
 		try {
 			// Validate on Server
 			String requestUrl = String.format("%s/token", getCredentialManager().getStreamlabsClient().getEndpointUrl());
-			System.out.println(requestUrl);
-			System.out.println(authenticationCode);
 			RestTemplate restTemplate = getCredentialManager().getStreamlabsClient().getRestClient().getRestTemplate();
-
-			// Headers
-			HttpHeaders postHeaders = new HttpHeaders();
-			// postHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			// postHeaders.add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36");
 
 			// Post Data
 			MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<String, Object>();
@@ -104,7 +97,6 @@ public class OAuthStreamlabs {
 			postParameters.add("client_secret", getCredentialManager().getStreamlabsClient().getClientSecret());
 			postParameters.add("redirect_uri", getCredentialManager().getOAuthStreamlabs().getRedirectUri());
 			postParameters.add("code", authenticationCode);
-			System.out.println(postParameters.toString());
 
 			// Rest Request
 			Authorize responseObject = restTemplate.postForObject(requestUrl, postParameters, Authorize.class);

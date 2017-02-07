@@ -33,7 +33,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Constructor
 	 */
-	public ChannelEndpoint(TwitchClient client, Long channelId) throws Exception {
+	public ChannelEndpoint(TwitchClient client, Long channelId) {
 		super(client);
 
 		// Validate Arguments
@@ -42,9 +42,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Process Arguments
 		setChannelId(channelId);
 
-		if(!getChannel().isPresent()) {
-			throw new Exception("Target Channel " + channelId + " does not exists!");
-		}
+		// Channel exists?
+		Assert.isTrue(getChannel().isPresent(), "Target Channel " + channelId + " does not exists!");
 	}
 
 	/**
@@ -267,11 +266,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Check Endpoint Status
 		// - Check Rest API
-
 		// - Check IRC
-		if(!getTwitchClient().getIrcClient().checkEndpointStatus()) {
-			getLogger().warn("IRC Client not operating. You will not recieve any irc events!");
-			return;
+		{
+			Map.Entry<Boolean, String> result = getTwitchClient().getIrcClient().checkEndpointStatus();
+			if(!result.getKey()) {
+				getLogger().warn("IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
+				return;
+			}
 		}
 		// - Check PubSub
 		if(!getTwitchClient().getPubSub().checkEndpointStatus()) {
@@ -279,20 +280,25 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			getLogger().warn("PubSub Client not operating. You will not recieve any pubsub events!");
 		}
 
-		// Listener
+		// Register Listener Events
+		getTwitchClient().getDispatcher().registerListener(annotationListener);
+
+		//
 		Channel channel = getChannel().get();
 		channel.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(channel));
 		// - Listen: IRC
 		getTwitchClient().getIrcClient().joinChannel(channel.getName());
-		// - Listen: PubSub (Requires Credentials)
-		// getClient().getPubSub().addChannel(channel);
+		// - Listen: PubSub
+		// NYI
 
-		// Timer
+		// Event Timer
 		eventTriggerTimer.scheduleAtFixedRate(
 			new TimerTask() {
 				public void run() {
+
 					// Followers
 					for(Follow follow : getFollowers().get()) {
+						System.out.println(follow);
 						if(follow.getCreatedAt().after(lastFollow)) {
 							Event dispatchEvent = new FollowEvent(channel, follow.getUser());
 							getTwitchClient().getDispatcher().dispatch(dispatchEvent);
@@ -303,9 +309,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 					// Donations
 				}
 			}, 0, 5 * 1000);
-
-		// Register Listener
-		getTwitchClient().getDispatcher().registerListener(annotationListener);
 	}
 
 	/**

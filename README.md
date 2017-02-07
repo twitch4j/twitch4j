@@ -89,14 +89,14 @@ and:
  - [ ] Whispers
  
 #### Twitch IRC
- - [ ] Follows
  - [x] Subscriptions
  - [x] Cheers (Bits)
  
 #### Streamlabs
  - [x] Users
  - [ ] Donations
-
+ - [ ] Alerts
+ 
 ## Getting Started
 Just some simple examples, visit the wiki for more details.
 

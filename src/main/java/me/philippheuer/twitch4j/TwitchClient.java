@@ -161,7 +161,7 @@ public class TwitchClient {
     /**
      * Get Channel Endpoint
      */
-    public ChannelEndpoint getChannelEndpoint(Long channelId) throws Exception {
+    public ChannelEndpoint getChannelEndpoint(Long channelId) {
     	return new ChannelEndpoint(this, channelId);
     }
 

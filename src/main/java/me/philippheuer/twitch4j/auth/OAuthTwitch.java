@@ -44,7 +44,7 @@ public class OAuthTwitch {
 	 */
 	public void requestPermissionsFor(String type, TwitchScopes... twitchScopes) {
 		// Get OAuthTwitch URI
-		String requestUrl = getAuthenticationUrl(twitchScopes);
+		String requestUrl = getAuthenticationUrl(type, twitchScopes);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -54,15 +54,17 @@ public class OAuthTwitch {
      * Returns the authentication URL that you can redirect the user to in order
      * to authorize your application to retrieve an access token.
      *
+	 * @param type 		What are the credentials requested for? (CHANNEL/IRC)
      * @param scopes	TwitchScopes to request access for
      * @return String	OAuth2 Uri
      */
-    private String getAuthenticationUrl(TwitchScopes... scopes) {
-        return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&force_verify=true",
+    private String getAuthenticationUrl(String type, TwitchScopes... scopes) {
+        return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
 				getCredentialManager().getTwitchClient().getTwitchEndpoint(),
 				getCredentialManager().getTwitchClient().getClientId(),
 				getRedirectUri(),
-				TwitchScopes.join(scopes)
+				TwitchScopes.join(scopes),
+				type
 		);
     }
 

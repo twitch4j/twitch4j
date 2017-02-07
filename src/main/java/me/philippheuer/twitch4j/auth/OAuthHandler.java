@@ -5,9 +5,12 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
+
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -67,7 +70,21 @@ public class OAuthHandler {
 
 										// Valid?
 										if(credential != null) {
-											getCredentialManager().addCredential(credential.getUser().getId().toString(), credential);
+											// Add requested Scopes to credential (separated by space when more than one is requested)
+											if(responseScope.contains(" ")) {
+												credential.getOAuthScopes().addAll(Arrays.asList(responseScope.split("\\s")));
+											} else {
+												credential.getOAuthScopes().add(responseScope);
+											}
+
+											// Store Credential
+											if(responseState.equals("IRC")) {
+												// IRC Credentials
+												getCredentialManager().addCredential(CredentialManager.CREDENTIAL_IRC, credential);
+											} else {
+												// Channel Credentials
+												getCredentialManager().addCredential(credential.getUser().getId().toString(), credential);
+											}
 
 											ctx.render("Welcome " + credential.getUser().getDisplayName() + "!");
 										} else {

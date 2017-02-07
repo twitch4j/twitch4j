@@ -4,9 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
+import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.*;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 	/**
 	 * Endpoint: Get Donations
 	 *  Fetch donations for the authenticated user. Results are ordered by creation date, descending.
+	 *  Limit: 100
 	 * Requires Scope: donations.read
 	 */
 	public Optional<List<Donation>> getDonations(StreamlabsCredential credential) {
@@ -38,10 +41,10 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 
 			// Query Parameters
 			List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
-			localRestInterceptors.addAll(getStreamlabsClient().getRestClient().getRestInterceptors());
-			localRestInterceptors.add(new HeaderRequestInterceptor("access_token", credential.getOAuthToken()));
-			localRestInterceptors.add(new HeaderRequestInterceptor("currency", "EUR"));
-			localRestInterceptors.add(new HeaderRequestInterceptor("limit", "50"));
+			localRestInterceptors.addAll(restTemplate.getInterceptors());
+			localRestInterceptors.add(new QueryRequestInterceptor("access_token", credential.getOAuthToken()));
+			localRestInterceptors.add(new QueryRequestInterceptor("currency", "EUR"));
+			localRestInterceptors.add(new QueryRequestInterceptor("limit", "50"));
 			restTemplate.setInterceptors(localRestInterceptors);
 
 			// Request

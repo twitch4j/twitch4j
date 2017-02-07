@@ -94,7 +94,8 @@ public class IrcEventHandler {
 		if(event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
 			// Get Channel on IRC
 			String channelName = event.getParameters().get(0).replace("#", "");
-			Channel channel = getTwitchClient().getChannelEndpoint(getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get()).getChannel().get();
+			Long channelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get();
+			Channel channel = getTwitchClient().getChannelEndpoint(channelId).getChannel().get();
 
 			// Build Map from Tags
 			Map<String, String> tagMap = new HashMap<>();

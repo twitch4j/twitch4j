@@ -86,25 +86,11 @@ public class CredentialManager {
 	/**
 	 * Adds Twitch Credentials to the Credential Manager
 	 * @param key Key
-	 * @param twitchCredential Credential Instance
+	 * @param credential Credential Instance
 	 */
-	public void addCredential(String key, TwitchCredential twitchCredential) {
+	public void addCredential(String key, TwitchCredential credential) {
 		// TwitchCredential Prefix
-		key = "TWITCH-" + key;
-
-		// Remove value if it exists
-		if(getOAuthCredentials().containsKey(key)) {
-			getLogger().debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
-			getOAuthCredentials().remove(key);
-		}
-
-		// Add value
-		getLogger().debug(String.format("Added Credentials with key [%s] and data [%s]", key, twitchCredential.toString()));
-
-		getOAuthCredentials().put(key, twitchCredential);
-
-		// Store
-		saveToFile();
+		addAnyCredential("TWITCH-" + key, credential);
 	}
 
 	/**
@@ -114,8 +100,15 @@ public class CredentialManager {
 	 */
 	public void addCredential(String key, StreamlabsCredential credential) {
 		// TwitchCredential Prefix
-		key = "STREAMLABS-" + key;
+		addAnyCredential("STREAMLABS-" + key, credential);
+	}
 
+	/**
+	 * Adds any Credentials to the Credential Manager
+	 * @param key Key
+	 * @param credential Credential Instance
+	 */
+	private void addAnyCredential(String key, Object credential) {
 		// Remove value if it exists
 		if(getOAuthCredentials().containsKey(key)) {
 			getLogger().debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
@@ -151,6 +144,19 @@ public class CredentialManager {
 	public Optional<TwitchCredential> getTwitchCredentialsForIRC() {
 		if(getOAuthCredentials().containsKey("TWITCH-" + CREDENTIAL_IRC)) {
 			return Optional.ofNullable((TwitchCredential) getOAuthCredentials().get("TWITCH-" + CREDENTIAL_IRC));
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Get Streamlabs credentials for channel
+	 * @param channel Channel
+	 * @return Optional<StreamlabsCredential> credential with oauth token and access scope.
+	 */
+	public Optional<StreamlabsCredential> getStreamlabsCredentialsForChannel(Channel channel) {
+		if(getOAuthCredentials().containsKey("STREAMLABS-" + channel.getId().toString())) {
+			return Optional.ofNullable((StreamlabsCredential) getOAuthCredentials().get("STREAMLABS-" + channel.getId().toString()));
 		} else {
 			return Optional.empty();
 		}
