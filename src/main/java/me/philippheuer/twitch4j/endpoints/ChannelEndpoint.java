@@ -2,7 +2,6 @@ package me.philippheuer.twitch4j.endpoints;
 
 import java.util.*;
 
-import com.sun.istack.internal.NotNull;
 import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
@@ -114,14 +113,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
-
 			if(!restObjectCache.containsKey(requestUrl)) {
 				Channel responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, Channel.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}
 
 			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
-System.out.println(responseObject.toString());
 
 			return responseObject;
 		} catch (Exception ex) {
@@ -171,7 +168,7 @@ System.out.println(responseObject.toString());
 	 * @param offset Object offset for pagination of results. Default: 0.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public List<Follow> getFollowers(@NotNull Optional<Integer> limit, @NotNull Optional<Integer> offset, @NotNull Optional<String> direction) {
+	public List<Follow> getFollowers(Optional<Integer> limit, Optional<Integer> offset, Optional<String> direction) {
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/follows", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
@@ -222,7 +219,7 @@ System.out.println(responseObject.toString());
 	 * @param offset Object offset for pagination of results. Default: 0.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public List<Subscription> getSubscriptions(@NotNull Optional<Integer> limit, @NotNull Optional<Integer> offset, @NotNull Optional<String> direction) {
+	public List<Subscription> getSubscriptions(Optional<Integer> limit, Optional<Integer> offset, Optional<String> direction) {
 		// Check Scope
 		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if(twitchCredential.isPresent()) {
@@ -305,7 +302,7 @@ System.out.println(responseObject.toString());
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight.
 	 *
 	 */
-	public List<Video> getVideos(@NotNull Optional<Integer> limit, @NotNull Optional<Integer> offset, @NotNull Optional<String> sort, @NotNull Optional<String> language, @NotNull Optional<String> broadcast_type) {
+	public List<Video> getVideos(Optional<Integer> limit, Optional<Integer> offset, Optional<String> sort, Optional<String> language, Optional<String> broadcast_type) {
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/videos", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
