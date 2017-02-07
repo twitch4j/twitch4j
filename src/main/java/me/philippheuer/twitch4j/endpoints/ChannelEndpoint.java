@@ -254,7 +254,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("sort", sort.orElse("time").toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("language", language.orElse("en,de,es").toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("language", language.orElse(null).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("broadcast_type", broadcast_type.orElse("highlight").toString()));
 
 		// REST Request

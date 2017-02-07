@@ -25,7 +25,11 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestDecorator httpRequest = new HttpRequestDecorator(request);
-        httpRequest.addParameter(name, value);
+
+		if(value != null) {
+			httpRequest.addParameter(name, value);
+		}
+
         return execution.execute(httpRequest, body);
     }
 }
