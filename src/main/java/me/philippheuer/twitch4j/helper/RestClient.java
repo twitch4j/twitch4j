@@ -26,7 +26,7 @@ public class RestClient {
 	private List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 
 	/**
-	 *
+	 * Constructor
 	 */
 	public RestClient() {
 		super();
@@ -38,7 +38,8 @@ public class RestClient {
 
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setInterceptors(getRestInterceptors());
+		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
+		restTemplate.getInterceptors().addAll(getRestInterceptors());
 		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;

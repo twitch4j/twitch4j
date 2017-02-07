@@ -7,6 +7,7 @@ import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.FollowEvent;
+import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 
@@ -107,10 +108,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: channel_read
 	 */
 	public List<User> getEditors() {
+		// Endpoint
+		String requestUrl = String.format("%s/channels/%s/editors", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/editors", getTwitchClient().getTwitchEndpoint(), getChannelId());
-			UserList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, UserList.class);
+			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
 
 			return responseObject.getUsers();
 		} catch (Exception ex) {
@@ -139,7 +143,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
-			FollowList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, FollowList.class);
+			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
 			return responseObject.getFollows();
 		} catch (Exception ex) {
