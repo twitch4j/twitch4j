@@ -3,6 +3,8 @@
 #
 sudo: false
 language: java
+jdk:
+  - oraclejdk8
 
 # Cache
 before_cache:
