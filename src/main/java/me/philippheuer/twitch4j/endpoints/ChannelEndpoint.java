@@ -410,11 +410,10 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Central Endpoint: Register Channel Event Listener
-	 *  IRC: Subscriptions
-	 *  PubSub: Bits
-	 *
+	 *  IRC: Subscriptions, Bits
+	 *  Rest API: Follows
+	 *  Streamlabs API: Donations
 	 */
-
 	public void setChannelEventListener(Object annotationListener) {
 		// Check that the channel exists
 		// TODO

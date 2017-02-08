@@ -14,6 +14,10 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 @Setter
 public class StreamlabsClient {
@@ -49,6 +53,34 @@ public class StreamlabsClient {
 	 */
 	@Singular
 	private String clientSecret;
+
+	/**
+	 * Holds all valid currencies in streamlabs
+	 */
+	private List<String> validCurrencies = new ArrayList<String>() {{{
+		add("AUD");
+		add("BRL");
+		add("CAD");
+		add("CZK");
+		add("DKK");
+		add("EUR");
+		add("HKD");
+		add("ILS");
+		add("MYR");
+		add("MXN");
+		add("NOK");
+		add("NZD");
+		add("PHP");
+		add("PLN");
+		add("GBP");
+		add("RUB");
+		add("SGD");
+		add("SEK");
+		add("CHF");
+		add("THB");
+		add("TRY");
+		add("USD");
+	}}};
 
 	/**
 	 * Constructor
