@@ -18,7 +18,7 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 		ClientHttpResponse response = execution.execute(request, body);
 
-		log(request,body,response);
+		log(request, body, response);
 
 		return response;
 	}

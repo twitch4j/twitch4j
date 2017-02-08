@@ -14,6 +14,6 @@ public class DonationList {
 	/**
 	 * List of Entity
 	 */
-    private List<Donation> data;
+	private List<Donation> data;
 
 }

@@ -15,21 +15,21 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 
 	private final String name;
 
-    private final String value;
+	private final String value;
 
-    public QueryRequestInterceptor(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
+	public QueryRequestInterceptor(String name, String value) {
+		this.name = name;
+		this.value = value;
+	}
 
-    @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+	@Override
+	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestDecorator httpRequest = new HttpRequestDecorator(request);
 
-		if(value != null) {
+		if (value != null) {
 			httpRequest.addParameter(name, value);
 		}
 
-        return execution.execute(httpRequest, body);
-    }
+		return execution.execute(httpRequest, body);
+	}
 }

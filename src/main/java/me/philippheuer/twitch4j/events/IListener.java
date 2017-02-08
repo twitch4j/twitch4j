@@ -6,7 +6,7 @@ package me.philippheuer.twitch4j.events;
  * @param <T> The event type to handle.
  */
 @FunctionalInterface
-public interface IListener <T extends Event> {
+public interface IListener<T extends Event> {
 
 	/**
 	 * Called when the event is sent.

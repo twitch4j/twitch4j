@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -15,5 +14,5 @@ public class RestError {
 
 	private String status;
 
-    private String message;
+	private String message;
 }

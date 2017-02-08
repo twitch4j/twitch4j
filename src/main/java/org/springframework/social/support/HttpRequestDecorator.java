@@ -33,7 +33,7 @@ public class HttpRequestDecorator extends HttpRequestWrapper {
 
 	private boolean existingHeadersAdded;
 
-	MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
+	private MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
 
 	public HttpRequestDecorator(HttpRequest request) {
 		super(request);

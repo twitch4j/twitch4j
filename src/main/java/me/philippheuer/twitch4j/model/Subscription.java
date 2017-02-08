@@ -1,12 +1,13 @@
 package me.philippheuer.twitch4j.model;
 
-import java.util.*;
-
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 
-import lombok.*;
+import java.util.Date;
+import java.util.Optional;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -16,13 +17,13 @@ public class Subscription {
 	@JsonProperty("_id")
 	private Long id;
 
-    private Optional<Date> createdAt;
+	private Optional<Date> createdAt;
 
-    private Optional<Integer> streak;
+	private Optional<Integer> streak;
 
-    private Optional<String> message;
+	private Optional<String> message;
 
-    private Optional<Boolean> isPrimeSub;
+	private Optional<Boolean> isPrimeSub;
 
 	private User user;
 }

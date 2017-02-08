@@ -13,10 +13,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Authorize {
 
-    private String accessToken;
+	private String accessToken;
 
 	private String refreshToken;
 
-    private List<String> scope;
+	private List<String> scope;
 
 }

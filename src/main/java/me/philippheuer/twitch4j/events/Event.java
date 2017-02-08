@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.events;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 
 @Getter

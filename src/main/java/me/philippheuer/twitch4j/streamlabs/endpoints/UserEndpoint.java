@@ -35,7 +35,7 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Endpoint: Get the Streamlabs User
-	 *  Fetch information about the authenticated user.
+	 * Fetch information about the authenticated user.
 	 * Requires Scope: none
 	 */
 	public Optional<User> getUser() {
@@ -58,16 +58,17 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Endpoint: Get Donations
-	 *  Fetch donations for the authenticated user. Results are ordered by creation date, descending.
-	 *  Limit: 100
+	 * Fetch donations for the authenticated user. Results are ordered by creation date, descending.
+	 * Limit: 100
 	 * Requires Scope: donations.read
+	 *
 	 * @param currency Donations are returned in target currency (absense: original currency) [List of valid currencies: https://twitchalerts.readme.io/v1.0/docs/currency-codes]
-	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param limit    Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 */
 	public List<Donation> getDonations(Optional<Currency> currency, Optional<Integer> limit) {
 		// Validate Parameters
-		if(currency.isPresent()) {
-			if(!getStreamlabsClient().getValidCurrencies().contains(currency.get().getCurrencyCode())) {
+		if (currency.isPresent()) {
+			if (!getStreamlabsClient().getValidCurrencies().contains(currency.get().getCurrencyCode())) {
 				throw new CurrencyNotSupportedException(currency.get());
 			}
 		}

@@ -25,7 +25,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Stream by Channel
-	 *  Gets stream information (the stream object) for a specified channel.
+	 * Gets stream information (the stream object) for a specified channel.
 	 * Requires Scope: none
 	 */
 	public Optional<Stream> getByChannel(Channel channel) {
@@ -42,7 +42,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get All Streams
-	 *  Gets the list of live streams a user follows based on the OAuthTwitch token provided.
+	 * Gets the list of live streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: none
 	 */
 	public Optional<List<Stream>> getAll() {
@@ -66,7 +66,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Followed Streams
-	 *  Gets the list of online streams a user follows based on the OAuthTwitch token provided.
+	 * Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
 	 */
 	public Optional<List<Stream>> getFollowed() {
@@ -83,7 +83,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Featured Streams
-	 *  Gets a list of all featured live streams.
+	 * Gets a list of all featured live streams.
 	 * Requires Scope: none
 	 */
 	public Optional<List<StreamFeatured>> getFeatured() {
@@ -100,13 +100,13 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Streams Summary
-	 *  Gets a summary of all live streams.
+	 * Gets a summary of all live streams.
 	 * Requires Scope: none
 	 */
 	public Optional<StreamSummary> getSummary(Game game) {
 		// Build Parameters
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
-		if(game != null) {
+		if (game != null) {
 			parameters.add("game", game.getId().toString());
 		}
 

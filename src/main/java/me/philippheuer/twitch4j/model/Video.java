@@ -1,12 +1,13 @@
 package me.philippheuer.twitch4j.model;
 
-import java.util.*;
-
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 
-import lombok.*;
+import java.util.Date;
+import java.util.Map;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -14,39 +15,39 @@ import lombok.*;
 public class Video {
 
 	@JsonProperty("_id")
-    private long id;
+	private long id;
 
-    private String title;
+	private String title;
 
-    private String description;
+	private String description;
 
-    private String description_html;
+	private String description_html;
 
-    private long broadcastId;
+	private long broadcastId;
 
-    private String broadcastType; // highlight|archive|upload
+	private String broadcastType; // highlight|archive|upload
 
-    private Channel channel;
+	private Channel channel;
 
-    private String status;
+	private String status;
 
-    private String tagList; // Possibly used for exporting to YouTube. No real use.
+	private String tagList; // Possibly used for exporting to YouTube. No real use.
 
-    private String game;
+	private String game;
 
-    private int length;
+	private int length;
 
-    private Map<String, String> preview;
+	private Map<String, String> preview;
 
-    private String url;
+	private String url;
 
-    private int views;
+	private int views;
 
-    private VideoFramerates fps;
+	private VideoFramerates fps;
 
-    private VideoResolutions resolutions;
+	private VideoResolutions resolutions;
 
-    private Date createdAt;
+	private Date createdAt;
 
-    private Date publishedAt;
+	private Date publishedAt;
 }

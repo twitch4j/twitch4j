@@ -35,8 +35,7 @@ public class OAuthStreamlabs {
 	}
 
 	/**
-	 *
-	 * @param type Type for Permission for the CredentialManager (IRC/CHANNEL)
+	 * @param type             Type for Permission for the CredentialManager (IRC/CHANNEL)
 	 * @param streamlabsScopes TwitchScopes to request.
 	 */
 	public void requestPermissionsFor(String type, StreamlabsScopes... streamlabsScopes) {
@@ -48,24 +47,25 @@ public class OAuthStreamlabs {
 	}
 
 	/**
-     * Returns the authentication URL that you can redirect the user to in order
-     * to authorize your application to retrieve an access token.
-     *
-     * @param streamlabsScopes	StreamlabsScopes to request access for
-     * @return String	OAuth2 Uri
-     */
-    private String getAuthenticationUrl(StreamlabsScopes... streamlabsScopes) {
-        return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s",
-        		getCredentialManager().getStreamlabsClient().getEndpointUrl(),
+	 * Returns the authentication URL that you can redirect the user to in order
+	 * to authorize your application to retrieve an access token.
+	 *
+	 * @param streamlabsScopes StreamlabsScopes to request access for
+	 * @return String    OAuth2 Uri
+	 */
+	private String getAuthenticationUrl(StreamlabsScopes... streamlabsScopes) {
+		return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s",
+				getCredentialManager().getStreamlabsClient().getEndpointUrl(),
 				getCredentialManager().getStreamlabsClient().getClientId(),
 				getRedirectUri(),
 				StreamlabsScopes.join(streamlabsScopes)
 		);
-    }
+	}
 
 	/**
 	 * Returns the redirect URL a user is redirected to after a successful authorization.
-	 * @return String	Redirect Uri
+	 *
+	 * @return String    Redirect Uri
 	 */
 	public String getRedirectUri() {
 		return String.format("%s/%s",
@@ -76,6 +76,7 @@ public class OAuthStreamlabs {
 
 	/**
 	 * Handle Authentication Response
+	 *
 	 * @param authenticationCode
 	 * @return OAuthCredential
 	 */
@@ -103,12 +104,10 @@ public class OAuthStreamlabs {
 
 			// Streamlabs - Get User Id
 			Optional<User> user = getCredentialManager().getStreamlabsClient().getUserEndpoint(credential).getUser();
-			if(user.isPresent()) {
+			if (user.isPresent()) {
 				credential.setUserId(user.get().getId());
 				credential.setUserName(user.get().getName());
 				credential.setDisplayName(user.get().getDisplayName());
-			} else {
-				// Logger.error
 			}
 
 			return credential;

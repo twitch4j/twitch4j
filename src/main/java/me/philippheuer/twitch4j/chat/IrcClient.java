@@ -93,6 +93,7 @@ public class IrcClient {
 					// Filter Exceptions
 					if(ex.getMessage().length() > 0 && ex.getMessage().contains("Server version missing")) {
 						// Suppress Server version missing exception for twitch compability.
+						return;
 					} else {
 						if(ex instanceof KittehConnectionException) {
 							logger.warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));

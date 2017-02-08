@@ -11,7 +11,7 @@ import me.philippheuer.twitch4j.model.User;
 @Data
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class UserTimeout extends Event {
 
 	/**
@@ -36,10 +36,11 @@ public class UserTimeout extends Event {
 
 	/**
 	 * Constructor
-	 * @param channel Channel
-	 * @param user Target User
+	 *
+	 * @param channel  Channel
+	 * @param user     Target User
 	 * @param duration Timeout Duration in Minutes.
-	 * @param reason Reason for Timeout.
+	 * @param reason   Reason for Timeout.
 	 */
 	public UserTimeout(Channel channel, User user, Integer duration, String reason) {
 		super();

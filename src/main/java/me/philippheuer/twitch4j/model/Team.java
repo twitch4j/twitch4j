@@ -1,12 +1,12 @@
 package me.philippheuer.twitch4j.model;
 
-import java.util.*;
-
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 
-import lombok.*;
+import java.util.Date;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -14,7 +14,7 @@ import lombok.*;
 public class Team {
 
 	@JsonProperty("_id")
-    private long id;
+	private long id;
 
 	private String name;
 
@@ -28,7 +28,7 @@ public class Team {
 
 	private String banner;
 
-    private Date createdAt;
+	private Date createdAt;
 
-    private Date updatedAt;
+	private Date updatedAt;
 }

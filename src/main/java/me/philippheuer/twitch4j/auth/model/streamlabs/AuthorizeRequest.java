@@ -12,13 +12,13 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthorizeRequest {
 
-    private String clientId;
+	private String clientId;
 
-    private String clientSecret;
+	private String clientSecret;
 
-    private String grantType;
+	private String grantType;
 
-    private String redirectUri;
+	private String redirectUri;
 
-    private String code;
+	private String code;
 }

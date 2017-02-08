@@ -37,7 +37,17 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Event Timer
 	 */
-	Timer eventTriggerTimer = new Timer(true);
+	private Timer eventTriggerTimer = new Timer(true);
+
+	/**
+	 * Event Timer - Checker: Last Follow
+	 */
+	private Date lastFollow;
+
+	/**
+	 * Event Timer - Checker: Last Donation
+	 */
+	private Date lastDonation;
 
 	/**
 	 * Constructor
@@ -295,12 +305,15 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		try {
 			Subscription responseObject = restTemplate.getForObject(requestUrl, Subscription.class);
 
+			if(responseObject.getId() != null) {
+				return true;
+			}
 
-
-			return true;
 		} catch (Exception ex) {
-			return false;
+			ex.printStackTrace();
 		}
+
+		return false;
 	}
 
 	/**
@@ -399,16 +412,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * New Event Checker: Last Follow
-	 */
-	private Date lastFollow;
-
-	/**
-	 * New Event Checker: Last Donation
-	 */
-	private Date lastDonation;
-
-	/**
 	 * Central Endpoint: Register Channel Event Listener
 	 *  IRC: Subscriptions, Bits
 	 *  Rest API: Follows
@@ -444,79 +447,95 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// - Listen: PubSub
 		// NYI
 
-		// Event Timer - Follows
-		eventTriggerTimer.scheduleAtFixedRate(
-			new TimerTask() {
-				public void run() {
-					// Followers
-					List<Date> creationDates = new ArrayList<Date>();
-					List<Follow> followList = getFollowers(
-							Optional.ofNullable(10),
-							Optional.empty(),
-							Optional.empty()
-							);
-					if(followList.size() > 0) {
-						for(Follow follow : followList) {
-							// dispatch event for new follows only
-							if(lastFollow != null && follow.getCreatedAt().after(lastFollow)) {
-								Event dispatchEvent = new FollowEvent(channel, follow.getUser());
-								getTwitchClient().getDispatcher().dispatch(dispatchEvent);
-							}
-							creationDates.add(follow.getCreatedAt());
-						}
+		// Event Timer
+		// - Follows
+		startFollowListener(channel);
 
-						// Get newest date from all follows
-						Date lastFollowNew = creationDates.stream().max(Date::compareTo).get();
-						if(lastFollow == null || lastFollowNew.after(lastFollow)) {
-							lastFollow = lastFollowNew;
-						}
-					}
-				}
-			}, 0, 5 * 1000);
-
-		// Event Timer - Donations
+		// - Donations
 		if(channel.getStreamlabsCredential().isPresent()) {
-			me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint userEndpoint = getTwitchClient().getStreamLabsClient().getUserEndpoint(channel.getStreamlabsCredential().get());
-
-			eventTriggerTimer.scheduleAtFixedRate(
-					new TimerTask() {
-						public void run() {
-							// Followers
-							List<Date> creationDates = new ArrayList<Date>();
-							List<Donation> donationList = userEndpoint.getDonations(
-									Optional.ofNullable(Currency.getInstance("EUR")),
-									Optional.ofNullable(10)
-							);
-
-							if(donationList.size() > 0) {
-								for(Donation donation : donationList) {
-									// dispatch event for new follows only
-									if(lastFollow != null && donation.getCreatedAt().after(lastFollow)) {
-										Optional<User> user = getTwitchClient().getUserEndpoint().getUserByUserName(donation.getName());
-										Event dispatchEvent = new DonationEvent(
-												channel,
-												user.orElse(null),
-												"streamlabs",
-												Currency.getInstance(donation.getCurrency()),
-												donation.getAmount(),
-												donation.getMessage()
-										);
-										getTwitchClient().getDispatcher().dispatch(dispatchEvent);
-									}
-									creationDates.add(donation.getCreatedAt());
-								}
-
-								// Get newest date from all follows
-								Date lastDonationNew = creationDates.stream().max(Date::compareTo).get();
-								if(lastDonation == null || lastDonationNew.after(lastDonation)) {
-									lastDonation = lastDonationNew;
-								}
-							}
-						}
-					}, 0, 5 * 1000);
+			startDonationListener(channel);
 		} else {
 			logger.debug(String.format("No Streamlabs Credentials for Channel %s.", channel.getDisplayName()));
 		}
+	}
+
+	private void startFollowListener(Channel channel) {
+		// Define Action
+		TimerTask action = new TimerTask() {
+			public void run() {
+				// Followers
+				List<Date> creationDates = new ArrayList<Date>();
+				List<Follow> followList = getFollowers(
+						Optional.ofNullable(10),
+						Optional.empty(),
+						Optional.empty()
+				);
+				if(followList.size() > 0) {
+					for(Follow follow : followList) {
+						// dispatch event for new follows only
+						if(lastFollow != null && follow.getCreatedAt().after(lastFollow)) {
+							Event dispatchEvent = new FollowEvent(channel, follow.getUser());
+							getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+						}
+						creationDates.add(follow.getCreatedAt());
+					}
+
+					// Get newest date from all follows
+					Date lastFollowNew = creationDates.stream().max(Date::compareTo).get();
+					if(lastFollow == null || lastFollowNew.after(lastFollow)) {
+						lastFollow = lastFollowNew;
+					}
+				}
+			}
+		};
+
+		// Schedule Action
+		eventTriggerTimer.scheduleAtFixedRate(action, 0, 5 * 1000);
+	}
+
+	private void startDonationListener(Channel channel) {
+		// Define Action
+		TimerTask action = new TimerTask() {
+			public void run() {
+				// Prepare
+				me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint userEndpoint = getTwitchClient().getStreamLabsClient().getUserEndpoint(channel.getStreamlabsCredential().get());
+
+				// Followers
+				List<Date> creationDates = new ArrayList<Date>();
+				List<Donation> donationList = userEndpoint.getDonations(
+						Optional.ofNullable(Currency.getInstance("EUR")),
+						Optional.ofNullable(10)
+				);
+
+				if(donationList.size() > 0) {
+					for(Donation donation : donationList) {
+						// dispatch event for new follows only
+						if(lastFollow != null && donation.getCreatedAt().after(lastFollow)) {
+							Optional<User> user = getTwitchClient().getUserEndpoint().getUserByUserName(donation.getName());
+							Event dispatchEvent = new DonationEvent(
+									channel,
+									user.orElse(null),
+									"streamlabs",
+									Currency.getInstance(donation.getCurrency()),
+									donation.getAmount(),
+									donation.getMessage()
+							);
+							getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+						}
+						creationDates.add(donation.getCreatedAt());
+					}
+
+					// Get newest date from all follows
+					Date lastDonationNew = creationDates.stream().max(Date::compareTo).get();
+					if(lastDonation == null || lastDonationNew.after(lastDonation)) {
+						lastDonation = lastDonationNew;
+					}
+				}
+			}
+		};
+
+		// Schedule Action
+		eventTriggerTimer.scheduleAtFixedRate(action, 0, 5 * 1000);
 	}
 
 	/**

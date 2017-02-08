@@ -7,7 +7,7 @@ import me.philippheuer.twitch4j.model.*;
 @Data
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class CheerEvent extends Event {
 
 	/**
@@ -27,6 +27,7 @@ public class CheerEvent extends Event {
 
 	/**
 	 * Constructor
+	 *
 	 * @param cheer
 	 */
 	public CheerEvent(Channel channel, Cheer cheer) {
