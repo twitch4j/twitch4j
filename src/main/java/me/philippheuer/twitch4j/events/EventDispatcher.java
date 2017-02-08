@@ -22,7 +22,6 @@ public class EventDispatcher {
 	private static final Logger logger = LoggerFactory.getLogger(EventDispatcher.class);
 
 
-
 	private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<Method, CopyOnWriteArrayList<ListenerPair<Object>>>> methodListeners = new ConcurrentHashMap<>();
 	@SuppressWarnings("rawtypes")
 	private final ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<ListenerPair<IListener>>> classListeners = new ConcurrentHashMap<>();
@@ -89,7 +88,7 @@ public class EventDispatcher {
 							methodListeners.get(eventClass).put(method, new CopyOnWriteArrayList<>());
 
 						methodListeners.get(eventClass).get(method).add(new ListenerPair<>(isTemporary, listener));
-						logger.warn("Registered method listener {}#{}", listenerClass.getSimpleName(), method.getName());
+						logger.info("Registered method listener {}#{}", listenerClass.getSimpleName(), method.getName());
 					}
 				}
 			}
@@ -102,7 +101,7 @@ public class EventDispatcher {
 			if (!classListeners.containsKey(rawType))
 				classListeners.put(rawType, new CopyOnWriteArrayList<>());
 
-			logger.warn("Registered IListener {}", listener.getClass().getSimpleName());
+			logger.info("Registered IListener {}", listener.getClass().getSimpleName());
 			classListeners.get(rawType).add(new ListenerPair<>(isTemporary, listener));
 		}
 	}

@@ -148,9 +148,6 @@ public class TwitchClient {
      * Init Client
      */
     public void connect() {
-		// Start Local OAuth Listener
-		getCredentialManager().getOAuthHandler().start();
-
         // Init IRC
         setIrcClient(new IrcClient(this));
 
