@@ -1,0 +1,25 @@
+#
+# Build configuration for Travis
+#
+sudo: false
+language: java
+jdk:
+  - oraclejdk8
+
+# Cache
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+# Before Install
+before_install:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+
+# Build
+script:
+    - ./gradlew install

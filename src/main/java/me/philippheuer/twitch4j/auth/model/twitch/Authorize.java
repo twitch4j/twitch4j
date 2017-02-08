@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.twitch.model;
+package me.philippheuer.twitch4j.auth.model.twitch;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -6,21 +6,17 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
-@AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthorizeRequest {
+public class Authorize {
 
-    private String clientId;
+    private String accessToken;
 
-    private String clientSecret;
+	private String refreshToken;
 
-    private String grantType;
+    private List<String> scope;
 
-    private String redirectUri;
-
-    private String code;
-
-    private String state;
 }

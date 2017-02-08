@@ -1,19 +1,20 @@
 package me.philippheuer.twitch4j.streamlabs;
 
+import lombok.Builder;
+import lombok.Singular;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
+import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lombok.*;
-
-import me.philippheuer.twitch4j.TwitchClient;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
-import org.springframework.social.support.HttpRequestDecorator;
 import org.springframework.util.Assert;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,12 +23,7 @@ public class StreamlabsClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-
-	/**
-	 * Holds the API Instance
-	 */
-	private TwitchClient twitchClient;
+	private static final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
 
 	/**
 	 * Rest Client
@@ -57,6 +53,34 @@ public class StreamlabsClient {
 	private String clientSecret;
 
 	/**
+	 * Holds all valid currencies in streamlabs
+	 */
+	private List<String> validCurrencies = new ArrayList<String>() {{{
+		add("AUD");
+		add("BRL");
+		add("CAD");
+		add("CZK");
+		add("DKK");
+		add("EUR");
+		add("HKD");
+		add("ILS");
+		add("MYR");
+		add("MXN");
+		add("NOK");
+		add("NZD");
+		add("PHP");
+		add("PLN");
+		add("GBP");
+		add("RUB");
+		add("SGD");
+		add("SEK");
+		add("CHF");
+		add("THB");
+		add("TRY");
+		add("USD");
+	}}};
+
+	/**
 	 * Constructor
 	 */
 	public StreamlabsClient(String clientId, String clientSecret) {
@@ -66,7 +90,8 @@ public class StreamlabsClient {
 		setClientSecret(clientSecret);
 
 		// Initialize REST Client
-		getRestClient().putRestInterceptor(new QueryRequestInterceptor("access_token", getClientId()));
+		// - Valid User Agent, because Cloudflare is between us and the api.
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36"));
 	}
 
 	/**
@@ -92,4 +117,12 @@ public class StreamlabsClient {
 	public String getEndpointUrl() {
 		return String.format("%s/%s", getStreamlabsEndpoint(), getStreamlabsEndpointVersion());
 	}
+
+	/**
+	 * Get User Endpoint
+	 */
+	public UserEndpoint getUserEndpoint(OAuthCredential credential) {
+		return new UserEndpoint(this, credential);
+	}
+
 }

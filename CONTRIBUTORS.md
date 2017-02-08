@@ -1,5 +1,5 @@
 ## Developer
-* @PhilippHeuer
+* [Philipp Heuer](https://github.com/PhilippHeuer)
 
 ## Contributors
 

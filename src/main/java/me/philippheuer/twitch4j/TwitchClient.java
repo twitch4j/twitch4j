@@ -22,7 +22,7 @@ public class TwitchClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
 
 	/**
 	 * Event Dispatcher
@@ -109,15 +109,21 @@ public class TwitchClient {
     }
 
 	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave) {
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
     	// Initalize instance
 		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
+		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
 
 		// Optional Parameters
+		if(streamlabsClient != null) {
+			twitchClient.setStreamLabsClient(streamlabsClient);
+			twitchClient.getCredentialManager().provideStreamlabsClient(twitchClient.getStreamLabsClient());
+		}
+
 		if(configurationAutoSave != null) {
 			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
 		} else {
@@ -132,7 +138,7 @@ public class TwitchClient {
 		twitchClient.getCredentialManager().configurationCreate();
 
 		// Connect to API Endpoints
-		// twitchClient.connect();
+		twitchClient.connect();
 
 		// Return builded instance
 		return twitchClient;

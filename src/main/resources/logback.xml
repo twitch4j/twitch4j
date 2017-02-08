@@ -7,7 +7,7 @@
 	<logger name="org.springframework.web.client.RestTemplate" level="INFO" />
 
 	<!-- Configure Twitch4J logger level -->
-	<logger name="de.phlippheuer.twitch4j" level="DEBUG" />
+	<logger name="me.phlippheuer.twitch4j" level="INFO" />
 
 	<!-- Appender Configuration [Console] -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

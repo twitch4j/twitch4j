@@ -2,18 +2,20 @@ package me.philippheuer.twitch4j.chat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
 
 @Getter
 @Setter
@@ -22,7 +24,7 @@ public class IrcClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(IrcClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(IrcClient.class);
 
 	/**
 	 * Holds the API Instance
@@ -44,13 +46,22 @@ public class IrcClient {
 	}
 
 	private Boolean connect() {
-		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+		logger.info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+
+		// Shutdown, if the client is still running
+		if(this.getIrcClient() != null) {
+			logger.debug(String.format("Shutting down old Twitch IRC instance."));
+			getIrcClient().shutdown();
+		}
 
 		// Get Credentials
-		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
+		Optional<OAuthCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
 		// Check
-		Assert.isTrue(twitchCredential.isPresent(), "IRC needs valid Credentials from the CredentialManager.");
+		if(!twitchCredential.isPresent()) {
+			logger.warn("IRC needs valid Credentials from the CredentialManager.");
+			return false;
+		}
 
         try {
         	URI uri = new URI("irc://" + getClient().getTwitchIrcEndpoint()); // may throw URISyntaxException
@@ -65,7 +76,7 @@ public class IrcClient {
         		.serverHost(host)
         		.serverPort(port)
         		.serverPassword("oauth:"+twitchCredential.get().getOAuthToken())
-        		.nick(twitchCredential.get().getUser().getName())
+        		.nick(twitchCredential.get().getUserName())
         		.build());
         	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getClient(), this));
 
@@ -84,7 +95,7 @@ public class IrcClient {
 						// Suppress Server version missing exception for twitch compability.
 					} else {
 						if(ex instanceof KittehConnectionException) {
-							getLogger().warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));
+							logger.warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));
 							reconnect();
 						}
 
@@ -95,11 +106,11 @@ public class IrcClient {
 
         	});
 
-        	getLogger().info(String.format("Connected to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+        	logger.info(String.format("Connected to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
         	return true;
         } catch (Exception ex) {
-        	getLogger().error(String.format("Connection to Twitch IRC [%s] Failed: %s", getClient().getTwitchIrcEndpoint(), ex.getMessage()));
+        	logger.error(String.format("Connection to Twitch IRC [%s] Failed: %s", getClient().getTwitchIrcEndpoint(), ex.getMessage()));
             return false;
         }
 	}
@@ -107,14 +118,14 @@ public class IrcClient {
 	/**
 	 * Reconnects only if the connection was lost.
 	 */
-	public void reconnect() {
-		getLogger().info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
+	private void reconnect() {
+		logger.info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
 
 		disconnect();
 		connect();
 	}
 
-	public void disconnect() {
+	private void disconnect() {
 		getIrcClient().shutdown();
 	}
 
@@ -122,20 +133,25 @@ public class IrcClient {
 		String ircChannel = String.format("#%s", channelName);
 		if(!getIrcClient().getChannels().contains(ircChannel)) {
 			getIrcClient().addChannel(ircChannel);
-			getLogger().info(String.format("Joined Channel %s using Twitch IRC [%s] ...", ircChannel, getClient().getTwitchIrcEndpoint()));
+			logger.info(String.format("Joined Channel %s using Twitch IRC [%s] ...", ircChannel, getClient().getTwitchIrcEndpoint()));
 		}
 	}
 	/**
 	 * Method: Check IRC Client Status
 	 */
-	public Boolean checkEndpointStatus() {
-		// @TODO: Check for UserName and OAUTH Token
-		/*
-		if() {
+	public Map.Entry<Boolean, String> checkEndpointStatus() {
+		// Get Credentials
+		Optional<OAuthCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
+		// Check
+		if(!twitchCredential.isPresent()) {
+			return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials not present!");
+		} else {
+			if(!twitchCredential.get().getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
+				return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
+			}
 		}
-		*/
 
-		return true;
+		return new AbstractMap.SimpleEntry<Boolean, String>(true, "");
 	}
 }

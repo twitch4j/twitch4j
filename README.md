@@ -1,19 +1,27 @@
-# Twitch Java API - V5
+# Java API for [Twitch](https://www.twitch.tv/) V5
 
-[![CircleCI](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master.svg?style=svg)](https://circleci.com/gh/PhilippHeuer/twitch4j/tree/master)
-[![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
+Project Information:
+
+[![Build Status](https://travis-ci.org/PhilippHeuer/twitch4j.svg?branch=master)](https://travis-ci.org/PhilippHeuer/twitch4j)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669)](https://www.codacy.com/app/PhilippHeuer/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PhilippHeuer/twitch4j&amp;utm_campaign=Badge_Grade)
-[![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
+[![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Percentage of issues still open")
 [![](https://jitpack.io/v/philippheuer/twitch4j.svg)](https://jitpack.io/#philippheuer/twitch4j)
+
+Support:
+
+[![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
 
 --------
 
 ## A quick note:
-This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like StreamLabs are integrated.
+This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like Streamlabs are integrated.
 
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
-## Gradle
+## Quick Start
+#### Gradle
 Add it to your build.gradle with:
 ```gradle
 allprojects {
@@ -29,23 +37,40 @@ dependencies {
     compile 'com.github.PhilippHeuer:twitch4j:master-SNAPSHOT'
 }
 ```
+
+#### Maven
+Add it to your pom.xml with:
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+and:
+
+```xml
+<dependency>
+    <groupId>com.github.PhilippHeuer</groupId>
+    <artifactId>twitch4j</artifactId>
+    <version>master-SNAPSHOT</version>
+</dependency>
+```
+
 --------
 
 ## Table of Contents
-- [Dependencies](#dependencies)
 - [Features](#features)
 - [Getting Started](#gettingstarted)
-- [Changelog](#changelog)
-- [Credits](#credits)
+- [Changelog](./CHANGELOG.md)
+- [Credits](./CONTRIBUTORS.md)
 
-
-## Dependencies
- * Java 1.8+
 
 ## Features
 #### OAuth Authentication
  - [x] Twitch
- - [ ] StreamLabs
+ - [x] StreamLabs
  
 #### Twitch REST Endpoints
  - [ ] Channel Feed
@@ -54,7 +79,7 @@ dependencies {
  - [x] Games
  - [ ] Ingests
  - [ ] Search
- - [X] Streams
+ - [x] Streams
  - [x] Teams
  - [ ] Users
  - [ ] Videos
@@ -64,13 +89,14 @@ dependencies {
  - [ ] Whispers
  
 #### Twitch IRC
- - [ ] Follows
- - [X] Subscriptions
- - [X] Cheers (Bits)
+ - [x] Subscriptions
+ - [x] Cheers (Bits)
  
-#### StreamLabs
- - [ ] Donations
-
+#### Streamlabs
+ - [x] Users
+ - [x] Donations
+ - [ ] Alerts
+ 
 ## Getting Started
 Just some simple examples, visit the wiki for more details.
 
@@ -100,10 +126,3 @@ if(channelId.isPresent()) {
 	// User doesn't exist
 }
 ```
-
-## Changelog
-Changes ... no release version yet.
-
-## Credits
-Click [here](CONTRIBUTORS.md) to view the projects contributors and credits.
- 

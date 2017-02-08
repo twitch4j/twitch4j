@@ -10,10 +10,11 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DonationList {
+public class UserResponse {
+
 	/**
-	 * List of Entity
+	 * Entity
 	 */
-    private List<Donation> data;
+	private User twitch;
 
 }

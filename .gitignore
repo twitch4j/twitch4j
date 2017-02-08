@@ -16,6 +16,7 @@ hs_err_pid*
 bin/
 gen/
 build/
+out/
 
 # Eclipse project files
 .classpath
@@ -40,3 +41,10 @@ local.properties
 
 # Exceptions
 !gradle/wrapper/*.jar
+
+# Logs / Save Files
+credentials.json
+client.log
+
+# Example Code
+/src/main/java/me/philippheuer/twitch4j/example/*

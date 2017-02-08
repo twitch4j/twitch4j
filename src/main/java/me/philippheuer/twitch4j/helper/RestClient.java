@@ -2,10 +2,7 @@ package me.philippheuer.twitch4j.helper;
 
 import lombok.*;
 
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.twitch.model.TwitchCredential;
-import me.philippheuer.twitch4j.endpoints.AbstractTwitchEndpoint;
-import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -20,7 +17,7 @@ public class RestClient {
 	/**
 	 * Logger
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(AbstractTwitchEndpoint.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
@@ -28,7 +25,7 @@ public class RestClient {
 	private List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 
 	/**
-	 *
+	 * Constructor
 	 */
 	public RestClient() {
 		super();
@@ -40,21 +37,22 @@ public class RestClient {
 
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setInterceptors(getRestInterceptors());
-		// restTemplate.setErrorHandler(errorHandler);
+		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
+		restTemplate.getInterceptors().addAll(getRestInterceptors());
+		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;
 	}
 
 	/**
 	 *
-	 * @param twitchCredential
+	 * @param OAuthCredential
 	 * @return
 	 */
-	public RestTemplate getPrivilegedRestTemplate(TwitchCredential twitchCredential) {
+	public RestTemplate getPrivilegedRestTemplate(OAuthCredential OAuthCredential) {
 		List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 		localRestInterceptors.addAll(getRestInterceptors());
-		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", twitchCredential.getOAuthToken())));
+		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getOAuthToken())));
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setInterceptors(localRestInterceptors);
@@ -64,6 +62,7 @@ public class RestClient {
 
 	public RestTemplate getPlainRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;
 	}

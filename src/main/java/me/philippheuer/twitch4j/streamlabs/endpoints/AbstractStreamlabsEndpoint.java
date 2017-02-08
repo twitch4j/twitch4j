@@ -19,7 +19,7 @@ public class AbstractStreamlabsEndpoint {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(AbstractStreamlabsEndpoint.class);
+	private static final Logger logger = LoggerFactory.getLogger(AbstractStreamlabsEndpoint.class);
 
 	/**
 	 * Holds the API Instance

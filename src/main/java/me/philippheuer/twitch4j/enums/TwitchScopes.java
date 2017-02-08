@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.model;
+package me.philippheuer.twitch4j.enums;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify
@@ -6,10 +6,10 @@ package me.philippheuer.twitch4j.model;
  * receive upon a successful authorization. Without specifying scopes, your app only has
  * access to basic information about the authenticated user. You may specify any or all
  * of the following scopes.
- * 
+ *
  * @author Urgue - Github [https://raw.githubusercontent.com/urgrue/Java-Twitch-Api-Wrapper/master/src/main/java/com/mb3364/twitch/api/auth/Scopes.java]
  */
-public enum Scopes {
+public enum TwitchScopes {
     /**
      * Read access to non-public user information, such as email address.
      */
@@ -70,28 +70,28 @@ public enum Scopes {
      */
     CHAT_LOGIN("chat_login");
 
-	
+
     private String key;
 
     /**
      * Constructor
      * @param key
      */
-    Scopes(String key) {
+    TwitchScopes(String key) {
         this.key = key;
     }
 
     /**
-     * Combine <code>Scopes</code> into a '+' separated <code>String</code>.
+     * Combine <code>TwitchScopes</code> into a '+' separated <code>String</code>.
      * This is the required input format for twitch.tv
      *
-     * @param scopes <code>Scopes</code> to combine.
-     * @return <code>String</code> representing '+' separated list of <code>Scopes</code>
+     * @param scopes <code>TwitchScopes</code> to combine.
+     * @return <code>String</code> representing '+' separated list of <code>TwitchScopes</code>
      */
-    public static String join(Scopes... scopes) {
+    public static String join(TwitchScopes... scopes) {
         if (scopes == null) return "";
         StringBuilder sb = new StringBuilder();
-        for (Scopes scope : scopes) {
+        for (TwitchScopes scope : scopes) {
             sb.append(scope.getKey()).append("+");
         }
         return sb.toString();
@@ -103,9 +103,9 @@ public enum Scopes {
      * @param text Text representation of Enum value
      * @return Enum value that the text represents
      */
-    public static Scopes fromString(String text) {
+    public static TwitchScopes fromString(String text) {
         if (text == null) return null;
-        for (Scopes b : Scopes.values()) {
+        for (TwitchScopes b : TwitchScopes.values()) {
             if (text.equalsIgnoreCase(b.key)) {
                 return b;
             }
