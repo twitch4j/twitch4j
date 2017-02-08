@@ -23,7 +23,7 @@ public class CredentialManager {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(CredentialManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(CredentialManager.class);
 
 	/**
 	 * Holds the Twitch Instance
@@ -111,12 +111,12 @@ public class CredentialManager {
 	private void addAnyCredential(String key, Object credential) {
 		// Remove value if it exists
 		if(getOAuthCredentials().containsKey(key)) {
-			getLogger().debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
+			logger.debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
 			getOAuthCredentials().remove(key);
 		}
 
 		// Add value
-		getLogger().debug(String.format("Added Credentials with key [%s] and data [%s]", key, credential.toString()));
+		logger.debug(String.format("Added Credentials with key [%s] and data [%s]", key, credential.toString()));
 
 		getOAuthCredentials().put(key, credential);
 
@@ -183,7 +183,7 @@ public class CredentialManager {
 
 				mapper.writeValue(getCredentialFile(), oAuthCredentials);
 
-				getLogger().debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+				logger.debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -200,7 +200,7 @@ public class CredentialManager {
 				Map<String, TwitchCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, TwitchCredential>>(){});
 				getOAuthCredentials().putAll(loadedCredentials);
 
-				getLogger().debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+				logger.debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
 
 			} catch (Exception ex) {
 				ex.printStackTrace();

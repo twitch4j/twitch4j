@@ -39,7 +39,7 @@ public class IrcEventHandler {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(IrcEventHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(IrcEventHandler.class);
 
 	/**
 	 * Holds the API Instance
@@ -87,7 +87,7 @@ public class IrcEventHandler {
 		if(event.getOriginalMessage().contains("PING :tmi.twitch.tv")) {
 			getIrcClient().getIrcClient().sendRawLine("PONG :tmi.twitch.tv");
 
-			getLogger().debug("Responded to PING from Twitch IRC.");
+			logger.debug("Responded to PING from Twitch IRC.");
 		}
 
 		// Handle Messages
@@ -287,14 +287,14 @@ public class IrcEventHandler {
 		// Prevent multi-firing of the same subscription (is sometimes send 2. times)
 		String subHistoryKey = String.format("%s|%s", entity.getUser().getId(), entity.getStreak());
 		if(subscriptionHistory.containsKey(subHistoryKey)) {
-			getLogger().trace(String.format("Subscription called two times, not firing event! %s", entity.toString()));
+			logger.trace(String.format("Subscription called two times, not firing event! %s", entity.toString()));
 			return;
 		} else {
 			subscriptionHistory.put(subHistoryKey, entity);
 		}
 
 		// Debug
-		getLogger().debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel.getName(), entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
+		logger.debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel.getName(), entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity));
@@ -311,7 +311,7 @@ public class IrcEventHandler {
 		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
 
 		// Debug
-		getLogger().debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel.getName(), bits.toString(), entity.getMessage()));
+		logger.debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel.getName(), bits.toString(), entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new CheerEvent(channel, entity));

@@ -25,7 +25,7 @@ public class StreamlabsClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
+	private static final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
 
 	/**
 	 * Rest Client

@@ -22,7 +22,7 @@ public class TwitchClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
 
 	/**
 	 * Event Dispatcher

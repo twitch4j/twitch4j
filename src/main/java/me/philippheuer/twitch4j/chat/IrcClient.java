@@ -25,7 +25,7 @@ public class IrcClient {
 	/**
 	 * Logger
 	 */
-	private final Logger logger = LoggerFactory.getLogger(IrcClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(IrcClient.class);
 
 	/**
 	 * Holds the API Instance
@@ -47,11 +47,11 @@ public class IrcClient {
 	}
 
 	private Boolean connect() {
-		getLogger().info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+		logger.info(String.format("Connecting to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
 		// Shutdown, if the client is still running
 		if(this.getIrcClient() != null) {
-			getLogger().debug(String.format("Shutting down old Twitch IRC instance."));
+			logger.debug(String.format("Shutting down old Twitch IRC instance."));
 			getIrcClient().shutdown();
 		}
 
@@ -60,7 +60,7 @@ public class IrcClient {
 
 		// Check
 		if(!twitchCredential.isPresent()) {
-			getLogger().warn("IRC needs valid Credentials from the CredentialManager.");
+			logger.warn("IRC needs valid Credentials from the CredentialManager.");
 			return false;
 		}
 
@@ -96,7 +96,7 @@ public class IrcClient {
 						// Suppress Server version missing exception for twitch compability.
 					} else {
 						if(ex instanceof KittehConnectionException) {
-							getLogger().warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));
+							logger.warn(String.format("Connection to Twitch IRC [%s] lost.", getClient().getTwitchIrcEndpoint()));
 							reconnect();
 						}
 
@@ -107,11 +107,11 @@ public class IrcClient {
 
         	});
 
-        	getLogger().info(String.format("Connected to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
+        	logger.info(String.format("Connected to Twitch IRC [%s]", getClient().getTwitchIrcEndpoint()));
 
         	return true;
         } catch (Exception ex) {
-        	getLogger().error(String.format("Connection to Twitch IRC [%s] Failed: %s", getClient().getTwitchIrcEndpoint(), ex.getMessage()));
+        	logger.error(String.format("Connection to Twitch IRC [%s] Failed: %s", getClient().getTwitchIrcEndpoint(), ex.getMessage()));
             return false;
         }
 	}
@@ -120,7 +120,7 @@ public class IrcClient {
 	 * Reconnects only if the connection was lost.
 	 */
 	private void reconnect() {
-		getLogger().info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
+		logger.info(String.format("Reconnecting to Twitch IRC [%s] ...", getClient().getTwitchIrcEndpoint()));
 
 		disconnect();
 		connect();
@@ -134,7 +134,7 @@ public class IrcClient {
 		String ircChannel = String.format("#%s", channelName);
 		if(!getIrcClient().getChannels().contains(ircChannel)) {
 			getIrcClient().addChannel(ircChannel);
-			getLogger().info(String.format("Joined Channel %s using Twitch IRC [%s] ...", ircChannel, getClient().getTwitchIrcEndpoint()));
+			logger.info(String.format("Joined Channel %s using Twitch IRC [%s] ...", ircChannel, getClient().getTwitchIrcEndpoint()));
 		}
 	}
 	/**

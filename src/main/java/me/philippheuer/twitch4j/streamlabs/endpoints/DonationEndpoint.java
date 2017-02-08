@@ -33,8 +33,8 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 	 *  Fetch donations for the authenticated user. Results are ordered by creation date, descending.
 	 *  Limit: 100
 	 * Requires Scope: donations.read
-	 * @param currency
-	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param currency Donations are returned in target currency (absense: original currency) [List of valid currencies: https://twitchalerts.readme.io/v1.0/docs/currency-codes]
+	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 */
 	public List<Donation> getDonations(StreamlabsCredential credential, Optional<Currency> currency, Optional<Integer> limit) {
 		// Validate Parameters
