@@ -6,10 +6,7 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.CurrencyNotSupportedException;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import me.philippheuer.twitch4j.streamlabs.model.Donation;
-import me.philippheuer.twitch4j.streamlabs.model.DonationList;
-import me.philippheuer.twitch4j.streamlabs.model.User;
-import me.philippheuer.twitch4j.streamlabs.model.UserResponse;
+import me.philippheuer.twitch4j.streamlabs.model.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Currency;
@@ -87,6 +84,46 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 			DonationList responseObject = restTemplate.getForObject(requestUrl, DonationList.class);
 
 			return responseObject.getData();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Endpoint: Create Donation
+	 *  Create a donation for the authenticated user.
+	 * Requires Scope: donations.create
+	 * @name The name of the donor
+	 * @identifier An identifier for this donor, which is used to group donations with the same donor. For example, if you create more than one donation with the same identifier, they will be grouped together as if they came from the same donor. Typically this is best suited as an email address, or a unique hash.
+	 * @currency The 3 letter currency code for this donation. Must be one of the supported currency codes. [https://twitchalerts.readme.io/v1.0/docs/currency-codes]
+	 * @amount The amount of this donation
+	 * @message Optional: The message from the donor
+	 * @return ID (Long) of the created donation
+	 */
+	public Long createDonations(String name, String identifier, Currency currency, Double amount, Optional<String> message) {
+		// Validate Parameters
+		if(!getStreamlabsClient().getValidCurrencies().contains(currency.getCurrencyCode())) {
+			throw new CurrencyNotSupportedException(currency);
+		}
+
+		// Endpoint
+		String requestUrl = String.format("%s/donations", getStreamlabsClient().getEndpointUrl());
+		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("name", name));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("identifier", identifier));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("amount", amount.toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("currency", currency.getCurrencyCode()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("message", message.orElse("")));
+
+		// REST Request
+		try {
+			DonationCreate responseObject = restTemplate.getForObject(requestUrl, DonationCreate.class);
+
+			return responseObject.getDonationId();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
