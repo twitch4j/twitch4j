@@ -2,10 +2,9 @@ package me.philippheuer.twitch4j.streamlabs;
 
 import lombok.Builder;
 import lombok.Singular;
+import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
-import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -123,14 +121,8 @@ public class StreamlabsClient {
 	/**
 	 * Get User Endpoint
 	 */
-	public UserEndpoint getUserEndpoint() {
-		return new UserEndpoint(this);
+	public UserEndpoint getUserEndpoint(StreamlabsCredential streamlabsCredential) {
+		return new UserEndpoint(this, streamlabsCredential);
 	}
 
-	/**
-	 * Get User Endpoint
-	 */
-	public DonationEndpoint getDonationEndpoint() {
-		return new DonationEndpoint(this);
-	}
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 import lombok.*;
+import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 
 @Data
@@ -55,6 +56,9 @@ public class Channel {
 
     private long views;
 
-    // Holds related Credentials
-    private Optional<TwitchCredential> twitchCredential;
+    // Holds related Twitch Credentials
+    private Optional<TwitchCredential> twitchCredential = Optional.empty();
+
+	// Holds related Streamlabs Credentials
+	private Optional<StreamlabsCredential> streamlabsCredential = Optional.empty();
 }
