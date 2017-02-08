@@ -66,7 +66,7 @@ public class CredentialManager {
 	/**
 	 * Constructor
 	 */
-	public CredentialManager(TwitchClient twitchClient) {
+	public CredentialManager() {
 		super();
 		setOAuthHandler(new OAuthHandler(this));
 	}

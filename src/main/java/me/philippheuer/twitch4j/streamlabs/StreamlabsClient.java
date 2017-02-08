@@ -1,16 +1,16 @@
 package me.philippheuer.twitch4j.streamlabs;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
+import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -24,22 +24,18 @@ public class StreamlabsClient {
 	 * Logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-
-	/**
-	 * Rest Client
-	 */
-	private RestClient restClient = new RestClient();
-
 	/**
 	 * Streamlabs API Endpoint
 	 */
 	public final String streamlabsEndpoint = "https://www.twitchalerts.com/api";
-
 	/**
 	 * Streamlabs API Version
 	 */
 	public final String streamlabsEndpointVersion = "v1.0";
-
+	/**
+	 * Rest Client
+	 */
+	private RestClient restClient = new RestClient();
 	/**
 	 * Streamlabs Client Id
 	 */
@@ -55,30 +51,32 @@ public class StreamlabsClient {
 	/**
 	 * Holds all valid currencies in streamlabs
 	 */
-	private List<String> validCurrencies = new ArrayList<String>() {{{
-		add("AUD");
-		add("BRL");
-		add("CAD");
-		add("CZK");
-		add("DKK");
-		add("EUR");
-		add("HKD");
-		add("ILS");
-		add("MYR");
-		add("MXN");
-		add("NOK");
-		add("NZD");
-		add("PHP");
-		add("PLN");
-		add("GBP");
-		add("RUB");
-		add("SGD");
-		add("SEK");
-		add("CHF");
-		add("THB");
-		add("TRY");
-		add("USD");
-	}}};
+	private List<String> validCurrencies = new ArrayList<String>() {{
+		{
+			add("AUD");
+			add("BRL");
+			add("CAD");
+			add("CZK");
+			add("DKK");
+			add("EUR");
+			add("HKD");
+			add("ILS");
+			add("MYR");
+			add("MXN");
+			add("NOK");
+			add("NZD");
+			add("PHP");
+			add("PLN");
+			add("GBP");
+			add("RUB");
+			add("SGD");
+			add("SEK");
+			add("CHF");
+			add("THB");
+			add("TRY");
+			add("USD");
+		}
+	}};
 
 	/**
 	 * Constructor
@@ -112,6 +110,7 @@ public class StreamlabsClient {
 
 	/**
 	 * Get the full api endpoint address.
+	 *
 	 * @return The full api endpoint url.
 	 */
 	public String getEndpointUrl() {

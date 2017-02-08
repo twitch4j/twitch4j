@@ -1,15 +1,12 @@
 package me.philippheuer.twitch4j.auth.model;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
-import me.philippheuer.twitch4j.model.User;
 
 @Data
 @Getter

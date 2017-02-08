@@ -23,7 +23,7 @@ public class OAuthHandler {
 
 	/**
 	 * Port for local webserver
-	 *  Will be used to recieve oauth redirect.
+	 * Will be used to recieve oauth redirect.
 	 */
 	private Integer localPort = 7090;
 
@@ -65,16 +65,16 @@ public class OAuthHandler {
 										OAuthCredential credential = getCredentialManager().getOAuthTwitch().handleAuthenticationCodeResponseTwitch(responseCode);
 
 										// Valid?
-										if(credential != null) {
+										if (credential != null) {
 											// Add requested Scopes to credential (separated by space when more than one is requested)
-											if(responseScope.contains(" ")) {
+											if (responseScope.contains(" ")) {
 												credential.getOAuthScopes().addAll(Arrays.asList(responseScope.split("\\s")));
 											} else {
 												credential.getOAuthScopes().add(responseScope);
 											}
 
 											// Store Credential
-											if("IRC".equals(responseState)) {
+											if ("IRC".equals(responseState)) {
 												// IRC Credentials
 												getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, credential);
 											} else {
@@ -103,7 +103,7 @@ public class OAuthHandler {
 										OAuthCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
 
 										// Valid?
-										if(credential != null) {
+										if (credential != null) {
 											getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
 
 											ctx.render("Welcome " + credential.getDisplayName() + "!");

@@ -1,17 +1,20 @@
 package me.philippheuer.twitch4j.events;
 
+import lombok.Getter;
+import lombok.Setter;
+import me.philippheuer.twitch4j.TwitchClient;
 import net.jodah.typetools.TypeResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import java.util.concurrent.*;
-
-import lombok.*;
-import me.philippheuer.twitch4j.TwitchClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Getter
 @Setter
@@ -61,12 +64,12 @@ public class EventDispatcher {
 	 *
 	 * @param listener The listener.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void registerListener(IListener listener) {
 		registerListener(listener, false);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void registerListener(Class<?> listenerClass, Object listener, boolean isTemporary) {
 		if (IListener.class.isAssignableFrom(listenerClass)) {
 			logger.warn("IListener was attempted to be registered as an annotation listener. The listener in question will now be registered as an IListener.");
@@ -226,10 +229,10 @@ public class EventDispatcher {
 											}
 										} catch (IllegalAccessException e) {
 											logger.error("Error dispatching event " + event.getClass().getSimpleName(), e);
-										} catch(InvocationTargetException e) {
-											logger.error("Unhandled exception caught dispatching event "+event.getClass().getSimpleName(), e.getCause());
+										} catch (InvocationTargetException e) {
+											logger.error("Unhandled exception caught dispatching event " + event.getClass().getSimpleName(), e.getCause());
 										} catch (Exception e) {
-											logger.error("Unhandled exception caught dispatching event "+event.getClass().getSimpleName(), e);
+											logger.error("Unhandled exception caught dispatching event " + event.getClass().getSimpleName(), e);
 										}
 									})));
 
@@ -247,8 +250,8 @@ public class EventDispatcher {
 								unregisterListener(l.listener);
 						} catch (ClassCastException e) {
 							//FIXME: This occurs when a lambda expression is used to create an IListener leading it to be registered under the type 'Event'. This is due to a bug in TypeTools: https://github.com/jhalterman/typetools/issues/14
-					 	} catch (Exception e) {
-					 		logger.error("Unhandled exception caught dispatching event "+event.getClass().getSimpleName(), e);
+						} catch (Exception e) {
+							logger.error("Unhandled exception caught dispatching event " + event.getClass().getSimpleName(), e);
 						}
 					}));
 		});

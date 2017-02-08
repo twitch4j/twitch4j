@@ -1,7 +1,7 @@
 package me.philippheuer.twitch4j.helper;
 
-import lombok.*;
-
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +22,15 @@ public class RestClient {
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
 	 */
-	private List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
+	private List<ClientHttpRequestInterceptor> restInterceptors;
 
 	/**
 	 * Constructor
 	 */
 	public RestClient() {
 		super();
+
+		setRestInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
 	}
 
 	public void putRestInterceptor(ClientHttpRequestInterceptor interceptor) {
@@ -45,7 +47,6 @@ public class RestClient {
 	}
 
 	/**
-	 *
 	 * @param OAuthCredential
 	 * @return
 	 */

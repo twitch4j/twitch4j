@@ -7,14 +7,13 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
-import me.philippheuer.twitch4j.streamlabs.model.Donation;
 
 import java.util.Currency;
 
 @Data
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class DonationEvent extends Event {
 
 	/**

@@ -32,7 +32,7 @@ public class TwitchClient {
 	/**
      * Credential Manager
      */
-    private final CredentialManager credentialManager = new CredentialManager(this);
+    private final CredentialManager credentialManager = new CredentialManager();
 
 	/**
 	 * Rest Client
@@ -101,6 +101,9 @@ public class TwitchClient {
 
         setClientId(clientId);
         setClientSecret(clientSecret);
+
+        // Provide Instance of TwitchClient to CredentialManager
+		credentialManager.setTwitchClient(this);
 
 		// Initialize REST Client
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));

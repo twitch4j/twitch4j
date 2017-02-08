@@ -1,13 +1,14 @@
 package me.philippheuer.twitch4j.model;
 
-import java.util.*;
-
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+
+import java.util.Date;
+import java.util.Optional;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -15,7 +16,7 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 public class Channel {
 
 	@JsonProperty("_id")
-    private Long id;
+	private Long id;
 
 	private String broadcasterLanguage;
 
@@ -41,22 +42,22 @@ public class Channel {
 
 	private String profileBanner;
 
-    private String profileBannerBackgroundColor;
+	private String profileBannerBackgroundColor;
 
-    private String status;
+	private String status;
 
-    private String streamKey;
+	private String streamKey;
 
-    private Date updatedAt;
+	private Date updatedAt;
 
-    private String url;
+	private String url;
 
-    private String videoBanner;
+	private String videoBanner;
 
-    private long views;
+	private long views;
 
-    // Holds related Twitch Credentials
-    private Optional<OAuthCredential> twitchCredential = Optional.empty();
+	// Holds related Twitch Credentials
+	private Optional<OAuthCredential> twitchCredential = Optional.empty();
 
 	// Holds related Streamlabs Credentials
 	private Optional<OAuthCredential> streamlabsCredential = Optional.empty();

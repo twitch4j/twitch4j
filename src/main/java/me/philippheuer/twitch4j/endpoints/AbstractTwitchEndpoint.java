@@ -37,8 +37,9 @@ public class AbstractTwitchEndpoint {
 
 	/**
 	 * AbstractTwitchEndpoint
-	 * @TODO: Description
+	 *
 	 * @param twitchClient
+	 * TODO: Description
 	 */
 	public AbstractTwitchEndpoint(TwitchClient twitchClient) {
 		// Properties
@@ -47,12 +48,13 @@ public class AbstractTwitchEndpoint {
 
 	/**
 	 * Check that the api has the required scopes before making a request
-	 * @param scopes Scopes, we have access to.
+	 *
+	 * @param scopes         Scopes, we have access to.
 	 * @param requiredScopes Scopes, we want to access.
 	 */
 	protected void checkScopePermission(List<String> scopes, List<String> requiredScopes) {
-		for(String requiredScope : requiredScopes) {
-			if(!scopes.contains(requiredScope)) {
+		for (String requiredScope : requiredScopes) {
+			if (!scopes.contains(requiredScope)) {
 				throw new ScopeMissingException(requiredScope);
 			}
 		}

@@ -20,7 +20,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Top Games
-	 *  Get games by number of current viewers on Twitch.
+	 * Get games by number of current viewers on Twitch.
 	 * Requires Scope: none
 	 */
 	public Optional<List<TopGame>> getTopGames() {

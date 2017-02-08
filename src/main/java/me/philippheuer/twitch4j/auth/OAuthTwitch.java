@@ -35,8 +35,7 @@ public class OAuthTwitch {
 	}
 
 	/**
-	 *
-	 * @param type Type for Permission for the CredentialManager (IRC/CHANNEL)
+	 * @param type         Type for Permission for the CredentialManager (IRC/CHANNEL)
 	 * @param twitchScopes TwitchScopes to request.
 	 */
 	public void requestPermissionsFor(String type, TwitchScopes... twitchScopes) {
@@ -48,26 +47,27 @@ public class OAuthTwitch {
 	}
 
 	/**
-     * Returns the authentication URL that you can redirect the user to in order
-     * to authorize your application to retrieve an access token.
-     *
-	 * @param type 		What are the credentials requested for? (CHANNEL/IRC)
-     * @param scopes	TwitchScopes to request access for
-     * @return String	OAuth2 Uri
-     */
-    private String getAuthenticationUrl(String type, TwitchScopes... scopes) {
-        return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
+	 * Returns the authentication URL that you can redirect the user to in order
+	 * to authorize your application to retrieve an access token.
+	 *
+	 * @param type   What are the credentials requested for? (CHANNEL/IRC)
+	 * @param scopes TwitchScopes to request access for
+	 * @return String    OAuth2 Uri
+	 */
+	private String getAuthenticationUrl(String type, TwitchScopes... scopes) {
+		return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
 				getCredentialManager().getTwitchClient().getTwitchEndpoint(),
 				getCredentialManager().getTwitchClient().getClientId(),
 				getRedirectUri(),
 				TwitchScopes.join(scopes),
 				type
 		);
-    }
+	}
 
 	/**
 	 * Returns the redirect URL a user is redirected to after a successful authorization.
-	 * @return String	Redirect Uri
+	 *
+	 * @return String    Redirect Uri
 	 */
 	public String getRedirectUri() {
 		return String.format("%s/%s",
@@ -78,6 +78,7 @@ public class OAuthTwitch {
 
 	/**
 	 * Handle Authentication Response
+	 *
 	 * @param authenticationCode
 	 * @return OAuthCredential
 	 */
@@ -103,7 +104,7 @@ public class OAuthTwitch {
 			credential.setOAuthToken(responseObject.getAccessToken());
 
 			Optional<User> user = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(credential);
-			if(user.isPresent()) {
+			if (user.isPresent()) {
 				credential.setUserId(user.get().getId());
 				credential.setUserName(user.get().getName());
 				credential.setDisplayName(user.get().getDisplayName());

@@ -11,7 +11,7 @@ import me.philippheuer.twitch4j.model.User;
 @Data
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class FollowEvent extends Event {
 
 	/**

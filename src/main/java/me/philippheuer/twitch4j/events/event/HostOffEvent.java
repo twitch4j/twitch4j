@@ -10,7 +10,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Data
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class HostOffEvent extends Event {
 
 	/**

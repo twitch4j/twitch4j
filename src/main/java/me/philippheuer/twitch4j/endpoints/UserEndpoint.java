@@ -21,7 +21,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint to get the UserId from the UserName
-	 *
+	 * <p>
 	 * https://api.twitch.tv/kraken/users?login=USERNAME
 	 */
 	public Optional<Long> getUserIdByUserName(String userName) {
@@ -32,15 +32,15 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		String requestUrl = String.format("%s/users?login=%s", getTwitchClient().getTwitchEndpoint(), userName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
-		if(!restObjectCache.containsKey(requestUrl)) {
+		if (!restObjectCache.containsKey(requestUrl)) {
 			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
 			restObjectCache.put(requestUrl, responseObject);
 		}
 
-		List<User> userList = ((UserList)restObjectCache.get(requestUrl)).getUsers();
+		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();
 
 		// User found?
-		if(userList.size() == 1) {
+		if (userList.size() == 1) {
 			return Optional.ofNullable(userList.get(0).getId());
 		} else {
 			return Optional.empty();
@@ -55,7 +55,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.hasLength(userName, "Please provide a Username!");
 
 		Optional<Long> userId = getUserIdByUserName(userName);
-		if(userId.isPresent()) {
+		if (userId.isPresent()) {
 			return getUser(userId.get());
 		}
 
@@ -64,8 +64,6 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint to get Privileged User Information
-	 *
-	 *
 	 */
 	public Optional<User> getUser(OAuthCredential OAuthCredential) {
 		// Validate Arguments
@@ -84,8 +82,6 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint to get User Information
-	 *
-	 *
 	 */
 	public Optional<User> getUser(Long userId) {
 		// Validate Arguments
@@ -94,12 +90,12 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/users/%d", getTwitchClient().getTwitchEndpoint(), userId);
-			if(!restObjectCache.containsKey(requestUrl)) {
+			if (!restObjectCache.containsKey(requestUrl)) {
 				User responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, User.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}
 
-			return Optional.ofNullable((User)restObjectCache.get(requestUrl));
+			return Optional.ofNullable((User) restObjectCache.get(requestUrl));
 		} catch (Exception ex) {
 			return Optional.empty();
 		}

@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-import lombok.*;
+import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -13,13 +12,13 @@ public class VideoFramerates {
 
 	private double audioOnly;
 
-    private double medium;
+	private double medium;
 
-    private double mobile;
+	private double mobile;
 
-    private double high;
+	private double high;
 
-    private double low;
+	private double low;
 
-    private double chunked;
+	private double chunked;
 }

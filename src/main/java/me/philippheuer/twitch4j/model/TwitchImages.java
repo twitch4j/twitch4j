@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-import lombok.*;
+import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
@@ -13,9 +12,9 @@ public class TwitchImages {
 
 	private String small;
 
-    private String medium;
+	private String medium;
 
-    private String large;
+	private String large;
 
-    private String template;
+	private String template;
 }
