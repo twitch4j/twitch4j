@@ -3,17 +3,17 @@ package me.philippheuer.twitch4j.endpoints;
 import java.util.List;
 import java.util.Optional;
 
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.springframework.util.Assert;
 
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.*;
+import org.springframework.web.client.RestTemplate;
 
 public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get UserEndpoint
-	 * @throws UserNotFoundException
 	 */
 	public UserEndpoint(TwitchClient client) {
 		super(client);
@@ -23,7 +23,6 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint to get the UserId from the UserName
 	 *
 	 * https://api.twitch.tv/kraken/users?login=USERNAME
-	 * @throws UserNotFoundException
 	 */
 	public Optional<Long> getUserIdByUserName(String userName) {
 		// Validate Arguments
@@ -31,8 +30,10 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		String requestUrl = String.format("%s/users?login=%s", getTwitchClient().getTwitchEndpoint(), userName);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
 		if(!restObjectCache.containsKey(requestUrl)) {
-			UserList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, UserList.class);
+			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
 			restObjectCache.put(requestUrl, responseObject);
 		}
 
@@ -47,18 +48,33 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
+	 * Helper to get the User Object by Name
+	 */
+	public Optional<User> getUserByUserName(String userName) {
+		// Validate Arguments
+		Assert.hasLength(userName, "Please provide a Username!");
+
+		Optional<Long> userId = getUserIdByUserName(userName);
+		if(userId.isPresent()) {
+			return getUser(userId.get());
+		}
+
+		return Optional.empty();
+	}
+
+	/**
 	 * Endpoint to get Privileged User Information
 	 *
 	 *
 	 */
-	public Optional<User> getUser(TwitchCredential twitchCredential) {
+	public Optional<User> getUser(OAuthCredential OAuthCredential) {
 		// Validate Arguments
-		Assert.notNull(twitchCredential, "Please provide Twitch Credentials!");
+		Assert.notNull(OAuthCredential, "Please provide Twitch Credentials!");
 
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
-			User responseObject = getTwitchClient().getRestClient().getPrivilegedRestTemplate(twitchCredential).getForObject(requestUrl, User.class);
+			User responseObject = getTwitchClient().getRestClient().getPrivilegedRestTemplate(OAuthCredential).getForObject(requestUrl, User.class);
 
 			return Optional.ofNullable(responseObject);
 		} catch (Exception ex) {

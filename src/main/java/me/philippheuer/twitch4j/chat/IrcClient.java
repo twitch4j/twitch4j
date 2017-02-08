@@ -7,16 +7,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
 
 @Getter
 @Setter
@@ -56,7 +55,7 @@ public class IrcClient {
 		}
 
 		// Get Credentials
-		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
+		Optional<OAuthCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
 		// Check
 		if(!twitchCredential.isPresent()) {
@@ -77,7 +76,7 @@ public class IrcClient {
         		.serverHost(host)
         		.serverPort(port)
         		.serverPassword("oauth:"+twitchCredential.get().getOAuthToken())
-        		.nick(twitchCredential.get().getUser().getName())
+        		.nick(twitchCredential.get().getUserName())
         		.build());
         	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getClient(), this));
 
@@ -142,7 +141,7 @@ public class IrcClient {
 	 */
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
 		// Get Credentials
-		Optional<TwitchCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
+		Optional<OAuthCredential> twitchCredential = getClient().getCredentialManager().getTwitchCredentialsForIRC();
 
 		// Check
 		if(!twitchCredential.isPresent()) {

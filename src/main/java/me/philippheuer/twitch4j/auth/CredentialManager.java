@@ -9,9 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
-import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +56,7 @@ public class CredentialManager {
 	// IRC Key
 	public static String CREDENTIAL_IRC = "IRC";
 
-	private final Map<String, Object> oAuthCredentials = new LinkedHashMap<>();
+	private final Map<String, OAuthCredential> oAuthCredentials = new LinkedHashMap<>();
 
 	/**
 	 * Holds the credentials
@@ -88,8 +86,8 @@ public class CredentialManager {
 	 * @param key Key
 	 * @param credential Credential Instance
 	 */
-	public void addCredential(String key, TwitchCredential credential) {
-		// TwitchCredential Prefix
+	public void addTwitchCredential(String key, OAuthCredential credential) {
+		// OAuthCredential Prefix
 		addAnyCredential("TWITCH-" + key, credential);
 	}
 
@@ -98,8 +96,8 @@ public class CredentialManager {
 	 * @param key Key
 	 * @param credential Credential Instance
 	 */
-	public void addCredential(String key, StreamlabsCredential credential) {
-		// TwitchCredential Prefix
+	public void addStreamlabsCredential(String key, OAuthCredential credential) {
+		// OAuthCredential Prefix
 		addAnyCredential("STREAMLABS-" + key, credential);
 	}
 
@@ -108,7 +106,7 @@ public class CredentialManager {
 	 * @param key Key
 	 * @param credential Credential Instance
 	 */
-	private void addAnyCredential(String key, Object credential) {
+	private void addAnyCredential(String key, OAuthCredential credential) {
 		// Remove value if it exists
 		if(getOAuthCredentials().containsKey(key)) {
 			logger.debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
@@ -127,11 +125,11 @@ public class CredentialManager {
 	/**
 	 * Get Twitch credentials for channel
 	 * @param channelId Channel ID
-	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
+	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
-	public Optional<TwitchCredential> getTwitchCredentialsForChannel(Long channelId) {
+	public Optional<OAuthCredential> getTwitchCredentialsForChannel(Long channelId) {
 		if(getOAuthCredentials().containsKey("TWITCH-" + channelId.toString())) {
-			return Optional.ofNullable((TwitchCredential) getOAuthCredentials().get("TWITCH-" + channelId.toString()));
+			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get("TWITCH-" + channelId.toString()));
 		} else {
 			return Optional.empty();
 		}
@@ -139,11 +137,11 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials for irc
-	 * @return Optional<TwitchCredential> credential with oauth token and access scope.
+	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
-	public Optional<TwitchCredential> getTwitchCredentialsForIRC() {
+	public Optional<OAuthCredential> getTwitchCredentialsForIRC() {
 		if(getOAuthCredentials().containsKey("TWITCH-" + CREDENTIAL_IRC)) {
-			return Optional.ofNullable((TwitchCredential) getOAuthCredentials().get("TWITCH-" + CREDENTIAL_IRC));
+			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get("TWITCH-" + CREDENTIAL_IRC));
 		} else {
 			return Optional.empty();
 		}
@@ -154,9 +152,12 @@ public class CredentialManager {
 	 * @param channelId Channel ID
 	 * @return Optional<StreamlabsCredential> credential with oauth token and access scope.
 	 */
-	public Optional<StreamlabsCredential> getStreamlabsCredentialsForChannel(Long channelId) {
-		if(getOAuthCredentials().containsKey("STREAMLABS-" + channelId.toString())) {
-			return Optional.ofNullable((StreamlabsCredential) getOAuthCredentials().get("STREAMLABS-" + channelId.toString()));
+	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(Long channelId) {
+		String credentialKey = "STREAMLABS-" + channelId.toString();
+
+		if(getOAuthCredentials().containsKey(credentialKey)) {
+			OAuthCredential credential = getOAuthCredentials().get(credentialKey);
+			return Optional.ofNullable(credential);
 		} else {
 			return Optional.empty();
 		}
@@ -197,7 +198,7 @@ public class CredentialManager {
 
 				getOAuthCredentials().clear();
 
-				Map<String, TwitchCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, TwitchCredential>>(){});
+				Map<String, OAuthCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, OAuthCredential>>(){});
 				getOAuthCredentials().putAll(loadedCredentials);
 
 				logger.debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));

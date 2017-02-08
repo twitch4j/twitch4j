@@ -2,18 +2,16 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.CurrencyNotSupportedException;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import me.philippheuer.twitch4j.streamlabs.model.DonationList;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
 import me.philippheuer.twitch4j.streamlabs.model.User;
 import me.philippheuer.twitch4j.streamlabs.model.UserResponse;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -25,14 +23,14 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 	/**
 	 * Holds the credentials to the current user
 	 */
-	private StreamlabsCredential streamlabsCredential;
+	private OAuthCredential oAuthCredential;
 
 	/**
 	 * Stream Labs - Authenticated Endpoint
 	 */
-	public UserEndpoint(StreamlabsClient streamlabsClient, StreamlabsCredential streamlabsCredential) {
+	public UserEndpoint(StreamlabsClient streamlabsClient, OAuthCredential credential) {
 		super(streamlabsClient);
-		setStreamlabsCredential(streamlabsCredential);
+		setOAuthCredential(credential);
 	}
 
 	/**
@@ -46,7 +44,7 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getStreamlabsCredential().getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
 
 		// REST Request
 		try {
@@ -79,7 +77,7 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getStreamlabsCredential().getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("currency", currency.isPresent() ? currency.get().getCurrencyCode() : "EUR"));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(50).toString()));
 

@@ -2,11 +2,7 @@ package me.philippheuer.twitch4j.auth;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
 
@@ -66,7 +62,7 @@ public class OAuthHandler {
 										String responseState = ctx.getRequest().getQueryParams().get("state");
 
 										// Handle Response
-										TwitchCredential credential = getCredentialManager().getOAuthTwitch().handleAuthenticationCodeResponseTwitch(responseCode);
+										OAuthCredential credential = getCredentialManager().getOAuthTwitch().handleAuthenticationCodeResponseTwitch(responseCode);
 
 										// Valid?
 										if(credential != null) {
@@ -80,13 +76,13 @@ public class OAuthHandler {
 											// Store Credential
 											if(responseState.equals("IRC")) {
 												// IRC Credentials
-												getCredentialManager().addCredential(CredentialManager.CREDENTIAL_IRC, credential);
+												getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, credential);
 											} else {
 												// Channel Credentials
-												getCredentialManager().addCredential(credential.getUser().getId().toString(), credential);
+												getCredentialManager().addTwitchCredential(credential.getUserId().toString(), credential);
 											}
 
-											ctx.render("Welcome " + credential.getUser().getDisplayName() + "!");
+											ctx.render("Welcome " + credential.getDisplayName() + "!");
 										} else {
 											ctx.render("Authentication failed!");
 										}
@@ -104,13 +100,13 @@ public class OAuthHandler {
 										String responseCode = ctx.getRequest().getQueryParams().get("code");
 
 										// Handle Response
-										StreamlabsCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
+										OAuthCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
 
 										// Valid?
 										if(credential != null) {
-											getCredentialManager().addCredential(credential.getUser().getId().toString(), credential);
+											getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
 
-											ctx.render("Welcome " + credential.getUser().getDisplayName() + "!");
+											ctx.render("Welcome " + credential.getDisplayName() + "!");
 										} else {
 											ctx.render("Authentication failed!");
 										}

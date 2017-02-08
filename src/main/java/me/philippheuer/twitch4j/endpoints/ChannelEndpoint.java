@@ -2,18 +2,20 @@ package me.philippheuer.twitch4j.endpoints;
 
 import java.util.*;
 
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
+import lombok.Getter;
+import lombok.Setter;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.DonationEvent;
 import me.philippheuer.twitch4j.events.event.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import org.springframework.util.Assert;
 
-import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.web.client.RestTemplate;
@@ -75,8 +77,19 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			Channel responseObject = (Channel)restObjectCache.get(requestUrl);
 
 			// Add twitch oauth credentials to channel object, if the credential manager has them
-			if(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject.getId()).isPresent()) {
-				responseObject.setTwitchCredential(getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject.getId()));
+			{
+				Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(responseObject.getId());
+				if(credential.isPresent()) {
+					responseObject.setTwitchCredential(credential);
+				}
+			}
+
+			// Add streamlabs oauth credentials to channel object, if the credential manager has them
+			{
+				Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getStreamlabsCredentialsForChannel(responseObject.getId());
+				if(credential.isPresent()) {
+					responseObject.setStreamlabsCredential(credential);
+				}
 			}
 
 			return responseObject;
@@ -93,7 +106,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Channel getChannelPrivilegied() {
 		// Check Scope
-		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if(twitchCredential.isPresent()) {
 			List<String> requiredScopes = new ArrayList<String>() {{
 				add(TwitchScopes.CHANNEL_READ.getKey());
@@ -134,7 +147,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<User> getEditors() {
 		// Check Scope
-		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if(twitchCredential.isPresent()) {
 			List<String> requiredScopes = new ArrayList<String>() {{
 				add(TwitchScopes.CHANNEL_READ.getKey());
@@ -221,7 +234,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Subscription> getSubscriptions(Optional<Integer> limit, Optional<Integer> offset, Optional<String> direction) {
 		// Check Scope
-		Optional<TwitchCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
+		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if(twitchCredential.isPresent()) {
 			List<String> requiredScopes = new ArrayList<String>() {{
 				add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
@@ -386,27 +399,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Streamlabs Donations
-	 *  Gets donations from streamlabs
-	 * Requires Scope: donation_read
-	 */
-	public Boolean getStreamlabsDonations() {
-		// Get Channel
-		Channel channel = getChannel();
-
-		// Check for Streamlabs Credentials and Scope
-		Optional<StreamlabsCredential> streamlabsCredential = getTwitchClient().getCredentialManager().getStreamlabsCredentialsForChannel(channel.getId());
-		if(!streamlabsCredential.isPresent()) {
-			Assert.isTrue(false, "No Streamlabs Credentials fo");
-		}
-
-		return false;
-	}
-
-	/**
 	 * New Event Checker: Last Follow
 	 */
 	private Date lastFollow;
+
+	/**
+	 * New Event Checker: Last Donation
+	 */
+	private Date lastDonation;
 
 	/**
 	 * Central Endpoint: Register Channel Event Listener
@@ -424,14 +424,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		{
 			Map.Entry<Boolean, String> result = getTwitchClient().getIrcClient().checkEndpointStatus();
 			if(!result.getKey()) {
-				getLogger().warn("IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
+				logger.warn("IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
 				return;
 			}
 		}
 		// - Check PubSub
 		if(!getTwitchClient().getPubSub().checkEndpointStatus()) {
 			// We can ignore this right now, because we will reconnect as soon as pubsub is back up.
-			getLogger().warn("PubSub Client not operating. You will not recieve any pubsub events!");
+			logger.warn("PubSub Client not operating. You will not recieve any pubsub events!");
 		}
 
 		// Register Listener Events
@@ -475,8 +475,48 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			}, 0, 5 * 1000);
 
 		// Event Timer - Donations
-		// TODO
-		// - check for streamlabs auth for this channel
+		if(channel.getStreamlabsCredential().isPresent()) {
+			me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint userEndpoint = getTwitchClient().getStreamLabsClient().getUserEndpoint(channel.getStreamlabsCredential().get());
+
+			eventTriggerTimer.scheduleAtFixedRate(
+					new TimerTask() {
+						public void run() {
+							// Followers
+							List<Date> creationDates = new ArrayList<Date>();
+							List<Donation> donationList = userEndpoint.getDonations(
+									Optional.ofNullable(Currency.getInstance("EUR")),
+									Optional.ofNullable(10)
+							);
+
+							if(donationList.size() > 0) {
+								for(Donation donation : donationList) {
+									// dispatch event for new follows only
+									if(lastFollow != null && donation.getCreatedAt().after(lastFollow)) {
+										Optional<User> user = getTwitchClient().getUserEndpoint().getUserByUserName(donation.getName());
+										Event dispatchEvent = new DonationEvent(
+												channel,
+												user.orElse(null),
+												"streamlabs",
+												Currency.getInstance(donation.getCurrency()),
+												donation.getAmount(),
+												donation.getMessage()
+										);
+										getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+									}
+									creationDates.add(donation.getCreatedAt());
+								}
+
+								// Get newest date from all follows
+								Date lastDonationNew = creationDates.stream().max(Date::compareTo).get();
+								if(lastDonation == null || lastDonationNew.after(lastDonation)) {
+									lastDonation = lastDonationNew;
+								}
+							}
+						}
+					}, 0, 5 * 1000);
+		} else {
+			logger.debug(String.format("No Streamlabs Credentials for Channel %s.", channel.getDisplayName()));
+		}
 	}
 
 	/**

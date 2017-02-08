@@ -33,7 +33,7 @@ public class TwitchPubSub {
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient api;
+	private TwitchClient twitchClient;
 
 	/**
 	 * WebSocketFactory
@@ -53,12 +53,17 @@ public class TwitchPubSub {
 	/**
 	 * Constructor
 	 */
-	public TwitchPubSub(TwitchClient api) {
-		setApi(api);
+	public TwitchPubSub(TwitchClient twitchClient) {
+		setTwitchClient(twitchClient);
+
+		// TODO PubSub needs to be implemented
+		if(true) {
+			return;
+		}
 
 		// Connect to twitch pubsub server
 		try {
-			setWebSocket(new WebSocketFactory().createSocket(getApi().getTwitchPubSubEndpoint()));
+			setWebSocket(new WebSocketFactory().createSocket(getTwitchClient().getTwitchPubSubEndpoint()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,7 +141,7 @@ public class TwitchPubSub {
             public void onDisconnected(WebSocket websocket,
                     WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                     boolean closedByServer) {
-            	logger.info(String.format("Connection to Twitch PubSub Closed by Server [%s]", getApi().getTwitchPubSubEndpoint()));
+            	logger.info(String.format("Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
             	reconnect();
             }
         });
@@ -146,7 +151,7 @@ public class TwitchPubSub {
 	}
 
 	private Boolean connect() {
-		logger.info(String.format("Connecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
+		logger.info(String.format("Connecting to Twitch PubSub [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
 
         try {
             getWebSocket().connect();
@@ -155,13 +160,13 @@ public class TwitchPubSub {
     		scheduleTasks();
             return true;
         } catch (Exception ex) {
-        	logger.error(String.format("Connection to Twitch PubSub [%s] Failed: %s", getApi().getTwitchPubSubEndpoint(), ex.getMessage()));
+        	logger.error(String.format("Connection to Twitch PubSub [%s] Failed: %s", getTwitchClient().getTwitchPubSubEndpoint(), ex.getMessage()));
             return false;
         }
 	}
 
 	private void reconnect() {
-		logger.info(String.format("Reconnecting to Twitch PubSub [%s]", getApi().getTwitchPubSubEndpoint()));
+		logger.info(String.format("Reconnecting to Twitch PubSub [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
 
 		cancelTasks();
 		if(connect()) {
@@ -241,7 +246,7 @@ public class TwitchPubSub {
 	 */
 	public Boolean checkEndpointStatus() {
 		// WebSocket needs to be open
-		if(!getWebSocket().getState().equals(WebSocketState.OPEN)) {
+		if(getWebSocket() == null || !getWebSocket().getState().equals(WebSocketState.OPEN)) {
 			return false;
 		}
 

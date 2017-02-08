@@ -94,7 +94,7 @@ and:
  
 #### Streamlabs
  - [x] Users
- - [ ] Donations
+ - [x] Donations
  - [ ] Alerts
  
 ## Getting Started

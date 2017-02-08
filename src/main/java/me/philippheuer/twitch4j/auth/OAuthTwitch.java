@@ -1,18 +1,15 @@
 package me.philippheuer.twitch4j.auth;
 
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchScopes;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.*;
-import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
-
-import ratpack.server.*;
 
 import java.util.Optional;
 
@@ -82,9 +79,9 @@ public class OAuthTwitch {
 	/**
 	 * Handle Authentication Response
 	 * @param authenticationCode
-	 * @return TwitchCredential
+	 * @return OAuthCredential
 	 */
-	public TwitchCredential handleAuthenticationCodeResponseTwitch(String authenticationCode) {
+	public OAuthCredential handleAuthenticationCodeResponseTwitch(String authenticationCode) {
 		try {
 			// Validate on Server
 			String requestUrl = String.format("%s/oauth2/token", getCredentialManager().getTwitchClient().getTwitchEndpoint());
@@ -102,13 +99,17 @@ public class OAuthTwitch {
 			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
 
 			// Credential
-			TwitchCredential twitchCredential = new TwitchCredential();
-			twitchCredential.setOAuthToken(responseObject.getAccessToken());
+			OAuthCredential credential = new OAuthCredential();
+			credential.setOAuthToken(responseObject.getAccessToken());
 
-			User twitchUser = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(twitchCredential).get();
-			twitchCredential.setUser(twitchUser);
+			Optional<User> user = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(credential);
+			if(user.isPresent()) {
+				credential.setUserId(user.get().getId());
+				credential.setUserName(user.get().getName());
+				credential.setDisplayName(user.get().getDisplayName());
+			}
 
-			return twitchCredential;
+			return credential;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

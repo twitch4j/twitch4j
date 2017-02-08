@@ -2,7 +2,7 @@ package me.philippheuer.twitch4j.streamlabs;
 
 import lombok.Builder;
 import lombok.Singular;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
@@ -121,8 +121,8 @@ public class StreamlabsClient {
 	/**
 	 * Get User Endpoint
 	 */
-	public UserEndpoint getUserEndpoint(StreamlabsCredential streamlabsCredential) {
-		return new UserEndpoint(this, streamlabsCredential);
+	public UserEndpoint getUserEndpoint(OAuthCredential credential) {
+		return new UserEndpoint(this, credential);
 	}
 
 }

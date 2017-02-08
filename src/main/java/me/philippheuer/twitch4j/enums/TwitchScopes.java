@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.model.twitch;
+package me.philippheuer.twitch4j.enums;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify

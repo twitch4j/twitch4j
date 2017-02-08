@@ -2,16 +2,11 @@ package me.philippheuer.twitch4j.auth;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import me.philippheuer.twitch4j.auth.model.streamlabs.StreamlabsScopes;
+import me.philippheuer.twitch4j.streamlabs.enums.StreamlabsScopes;
 import me.philippheuer.twitch4j.streamlabs.model.User;
-import org.springframework.http.*;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -82,9 +77,9 @@ public class OAuthStreamlabs {
 	/**
 	 * Handle Authentication Response
 	 * @param authenticationCode
-	 * @return TwitchCredential
+	 * @return OAuthCredential
 	 */
-	public StreamlabsCredential handleAuthenticationCodeResponseStreamlabs(String authenticationCode) {
+	public OAuthCredential handleAuthenticationCodeResponseStreamlabs(String authenticationCode) {
 		try {
 			// Validate on Server
 			String requestUrl = String.format("%s/token", getCredentialManager().getStreamlabsClient().getEndpointUrl());
@@ -102,19 +97,19 @@ public class OAuthStreamlabs {
 			Authorize responseObject = restTemplate.postForObject(requestUrl, postParameters, Authorize.class);
 
 			// Credential
-			StreamlabsCredential credential = new StreamlabsCredential();
+			OAuthCredential credential = new OAuthCredential();
 			credential.setOAuthToken(responseObject.getAccessToken());
 			credential.setOAuthRefreshToken(responseObject.getRefreshToken());
 
 			// Streamlabs - Get User Id
-			Optional<User> user = getCredentialManager().getStreamlabsClient().getUserEndpoint().getUser(credential);
+			Optional<User> user = getCredentialManager().getStreamlabsClient().getUserEndpoint(credential).getUser();
 			if(user.isPresent()) {
-				credential.setUser(user.get());
+				credential.setUserId(user.get().getId());
+				credential.setUserName(user.get().getName());
+				credential.setDisplayName(user.get().getDisplayName());
 			} else {
 				// Logger.error
 			}
-
-			System.out.println(credential.toString());
 
 			return credential;
 

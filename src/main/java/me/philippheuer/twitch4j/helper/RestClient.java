@@ -2,8 +2,7 @@ package me.philippheuer.twitch4j.helper;
 
 import lombok.*;
 
-import me.philippheuer.twitch4j.auth.model.twitch.TwitchCredential;
-import me.philippheuer.twitch4j.endpoints.AbstractTwitchEndpoint;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -47,13 +46,13 @@ public class RestClient {
 
 	/**
 	 *
-	 * @param twitchCredential
+	 * @param OAuthCredential
 	 * @return
 	 */
-	public RestTemplate getPrivilegedRestTemplate(TwitchCredential twitchCredential) {
+	public RestTemplate getPrivilegedRestTemplate(OAuthCredential OAuthCredential) {
 		List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 		localRestInterceptors.addAll(getRestInterceptors());
-		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", twitchCredential.getOAuthToken())));
+		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getOAuthToken())));
 
 		RestTemplate restTemplate = getRestTemplate();
 		restTemplate.setInterceptors(localRestInterceptors);

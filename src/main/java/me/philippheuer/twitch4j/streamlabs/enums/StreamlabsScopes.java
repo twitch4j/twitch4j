@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.auth.model.streamlabs;
+package me.philippheuer.twitch4j.streamlabs.enums;
 
 /**
  * Streamlabs TwitchScopes
