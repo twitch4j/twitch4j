@@ -74,7 +74,7 @@ public class OAuthHandler {
 											}
 
 											// Store Credential
-											if(responseState.equals("IRC")) {
+											if("IRC".equals(responseState)) {
 												// IRC Credentials
 												getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, credential);
 											} else {

@@ -47,7 +47,7 @@ public class RestErrorHandler implements ResponseErrorHandler {
 	 * Stupid Scanner Tricks ... to convert inputStream to String
 	 * @credits: http://stackoverflow.com/a/5445161
 	 */
-	static String convertStreamToString(java.io.InputStream is) {
+	private static String convertStreamToString(java.io.InputStream is) {
 		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
 		return s.hasNext() ? s.next() : "";
 	}

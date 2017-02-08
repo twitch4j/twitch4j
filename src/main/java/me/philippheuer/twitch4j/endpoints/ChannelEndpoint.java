@@ -37,7 +37,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Event Timer
 	 */
-	Timer eventTriggerTimer = new Timer(true);
+	private Timer eventTriggerTimer = new Timer(true);
 
 	/**
 	 * Constructor
