@@ -192,4 +192,18 @@ public class TwitchClient {
 	public CommunityEndpoint getCommunityEndpoint() {
 		return new CommunityEndpoint(this);
 	}
+
+	/**
+	 * Get Ingest Endpoint
+	 */
+	public IngestEndpoint getIngestEndpoint() {
+		return new IngestEndpoint(this);
+	}
+
+	/**
+	 * Get Search Endpoint
+	 */
+	public SearchEndpoint getSearchEndpoint() {
+		return new SearchEndpoint(this);
+	}
 }

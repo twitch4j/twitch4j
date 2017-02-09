@@ -81,7 +81,7 @@ and:
  - [x] Communities (Released: 10.02.2017)
  - [x] Games
  - [x] Ingests
- - [ ] Search
+ - [x] Search
  - [x] Streams
  - [x] Teams
  - [ ] Users
