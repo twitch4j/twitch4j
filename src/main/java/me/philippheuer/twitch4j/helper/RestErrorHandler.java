@@ -39,6 +39,11 @@ public class RestErrorHandler implements ResponseErrorHandler {
 		if (clienthttpresponse.getStatusCode() != HttpStatus.OK) {
 			String content = convertStreamToString(clienthttpresponse.getBody());
 
+			// The server has successfully fulfilled the request and that there is no additional content to send in the response payload body.
+			if(clienthttpresponse.getStatusCode() == HttpStatus.NO_CONTENT) {
+				return false;
+			}
+
 			// JSON String to RestError
 			try {
 				// REST Error

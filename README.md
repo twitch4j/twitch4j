@@ -78,6 +78,7 @@ and:
  - [ ] Channel Feed
  - [x] Channels
  - [ ] Chat
+ - [x] Communities (Released: 10.02.2017)
  - [x] Games
  - [ ] Ingests
  - [ ] Search
@@ -93,16 +94,26 @@ and:
 #### Twitch IRC
  - [x] Subscriptions
  - [x] Cheers (Bits)
- 
-#### Streamlabs
+
+#### 3rd Party
+##### [Streamlabs](https://streamlabs.com/)
  - [x] Users (Read)
  - [x] Donations (Read, Create)
  - [x] Custom Alerts (Create)
  
+##### [StreamTip](http://streamtip.com/)
+ - Planned
+
+##### [StreamPro](https://streampro.io/)
+  - No API
+
+##### [Muxy.IO](https://muxy.io/)
+  - No API
+
 ## Getting Started
 Just some simple examples, visit the wiki for more details.
 
-### Client Builder
+### Client Builder (Twitch Standalone)
 ```java
 TwitchClient twitchClient = TwitchClient.builder()
 	.clientId("***Twitch App Client ID***")

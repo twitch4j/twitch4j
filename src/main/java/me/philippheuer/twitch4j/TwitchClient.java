@@ -185,4 +185,11 @@ public class TwitchClient {
 	public UserEndpoint getUserEndpoint() {
 		return new UserEndpoint(this);
 	}
+
+	/**
+	 * Get Community Endpoint
+	 */
+	public CommunityEndpoint getCommunityEndpoint() {
+		return new CommunityEndpoint(this);
+	}
 }
