@@ -8,6 +8,8 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
+import me.philippheuer.twitch4j.streamlabs.endpoints.AlertEndpoint;
+import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,6 +124,20 @@ public class StreamlabsClient {
 	 */
 	public UserEndpoint getUserEndpoint(OAuthCredential credential) {
 		return new UserEndpoint(this, credential);
+	}
+
+	/**
+	 * Get Donation Endpoint
+	 */
+	public DonationEndpoint getDonationEndpoint(OAuthCredential credential) {
+		return new DonationEndpoint(this, credential);
+	}
+
+	/**
+	 * Get Alert Endpoint
+	 */
+	public AlertEndpoint getAlertEndpoint(OAuthCredential credential) {
+		return new AlertEndpoint(this, credential);
 	}
 
 }

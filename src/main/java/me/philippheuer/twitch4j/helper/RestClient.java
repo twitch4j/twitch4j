@@ -3,8 +3,6 @@ package me.philippheuer.twitch4j.helper;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,10 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 public class RestClient {
-	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
 	/**
 	 * REST Request Interceptors (adding header-values to requests)
@@ -39,8 +33,12 @@ public class RestClient {
 
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
+
+		// Request Interceptors
 		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
 		restTemplate.getInterceptors().addAll(getRestInterceptors());
+
+		// Default Error Handler
 		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;

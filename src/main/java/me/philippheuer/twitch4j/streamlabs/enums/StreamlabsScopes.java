@@ -12,7 +12,12 @@ public enum StreamlabsScopes {
 	/**
 	 * Write access to donations.
 	 */
-	DONATION_CREATE("donations.create");
+	DONATION_CREATE("donations.create"),
+
+	/**
+	 * Write access to Alerts.
+	 */
+	ALERT_CREATE("alerts.create");
 
     private String key;
 

@@ -11,11 +11,6 @@ import org.slf4j.LoggerFactory;
 public class AbstractStreamlabsEndpoint {
 
 	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(AbstractStreamlabsEndpoint.class);
-
-	/**
 	 * Holds the API Instance
 	 */
 	private StreamlabsClient streamlabsClient;
