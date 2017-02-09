@@ -31,7 +31,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
-			TopGameList responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, TopGameList.class);
+			TopGameList responseObject = restTemplate.getForObject(requestUrl, TopGameList.class);
 
 			return responseObject.getTop();
 		} catch (Exception ex) {

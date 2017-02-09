@@ -80,7 +80,7 @@ and:
  - [ ] Chat
  - [x] Communities (Released: 10.02.2017)
  - [x] Games
- - [ ] Ingests
+ - [x] Ingests
  - [ ] Search
  - [x] Streams
  - [x] Teams
