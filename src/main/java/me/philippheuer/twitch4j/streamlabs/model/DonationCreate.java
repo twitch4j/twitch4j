@@ -9,7 +9,6 @@ import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class DonationCreate {
 	/**
 	 * ID of the newly created donation

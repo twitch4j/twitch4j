@@ -5,11 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.CurrencyNotSupportedException;
+import me.philippheuer.twitch4j.exceptions.RestException;
+import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import me.philippheuer.twitch4j.streamlabs.model.DonationCreate;
 import me.philippheuer.twitch4j.streamlabs.model.DonationList;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Currency;
@@ -66,10 +70,13 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 			Logger.debug(this, "Sreamlabs: Fetched Donations for %s", getOAuthCredential().getDisplayName());
 
 			return responseObject.getData();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+
+		return null;
 	}
 
 	/**
@@ -94,24 +101,30 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 		String requestUrl = String.format("%s/donations", getStreamlabsClient().getEndpointUrl());
 		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
 
-		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("name", name));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("identifier", identifier));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("amount", amount.toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("currency", currency.getCurrencyCode()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("message", message.orElse("")));
+		// Post Data
+		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
+		postBody.add("access_token", getOAuthCredential().getOAuthToken());
+		postBody.add("name", name);
+		postBody.add("identifier", identifier);
+		postBody.add("amount", amount);
+		postBody.add("currency", currency.getCurrencyCode());
+		postBody.add("message", message.orElse(""));
+
+		restTemplate.getInterceptors().add(new LoggingRequestInterceptor());
 
 		// REST Request
 		try {
-			DonationCreate responseObject = restTemplate.getForObject(requestUrl, DonationCreate.class);
+			DonationCreate responseObject = restTemplate.postForObject(requestUrl, postBody, DonationCreate.class);
 
 			Logger.debug(this, "Sreamlabs: Created new Donation for %s [%s %s - ID:%s]", getOAuthCredential().getDisplayName(), amount.toString(), currency.getCurrencyCode(), responseObject.getDonationId());
 
 			return responseObject.getDonationId();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+
+		return null;
 	}
 }

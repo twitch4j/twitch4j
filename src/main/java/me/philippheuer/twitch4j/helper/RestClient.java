@@ -33,8 +33,12 @@ public class RestClient {
 
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
+
+		// Request Interceptors
 		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
 		restTemplate.getInterceptors().addAll(getRestInterceptors());
+
+		// Default Error Handler
 		restTemplate.setErrorHandler(new RestErrorHandler());
 
 		return restTemplate;

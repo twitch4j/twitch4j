@@ -4,9 +4,13 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.exceptions.RestException;
+import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.AlertCreate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -52,26 +56,32 @@ public class AlertEndpoint extends AbstractStreamlabsEndpoint {
 		String requestUrl = String.format("%s/alerts", getStreamlabsClient().getEndpointUrl());
 		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
 
-		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("type", type));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("message", message.orElse("")));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("duration", duration.orElse(10).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("special_text_color", special_text_color.orElse("")));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("image_href", imageUrl.orElse("")));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("sound_href", soundUrl.orElse("")));
+		// Post Data
+		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
+		postBody.add("access_token", getOAuthCredential().getOAuthToken());
+		postBody.add("type", type);
+		postBody.add("message", message.orElse(""));
+		postBody.add("duration", duration.orElse(10).toString());
+		postBody.add("special_text_color", special_text_color.orElse(""));
+		postBody.add("image_href", imageUrl.orElse(""));
+		postBody.add("sound_href", soundUrl.orElse(""));
+
+		restTemplate.getInterceptors().add(new LoggingRequestInterceptor());
 
 		// REST Request
 		try {
-			AlertCreate responseObject = restTemplate.getForObject(requestUrl, AlertCreate.class);
+			AlertCreate responseObject = restTemplate.postForObject(requestUrl, postBody, AlertCreate.class);
 
 			Logger.debug(this, "Sreamlabs: Created new Alert for %s", getOAuthCredential().getDisplayName());
 
 			return responseObject.getSuccess();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+
+		return null;
 	}
 
 }

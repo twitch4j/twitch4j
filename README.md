@@ -93,9 +93,9 @@ and:
  - [x] Cheers (Bits)
  
 #### Streamlabs
- - [x] Users
- - [x] Donations
- - [x] Alerts
+ - [x] Users (Read)
+ - [x] Donations (Read, Create)
+ - [x] Custom Alerts (Create)
  
 ## Getting Started
 Just some simple examples, visit the wiki for more details.
