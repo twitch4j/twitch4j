@@ -49,12 +49,11 @@ public class RestClient {
 	 * @return
 	 */
 	public RestTemplate getPrivilegedRestTemplate(OAuthCredential OAuthCredential) {
-		List<ClientHttpRequestInterceptor> localRestInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
-		localRestInterceptors.addAll(getRestInterceptors());
-		localRestInterceptors.add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getOAuthToken())));
-
+		// Get Rest Template
 		RestTemplate restTemplate = getRestTemplate();
-		restTemplate.setInterceptors(localRestInterceptors);
+
+		// Request Interceptors (add Authorization)
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getOAuthToken())));
 
 		return restTemplate;
 	}
