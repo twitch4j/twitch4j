@@ -515,7 +515,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 				if (donationList.size() > 0) {
 					for (Donation donation : donationList) {
 						// dispatch event for new follows only
-						if (lastFollow != null && donation.getCreatedAt().after(lastFollow)) {
+						if (lastDonation != null && donation.getCreatedAt().after(lastDonation)) {
 							Optional<User> user = getTwitchClient().getUserEndpoint().getUserByUserName(donation.getName());
 							Event dispatchEvent = new DonationEvent(
 									channel,
