@@ -95,7 +95,7 @@ and:
 #### Streamlabs
  - [x] Users
  - [x] Donations
- - [ ] Alerts
+ - [x] Alerts
  
 ## Getting Started
 Just some simple examples, visit the wiki for more details.
