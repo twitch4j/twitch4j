@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 
 import lombok.Getter;
 import lombok.Setter;
+import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.CurrencyNotSupportedException;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
@@ -83,6 +84,8 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 		try {
 			DonationList responseObject = restTemplate.getForObject(requestUrl, DonationList.class);
 
+			Logger.debug(this, "Sreamlabs: Fetched Donations for %s", getOAuthCredential().getDisplayName());
+
 			return responseObject.getData();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -101,7 +104,7 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 	 * @message Optional: The message from the donor
 	 * @return ID (Long) of the created donation
 	 */
-	public Long createDonations(String name, String identifier, Currency currency, Double amount, Optional<String> message) {
+	public Long createDonation(String name, String identifier, Currency currency, Double amount, Optional<String> message) {
 		// Validate Parameters
 		if(!getStreamlabsClient().getValidCurrencies().contains(currency.getCurrencyCode())) {
 			throw new CurrencyNotSupportedException(currency);
@@ -122,6 +125,8 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 		// REST Request
 		try {
 			DonationCreate responseObject = restTemplate.getForObject(requestUrl, DonationCreate.class);
+
+			Logger.debug(this, "Sreamlabs: Created new Donation for %s [%s %s]", getOAuthCredential().getDisplayName(), amount.toString(), currency.getCurrencyCode());
 
 			return responseObject.getDonationId();
 		} catch (Exception ex) {

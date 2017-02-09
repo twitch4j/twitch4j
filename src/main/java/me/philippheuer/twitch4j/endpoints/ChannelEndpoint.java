@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.endpoints;
 
 import java.util.*;
 
+import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -455,7 +456,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		if(channel.getStreamlabsCredential().isPresent()) {
 			startDonationListener(channel);
 		} else {
-			logger.debug(String.format("No Streamlabs Credentials for Channel %s.", channel.getDisplayName()));
+			Logger.debug(this, "Sreamlabs: No Credentials for Channel [%s]", channel.getDisplayName());
 		}
 	}
 
