@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.streamlabs.model;
+package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
