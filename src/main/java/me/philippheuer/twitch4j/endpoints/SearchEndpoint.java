@@ -84,7 +84,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 * @param query search query
 	 */
-	public List<Stream> getGames(String query) {
+	public List<Stream> getStreams(String query) {
 		// Endpoint
 		String requestUrl = String.format("%s/search/streams", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
