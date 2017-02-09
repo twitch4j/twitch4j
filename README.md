@@ -12,6 +12,7 @@ Project Information:
 Support:
 
 [![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
+[<img src="https://discordapp.com/api/guilds/143001431388061696/widget.png?style=shield">](https://discord.gg/FQ5vgW3)
 
 --------
 
@@ -63,6 +64,7 @@ and:
 ## Table of Contents
 - [Features](#features)
 - [Getting Started](#gettingstarted)
+- [Problems](#problems)
 - [Changelog](./CHANGELOG.md)
 - [Credits](./CONTRIBUTORS.md)
 
@@ -126,3 +128,22 @@ if(channelId.isPresent()) {
 	// User doesn't exist
 }
 ```
+
+### Event Listener
+```java
+
+```
+
+```java
+
+```
+
+## Problems
+
+If you have problems using the *Twitch Java API*, then you are welcome to join the [discord server](https://discord.gg/FQ5vgW3) to talk about it.
+
+If you discover any issues/have feature requests, then please [open an issue here](https://github.com/PhilippHeuer/twitch4j/issues/new).
+
+## License
+
+Released under the [MIT license](./LICENSE).
