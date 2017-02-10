@@ -122,11 +122,7 @@ public class CredentialManager {
 	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForChannel(Long channelId) {
-		if(getOAuthCredentials().containsKey("TWITCH-" + channelId.toString())) {
-			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get("TWITCH-" + channelId.toString()));
-		} else {
-			return Optional.empty();
-		}
+		return getAnyCredential("TWITCH-" + channelId.toString());
 	}
 
 	/**
@@ -134,24 +130,42 @@ public class CredentialManager {
 	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForIRC() {
-		if(getOAuthCredentials().containsKey("TWITCH-" + CREDENTIAL_IRC)) {
-			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get("TWITCH-" + CREDENTIAL_IRC));
-		} else {
-			return Optional.empty();
-		}
+		return getAnyCredential("TWITCH-" + CREDENTIAL_IRC);
 	}
 
 	/**
-	 * Get Streamlabs credentials for channel
+	 * Get Twitch credentials by custom identifier
+	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 */
+	public Optional<OAuthCredential> getTwitchCredentialsForCustomKey(String customKey) {
+		return getAnyCredential("TWITCH-" + customKey);
+	}
+
+	/**
+	 * Get Streamlabs credential by channel
 	 * @param channelId Channel ID
-	 * @return Optional<StreamlabsCredential> credential with oauth token and access scope.
+	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(Long channelId) {
-		String credentialKey = "STREAMLABS-" + channelId.toString();
+		return getAnyCredential("STREAMLABS-" + channelId.toString());
+	}
 
-		if(getOAuthCredentials().containsKey(credentialKey)) {
-			OAuthCredential credential = getOAuthCredentials().get(credentialKey);
-			return Optional.ofNullable(credential);
+	/**
+	 * Get Streamlabs credential by customKey
+	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 */
+	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(String customKey) {
+		return getAnyCredential("STREAMLABS-" + customKey);
+	}
+
+	/**
+	 * Private Method to get a credential by key
+	 * @param key The key to search for.
+	 * @return Optional<OAuthCredential>
+	 */
+	private Optional<OAuthCredential> getAnyCredential(String key) {
+		if(getOAuthCredentials().containsKey(key)) {
+			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get(key));
 		} else {
 			return Optional.empty();
 		}

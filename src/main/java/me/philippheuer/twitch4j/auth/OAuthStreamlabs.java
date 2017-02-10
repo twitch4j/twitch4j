@@ -40,7 +40,7 @@ public class OAuthStreamlabs {
 	 */
 	public void requestPermissionsFor(String type, StreamlabsScopes... streamlabsScopes) {
 		// Get OAuthTwitch URI
-		String requestUrl = getAuthenticationUrl(streamlabsScopes);
+		String requestUrl = getAuthenticationUrl(type, streamlabsScopes);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -50,15 +50,17 @@ public class OAuthStreamlabs {
 	 * Returns the authentication URL that you can redirect the user to in order
 	 * to authorize your application to retrieve an access token.
 	 *
+	 * @param type             What are the credentials requested for? (CHANNEL/IRC)
 	 * @param streamlabsScopes StreamlabsScopes to request access for
 	 * @return String    OAuth2 Uri
 	 */
-	private String getAuthenticationUrl(StreamlabsScopes... streamlabsScopes) {
-		return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s",
+	private String getAuthenticationUrl(String type, StreamlabsScopes... streamlabsScopes) {
+		return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s",
 				getCredentialManager().getStreamlabsClient().getEndpointUrl(),
 				getCredentialManager().getStreamlabsClient().getClientId(),
 				getRedirectUri(),
-				StreamlabsScopes.join(streamlabsScopes)
+				StreamlabsScopes.join(streamlabsScopes),
+				type
 		);
 	}
 

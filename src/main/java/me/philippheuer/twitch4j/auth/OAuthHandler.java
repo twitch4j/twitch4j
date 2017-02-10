@@ -73,10 +73,10 @@ public class OAuthHandler {
 												credential.getOAuthScopes().add(responseScope);
 											}
 
-											// Store Credential
-											if ("IRC".equals(responseState)) {
-												// IRC Credentials
-												getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, credential);
+											// Check for custom key, to store in credential manager
+											if (responseState.length() > 0) {
+												// Custom Key
+												getCredentialManager().addTwitchCredential(responseState, credential);
 											} else {
 												// Channel Credentials
 												getCredentialManager().addTwitchCredential(credential.getUserId().toString(), credential);
@@ -98,13 +98,21 @@ public class OAuthHandler {
 									ctx -> {
 										// Parse Parameters
 										String responseCode = ctx.getRequest().getQueryParams().get("code");
+										String responseState = ctx.getRequest().getQueryParams().get("state");
 
 										// Handle Response
 										OAuthCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
 
 										// Valid?
 										if (credential != null) {
-											getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
+											// Check for custom key, to store in credential manager
+											if (responseState.length() > 0) {
+												// Custom Key
+												getCredentialManager().addStreamlabsCredential(responseState, credential);
+											} else {
+												// Channel Credentials
+												getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
+											}
 
 											ctx.render("Welcome " + credential.getDisplayName() + "!");
 										} else {
