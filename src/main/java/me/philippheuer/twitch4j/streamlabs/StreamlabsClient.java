@@ -23,10 +23,6 @@ import java.util.List;
 public class StreamlabsClient {
 
 	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
-	/**
 	 * Streamlabs API Endpoint
 	 */
 	public final String streamlabsEndpoint = "https://www.twitchalerts.com/api";

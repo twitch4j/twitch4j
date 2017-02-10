@@ -103,6 +103,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			StreamList responseObject = restTemplate.getForObject(requestUrl, StreamList.class);
 
 			return responseObject.getStreams();

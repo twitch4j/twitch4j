@@ -165,6 +165,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			StreamSummary responseObject = restTemplate.getForObject(requestUrl, StreamSummary.class);
 
 			return responseObject;
@@ -196,6 +197,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			RecommendationList responseObject = restTemplate.getForObject(requestUrl, RecommendationList.class);
 
 			return responseObject.getRecommendedStreams();

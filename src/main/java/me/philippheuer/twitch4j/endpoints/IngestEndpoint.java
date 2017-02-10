@@ -36,6 +36,7 @@ public class IngestEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			IngestList responseObject = restTemplate.getForObject(requestUrl, IngestList.class);
 
 			return responseObject.getIngests();

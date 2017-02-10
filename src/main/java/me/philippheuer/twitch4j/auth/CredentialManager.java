@@ -7,21 +7,15 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 public class CredentialManager {
-
-	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(CredentialManager.class);
 
 	/**
 	 * Holds the Twitch Instance
@@ -109,12 +103,12 @@ public class CredentialManager {
 	private void addAnyCredential(String key, OAuthCredential credential) {
 		// Remove value if it exists
 		if(getOAuthCredentials().containsKey(key)) {
-			logger.debug(String.format("Credentials with key [%s] already present in CredentialManager.", key));
+			Logger.debug(this, "Credentials with key [%s] already present in CredentialManager.", key);
 			getOAuthCredentials().remove(key);
 		}
 
 		// Add value
-		logger.debug(String.format("Added Credentials with key [%s] and data [%s]", key, credential.toString()));
+		Logger.debug(this, "Added Credentials with key [%s] and data [%s]", key, credential.toString());
 
 		getOAuthCredentials().put(key, credential);
 
@@ -184,7 +178,7 @@ public class CredentialManager {
 
 				mapper.writeValue(getCredentialFile(), oAuthCredentials);
 
-				logger.debug(String.format("Saved %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+				Logger.debug(this, "Saved %d Credentials using the CredentialManager.", oAuthCredentials.size());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -201,7 +195,7 @@ public class CredentialManager {
 				Map<String, OAuthCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, OAuthCredential>>(){});
 				getOAuthCredentials().putAll(loadedCredentials);
 
-				logger.debug(String.format("Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size()));
+				Logger.debug(this, "Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size());
 
 			} catch (Exception ex) {
 				ex.printStackTrace();

@@ -1,5 +1,21 @@
 package me.philippheuer.twitch4j.chat;
 
+import com.jcabi.log.Logger;
+import lombok.Getter;
+import lombok.Setter;
+import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.*;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.Cheer;
+import me.philippheuer.twitch4j.model.Subscription;
+import me.philippheuer.twitch4j.model.User;
+import net.engio.mbassy.listener.Handler;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
+import org.kitteh.irc.client.library.element.MessageTag;
+import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,32 +24,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
-import org.kitteh.irc.client.library.element.MessageTag;
-import org.kitteh.irc.client.library.element.ServerMessage;
-import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.*;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.events.event.*;
-import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.model.Cheer;
-import me.philippheuer.twitch4j.model.Subscription;
-import net.engio.mbassy.listener.Handler;
-import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
-
 @Getter
 @Setter
 public class IrcEventHandler {
-
-	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(IrcEventHandler.class);
 
 	/**
 	 * Holds the API Instance
@@ -81,7 +74,7 @@ public class IrcEventHandler {
 		if (event.getOriginalMessage().contains("PING :tmi.twitch.tv")) {
 			getIrcClient().getIrcClient().sendRawLine("PONG :tmi.twitch.tv");
 
-			logger.debug("Responded to PING from Twitch IRC.");
+			Logger.debug(this, "Responded to PING from Twitch IRC.");
 		}
 
 		// Handle Messages
@@ -281,14 +274,11 @@ public class IrcEventHandler {
 		// Prevent multi-firing of the same subscription (is sometimes send 2. times)
 		String subHistoryKey = String.format("%s|%s", entity.getUser().getId(), entity.getStreak());
 		if (subscriptionHistory.containsKey(subHistoryKey)) {
-			logger.trace(String.format("Subscription called two times, not firing event! %s", entity.toString()));
+			Logger.trace(this, "Subscription called two times, not firing event! %s", entity.toString());
 			return;
 		} else {
 			subscriptionHistory.put(subHistoryKey, entity);
 		}
-
-		// Debug
-		logger.debug(String.format("%s subscribed to %s for the %s months. Prime=%s, Message=%s!", entity.getUser().getDisplayName(), channel.getName(), entity.getStreak(), entity.getIsPrimeSub(), entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity));
@@ -303,9 +293,6 @@ public class IrcEventHandler {
 		entity.setBits(Integer.parseInt(bits));
 		entity.setMessage(message);
 		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
-
-		// Debug
-		logger.debug(String.format("%s just cheered to %s with %s bits. Message=%s!", entity.getUser().getDisplayName(), channel.getName(), bits, entity.getMessage()));
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new CheerEvent(channel, entity));

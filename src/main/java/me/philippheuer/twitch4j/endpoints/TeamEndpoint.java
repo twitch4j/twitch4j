@@ -36,6 +36,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			TeamList responseObject = restTemplate.getForObject(requestUrl, TeamList.class);
 
 			return responseObject.getTeams();
@@ -61,6 +62,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			Team responseObject = restTemplate.getForObject(requestUrl, Team.class);
 
 			return Optional.ofNullable(responseObject);

@@ -37,6 +37,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			Video responseObject = restTemplate.getForObject(requestUrl, Video.class);
 
 			return responseObject;
@@ -69,6 +70,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			VideoTopList responseObject = restTemplate.getForObject(requestUrl, VideoTopList.class);
 
 			return responseObject.getVods();
@@ -98,6 +100,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			VideoList responseObject = restTemplate.getForObject(requestUrl, VideoList.class);
 
 			return responseObject.getVideos();

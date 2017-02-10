@@ -26,11 +26,6 @@ public class AbstractTwitchEndpoint {
 			.build();
 
 	/**
-	 * Logger
-	 */
-	protected static final Logger logger = LoggerFactory.getLogger(AbstractTwitchEndpoint.class);
-
-	/**
 	 * Holds the API Instance
 	 */
 	private TwitchClient twitchClient;

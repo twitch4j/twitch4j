@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.endpoints;
 import java.util.List;
 import java.util.Optional;
 
+import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.springframework.util.Assert;
 
@@ -69,10 +70,14 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// Validate Arguments
 		Assert.notNull(OAuthCredential, "Please provide Twitch Credentials!");
 
+		// Endpoint
+		String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(OAuthCredential);
+
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
-			User responseObject = getTwitchClient().getRestClient().getPrivilegedRestTemplate(OAuthCredential).getForObject(requestUrl, User.class);
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			User responseObject = restTemplate.getForObject(requestUrl, User.class);
 
 			return Optional.ofNullable(responseObject);
 		} catch (Exception ex) {
@@ -87,10 +92,14 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// Validate Arguments
 		Assert.notNull(userId, "Please provide a User ID!");
 
+		// Endpoint
+		String requestUrl = String.format("%s/users/%d", getTwitchClient().getTwitchEndpoint(), userId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/users/%d", getTwitchClient().getTwitchEndpoint(), userId);
 			if (!restObjectCache.containsKey(requestUrl)) {
+				Logger.trace(this, "Rest Request to [%s]", requestUrl);
 				User responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, User.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}

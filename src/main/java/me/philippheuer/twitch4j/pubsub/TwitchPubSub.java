@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jcabi.log.Logger;
 import com.neovisionaries.ws.client.*;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
@@ -20,10 +19,6 @@ import java.util.*;
 @Setter
 public class TwitchPubSub {
 
-	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(TwitchPubSub.class);
 	/**
 	 * List fo subscribed channels
 	 */
@@ -93,7 +88,7 @@ public class TwitchPubSub {
 					 *  of issuing a PING command, it should reconnect to the server.
 					 */
 					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("pong")) {
-						logger.debug("Recieved PONG Response from Twitch PubSub.");
+						Logger.debug(this, "Recieved PONG Response from Twitch PubSub.");
 					}
 
 					/**
@@ -105,18 +100,18 @@ public class TwitchPubSub {
 					 *  Otherwise, the client will be forcibly disconnected.
 					 */
 					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("reconnect")) {
-						logger.debug("Twitch PubSub is forcing us to reconnect ...");
+						Logger.debug(this, "Twitch PubSub is asking us to reconnect ...");
 						reconnect();
 					}
 
 					// Handle Error
 					if (jsonNode.has("error") && jsonNode.get("error") != null & jsonNode.get("error").textValue().length() > 0) {
-						logger.debug(String.format("Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue()));
+						Logger.error(this, "Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue());
 					}
 
 					// Handle Message
 					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("message")) {
-						logger.debug(String.format("Recieved a message from Twitch PubSub [%s]", message));
+						Logger.debug(this, "Recieved a message from Twitch PubSub: [%s]", message);
 						// TODO: parse Messages
 					}
 
@@ -132,7 +127,9 @@ public class TwitchPubSub {
 			public void onDisconnected(WebSocket websocket,
 									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
 									   boolean closedByServer) {
-				logger.info(String.format("Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
+
+				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint());
+
 				reconnect();
 			}
 		});
@@ -142,7 +139,7 @@ public class TwitchPubSub {
 	}
 
 	private Boolean connect() {
-		logger.info(String.format("Connecting to Twitch PubSub [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
+		Logger.info(this, "Connecting to Twitch PubSub: [%s]",  getTwitchClient().getTwitchPubSubEndpoint());
 
 		try {
 			getWebSocket().connect();
@@ -151,14 +148,12 @@ public class TwitchPubSub {
 			scheduleTasks();
 			return true;
 		} catch (Exception ex) {
-			logger.error(String.format("Connection to Twitch PubSub [%s] Failed: %s", getTwitchClient().getTwitchPubSubEndpoint(), ex.getMessage()));
+			Logger.error(this, "Connection to Twitch PubSub failed: [%s]",  ex.getMessage());
 			return false;
 		}
 	}
 
 	private void reconnect() {
-		logger.info(String.format("Reconnecting to Twitch PubSub [%s]", getTwitchClient().getTwitchPubSubEndpoint()));
-
 		cancelTasks();
 		if (connect()) {
 			scheduleTasks();
@@ -178,9 +173,10 @@ public class TwitchPubSub {
 					objectNode.put("type", "PING");
 
 					webSocket.sendText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
-					logger.debug("Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
+
+					Logger.debug(this, "Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
 				} catch (Exception ex) {
-					logger.error("Failed to Ping Twitch PubSub. (Connection Lost)");
+					Logger.error(this, "Failed to Ping Twitch PubSub. (%s)", ex.getMessage());
 					reconnect();
 				}
 
@@ -228,7 +224,8 @@ public class TwitchPubSub {
 		ArrayNode topicArray = dataMap.putArray("topics");
 		topicArray.add("channel-bitsevents." + channel.getId());
 
-		logger.debug("Sending Subscription to PubSub: " + objectNode.toString());
+		Logger.error(this, "Sending BitEvents-Subscription to PubSub: %s", objectNode.toString());
+
 		webSocket.sendText(objectNode.toString());
 	}
 

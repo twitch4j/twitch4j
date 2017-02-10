@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.endpoints;
 import java.util.List;
 import java.util.Optional;
 
+import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.*;
@@ -31,6 +32,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			TopGameList responseObject = restTemplate.getForObject(requestUrl, TopGameList.class);
 
 			return responseObject.getTop();

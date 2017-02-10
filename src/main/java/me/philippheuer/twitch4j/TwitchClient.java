@@ -19,10 +19,6 @@ import org.springframework.util.Assert;
 @Getter
 @Setter
 public class TwitchClient {
-	/**
-	 * Logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(TwitchClient.class);
 
 	/**
 	 * Event Dispatcher
