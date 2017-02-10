@@ -7,7 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import me.philippheuer.twitch4j.model.Error;
+import me.philippheuer.twitch4j.model.RestError;
 
 import java.io.IOException;
 
@@ -48,14 +48,14 @@ public class RestErrorHandler implements ResponseErrorHandler {
 			try {
 				// REST Error
 				ObjectMapper mapper = new ObjectMapper();
-				Error error = mapper.readValue(content, Error.class);
+				RestError restError = mapper.readValue(content, RestError.class);
 
 				// Add HTTP Status Code to Error
-				if(error.getStatus() == null) {
-					error.setStatus(clienthttpresponse.getStatusCode().ordinal());
+				if(restError.getStatus() == null) {
+					restError.setStatus(clienthttpresponse.getStatusCode().ordinal());
 				}
 
-				throw new RestException(error);
+				throw new RestException(restError);
 
 			} catch (RestException restException) {
 				// Rethrow

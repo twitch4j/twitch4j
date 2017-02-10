@@ -206,4 +206,11 @@ public class TwitchClient {
 	public SearchEndpoint getSearchEndpoint() {
 		return new SearchEndpoint(this);
 	}
+
+	/**
+	 * Get Team Endpoint
+	 */
+	public TeamEndpoint getTeamEndpoint() {
+		return new TeamEndpoint(this);
+	}
 }
