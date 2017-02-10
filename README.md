@@ -7,7 +7,7 @@ Project Information:
 [![Dependency Status](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5874cd85fff5dc002990c796)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Percentage of issues still open")
-[![](https://jitpack.io/v/philippheuer/twitch4j.svg)](https://jitpack.io/#philippheuer/twitch4j)
+[![](https://jitpack.io/v/PhilippHeuer/twitch4j.svg)](https://jitpack.io/#PhilippHeuer/twitch4j)
 
 Support:
 
