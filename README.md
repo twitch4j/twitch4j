@@ -85,7 +85,7 @@ and:
  - [x] Streams
  - [x] Teams
  - [ ] Users
- - [ ] Videos
+ - [x] Videos
 
 #### Twitch PubSub
  - [ ] Bits

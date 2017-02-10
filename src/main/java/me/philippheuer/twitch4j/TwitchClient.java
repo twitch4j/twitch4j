@@ -213,4 +213,11 @@ public class TwitchClient {
 	public TeamEndpoint getTeamEndpoint() {
 		return new TeamEndpoint(this);
 	}
+
+	/**
+	 * Get Video Endpoint
+	 */
+	public VideoEndpoint getVideoEndpoint() {
+		return new VideoEndpoint(this);
+	}
 }
