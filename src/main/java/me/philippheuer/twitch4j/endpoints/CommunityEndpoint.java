@@ -14,9 +14,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
@@ -129,12 +129,12 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param id Id of the community, which will be updated.
+	 * @param id          Id of the community, which will be updated.
 	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
 	 * @param description Long description of the community, shown in the “about this community” box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
-	 * @param email Email address of the community owner.
+	 * @param email       Email address of the community owner.
 	 * @return ID (String) of the created community
 	 */
 	public void updateCommunity(OAuthCredential credential, String id, Optional<String> name, Optional<String> summary, Optional<String> description, Optional<String> rules, Optional<String> email) {
@@ -166,21 +166,23 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Gets a specified community.
 	 * Requires Scope: none
 	 *
-	 * @param limit     Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param cursor Tells the server where to start fetching the next set of results in a multi-page response.
 	 */
-	public List<Community> getTopCommunities(Optional<Integer> limit) {
+	public CommunityList getTopCommunities(Optional<Integer> limit, Optional<String> cursor) {
 		// Endpoint
 		String requestUrl = String.format("%s/communities/top", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
 
 		// REST Request
 		try {
 			CommunityList responseObject = restTemplate.getForObject(requestUrl, CommunityList.class);
 
-			return responseObject.getCommunities();
+			return responseObject;
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
@@ -188,6 +190,42 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Endpoint: Get Top Communities
+	 * Calling the getTopCommunities with parameters to get up to limit communities.
+	 * Requires Scope: none
+	 *
+	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
+	 */
+	public List<Community> getTopCommunities(Optional<Integer> limit) {
+		if(limit.isPresent()) {
+			if(limit.get() > 100) {
+				List<Community> resultList = new ArrayList<Community>();
+
+				Integer recordsToFetch = limit.get();
+				String cursor = "";
+
+				while(recordsToFetch > 0) {
+					CommunityList communityList = getTopCommunities(Optional.ofNullable(recordsToFetch > 100 ? 100 : recordsToFetch), Optional.empty());
+					cursor = communityList.getCursor();
+					Integer results = communityList.getCommunities().size();
+					resultList.addAll(communityList.getCommunities());
+					recordsToFetch -= results;
+
+					if(results == 0) {
+						break;
+					}
+				}
+
+				return resultList;
+			} else {
+				return getTopCommunities(limit, Optional.empty()).getCommunities();
+			}
+		} else {
+			return getTopCommunities(Optional.empty(), Optional.empty()).getCommunities();
+		}
 	}
 
 	// TODO

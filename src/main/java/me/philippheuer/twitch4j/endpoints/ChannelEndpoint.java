@@ -192,27 +192,64 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param limit     Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: 100.
-	 * @param offset    Object offset for pagination of results. Default: 0.
+	 * @param cursor  	Tells the server where to start fetching the next set of results, in a multi-page response.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public List<Follow> getFollowers(Optional<Integer> limit, Optional<Integer> offset, Optional<String> direction) {
+	public FollowList getFollowers(Optional<Integer> limit, Optional<String> cursor, Optional<String> direction) {
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/follows", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.orElse("desc").toString()));
 
 		// REST Request
 		try {
 			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
-			return responseObject.getFollows();
+			return responseObject;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * Endpoint: Get Channel Followers
+	 * Gets a list of users who follow a specified channel, sorted by the date when they started following the channel (newest first, unless specified otherwise).
+	 * Requires Scope: none
+	 *
+	 * @param limit     Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: none.
+	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
+	 */
+	public List<Follow> getFollowers(Optional<Integer> limit, Optional<String> direction) {
+		if(limit.isPresent()) {
+			if(limit.get() > 100) {
+				List<Follow> resultList = new ArrayList<Follow>();
+
+				Integer recordsToFetch = limit.get();
+				String cursor = "";
+
+				while(recordsToFetch > 0) {
+					FollowList followList = getFollowers(Optional.ofNullable(recordsToFetch > 100 ? 100 : recordsToFetch), Optional.empty(), Optional.empty());
+					cursor = followList.getCursor();
+					Integer results = followList.getFollows().size();
+					resultList.addAll(followList.getFollows());
+					recordsToFetch -= results;
+
+					if(results == 0) {
+						break;
+					}
+				}
+
+				return resultList;
+			} else {
+				return getFollowers(limit, Optional.empty(), direction).getFollows();
+			}
+		} else {
+			return getFollowers(Optional.empty(), Optional.empty(), direction).getFollows();
 		}
 	}
 
@@ -474,7 +511,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 						Optional.ofNullable(10),
 						Optional.empty(),
 						Optional.empty()
-				);
+				).getFollows();
 				if (followList.size() > 0) {
 					for (Follow follow : followList) {
 						// dispatch event for new follows only

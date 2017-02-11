@@ -13,7 +13,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RecommendationList {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<Recommendation> recommendedStreams;
 

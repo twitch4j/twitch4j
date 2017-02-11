@@ -11,21 +11,9 @@ import java.util.List;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CommunityList {
+public class CommunityList extends AbstractResultList {
 	/**
-	 * Cursor
-	 */
-	@JsonProperty("_cursor")
-	private String cursor;
-
-	/**
-	 * Total Entries
-	 */
-	@JsonProperty("_total")
-	private Long total;
-
-	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<Community> communities;
 
