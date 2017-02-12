@@ -117,8 +117,8 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 ### Client Builder (Twitch Standalone)
 ```java
 TwitchClient twitchClient = TwitchClient.builder()
-	.clientId("***Twitch App Client ID***")
-	.clientSecret("***Twitch App Client SECRET***")
+	.clientId("Twitch App ID")
+	.clientSecret("Twitch App SECRET")
 	.configurationAutoSave(true)
 	.configurationDirectory(new File("").getAbsolutePath())
 	.build();
@@ -164,103 +164,8 @@ try {
 }
 ```
 
-### Event Listener
-You can create a class to handle Event by defining methods with the *@EventSubscriber* annotation.
-```java
-// Channel Endpoint
-ChannelEndpoint channelEndpoint = twitchClient.getChannelEndpoint("channelName");
-// - Register Event Listener
-channelEndpoint.setChannelEventListener(new ChannelEvents(twitchClient, channel));
-```
-
-And handle all event's in a simple class:
-```java
-public class ChannelEvents {
-
-	/**
-	 * Holds the Twitch Client
-	 */
-	TwitchClient client;
-
-	/**
-	 * Holds the channel
-	 */
-	Channel channel;
-
-	public ChannelEvents(TwitchClient client, Channel channel) {
-		this.client = client;
-		this.channel = channel;
-	}
-
-	@EventSubscriber
-	public void onSubscription(SubscriptionEvent event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.getSubscription().toString());
-
-		}
-	}
-
-	@EventSubscriber
-	public void onCheer(CheerEvent event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.getCheer().toString());
-
-		}
-	}
-
-	@EventSubscriber
-	public void onUserBan(UserBan event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.toString());
-
-		}
-	}
-
-	@EventSubscriber
-	public void onUserTimeout(UserTimeout event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.toString());
-
-		}
-	}
-
-	@EventSubscriber
-	public void onUserFollow(FollowEvent event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.toString());
-		}
-	}
-
-	@EventSubscriber
-	public void onUserDonation(DonationEvent event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println("Recieved Event: " + event.toString());
-		}
-	}
-
-	@EventSubscriber
-	public void onMessage(MessageEvent event) {
-		// Filter Events for this Channel
-		if(event.getChannel().getId() == channel.getId()) {
-			// Actual Work
-			System.out.println(String.format("Recieved MessageEvent: %s - %s: %s %s", event.getChannel().getDisplayName(), event.getUser().getDisplayName(), event.getMessage()));
-		}
-	}
-}
-
-```
+### WIKI
+For more advanced features, check out the [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki).
 
 ## Problems
 
