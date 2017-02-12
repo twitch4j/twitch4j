@@ -381,8 +381,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint: Get Channel Videos
-	 * Gets a list of users subscribed to a specified channel, sorted by the date when they subscribed.
-	 * This is not related to the user messages, subscriptions are visible immediately.
+	 * Gets a list of videos from a specified channel.
 	 * Requires Scope: none
 	 *
 	 * @param limit          Maximum number of most-recent objects to return. Default: 25. Maximum: 100.

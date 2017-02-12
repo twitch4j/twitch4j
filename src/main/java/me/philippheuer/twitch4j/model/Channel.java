@@ -26,7 +26,7 @@ public class Channel {
 
 	private String email;
 
-	private int followers;
+	private Long followers;
 
 	private String game;
 
@@ -54,7 +54,7 @@ public class Channel {
 
 	private String videoBanner;
 
-	private long views;
+	private Long views;
 
 	// Holds related Twitch Credentials
 	private Optional<OAuthCredential> twitchCredential = Optional.empty();

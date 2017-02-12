@@ -64,6 +64,7 @@ and:
 ## Table of Contents
 - [Features](#features)
 - [Getting Started](#gettingstarted)
+- [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki)
 - [Problems](#problems)
 - [Changelog](./CHANGELOG.md)
 - [Credits](./CONTRIBUTORS.md)
@@ -111,7 +112,7 @@ and:
   - No API
 
 ## Getting Started
-Just some simple examples, visit the wiki for more details.
+Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki) for more details.
 
 ### Client Builder (Twitch Standalone)
 ```java
