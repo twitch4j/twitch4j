@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IngestList {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<Ingest> ingests;
 

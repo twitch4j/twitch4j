@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamList {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<Team> teams;
 

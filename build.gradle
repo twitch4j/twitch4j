@@ -56,6 +56,9 @@ dependencies {
     // TypeTools
     compile("net.jodah:typetools:0.4.8")
 
+	// Args4J - CommandLineArgumentParser
+	compile("args4j:args4j:2.33")
+
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.12")
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoList {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<Video> videos;
 
