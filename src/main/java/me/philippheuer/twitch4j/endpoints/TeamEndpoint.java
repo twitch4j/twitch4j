@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.twitch4j.model.RestError;
+import me.philippheuer.twitch4j.model.Team;
+import me.philippheuer.twitch4j.model.TeamList;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -26,13 +29,18 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get All Teams
 	 * Gets all active teams.
 	 * Requires Scope: none
-	 * @param limit
-	 * @param offset
+	 *
+	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param offset Object offset for pagination. Default is 0.
 	 */
-	public List<Team> getTeams() {
+	public List<Team> getTeams(Optional<Integer> limit, Optional<Integer> offset) {
 		// Endpoint
 		String requestUrl = String.format("%s/teams", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
 
 		// REST Request
 		try {
@@ -53,6 +61,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Team
 	 * Gets a specified team object.
 	 * Requires Scope: none
+	 *
+	 * @param teamName Name of the Team.
 	 * @return Optional<Team>, is only present - if the team exists.
 	 */
 	public Optional<Team> getTeam(String teamName) {
@@ -71,7 +81,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 			Logger.error(this, "RestException: " + restError.toString());
 
 			// Handle: Team does not exist
-			if(restError.getStatus().equals(404) && restError.getMessage().equals("Team does not exist")) {
+			if (restError.getStatus().equals(404) && restError.getMessage().equals("Team does not exist")) {
 				return Optional.empty();
 			}
 		} catch (Exception ex) {

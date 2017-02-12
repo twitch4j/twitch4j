@@ -61,6 +61,11 @@ public class TwitchClient {
 	public final int twitchEndpointVersion = 5;
 
 	/**
+	 * Twitch TMI Endpoint
+	 */
+	public final String twitchMessagingInterfaceEndpoint = "http://tmi.twitch.tv";
+
+	/**
 	 * Twitch PubSub Endpoint
 	 */
 	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv";
@@ -155,11 +160,18 @@ public class TwitchClient {
     }
 
     /**
-     * Get Channel Endpoint
+     * Get Channel Endpoint - by ID
      */
     public ChannelEndpoint getChannelEndpoint(Long channelId) {
     	return new ChannelEndpoint(this, channelId);
     }
+
+	/**
+	 * Get Channel Endpoint - by Name
+	 */
+	public ChannelEndpoint getChannelEndpoint(String channelName) {
+		return new ChannelEndpoint(this, channelName);
+	}
 
     /**
      * Get Game Endpoint
@@ -215,5 +227,13 @@ public class TwitchClient {
 	 */
 	public VideoEndpoint getVideoEndpoint() {
 		return new VideoEndpoint(this);
+	}
+
+	/**
+	 * Get Twitch Messaging Service (TMI) Endpoint
+	 * This endpoint is unofficial and can be changed without a notice.
+	 */
+	public TMIEndpoint getTMIEndpoint() {
+		return new TMIEndpoint(this);
 	}
 }

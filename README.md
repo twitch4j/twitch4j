@@ -123,29 +123,141 @@ TwitchClient twitchClient = TwitchClient.builder()
 	.build();
 ```
 
-### Get Channel Follows
+### Get User Id from UserName
+The Twitch V5 Endpoints prefer to use id's over names. You can get the user/channel id
+by using the getUserIdByUserName Method of the UserEndpoint.
 ```java
 // Channel Name to Channel ID (V5 API)
-Optional<Long> channelId = twitchClient.getUserEndpoint().getUserIdByUserName("whynabit");
+Optional<Long> userId = twitchClient.getUserEndpoint().getUserIdByUserName("whynabit");
+```
 
-// Get the Channel Endpoint
-if(channelId.isPresent()) {
-	// Get Endpoint
-	ChannelEndpoint channelEndpoint = twitchClient.getChannelEndpoint(channelId.get());
-	
-	// Get Follows
-	// ...
+Because there is the possibility that the user may not exists, you will get an optional return.
+So you need to handle the result like this:
+```java
+if (userId.isPresent()) {
+	// User exists
+	System.out.println("UserID = " + userId.get());
 } else {
-	// User doesn't exist
+	// User does not exist -> handle error
+}
+```
+
+### Get Channel Follows
+To extend the above example, the whole code to get the followers of a channel woud look like this:
+
+```java
+try {
+	// Get Channel Endpoint for specific channel
+	ChannelEndpoint channelEndpoint = twitchClient.getChannelEndpoint("channelName");
+
+	// Get the 500 newest followers
+	List<Follow> followList = channelEndpoint.getFollowers(Optional.ofNullable(500), Optional.ofNullable("desc"));
+	for(Follow follow : followList) {
+		System.out.println("User " + follow.getUser().getDisplayName() + " first followed at " + follow.getCreatedAt().toString());
+	}
+
+} catch (ChannelDoesNotExistException ex) {
+	System.out.println("Channel does not exist!");
+} catch (Exception ex) {
+	ex.printStackTrace();
 }
 ```
 
 ### Event Listener
+You can create a class to handle Event by defining methods with the *@EventSubscriber* annotation.
 ```java
-
+// Channel Endpoint
+ChannelEndpoint channelEndpoint = twitchClient.getChannelEndpoint("channelName");
+// - Register Event Listener
+channelEndpoint.setChannelEventListener(new ChannelEvents(twitchClient, channel));
 ```
 
+And handle all event's in a simple class:
 ```java
+public class ChannelEvents {
+
+	/**
+	 * Holds the Twitch Client
+	 */
+	TwitchClient client;
+
+	/**
+	 * Holds the channel
+	 */
+	Channel channel;
+
+	public ChannelEvents(TwitchClient client, Channel channel) {
+		this.client = client;
+		this.channel = channel;
+	}
+
+	@EventSubscriber
+	public void onSubscription(SubscriptionEvent event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.getSubscription().toString());
+
+		}
+	}
+
+	@EventSubscriber
+	public void onCheer(CheerEvent event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.getCheer().toString());
+
+		}
+	}
+
+	@EventSubscriber
+	public void onUserBan(UserBan event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.toString());
+
+		}
+	}
+
+	@EventSubscriber
+	public void onUserTimeout(UserTimeout event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.toString());
+
+		}
+	}
+
+	@EventSubscriber
+	public void onUserFollow(FollowEvent event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.toString());
+		}
+	}
+
+	@EventSubscriber
+	public void onUserDonation(DonationEvent event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println("Recieved Event: " + event.toString());
+		}
+	}
+
+	@EventSubscriber
+	public void onMessage(MessageEvent event) {
+		// Filter Events for this Channel
+		if(event.getChannel().getId() == channel.getId()) {
+			// Actual Work
+			System.out.println(String.format("Recieved MessageEvent: %s - %s: %s %s", event.getChannel().getDisplayName(), event.getUser().getDisplayName(), event.getMessage()));
+		}
+	}
+}
 
 ```
 

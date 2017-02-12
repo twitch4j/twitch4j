@@ -53,7 +53,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	private Date lastDonation;
 
 	/**
-	 * Constructor
+	 * Constructor - by ChannelId
 	 */
 	public ChannelEndpoint(TwitchClient client, Long channelId) {
 		super(client);
@@ -63,6 +63,27 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Process Arguments
 		setChannelId(channelId);
+
+		// Throw ChannelDoesNotExistException
+		if (getChannel() == null) {
+			throw new ChannelDoesNotExistException(channelId);
+		}
+	}
+
+	/**
+	 * Constructor - by ChannelName
+	 */
+	public ChannelEndpoint(TwitchClient client, String channelName) {
+		super(client);
+
+		// Validate Arguments
+		Assert.notNull(channelName, "Please provide a Channel Name!");
+
+		// Process Arguments
+		Optional<Long> userId = client.getUserEndpoint().getUserIdByUserName(channelName);
+		if(userId.isPresent()) {
+			setChannelId(userId.get());
+		}
 
 		// Throw ChannelDoesNotExistException
 		if (getChannel() == null) {
