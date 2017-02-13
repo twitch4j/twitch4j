@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.model.Channel;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
@@ -92,13 +93,12 @@ public class IrcClient {
 						if(ex instanceof KittehConnectionException) {
 							Logger.warn(this, "Connection to Twitch IRC lost. [%s]", getClient().getTwitchIrcEndpoint());
 							reconnect();
+							return;
 						}
 
 						ex.printStackTrace();
 					}
-
 				}
-
         	});
 
 			Logger.info(this, "Connected to Twitch IRC! [%s]", getClient().getTwitchIrcEndpoint());
@@ -123,6 +123,10 @@ public class IrcClient {
 		getIrcClient().shutdown();
 	}
 
+	/**
+	 * Join's a channel, required to listen for messages
+	 * @param channelName The channel to join.
+	 */
 	public void joinChannel(String channelName) {
 		String ircChannel = String.format("#%s", channelName);
 		if(!getIrcClient().getChannels().contains(ircChannel)) {
@@ -131,6 +135,17 @@ public class IrcClient {
 			Logger.info(this, "Joined Channel [%s]!", channelName);
 		}
 	}
+
+	/**
+	 * Send message to channel
+	 * @param channelName Channel, the message is send to.
+	 * @param message The message to send.
+	 */
+	public void sendMessage(String channelName, String message) {
+		// TODO: Queue messages, to prevent the rate-limit from kicking in
+		getIrcClient().sendMessage("#" + channelName, message);
+	}
+
 	/**
 	 * Method: Check IRC Client Status
 	 */

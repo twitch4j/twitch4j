@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamFeaturedList {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private List<StreamFeatured> featured;
 

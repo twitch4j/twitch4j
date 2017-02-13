@@ -4,8 +4,10 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
+import me.philippheuer.twitch4j.events.event.MessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Cheer;
 import me.philippheuer.twitch4j.model.Subscription;
@@ -15,6 +17,8 @@ import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
+import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.event.helper.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -257,6 +261,29 @@ public class IrcEventHandler {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Event: onMessage
+	 * Gets executed on MessageEvent
+	 */
+	@Handler(priority = Integer.MAX_VALUE)
+	public void onMessageEvent(ChannelMessageEvent event) {
+		String channelName = event.getChannel().getName().replace("#", "");
+		String userName = event.getActor().getNick();
+		String userMessage = event.getMessage();
+
+		// Channel Information
+		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).orElse(null);
+		Channel channel = getTwitchClient().getChannelEndpoint(chanelId).getChannel();
+
+		// User Information
+		User user = new User();
+		user.setName(userName);
+		user.setDisplayName(userName);
+
+		MessageEvent messageEvent = new MessageEvent(channel, user, userMessage);
+		getTwitchClient().getDispatcher().dispatch(messageEvent);
 	}
 
 	/**

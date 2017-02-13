@@ -154,7 +154,7 @@ public class CredentialManager {
 	 * Get Streamlabs credential by customKey
 	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
 	 */
-	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(String customKey) {
+	public Optional<OAuthCredential> getStreamlabsCredentialsForCustomKey(String customKey) {
 		return getAnyCredential("STREAMLABS-" + customKey);
 	}
 

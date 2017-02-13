@@ -10,7 +10,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamSingle {
 	/**
-	 * List of Entity
+	 * Data
 	 */
 	private Stream stream;
 

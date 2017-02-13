@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j;
 
 import java.io.File;
 
+import me.philippheuer.twitch4j.chat.commands.CommandHandler;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
 import org.slf4j.Logger;
@@ -95,6 +96,11 @@ public class TwitchClient {
 	private File configurationDirectory;
 
 	/**
+	 * Command Handler (CHAT)
+	 */
+	private CommandHandler commandHandler = new CommandHandler(this);
+
+	/**
      * Constructs a Twitch application instance.
      */
     public TwitchClient(String clientId, String clientSecret) {
@@ -105,6 +111,9 @@ public class TwitchClient {
 
         // Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
+
+		// EventSubscribers
+		getDispatcher().registerListener(getCommandHandler());
 
 		// Initialize REST Client
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
