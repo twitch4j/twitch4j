@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 
 import javax.swing.text.html.Option;
@@ -87,6 +88,7 @@ public class CommandHandler {
 	 *
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
+	@EventSubscriber
 	public void processCommand(MessageEvent messageEvent) {
 		// Get real command name from alias
 		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring("!".length(), messageEvent.getMessage().length()));

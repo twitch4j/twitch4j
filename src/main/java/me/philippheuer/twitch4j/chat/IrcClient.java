@@ -142,6 +142,7 @@ public class IrcClient {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(String channelName, String message) {
+		// TODO: Queue messages, to prevent the rate-limit from kicking in
 		getIrcClient().sendMessage("#" + channelName, message);
 	}
 

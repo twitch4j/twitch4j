@@ -107,6 +107,9 @@ public class TwitchClient {
         // Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
 
+		// EventSubscribers
+		getDispatcher().registerListener(getCommandHandler());
+
 		// Initialize REST Client
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
