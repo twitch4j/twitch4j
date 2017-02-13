@@ -18,7 +18,7 @@ public class Chatter {
 
 	private List<String> admins;
 
-	private List<String> global_mods;
+	private List<String> globalMods;
 
 	private List<String> viewers;
 }
