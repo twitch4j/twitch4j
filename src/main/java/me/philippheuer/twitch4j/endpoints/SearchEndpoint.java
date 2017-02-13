@@ -31,13 +31,13 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 */
-	public List<Channel> getChannels(String query, Optional<Integer> limit) {
+	public List<Channel> getChannels(String query, Optional<Long> limit) {
 		// Endpoint
 		String requestUrl = String.format("%s/search/channels", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", query));
 
 		// REST Request
@@ -92,13 +92,13 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 */
-	public List<Stream> getStreams(String query, Optional<Integer> limit) {
+	public List<Stream> getStreams(String query, Optional<Long> limit) {
 		// Endpoint
 		String requestUrl = String.format("%s/search/streams", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", query));
 
 		// REST Request

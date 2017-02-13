@@ -216,13 +216,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param cursor  	Tells the server where to start fetching the next set of results, in a multi-page response.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public FollowList getFollowers(Optional<Integer> limit, Optional<String> cursor, Optional<String> direction) {
+	public FollowList getFollowers(Optional<Long> limit, Optional<String> cursor, Optional<String> direction) {
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/follows", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.orElse("desc").toString()));
 
@@ -245,12 +245,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit     Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: none.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public List<Follow> getFollowers(Optional<Integer> limit, Optional<String> direction) {
+	public List<Follow> getFollowers(Optional<Long> limit, Optional<String> direction) {
 		if(limit.isPresent()) {
 			if(limit.get() > 100) {
 				List<Follow> resultList = new ArrayList<Follow>();
 
-				Integer recordsToFetch = limit.get();
+				Long recordsToFetch = limit.get();
 				String cursor = "";
 
 				while(recordsToFetch > 0) {
@@ -305,7 +305,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param offset    Object offset for pagination of results. Default: 0.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 */
-	public List<Subscription> getSubscriptions(Optional<Integer> limit, Optional<Integer> offset, Optional<String> direction) {
+	public List<Subscription> getSubscriptions(Optional<Long> limit, Optional<Long> offset, Optional<String> direction) {
 		// Check Scope
 		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if (twitchCredential.isPresent()) {
@@ -323,8 +323,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.orElse("desc").toString()));
 
 		// REST Request
@@ -390,14 +390,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param language       Constrains the language of the videos that are returned; for example, “en,es.” Default: all languages.
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight.
 	 */
-	public List<Video> getVideos(Optional<Integer> limit, Optional<Integer> offset, Optional<String> sort, Optional<String> language, Optional<String> broadcast_type) {
+	public List<Video> getVideos(Optional<Long> limit, Optional<Long> offset, Optional<String> sort, Optional<String> language, Optional<String> broadcast_type) {
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/videos", getTwitchClient().getTwitchEndpoint(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("sort", sort.orElse("time").toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("language", language.orElse(null).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("broadcast_type", broadcast_type.orElse("highlight").toString()));
@@ -528,7 +528,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 				// Followers
 				List<Date> creationDates = new ArrayList<Date>();
 				List<Follow> followList = getFollowers(
-						Optional.ofNullable(10),
+						Optional.ofNullable(10l),
 						Optional.empty(),
 						Optional.empty()
 				).getFollows();

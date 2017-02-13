@@ -33,14 +33,14 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param offset Object offset for pagination. Default is 0.
 	 */
-	public List<Team> getTeams(Optional<Integer> limit, Optional<Integer> offset) {
+	public List<Team> getTeams(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
 		String requestUrl = String.format("%s/teams", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
 
 		// REST Request
 		try {

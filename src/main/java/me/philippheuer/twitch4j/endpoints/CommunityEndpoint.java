@@ -169,13 +169,13 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param cursor Tells the server where to start fetching the next set of results in a multi-page response.
 	 */
-	public CommunityList getTopCommunities(Optional<Integer> limit, Optional<String> cursor) {
+	public CommunityList getTopCommunities(Optional<Long> limit, Optional<String> cursor) {
 		// Endpoint
 		String requestUrl = String.format("%s/communities/top", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
 
 		// REST Request
@@ -199,12 +199,12 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
 	 */
-	public List<Community> getTopCommunities(Optional<Integer> limit) {
+	public List<Community> getTopCommunities(Optional<Long> limit) {
 		if(limit.isPresent()) {
 			if(limit.get() > 100) {
 				List<Community> resultList = new ArrayList<Community>();
 
-				Integer recordsToFetch = limit.get();
+				Long recordsToFetch = limit.get();
 				String cursor = "";
 
 				while(recordsToFetch > 0) {

@@ -71,14 +71,14 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * @param channelIds  Receives the streams from a comma-separated list of channel IDs.
 	 * @param stream_type Restricts the returned streams to a certain stream type. Valid values: live, playlist, all. Playlists are offline streams of VODs (Video on Demand) that appear live. Default: live.
 	 */
-	public List<Stream> getAll(Optional<Integer> limit, Optional<Integer> offset, Optional<String> language, Optional<Game> game, Optional<String> channelIds, Optional<String> stream_type) {
+	public List<Stream> getAll(Optional<Long> limit, Optional<Long> offset, Optional<String> language, Optional<Game> game, Optional<String> channelIds, Optional<String> stream_type) {
 		// Endpoint
 		String requestUrl = String.format("%s/streams", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("language", language.orElse(null)));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("game", game.map(Game::getName).orElse(null)));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("channel", channelIds.isPresent() ? channelIds.get() : null));
@@ -127,14 +127,14 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param offset Object offset for pagination of results. Default: 0.
 	 */
-	public List<StreamFeatured> getFeatured(Optional<Integer> limit, Optional<Integer> offset) {
+	public List<StreamFeatured> getFeatured(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
 		String requestUrl = String.format("%s/streams/featured", getTwitchClient().getTwitchEndpoint());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
 
 		// REST Request
 		try {
