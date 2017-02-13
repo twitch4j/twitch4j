@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -10,14 +11,13 @@ import java.util.Date;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Follow {
+public class UserSubscriptionCheck {
 
-	private Date createdAt;
-
-	private Boolean notifications;
-
-	private User user;
+	@JsonProperty("_id")
+	private String id;
 
 	private Channel channel;
+
+	private Date createdAt;
 
 }

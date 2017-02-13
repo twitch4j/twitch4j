@@ -517,7 +517,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		if (channel.getStreamlabsCredential().isPresent()) {
 			startDonationListener(channel);
 		} else {
-			Logger.debug(this, "Sreamlabs: No Credentials for Channel [%s]", channel.getDisplayName());
+			Logger.info(this, "Sreamlabs: No Credentials for Channel [%s]", channel.getDisplayName());
 		}
 	}
 

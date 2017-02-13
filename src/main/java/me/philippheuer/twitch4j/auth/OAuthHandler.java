@@ -74,7 +74,7 @@ public class OAuthHandler {
 											}
 
 											// Check for custom key, to store in credential manager
-											if (responseState.length() > 0) {
+											if (responseState.length() > 0 && !responseState.equals("CHANNEL")) {
 												// Custom Key
 												getCredentialManager().addTwitchCredential(responseState, credential);
 											} else {
@@ -106,7 +106,7 @@ public class OAuthHandler {
 										// Valid?
 										if (credential != null) {
 											// Check for custom key, to store in credential manager
-											if (responseState.length() > 0) {
+											if (responseState.length() > 0 && !responseState.equals("CHANNEL")) {
 												// Custom Key
 												getCredentialManager().addStreamlabsCredential(responseState, credential);
 											} else {
