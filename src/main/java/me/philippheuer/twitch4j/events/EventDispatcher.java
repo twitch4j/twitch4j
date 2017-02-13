@@ -221,11 +221,11 @@ public class EventDispatcher {
 											if (o.isTemporary) {
 												unregisterListener(o.listener);
 											}
-										} catch (IllegalAccessException e) {
+										} catch (IllegalAccessException ex) {
 											Logger.error(this, "Error dispatching event %s", event.getClass().getSimpleName());
-										} catch (InvocationTargetException e) {
+										} catch (InvocationTargetException ex) {
 											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName()); // e.getCause()
-										} catch (Exception e) {
+										} catch (Exception ex) {
 											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName());
 										}
 									})));
@@ -244,8 +244,8 @@ public class EventDispatcher {
 								unregisterListener(l.listener);
 						} catch (ClassCastException e) {
 							//FIXME: This occurs when a lambda expression is used to create an IListener leading it to be registered under the type 'Event'. This is due to a bug in TypeTools: https://github.com/jhalterman/typetools/issues/14
-						} catch (Exception e) {
-							Logger.error(this, "Unhandled exception caught dispatching event %s [%s]", event.getClass().getSimpleName(), e.getMessage());
+						} catch (Exception ex) {
+							Logger.error(this, "Unhandled exception caught dispatching event %s [%s]", event.getClass().getSimpleName(), ex.getMessage());
 						}
 					}));
 		});

@@ -27,7 +27,7 @@ public class MessageEvent extends Event {
 	/**
 	 * Message
 	 */
-	private String message;
+	private final String message;
 
 	/**
 	 * Constructor

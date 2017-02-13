@@ -2,7 +2,6 @@ package me.philippheuer.twitch4j.chat.commands;
 
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.discord.bot.model.CommandArgumentValidationType;
 
 import java.util.ArrayList;
 import java.util.List;

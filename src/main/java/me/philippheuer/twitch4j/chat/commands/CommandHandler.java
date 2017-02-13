@@ -4,6 +4,7 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 
 import javax.swing.text.html.Option;
@@ -28,6 +29,14 @@ public class CommandHandler {
 	 * A map routing command aliases to the primary command
 	 */
 	public HashMap<String, String> commandAliasToPrimaryMap = new HashMap<String, String>();
+
+	/**
+	 * Constructor
+	 * @param twitchClient
+	 */
+	public CommandHandler(TwitchClient twitchClient) {
+		setTwitchClient(twitchClient);
+	}
 
 	/**
 	 * Register a command in the CommandHandler
@@ -79,8 +88,6 @@ public class CommandHandler {
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
 	public void processCommand(MessageEvent messageEvent) {
-		Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
-
 		// Get real command name from alias
 		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring("!".length(), messageEvent.getMessage().length()));
 		if (messageEvent.getMessage().contains(" ")) {
@@ -95,6 +102,8 @@ public class CommandHandler {
 		Optional<Command> cmd = getCommand(cmdName);
 		// Command exists?
 		if(cmd.isPresent()) {
+			Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
+
 			// Check Command Permissions
 			if (cmd.get().hasPermissions(messageEvent)) {
 				cmd.get().executeCommand(messageEvent);
