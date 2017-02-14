@@ -168,6 +168,11 @@ public class TwitchClient {
         setPubSub(new TwitchPubSub(this));
     }
 
+	/**
+	 * Get Kraken Endpoint
+	 */
+	private KrakenEndpoint krakenEndpoint = new KrakenEndpoint(this);
+
     /**
      * Get Channel Endpoint - by ID
      */

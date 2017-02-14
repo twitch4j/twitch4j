@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.auth;
 
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -103,11 +104,12 @@ public class OAuthTwitch {
 			OAuthCredential credential = new OAuthCredential();
 			credential.setOAuthToken(responseObject.getAccessToken());
 
-			Optional<User> user = getCredentialManager().getTwitchClient().getUserEndpoint().getUser(credential);
-			if (user.isPresent()) {
-				credential.setUserId(user.get().getId());
-				credential.setUserName(user.get().getName());
-				credential.setDisplayName(user.get().getDisplayName());
+			// Get Token Status from Kraken Endpoint
+			Token token = getCredentialManager().getTwitchClient().getKrakenEndpoint().getToken(credential);
+			if(token.getValid()) {
+				credential.setUserId(token.getUserId());
+				credential.setUserName(token.getUserName());
+				credential.setDisplayName(token.getUserName());
 			}
 
 			return credential;
