@@ -105,7 +105,7 @@ public class IrcClient {
 
         	return true;
         } catch (Exception ex) {
-			Logger.warn(this, "Connection to Twitch IRC failed: %s",  getClient().getTwitchIrcEndpoint(), ex.getMessage());
+			Logger.warn(this, "Connection to Twitch IRC failed: %s", ex.getMessage());
             return false;
         }
 	}
