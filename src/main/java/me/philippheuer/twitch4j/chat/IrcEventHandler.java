@@ -292,12 +292,12 @@ public class IrcEventHandler {
 			}
 			// Twitch Prime
 			if(badges.contains("premium/1")) {
-				userPermissions.add(CommandPermission.PRIME);
+				userPermissions.add(CommandPermission.PRIME_TURBO);
 			}
 		}
 		// Twitch Turbo
 		if(tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
-			userPermissions.add(CommandPermission.TURBO);
+			userPermissions.add(CommandPermission.PRIME_TURBO);
 		}
 		// Subscriber
 		if(tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {

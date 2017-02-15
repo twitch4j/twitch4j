@@ -2,8 +2,7 @@ package me.philippheuer.twitch4j.enums;
 
 public enum CommandPermission {
 	EVERYONE,
-	PRIME,
-	TURBO,
+	PRIME_TURBO,
 	SUBSCRIBER,
 	MODERATOR,
 	BROADCASTER
