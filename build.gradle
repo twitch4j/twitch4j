@@ -32,6 +32,15 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+// Method, that gets the total amount of commits in the repository (as build number)
+def gitVersion() {
+	def counter = 0
+	def process = "git rev-list dev --first-parent --count".execute()
+	counter = process.text.toInteger()
+	return counter
+}
+
+// Dependencies
 dependencies {
 	// Logging
     compile("ch.qos.logback:logback-classic:1.1.8")
