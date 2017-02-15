@@ -5,12 +5,15 @@ import java.net.URISyntaxException;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Channel;
+import org.isomorphism.util.TokenBucket;
+import org.isomorphism.util.TokenBuckets;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
@@ -30,6 +33,13 @@ public class IrcClient {
 	 * IRC Client Library
 	 */
 	private Client ircClient;
+
+	// Create a token bucket with a capacity of 1 token that refills at a fixed interval of 1 token / 2 sec.
+	// [If you send more than 20 commands or messages to the server within 30 seconds, you will be locked out for 30 minutes.]
+	private final TokenBucket messageBucket = TokenBuckets.builder()
+			.withCapacity(20)
+			.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
+			.build();
 
 	/**
 	 * Constructor
@@ -141,9 +151,14 @@ public class IrcClient {
 	 * @param channelName Channel, the message is send to.
 	 * @param message The message to send.
 	 */
-	public void sendMessage(String channelName, String message) {
-		// TODO: Queue messages, to prevent the rate-limit from kicking in
-		getIrcClient().sendMessage("#" + channelName, message);
+	public void sendMessage(final String channelName, final String message) {
+		new Thread(() -> {
+			// Consume 1 Token (wait's in case the limit has been exceeded)
+			getMessageBucket().consume(1);
+
+			// Send Message
+			getIrcClient().sendMessage("#" + channelName, message);
+		}).start();
 	}
 
 	/**

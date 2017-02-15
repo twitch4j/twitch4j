@@ -59,6 +59,9 @@ dependencies {
     // JSON
     compile("com.fasterxml.jackson.core:jackson-databind:2.8.6")
 
+	// Bucket for rate-limiting
+	compile("org.isomorphism:token-bucket:1.7")
+
     // Expiring Map
     compile("net.jodah:expiringmap:0.5.7")
 
