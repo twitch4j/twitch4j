@@ -20,9 +20,10 @@ public class AbstractTwitchEndpoint {
 	/**
 	 * Cache - Objects
 	 */
-	static protected Map<String, Object> restObjectCache = ExpiringMap.builder()
-			.expiration(1, TimeUnit.MINUTES)
+	static protected ExpiringMap<String, Object> restObjectCache = ExpiringMap.builder()
+			.expiration(30, TimeUnit.SECONDS)
 			.expirationPolicy(ExpirationPolicy.ACCESSED)
+			.variableExpiration()
 			.build();
 
 	/**

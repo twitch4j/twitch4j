@@ -67,8 +67,6 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 		try {
 			DonationList responseObject = restTemplate.getForObject(requestUrl, DonationList.class);
 
-			Logger.debug(this, "Sreamlabs: Fetched Donations for %s", getOAuthCredential().getDisplayName());
-
 			return responseObject.getData();
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());

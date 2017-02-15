@@ -4,7 +4,9 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.chat.commands.Command;
 import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
+import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
@@ -16,14 +18,12 @@ import net.engio.mbassy.listener.Handler;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.kitteh.irc.client.library.element.MessageTag;
+import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 import org.kitteh.irc.client.library.event.helper.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,12 +89,7 @@ public class IrcEventHandler {
 			Channel channel = getTwitchClient().getChannelEndpoint(channelId).getChannel();
 
 			// Build Map from Tags
-			Map<String, String> tagMap = new HashMap<>();
-			for (MessageTag tag : event.getServerMessage().getTags()) {
-				if (tag.getValue().isPresent()) {
-					tagMap.put(tag.getName(), tag.getValue().get());
-				}
-			}
+			Map<String, String> tagMap = getTagMap(event.getServerMessage());
 
 			// Bans/Timeouts
 			if (tagMap.containsKey("ban-reason")) {
@@ -272,6 +267,11 @@ public class IrcEventHandler {
 		String channelName = event.getChannel().getName().replace("#", "");
 		String userName = event.getActor().getNick();
 		String userMessage = event.getMessage();
+		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
+
+		// Build Map from Tags
+		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
+		Long userId = Long.parseLong(tagMap.get("user-id"));
 
 		// Channel Information
 		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).orElse(null);
@@ -279,10 +279,39 @@ public class IrcEventHandler {
 
 		// User Information
 		User user = new User();
+		user.setId(userId);
 		user.setName(userName);
 		user.setDisplayName(userName);
 
-		MessageEvent messageEvent = new MessageEvent(channel, user, userMessage);
+		// Check for Permissions
+		if(tagMap.containsKey("badges")) {
+			List<String> badges = Arrays.asList(tagMap.get("badges").split(","));
+			// - Broadcaster
+			if(badges.contains("broadcaster/1")) {
+				userPermissions.add(CommandPermission.BROADCASTER);
+			}
+			// Twitch Prime
+			if(badges.contains("premium/1")) {
+				userPermissions.add(CommandPermission.PRIME);
+			}
+		}
+		// Twitch Turbo
+		if(tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
+			userPermissions.add(CommandPermission.TURBO);
+		}
+		// Subscriber
+		if(tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
+			userPermissions.add(CommandPermission.SUBSCRIBER);
+		}
+		// Moderator
+		if(twitchClient.getTMIEndpoint().isUserModerator(channel, user)) {
+			userPermissions.add(CommandPermission.MODERATOR);
+		}
+		// Everyone
+		userPermissions.add(CommandPermission.EVERYONE);
+
+		// Dispatch Event
+		MessageEvent messageEvent = new MessageEvent(channel, user, userMessage, userPermissions);
 		getTwitchClient().getDispatcher().dispatch(messageEvent);
 	}
 
@@ -323,5 +352,17 @@ public class IrcEventHandler {
 
 		// Fire Event
 		getTwitchClient().getDispatcher().dispatch(new CheerEvent(channel, entity));
+	}
+
+	private Map<String, String> getTagMap(ServerMessage serverMessage) {
+		// Build Map from Tags
+		Map<String, String> tagMap = new HashMap<>();
+		for (MessageTag tag : serverMessage.getTags()) {
+			if (tag.getValue().isPresent()) {
+				tagMap.put(tag.getName(), tag.getValue().get());
+			}
+		}
+
+		return tagMap;
 	}
 }

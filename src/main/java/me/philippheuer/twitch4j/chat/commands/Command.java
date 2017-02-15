@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
@@ -11,9 +12,9 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -47,7 +48,7 @@ public abstract class Command {
 	/**
 	 * Required permission to execute the command
 	 */
-	//protected Permission requiredPermission;
+	protected Set<CommandPermission> requiredPermissions = new HashSet<CommandPermission>();
 
 	/**
 	 * Requires the use of the command trigger
@@ -110,17 +111,20 @@ public abstract class Command {
 		}
 	}
 
-	;
-
 	/**
-	 * Check if user has permissions
+	 * Checks if the user has any of the required permissions
 	 *
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 * @return True, if user has the required permissions, false if not.
 	 */
-	public boolean hasPermissions(MessageEvent messageEvent) {
-		// TODO: Permission check (Anyone,Follower,Subscriber,Moderator,Owner)
-		return true;
+	public Boolean hasPermissions(MessageEvent messageEvent) {
+		for(CommandPermission permission : messageEvent.getPermissions()) {
+			if(getRequiredPermissions().contains(permission)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

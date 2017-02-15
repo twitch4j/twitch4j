@@ -8,12 +8,14 @@ import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
+import net.jodah.expiringmap.ExpirationPolicy;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class UserEndpoint extends AbstractTwitchEndpoint {
 
@@ -39,7 +41,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 		if (!restObjectCache.containsKey(requestUrl)) {
 			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
-			restObjectCache.put(requestUrl, responseObject);
+			restObjectCache.put(requestUrl, responseObject,15, TimeUnit.MINUTES);
 		}
 
 		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();
