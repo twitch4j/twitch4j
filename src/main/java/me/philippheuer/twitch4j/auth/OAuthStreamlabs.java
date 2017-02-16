@@ -39,6 +39,9 @@ public class OAuthStreamlabs {
 	 * @param streamlabsScopes TwitchScopes to request.
 	 */
 	public void requestPermissionsFor(String type, StreamlabsScopes... streamlabsScopes) {
+		// Ensures that the listener runs, if permissions are requested
+		getCredentialManager().getOAuthHandler().onRequestPermission();
+
 		// Get OAuthTwitch URI
 		String requestUrl = getAuthenticationUrl(type, streamlabsScopes);
 

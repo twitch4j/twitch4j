@@ -40,6 +40,9 @@ public class OAuthTwitch {
 	 * @param twitchScopes TwitchScopes to request.
 	 */
 	public void requestPermissionsFor(String type, TwitchScopes... twitchScopes) {
+		// Ensures that the listener runs, if permissions are requested
+		getCredentialManager().getOAuthHandler().onRequestPermission();
+
 		// Get OAuthTwitch URI
 		String requestUrl = getAuthenticationUrl(type, twitchScopes);
 

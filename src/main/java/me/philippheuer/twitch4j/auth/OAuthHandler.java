@@ -7,6 +7,8 @@ import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
 
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Getter
 @Setter
@@ -32,7 +34,7 @@ public class OAuthHandler {
 	 */
 	public OAuthHandler(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
-		start();
+		initalize();
 	}
 
 	/**
@@ -45,9 +47,9 @@ public class OAuthHandler {
 	/**
 	 * Start Listener
 	 */
-	public void start() {
+	public void initalize() {
 		try {
-			RatpackServer ratpackServer = RatpackServer.of(s -> s
+			ratpackServer = RatpackServer.of(s -> s
 					.serverConfig(c -> c
 							.port(getLocalPort())
 					)
@@ -128,10 +130,36 @@ public class OAuthHandler {
 					)
 			);
 
-			ratpackServer.start();
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	public void onRequestPermission() {
+		// User Requested permission, start the listener for the next 5 minutes
+		if (!ratpackServer.isRunning()) {
+			try {
+				// RatpackServer: Start
+				ratpackServer.start();
+
+				final Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					public void run() {
+						// RatpackServer: Stop
+						try {
+							if(ratpackServer.isRunning()) {
+								ratpackServer.stop();
+							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+
+					}
+				}, 360 * 1000);
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 }

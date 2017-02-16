@@ -126,7 +126,7 @@ public class TwitchClient {
     }
 
 	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCedentials) {
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
@@ -155,8 +155,8 @@ public class TwitchClient {
 		}
 
 		// Credentials
-		if(ircCedentials != null) {
-			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCedentials);
+		if(ircCredential != null) {
+			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
 		}
 
 		// Connect to API Endpoints
