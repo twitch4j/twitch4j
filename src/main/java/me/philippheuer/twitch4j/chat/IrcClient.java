@@ -167,6 +167,21 @@ public class IrcClient {
 	}
 
 	/**
+	 * Send a private message to a user
+	 * @param userName User, you want to send a private message
+	 * @param message The message to send.
+	 */
+	public void sendPrivateMessage(final String userName, final String message) {
+		new Thread(() -> {
+			// Consume 1 Token (wait's in case the limit has been exceeded)
+			getMessageBucket().consume(1);
+
+			// Send Private Message [Needs a target channel, but the channel itself doesn't matter - so we use the recipients channel]
+			getIrcClient().sendMessage("#" + userName, String.format("/w %s %s", userName, message));
+		}).start();
+	}
+
+	/**
 	 * Method: Check IRC Client Status
 	 */
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
