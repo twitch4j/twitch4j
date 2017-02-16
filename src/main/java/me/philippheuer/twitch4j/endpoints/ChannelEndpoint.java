@@ -484,7 +484,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			Map.Entry<Boolean, String> result = getTwitchClient().getIrcClient().checkEndpointStatus();
 			if (!result.getKey()) {
 				Logger.warn(this, "IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
-				return;
 			}
 		}
 		// - Check PubSub

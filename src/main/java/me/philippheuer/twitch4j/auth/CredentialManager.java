@@ -120,8 +120,10 @@ public class CredentialManager {
 
 		getOAuthCredentials().put(key, credential);
 
-		// Store
-		saveToFile();
+		// Store - if autoSaving was enabled
+		if(getSaveCredentials()) {
+			saveToFile();
+		}
 	}
 
 	/**

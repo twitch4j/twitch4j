@@ -47,6 +47,7 @@ public class IrcClient {
 	public IrcClient(TwitchClient client) {
 		setClient(client);
 
+
 		connect();
 	}
 
@@ -138,6 +139,10 @@ public class IrcClient {
 	 * @param channelName The channel to join.
 	 */
 	public void joinChannel(String channelName) {
+		if(getIrcClient() == null) {
+			Logger.warn(this, "IRC Client not initalized. Can't join [%s]!", channelName);
+		}
+
 		String ircChannel = String.format("#%s", channelName);
 		if(!getIrcClient().getChannels().contains(ircChannel)) {
 			getIrcClient().addChannel(ircChannel);

@@ -1,7 +1,9 @@
 package me.philippheuer.twitch4j;
 
 import java.io.File;
+import java.util.Set;
 
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.chat.commands.CommandHandler;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
@@ -16,6 +18,8 @@ import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
+
+import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 
 @Getter
 @Setter
@@ -122,7 +126,7 @@ public class TwitchClient {
     }
 
 	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient) {
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCedentials) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
@@ -148,6 +152,11 @@ public class TwitchClient {
 
 			// Initialize Managers dependening on the configuration
 			twitchClient.getCredentialManager().configurationCreate();
+		}
+
+		// Credentials
+		if(ircCedentials != null) {
+			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCedentials);
 		}
 
 		// Connect to API Endpoints
