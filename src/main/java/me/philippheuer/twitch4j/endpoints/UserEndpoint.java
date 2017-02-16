@@ -12,9 +12,7 @@ import net.jodah.expiringmap.ExpirationPolicy;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class UserEndpoint extends AbstractTwitchEndpoint {
@@ -128,9 +126,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// Check Scope
 		Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(userId);
 		if (credential.isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.USER_SUBSCRIPTIONS.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.USER_SUBSCRIPTIONS.getKey());
 
 			checkScopePermission(credential.get().getOAuthScopes(), requiredScopes);
 		} else {
