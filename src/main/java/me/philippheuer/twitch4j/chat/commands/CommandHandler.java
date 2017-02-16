@@ -39,6 +39,7 @@ public class CommandHandler {
 		setTwitchClient(twitchClient);
 	}
 
+	private String commandTrigger = "!";
 	/**
 	 * Register a command in the CommandHandler
 	 *
@@ -91,9 +92,9 @@ public class CommandHandler {
 	@EventSubscriber
 	public void processCommand(MessageEvent messageEvent) {
 		// Get real command name from alias
-		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring("!".length(), messageEvent.getMessage().length()));
+		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().length()));
 		if (messageEvent.getMessage().contains(" ")) {
-			cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring("".length(), messageEvent.getMessage().indexOf(" ")));
+			cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().indexOf(" ")));
 		}
 
 		// Command existing, or a general message?

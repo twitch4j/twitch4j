@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -147,10 +149,35 @@ public abstract class Command {
 
 	/**
 	 * Get all Users mentioned in the Command Arguments
+	 * @return List<String> All mentioned usernames
 	 */
 	public List<String> getCommandArgumentTargetUser() {
-		return getParsedArguments();
+		Pattern patternMention = Pattern.compile("\\@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
+
+		List<String> targetUsers = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
+
+		return targetUsers;
 	}
+
+	/**
+	 * Allows to easily send messages to the channel
+	 * @param channelName
+	 * @param message
+	 */
+	public void sendMessageToChannel(String channelName, String message) {
+		getTwitchClient().getIrcClient().sendMessage(channelName, message);
+	}
+
+	/**
+	 * Allows to easily send messages to the channel
+	 * @param userName
+	 * @param message
+	 */
+	public void sendMessageToUser(String userName, String message) {
+		getTwitchClient().getIrcClient().sendPrivateMessage(userName, message);
+	}
+
+
 
 	public void onInvalidCommandUsage(MessageEvent messageEvent) {
 

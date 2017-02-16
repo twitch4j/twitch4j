@@ -16,13 +16,9 @@ Just a few things to note when submitting a pull request:
 1. All your code will be subject to the project's licence, in this case [MIT](https://github.com/PhilippHeuer/twitch4j/blob/master/LICENSE).
 2. You cannot modify this project's style (i.e. indentation style, bracket style, naming, etc).
 Rewrites of certain systems are fine too.
-3. Merge to the right branch! Always merge to the `dev` branch. 
+3. Create your pull-request against the `develop` branch! 
 
 ### Style Requirements
 * This project uses [1tbs](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS), with the exception that single 
 line if statements do not need brackets.
 * All instanced objects should have getters and setters (where reasonable)
-
-## Credit
-Credits will be given in the changelog and on the [contributors page](https://github.com/PhilippHeuer/twitch4j/blob/master/CONTRIBUTORS.md).
-So be sure to add yourself if you make a pull request.
