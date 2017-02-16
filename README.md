@@ -61,15 +61,6 @@ and:
 
 --------
 
-## Table of Contents
-- [Features](#features)
-- [Getting Started](#gettingstarted)
-- [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki)
-- [Problems](#problems)
-- [Changelog](./CHANGELOG.md)
-- [Credits](./CONTRIBUTORS.md)
-
-
 ## Features
 #### OAuth Authentication
  - [x] Twitch
@@ -113,6 +104,9 @@ and:
 
 ## Getting Started
 Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki) for more details.
+
+### Sample Projects using Twitch4J
+ - [Chatbot - Twitch4J](https://github.com/PhilippHeuer/twitch4j-chatbot)
 
 ### Client Builder (Twitch Standalone)
 ```java

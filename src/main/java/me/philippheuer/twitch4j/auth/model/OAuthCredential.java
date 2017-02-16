@@ -1,7 +1,7 @@
 package me.philippheuer.twitch4j.auth.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -20,7 +20,7 @@ public class OAuthCredential {
 
 	private String oAuthRefreshToken;
 
-	private final List<String> oAuthScopes = new ArrayList<String>();
+	private final Set<String> oAuthScopes = new HashSet<String>();
 
 	private Long userId;
 

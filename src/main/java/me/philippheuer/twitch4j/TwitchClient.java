@@ -145,10 +145,10 @@ public class TwitchClient {
 
 		if(configurationDirectory != null) {
 			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
-		}
 
-		// Initialize Managers dependening on the configuration
-		twitchClient.getCredentialManager().configurationCreate();
+			// Initialize Managers dependening on the configuration
+			twitchClient.getCredentialManager().configurationCreate();
+		}
 
 		// Connect to API Endpoints
 		twitchClient.connect();

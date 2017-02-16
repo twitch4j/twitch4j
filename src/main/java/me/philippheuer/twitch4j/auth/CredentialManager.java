@@ -11,6 +11,7 @@ import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 
 @Getter
@@ -81,6 +82,13 @@ public class CredentialManager {
 	 * @param credential Credential Instance
 	 */
 	public void addTwitchCredential(String key, OAuthCredential credential) {
+		// Check Credential Content
+		Token token = getTwitchClient().getKrakenEndpoint().getToken(credential);
+		credential.setUserId(token.getUserId());
+		credential.setUserName(token.getUserName());
+		credential.setDisplayName(token.getUserName());
+		credential.getOAuthScopes().addAll(token.getAuthorization().getScopes());
+
 		// OAuthCredential Prefix
 		addAnyCredential("TWITCH-" + key, credential);
 	}

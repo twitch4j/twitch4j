@@ -500,7 +500,9 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		// Register Listener Events
-		getTwitchClient().getDispatcher().registerListener(annotationListener);
+		if(annotationListener != null) {
+			getTwitchClient().getDispatcher().registerListener(annotationListener);
+		}
 
 		// Get Channel Information
 		Channel channel = getChannel();
