@@ -142,9 +142,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Check Scope
 		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if (twitchCredential.isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_READ.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_READ.getKey());
 
 			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
 		} else {
@@ -183,9 +182,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Check Scope
 		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if (twitchCredential.isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_READ.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_READ.getKey());
 
 			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
 		} else {
@@ -309,9 +307,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Check Scope
 		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
 		if (twitchCredential.isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
 
 			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
 		} else {
@@ -348,9 +345,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Boolean getSubscriptionByUser(User user) {
 		// Check Scope
 		if (getChannel().getTwitchCredential().isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_CHECK_SUBSCRIPTION.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_CHECK_SUBSCRIPTION.getKey());
 
 			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
 		} else {
@@ -424,9 +420,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Boolean startCommercial(Long length) {
 		// Check Scope
 		if (getChannel().getTwitchCredential().isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_COMMERCIAL.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_COMMERCIAL.getKey());
 
 			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
 		} else {
@@ -453,9 +448,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public Boolean deleteStreamKey() {
 		// Check Scope
 		if (getChannel().getTwitchCredential().isPresent()) {
-			List<String> requiredScopes = new ArrayList<String>() {{
-				add(TwitchScopes.CHANNEL_STREAM.getKey());
-			}};
+			Set<String> requiredScopes = new HashSet<String>();
+			requiredScopes.add(TwitchScopes.CHANNEL_STREAM.getKey());
 
 			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
 		} else {

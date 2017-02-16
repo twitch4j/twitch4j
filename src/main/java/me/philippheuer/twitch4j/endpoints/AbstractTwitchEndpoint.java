@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.endpoints;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
@@ -47,7 +48,7 @@ public class AbstractTwitchEndpoint {
 	 * @param scopes         Scopes, we have access to.
 	 * @param requiredScopes Scopes, we want to access.
 	 */
-	protected void checkScopePermission(List<String> scopes, List<String> requiredScopes) {
+	protected void checkScopePermission(Set<String> scopes, Set<String> requiredScopes) {
 		for (String requiredScope : requiredScopes) {
 			if (!scopes.contains(requiredScope)) {
 				throw new ScopeMissingException(requiredScope);
