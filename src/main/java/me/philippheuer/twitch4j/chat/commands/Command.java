@@ -63,6 +63,11 @@ public abstract class Command {
 	protected String usageExample;
 
 	/**
+	 * Enabled?
+	 */
+	protected Boolean enabled = true;
+
+	/**
 	 * Command Actor
 	 * Runtime only
 	 */

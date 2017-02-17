@@ -32,6 +32,11 @@ public class CommandHandler {
 	public HashMap<String, String> commandAliasToPrimaryMap = new HashMap<String, String>();
 
 	/**
+	 * Command Trigger
+	 */
+	private String commandTrigger = "!";
+
+	/**
 	 * Constructor
 	 * @param twitchClient
 	 */
@@ -39,7 +44,6 @@ public class CommandHandler {
 		setTwitchClient(twitchClient);
 	}
 
-	private String commandTrigger = "!";
 	/**
 	 * Register a command in the CommandHandler
 	 *
@@ -105,13 +109,18 @@ public class CommandHandler {
 		Optional<Command> cmd = getCommand(cmdName);
 		// Command exists?
 		if(cmd.isPresent()) {
-			Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
+			// Enabled?
+			if(cmd.get().getEnabled()) {
+				// Check Command Permissions
+				if (cmd.get().hasPermissions(messageEvent)) {
+					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
 
-			// Check Command Permissions
-			if (cmd.get().hasPermissions(messageEvent)) {
-				cmd.get().executeCommand(messageEvent);
+					cmd.get().executeCommand(messageEvent);
+				} else {
+					Logger.info(this, "Access to command [%s] denied for user [%s]! (Missing Permissions)", cmdName, messageEvent.getUser().getDisplayName());
+				}
 			} else {
-				Logger.info(this, "Access to command [%s] denied for user [%s]!", cmdName, messageEvent.getUser().getDisplayName());
+				Logger.info(this, "Access to command [%s] denied for user [%s].! (Command Disabled)", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
 			}
 		}
 	}
