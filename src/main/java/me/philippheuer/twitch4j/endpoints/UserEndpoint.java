@@ -8,7 +8,6 @@ import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
-import net.jodah.expiringmap.ExpirationPolicy;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,7 +38,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 		if (!restObjectCache.containsKey(requestUrl)) {
 			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
-			restObjectCache.put(requestUrl, responseObject,15, TimeUnit.MINUTES);
+			restObjectCache.put(requestUrl, responseObject, 15, TimeUnit.MINUTES);
 		}
 
 		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();
@@ -215,7 +214,6 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.orElse("desc")));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("sortby", sortBy.orElse("created_at")));
 
-
 		// REST Request
 		try {
 			Logger.trace(this, "Rest Request to [%s]", requestUrl);
@@ -226,7 +224,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			followList.addAll(responseObject.getFollows());
 
 			// Provide User to Follow Object
-			for(Follow follow : followList) {
+			for (Follow follow : followList) {
 				// The user id exists for sure, or the rest request would fail, so we can directly get the user
 				follow.setUser(getUser(userId).get());
 			}
@@ -241,12 +239,186 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		return new ArrayList<Follow>();
 	}
 
-	// TODO:
-	// Check User Follows by Channel
-	// Follow Channel
-	// Unfollow Channel
-	// Get User Block List
-	// Block User
-	// Unblock User
+	/**
+	 * Endpoint: Check User Follows by Channel
+	 * Checks if a specified user follows a specified channel. If the user is following the channel, a follow object is returned.
+	 * Requires Scope: none
+	 *
+	 * @param userId    UserID as Long
+	 * @param channelId ChannelID as Long
+	 * @return Optional<Follow> Follow, if user is following.
+	 */
+	public Optional<Follow> checkUserFollowByChannel(Long userId, Long channelId) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), userId, channelId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			Follow responseObject = restTemplate.getForObject(requestUrl, Follow.class);
+
+			return Optional.ofNullable(responseObject);
+		} catch (RestException restException) {
+			if (restException.getRestError().getStatus().equals(404)) {
+				// User does not follow channel
+				return Optional.empty();
+			} else {
+				Logger.error(this, "RestException: " + restException.getRestError().toString());
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return Optional.empty();
+	}
+
+	/**
+	 * Endpoint: Follow Channel
+	 * Adds a specified user to the followers of a specified channel.
+	 * Requires Scope: user_follows_edit
+	 *
+	 * @param credential    Credential
+	 * @param channelId     Channel to follow
+	 * @param notifications Send's email notifications on true.
+	 * @return Optional<Follow> Follow, if user is following.
+	 */
+	public Boolean followChannel(OAuthCredential credential, Long channelId, Optional<Boolean> notifications) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), channelId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			restTemplate.put(requestUrl, Follow.class, new HashMap<String, String>());
+
+			return true;
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Endpoint: Unfollow Channel
+	 * Deletes a specified user from the followers of a specified channel.
+	 * Requires Scope: user_follows_edit
+	 *
+	 * @param credential Credential
+	 * @param channelId  Channel to follow
+	 * @return Optional<Follow> Follow, if user is following.
+	 */
+	public Boolean unfollowChannel(OAuthCredential credential, Long channelId) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), channelId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			restTemplate.delete(requestUrl);
+
+			return true;
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Endpoint: Get User Block List
+	 * Gets a user’s block list. List sorted by recency, newest first.
+	 * Requires Scope: user_blocks_read
+	 *
+	 * @param credential Credential to use.
+	 * @param limit      Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: 100.
+	 * @param offset     Tells the server where to start fetching the next set of results, in a multi-page response.
+	 */
+	public List<Block> getUserBlockList(OAuthCredential credential, Optional<Long> limit, Optional<Long> offset) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/blocks", getTwitchClient().getTwitchEndpoint(), credential.getUserId());
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			BlockList responseObject = restTemplate.getForObject(requestUrl, BlockList.class);
+
+			return responseObject.getBlocks();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return new ArrayList<Block>();
+	}
+
+	/**
+	 * Endpoint: Block User
+	 * Blocks a user; that is, adds a specified target user to the blocks list of a specified source user.
+	 * Requires Scope: user_blocks_edit
+	 *
+	 * @param credential   Credential
+	 * @param targetUserId UserID of the Target
+	 */
+	public Boolean addBlock(OAuthCredential credential, Long targetUserId) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/blocks/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), targetUserId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			restTemplate.put(requestUrl, Follow.class, new HashMap<String, String>());
+
+			return true;
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Endpoint: Unblock User
+	 * Unblocks a user; that is, deletes a specified target user from the blocks list of a specified source user.
+	 * Requires Scope: user_blocks_edit
+	 *
+	 * @param credential   Credential
+	 * @param targetUserId UserID of the Target
+	 */
+	public Boolean deleteBlock(OAuthCredential credential, Long targetUserId) {
+		// Endpoint
+		String requestUrl = String.format("%s/users/%s/blocks/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), targetUserId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			restTemplate.delete(requestUrl);
+
+			return true;
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return false;
+	}
 
 }

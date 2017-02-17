@@ -76,7 +76,7 @@ and:
  - [x] Search
  - [x] Streams
  - [x] Teams
- - [ ] Users
+ - [x] Users
  - [x] Videos
 
 #### Twitch PubSub
