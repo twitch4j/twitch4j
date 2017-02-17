@@ -6,15 +6,15 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
+import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.beans.Transient;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -63,8 +63,14 @@ public abstract class Command {
 	protected String usageExample;
 
 	/**
+	 * Command Actor
+	 * Runtime only
+	 */
+	protected User actor;
+
+	/**
 	 * Command Content
-	 * Only available at execution
+	 * Runtime only
 	 */
 	protected String parsedContent;
 
@@ -78,7 +84,14 @@ public abstract class Command {
 	 * Validate arguments
 	 */
 	public boolean parseArguments(MessageEvent messageEvent) {
+		// Save Actor
+		setActor(messageEvent.getUser());
+
+		// Parse Arguments
 		CmdLineParser parser = new CmdLineParser(this);
+
+		// Disable parsing @ as files (is used to mention users)
+		parser.getProperties().withAtSyntax(false);
 
 		try {
 			// Parse the arguments.
@@ -151,12 +164,38 @@ public abstract class Command {
 	 * Get all Users mentioned in the Command Arguments
 	 * @return List<String> All mentioned usernames
 	 */
-	public List<String> getCommandArgumentTargetUser() {
+	public List<User> getCommandArgumentTargetUsers() {
 		Pattern patternMention = Pattern.compile("\\@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
 
-		List<String> targetUsers = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
+		List<User> targetUserList = new ArrayList<User>();
+		List<String> targetUserNameList = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
 
-		return targetUsers;
+		for(String userName : targetUserNameList) {
+			Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUserByUserName(userName);
+
+			// Username Valid?
+			if(targetUser.isPresent()) {
+				// Add to Targets
+				targetUserList.add(targetUser.get());
+			}
+		}
+
+		return targetUserList;
+	}
+
+	/**
+	 * Gets the target user of a command, returns the actor (self) if not target.
+	 * @return
+	 */
+	public User getCommandArgumentTargetUserOrSelf() {
+		List<User> targetUsers = getCommandArgumentTargetUsers();
+		System.out.println(targetUsers);
+
+		if(targetUsers.size() == 1) {
+			return targetUsers.get(0);
+		} else {
+			return getActor();
+		}
 	}
 
 	/**
