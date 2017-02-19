@@ -43,7 +43,7 @@ local.properties
 !gradle/wrapper/*.jar
 
 # Logs / Save Files
-credentials.json
+config/*
 client.log
 
 # Example Code

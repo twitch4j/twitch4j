@@ -181,7 +181,10 @@ public class CredentialManager {
 		}
 	}
 
-	public void configurationCreate() {
+	/**
+	 * Initalizes the Configuration (creates the files)
+	 */
+	public void initializeConfiguration() {
 		// Ensure that the file exists
 		try {
 			File file = new File(getTwitchClient().getConfigurationDirectory().getAbsolutePath() + File.separator + "credentials.json");
@@ -211,11 +214,12 @@ public class CredentialManager {
 
 	public void loadFromFile() {
 		if(getCredentialFile() != null) {
+			// Clear present credentials
+			getOAuthCredentials().clear();
+
+			// Load credentials from file
 			try {
 				ObjectMapper mapper = new ObjectMapper();
-
-				getOAuthCredentials().clear();
-
 				Map<String, OAuthCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, OAuthCredential>>(){});
 				getOAuthCredentials().putAll(loadedCredentials);
 

@@ -1,15 +1,20 @@
 package me.philippheuer.twitch4j.chat.commands;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 
 import javax.swing.text.html.Option;
+import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -37,6 +42,11 @@ public class CommandHandler {
 	private String commandTrigger = "!";
 
 	/**
+	 * Holds the credentials
+	 */
+	private File commandSaveFile;
+
+	/**
 	 * Constructor
 	 * @param twitchClient
 	 */
@@ -58,24 +68,24 @@ public class CommandHandler {
 
 		// Create instance of commandClass and register it
 		try {
-			Command instance = (Command) Class.forName(commandClass.getName()).newInstance();
-			instance.setTwitchClient(getTwitchClient());
+			Command command = (Command) Class.forName(commandClass.getName()).newInstance();
+			command.setTwitchClient(getTwitchClient());
 
 			// Check, if the command already was registered
-			if(getCommandMap().containsKey(instance.getCommand())) {
+			if(getCommandMap().containsKey(command.getCommand())) {
 				Logger.error(this, "Can't register an Command! [%s]! Error: Command was already registered!", commandClass.getSimpleName());
 				return;
 			}
 
 			// Register Command
-			if(instance.getCommand().length() > 0) {
+			if(command.getCommand().length() > 0) {
 				// Add to CommandMap
-				getCommandMap().put(instance.getCommand(), instance);
+				getCommandMap().put(command.getCommand(), command);
 
 				// Add Primary and Aliases to AliasMap
-				getCommandAliasToPrimaryMap().put(instance.getCommand(), instance.getCommand());
-				for (String cmd : instance.getCommandAliases()) {
-					getCommandAliasToPrimaryMap().put(cmd, instance.getCommand());
+				getCommandAliasToPrimaryMap().put(command.getCommand(), command.getCommand());
+				for (String cmdAlias : command.getCommandAliases()) {
+					getCommandAliasToPrimaryMap().put(cmdAlias, command.getCommand());
 				}
 			}
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
@@ -85,6 +95,40 @@ public class CommandHandler {
 		}
 
 		Logger.info(this, "Registered new Command [%s]!", commandClass.getSimpleName());
+	}
+
+	/**
+	 * Register a command in the CommandHandler
+	 *
+	 * @param command Command instance to register.
+	 */
+	public void registerCommand(Command command) {
+		// Create instance of commandClass and register it
+		command.setTwitchClient(getTwitchClient());
+
+		// Check, if the command already was registered
+		if(getCommandMap().containsKey(command.getCommand())) {
+			Logger.error(this, "Can't register Command! [%s]! Error: Command was already registered!", command.getCommand());
+			return;
+		}
+
+		// Register Command
+		if(command.getCommand().length() > 0) {
+			// Add to CommandMap
+			getCommandMap().put(command.getCommand(), command);
+
+			// Add Primary and Aliases to AliasMap
+			getCommandAliasToPrimaryMap().put(command.getCommand(), command.getCommand());
+			for (String cmdAlias : command.getCommandAliases()) {
+				getCommandAliasToPrimaryMap().put(cmdAlias, command.getCommand());
+			}
+
+			// Genreally only dynamic commands will be registered using this, so we can save them here
+			saveDynamicCommands();
+		}
+
+
+		Logger.info(this, "Registered new Command [%s]!", command.getCommand());
 	}
 
 	/**
@@ -140,6 +184,71 @@ public class CommandHandler {
 	 * Get all Commands
 	 */
 	public Collection<Command> getAllCommands() {
-		return new ArrayList<Command>(commandMap.values());
+		return new ArrayList<Command>(getCommandMap().values());
 	}
+
+	/**
+	 * Initalizes the Configuration (creates the files)
+	 */
+	public void initializeConfiguration() {
+		// Ensure that the file exists
+		try {
+			File file = new File(getTwitchClient().getConfigurationDirectory().getAbsolutePath() + File.separator + "commands.json");
+			file.createNewFile();
+			setCommandSaveFile(file);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		// Try to load configuration
+		loadDynamicCommands();
+	}
+
+	/**
+	 * Save Dynamic Commands
+	 */
+	public void saveDynamicCommands() {
+		try {
+			// Get all Dynamic Commands
+			List<Command> commandList = getCommandMap().values().stream().filter(e -> e instanceof DynamicCommand).collect(Collectors.toList());
+
+			// Save List to File
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.writeValue(getCommandSaveFile(), commandList);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load Dynamic Commands
+	 */
+	public void loadDynamicCommands() {
+		purgeDynamicCommands();
+
+		try {
+			// Load commands from File
+			ObjectMapper mapper = new ObjectMapper();
+			List<DynamicCommand> loadedCommands = mapper.readValue(getCommandSaveFile(), new TypeReference<ArrayList<DynamicCommand>>(){});
+
+			// Register Commands
+			for(Command cmd : loadedCommands) {
+				registerCommand(cmd);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public void purgeDynamicCommands() {
+		// Get all Dynamic Commands
+		List<Command> commandList = getCommandMap().values().stream().filter(e -> e instanceof DynamicCommand).collect(Collectors.toList());
+
+		// Remove all dynamic commands
+		for(Command cmd : commandList) {
+			getCommandMap().remove(cmd.getCommand());
+		}
+	}
+
 }

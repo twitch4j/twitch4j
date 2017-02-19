@@ -150,8 +150,12 @@ public class TwitchClient {
 		if(configurationDirectory != null) {
 			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
 
+			// Create ConfigurationDirectory, if it does not exist
+			twitchClient.getConfigurationDirectory().mkdirs();
+
 			// Initialize Managers dependening on the configuration
-			twitchClient.getCredentialManager().configurationCreate();
+			twitchClient.getCredentialManager().initializeConfiguration();
+			twitchClient.getCommandHandler().initializeConfiguration();
 		}
 
 		// Credentials

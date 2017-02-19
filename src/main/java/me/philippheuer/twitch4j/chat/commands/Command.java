@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.chat.commands;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public abstract class Command {
 	/**
 	 * TwitchClient
 	 */
+	@JsonIgnore
 	protected TwitchClient twitchClient;
 
 	/**
@@ -71,18 +73,21 @@ public abstract class Command {
 	 * Command Actor
 	 * Runtime only
 	 */
+	@JsonIgnore
 	protected User actor;
 
 	/**
 	 * Command Content
 	 * Runtime only
 	 */
+	@JsonIgnore
 	protected String parsedContent;
 
 	/**
 	 * Parsed Arguments
 	 */
 	@Argument
+	@JsonIgnore
 	private List<String> parsedArguments = new ArrayList<String>();
 
 	/**
