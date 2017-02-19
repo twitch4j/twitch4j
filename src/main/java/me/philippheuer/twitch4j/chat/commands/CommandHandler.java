@@ -123,12 +123,31 @@ public class CommandHandler {
 				getCommandAliasToPrimaryMap().put(cmdAlias, command.getCommand());
 			}
 
-			// Genreally only dynamic commands will be registered using this, so we can save them here
+			// Generally only dynamic commands will be registered using this, so we can save them here
 			saveDynamicCommands();
 		}
 
 
 		Logger.info(this, "Registered new Command [%s]!", command.getCommand());
+	}
+
+	/**
+	 * Unregister a command in the CommandHandler
+	 *
+	 * @param command Command instance to unregister.
+	 */
+	public void unregisterCommand(Command command) {
+		// Remove from CommandMap
+		getCommandMap().remove(command.getCommand(), command);
+
+		// Remove Primary and Aliases from AliasMap
+		getCommandAliasToPrimaryMap().put(command.getCommand(), command.getCommand());
+		for (String cmdAlias : command.getCommandAliases()) {
+			getCommandAliasToPrimaryMap().remove(cmdAlias, command.getCommand());
+		}
+
+		// Save Dynamic Commands
+		saveDynamicCommands();
 	}
 
 	/**
@@ -237,6 +256,11 @@ public class CommandHandler {
 				registerCommand(cmd);
 			}
 		} catch (Exception ex) {
+			// we can ignore this, no dynamic content's saved
+			if(ex.getMessage().contains("No content")) {
+				return;
+			}
+
 			ex.printStackTrace();
 		}
 	}
