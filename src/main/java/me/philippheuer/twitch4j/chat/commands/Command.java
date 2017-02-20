@@ -199,7 +199,6 @@ public abstract class Command {
 	 */
 	public User getCommandArgumentTargetUserOrSelf() {
 		List<User> targetUsers = getCommandArgumentTargetUsers();
-		System.out.println(targetUsers);
 
 		if(targetUsers.size() == 1) {
 			return targetUsers.get(0);

@@ -119,10 +119,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			}
 
 			// Add streamlabs oauth credentials to channel object, if the credential manager has them
+			// Matching will be done using the channel id's, not credential aliases
 			{
-				Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getStreamlabsCredentialsForChannel(responseObject.getId());
-				if (credential.isPresent()) {
-					responseObject.setStreamlabsCredential(credential);
+				for(Map.Entry<String, OAuthCredential> entryCredential : getTwitchClient().getCredentialManager().getOAuthCredentials().entrySet()) {
+					if(entryCredential.getKey().startsWith("STREAMLABS-") && entryCredential.getValue().getUserId().equals(responseObject.getId())) {
+						responseObject.setStreamlabsCredential(Optional.ofNullable(entryCredential.getValue()));
+					}
 				}
 			}
 
@@ -510,6 +512,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// - Donations
 		if (channel.getStreamlabsCredential().isPresent()) {
+			Logger.debug(this, "Sreamlabs: Credential found, starting to listen for Channel [%s]", channel.getDisplayName());
 			startDonationListener(channel);
 		} else {
 			Logger.info(this, "Sreamlabs: No Credentials for Channel [%s]", channel.getDisplayName());
