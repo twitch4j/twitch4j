@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.auth;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
 import me.philippheuer.twitch4j.streamlabs.enums.StreamlabsScopes;
@@ -11,7 +12,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -42,8 +46,14 @@ public class OAuthStreamlabs {
 		// Ensures that the listener runs, if permissions are requested
 		getCredentialManager().getOAuthHandler().onRequestPermission();
 
+		// Store Request Information / Generate Token
+		OAuthRequest request = new OAuthRequest();
+		request.setType(type);
+		request.getOAuthScopes().addAll(Arrays.stream(streamlabsScopes).map(e -> e.toString()).collect(Collectors.toList()));
+		getCredentialManager().getOAuthRequestCache().put(request.getTokenId(), request);
+
 		// Get OAuthTwitch URI
-		String requestUrl = getAuthenticationUrl(type, streamlabsScopes);
+		String requestUrl = getAuthenticationUrl(request.getTokenId(), streamlabsScopes);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -53,17 +63,17 @@ public class OAuthStreamlabs {
 	 * Returns the authentication URL that you can redirect the user to in order
 	 * to authorize your application to retrieve an access token.
 	 *
-	 * @param type             What are the credentials requested for? (CHANNEL/IRC)
+	 * @param state            What are the credentials requested for? (CHANNEL/IRC)
 	 * @param streamlabsScopes StreamlabsScopes to request access for
 	 * @return String    OAuth2 Uri
 	 */
-	private String getAuthenticationUrl(String type, StreamlabsScopes... streamlabsScopes) {
+	private String getAuthenticationUrl(String state, StreamlabsScopes... streamlabsScopes) {
 		return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s",
 				getCredentialManager().getStreamlabsClient().getEndpointUrl(),
 				getCredentialManager().getStreamlabsClient().getClientId(),
 				getRedirectUri(),
 				StreamlabsScopes.join(streamlabsScopes),
-				type
+				state
 		);
 	}
 

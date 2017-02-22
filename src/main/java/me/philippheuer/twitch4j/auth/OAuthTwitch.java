@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.auth;
 
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.model.User;
@@ -12,7 +13,10 @@ import lombok.*;
 import me.philippheuer.twitch4j.helper.WebsiteUtils;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -43,8 +47,14 @@ public class OAuthTwitch {
 		// Ensures that the listener runs, if permissions are requested
 		getCredentialManager().getOAuthHandler().onRequestPermission();
 
+		// Store Request Information / Generate Token
+		OAuthRequest request = new OAuthRequest();
+		request.setType(type);
+		request.getOAuthScopes().addAll(Arrays.stream(twitchScopes).map(e -> e.toString()).collect(Collectors.toList()));
+		getCredentialManager().getOAuthRequestCache().put(request.getTokenId(), request);
+
 		// Get OAuthTwitch URI
-		String requestUrl = getAuthenticationUrl(type, twitchScopes);
+		String requestUrl = getAuthenticationUrl(request.getTokenId(), twitchScopes);
 
 		// Open Authorization Page for User
 		WebsiteUtils.openWebpage(requestUrl);
@@ -54,17 +64,17 @@ public class OAuthTwitch {
 	 * Returns the authentication URL that you can redirect the user to in order
 	 * to authorize your application to retrieve an access token.
 	 *
-	 * @param type   What are the credentials requested for? (CHANNEL/IRC)
+	 * @param state   What are the credentials requested for? (CHANNEL/IRC)
 	 * @param scopes TwitchScopes to request access for
 	 * @return String    OAuth2 Uri
 	 */
-	private String getAuthenticationUrl(String type, TwitchScopes... scopes) {
+	private String getAuthenticationUrl(String state, TwitchScopes... scopes) {
 		return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
 				getCredentialManager().getTwitchClient().getTwitchEndpoint(),
 				getCredentialManager().getTwitchClient().getClientId(),
 				getRedirectUri(),
 				TwitchScopes.join(scopes),
-				type
+				state
 		);
 	}
 

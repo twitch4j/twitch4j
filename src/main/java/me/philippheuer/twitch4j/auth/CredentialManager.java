@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,8 +12,11 @@ import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 
 @Getter
 @Setter
@@ -42,6 +46,15 @@ public class CredentialManager {
 	 * OAuth - Streamlabs
 	 */
 	private OAuthStreamlabs oAuthStreamlabs;
+
+	/**
+	 * Current Requests
+	 */
+	protected ExpiringMap<String, OAuthRequest> oAuthRequestCache = ExpiringMap.builder()
+			.expiration(3600, TimeUnit.SECONDS)
+			.expirationPolicy(ExpirationPolicy.CREATED)
+			.variableExpiration()
+			.build();
 
 	/**
 	 * Save all credentials locally be default?

@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.auth;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
 
@@ -63,6 +64,12 @@ public class OAuthHandler {
 										String responseScope = ctx.getRequest().getQueryParams().get("scope");
 										String responseState = ctx.getRequest().getQueryParams().get("state");
 
+										// Get Request from Cache
+										if(!getCredentialManager().getOAuthRequestCache().containsKey(responseState)) {
+											ctx.render("Timeout! Please retry!");
+										}
+										OAuthRequest request = getCredentialManager().getOAuthRequestCache().get(responseState);
+
 										// Handle Response
 										OAuthCredential credential = getCredentialManager().getOAuthTwitch().handleAuthenticationCodeResponseTwitch(responseCode);
 
@@ -76,9 +83,9 @@ public class OAuthHandler {
 											}
 
 											// Check for custom key, to store in credential manager
-											if (responseState.length() > 0 && !responseState.equals("CHANNEL")) {
+											if (request.getType().length() > 0 && !request.getType().equals("CHANNEL")) {
 												// Custom Key
-												getCredentialManager().addTwitchCredential(responseState, credential);
+												getCredentialManager().addTwitchCredential(request.getType(), credential);
 											} else {
 												// Channel Credentials
 												getCredentialManager().addTwitchCredential(credential.getUserId().toString(), credential);
@@ -102,15 +109,24 @@ public class OAuthHandler {
 										String responseCode = ctx.getRequest().getQueryParams().get("code");
 										String responseState = ctx.getRequest().getQueryParams().get("state");
 
+										// Get Request from Cache
+										if(!getCredentialManager().getOAuthRequestCache().containsKey(responseState)) {
+											ctx.render("Timeout! Please retry!");
+										}
+										OAuthRequest request = getCredentialManager().getOAuthRequestCache().get(responseState);
+
 										// Handle Response
 										OAuthCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
 
 										// Valid?
 										if (credential != null) {
+											// Add Scopes from Request
+											credential.getOAuthScopes().addAll(request.getOAuthScopes());
+
 											// Check for custom key, to store in credential manager
-											if (responseState.length() > 0 && !responseState.equals("CHANNEL")) {
+											if (request.getType().length() > 0 && !request.getType().equals("CHANNEL")) {
 												// Custom Key
-												getCredentialManager().addStreamlabsCredential(responseState, credential);
+												getCredentialManager().addStreamlabsCredential(request.getType(), credential);
 											} else {
 												// Channel Credentials
 												getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
