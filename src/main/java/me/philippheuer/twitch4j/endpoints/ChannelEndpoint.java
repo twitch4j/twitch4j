@@ -595,7 +595,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		};
 
 		// Schedule Action
-		eventTriggerTimer.scheduleAtFixedRate(action, 0, 5 * 1000);
+		eventTriggerTimer.scheduleAtFixedRate(action, 0, 1500);
 	}
 
 	/**
