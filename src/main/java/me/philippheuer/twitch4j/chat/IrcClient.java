@@ -182,6 +182,16 @@ public class IrcClient {
 	}
 
 	/**
+	 * Purges all chat messages for a user
+	 * @param channelName
+	 * @param userName
+	 */
+	public void purgeChatOfUser(final String channelName, final String userName) {
+		// Send Message
+		sendMessage(channelName, String.format(".timeout %s 1", userName));
+	}
+
+	/**
 	 * Method: Check IRC Client Status
 	 */
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
