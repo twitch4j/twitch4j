@@ -30,7 +30,7 @@ import java.io.IOException;
  * will add the header's at runtime.
  *
  * @author Philipp Heuer
- * @author {@link http://stackoverflow.com/users/912950/ammar} on {@link http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request}
+ * @author ammar (http://stackoverflow.com/users/912950/ammar) on http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request}
  * @version %I%, %G%
  * @since 1.0
  */

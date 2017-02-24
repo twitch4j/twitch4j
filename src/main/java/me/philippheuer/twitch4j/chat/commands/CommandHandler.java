@@ -47,8 +47,10 @@ public class CommandHandler {
 	private File commandSaveFile;
 
 	/**
-	 * Constructor
-	 * @param twitchClient
+	 * Class Constructor
+	 *
+	 * @param twitchClient Instance of TwitchClient
+	 * @see TwitchClient
 	 */
 	public CommandHandler(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
@@ -190,6 +192,10 @@ public class CommandHandler {
 
 	/**
 	 * Get Primary Command by Alias or Primary Command
+	 *
+	 * @param name Name or alias of the command.
+	 * @return Returns an optional Command instance, that only isPresent if it exists.
+	 * @see Command
 	 */
 	public Optional<Command> getCommand(String name) {
 		if(getCommandAliasToPrimaryMap().containsKey(name)) {
@@ -201,6 +207,8 @@ public class CommandHandler {
 
 	/**
 	 * Get all Commands
+	 *
+	 * @return Returns a list of all registered commands. This includes disabled commands.
 	 */
 	public Collection<Command> getAllCommands() {
 		return new ArrayList<Command>(getCommandMap().values());

@@ -173,9 +173,9 @@ public abstract class Command {
 	}
 
 	/**
-	 * Get all Users mentioned in the Command Arguments
+	 * Gets a list of all usernames, that have been mentioned in the command arguments.
 	 *
-	 * @return List<String> All mentioned usernames
+	 * @return Returns a {@link List} of type string that contains all usernames, that have been mentioned in the message.
 	 */
 	public List<User> getCommandArgumentTargetUsers() {
 		Pattern patternMention = Pattern.compile("\\@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
@@ -199,7 +199,8 @@ public abstract class Command {
 	/**
 	 * Gets the target user of a command, returns the actor (self) if not target.
 	 *
-	 * @return
+	 * @return Instance of type User
+	 * @see User
 	 */
 	public User getCommandArgumentTargetUserOrSelf() {
 		List<User> targetUsers = getCommandArgumentTargetUsers();
@@ -214,8 +215,8 @@ public abstract class Command {
 	/**
 	 * Allows to easily send messages to the channel
 	 *
-	 * @param channelName
-	 * @param message
+	 * @param channelName Name of the channel that should receive the message.
+	 * @param message The message to send to the specified channel.
 	 */
 	public void sendMessageToChannel(String channelName, String message) {
 		getTwitchClient().getIrcClient().sendMessage(channelName, message);
@@ -224,8 +225,8 @@ public abstract class Command {
 	/**
 	 * Allows to easily send messages to the channel
 	 *
-	 * @param userName
-	 * @param message
+	 * @param userName Name of the user that should receive the message.
+	 * @param message The message to send to the specified channel.
 	 */
 	public void sendMessageToUser(String userName, String message) {
 		getTwitchClient().getIrcClient().sendPrivateMessage(userName, message);

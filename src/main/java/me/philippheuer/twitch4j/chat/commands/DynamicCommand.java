@@ -17,6 +17,11 @@ public class DynamicCommand extends Command {
 
 	/**
 	 * Initalize Command
+	 *
+	 * @param commandName Name for the new command.
+	 * @param commandPermission Permissions required to use the new command.
+	 * @param commandText Text to write, if the new command is triggered.
+	 * @see CommandPermission
 	 */
 	public DynamicCommand(String commandName, CommandPermission commandPermission, String commandText) {
 		super();
