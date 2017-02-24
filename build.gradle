@@ -74,3 +74,14 @@ dependencies {
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.14")
 }
+
+/**
+ * JavaDocs Generation
+ */
+javadoc {
+	source = sourceSets.main.allJava
+	classpath = sourceSets.main.compileClasspath
+
+	// if not changed the destinationDir, the javadoc for production code is overridden.
+	destinationDir = file("${buildDir}/../docs/javadoc")
+}

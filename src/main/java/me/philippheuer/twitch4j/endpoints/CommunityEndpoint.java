@@ -93,7 +93,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
 	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
-	 * @param description Long description of the community, shown in the “about this community” box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
+	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
 	 * @return ID (String) of the created community
 	 */
@@ -132,7 +132,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param id          Id of the community, which will be updated.
 	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
-	 * @param description Long description of the community, shown in the “about this community” box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
+	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
 	 * @param email       Email address of the community owner.
 	 * @return ID (String) of the created community

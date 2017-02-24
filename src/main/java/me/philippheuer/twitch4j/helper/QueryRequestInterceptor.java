@@ -9,7 +9,14 @@ import org.springframework.social.support.HttpRequestDecorator;
 import java.io.IOException;
 
 /**
- * Query Request Interceptor
+ * Spring Rest: Query Request Interceptor
+ * <p>
+ * The query request interceptors can be applied to a {@link org.springframework.web.client.RestTemplate} and
+ * will add query parameters at runtime.
+ *
+ * @author Philipp Heuer
+ * @version %I%, %G%
+ * @since 1.0
  */
 public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 

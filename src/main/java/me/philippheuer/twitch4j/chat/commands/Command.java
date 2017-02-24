@@ -12,9 +12,7 @@ import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
 
-import java.beans.Transient;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -91,7 +89,11 @@ public abstract class Command {
 	private List<String> parsedArguments = new ArrayList<String>();
 
 	/**
-	 * Validate arguments
+	 * This method will use args4j to parse the provided arguments and
+	 * will store information about the actor temporary.
+	 *
+	 * @param messageEvent The MessageEvent triggering this command.
+	 * @return True, if parsing was successful. False, if the parsing failed because of missing required arguments, ...
 	 */
 	public boolean parseArguments(MessageEvent messageEvent) {
 		// Save Actor
@@ -143,8 +145,8 @@ public abstract class Command {
 	 * @return True, if user has the required permissions, false if not.
 	 */
 	public Boolean hasPermissions(MessageEvent messageEvent) {
-		for(CommandPermission permission : messageEvent.getPermissions()) {
-			if(getRequiredPermissions().contains(permission)) {
+		for (CommandPermission permission : messageEvent.getPermissions()) {
+			if (getRequiredPermissions().contains(permission)) {
 				return true;
 			}
 		}
@@ -172,6 +174,7 @@ public abstract class Command {
 
 	/**
 	 * Get all Users mentioned in the Command Arguments
+	 *
 	 * @return List<String> All mentioned usernames
 	 */
 	public List<User> getCommandArgumentTargetUsers() {
@@ -180,11 +183,11 @@ public abstract class Command {
 		List<User> targetUserList = new ArrayList<User>();
 		List<String> targetUserNameList = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
 
-		for(String userName : targetUserNameList) {
+		for (String userName : targetUserNameList) {
 			Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUserByUserName(userName);
 
 			// Username Valid?
-			if(targetUser.isPresent()) {
+			if (targetUser.isPresent()) {
 				// Add to Targets
 				targetUserList.add(targetUser.get());
 			}
@@ -195,12 +198,13 @@ public abstract class Command {
 
 	/**
 	 * Gets the target user of a command, returns the actor (self) if not target.
+	 *
 	 * @return
 	 */
 	public User getCommandArgumentTargetUserOrSelf() {
 		List<User> targetUsers = getCommandArgumentTargetUsers();
 
-		if(targetUsers.size() == 1) {
+		if (targetUsers.size() == 1) {
 			return targetUsers.get(0);
 		} else {
 			return getActor();
@@ -209,6 +213,7 @@ public abstract class Command {
 
 	/**
 	 * Allows to easily send messages to the channel
+	 *
 	 * @param channelName
 	 * @param message
 	 */
@@ -218,13 +223,13 @@ public abstract class Command {
 
 	/**
 	 * Allows to easily send messages to the channel
+	 *
 	 * @param userName
 	 * @param message
 	 */
 	public void sendMessageToUser(String userName, String message) {
 		getTwitchClient().getIrcClient().sendPrivateMessage(userName, message);
 	}
-
 
 
 	public void onInvalidCommandUsage(MessageEvent messageEvent) {

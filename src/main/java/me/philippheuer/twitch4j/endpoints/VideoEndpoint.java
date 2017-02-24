@@ -28,7 +28,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Video
 	 * Gets a specified video object.
 	 * Requires Scope: none
-	 * @param videoId VideoID (int) to retrieve (the “v” prefix is deprecated in the v5 api)
+	 * @param videoId VideoID (int) to retrieve (the *v* prefix is deprecated in the v5 api)
 	 */
 	public Video getVideo(String videoId) {
 		// Endpoint

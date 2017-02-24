@@ -1,26 +1,39 @@
 package me.philippheuer.twitch4j;
 
-import java.io.File;
-import java.util.Set;
-
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.chat.commands.CommandHandler;
-import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
-import me.philippheuer.twitch4j.helper.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.chat.IrcClient;
+import me.philippheuer.twitch4j.chat.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
+import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
+import me.philippheuer.twitch4j.helper.RestClient;
 import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
+import java.io.File;
+
 import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 
+/**
+ * TwitchClient is the core class for all api operations.
+ * <p>
+ * All coordinates which appear as arguments to the methods of this
+ * Graphics object are considered relative to the translation origin
+ * of this Graphics object prior to the invocation of the method.
+ * All rendering operations modify only pixels which lie within the
+ * area bounded by both the current clip of the graphics context
+ * and the extents of the Component used to create the Graphics object.
+ *
+ * @author Philipp Heuer
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class TwitchClient {
@@ -31,9 +44,9 @@ public class TwitchClient {
 	private final EventDispatcher dispatcher = new EventDispatcher(this);
 
 	/**
-     * Credential Manager
-     */
-    private final CredentialManager credentialManager = new CredentialManager();
+	 * Credential Manager
+	 */
+	private final CredentialManager credentialManager = new CredentialManager();
 
 	/**
 	 * Rest Client
@@ -46,14 +59,14 @@ public class TwitchClient {
 	private IrcClient ircClient;
 
 	/**
-     * PubSub Service
-     */
-    private TwitchPubSub pubSub;
+	 * PubSub Service
+	 */
+	private TwitchPubSub pubSub;
 
-    /**
-     * StreamLabs API
-     */
-    private StreamlabsClient streamLabsClient;
+	/**
+	 * StreamLabs API
+	 */
+	private StreamlabsClient streamLabsClient;
 
 	/**
 	 * Twitch API Endpoint
@@ -80,18 +93,18 @@ public class TwitchClient {
 	 */
 	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
 
-    /**
-     * Twitch Client Id
-     *  Default Value: Twitch Client Id
-     */
+	/**
+	 * Twitch Client Id
+	 * Default Value: Twitch Client Id
+	 */
 	@Singular
-    private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
+	private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
 
-    /**
-     * Twitch Client Secret
-     */
+	/**
+	 * Twitch Client Secret
+	 */
 	@Singular
-    private String clientSecret;
+	private String clientSecret;
 
 	/**
 	 * Configuration Directory to save settings
@@ -105,15 +118,21 @@ public class TwitchClient {
 	private CommandHandler commandHandler = new CommandHandler(this);
 
 	/**
-     * Constructs a Twitch application instance.
-     */
-    public TwitchClient(String clientId, String clientSecret) {
-        super();
+	 * Class Constructor - Creates a new TwitchClient Instance for the provided app.
+	 * <p>
+	 * This will also initalize the rest interceptors, that provide oauth tokens/get/post parameters
+	 * on the fly to easily build the rest requests.
+	 *
+	 * @param clientId     Twitch Application - Id
+	 * @param clientSecret Twitch Application - Secret
+	 */
+	public TwitchClient(String clientId, String clientSecret) {
+		super();
 
-        setClientId(clientId);
-        setClientSecret(clientSecret);
+		setClientId(clientId);
+		setClientSecret(clientSecret);
 
-        // Provide Instance of TwitchClient to CredentialManager
+		// Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
 
 		// EventSubscribers
@@ -123,31 +142,42 @@ public class TwitchClient {
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
-    }
+	}
 
+	/**
+	 * Builder to get a TwitchClient Instance by provided varius options, to provide the user with a lot of customizable options.
+	 *
+	 * @param clientId Twitch Application - Id
+	 * @param clientSecret Twitch Application - Secret
+	 * @param configurationDirectory
+	 * @param configurationAutoSave
+	 * @param streamlabsClient
+	 * @param ircCredential
+	 * @return
+	 */
 	@Builder(builderMethodName = "builder")
 	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
-    	// Initalize instance
+		// Initalize instance
 		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
 		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
 
 		// Optional Parameters
-		if(streamlabsClient != null) {
+		if (streamlabsClient != null) {
 			twitchClient.setStreamLabsClient(streamlabsClient);
 			twitchClient.getCredentialManager().provideStreamlabsClient(twitchClient.getStreamLabsClient());
 		}
 
-		if(configurationAutoSave != null) {
+		if (configurationAutoSave != null) {
 			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
 		} else {
 			twitchClient.getCredentialManager().setSaveCredentials(false);
 		}
 
-		if(configurationDirectory != null) {
+		if (configurationDirectory != null) {
 			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
 
 			// Create ConfigurationDirectory, if it does not exist
@@ -159,7 +189,7 @@ public class TwitchClient {
 		}
 
 		// Credentials
-		if(ircCredential != null) {
+		if (ircCredential != null) {
 			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
 		}
 
@@ -170,97 +200,172 @@ public class TwitchClient {
 		return twitchClient;
 	}
 
-    /**
-     * Init Client
-     */
-    public void connect() {
-        // Init IRC
-        setIrcClient(new IrcClient(this));
-
-        // Init PubSub API
-        setPubSub(new TwitchPubSub(this));
-    }
-
 	/**
-	 * Get Kraken Endpoint
+	 * Connect to other related services.
+	 * <p>
+	 * This methods opens the connection to the twitch irc server and the pubsub endpoint.
+	 * Connect needs to be called after initalizing the {@link CredentialManager}.
 	 */
-	private KrakenEndpoint krakenEndpoint = new KrakenEndpoint(this);
+	public void connect() {
+		// Init IRC
+		setIrcClient(new IrcClient(this));
 
-    /**
-     * Get Channel Endpoint - by ID
-     */
-    public ChannelEndpoint getChannelEndpoint(Long channelId) {
-    	return new ChannelEndpoint(this, channelId);
-    }
+		// Init PubSub API
+		setPubSub(new TwitchPubSub(this));
+	}
 
 	/**
-	 * Get Channel Endpoint - by Name
+	 * Returns an a new KrakenEndpoint instance.
+	 * <p>
+	 * The Kraken Endpoint is the root of the twitch api.
+	 * Querying the Kraken Endpoint gives information about the currently used token.
+	 *
+	 * @return a new instance of {@link KrakenEndpoint}
+	 */
+	public KrakenEndpoint getKrakenEndpoint() {
+		return new KrakenEndpoint(this);
+	}
+
+	/**
+	 * Returns an a new ChannelEndpoint instance - identifying the channel by the channel id.
+	 * <p>
+	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
+	 * therefore you need to provide information to identify a unique channel.
+	 *
+	 * @param channelId ID of the twitch channel
+	 * @return a new instance of {@link ChannelEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Channel
+	 */
+	public ChannelEndpoint getChannelEndpoint(Long channelId) {
+		return new ChannelEndpoint(this, channelId);
+	}
+
+	/**
+	 * Returns an a new ChannelEndpoint instance - identifying the channel by the channel name.
+	 * <p>
+	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
+	 * therefore you need to provide information to identify a unique channel.
+	 *
+	 * @param channelName Name of the twitch channel
+	 * @return a new instance of {@link ChannelEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Channel
 	 */
 	public ChannelEndpoint getChannelEndpoint(String channelName) {
 		return new ChannelEndpoint(this, channelName);
 	}
 
-    /**
-     * Get Game Endpoint
-     */
-    public GameEndpoint getGameEndpoint() {
-    	return new GameEndpoint(this);
-    }
+	/**
+	 * Returns an a new GameEndpoint instance.
+	 * <p>
+	 * The Game Endpoint instance allows you to access information about the all available games on twitch.
+	 *
+	 * @return a new instance of {@link GameEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Game
+	 */
+	public GameEndpoint getGameEndpoint() {
+		return new GameEndpoint(this);
+	}
 
 	/**
-	 * Get User Endpoint
+	 * Returns an a new StreamEndpoint instance.
+	 * <p>
+	 * The Stream Endpoint provides information about all current live streams and related metadata.
+	 * For more information about the data, check out the {@link me.philippheuer.twitch4j.model.Stream} model.
+	 *
+	 * @return a new instance of {@link StreamEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Stream
 	 */
 	public StreamEndpoint getStreamEndpoint() {
 		return new StreamEndpoint(this);
 	}
 
 	/**
-	 * Get User Endpoint
+	 * Returns an a new UserEndpoint instance.
+	 * <p>
+	 * The User Endpoint provides access to user-related informations and actions.
+	 * For more information about the available methods, check out the {@link UserEndpoint}.
+	 *
+	 * @return a new instance of {@link UserEndpoint}
+	 * @see me.philippheuer.twitch4j.model.User
 	 */
 	public UserEndpoint getUserEndpoint() {
 		return new UserEndpoint(this);
 	}
 
 	/**
-	 * Get Community Endpoint
+	 * Returns an a new CommunityEndpoint instance.
+	 * <p>
+	 * The Community Endpoint allows you to fetch information or manage your communities using the api.
+	 * The community methods usually return a {@link me.philippheuer.twitch4j.model.Community} model.
+	 *
+	 * @return a new instance of {@link CommunityEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Community
 	 */
 	public CommunityEndpoint getCommunityEndpoint() {
 		return new CommunityEndpoint(this);
 	}
 
 	/**
-	 * Get Ingest Endpoint
+	 * Returns an a new IngestEndpoint instance.
+	 * <p>
+	 * The Ingest Endpoint allows you to fetch a list of the twitch ingest servers.
+	 *
+	 * @return a new instance of {@link IngestEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Ingest
 	 */
 	public IngestEndpoint getIngestEndpoint() {
 		return new IngestEndpoint(this);
 	}
 
 	/**
-	 * Get Search Endpoint
+	 * Returns an a new SearchEndpoint instance.
+	 * <p>
+	 * The Search Endpoint allows you to search for {@link me.philippheuer.twitch4j.model.Channel}s,
+	 * {@link me.philippheuer.twitch4j.model.Game}s or {@link me.philippheuer.twitch4j.model.Stream}s.
+	 *
+	 * @return a new instance of {@link SearchEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Stream
+	 * @see me.philippheuer.twitch4j.model.Game
+	 * @see me.philippheuer.twitch4j.model.Channel
 	 */
 	public SearchEndpoint getSearchEndpoint() {
 		return new SearchEndpoint(this);
 	}
 
 	/**
-	 * Get Team Endpoint
+	 * Returns an a new TeamEndpoint instance.
+	 * <p>
+	 * The Team Endpoint provides a list of all teams and detailed information about single teams.
+	 *
+	 * @return a new instance of {@link TeamEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Team
 	 */
 	public TeamEndpoint getTeamEndpoint() {
 		return new TeamEndpoint(this);
 	}
 
 	/**
-	 * Get Video Endpoint
+	 * Returns an a new VideoEndpoint instance.
+	 * <p>
+	 * The Video Endpoint provides access to videos that twitch users recoded.
+	 *
+	 * @return a new instance of {@link VideoEndpoint}
+	 * @see me.philippheuer.twitch4j.model.Video
 	 */
 	public VideoEndpoint getVideoEndpoint() {
 		return new VideoEndpoint(this);
 	}
 
 	/**
-	 * Get Twitch Messaging Service (TMI) Endpoint
-	 * This endpoint is unofficial and can be changed without a notice.
+	 * Returns an a new TMIEndpoint instance.
+	 * <p>
+	 * The Twitch Messaging Service (TMI) is the chat service used in twitch.
+	 * This is an unofficial api and can break at any point without any notice.
+	 *
+	 * @return a new instance of {@link TMIEndpoint}
 	 */
 	public TMIEndpoint getTMIEndpoint() {
 		return new TMIEndpoint(this);
 	}
+
 }

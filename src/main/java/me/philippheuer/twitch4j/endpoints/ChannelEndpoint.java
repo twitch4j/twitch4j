@@ -385,7 +385,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit          Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param offset         Object offset for pagination of results. Default: 0.
 	 * @param sort           Sorting order of the returned objects. Valid values: views, time. Default: time (most recent first).
-	 * @param language       Constrains the language of the videos that are returned; for example, “en,es.” Default: all languages.
+	 * @param language       Constrains the language of the videos that are returned; for example, *en,es.* Default: all languages.
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight.
 	 */
 	public List<Video> getVideos(Optional<Long> limit, Optional<Long> offset, Optional<String> sort, Optional<String> language, Optional<String> broadcast_type) {

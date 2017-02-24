@@ -96,6 +96,9 @@ and:
 ##### [StreamTip](http://streamtip.com/)
  - Planned
 
+##### [GameWisp](https://gamewisp.com/)
+ - Planned
+ 
 ##### [StreamPro](https://streampro.io/)
   - No API
 

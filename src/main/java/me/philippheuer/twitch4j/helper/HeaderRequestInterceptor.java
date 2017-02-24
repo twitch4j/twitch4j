@@ -9,8 +9,30 @@ import org.springframework.http.client.support.HttpRequestWrapper;
 import java.io.IOException;
 
 /**
- * @author http://stackoverflow.com/users/912950/ammar
- * @link http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request
+ * TwitchClient is the core class for all api operations.
+ * <p>
+ * All coordinates which appear as arguments to the methods of this
+ * Graphics object are considered relative to the translation origin
+ * of this Graphics object prior to the invocation of the method.
+ * All rendering operations modify only pixels which lie within the
+ * area bounded by both the current clip of the graphics context
+ * and the extents of the Component used to create the Graphics object.
+ *
+ * @author Philipp Heuer
+ * @version %I%, %G%
+ * @since 1.0
+ */
+
+/**
+ * Spring Rest: Header Request Interceptor
+ * <p>
+ * The header request interceptors can be applied to a {@link org.springframework.web.client.RestTemplate} and
+ * will add the header's at runtime.
+ *
+ * @author Philipp Heuer
+ * @author {@link http://stackoverflow.com/users/912950/ammar} on {@link http://stackoverflow.com/questions/19238715/how-to-set-an-accept-header-on-spring-resttemplate-request}
+ * @version %I%, %G%
+ * @since 1.0
  */
 public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor {
 	private final String name;
