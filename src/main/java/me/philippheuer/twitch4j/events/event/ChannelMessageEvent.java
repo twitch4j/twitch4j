@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class MessageEvent extends Event {
+public class ChannelMessageEvent extends Event {
 
 	/**
 	 * Event Channel
@@ -40,7 +40,7 @@ public class MessageEvent extends Event {
 	/**
 	 * Constructor
 	 */
-	public MessageEvent(Channel channel, User user, String message, Set<CommandPermission> permissions) {
+	public ChannelMessageEvent(Channel channel, User user, String message, Set<CommandPermission> permissions) {
 		this.channel = channel;
 		this.user = user;
 		this.message = message;

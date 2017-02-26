@@ -6,15 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.CommandPermission;
-import me.philippheuer.twitch4j.events.event.MessageEvent;
+import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
 
-import java.beans.Transient;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,7 +91,7 @@ public abstract class Command {
 	/**
 	 * Validate arguments
 	 */
-	public boolean parseArguments(MessageEvent messageEvent) {
+	public boolean parseArguments(ChannelMessageEvent messageEvent) {
 		// Save Actor
 		setActor(messageEvent.getUser());
 
@@ -128,7 +126,7 @@ public abstract class Command {
 	 *
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
-	public void executeCommand(MessageEvent messageEvent) {
+	public void executeCommand(ChannelMessageEvent messageEvent) {
 		if (parseArguments(messageEvent)) {
 			// Call Child executeCommand
 		} else {
@@ -142,7 +140,7 @@ public abstract class Command {
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 * @return True, if user has the required permissions, false if not.
 	 */
-	public Boolean hasPermissions(MessageEvent messageEvent) {
+	public Boolean hasPermissions(ChannelMessageEvent messageEvent) {
 		for(CommandPermission permission : messageEvent.getPermissions()) {
 			if(getRequiredPermissions().contains(permission)) {
 				return true;
@@ -159,7 +157,7 @@ public abstract class Command {
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 * @return String. Empty if there are no arguments
 	 */
-	public String getCommandContent(MessageEvent messageEvent) {
+	public String getCommandContent(ChannelMessageEvent messageEvent) {
 		return TypeConvert.combineStringArray(TypeConvert.removeFirstArrayEntry(messageEvent.getMessage().split(" ")), " ");
 	}
 
@@ -227,7 +225,7 @@ public abstract class Command {
 
 
 
-	public void onInvalidCommandUsage(MessageEvent messageEvent) {
+	public void onInvalidCommandUsage(ChannelMessageEvent messageEvent) {
 
 	}
 }

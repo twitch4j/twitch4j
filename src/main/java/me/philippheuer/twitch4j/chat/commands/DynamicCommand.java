@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.philippheuer.twitch4j.enums.CommandPermission;
-import me.philippheuer.twitch4j.events.event.MessageEvent;
+import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
 
 @Data
 @NoArgsConstructor
@@ -35,7 +35,7 @@ public class DynamicCommand extends Command {
 	 * executeCommand Logic
 	 */
 	@Override
-	public void executeCommand(MessageEvent messageEvent) {
+	public void executeCommand(ChannelMessageEvent messageEvent) {
 		super.executeCommand(messageEvent);
 
 		// Prepare Response
