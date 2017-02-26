@@ -75,6 +75,19 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.16.14")
 }
 
+// Disable Gradle Caching
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+/**
+ * Sources - build a jar with source files
+ */
+task sourcesJar(type: Jar) {
+	from sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
 /**
  * JavaDocs Generation
  */
@@ -84,4 +97,18 @@ javadoc {
 
 	// if not changed the destinationDir, the javadoc for production code is overridden.
 	destinationDir = file("${buildDir}/../docs/javadoc")
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+/**
+ * Artifacts
+ */
+artifacts {
+	archives sourcesJar
+	archives javadocJar
 }
