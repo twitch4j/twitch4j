@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.conversion.TypeConvert;

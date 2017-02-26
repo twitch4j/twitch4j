@@ -4,9 +4,7 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.chat.commands.Command;
-import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
-import me.philippheuer.twitch4j.enums.CommandPermission;
+import me.philippheuer.twitch4j.chat.commands.CommandPermission;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
@@ -21,7 +19,6 @@ import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
-import org.kitteh.irc.client.library.event.helper.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;

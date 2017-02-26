@@ -27,7 +27,7 @@ import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
  * to the various rest endpoints, the twitch chat interface and the
  * client related services. (CredentialManager/CommandHandler/...)
  *
- * @author Philipp Heuer
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%
  * @since 1.0
  */
@@ -68,7 +68,7 @@ public class TwitchClient {
 	/**
 	 * Twitch API Endpoint
 	 */
-	public final String twitchEndpoints = "https://api.twitch.tv/kraken";
+	public final String twitchEndpoint = "https://api.twitch.tv/kraken";
 
 	/**
 	 * Twitch API Version
@@ -152,13 +152,13 @@ public class TwitchClient {
 	 * @param ircCredential The irc credential to use for chat messages. Should only be provided for bots.
 	 * @return A new twitch client instance, that will be initalized with the specified options.
 	 */
-	@Builder
-	public static TwitchClient builder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
+	@Builder(builderMethodName = "builder")
+	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
-		// Initalize instance
+		// Initialize instance
 		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
 		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
 

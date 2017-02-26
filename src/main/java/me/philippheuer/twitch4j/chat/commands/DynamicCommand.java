@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.event.MessageEvent;
 
 @Data
