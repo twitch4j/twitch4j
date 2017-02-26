@@ -35,7 +35,7 @@ public class AbstractTwitchEndpoint {
 	/**
 	 * AbstractTwitchEndpoint
 	 *
-	 * @param twitchClient
+	 * @param twitchClient todo
 	 */
 	public AbstractTwitchEndpoint(TwitchClient twitchClient) {
 		// Properties

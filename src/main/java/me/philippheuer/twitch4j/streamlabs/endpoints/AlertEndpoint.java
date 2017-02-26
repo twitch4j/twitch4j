@@ -27,6 +27,9 @@ public class AlertEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Stream Labs - Authenticated Endpoint
+	 *
+	 * @param streamlabsClient todo
+	 * @param credential todo
 	 */
 	public AlertEndpoint(StreamlabsClient streamlabsClient, OAuthCredential credential) {
 		super(streamlabsClient);

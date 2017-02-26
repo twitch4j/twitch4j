@@ -37,7 +37,9 @@ public class TwitchPubSub {
 	private WebSocket webSocket;
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param twitchClient TwitchClient is the core class for all api operations.
 	 */
 	public TwitchPubSub(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
@@ -194,6 +196,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Subscribe to Bits Topic
+	 *
+	 * @param channel Channel
+	 * @see Channel
 	 */
 	public void addChannel(Channel channel) {
 		// Validate Arguments
@@ -231,6 +236,8 @@ public class TwitchPubSub {
 
 	/**
 	 * Method: Check PubSub Socket Status
+	 *
+	 * @return True, if the socket is connected. False, if there are problems with the pubsub endpoint.
 	 */
 	public Boolean checkEndpointStatus() {
 		// WebSocket needs to be open

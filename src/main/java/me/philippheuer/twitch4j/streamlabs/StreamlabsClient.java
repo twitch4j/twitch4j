@@ -7,12 +7,9 @@ import lombok.Singular;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
 import me.philippheuer.twitch4j.helper.RestClient;
-import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.endpoints.AlertEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -77,7 +74,10 @@ public class StreamlabsClient {
 	}};
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param clientId     Streamlabs Application - Id
+	 * @param clientSecret Streamlabs Application - Secret
 	 */
 	public StreamlabsClient(String clientId, String clientSecret) {
 		super();
@@ -92,6 +92,10 @@ public class StreamlabsClient {
 
 	/**
 	 * Client Builder
+	 *
+	 * @param clientId     Streamlabs Application - Id
+	 * @param clientSecret Streamlabs Application - Secret
+	 * @return new instance of type StreamlabsClient
 	 */
 	@Builder(builderMethodName = "builder")
 	public static StreamlabsClient streamlabsClientBuilder(String clientId, String clientSecret) {
@@ -117,6 +121,9 @@ public class StreamlabsClient {
 
 	/**
 	 * Get User Endpoint
+	 *
+	 * @param credential OAuthCredential
+	 * @return user endpoint
 	 */
 	public UserEndpoint getUserEndpoint(OAuthCredential credential) {
 		return new UserEndpoint(this, credential);
@@ -124,6 +131,9 @@ public class StreamlabsClient {
 
 	/**
 	 * Get Donation Endpoint
+	 *
+	 * @param credential OAuthCredential
+	 * @return donation endpoint
 	 */
 	public DonationEndpoint getDonationEndpoint(OAuthCredential credential) {
 		return new DonationEndpoint(this, credential);
@@ -131,6 +141,9 @@ public class StreamlabsClient {
 
 	/**
 	 * Get Alert Endpoint
+	 *
+	 * @param credential OAuthCredential
+	 * @return alert endpoint
 	 */
 	public AlertEndpoint getAlertEndpoint(OAuthCredential credential) {
 		return new AlertEndpoint(this, credential);

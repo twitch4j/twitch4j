@@ -163,6 +163,9 @@ public class IrcClient {
 
 			// Send Message
 			getIrcClient().sendMessage("#" + channelName, message);
+
+			// Logging
+			Logger.debug(this, "Message send to Channel [%s] with content [%s].", channelName, message);
 		}).start();
 	}
 
@@ -178,6 +181,9 @@ public class IrcClient {
 
 			// Send Private Message [Needs a target channel, but the channel itself doesn't matter - so we use the recipients channel]
 			getIrcClient().sendMessage("#" + userName, String.format("/w %s %s", userName, message));
+
+			// Logging
+			Logger.debug(this, "Private Message send to [%s] with content [%s].", userName, message);
 		}).start();
 	}
 

@@ -28,6 +28,8 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Constructor - by ChannelId
+	 *
+	 * @param client todo
 	 */
 	public KrakenEndpoint(TwitchClient client) {
 		super(client);
@@ -37,6 +39,8 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get OAuth Token Information
 	 * Gets information about the provided oAuthToken
 	 * Requires Scope: none
+	 *
+	 * @return todo
 	 */
 	public Token getToken(OAuthCredential credential) {
 		// Endpoint

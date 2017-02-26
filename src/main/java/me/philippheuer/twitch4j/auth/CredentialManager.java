@@ -142,7 +142,7 @@ public class CredentialManager {
 	/**
 	 * Get Twitch credentials for channel
 	 * @param channelId Channel ID
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForChannel(Long channelId) {
 		return getAnyCredential("TWITCH-" + channelId.toString());
@@ -150,7 +150,7 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials for irc
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForIRC() {
 		return getAnyCredential("TWITCH-" + CREDENTIAL_IRC);
@@ -158,7 +158,7 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials by custom identifier
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForCustomKey(String customKey) {
 		return getAnyCredential("TWITCH-" + customKey);
@@ -167,7 +167,7 @@ public class CredentialManager {
 	/**
 	 * Get Streamlabs credential by channel
 	 * @param channelId Channel ID
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(Long channelId) {
 		return getAnyCredential("STREAMLABS-" + channelId.toString());
@@ -175,7 +175,7 @@ public class CredentialManager {
 
 	/**
 	 * Get Streamlabs credential by customKey
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForCustomKey(String customKey) {
 		return getAnyCredential("STREAMLABS-" + customKey);

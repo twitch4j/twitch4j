@@ -22,6 +22,9 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Stream Labs - Authenticated Endpoint
+	 *
+	 * @param streamlabsClient todo
+	 * @param credential todo
 	 */
 	public UserEndpoint(StreamlabsClient streamlabsClient, OAuthCredential credential) {
 		super(streamlabsClient);
@@ -32,6 +35,7 @@ public class UserEndpoint extends AbstractStreamlabsEndpoint {
 	 * Endpoint: Get the Streamlabs User
 	 * Fetch information about the authenticated user.
 	 * Requires Scope: none
+	 * @return Returns an optional of type user
 	 */
 	public Optional<User> getUser() {
 		// Endpoint
