@@ -23,12 +23,9 @@ import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 /**
  * TwitchClient is the core class for all api operations.
  * <p>
- * All coordinates which appear as arguments to the methods of this
- * Graphics object are considered relative to the translation origin
- * of this Graphics object prior to the invocation of the method.
- * All rendering operations modify only pixels which lie within the
- * area bounded by both the current clip of the graphics context
- * and the extents of the Component used to create the Graphics object.
+ * The TwitchClient class is the central component, that grants access
+ * to the various rest endpoints, the twitch chat interface and the
+ * client related services. (CredentialManager/CommandHandler/...)
  *
  * @author Philipp Heuer
  * @version %I%, %G%
@@ -39,39 +36,39 @@ import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 public class TwitchClient {
 
 	/**
-	 * Event Dispatcher
+	 * Service to dispatch Events
 	 */
 	private final EventDispatcher dispatcher = new EventDispatcher(this);
 
 	/**
-	 * Credential Manager
+	 * Services to store/request credentials
 	 */
 	private final CredentialManager credentialManager = new CredentialManager();
 
 	/**
-	 * Rest Client
+	 * RestClient to build the rest requests
 	 */
 	private RestClient restClient = new RestClient();
 
 	/**
-	 * IRC Client
+	 * Twitch IRC Client
 	 */
 	private IrcClient ircClient;
 
 	/**
-	 * PubSub Service
+	 * Twitch PubSub Client
 	 */
 	private TwitchPubSub pubSub;
 
 	/**
-	 * StreamLabs API
+	 * Integration: Streamlabs Client
 	 */
 	private StreamlabsClient streamLabsClient;
 
 	/**
 	 * Twitch API Endpoint
 	 */
-	public final String twitchEndpoint = "https://api.twitch.tv/kraken";
+	public final String twitchEndpoints = "https://api.twitch.tv/kraken";
 
 	/**
 	 * Twitch API Version
@@ -94,14 +91,14 @@ public class TwitchClient {
 	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
 
 	/**
-	 * Twitch Client Id
+	 * Twitch Application - Client Id
 	 * Default Value: Twitch Client Id
 	 */
 	@Singular
 	private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
 
 	/**
-	 * Twitch Client Secret
+	 * Twitch Application - Client Secret
 	 */
 	@Singular
 	private String clientSecret;
@@ -113,14 +110,14 @@ public class TwitchClient {
 	private File configurationDirectory;
 
 	/**
-	 * Command Handler (CHAT)
+	 * Command Handler (CHAT Commands and Features)
 	 */
 	private CommandHandler commandHandler = new CommandHandler(this);
 
 	/**
 	 * Class Constructor - Creates a new TwitchClient Instance for the provided app.
 	 * <p>
-	 * This will also initalize the rest interceptors, that provide oauth tokens/get/post parameters
+	 * This will also initialize the rest interceptors, that provide oauth tokens/get/post parameters
 	 * on the fly to easily build the rest requests.
 	 *
 	 * @param clientId     Twitch Application - Id
@@ -149,14 +146,14 @@ public class TwitchClient {
 	 *
 	 * @param clientId Twitch Application - Id
 	 * @param clientSecret Twitch Application - Secret
-	 * @param configurationDirectory
-	 * @param configurationAutoSave
-	 * @param streamlabsClient
-	 * @param ircCredential
-	 * @return
+	 * @param configurationDirectory The directory the configuraton files should be stored in.
+	 * @param configurationAutoSave Whether the configuration should be saved automatically.
+	 * @param streamlabsClient The streamlabs client instance, to enable streamlabs related events and requests.
+	 * @param ircCredential The irc credential to use for chat messages. Should only be provided for bots.
+	 * @return A new twitch client instance, that will be initalized with the specified options.
 	 */
-	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
+	@Builder
+	public static TwitchClient builder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");

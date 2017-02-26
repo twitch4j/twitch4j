@@ -43,7 +43,7 @@ def gitVersion() {
 // Dependencies
 dependencies {
 	// Logging
-    compile("ch.qos.logback:logback-classic:1.1.8")
+    compile("ch.qos.logback:logback-classic:1.2.1")
     compile("com.jcabi:jcabi-log:0.17.2")
 
     // Spring Boot
@@ -54,10 +54,10 @@ dependencies {
     compile('com.neovisionaries:nv-websocket-client:1.31')
 
     // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-    compile('org.kitteh.irc:client-lib:3.0.1');
+    compile('org.kitteh.irc:client-lib:3.0.2');
 
     // JSON / YAML
-    compile("com.fasterxml.jackson.core:jackson-databind:2.8.6")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.8.7")
 
 	// Bucket for rate-limiting
 	compile("org.isomorphism:token-bucket:1.7")
