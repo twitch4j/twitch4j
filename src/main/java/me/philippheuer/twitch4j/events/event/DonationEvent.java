@@ -10,6 +10,13 @@ import me.philippheuer.twitch4j.model.User;
 
 import java.util.Currency;
 
+/**
+ * This event gets called when a user receives a donation from any source.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter

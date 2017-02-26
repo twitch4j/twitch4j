@@ -9,6 +9,16 @@ import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
 
+/**
+ * This event gets called when a user gets a new subscriber or a user resubscribes.
+ * <p>
+ * This event will be called simultaneously with the chat announcement,
+ * not when the user presses his subscription button.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter

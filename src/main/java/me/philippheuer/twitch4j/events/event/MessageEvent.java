@@ -11,6 +11,13 @@ import me.philippheuer.twitch4j.model.User;
 
 import java.util.Set;
 
+/**
+ * This event gets called when a message is received in a channel.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter
