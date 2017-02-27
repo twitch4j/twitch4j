@@ -6,7 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.web.client.RestTemplate;
 

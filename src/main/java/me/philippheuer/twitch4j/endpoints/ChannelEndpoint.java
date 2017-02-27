@@ -11,16 +11,14 @@ import me.philippheuer.twitch4j.events.event.DonationEvent;
 import me.philippheuer.twitch4j.events.event.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
-import me.philippheuer.twitch4j.helper.HeaderRequestInterceptor;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.HeaderRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
-import me.philippheuer.twitch4j.streamlabs.endpoints.AlertEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 @Getter

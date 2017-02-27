@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.helper;
+package me.philippheuer.util.rest;
 
 import com.jcabi.log.Logger;
 import org.springframework.http.HttpRequest;

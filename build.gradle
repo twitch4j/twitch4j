@@ -11,7 +11,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
+        classpath("org.springframework.boot:rest-boot-gradle-plugin:1.4.3.RELEASE")
         classpath("io.ratpack:ratpack-gradle:1.4.4")
     }
 }
@@ -47,8 +47,8 @@ dependencies {
     compile("com.jcabi:jcabi-log:0.17.2")
 
     // Spring Boot
-    compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework:spring-web")
+    compile("org.springframework.boot:rest-boot-starter")
+    compile("org.springframework:rest-web")
 
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')

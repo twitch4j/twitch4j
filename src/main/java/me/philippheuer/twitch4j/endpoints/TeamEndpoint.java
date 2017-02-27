@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.RestError;
 import me.philippheuer.twitch4j.model.Team;
 import me.philippheuer.twitch4j.model.TeamList;

@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.User;
 import me.philippheuer.twitch4j.streamlabs.model.UserResponse;
