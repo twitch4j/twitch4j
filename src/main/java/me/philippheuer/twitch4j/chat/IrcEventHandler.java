@@ -4,10 +4,9 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.chat.commands.CommandPermission;
+import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
-import me.philippheuer.twitch4j.events.event.MessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Cheer;
 import me.philippheuer.twitch4j.model.Subscription;
@@ -18,7 +17,6 @@ import net.jodah.expiringmap.ExpiringMap;
 import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
-import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -61,13 +59,6 @@ public class IrcEventHandler {
 	 */
 	@Handler(priority = Integer.MAX_VALUE)
 	public void onClientReceiveCommand(ClientReceiveServerMessageEventBase event) {
-
-		/* For debugging
-		if(!event.getCommand().equals("PRIVMSG")) {
-			System.out.println(event.getCommand() + " | " + event.getServerMessage().toString());
-		}
-		*/
-
 		/**
 		 * About once every five minutes, you will receive a PING :tmi.twitch.tv from the server, in order to
 		 * ensure that your connection to the server is not prematurely terminated, you should reply with PONG :tmi.twitch.tv.
@@ -79,7 +70,7 @@ public class IrcEventHandler {
 		}
 
 		// Handle Messages
-		if (event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
+		if (event.getCommand().equals("WHISPER") || event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
 			// Get Channel on IRC
 			String channelName = event.getParameters().get(0).replace("#", "");
 			Long channelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get();
@@ -109,7 +100,37 @@ public class IrcEventHandler {
 				}
 			}
 
-			if (event.getCommand().equals("PRIVMSG")) {
+			// Private Messages
+			if (event.getCommand().equals("WHISPER")) {
+				String rawMessage = event.getServerMessage().getMessage();
+
+				Pattern regExpr = Pattern.compile("^.+:.+?!.+?\\@.+?\\.tmi\\.twitch\\.tv WHISPER (?<recipient>[a-zA-Z0-9_]{4,25}) \\:(?<message>.+)$");
+				Matcher matcher = regExpr.matcher(rawMessage);
+				String chatMessage = "";
+
+				if(!matcher.matches()) {
+					return;
+				}
+
+				chatMessage = matcher.group("message");
+				String recipientName = matcher.group("recipient");
+
+				Long userId = Long.parseLong(tagMap.get("user-id"));
+				Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
+				userPermissions.add(CommandPermission.EVERYONE);
+
+				// Get User by ID
+				Optional<User> user = getTwitchClient().getUserEndpoint().getUser(userId);
+				Optional<User> recipient = getTwitchClient().getUserEndpoint().getUserByUserName(recipientName);
+				
+				if (user.isPresent() && recipient.isPresent()) {
+					// Dispatch Event
+					PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(user.get(), recipient.get(), chatMessage, userPermissions);
+					getTwitchClient().getDispatcher().dispatch(privateMessageEvent);
+				}
+			}
+			// Events
+			else if (event.getCommand().equals("PRIVMSG")) {
 				// First Subscribers Subscriptions
 				String rawMessage = event.getServerMessage().getMessage();
 				if (event.getServerMessage().getMessage().startsWith(":twitchnotify")) {
@@ -257,10 +278,10 @@ public class IrcEventHandler {
 
 	/**
 	 * Event: onMessage
-	 * Gets executed on MessageEvent
+	 * Gets executed on ChannelMessageEvent
 	 */
 	@Handler(priority = Integer.MAX_VALUE)
-	public void onMessageEvent(ChannelMessageEvent event) {
+	public void onMessageEvent(org.kitteh.irc.client.library.event.channel.ChannelMessageEvent event) {
 		String channelName = event.getChannel().getName().replace("#", "");
 		String userName = event.getActor().getNick();
 		String userMessage = event.getMessage();
@@ -281,35 +302,35 @@ public class IrcEventHandler {
 		user.setDisplayName(userName);
 
 		// Check for Permissions
-		if(tagMap.containsKey("badges")) {
+		if (tagMap.containsKey("badges")) {
 			List<String> badges = Arrays.asList(tagMap.get("badges").split(","));
 			// - Broadcaster
-			if(badges.contains("broadcaster/1")) {
+			if (badges.contains("broadcaster/1")) {
 				userPermissions.add(CommandPermission.BROADCASTER);
 			}
 			// Twitch Prime
-			if(badges.contains("premium/1")) {
+			if (badges.contains("premium/1")) {
 				userPermissions.add(CommandPermission.PRIME_TURBO);
 			}
 		}
 		// Twitch Turbo
-		if(tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
+		if (tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
 			userPermissions.add(CommandPermission.PRIME_TURBO);
 		}
 		// Subscriber
-		if(tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
+		if (tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
 			userPermissions.add(CommandPermission.SUBSCRIBER);
 		}
 		// Moderator
-		if(twitchClient.getTMIEndpoint().isUserModerator(channel, user)) {
+		if (twitchClient.getTMIEndpoint().isUserModerator(channel, user)) {
 			userPermissions.add(CommandPermission.MODERATOR);
 		}
 		// Everyone
 		userPermissions.add(CommandPermission.EVERYONE);
 
 		// Dispatch Event
-		MessageEvent messageEvent = new MessageEvent(channel, user, userMessage, userPermissions);
-		getTwitchClient().getDispatcher().dispatch(messageEvent);
+		ChannelMessageEvent channelMessageEvent = new ChannelMessageEvent(channel, user, userMessage, userPermissions);
+		getTwitchClient().getDispatcher().dispatch(channelMessageEvent);
 	}
 
 	/**

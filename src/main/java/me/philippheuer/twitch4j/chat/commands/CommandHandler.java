@@ -6,12 +6,9 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.MessageEvent;
+import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -159,7 +156,7 @@ public class CommandHandler {
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
 	@EventSubscriber
-	public void processCommand(MessageEvent messageEvent) {
+	public void processCommand(ChannelMessageEvent messageEvent) {
 		// Get real command name from alias
 		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().length()));
 		if (messageEvent.getMessage().contains(" ")) {
