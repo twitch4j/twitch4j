@@ -12,7 +12,6 @@ plugins {
 	id 'eclipse'
 	id 'idea'
 	id 'io.ratpack.ratpack-java' version '1.4.5'
-	id "org.springframework.boot" version "1.5.1.RELEASE"
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -23,6 +22,9 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+// Doesn't matter, only so that spring doesn't fail
+mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
 // Method, that gets the total amount of commits in the repository (as build number)
 def gitVersion() {
@@ -38,9 +40,8 @@ dependencies {
     compile("ch.qos.logback:logback-classic:1.2.1")
     compile("com.jcabi:jcabi-log:0.17.2")
 
-    // Spring Boot
-	compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework:spring-web")
+    // Spring (RestTemplate)
+    compile("org.springframework:spring-web:4.3.6.RELEASE")
 
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
