@@ -14,6 +14,12 @@ Support:
 [![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
 [<img src="https://discordapp.com/api/guilds/143001431388061696/widget.png?style=shield">](https://discord.gg/FQ5vgW3)
 
+Documentation:
+
+[![JavaDoc: Master](https://img.shields.io/badge/JavaDoc-Master-006400.svg?style=flat-square)](https://jitpack.io/com/github/PhilippHeuer/twitch4j/master-SNAPSHOT/javadoc/index.html)
+[![JavaDoc: Develop](https://img.shields.io/badge/JavaDoc-Develop-006400.svg?style=flat-square)](https://jitpack.io/com/github/PhilippHeuer/twitch4j/develop-SNAPSHOT/javadoc/index.html)
+[![Wiki](https://img.shields.io/badge/Wiki-Github-D3D3D3.svg?style=flat-square)](https://github.com/PhilippHeuer/twitch4j/wiki)
+
 --------
 
 ## A quick note:
