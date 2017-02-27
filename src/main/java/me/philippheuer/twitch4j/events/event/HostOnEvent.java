@@ -31,10 +31,14 @@ public class HostOnEvent extends Event {
 	private final Channel targetChannel;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel       The channel that this event originates from.
+	 * @param targetChannel The channel that was hosted.
 	 */
 	public HostOnEvent(Channel channel, Channel targetChannel) {
 		this.channel = channel;
 		this.targetChannel = targetChannel;
 	}
+
 }

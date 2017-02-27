@@ -37,10 +37,10 @@ public class UserBan extends Event {
 	private final String reason;
 
 	/**
-	 * Constructor
+	 * Event Constructor
 	 *
-	 * @param channel Channel
-	 * @param user    Target User
+	 * @param channel The channel that this event originates from.
+	 * @param user    The user who triggered the event.
 	 * @param reason  Reason for Ban.
 	 */
 	public UserBan(Channel channel, User user, String reason) {

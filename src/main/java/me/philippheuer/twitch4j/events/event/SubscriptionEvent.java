@@ -41,10 +41,10 @@ public class SubscriptionEvent extends Event {
 	private final Subscription subscription;
 
 	/**
-	 * Constructor
+	 * Event Constructor
 	 *
-	 * @param channel      Channel
-	 * @param subscription Subscription
+	 * @param channel      The channel that this event originates from.
+	 * @param subscription The subscription, containing all relevant information.
 	 */
 	public SubscriptionEvent(Channel channel, Subscription subscription) {
 		this.channel = channel;

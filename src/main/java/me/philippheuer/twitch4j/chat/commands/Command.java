@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.CommandPermission;
 import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.conversion.TypeConvert;
@@ -145,8 +144,8 @@ public abstract class Command {
 	 * @return True, if user has the required permissions, false if not.
 	 */
 	public Boolean hasPermissions(ChannelMessageEvent messageEvent) {
-		for(CommandPermission permission : messageEvent.getPermissions()) {
-			if(getRequiredPermissions().contains(permission)) {
+		for (CommandPermission permission : messageEvent.getPermissions()) {
+			if (getRequiredPermissions().contains(permission)) {
 				return true;
 			}
 		}
@@ -216,7 +215,7 @@ public abstract class Command {
 	 * Allows to easily send messages to the channel
 	 *
 	 * @param channelName Name of the channel that should receive the message.
-	 * @param message The message to send to the specified channel.
+	 * @param message     The message to send to the specified channel.
 	 */
 	public void sendMessageToChannel(String channelName, String message) {
 		getTwitchClient().getIrcClient().sendMessage(channelName, message);
@@ -226,12 +225,11 @@ public abstract class Command {
 	 * Allows to easily send messages to the channel
 	 *
 	 * @param userName Name of the user that should receive the message.
-	 * @param message The message to send to the specified channel.
+	 * @param message  The message to send to the specified channel.
 	 */
 	public void sendMessageToUser(String userName, String message) {
 		getTwitchClient().getIrcClient().sendPrivateMessage(userName, message);
 	}
-
 
 
 	public void onInvalidCommandUsage(ChannelMessageEvent messageEvent) {

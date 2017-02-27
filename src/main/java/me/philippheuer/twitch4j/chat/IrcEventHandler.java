@@ -4,7 +4,7 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.CommandPermission;
+import me.philippheuer.twitch4j.chat.commands.CommandPermission;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
 import me.philippheuer.twitch4j.model.Channel;
@@ -28,22 +28,20 @@ import java.util.regex.Pattern;
 public class IrcEventHandler {
 
 	/**
-	 * Holds the API Instance
-	 */
-	private TwitchClient twitchClient;
-
-	/**
-	 * Holds the API Instance
-	 */
-	private IrcClient ircClient;
-
-	/**
 	 * Holds recent Subscriptions
 	 */
 	static private Map<String, Subscription> subscriptionHistory = ExpiringMap.builder()
 			.expiration(5, TimeUnit.MINUTES)
 			.expirationPolicy(ExpirationPolicy.CREATED)
 			.build();
+	/**
+	 * Holds the API Instance
+	 */
+	private TwitchClient twitchClient;
+	/**
+	 * Holds the API Instance
+	 */
+	private IrcClient ircClient;
 
 	/**
 	 * Constructor
@@ -108,7 +106,7 @@ public class IrcEventHandler {
 				Matcher matcher = regExpr.matcher(rawMessage);
 				String chatMessage = "";
 
-				if(!matcher.matches()) {
+				if (!matcher.matches()) {
 					return;
 				}
 
@@ -122,7 +120,7 @@ public class IrcEventHandler {
 				// Get User by ID
 				Optional<User> user = getTwitchClient().getUserEndpoint().getUser(userId);
 				Optional<User> recipient = getTwitchClient().getUserEndpoint().getUserByUserName(recipientName);
-				
+
 				if (user.isPresent() && recipient.isPresent()) {
 					// Dispatch Event
 					PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(user.get(), recipient.get(), chatMessage, userPermissions);

@@ -42,12 +42,12 @@ public class UserTimeout extends Event {
 	private final String reason;
 
 	/**
-	 * Constructor
+	 * Event Constructor
 	 *
-	 * @param channel  Channel
-	 * @param user     Target User
+	 * @param channel  The channel that this event originates from.
+	 * @param user     The user who triggered the event.
 	 * @param duration Timeout Duration in Minutes.
-	 * @param reason   Reason for Timeout.
+	 * @param reason   Reason for Ban.
 	 */
 	public UserTimeout(Channel channel, User user, Integer duration, String reason) {
 		super();

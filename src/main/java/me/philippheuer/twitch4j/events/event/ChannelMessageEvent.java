@@ -45,7 +45,12 @@ public class ChannelMessageEvent extends Event {
 	private final Set<CommandPermission> permissions;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel     The channel that this event originates from.
+	 * @param user        The user who triggered the event.
+	 * @param message     The plain text of the message.
+	 * @param permissions The permissions of the triggering user.
 	 */
 	public ChannelMessageEvent(Channel channel, User user, String message, Set<CommandPermission> permissions) {
 		this.channel = channel;

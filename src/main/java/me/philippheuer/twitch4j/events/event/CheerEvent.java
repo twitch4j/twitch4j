@@ -1,8 +1,13 @@
 package me.philippheuer.twitch4j.events.event;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.Cheer;
+import me.philippheuer.twitch4j.model.User;
 
 /**
  * This event gets called when a user receives bits.
@@ -33,9 +38,11 @@ public class CheerEvent extends Event {
 	private final Cheer cheer;
 
 	/**
-	 * Constructor
+	 * Event Constructor
 	 *
-	 * @param cheer
+	 * @param channel The channel that this event originates from.
+	 * @param cheer   The cheer, containing all relevant information.
+	 * @see Cheer
 	 */
 	public CheerEvent(Channel channel, Cheer cheer) {
 		this.channel = channel;

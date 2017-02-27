@@ -26,9 +26,12 @@ public class HostOffEvent extends Event {
 	private final Channel channel;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel     The channel that this event originates from.
 	 */
 	public HostOffEvent(Channel channel) {
 		this.channel = channel;
 	}
+
 }

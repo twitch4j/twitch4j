@@ -32,7 +32,10 @@ public class FollowEvent extends Event {
 	private final User user;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel The channel that this event originates from.
+	 * @param user    The user who triggered the event.
 	 */
 	public FollowEvent(Channel channel, User user) {
 		this.channel = channel;
