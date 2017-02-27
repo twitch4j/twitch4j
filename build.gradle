@@ -7,21 +7,22 @@
  */
 
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:rest-boot-gradle-plugin:1.4.3.RELEASE")
-        classpath("io.ratpack:ratpack-gradle:1.4.4")
-    }
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
+	}
 }
 
 // Apply the java plugin to add support for Java
-apply plugin: "java"
-apply plugin: "eclipse"
-apply plugin: "idea"
-apply plugin: "org.springframework.boot"
-apply plugin: "io.ratpack.ratpack-groovy"
+plugins {
+	id 'java'
+	id 'eclipse'
+	id 'idea'
+	id 'io.ratpack.ratpack-java' version '1.4.5'
+}
+apply plugin: 'org.springframework.boot'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -47,8 +48,8 @@ dependencies {
     compile("com.jcabi:jcabi-log:0.17.2")
 
     // Spring Boot
-    compile("org.springframework.boot:rest-boot-starter")
-    compile("org.springframework:rest-web")
+	compile("org.springframework.boot:spring-boot-starter:1.5.1.RELEASE")//
+    compile("org.springframework:spring-web:4.3.6.RELEASE")//
 
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
