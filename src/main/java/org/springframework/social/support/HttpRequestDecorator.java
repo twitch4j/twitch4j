@@ -25,6 +25,7 @@ import org.springframework.util.MultiValueMap;
 
 /**
  * Extension of HttpRequestWrapper that supports adding new HttpHeaders to the wrapped HttpRequest.
+ *
  * @author Keith Donald
  */
 public class HttpRequestDecorator extends HttpRequestWrapper {

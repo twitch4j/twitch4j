@@ -155,6 +155,7 @@ public class EventDispatcher {
 	 * This registers a temporary single event listener.
 	 * Meaning that when it listens to an event, it immediately unregisters itself.
 	 *
+	 * @param <T> Type of the temporary event.
 	 * @param listener The listener.
 	 */
 	public <T extends Event> void registerTemporaryListener(IListener<T> listener) {

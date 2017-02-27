@@ -9,6 +9,13 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+/**
+ * Model representing a list of followers.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)

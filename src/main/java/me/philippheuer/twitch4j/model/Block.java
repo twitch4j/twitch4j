@@ -10,6 +10,13 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Model representing a blocked user.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)

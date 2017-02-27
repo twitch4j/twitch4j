@@ -8,6 +8,15 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * Model representing a stream.
+ * <p>
+ * A stream is a channel, that is currently streaming live.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,4 +38,5 @@ public class Stream {
 	private TwitchImages preview;
 
 	private Channel channel;
+
 }
