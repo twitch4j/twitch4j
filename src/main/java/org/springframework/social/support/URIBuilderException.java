@@ -17,6 +17,7 @@ package org.springframework.social.support;
 
 /**
  * Exception thrown when URIBuilder can't build the specified URI. For the underlying reason, call getCause().
+ *
  * @author Craig Walls
  */
 @SuppressWarnings("serial")

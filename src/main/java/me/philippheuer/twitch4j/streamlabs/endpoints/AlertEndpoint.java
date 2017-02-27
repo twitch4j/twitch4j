@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.LoggingRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.AlertCreate;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,6 +26,9 @@ public class AlertEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Stream Labs - Authenticated Endpoint
+	 *
+	 * @param streamlabsClient todo
+	 * @param credential todo
 	 */
 	public AlertEndpoint(StreamlabsClient streamlabsClient, OAuthCredential credential) {
 		super(streamlabsClient);

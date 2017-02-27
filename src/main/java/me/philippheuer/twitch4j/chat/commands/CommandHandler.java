@@ -18,21 +18,17 @@ import java.util.stream.Collectors;
 public class CommandHandler {
 
 	/**
+	 * A map routing command aliases to the primary command
+	 */
+	public HashMap<String, String> commandAliasToPrimaryMap = new HashMap<String, String>();
+	/**
 	 * Holds the Twitch Instance
 	 */
 	private TwitchClient twitchClient;
-
-
 	/**
 	 * Holds all available Commands
 	 */
 	private HashMap<String, Command> commandMap = new HashMap<String, Command>();
-
-	/**
-	 * A map routing command aliases to the primary command
-	 */
-	public HashMap<String, String> commandAliasToPrimaryMap = new HashMap<String, String>();
-
 	/**
 	 * Command Trigger
 	 */
@@ -44,8 +40,10 @@ public class CommandHandler {
 	private File commandSaveFile;
 
 	/**
-	 * Constructor
-	 * @param twitchClient
+	 * Class Constructor
+	 *
+	 * @param twitchClient Instance of TwitchClient
+	 * @see TwitchClient
 	 */
 	public CommandHandler(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
@@ -69,13 +67,13 @@ public class CommandHandler {
 			command.setTwitchClient(getTwitchClient());
 
 			// Check, if the command already was registered
-			if(getCommandMap().containsKey(command.getCommand())) {
+			if (getCommandMap().containsKey(command.getCommand())) {
 				Logger.error(this, "Can't register an Command! [%s]! Error: Command was already registered!", commandClass.getSimpleName());
 				return;
 			}
 
 			// Register Command
-			if(command.getCommand().length() > 0) {
+			if (command.getCommand().length() > 0) {
 				// Add to CommandMap
 				getCommandMap().put(command.getCommand(), command);
 
@@ -104,13 +102,13 @@ public class CommandHandler {
 		command.setTwitchClient(getTwitchClient());
 
 		// Check, if the command already was registered
-		if(getCommandMap().containsKey(command.getCommand())) {
+		if (getCommandMap().containsKey(command.getCommand())) {
 			Logger.error(this, "Can't register Command! [%s]! Error: Command was already registered!", command.getCommand());
 			return;
 		}
 
 		// Register Command
-		if(command.getCommand().length() > 0) {
+		if (command.getCommand().length() > 0) {
 			// Add to CommandMap
 			getCommandMap().put(command.getCommand(), command);
 
@@ -168,9 +166,9 @@ public class CommandHandler {
 
 		Optional<Command> cmd = getCommand(cmdName);
 		// Command exists?
-		if(cmd.isPresent()) {
+		if (cmd.isPresent()) {
 			// Enabled?
-			if(cmd.get().getEnabled()) {
+			if (cmd.get().getEnabled()) {
 				// Check Command Permissions
 				if (cmd.get().hasPermissions(messageEvent)) {
 					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
@@ -187,9 +185,13 @@ public class CommandHandler {
 
 	/**
 	 * Get Primary Command by Alias or Primary Command
+	 *
+	 * @param name Name or alias of the command.
+	 * @return Returns an optional Command instance, that only isPresent if it exists.
+	 * @see Command
 	 */
 	public Optional<Command> getCommand(String name) {
-		if(getCommandAliasToPrimaryMap().containsKey(name)) {
+		if (getCommandAliasToPrimaryMap().containsKey(name)) {
 			return Optional.ofNullable(getCommandMap().get(getCommandAliasToPrimaryMap().get(name)));
 		}
 
@@ -198,6 +200,8 @@ public class CommandHandler {
 
 	/**
 	 * Get all Commands
+	 *
+	 * @return Returns a list of all registered commands. This includes disabled commands.
 	 */
 	public Collection<Command> getAllCommands() {
 		return new ArrayList<Command>(getCommandMap().values());
@@ -246,15 +250,16 @@ public class CommandHandler {
 		try {
 			// Load commands from File
 			ObjectMapper mapper = new ObjectMapper();
-			List<DynamicCommand> loadedCommands = mapper.readValue(getCommandSaveFile(), new TypeReference<ArrayList<DynamicCommand>>(){});
+			List<DynamicCommand> loadedCommands = mapper.readValue(getCommandSaveFile(), new TypeReference<ArrayList<DynamicCommand>>() {
+			});
 
 			// Register Commands
-			for(Command cmd : loadedCommands) {
+			for (Command cmd : loadedCommands) {
 				registerCommand(cmd);
 			}
 		} catch (Exception ex) {
 			// we can ignore this, no dynamic content's saved
-			if(ex.getMessage().contains("No content")) {
+			if (ex.getMessage().contains("No content")) {
 				return;
 			}
 
@@ -267,7 +272,7 @@ public class CommandHandler {
 		List<Command> commandList = getCommandMap().values().stream().filter(e -> e instanceof DynamicCommand).collect(Collectors.toList());
 
 		// Remove all dynamic commands
-		for(Command cmd : commandList) {
+		for (Command cmd : commandList) {
 			getCommandMap().remove(cmd.getCommand());
 		}
 	}

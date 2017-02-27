@@ -17,6 +17,8 @@ public class IngestEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param client todo
 	 */
 	public IngestEndpoint(TwitchClient client) {
 		super(client);
@@ -28,6 +30,8 @@ public class IngestEndpoint extends AbstractTwitchEndpoint {
 	 * The Twitch ingesting system is the first stop for a broadcast stream. An ingest server receives your stream, and the
 	 * ingesting system authorizes and registers streams, then prepares them for viewers.
 	 * Requires Scope: none
+	 *
+	 * @return todo
 	 */
 	public List<Ingest> getIngestServer() {
 		// Endpoint

@@ -18,7 +18,7 @@ public class AbstractStreamlabsEndpoint {
 	/**
 	 * AbstractTwitchEndpoint
 	 *
-	 * @param streamlabsClient
+	 * @param streamlabsClient Streamlabs Client
 	 */
 	public AbstractStreamlabsEndpoint(StreamlabsClient streamlabsClient) {
 		// Properties

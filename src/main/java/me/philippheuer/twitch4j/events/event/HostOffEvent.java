@@ -7,6 +7,13 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 
+/**
+ * This event gets called when the user stops hosting someone.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter
@@ -19,9 +26,12 @@ public class HostOffEvent extends Event {
 	private final Channel channel;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel     The channel that this event originates from.
 	 */
 	public HostOffEvent(Channel channel) {
 		this.channel = channel;
 	}
+
 }

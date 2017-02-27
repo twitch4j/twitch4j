@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +18,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param client todo
 	 */
 	public SearchEndpoint(TwitchClient client) {
 		super(client);
@@ -30,6 +32,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @return todo
 	 */
 	public List<Channel> getChannels(String query, Optional<Long> limit) {
 		// Endpoint
@@ -60,6 +63,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param query search query
+	 * @return todo
 	 */
 	public List<Game> getGames(String query, Optional<Boolean> live) {
 		// Endpoint
@@ -91,6 +95,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @return todo
 	 */
 	public List<Stream> getStreams(String query, Optional<Long> limit) {
 		// Endpoint

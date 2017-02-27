@@ -1,15 +1,10 @@
 package me.philippheuer.twitch4j.auth;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcabi.log.Logger;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
@@ -18,9 +13,31 @@ import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * This class managed all oauth credentials for the verious services.
+ * <p>
+ * This class contains methods to request, load, store and get oauth
+ * credentials for a specific channel.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class CredentialManager {
+
+	/**
+	 * Static key for the primary irc credential. This account will be used as sender for all chat messages.
+	 * @see me.philippheuer.twitch4j.chat.IrcClient
+	 */
+	public static String CREDENTIAL_IRC = "IRC";
 
 	/**
 	 * Holds the Twitch Instance
@@ -48,7 +65,10 @@ public class CredentialManager {
 	private OAuthStreamlabs oAuthStreamlabs;
 
 	/**
-	 * Current Requests
+	 * A map that stores all current requests.
+	 * <p>
+	 * This map temporarily stores all current ongoing requests. This is required to link
+	 * the oauth states to the requests.
 	 */
 	protected ExpiringMap<String, OAuthRequest> oAuthRequestCache = ExpiringMap.builder()
 			.expiration(3600, TimeUnit.SECONDS)
@@ -61,9 +81,9 @@ public class CredentialManager {
 	 */
 	private Boolean saveCredentials = false;
 
-	// IRC Key
-	public static String CREDENTIAL_IRC = "IRC";
-
+	/**
+	 * A key-value map that contains all currently avaiable credentials.
+	 */
 	private final Map<String, OAuthCredential> oAuthCredentials = new LinkedHashMap<>();
 
 	/**
@@ -79,6 +99,10 @@ public class CredentialManager {
 		setOAuthHandler(new OAuthHandler(this));
 	}
 
+	/**
+	 *
+	 * @param twitchClient
+	 */
 	public void provideTwitchClient(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
 		setOAuthTwitch(new OAuthTwitch(this));
@@ -91,7 +115,8 @@ public class CredentialManager {
 
 	/**
 	 * Adds Twitch Credentials to the Credential Manager
-	 * @param key Key
+	 *
+	 * @param key        Key
 	 * @param credential Credential Instance
 	 */
 	public void addTwitchCredential(String key, OAuthCredential credential) {
@@ -108,7 +133,8 @@ public class CredentialManager {
 
 	/**
 	 * Adds Streamlabs Credentials to the Credential Manager
-	 * @param key Key
+	 *
+	 * @param key        Key
 	 * @param credential Credential Instance
 	 */
 	public void addStreamlabsCredential(String key, OAuthCredential credential) {
@@ -118,12 +144,13 @@ public class CredentialManager {
 
 	/**
 	 * Adds any Credentials to the Credential Manager
-	 * @param key Key
+	 *
+	 * @param key        Key
 	 * @param credential Credential Instance
 	 */
 	private void addAnyCredential(String key, OAuthCredential credential) {
 		// Remove value if it exists
-		if(getOAuthCredentials().containsKey(key)) {
+		if (getOAuthCredentials().containsKey(key)) {
 			Logger.debug(this, "Credentials with key [%s] already present in CredentialManager.", key);
 			getOAuthCredentials().remove(key);
 		}
@@ -134,15 +161,16 @@ public class CredentialManager {
 		getOAuthCredentials().put(key, credential);
 
 		// Store - if autoSaving was enabled
-		if(getSaveCredentials()) {
+		if (getSaveCredentials()) {
 			saveToFile();
 		}
 	}
 
 	/**
 	 * Get Twitch credentials for channel
+	 *
 	 * @param channelId Channel ID
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForChannel(Long channelId) {
 		return getAnyCredential("TWITCH-" + channelId.toString());
@@ -150,7 +178,8 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials for irc
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 *
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForIRC() {
 		return getAnyCredential("TWITCH-" + CREDENTIAL_IRC);
@@ -158,7 +187,8 @@ public class CredentialManager {
 
 	/**
 	 * Get Twitch credentials by custom identifier
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 *
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForCustomKey(String customKey) {
 		return getAnyCredential("TWITCH-" + customKey);
@@ -166,8 +196,9 @@ public class CredentialManager {
 
 	/**
 	 * Get Streamlabs credential by channel
+	 *
 	 * @param channelId Channel ID
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForChannel(Long channelId) {
 		return getAnyCredential("STREAMLABS-" + channelId.toString());
@@ -175,7 +206,8 @@ public class CredentialManager {
 
 	/**
 	 * Get Streamlabs credential by customKey
-	 * @return Optional<OAuthCredential> credential with oauth token and access scope.
+	 *
+	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForCustomKey(String customKey) {
 		return getAnyCredential("STREAMLABS-" + customKey);
@@ -183,11 +215,12 @@ public class CredentialManager {
 
 	/**
 	 * Private Method to get a credential by key
+	 *
 	 * @param key The key to search for.
 	 * @return Optional<OAuthCredential>
 	 */
 	private Optional<OAuthCredential> getAnyCredential(String key) {
-		if(getOAuthCredentials().containsKey(key)) {
+		if (getOAuthCredentials().containsKey(key)) {
 			return Optional.ofNullable((OAuthCredential) getOAuthCredentials().get(key));
 		} else {
 			return Optional.empty();
@@ -212,7 +245,7 @@ public class CredentialManager {
 	}
 
 	public void saveToFile() {
-		if(getCredentialFile() != null) {
+		if (getCredentialFile() != null) {
 			try {
 				ObjectMapper mapper = new ObjectMapper();
 
@@ -226,14 +259,15 @@ public class CredentialManager {
 	}
 
 	public void loadFromFile() {
-		if(getCredentialFile() != null) {
+		if (getCredentialFile() != null) {
 			// Clear present credentials
 			getOAuthCredentials().clear();
 
 			// Load credentials from file
 			try {
 				ObjectMapper mapper = new ObjectMapper();
-				Map<String, OAuthCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, OAuthCredential>>(){});
+				Map<String, OAuthCredential> loadedCredentials = mapper.readValue(getCredentialFile(), new TypeReference<LinkedHashMap<String, OAuthCredential>>() {
+				});
 				getOAuthCredentials().putAll(loadedCredentials);
 
 				Logger.debug(this, "Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size());

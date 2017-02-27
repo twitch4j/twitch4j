@@ -6,7 +6,7 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
@@ -18,6 +18,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get UserEndpoint
+	 *
+	 * @param client todo
 	 */
 	public UserEndpoint(TwitchClient client) {
 		super(client);
@@ -27,6 +29,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint to get the UserId from the UserName
 	 * <p>
 	 * https://api.twitch.tv/kraken/users?login=USERNAME
+	 *
+	 * @param userName todo
+	 * @return todo
 	 */
 	public Optional<Long> getUserIdByUserName(String userName) {
 		// Validate Arguments
@@ -53,6 +58,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Helper to get the User Object by Name
+	 *
+	 * @param userName todo
+	 * @return todo
 	 */
 	public Optional<User> getUserByUserName(String userName) {
 		// Validate Arguments
@@ -68,14 +76,17 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint to get Privileged User Information
+	 *
+	 * @param credential todo
+	 * @return todo
 	 */
-	public Optional<User> getUser(OAuthCredential OAuthCredential) {
+	public Optional<User> getUser(OAuthCredential credential) {
 		// Validate Arguments
-		Assert.notNull(OAuthCredential, "Please provide Twitch Credentials!");
+		Assert.notNull(credential, "Please provide Twitch Credentials!");
 
 		// Endpoint
 		String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(OAuthCredential);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
 		try {
@@ -90,6 +101,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint to get User Information
+	 *
+	 * @param userId todo
+	 * @return todo
 	 */
 	public Optional<User> getUser(Long userId) {
 		// Validate Arguments
@@ -120,6 +134,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: user_subscriptions
 	 *
 	 * @param userId UserId of the user.
+	 * @return todo
 	 */
 	public List<Emote> getUserEmotes(Long userId) {
 		// Check Scope
@@ -164,7 +179,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: user_subscriptions
 	 *
 	 * @param userId UserId of the user.
-	 * @return Optional<UserSubscriptionCheck> Is only present, when the user is subscribed.
+	 * @return Optional of Type UserSubscriptionCheck. Is only present, when the user is subscribed.
 	 */
 	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(Long userId, Long channelId) {
 		// Endpoint
@@ -201,7 +216,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param offset    Tells the server where to start fetching the next set of results, in a multi-page response.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 * @param sortBy    Sorting key. Valid values: created_at, last_broadcast, login. Default: created_at.
-	 * @return List<Follow> A list of all Follows
+	 * @return List of Type Follow. A list of all Follows
 	 */
 	public List<Follow> getUserFollows(Long userId, Optional<Long> limit, Optional<Long> offset, Optional<String> direction, Optional<String> sortBy) {
 		// Endpoint
@@ -246,7 +261,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param userId    UserID as Long
 	 * @param channelId ChannelID as Long
-	 * @return Optional<Follow> Follow, if user is following.
+	 * @return Optional Follow, if user is following.
 	 */
 	public Optional<Follow> checkUserFollowByChannel(Long userId, Long channelId) {
 		// Endpoint
@@ -281,7 +296,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param credential    Credential
 	 * @param channelId     Channel to follow
 	 * @param notifications Send's email notifications on true.
-	 * @return Optional<Follow> Follow, if user is following.
+	 * @return Optional Follow, if user is following.
 	 */
 	public Boolean followChannel(OAuthCredential credential, Long channelId, Optional<Boolean> notifications) {
 		// Endpoint
@@ -310,7 +325,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param credential Credential
 	 * @param channelId  Channel to follow
-	 * @return Optional<Follow> Follow, if user is following.
+	 * @return Optional Follow, if user is following.
 	 */
 	public Boolean unfollowChannel(OAuthCredential credential, Long channelId) {
 		// Endpoint
@@ -340,6 +355,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param credential Credential to use.
 	 * @param limit      Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: 100.
 	 * @param offset     Tells the server where to start fetching the next set of results, in a multi-page response.
+	 * @return todo
 	 */
 	public List<Block> getUserBlockList(OAuthCredential credential, Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
@@ -372,6 +388,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param credential   Credential
 	 * @param targetUserId UserID of the Target
+	 * @return todo
 	 */
 	public Boolean addBlock(OAuthCredential credential, Long targetUserId) {
 		// Endpoint
@@ -400,6 +417,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param credential   Credential
 	 * @param targetUserId UserID of the Target
+	 * @return todo
 	 */
 	public Boolean deleteBlock(OAuthCredential credential, Long targetUserId) {
 		// Endpoint

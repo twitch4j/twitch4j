@@ -152,7 +152,8 @@ public class IrcClient {
 	}
 
 	/**
-	 * Send message to channel
+	 * Sends a message to a channel.
+	 *
 	 * @param channelName Channel, the message is send to.
 	 * @param message The message to send.
 	 */
@@ -163,12 +164,16 @@ public class IrcClient {
 
 			// Send Message
 			getIrcClient().sendMessage("#" + channelName, message);
+
+			// Logging
+			Logger.debug(this, "Message send to Channel [%s] with content [%s].", channelName, message);
 		}).start();
 	}
 
 	/**
-	 * Send a private message to a user
-	 * @param userName User, you want to send a private message
+	 * Sends a private message to a user.
+	 *
+	 * @param userName The user that should receive your private message.
 	 * @param message The message to send.
 	 */
 	public void sendPrivateMessage(final String userName, final String message) {
@@ -178,13 +183,17 @@ public class IrcClient {
 
 			// Send Private Message [Needs a target channel, but the channel itself doesn't matter - so we use the recipients channel]
 			getIrcClient().sendMessage("#" + userName, String.format("/w %s %s", userName, message));
+
+			// Logging
+			Logger.debug(this, "Private Message send to [%s] with content [%s].", userName, message);
 		}).start();
 	}
 
 	/**
-	 * Purges all chat messages for a user
-	 * @param channelName
-	 * @param userName
+	 * Purges all chat messages for a user.
+	 *
+	 * @param channelName Name of the channel.
+	 * @param userName Name of the user.
 	 */
 	public void purgeChatOfUser(final String channelName, final String userName) {
 		// Send Message
@@ -192,7 +201,9 @@ public class IrcClient {
 	}
 
 	/**
-	 * Method: Check IRC Client Status
+	 * Gets the status of the IRC Client.
+	 *
+	 * @return Whether the service or operating normally or not.
 	 */
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
 		// Get Credentials

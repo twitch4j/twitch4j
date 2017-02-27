@@ -6,7 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,7 +28,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Video
 	 * Gets a specified video object.
 	 * Requires Scope: none
-	 * @param videoId VideoID (int) to retrieve (the “v” prefix is deprecated in the v5 api)
+	 * @param videoId VideoID (int) to retrieve (the *v* prefix is deprecated in the v5 api)
 	 */
 	public Video getVideo(String videoId) {
 		// Endpoint

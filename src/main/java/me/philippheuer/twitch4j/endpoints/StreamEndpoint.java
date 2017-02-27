@@ -6,7 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.annotation.Unofficial;
 import org.springframework.web.client.RestTemplate;
@@ -32,7 +32,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param channel Get stream object of Channel Entity
-	 * @return Optional<Stream> is only Present if Stream is Online, returns Optional.empty for Offline streams
+	 * @return Optional of type Stream is only Present if Stream is Online, returns Optional.empty for Offline streams
 	 */
 	public Optional<Stream> getByChannel(Channel channel) {
 		// Endpoint
@@ -70,6 +70,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * @param game        Restricts the returned streams to the specified game.
 	 * @param channelIds  Receives the streams from a comma-separated list of channel IDs.
 	 * @param stream_type Restricts the returned streams to a certain stream type. Valid values: live, playlist, all. Playlists are offline streams of VODs (Video on Demand) that appear live. Default: live.
+	 * @return todo
 	 */
 	public List<Stream> getAll(Optional<Long> limit, Optional<Long> offset, Optional<String> language, Optional<Game> game, Optional<String> channelIds, Optional<String> stream_type) {
 		// Endpoint
@@ -101,6 +102,9 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Followed Streams
 	 * Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
+	 *
+	 * @param credential todo
+	 * @return todo
 	 */
 	public List<Stream> getFollowed(OAuthCredential credential) {
 		// Endpoint
@@ -154,6 +158,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param game Restricts the summary stats to the specified game.
+	 * @return todo
 	 */
 	public StreamSummary getSummary(Optional<Game> game) {
 		// Endpoint

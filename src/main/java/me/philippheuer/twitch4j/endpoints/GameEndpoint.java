@@ -15,6 +15,8 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param client todo
 	 */
 	public GameEndpoint(TwitchClient client) {
 		super(client);
@@ -24,6 +26,8 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Top Games
 	 * Get games by number of current viewers on Twitch.
 	 * Requires Scope: none
+	 *
+	 * @return todo
 	 */
 	public List<TopGame> getTopGames() {
 		// Endpoint

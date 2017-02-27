@@ -20,6 +20,8 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Twitch Messaging Interface (TMI)
+	 *
+	 * @param client todo
 	 */
 	public TMIEndpoint(TwitchClient client) {
 		super(client);
@@ -31,6 +33,7 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param channelName Channel to fetch the information for.
+	 * @return todo
 	 */
 	public Chatter getChatters(String channelName) {
 		// Endpoint

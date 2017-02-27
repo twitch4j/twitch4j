@@ -4,18 +4,15 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Token;
-import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.*;
-import me.philippheuer.twitch4j.helper.WebsiteUtils;
+import me.philippheuer.util.desktop.WebsiteUtils;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter

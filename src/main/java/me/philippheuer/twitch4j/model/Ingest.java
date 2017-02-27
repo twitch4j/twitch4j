@@ -8,6 +8,17 @@ import lombok.Data;
 
 import java.util.Date;
 
+/**
+ * Model representing a twitch ingest server.
+ * <p>
+ * The Twitch ingesting system is the first stop for a broadcast stream.
+ * An ingest server receives your stream, and the ingesting system
+ * authorizes and registers streams, then prepares them for viewers.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)

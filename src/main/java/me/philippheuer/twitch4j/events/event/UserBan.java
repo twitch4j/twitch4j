@@ -8,6 +8,13 @@ import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
+/**
+ * This event gets called when a user gets banned.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter
@@ -30,10 +37,10 @@ public class UserBan extends Event {
 	private final String reason;
 
 	/**
-	 * Constructor
+	 * Event Constructor
 	 *
-	 * @param channel Channel
-	 * @param user    Target User
+	 * @param channel The channel that this event originates from.
+	 * @param user    The user who triggered the event.
 	 * @param reason  Reason for Ban.
 	 */
 	public UserBan(Channel channel, User user, String reason) {

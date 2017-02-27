@@ -15,6 +15,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Manages event listeners and event logic.
+ *
+ * @author Austin [https://github.com/austinv11]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class EventDispatcher {
@@ -29,8 +36,16 @@ public class EventDispatcher {
 		return thread;
 	});
 
+	/**
+	 * Holds the TwitchClient Instance
+	 */
 	private TwitchClient client;
 
+	/**
+	 * Class Constructor
+	 *
+	 * @param client The Twitch4J Client.
+	 */
 	public EventDispatcher(TwitchClient client) {
 		setClient(client);
 	}
@@ -63,6 +78,13 @@ public class EventDispatcher {
 		registerListener(listener, false);
 	}
 
+	/**
+	 * Registers a single event listener.
+	 *
+	 * @param listenerClass The class of the listener.
+	 * @param listener The listener.
+	 * @param isTemporary Whether the listener is temporary or not.
+	 */
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void registerListener(Class<?> listenerClass, Object listener, boolean isTemporary) {
 		if (IListener.class.isAssignableFrom(listenerClass)) {
@@ -92,6 +114,12 @@ public class EventDispatcher {
 		}
 	}
 
+	/**
+	 * Registers a single event listener.
+	 *
+	 * @param listener The listener.
+	 * @param isTemporary Whether the listener is temporary or not.
+	 */
 	private <T extends Event> void registerListener(IListener<T> listener, boolean isTemporary) {
 		Class<?> rawType = TypeResolver.resolveRawArgument(IListener.class, listener.getClass());
 		if (Event.class.isAssignableFrom(rawType)) {
@@ -127,6 +155,7 @@ public class EventDispatcher {
 	 * This registers a temporary single event listener.
 	 * Meaning that when it listens to an event, it immediately unregisters itself.
 	 *
+	 * @param <T> Type of the temporary event.
 	 * @param listener The listener.
 	 */
 	public <T extends Event> void registerTemporaryListener(IListener<T> listener) {
@@ -245,7 +274,8 @@ public class EventDispatcher {
 							if (l.isTemporary)
 								unregisterListener(l.listener);
 						} catch (ClassCastException e) {
-							//FIXME: This occurs when a lambda expression is used to create an IListener leading it to be registered under the type 'Event'. This is due to a bug in TypeTools: https://github.com/jhalterman/typetools/issues/14
+							// FIXME: This occurs when a lambda expression is used to create an IListener leading it to be registered under the type 'Event'.
+							// FIXME: This is due to a bug in TypeTools: https://github.com/jhalterman/typetools/issues/14
 						} catch (Exception ex) {
 							Logger.error(this, "Unhandled exception caught dispatching event %s [%s]", event.getClass().getSimpleName(), ex.getMessage());
 						}
@@ -271,6 +301,12 @@ public class EventDispatcher {
 		 */
 		public final V listener;
 
+		/**
+		 * Class Constructor
+		 *
+		 * @param isTemporary Whether the listener is temporary or not.
+		 * @param listener The listener.
+		 */
 		private ListenerPair(boolean isTemporary, V listener) {
 			this.isTemporary = isTemporary;
 			this.listener = listener;

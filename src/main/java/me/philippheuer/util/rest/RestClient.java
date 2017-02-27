@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.helper;
+package me.philippheuer.util.rest;
 
 import lombok.Getter;
 import lombok.Setter;

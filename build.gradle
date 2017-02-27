@@ -6,22 +6,13 @@
  * user guide available at https://docs.gradle.org/3.3/userguide/tutorial_java_projects.html
  */
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
-        classpath("io.ratpack:ratpack-gradle:1.4.4")
-    }
-}
-
 // Apply the java plugin to add support for Java
-apply plugin: "java"
-apply plugin: "eclipse"
-apply plugin: "idea"
-apply plugin: "org.springframework.boot"
-apply plugin: "io.ratpack.ratpack-groovy"
+plugins {
+	id 'java'
+	id 'eclipse'
+	id 'idea'
+	id 'io.ratpack.ratpack-java' version '1.4.5'
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -31,6 +22,9 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+// Doesn't matter, only so that spring doesn't fail
+mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
 // Method, that gets the total amount of commits in the repository (as build number)
 def gitVersion() {
@@ -43,21 +37,20 @@ def gitVersion() {
 // Dependencies
 dependencies {
 	// Logging
-    compile("ch.qos.logback:logback-classic:1.1.8")
+    compile("ch.qos.logback:logback-classic:1.2.1")
     compile("com.jcabi:jcabi-log:0.17.2")
 
-    // Spring Boot
-    compile("org.springframework.boot:spring-boot-starter")
-    compile("org.springframework:spring-web")
+    // Spring (RestTemplate)
+    compile("org.springframework:spring-web:4.3.6.RELEASE")
 
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
 
     // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-    compile('org.kitteh.irc:client-lib:3.0.1');
+    compile('org.kitteh.irc:client-lib:3.0.2');
 
     // JSON / YAML
-    compile("com.fasterxml.jackson.core:jackson-databind:2.8.6")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.8.7")
 
 	// Bucket for rate-limiting
 	compile("org.isomorphism:token-bucket:1.7")
@@ -73,4 +66,42 @@ dependencies {
 
     // Getter & Setter
     compileOnly("org.projectlombok:lombok:1.16.14")
+}
+
+// Disable Gradle Caching
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+/**
+ * Sources - build a jar with source files
+ */
+task sourcesJar(type: Jar) {
+	from sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
+/**
+ * JavaDocs Generation
+ */
+javadoc {
+	source = sourceSets.main.allJava
+	classpath = sourceSets.main.compileClasspath
+
+	// if not changed the destinationDir, the javadoc for production code is overridden.
+	destinationDir = file("${buildDir}/../docs/javadoc")
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+/**
+ * Artifacts
+ */
+artifacts {
+	archives sourcesJar
+	archives javadocJar
 }

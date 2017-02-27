@@ -7,6 +7,13 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 
+/**
+ * This event gets called when the user starts hosting someone.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Data
 @Getter
 @Setter
@@ -24,10 +31,14 @@ public class HostOnEvent extends Event {
 	private final Channel targetChannel;
 
 	/**
-	 * Constructor
+	 * Event Constructor
+	 *
+	 * @param channel       The channel that this event originates from.
+	 * @param targetChannel The channel that was hosted.
 	 */
 	public HostOnEvent(Channel channel, Channel targetChannel) {
 		this.channel = channel;
 		this.targetChannel = targetChannel;
 	}
+
 }

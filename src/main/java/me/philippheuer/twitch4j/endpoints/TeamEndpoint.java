@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.RestError;
 import me.philippheuer.twitch4j.model.Team;
 import me.philippheuer.twitch4j.model.TeamList;
@@ -20,6 +20,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param client todo
 	 */
 	public TeamEndpoint(TwitchClient client) {
 		super(client);
@@ -32,6 +34,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param offset Object offset for pagination. Default is 0.
+	 * @return todo
 	 */
 	public List<Team> getTeams(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
@@ -63,7 +66,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param teamName Name of the Team.
-	 * @return Optional<Team>, is only present - if the team exists.
+	 * @return Optional of type Team, is only present - if the team exists.
 	 */
 	public Optional<Team> getTeam(String teamName) {
 		// Endpoint
@@ -90,4 +93,5 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 
 		throw new RuntimeException("Unhandled Exception!");
 	}
+
 }

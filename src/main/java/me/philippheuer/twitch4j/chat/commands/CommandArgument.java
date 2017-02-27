@@ -39,10 +39,11 @@ public class CommandArgument {
 
 	/**
 	 * Constructor
-	 * @param argumentName
-	 * @param argumentAlias
-	 * @param argumentValidationType
-	 * @param help
+	 *
+	 * @param argumentName           Name of the argument
+	 * @param argumentAlias          Aliases of the argument
+	 * @param argumentValidationType Validation type for the argument input data
+	 * @param help                   help text for the argument
 	 */
 	public CommandArgument(String argumentName, String argumentAlias, String argumentValidationType, String help) {
 		super();

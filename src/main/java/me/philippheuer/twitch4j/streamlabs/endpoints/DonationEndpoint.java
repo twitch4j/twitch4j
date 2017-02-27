@@ -6,8 +6,8 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.CurrencyNotSupportedException;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.LoggingRequestInterceptor;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.LoggingRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import me.philippheuer.twitch4j.streamlabs.model.DonationCreate;
@@ -31,6 +31,9 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 
 	/**
 	 * Stream Labs - Authenticated Endpoint
+	 *
+	 * @param streamlabsClient todo
+	 * @param credential todo
 	 */
 	public DonationEndpoint(StreamlabsClient streamlabsClient, OAuthCredential credential) {
 		super(streamlabsClient);
@@ -45,6 +48,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 	 *
 	 * @param currency Donations are returned in target currency (absense: original currency) [List of valid currencies: https://twitchalerts.readme.io/v1.0/docs/currency-codes]
 	 * @param limit    Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @return List of Donations
 	 */
 	public List<Donation> getDonations(Optional<Currency> currency, Optional<Integer> limit) {
 		// Validate Parameters

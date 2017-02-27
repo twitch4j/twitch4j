@@ -46,5 +46,8 @@ local.properties
 config/*
 client.log
 
+# JavaDoc
+/docs/javadoc/*
+
 # Example Code
 /src/main/java/me/philippheuer/twitch4j/example/*

@@ -6,7 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.helper.QueryRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.Community;
 import me.philippheuer.twitch4j.model.CommunityCreate;
 import me.philippheuer.twitch4j.model.CommunityList;
@@ -25,6 +25,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param client todo
 	 */
 	public CommunityEndpoint(TwitchClient client) {
 		super(client);
@@ -36,6 +38,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param name The name of the community is specified in a required query-string parameter. It must be 3-25 characters.
+	 * @return todo
 	 */
 	public Community getCommunityByName(String name) {
 		// Endpoint
@@ -65,6 +68,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param id The guid of the community. (e9f17055-810f-4736-ba40-fba4ac541caa)
+	 * @return todo
 	 */
 	public Community getCommunityById(String id) {
 		// Endpoint
@@ -93,7 +97,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
 	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
-	 * @param description Long description of the community, shown in the “about this community” box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
+	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
 	 * @return ID (String) of the created community
 	 */
@@ -132,10 +136,9 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param id          Id of the community, which will be updated.
 	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
-	 * @param description Long description of the community, shown in the “about this community” box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
+	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
 	 * @param email       Email address of the community owner.
-	 * @return ID (String) of the created community
 	 */
 	public void updateCommunity(OAuthCredential credential, String id, Optional<String> name, Optional<String> summary, Optional<String> description, Optional<String> rules, Optional<String> email) {
 		// Endpoint
@@ -168,6 +171,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param cursor Tells the server where to start fetching the next set of results in a multi-page response.
+	 * @return todo
 	 */
 	public CommunityList getTopCommunities(Optional<Long> limit, Optional<String> cursor) {
 		// Endpoint
@@ -198,6 +202,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
+	 * @return todo
 	 */
 	public List<Community> getTopCommunities(Optional<Long> limit) {
 		if(limit.isPresent()) {
@@ -245,6 +250,12 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	// Add Community Timed-Out User
 	// Delete Community Timed-Out User
 
+	/**
+	 * Validates community names against the twitch name limitations.
+	 *
+	 * @param name Community name to validate.
+	 * @return Boolean, true if valid. False, if violation of the twitch policies.
+	 */
 	private Boolean validateCommunityName(String name) {
 		Pattern pattern = Pattern.compile("[A-Za-z\\-\\.\\_\\~]{3,25}");
 

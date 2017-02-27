@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.enums;
+package me.philippheuer.twitch4j.chat.commands;
 
 public enum CommandPermission {
 	EVERYONE,
