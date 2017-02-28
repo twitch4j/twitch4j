@@ -42,6 +42,7 @@ dependencies {
 
     // Spring (RestTemplate)
     compile("org.springframework:spring-web:4.3.6.RELEASE")
+	compile("org.springframework.social:spring-social-core:1.1.4.RELEASE")
 
     // WebSocket Client for Twitch PubSub
     compile('com.neovisionaries:nv-websocket-client:1.31')
