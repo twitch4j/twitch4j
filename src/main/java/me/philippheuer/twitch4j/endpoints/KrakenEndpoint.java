@@ -14,12 +14,12 @@ import org.springframework.web.client.RestTemplate;
 public class KrakenEndpoint extends AbstractTwitchEndpoint {
 
 	/**
-	 * Constructor - by ChannelId
+	 * Class Constructor
 	 *
-	 * @param client todo
+	 * @param twitchClient The TwitchClient.
 	 */
-	public KrakenEndpoint(TwitchClient client) {
-		super(client);
+	public KrakenEndpoint(TwitchClient twitchClient) {
+		super(twitchClient);
 	}
 
 	/**
@@ -27,7 +27,9 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	 * Gets information about the provided oAuthToken
 	 * Requires Scope: none
 	 *
-	 * @return todo
+	 * @param credential The credential the information should be fetched for.
+	 * @return Information about the user, that issued the token - also provides info about scopes/valid/etc.
+	 * @see Token
 	 */
 	public Token getToken(OAuthCredential credential) {
 		// Endpoint

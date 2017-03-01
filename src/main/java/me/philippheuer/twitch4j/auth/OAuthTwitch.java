@@ -30,7 +30,9 @@ public class OAuthTwitch {
 	public static String REDIRECT_KEY = "oauth_authorize_twitch";
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param credentialManager The Credential Manager.
 	 */
 	protected OAuthTwitch(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
@@ -90,7 +92,7 @@ public class OAuthTwitch {
 	/**
 	 * Handle Authentication Response
 	 *
-	 * @param authenticationCode
+	 * @param authenticationCode The oauth token that will be used to access the api.
 	 * @return OAuthCredential
 	 */
 	public OAuthCredential handleAuthenticationCodeResponseTwitch(String authenticationCode) {

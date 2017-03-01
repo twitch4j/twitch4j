@@ -17,12 +17,12 @@ import java.util.Optional;
 public class SearchEndpoint extends AbstractTwitchEndpoint {
 
 	/**
-	 * Get User by UserId
+	 * Search Endpoint
 	 *
-	 * @param client todo
+	 * @param twitchClient The TwitchClient.
 	 */
-	public SearchEndpoint(TwitchClient client) {
-		super(client);
+	public SearchEndpoint(TwitchClient twitchClient) {
+		super(twitchClient);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
-	 * @return todo
+	 * @return A list of Channels matching the query.
 	 */
 	public List<Channel> getChannels(String query, Optional<Long> limit) {
 		// Endpoint
@@ -63,7 +63,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param query search query
-	 * @return todo
+	 * @param live Whether only games that are live should be returned. This argument is optional.
+	 * @return A list of games matching the query.
 	 */
 	public List<Game> getGames(String query, Optional<Boolean> live) {
 		// Endpoint
@@ -95,7 +96,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param query search query
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
-	 * @return todo
+	 * @return A list of Streams matching the query.
 	 */
 	public List<Stream> getStreams(String query, Optional<Long> limit) {
 		// Endpoint

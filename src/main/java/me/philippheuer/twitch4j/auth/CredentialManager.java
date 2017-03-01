@@ -35,7 +35,6 @@ public class CredentialManager {
 
 	/**
 	 * Static key for the primary irc credential. This account will be used as sender for all chat messages.
-	 * @see me.philippheuer.twitch4j.chat.IrcClient
 	 */
 	public static String CREDENTIAL_IRC = "IRC";
 
@@ -92,7 +91,7 @@ public class CredentialManager {
 	private File credentialFile;
 
 	/**
-	 * Constructor
+	 * Class Constructor
 	 */
 	public CredentialManager() {
 		super();
@@ -100,14 +99,20 @@ public class CredentialManager {
 	}
 
 	/**
+	 * Provides the CredentialManager with the Twitch Context.
 	 *
-	 * @param twitchClient
+	 * @param twitchClient The TwitchClient.
 	 */
 	public void provideTwitchClient(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
 		setOAuthTwitch(new OAuthTwitch(this));
 	}
 
+	/**
+	 * Provides the CredentialManager with the Streamlabs Context.
+	 *
+	 * @param streamlabsClient The Streamlabs Client.
+	 */
 	public void provideStreamlabsClient(StreamlabsClient streamlabsClient) {
 		setStreamlabsClient(streamlabsClient);
 		setOAuthStreamlabs(new OAuthStreamlabs(this));
@@ -188,6 +193,7 @@ public class CredentialManager {
 	/**
 	 * Get Twitch credentials by custom identifier
 	 *
+	 * @param customKey The key, the credential was stored with.
 	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getTwitchCredentialsForCustomKey(String customKey) {
@@ -207,6 +213,7 @@ public class CredentialManager {
 	/**
 	 * Get Streamlabs credential by customKey
 	 *
+	 * @param customKey The key, the credential was stored with.
 	 * @return Optional OAuthCredential credential with oauth token and access scope.
 	 */
 	public Optional<OAuthCredential> getStreamlabsCredentialsForCustomKey(String customKey) {
@@ -228,7 +235,7 @@ public class CredentialManager {
 	}
 
 	/**
-	 * Initalizes the Configuration (creates the files)
+	 * Initializes the Configuration (creates the files)
 	 */
 	public void initializeConfiguration() {
 		// Ensure that the file exists
@@ -244,7 +251,7 @@ public class CredentialManager {
 		loadFromFile();
 	}
 
-	public void saveToFile() {
+	private void saveToFile() {
 		if (getCredentialFile() != null) {
 			try {
 				ObjectMapper mapper = new ObjectMapper();
@@ -258,7 +265,7 @@ public class CredentialManager {
 		}
 	}
 
-	public void loadFromFile() {
+	private void loadFromFile() {
 		if (getCredentialFile() != null) {
 			// Clear present credentials
 			getOAuthCredentials().clear();

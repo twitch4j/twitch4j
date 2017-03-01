@@ -31,7 +31,9 @@ public class OAuthStreamlabs {
 	public static String REDIRECT_KEY = "oauth_authorize_streamlabs";
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param credentialManager The Credential Manager.
 	 */
 	public OAuthStreamlabs(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
@@ -91,7 +93,7 @@ public class OAuthStreamlabs {
 	/**
 	 * Handle Authentication Response
 	 *
-	 * @param authenticationCode
+	 * @param authenticationCode The oauth token that will be used to access the api.
 	 * @return OAuthCredential
 	 */
 	public OAuthCredential handleAuthenticationCodeResponseStreamlabs(String authenticationCode) {

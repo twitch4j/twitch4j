@@ -29,7 +29,9 @@ public class OAuthCredential {
 	private String displayName;
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param oAuthToken The OAuthToken for a user.
 	 */
 	public OAuthCredential(String oAuthToken) {
 		setOAuthToken(oAuthToken);

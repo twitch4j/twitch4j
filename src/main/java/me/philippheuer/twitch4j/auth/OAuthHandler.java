@@ -31,15 +31,19 @@ public class OAuthHandler {
 	private Integer localPort = 7090;
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param credentialManager The Credential Manager.
 	 */
 	public OAuthHandler(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
-		initalize();
+		initialize();
 	}
 
 	/**
 	 * Get server base address for redirect urls
+	 *
+	 * @return The address of the local web server used for auth handling.
 	 */
 	public String getServerBaseAddress() {
 		return String.format("http://127.0.0.1:%s", getLocalPort().toString());
@@ -48,7 +52,7 @@ public class OAuthHandler {
 	/**
 	 * Start Listener
 	 */
-	public void initalize() {
+	public void initialize() {
 		try {
 			ratpackServer = RatpackServer.of(s -> s
 					.serverConfig(c -> c

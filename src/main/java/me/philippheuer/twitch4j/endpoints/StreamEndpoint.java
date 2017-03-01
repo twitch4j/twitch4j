@@ -6,9 +6,9 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.annotation.Unofficial;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -21,9 +21,11 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Stream Endpoint
+	 *
+	 * @param twitchClient The Twitch Client.
 	 */
-	public StreamEndpoint(TwitchClient client) {
-		super(client);
+	public StreamEndpoint(TwitchClient twitchClient) {
+		super(twitchClient);
 	}
 
 	/**
@@ -70,7 +72,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * @param game        Restricts the returned streams to the specified game.
 	 * @param channelIds  Receives the streams from a comma-separated list of channel IDs.
 	 * @param stream_type Restricts the returned streams to a certain stream type. Valid values: live, playlist, all. Playlists are offline streams of VODs (Video on Demand) that appear live. Default: live.
-	 * @return todo
+	 * @return Returns all streams that match with the provided filtering.
 	 */
 	public List<Stream> getAll(Optional<Long> limit, Optional<Long> offset, Optional<String> language, Optional<Game> game, Optional<String> channelIds, Optional<String> stream_type) {
 		// Endpoint
@@ -103,8 +105,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
 	 *
-	 * @param credential todo
-	 * @return todo
+	 * @param credential The user.
+	 * @return All streams as user follows.
 	 */
 	public List<Stream> getFollowed(OAuthCredential credential) {
 		// Endpoint
@@ -130,6 +132,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param offset Object offset for pagination of results. Default: 0.
+	 * @return The requested range/amount of featured streams.
 	 */
 	public List<StreamFeatured> getFeatured(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
@@ -158,7 +161,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param game Restricts the summary stats to the specified game.
-	 * @return todo
+	 * @return A <code>StreamSummary</code> object, that contains the total number of live streams and viewers.
 	 */
 	public StreamSummary getSummary(Optional<Game> game) {
 		// Endpoint
@@ -188,8 +191,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Gets a list of recommended streams for a user.
 	 * Requires Scope: none
 	 *
-	 * @param credential OAuthCredential of the user, you want to request recommendations for
-	 * @return StreamList of random Streams
+	 * @param credential OAuthCredential of the user, you want to request recommendations for.
+	 * @return StreamList of random Streams.
 	 */
 	@Unofficial
 	public List<Recommendation> getRecommendations(OAuthCredential credential) {
