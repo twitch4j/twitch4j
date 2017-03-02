@@ -1,17 +1,18 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import junit.framework.TestCase;
-import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.tmi.Chatter;
-import me.philippheuer.twitch4j.test.TwitchClientTestCase;
+import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
+import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * These tests check the unofficial tmi endpoints.
  */
-public class TMIEndpointTest extends TwitchClientTestCase {
+@Category(IntegrationTestCategory.class)
+public class TMIEndpointIntegrationTest extends TwitchClientIntegrationTest {
 
 	/**
 	 * Test the getChatters Method

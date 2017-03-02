@@ -1,11 +1,14 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import me.philippheuer.twitch4j.test.TwitchClientTestCase;
+import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
+import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Optional;
 
-public class UserEndpointTest extends TwitchClientTestCase {
+@Category(IntegrationTestCategory.class)
+public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 
 	/**
 	 * Test the Get UserId by Name Method
