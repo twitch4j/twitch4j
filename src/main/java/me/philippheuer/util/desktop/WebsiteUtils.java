@@ -3,8 +3,20 @@ package me.philippheuer.util.desktop;
 import java.awt.*;
 import java.net.URI;
 
+/**
+ * Website Utils
+ *
+ * @author Philipp Heuer
+ * @version %I%, %G%
+ * @since 1.0
+ */
 public class WebsiteUtils {
 
+	/**
+	 * Opens the specified url in the default webbrowser.
+	 *
+	 * @param uri The uri, that will be opened.
+	 */
 	public static void openWebpage(String uri) {
 		try {
 			Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;

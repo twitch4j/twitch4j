@@ -70,11 +70,13 @@ public enum TwitchScopes {
 	 */
 	CHAT_LOGIN("chat_login");
 
-
+	/**
+	 * Scope Key
+	 */
 	private String key;
 
 	/**
-	 * Constructor
+	 * Class Constructor
 	 *
 	 * @param key
 	 */
@@ -99,25 +101,29 @@ public enum TwitchScopes {
 	}
 
 	/**
-	 * Convert the string representation of the Scope to the Enum.
+	 * Gets the enum from the string representation of the scope.
 	 *
 	 * @param text Text representation of Enum value
 	 * @return Enum value that the text represents
 	 */
 	public static TwitchScopes fromString(String text) {
-		if (text == null) return null;
+		if (text == null) {
+			return null;
+		}
+
 		for (TwitchScopes b : TwitchScopes.values()) {
 			if (text.equalsIgnoreCase(b.key)) {
 				return b;
 			}
 		}
+
 		return null;
 	}
 
 	/**
-	 * Get the identifier that twitch will recognize.
+	 * Get the identifier that oauth will recognize.
 	 *
-	 * @return A <code>String</code> identifier
+	 * @return A <code>String</code> identifier of the scope.
 	 */
 	public String getKey() {
 		return key;

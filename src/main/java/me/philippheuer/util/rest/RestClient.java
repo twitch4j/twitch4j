@@ -9,17 +9,24 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Rest Client Wrapper
+ *
+ * @author Philipp Heuer
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class RestClient {
 
 	/**
-	 * REST Request Interceptors (adding header-values to requests)
+	 * REST Request Interceptors (adding header-values/query parameters/... to requests)
 	 */
 	private List<ClientHttpRequestInterceptor> restInterceptors;
 
 	/**
-	 * Constructor
+	 * Class Constructor
 	 */
 	public RestClient() {
 		super();
@@ -27,10 +34,22 @@ public class RestClient {
 		setRestInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
 	}
 
+	/**
+	 * Adds a interceptor to the Rest Template.
+	 *
+	 * @param interceptor Interceptor, that will be executed prior to the rest request.
+	 * @see HeaderRequestInterceptor
+	 * @see QueryRequestInterceptor
+	 */
 	public void putRestInterceptor(ClientHttpRequestInterceptor interceptor) {
 		restInterceptors.add(interceptor);
 	}
 
+	/**
+	 * Gets a Rest Template.
+	 *
+	 * @return A RestTemplate for rest requests.
+	 */
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -45,8 +64,10 @@ public class RestClient {
 	}
 
 	/**
-	 * @param OAuthCredential
-	 * @return
+	 * Gets a Rest Template with authorization.
+	 *
+	 * @param OAuthCredential Credential, to add authentication headers to the rest template.
+	 * @return A RestTemplate for rest requests.
 	 */
 	public RestTemplate getPrivilegedRestTemplate(OAuthCredential OAuthCredential) {
 		// Get Rest Template
@@ -58,6 +79,11 @@ public class RestClient {
 		return restTemplate;
 	}
 
+	/**
+	 * Gets a Rest Template without any interceptors.
+	 *
+	 * @return A RestTemplate for rest requests.
+	 */
 	public RestTemplate getPlainRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new RestErrorHandler());

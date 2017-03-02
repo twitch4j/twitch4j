@@ -6,8 +6,8 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
@@ -178,7 +178,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Checks if a specified user is subscribed to a specified channel.
 	 * Requires Scope: user_subscriptions
 	 *
-	 * @param userId UserId of the user.
+	 * @param userId    UserId of the user.
+	 * @param channelId ChannelId of the channel you are checking against.
 	 * @return Optional of Type UserSubscriptionCheck. Is only present, when the user is subscribed.
 	 */
 	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(Long userId, Long channelId) {

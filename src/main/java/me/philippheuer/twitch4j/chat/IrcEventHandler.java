@@ -38,31 +38,30 @@ public class IrcEventHandler {
 	 * Holds the API Instance
 	 */
 	private TwitchClient twitchClient;
-	/**
-	 * Holds the API Instance
-	 */
-	private IrcClient ircClient;
 
 	/**
-	 * Constructor
+	 * Class Constructor
+	 *
+	 * @param twitchClient Twitch Client.
 	 */
-	public IrcEventHandler(TwitchClient twitchClient, IrcClient ircClient) {
+	public IrcEventHandler(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
-		setIrcClient(ircClient);
 	}
 
 	/**
 	 * Event: onClientReceiveCommand
 	 * Gets executed on NOTICE, USERNOTICE and simelar events.
+	 *
+	 * @param event ClientReceiveServerMessageEventBase provided by the irc library.
 	 */
 	@Handler(priority = Integer.MAX_VALUE)
-	public void onClientReceiveCommand(ClientReceiveServerMessageEventBase event) {
+	protected void onClientReceiveCommand(ClientReceiveServerMessageEventBase event) {
 		/**
 		 * About once every five minutes, you will receive a PING :tmi.twitch.tv from the server, in order to
 		 * ensure that your connection to the server is not prematurely terminated, you should reply with PONG :tmi.twitch.tv.
 		 */
 		if (event.getOriginalMessage().contains("PING :tmi.twitch.tv")) {
-			getIrcClient().getIrcClient().sendRawLine("PONG :tmi.twitch.tv");
+			event.getClient().sendRawLine("PONG :tmi.twitch.tv");
 
 			Logger.debug(this, "Responded to PING from Twitch IRC.");
 		}
@@ -277,9 +276,11 @@ public class IrcEventHandler {
 	/**
 	 * Event: onMessage
 	 * Gets executed on ChannelMessageEvent
+	 *
+	 * @param event The {@link org.kitteh.irc.client.library.event.channel.ChannelMessageEvent} provided by the irc library.
 	 */
 	@Handler(priority = Integer.MAX_VALUE)
-	public void onMessageEvent(org.kitteh.irc.client.library.event.channel.ChannelMessageEvent event) {
+	protected void onMessageEvent(org.kitteh.irc.client.library.event.channel.ChannelMessageEvent event) {
 		String channelName = event.getChannel().getName().replace("#", "");
 		String userName = event.getActor().getNick();
 		String userMessage = event.getMessage();

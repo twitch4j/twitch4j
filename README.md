@@ -28,6 +28,7 @@ This API aims to retrieve all twitch relation information from the Twitch REST A
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
 
 ## Quick Start
+
 #### Gradle
 Add it to your build.gradle with:
 ```gradle

@@ -20,10 +20,22 @@ import java.io.IOException;
  */
 public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 
+	/**
+	 * Name of the query parameter.
+	 */
 	private final String name;
 
+	/**
+	 * Value of the query parameter.
+	 */
 	private final String value;
 
+	/**
+	 * Class Constructor
+	 *
+	 * @param name Name of the query parameter to add.
+	 * @param value Value of the query parameter to add.
+	 */
 	public QueryRequestInterceptor(String name, String value) {
 		this.name = name;
 		this.value = value;
@@ -33,7 +45,7 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestDecorator httpRequest = new HttpRequestDecorator(request);
 
-		if (value != null) {
+		if(name != null && value != null) {
 			httpRequest.addParameter(name, value);
 		}
 

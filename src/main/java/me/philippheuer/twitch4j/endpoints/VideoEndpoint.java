@@ -19,16 +19,20 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
+	 *
+	 * @param twitchClient The Twitch Client.
 	 */
-	public VideoEndpoint(TwitchClient client) {
-		super(client);
+	public VideoEndpoint(TwitchClient twitchClient) {
+		super(twitchClient);
 	}
 
 	/**
 	 * Endpoint: Get Video
 	 * Gets a specified video object.
 	 * Requires Scope: none
+	 *
 	 * @param videoId VideoID (int) to retrieve (the *v* prefix is deprecated in the v5 api)
+	 * @return Returns a single video object.
 	 */
 	public Video getVideo(String videoId) {
 		// Endpoint
@@ -57,6 +61,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * @param game Constrains videos by game. A game name can be retrieved using the Search Games endpoint.
 	 * @param period Specifies the window of time to search. Valid values: week, month, all. Default: week
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight. (comma-separated list)
+	 * @return Returns all top videos matching the query parameters.
 	 */
 	public List<Video> getTopVideos(Optional<Game> game, Optional<String> period, Optional<String> broadcast_type) {
 		// Endpoint
@@ -88,7 +93,10 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Followed Videos
 	 * Gets the videos from channels the user is following based on the OAuth token provided.
 	 * Requires Scope: user_read
+	 *
+	 * @param oAuthCredential The user.
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight. (comma-separated list)
+	 * @return Gets the videos from channels the user is following based on the OAuth token provided.
 	 */
 	public List<Video> getFollowedVideos(OAuthCredential oAuthCredential, Optional<String> broadcast_type) {
 		// Endpoint
