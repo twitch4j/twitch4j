@@ -37,39 +37,42 @@ def gitVersion() {
 // Dependencies
 dependencies {
 	// Logging
-    compile("ch.qos.logback:logback-classic:1.2.1")
-    compile("com.jcabi:jcabi-log:0.17.2")
+	compile('ch.qos.logback:logback-classic:1.2.1')
+	compile('com.jcabi:jcabi-log:0.17.2')
 
-    // Spring (RestTemplate)
-    compile("org.springframework:spring-web:4.3.6.RELEASE")
-	compile("org.springframework.social:spring-social-core:1.1.4.RELEASE")
+	// Spring (RestTemplate)
+	compile('org.springframework:spring-web:4.3.6.RELEASE')
+	compile('org.springframework.social:spring-social-core:1.1.4.RELEASE')
 
-    // WebSocket Client for Twitch PubSub
-    compile('com.neovisionaries:nv-websocket-client:1.31')
+	// WebSocket Client for Twitch PubSub
+	compile('com.neovisionaries:nv-websocket-client:1.31')
 
-    // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-    compile('org.kitteh.irc:client-lib:3.0.2');
+	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
+	compile('org.kitteh.irc:client-lib:3.0.2');
 
 	// Apache Commons IO
 	compile('commons-io:commons-io:2.5')
 
-    // JSON / YAML
-    compile("com.fasterxml.jackson.core:jackson-databind:2.8.7")
+	// JSON / YAML
+	compile('com.fasterxml.jackson.core:jackson-databind:2.8.7')
 
 	// Bucket for rate-limiting
-	compile("org.isomorphism:token-bucket:1.7")
+	compile('org.isomorphism:token-bucket:1.7')
 
-    // Expiring Map
-    compile("net.jodah:expiringmap:0.5.7")
+	// Expiring Map
+	compile('net.jodah:expiringmap:0.5.7')
 
-    // TypeTools
-    compile("net.jodah:typetools:0.4.8")
+	// TypeTools
+	compile('net.jodah:typetools:0.4.8')
 
 	// Args4J - CommandLineArgumentParser
-	compile("args4j:args4j:2.33")
+	compile('args4j:args4j:2.33')
 
-    // Getter & Setter
-    compileOnly("org.projectlombok:lombok:1.16.14")
+	// Getter & Setter
+	compileOnly('org.projectlombok:lombok:1.16.14')
+
+	// Testing
+	testCompile('junit:junit:4.12')
 }
 
 // Disable Gradle Caching
