@@ -20,7 +20,7 @@ public class TMIEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	@Test
 	public void testGetChatters() {
 		// Request
-		Chatter chatter = twitchClient.getTMIEndpoint().getChatters("twitch4j");
+		Chatter chatter = twitchClient.getTMIEndpoint().getChatters(USER_NAME);
 
 		// Result
 		assertNotNull(chatter);

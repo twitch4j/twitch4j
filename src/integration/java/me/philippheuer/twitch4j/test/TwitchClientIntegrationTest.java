@@ -14,6 +14,16 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 	public static TwitchClient twitchClient;
 
 	/**
+	 * Test User Id
+	 */
+	protected static Long USER_ID = 149223493l;
+
+	/**
+	 * Test User Name
+	 */
+	protected static String USER_NAME = "twitch4j";
+
+	/**
 	 * Class Constructor
 	 */
 	public TwitchClientIntegrationTest() {
