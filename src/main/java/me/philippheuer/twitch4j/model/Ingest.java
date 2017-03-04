@@ -29,7 +29,7 @@ public class Ingest {
 
 	private String name;
 
-	private Boolean availability;
+	private Integer availability;
 
 	@JsonProperty("default")
 	private Boolean isDefault;

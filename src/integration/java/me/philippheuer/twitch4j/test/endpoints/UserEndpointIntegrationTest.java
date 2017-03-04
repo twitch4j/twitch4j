@@ -16,10 +16,10 @@ public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	 */
 	@Test
 	public void testGetUserIdByName() {
-		Optional<Long> userId = twitchClient.getUserEndpoint().getUserIdByUserName(USER_NAME);
+		Optional<Long> userId = twitchClient.getUserEndpoint().getUserIdByUserName("twitch4j");
 
 		assertTrue(userId.isPresent());
-		assertEquals(USER_ID.toString(), userId.get().toString());
+		assertEquals(149223493l, (long) userId.get());
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	 */
 	@Test
 	public void testGetUser() {
-		Optional<User> user = twitchClient.getUserEndpoint().getUser(USER_ID);
+		Optional<User> user = twitchClient.getUserEndpoint().getUser(149223493l);
 
 		assertTrue(user.isPresent());
 		assertNotNull(user.get().getId());
