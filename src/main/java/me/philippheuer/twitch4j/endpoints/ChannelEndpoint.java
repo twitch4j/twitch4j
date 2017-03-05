@@ -164,7 +164,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", getChannel().getTwitchCredential().get().getOAuthToken())));
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", getChannel().getTwitchCredential().get().getToken())));
 
 		// REST Request
 		try {

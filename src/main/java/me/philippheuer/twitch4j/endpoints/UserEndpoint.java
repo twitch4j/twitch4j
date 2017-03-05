@@ -19,10 +19,10 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get UserEndpoint
 	 *
-	 * @param client todo
+	 * @param twitchClient The Twitch Client.
 	 */
-	public UserEndpoint(TwitchClient client) {
-		super(client);
+	public UserEndpoint(TwitchClient twitchClient) {
+		super(twitchClient);
 	}
 
 	/**

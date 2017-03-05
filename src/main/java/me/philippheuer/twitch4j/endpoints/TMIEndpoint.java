@@ -28,12 +28,10 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get All Teams
-	 * Gets all active teams.
-	 * Requires Scope: none
+	 * Gets all user's present in the twitch chat of a channel.
 	 *
 	 * @param channelName Channel to fetch the information for.
-	 * @return todo
+	 * @return All chatters in a channel, separated into groups like admins, moderators and viewers.
 	 */
 	public Chatter getChatters(String channelName) {
 		// Endpoint

@@ -114,7 +114,8 @@ public class OAuthTwitch {
 
 			// Credential
 			OAuthCredential credential = new OAuthCredential();
-			credential.setOAuthToken(responseObject.getAccessToken());
+			credential.setType("twitch");
+			credential.setToken(responseObject.getAccessToken());
 
 			// Get Token Status from Kraken Endpoint
 			Token token = getCredentialManager().getTwitchClient().getKrakenEndpoint().getToken(credential);

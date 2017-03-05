@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
@@ -68,7 +69,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param id The guid of the community. (e9f17055-810f-4736-ba40-fba4ac541caa)
-	 * @return todo
+	 * @return The community.
 	 */
 	public Community getCommunityById(String id) {
 		// Endpoint
@@ -171,7 +172,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @param cursor Tells the server where to start fetching the next set of results in a multi-page response.
-	 * @return todo
+	 * @return The top communities.
 	 */
 	public CommunityList getTopCommunities(Optional<Long> limit, Optional<String> cursor) {
 		// Endpoint
@@ -202,7 +203,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
-	 * @return todo
+	 * @return The top communities.
 	 */
 	public List<Community> getTopCommunities(Optional<Long> limit) {
 		if(limit.isPresent()) {
@@ -254,11 +255,15 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Validates community names against the twitch name limitations.
 	 *
 	 * @param name Community name to validate.
-	 * @return Boolean, true if valid. False, if violation of the twitch policies.
+	 * @return Whether the given name is a valid community name.
 	 */
 	private Boolean validateCommunityName(String name) {
-		Pattern pattern = Pattern.compile("[A-Za-z\\-\\.\\_\\~]{3,25}");
+		String regex = "[A-Za-z\\-\\.\\_\\~]{3,25}";
 
-		return true;
+		if(name.matches(regex)) {
+			return true;
+		}
+
+		return false;
 	}
 }

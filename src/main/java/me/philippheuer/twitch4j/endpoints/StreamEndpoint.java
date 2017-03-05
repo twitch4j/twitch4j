@@ -12,9 +12,17 @@ import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * All api methods related to a stream.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class StreamEndpoint extends AbstractTwitchEndpoint {
@@ -29,7 +37,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Stream by Channel
+	 * Get Stream by Channel
+	 * <p>
 	 * Gets stream information (the stream object) for a specified channel.
 	 * Requires Scope: none
 	 *
@@ -62,7 +71,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get All Streams (ordered by current viewers, desc)
+	 * Get All Streams (ordered by current viewers, desc)
+	 * <p>
 	 * Gets the list of all live streams.
 	 * Requires Scope: none
 	 *
@@ -101,7 +111,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Followed Streams
+	 * Get Followed Streams
+	 * <p>
 	 * Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
 	 *
@@ -126,7 +137,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Featured Streams
+	 * Get Featured Streams
+	 * <p>
 	 * Gets a list of all featured live streams.
 	 * Requires Scope: none
 	 *
@@ -156,7 +168,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Streams Summary
+	 * Get Streams Summary
+	 * <p>
 	 * Gets a summary of all live streams.
 	 * Requires Scope: none
 	 *
@@ -187,7 +200,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get recommended streams for User (Unofficial)
+	 * Get recommended streams for User (Unofficial)
 	 * Gets a list of recommended streams for a user.
 	 * Requires Scope: none
 	 *
@@ -201,7 +214,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("oauth_token", credential.getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("oauth_token", credential.getToken()));
 
 		// REST Request
 		try {

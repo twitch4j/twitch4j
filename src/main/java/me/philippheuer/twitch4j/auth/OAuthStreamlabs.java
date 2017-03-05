@@ -5,6 +5,8 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
+import me.philippheuer.twitch4j.events.EventSubscriber;
+import me.philippheuer.twitch4j.events.event.AuthTokenExpiredEvent;
 import me.philippheuer.util.desktop.WebsiteUtils;
 import me.philippheuer.twitch4j.streamlabs.enums.StreamlabsScopes;
 import me.philippheuer.twitch4j.streamlabs.model.User;
@@ -13,7 +15,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Getter
@@ -98,25 +103,19 @@ public class OAuthStreamlabs {
 	 */
 	public OAuthCredential handleAuthenticationCodeResponseStreamlabs(String authenticationCode) {
 		try {
-			// Validate on Server
-			String requestUrl = String.format("%s/token", getCredentialManager().getStreamlabsClient().getEndpointUrl());
-			RestTemplate restTemplate = getCredentialManager().getStreamlabsClient().getRestClient().getRestTemplate();
-
-			// Post Data
-			MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<String, Object>();
-			postParameters.add("grant_type", "authorization_code");
-			postParameters.add("client_id", getCredentialManager().getStreamlabsClient().getClientId());
-			postParameters.add("client_secret", getCredentialManager().getStreamlabsClient().getClientSecret());
-			postParameters.add("redirect_uri", getCredentialManager().getOAuthStreamlabs().getRedirectUri());
-			postParameters.add("code", authenticationCode);
-
-			// Rest Request
-			Authorize responseObject = restTemplate.postForObject(requestUrl, postParameters, Authorize.class);
+			// Rest Request to get token details
+			Authorize responseObject = getCredentialManager().getStreamlabsClient().getTokenEndpoint().getToken("authorization_code", getRedirectUri(), authenticationCode).get();
 
 			// Credential
 			OAuthCredential credential = new OAuthCredential();
-			credential.setOAuthToken(responseObject.getAccessToken());
-			credential.setOAuthRefreshToken(responseObject.getRefreshToken());
+			credential.setType("streamlabs");
+			credential.setToken(responseObject.getAccessToken());
+			credential.setRefreshToken(responseObject.getRefreshToken());
+
+			// Set Token Expiry Date
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.SECOND, 3600);
+			credential.setTokenExpiresAt(calendar);
 
 			// Streamlabs - Get User Id
 			Optional<User> user = getCredentialManager().getStreamlabsClient().getUserEndpoint(credential).getUser();
@@ -132,6 +131,36 @@ public class OAuthStreamlabs {
 			ex.printStackTrace();
 
 			return null;
+		}
+	}
+
+	/**
+	 * Event that gets triggered when a streamlabs token is expired.
+	 *
+	 * @param event The Event, containing the credential and all other related information.
+	 */
+	@EventSubscriber
+	public void onStreamlabsTokenExpired(AuthTokenExpiredEvent event) {
+		// Filter to Streamlabs credentials
+		if(event.getCredential().getType().equals("streamlabs")) {
+			OAuthCredential credential = event.getCredential();
+
+			// Rest Request to get refreshed token details
+			Authorize responseObject = getCredentialManager().getStreamlabsClient().getTokenEndpoint().getToken("refresh_token", getRedirectUri(), credential.getRefreshToken()).get();
+			System.out.println(responseObject.toString());
+
+			// Save Response
+			credential.setToken(responseObject.getAccessToken());
+			credential.setRefreshToken(responseObject.getRefreshToken());
+
+			// Set Token Expiry Date
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.SECOND, 3600);
+			System.out.println("New Expiry: " + calendar.toString());
+			credential.setTokenExpiresAt(calendar);
+
+			// Credential was modified.
+			getCredentialManager().onCredentialChanged();
 		}
 	}
 }

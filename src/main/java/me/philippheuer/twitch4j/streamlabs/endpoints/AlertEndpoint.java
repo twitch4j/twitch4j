@@ -60,7 +60,7 @@ public class AlertEndpoint extends AbstractStreamlabsEndpoint {
 
 		// Post Data
 		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
-		postBody.add("access_token", getOAuthCredential().getOAuthToken());
+		postBody.add("access_token", getOAuthCredential().getToken());
 		postBody.add("type", type);
 		postBody.add("message", message.orElse(""));
 		postBody.add("duration", duration.orElse(10).toString());

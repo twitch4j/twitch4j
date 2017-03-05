@@ -8,15 +8,14 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
+import me.philippheuer.twitch4j.events.event.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -96,6 +95,39 @@ public class CredentialManager {
 	public CredentialManager() {
 		super();
 		setOAuthHandler(new OAuthHandler(this));
+
+		// Define Token Refresh Task
+		Thread tokenRefreshTask = new Thread(new Runnable() {
+			public void run() {
+				// Keep running
+				while(true) {
+					try {
+						// For each Credential
+						for(OAuthCredential credential : getOAuthCredentials().values()) {
+							// Check for expiry date
+							if(credential.getTokenExpiresAt() == null) {
+								continue;
+							}
+
+							// Is the token expired?
+							if(credential.getTokenExpiresAt().before(Calendar.getInstance())) {
+								// Dispatch token expired event
+								AuthTokenExpiredEvent event = new AuthTokenExpiredEvent(credential);
+								getTwitchClient().getDispatcher().dispatch(event);
+
+								Logger.info(this, "Token Expired, triggering Refresh Event! [%s]", event.toString());
+							}
+						}
+
+						// Delay
+						Thread.sleep(10 * 1000);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
+		tokenRefreshTask.start();
 	}
 
 	/**
@@ -106,6 +138,9 @@ public class CredentialManager {
 	public void provideTwitchClient(TwitchClient twitchClient) {
 		setTwitchClient(twitchClient);
 		setOAuthTwitch(new OAuthTwitch(this));
+
+		// Register OAuthTwitch to get Events
+		getTwitchClient().getDispatcher().registerListener(getOAuthTwitch());
 	}
 
 	/**
@@ -116,6 +151,9 @@ public class CredentialManager {
 	public void provideStreamlabsClient(StreamlabsClient streamlabsClient) {
 		setStreamlabsClient(streamlabsClient);
 		setOAuthStreamlabs(new OAuthStreamlabs(this));
+
+		// Register OAuthStreamlabs to get Events
+		getTwitchClient().getDispatcher().registerListener(getOAuthStreamlabs());
 	}
 
 	/**
@@ -232,6 +270,13 @@ public class CredentialManager {
 		} else {
 			return Optional.empty();
 		}
+	}
+
+	/**
+	 * Should be called, when a credential is externally modified.
+	 */
+	public void onCredentialChanged() {
+		saveToFile();
 	}
 
 	/**
