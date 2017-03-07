@@ -136,6 +136,9 @@ public class OAuthStreamlabs {
 
 	/**
 	 * Event that gets triggered when a streamlabs token is expired.
+	 * <p>
+	 * This events get triggered when a streamlabs auth token has expired, a new token
+	 * will be requested using the refresh token.
 	 *
 	 * @param event The Event, containing the credential and all other related information.
 	 */
@@ -156,7 +159,6 @@ public class OAuthStreamlabs {
 			// Set Token Expiry Date
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.SECOND, 3600);
-			System.out.println("New Expiry: " + calendar.toString());
 			credential.setTokenExpiresAt(calendar);
 
 			// Credential was modified.

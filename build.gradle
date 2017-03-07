@@ -63,7 +63,7 @@ dependencies {
     compile("net.jodah:expiringmap:0.5.7")
 
     // TypeTools
-    compile("net.jodah:typetools:0.4.8")
+    compile("net.jodah:typetools:0.4.9")
 
 	// Args4J - CommandLineArgumentParser
 	compile("args4j:args4j:2.33")
