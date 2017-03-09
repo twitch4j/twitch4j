@@ -16,10 +16,12 @@ plugins {
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    jcenter()
-    mavenCentral()
+	maven { url 'https://jitpack.io' }
+	mavenCentral()
+	jcenter()
 }
 
+// Required Java Version
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -37,50 +39,102 @@ def gitVersion() {
 // Dependencies
 dependencies {
 	// Logging
-    compile("ch.qos.logback:logback-classic:1.2.1")
-    compile("com.jcabi:jcabi-log:0.17.2")
+	compile group: 'ch.qos.logback', 				name: 'logback-classic', 		version: '1.2.1'
+	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
-    // Spring (RestTemplate)
-    compile("org.springframework:spring-web:4.3.6.RELEASE")
-	compile("org.springframework.social:spring-social-core:1.1.4.RELEASE")
+	// Spring (RestTemplate)
+	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.6.RELEASE'
+	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
-    // WebSocket Client for Twitch PubSub
-    compile('com.neovisionaries:nv-websocket-client:1.31')
+	// WebSocket Client for Twitch PubSub
+	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '1.31'
 
-    // IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-    compile('org.kitteh.irc:client-lib:3.0.2');
+	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
+	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.0.2'
 
 	// Apache Commons IO
-	compile('commons-io:commons-io:2.5')
+	compile group: 'commons-io', 					name: 'commons-io', 			version: '2.5'
 
-    // JSON / YAML
-    compile("com.fasterxml.jackson.core:jackson-databind:2.8.7")
+	// JSON / YAML
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.8.7'
 
 	// Bucket for rate-limiting
-	compile("org.isomorphism:token-bucket:1.7")
+	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'
 
-    // Expiring Map
-    compile("net.jodah:expiringmap:0.5.7")
+	// Expiring Map
+	compile group: 'net.jodah', 					name: 'expiringmap', 			version: '0.5.7'
 
-    // TypeTools
-    compile("net.jodah:typetools:0.4.9")
+
+	// TypeTools
+	compile group: 'net.jodah', 					name: 'typetools', 				version: '0.4.9'
 
 	// Args4J - CommandLineArgumentParser
-	compile("args4j:args4j:2.33")
+	compile group: 'args4j', 						name: 'args4j', 				version: '2.33'
 
-    // Getter & Setter
-    compileOnly("org.projectlombok:lombok:1.16.14")
+	// Getter & Setter
+	compile group: 'org.projectlombok', 			name: 'lombok', 				version: '1.16.14'
+
+	// Testing
+	testCompile group: 'junit', 					name: 'junit', 					version: '4.12'
 }
 
-// Disable Gradle Caching
+/**
+ * Define SourceSets
+ */
+sourceSets {
+	main {
+		java.srcDir 'src/main/java'
+	}
+	test {
+		java.srcDir 'src/test/java'
+	}
+	integration {
+		java.srcDir 'src/integration/java'
+		resources.srcDir 'src/integration/resources'
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
+}
+
+// Configuration
+configurations {
+	// Integration compile task
+	integrationCompile.extendsFrom testCompile
+	integrationRuntime.extendsFrom testRuntime
+}
+
 configurations.all {
+	// Disable Gradle Caching
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+/**
+ * Test Task `test` - Run Unit Tests
+ */
+test {
+	useJUnit {
+		includeCategories 'me.philippheuer.util.test.UnitTestCategory'
+		excludeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
+	}
+}
+
+/**
+ * Test Task `testIntegration` - Run Integration Tests
+ */
+task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+	testClassesDir = sourceSets.integration.output.classesDir
+	classpath = sourceSets.integration.runtimeClasspath
+
+	useJUnit {
+		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
+		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
+	}
 }
 
 /**
  * Sources - build a jar with source files
  */
-task sourcesJar(type: Jar) {
+task sourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
 	from sourceSets.main.java.srcDirs
 	classifier = 'sources'
 }
@@ -97,7 +151,7 @@ javadoc {
 }
 
 // build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
 }
