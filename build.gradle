@@ -134,7 +134,7 @@ task testIntegration(type: Test, description: 'Runs the integration tests.', gro
 /**
  * Sources - build a jar with source files
  */
-task buildSourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
+task sourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
 	from sourceSets.main.java.srcDirs
 	classifier = 'sources'
 }
@@ -151,7 +151,7 @@ javadoc {
 }
 
 // build a jar with javadoc
-task buildJavadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
+task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
 }
@@ -160,6 +160,6 @@ task buildJavadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the jav
  * Artifacts
  */
 artifacts {
-	archives buildSourcesJar
-	archives buildJavadocJar
+	archives sourcesJar
+	archives javadocJar
 }
