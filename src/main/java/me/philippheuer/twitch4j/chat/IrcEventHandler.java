@@ -294,6 +294,12 @@ public class IrcEventHandler {
 
 		// Build Map from Tags
 		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
+
+		// Cancel, if there is no information about the user.
+		if(!tagMap.containsKey("user-id")) {
+			return;
+		}
+
 		Long userId = Long.parseLong(tagMap.get("user-id"));
 
 		// Channel Information

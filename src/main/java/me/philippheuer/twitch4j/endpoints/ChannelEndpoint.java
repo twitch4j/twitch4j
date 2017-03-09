@@ -497,10 +497,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * IRC: Subscriptions, Bits
 	 * Rest API: Follows
 	 * Streamlabs API: Donations
-	 *
-	 * @param annotationListener todo
 	 */
-	public void setChannelEventListener(Object annotationListener) {
+	public void registerEventListener() {
 		// Check that the channel exists
 		// TODO
 
@@ -517,11 +515,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		if (!getTwitchClient().getPubSub().checkEndpointStatus()) {
 			// We can ignore this right now, because we will reconnect as soon as pubsub is back up.
 			Logger.warn(this, "PubSub Client not operating. You will not recieve any pubsub events!");
-		}
-
-		// Register Listener Events
-		if(annotationListener != null) {
-			getTwitchClient().getDispatcher().registerListener(annotationListener);
 		}
 
 		// Get Channel Information

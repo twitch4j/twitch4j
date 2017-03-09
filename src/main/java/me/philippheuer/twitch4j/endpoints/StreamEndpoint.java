@@ -230,4 +230,106 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 		return null;
 	}
+
+	/**
+	 * Get the streams on the frontpage for a specific region (UnofficialEndpoint)
+	 * <p>
+	 * Valid Regions:
+	 * AT: Austria
+	 * BE: Belgium
+	 * BG: Bulgaria
+	 * CY: Cyprus
+	 * CZ: Czech Republic
+	 * DE: Germany
+	 * DK: Denmark
+	 * EE: Estonia
+	 * FI: Finland
+	 * FR: France
+	 * GR: Greece
+	 * GL: Greenland
+	 * HU: Hungary
+	 * IS: Iceland
+	 * IT: Italy
+	 * LT: Lithuania
+	 * LU: Luxembourg
+	 * NL: Netherlands
+	 * NO: Norway
+	 * PL: Poland
+	 * PT: Portugal
+	 * RO: Romania
+	 * RU: Russia
+	 * SK: Slovakia
+	 * SI: Slovenia
+	 * ES: Spain
+	 * SE: Sweden
+	 * CH: Switzerland
+	 * TR: Turkey
+	 * LV: Latvia
+	 * MT: Malta
+	 * RS: Serbia
+	 * AL: Albania
+	 * AD: Andorra
+	 * AM: Armenia
+	 * AZ: Azerbaijan
+	 * BY: Belarus
+	 * BA: Bosnia + Herzegovina
+	 * HR: Croatia
+	 * GE: Georgia
+	 * IL: Israel
+	 * LI: Liechtenstein
+	 * MK: Macedonia
+	 * MD: Moldova
+	 * MC: Monaco
+	 * ME: Montenegro
+	 * QA: Qatar
+	 * SM: San Marino
+	 * UA: Ukraine
+	 * UK: United Kingdom
+	 * GB: Great Britain
+	 * IE: Ireland
+	 * US: USA
+	 *
+	 * @return The 6 streams of the frontpage for the specified region.
+	 */
+	@Unofficial
+	public List<StreamFeatured> getStreamsOnFrontpage(Optional<String> geo) {
+		// Endpoint
+		String requestUrl = String.format("https://api.twitch.tv/kraken/streams/featured");
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", "6"));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("geo", geo.orElse("US")));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("lang", "en"));
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			StreamFeaturedList responseObject = restTemplate.getForObject(requestUrl, StreamFeaturedList.class);
+
+			return responseObject.getFeatured();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Whether a stream is on the frontpage.
+	 * <p>
+	 * This method check's if the stream is on the frontpage for a certain region.
+	 *
+	 * @return Whether a stream is on the frontpage.
+	 */
+	@Unofficial
+	public Boolean isStreamOnFrontpage(Stream stream) {
+		List<String> regions = Arrays.asList("", "");
+
+
+
+		return false;
+	}
 }
