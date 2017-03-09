@@ -365,4 +365,12 @@ public class TwitchClient {
 		return new TMIEndpoint(this);
 	}
 
+	/**
+	 * Returns an a new UnofficialEndpoint instance.
+	 *
+	 * @return a new instance of {@link UnofficialEndpoint}
+	 */
+	public UnofficialEndpoint getUnofficialEndpoint() {
+		return new UnofficialEndpoint(this);
+	}
 }
