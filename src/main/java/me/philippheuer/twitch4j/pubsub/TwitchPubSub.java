@@ -225,7 +225,7 @@ public class TwitchPubSub {
 		objectNode.put("nonce", channel.getId() + ".pubsub.bitevents");
 
 		ObjectNode dataMap = objectNode.putObject("data");
-		dataMap.put("auth_token", channel.getTwitchCredential().get().getOAuthToken());
+		dataMap.put("auth_token", channel.getTwitchCredential().get().getToken());
 		ArrayNode topicArray = dataMap.putArray("topics");
 		topicArray.add("channel-bitsevents." + channel.getId());
 

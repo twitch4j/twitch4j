@@ -12,9 +12,17 @@ import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * All api methods related to a stream.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Getter
 @Setter
 public class StreamEndpoint extends AbstractTwitchEndpoint {
@@ -29,7 +37,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Stream by Channel
+	 * Get Stream by Channel
+	 * <p>
 	 * Gets stream information (the stream object) for a specified channel.
 	 * Requires Scope: none
 	 *
@@ -62,7 +71,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get All Streams (ordered by current viewers, desc)
+	 * Get All Streams (ordered by current viewers, desc)
+	 * <p>
 	 * Gets the list of all live streams.
 	 * Requires Scope: none
 	 *
@@ -101,7 +111,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Followed Streams
+	 * Get Followed Streams
+	 * <p>
 	 * Gets the list of online streams a user follows based on the OAuthTwitch token provided.
 	 * Requires Scope: user_read
 	 *
@@ -126,7 +137,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Featured Streams
+	 * Get Featured Streams
+	 * <p>
 	 * Gets a list of all featured live streams.
 	 * Requires Scope: none
 	 *
@@ -156,7 +168,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get Streams Summary
+	 * Get Streams Summary
+	 * <p>
 	 * Gets a summary of all live streams.
 	 * Requires Scope: none
 	 *
@@ -187,7 +200,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
-	 * Endpoint: Get recommended streams for User (Unofficial)
+	 * Get recommended streams for User (Unofficial)
 	 * Gets a list of recommended streams for a user.
 	 * Requires Scope: none
 	 *
@@ -201,7 +214,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("oauth_token", credential.getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("oauth_token", credential.getToken()));
 
 		// REST Request
 		try {
@@ -216,5 +229,107 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get the streams on the frontpage for a specific region (UnofficialEndpoint)
+	 * <p>
+	 * Valid Regions:
+	 * AT: Austria
+	 * BE: Belgium
+	 * BG: Bulgaria
+	 * CY: Cyprus
+	 * CZ: Czech Republic
+	 * DE: Germany
+	 * DK: Denmark
+	 * EE: Estonia
+	 * FI: Finland
+	 * FR: France
+	 * GR: Greece
+	 * GL: Greenland
+	 * HU: Hungary
+	 * IS: Iceland
+	 * IT: Italy
+	 * LT: Lithuania
+	 * LU: Luxembourg
+	 * NL: Netherlands
+	 * NO: Norway
+	 * PL: Poland
+	 * PT: Portugal
+	 * RO: Romania
+	 * RU: Russia
+	 * SK: Slovakia
+	 * SI: Slovenia
+	 * ES: Spain
+	 * SE: Sweden
+	 * CH: Switzerland
+	 * TR: Turkey
+	 * LV: Latvia
+	 * MT: Malta
+	 * RS: Serbia
+	 * AL: Albania
+	 * AD: Andorra
+	 * AM: Armenia
+	 * AZ: Azerbaijan
+	 * BY: Belarus
+	 * BA: Bosnia + Herzegovina
+	 * HR: Croatia
+	 * GE: Georgia
+	 * IL: Israel
+	 * LI: Liechtenstein
+	 * MK: Macedonia
+	 * MD: Moldova
+	 * MC: Monaco
+	 * ME: Montenegro
+	 * QA: Qatar
+	 * SM: San Marino
+	 * UA: Ukraine
+	 * UK: United Kingdom
+	 * GB: Great Britain
+	 * IE: Ireland
+	 * US: USA
+	 *
+	 * @return The 6 streams of the frontpage for the specified region.
+	 */
+	@Unofficial
+	public List<StreamFeatured> getStreamsOnFrontpage(Optional<String> geo) {
+		// Endpoint
+		String requestUrl = String.format("https://api.twitch.tv/kraken/streams/featured");
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", "6"));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("geo", geo.orElse("US")));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("lang", "en"));
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			StreamFeaturedList responseObject = restTemplate.getForObject(requestUrl, StreamFeaturedList.class);
+
+			return responseObject.getFeatured();
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Whether a stream is on the frontpage.
+	 * <p>
+	 * This method check's if the stream is on the frontpage for a certain region.
+	 *
+	 * @return Whether a stream is on the frontpage.
+	 */
+	@Unofficial
+	public Boolean isStreamOnFrontpage(Stream stream) {
+		List<String> regions = Arrays.asList("", "");
+
+
+
+		return false;
 	}
 }

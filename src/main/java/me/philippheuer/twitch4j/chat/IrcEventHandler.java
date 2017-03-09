@@ -70,8 +70,14 @@ public class IrcEventHandler {
 		if (event.getCommand().equals("WHISPER") || event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
 			// Get Channel on IRC
 			String channelName = event.getParameters().get(0).replace("#", "");
-			Long channelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).get();
-			Channel channel = getTwitchClient().getChannelEndpoint(channelId).getChannel();
+			Optional<Long> channelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName);
+
+			if(!channelId.isPresent()) {
+				Logger.error(this, "Got IrcEvent for invalid channel [%s][%s]", channelName, event.getOriginalMessage());
+				return;
+			}
+
+			Channel channel = getTwitchClient().getChannelEndpoint(channelId.get()).getChannel();
 
 			// Build Map from Tags
 			Map<String, String> tagMap = getTagMap(event.getServerMessage());
@@ -288,6 +294,12 @@ public class IrcEventHandler {
 
 		// Build Map from Tags
 		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
+
+		// Cancel, if there is no information about the user.
+		if(!tagMap.containsKey("user-id")) {
+			return;
+		}
+
 		Long userId = Long.parseLong(tagMap.get("user-id"));
 
 		// Channel Information

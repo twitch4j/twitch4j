@@ -1,12 +1,16 @@
 package me.philippheuer.twitch4j.auth.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Getter
@@ -16,9 +20,13 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OAuthCredential {
 
-	private String oAuthToken;
+	private String type;
 
-	private String oAuthRefreshToken;
+	private String token;
+
+	private Calendar tokenExpiresAt;
+
+	private String refreshToken;
 
 	private final Set<String> oAuthScopes = new HashSet<String>();
 
@@ -31,10 +39,10 @@ public class OAuthCredential {
 	/**
 	 * Class Constructor
 	 *
-	 * @param oAuthToken The OAuthToken for a user.
+	 * @param token The OAuth Token for a user.
 	 */
-	public OAuthCredential(String oAuthToken) {
-		setOAuthToken(oAuthToken);
+	public OAuthCredential(String token) {
+		setToken(token);
 	}
 
 }

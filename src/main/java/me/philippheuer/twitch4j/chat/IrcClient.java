@@ -84,7 +84,7 @@ public class IrcClient {
         	setIrcClient(Client.builder()
         		.serverHost(host)
         		.serverPort(port)
-        		.serverPassword("oauth:"+twitchCredential.get().getOAuthToken())
+        		.serverPassword("oauth:"+twitchCredential.get().getToken())
         		.nick(twitchCredential.get().getUserName())
         		.build());
         	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getTwitchClient()));

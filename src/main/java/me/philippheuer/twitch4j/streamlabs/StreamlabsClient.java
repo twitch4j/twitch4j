@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.streamlabs.endpoints.TokenEndpoint;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
 import me.philippheuer.twitch4j.streamlabs.endpoints.AlertEndpoint;
@@ -117,6 +118,15 @@ public class StreamlabsClient {
 	 */
 	public String getEndpointUrl() {
 		return String.format("%s/%s", getStreamlabsEndpoint(), getStreamlabsEndpointVersion());
+	}
+
+	/**
+	 * Get Token Endpoint
+	 *
+	 * @return user endpoint
+	 */
+	public TokenEndpoint getTokenEndpoint() {
+		return new TokenEndpoint(this);
 	}
 
 	/**

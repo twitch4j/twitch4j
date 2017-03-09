@@ -74,7 +74,7 @@ public class RestClient {
 		RestTemplate restTemplate = getRestTemplate();
 
 		// Request Interceptors (add Authorization)
-		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getOAuthToken())));
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", OAuthCredential.getToken())));
 
 		return restTemplate;
 	}

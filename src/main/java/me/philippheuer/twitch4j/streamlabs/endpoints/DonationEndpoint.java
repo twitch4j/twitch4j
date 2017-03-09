@@ -63,7 +63,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 		RestTemplate restTemplate = getStreamlabsClient().getRestClient().getRestTemplate();
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getOAuthToken()));
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("access_token", getOAuthCredential().getToken()));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("currency", currency.isPresent() ? currency.get().getCurrencyCode() : "EUR"));
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(50).toString()));
 
@@ -105,7 +105,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 
 		// Post Data
 		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
-		postBody.add("access_token", getOAuthCredential().getOAuthToken());
+		postBody.add("access_token", getOAuthCredential().getToken());
 		postBody.add("name", name);
 		postBody.add("identifier", identifier);
 		postBody.add("amount", amount);
