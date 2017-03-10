@@ -11,14 +11,15 @@ import me.philippheuer.twitch4j.events.event.DonationEvent;
 import me.philippheuer.twitch4j.events.event.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
-import me.philippheuer.util.rest.HeaderRequestInterceptor;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
+import me.philippheuer.util.rest.HeaderRequestInterceptor;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.*;
 
 @Getter
@@ -26,15 +27,13 @@ import java.util.*;
 public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	/**
-	 * Channel ID
-	 */
-	private Long channelId;
-
-	/**
 	 * Commercial Lengths
 	 */
 	private final List<Long> validCommercialLengths = new ArrayList<Long>(Arrays.asList(30L, 60L, 90L, 120L, 150L, 180L));
-
+	/**
+	 * Channel ID
+	 */
+	private Long channelId;
 	/**
 	 * Event Timer
 	 */
@@ -48,12 +47,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Event Timer - Checker: Last Donation
 	 */
-	private Date lastDonation;
+	private Calendar lastDonation;
 
 	/**
 	 * Constructor - by ChannelId
 	 *
-	 * @param client todo
+	 * @param client    todo
 	 * @param channelId todo
 	 */
 	public ChannelEndpoint(TwitchClient client, Long channelId) {
@@ -74,7 +73,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Constructor - by ChannelName
 	 *
-	 * @param client todo
+	 * @param client      todo
 	 * @param channelName todo
 	 */
 	public ChannelEndpoint(TwitchClient client, String channelName) {
@@ -85,7 +84,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Process Arguments
 		Optional<Long> userId = client.getUserEndpoint().getUserIdByUserName(channelName);
-		if(userId.isPresent()) {
+		if (userId.isPresent()) {
 			setChannelId(userId.get());
 		}
 
@@ -99,6 +98,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Channel
 	 * Gets a specified channel object.
 	 * Requires Scope: none
+	 *
 	 * @return todo
 	 */
 	public Channel getChannel() {
@@ -126,8 +126,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			// Add streamlabs oauth credentials to channel object, if the credential manager has them
 			// Matching will be done using the channel id's, not credential aliases
 			{
-				for(Map.Entry<String, OAuthCredential> entryCredential : getTwitchClient().getCredentialManager().getOAuthCredentials().entrySet()) {
-					if(entryCredential.getKey().startsWith("STREAMLABS-") && entryCredential.getValue().getUserId().equals(responseObject.getId())) {
+				for (Map.Entry<String, OAuthCredential> entryCredential : getTwitchClient().getCredentialManager().getOAuthCredentials().entrySet()) {
+					if (entryCredential.getKey().startsWith("STREAMLABS-") && entryCredential.getValue().getUserId().equals(responseObject.getId())) {
 						responseObject.setStreamlabsCredential(Optional.ofNullable(entryCredential.getValue()));
 					}
 				}
@@ -222,7 +222,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param limit     Maximum number of most-recent objects to return (users who started following the channel most recently). Default: 25. Maximum: 100.
-	 * @param cursor  	Tells the server where to start fetching the next set of results, in a multi-page response.
+	 * @param cursor    Tells the server where to start fetching the next set of results, in a multi-page response.
 	 * @param direction Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: desc.
 	 * @return todo
 	 */
@@ -257,21 +257,21 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @return todo
 	 */
 	public List<Follow> getFollowers(Optional<Long> limit, Optional<String> direction) {
-		if(limit.isPresent()) {
-			if(limit.get() > 100) {
+		if (limit.isPresent()) {
+			if (limit.get() > 100) {
 				List<Follow> resultList = new ArrayList<Follow>();
 
 				Long recordsToFetch = limit.get();
 				String cursor = "";
 
-				while(recordsToFetch > 0) {
+				while (recordsToFetch > 0) {
 					FollowList followList = getFollowers(Optional.ofNullable(recordsToFetch > 100 ? 100 : recordsToFetch), Optional.empty(), Optional.empty());
 					cursor = followList.getCursor();
 					Integer results = followList.getFollows().size();
 					resultList.addAll(followList.getFollows());
 					recordsToFetch -= results;
 
-					if(results == 0) {
+					if (results == 0) {
 						break;
 					}
 				}
@@ -579,7 +579,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 				DonationEndpoint donationEndpoint = getTwitchClient().getStreamLabsClient().getDonationEndpoint(channel.getStreamlabsCredential().get());
 
 				// Followers
-				List<Date> creationDates = new ArrayList<Date>();
+				List<Calendar> creationDates = new ArrayList<Calendar>();
 				List<Donation> donationList = donationEndpoint.getDonations(
 						Optional.ofNullable(Currency.getInstance("EUR")),
 						Optional.ofNullable(10)
@@ -604,16 +604,19 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 					}
 
 					// Get newest date from all follows
-					Date lastDonationNew = creationDates.stream().max(Date::compareTo).get();
+					Calendar lastDonationNew = creationDates.stream().max(Calendar::compareTo).get();
 					if (lastDonation == null || lastDonationNew.after(lastDonation)) {
 						lastDonation = lastDonationNew;
 					}
+				} else {
+					// No donations created yet!
+					lastDonation = Calendar.getInstance();
 				}
 			}
 		};
 
 		// Schedule Action
-		eventTriggerTimer.scheduleAtFixedRate(action, 0, 1500);
+		eventTriggerTimer.scheduleAtFixedRate(action, 0, 2 * 1000);
 	}
 
 	/**

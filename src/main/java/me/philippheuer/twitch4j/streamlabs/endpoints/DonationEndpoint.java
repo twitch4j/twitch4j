@@ -16,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +79,7 @@ public class DonationEndpoint extends AbstractStreamlabsEndpoint {
 			ex.printStackTrace();
 		}
 
-		return null;
+		return new ArrayList<Donation>();
 	}
 
 	/**

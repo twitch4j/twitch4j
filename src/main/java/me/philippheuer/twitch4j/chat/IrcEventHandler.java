@@ -66,6 +66,14 @@ public class IrcEventHandler {
 			Logger.debug(this, "Responded to PING from Twitch IRC.");
 		}
 
+		/**
+		 * Check for the Authentication failed notice, which will be send if the irc oauth token was invalid!
+		 */
+		if(event.getOriginalMessage().equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+			Logger.error(this, "Login failed!");
+			return;
+		}
+
 		// Handle Messages
 		if (event.getCommand().equals("WHISPER") || event.getCommand().equals("USERNOTICE") || event.getCommand().equals("PRIVMSG") || event.getCommand().equals("NOTICE") || event.getCommand().equals("CLEARCHAT") || event.getCommand().equals("HOSTTARGET ") || event.getCommand().equals("ROOMSTATE")) {
 			// Get Channel on IRC

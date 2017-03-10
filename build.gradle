@@ -43,7 +43,7 @@ dependencies {
 	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
 	// Spring (RestTemplate)
-	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.6.RELEASE'
+	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.7.RELEASE'
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
 	// WebSocket Client for Twitch PubSub

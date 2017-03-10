@@ -41,9 +41,17 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		String requestUrl = String.format("%s/users?login=%s", getTwitchClient().getTwitchEndpoint(), userName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
+		// REST Request
 		if (!restObjectCache.containsKey(requestUrl)) {
-			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
-			restObjectCache.put(requestUrl, responseObject, 15, TimeUnit.MINUTES);
+			try {
+				UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
+				restObjectCache.put(requestUrl, responseObject, 15, TimeUnit.MINUTES);
+			} catch (RestException restException) {
+				Logger.error(this, "RestException: " + restException.getRestError().toString());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				return Optional.empty();
+			}
 		}
 
 		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();

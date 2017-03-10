@@ -1,10 +1,12 @@
 package me.philippheuer.twitch4j.streamlabs.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.util.Calendar;
 import java.util.Date;
 
 @Data
@@ -14,7 +16,11 @@ public class Donation {
 
 	private Long donationId;
 
-	private Date createdAt;
+	/**
+	 * The time gets returned as unix timestamp in seconds
+	 */
+	@JsonFormat(shape= JsonFormat.Shape.NUMBER, pattern="s")
+	private Calendar createdAt;
 
 	private String currency;
 
