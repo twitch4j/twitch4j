@@ -94,9 +94,13 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			User responseObject = restTemplate.getForObject(requestUrl, User.class);
 
 			return Optional.ofNullable(responseObject);
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			return Optional.empty();
+			ex.printStackTrace();
 		}
+
+		return Optional.empty();
 	}
 
 	/**
@@ -122,9 +126,13 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			}
 
 			return Optional.ofNullable((User) restObjectCache.get(requestUrl));
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			return Optional.empty();
+			ex.printStackTrace();
 		}
+
+		return Optional.empty();
 	}
 
 	/**
