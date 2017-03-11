@@ -224,6 +224,15 @@ public class TwitchClient {
 	}
 
 	/**
+	 * Returns an a new ChannelFeedEndpoint instance.
+	 *
+	 * @return a new instance of {@link ChannelFeedEndpoint}
+	 */
+	public ChannelFeedEndpoint getChannelFeedEndpoint() {
+		return new ChannelFeedEndpoint(this);
+	}
+
+	/**
 	 * Returns an a new ChannelEndpoint instance - identifying the channel by the channel id.
 	 * <p>
 	 * The Channel Endpoint instances allow you the query or set data for a specific channel,

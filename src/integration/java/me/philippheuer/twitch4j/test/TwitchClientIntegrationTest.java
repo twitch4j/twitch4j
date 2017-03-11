@@ -19,6 +19,11 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 	protected static Long USER_ID = 149223493l;
 
 	/**
+	 * Test Channel Id
+	 */
+	protected static Long CHANNEL_ID = 149223493l;
+
+	/**
 	 * Test User Name
 	 */
 	protected static String USER_NAME = "twitch4j";
