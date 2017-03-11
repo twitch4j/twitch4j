@@ -61,5 +61,35 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 		return new ArrayList<ChannelFeedPost>();
 	}
 
+	/**
+	 * Gets a specified post from a specified channel feed.
+	 *
+	 * @param channelId    The channel id, which the posts should be retrieved from.
+	 * @param postId       The post id.
+	 * @param commentLimit Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
+	 * @return a specified post from a specified channel feed.
+	 */
+	public ChannelFeedPost getFeedPost(Long channelId, String postId, Optional<Long> commentLimit) {
+		// Endpoint
+		String requestUrl = String.format("%s/feed/%s/posts/%s", getTwitchClient().getTwitchEndpoint(), channelId, postId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("comments", commentLimit.orElse(5l).toString()));
+
+		// REST Request
+		try {
+			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			ChannelFeedPost responseObject = restTemplate.getForObject(requestUrl, ChannelFeedPost.class);
+
+			return responseObject;
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return null;
+	}
 
 }

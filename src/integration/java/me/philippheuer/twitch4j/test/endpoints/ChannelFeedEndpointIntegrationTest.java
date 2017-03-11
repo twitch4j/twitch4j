@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.test.endpoints;
 
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
+import me.philippheuer.twitch4j.test.model.AssertEntity;
 import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -20,20 +21,25 @@ public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationT
 	public void testGetFeedPosts() {
 		List<ChannelFeedPost> channelFeedPosts = twitchClient.getChannelFeedEndpoint().getFeedPosts(CHANNEL_ID, Optional.empty(), Optional.empty(), Optional.empty());
 
-		for (ChannelFeedPost post : channelFeedPosts) {
-			System.out.println(post.toString());
-		}
-
 		// Result
-		Assert.notNull(channelFeedPosts);
-		Assert.isTrue(channelFeedPosts.size() > 0);
+		Assert.isTrue(channelFeedPosts != null && channelFeedPosts.size() > 0);
 		for (ChannelFeedPost post : channelFeedPosts) {
-			Assert.notNull(post.getBody());
-			Assert.notNull(post.getId());
-			Assert.notNull(post.getUser());
-			Assert.notNull(post.getCreatedAt());
-			Assert.notNull(post.getDeleted());
+			//System.out.println(post.toString());
+			AssertEntity.assertChannelFeedPost(post);
 		}
+	}
+
+	/**
+	 * Test the Get UserId by Name Method
+	 */
+	@Test
+	public void testGetFeedPost() {
+		String postId = "c5527e8a-7cb5-40ca-b434-160ef0bd0b1b";
+
+		ChannelFeedPost post = twitchClient.getChannelFeedEndpoint().getFeedPost(CHANNEL_ID, postId, Optional.empty());
+		// System.out.println(post);
+
+		AssertEntity.assertChannelFeedPost(post);
 	}
 
 }
