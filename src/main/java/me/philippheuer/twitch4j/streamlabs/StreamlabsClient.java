@@ -23,7 +23,7 @@ public class StreamlabsClient {
 	/**
 	 * Streamlabs API Endpoint
 	 */
-	public final String streamlabsEndpoint = "https://www.twitchalerts.com/api";
+	public final String streamlabsEndpoint = "https://streamlabs.com/api";
 	/**
 	 * Streamlabs API Version
 	 */

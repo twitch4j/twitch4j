@@ -74,7 +74,7 @@ public class OAuthStreamlabs {
 	 * @return String    OAuth2 Uri
 	 */
 	private String getAuthenticationUrl(String state, StreamlabsScopes... streamlabsScopes) {
-		return String.format("%s/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s",
+		return String.format("%s/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s",
 				getCredentialManager().getStreamlabsClient().getEndpointUrl(),
 				getCredentialManager().getStreamlabsClient().getClientId(),
 				getRedirectUri(),
