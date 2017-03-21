@@ -104,7 +104,6 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
 	 * @param channelId
-	 * @return ID of the created community
 	 */
 	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
 		// Endpoint
@@ -113,7 +112,6 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("share", share.orElse(false).toString()));
-
 
 		// Post Data
 		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
