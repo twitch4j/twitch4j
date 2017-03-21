@@ -29,9 +29,17 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 	protected static String USER_NAME = "twitch4j";
 
 	/**
+	 * OAuth Token
+	 */
+	protected static String USER_OAUTH_TOKEN = System.getProperty("OAUTH_TOKEN", "");
+
+	/**
 	 * Class Constructor
 	 */
 	public TwitchClientIntegrationTest() {
+		// A OAuth Token
+
+
 		// Initalize the Client a single time
 		if(twitchClient == null) {
 			twitchClient = TwitchClient.builder()

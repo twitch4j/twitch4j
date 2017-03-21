@@ -4,10 +4,15 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.ChannelFeed;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
+import me.philippheuer.twitch4j.model.CommunityCreate;
+import me.philippheuer.twitch4j.model.Void;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -91,5 +96,40 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 
 		return null;
 	}
+
+	/**
+	 * Create Feed Post
+	 * <p>
+	 * Requires the Twitch *channel_feed_edit* Scope.
+	 *
+	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
+	 * @param channelId
+	 * @return ID of the created community
+	 */
+	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
+		// Endpoint
+		String requestUrl = String.format("%s//feed/%s/posts", getTwitchClient().getTwitchEndpoint(), channelId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+
+		// Parameters
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("share", share.orElse(false).toString()));
+
+
+		// Post Data
+		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
+		postBody.add("content", message);
+
+		// REST Request
+		try {
+			restTemplate.postForObject(requestUrl, postBody, Void.class);
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	// Requires channel_feed_edit
+
 
 }

@@ -22,7 +22,7 @@ public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationT
 		List<ChannelFeedPost> channelFeedPosts = twitchClient.getChannelFeedEndpoint().getFeedPosts(CHANNEL_ID, Optional.empty(), Optional.empty(), Optional.empty());
 
 		// Result
-		Assert.isTrue(channelFeedPosts != null && channelFeedPosts.size() > 0);
+		Assert.isTrue(channelFeedPosts != null && channelFeedPosts.size() > 0, "No posts found!");
 		for (ChannelFeedPost post : channelFeedPosts) {
 			//System.out.println(post.toString());
 			AssertEntity.assertChannelFeedPost(post);
@@ -40,6 +40,16 @@ public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationT
 		// System.out.println(post);
 
 		AssertEntity.assertChannelFeedPost(post);
+	}
+
+	/**
+	 * Test the Create Post in Feed method
+	 */
+	@Test
+	public void getCreateFeedPost() {
+		if(USER_OAUTH_TOKEN.length() <= 0) {
+			return;
+		}
 	}
 
 }

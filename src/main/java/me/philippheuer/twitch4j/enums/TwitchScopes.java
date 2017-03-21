@@ -61,6 +61,11 @@ public enum TwitchScopes {
 	USER_SUBSCRIPTIONS("user_subscriptions"),
 
 	/**
+	 * Read and write access to the channel feed.
+	 */
+	CHANNEL_FEED_EDIT("channel_feed_edit"),
+
+	/**
 	 * Read access to check if a user is subscribed to your channel.
 	 */
 	CHANNEL_CHECK_SUBSCRIPTION("channel_check_subscription"),
