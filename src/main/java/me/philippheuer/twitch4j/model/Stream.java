@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.time.Duration;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -29,7 +31,7 @@ public class Stream {
 
 	private int viewers;
 
-	private Date createdAt;
+	private Calendar createdAt;
 
 	private int videoHeight;
 
@@ -38,5 +40,16 @@ public class Stream {
 	private TwitchImages preview;
 
 	private Channel channel;
+
+	/**
+	 * Gets the stream uptime based on the start date.
+	 *
+	 * @return The stream uptime.
+	 */
+	public Duration getUptime() {
+		Duration uptime = Duration.between(Calendar.getInstance().toInstant(), getCreatedAt().toInstant());
+
+		return uptime;
+	}
 
 }
