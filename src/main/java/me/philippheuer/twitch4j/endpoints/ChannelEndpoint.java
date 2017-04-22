@@ -240,6 +240,11 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		try {
 			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
+			// Provide the Follow with info about the channel
+			for(Follow f : responseObject.getFollows()) {
+				f.setChannel(getChannel());
+			}
+
 			return responseObject;
 		} catch (Exception ex) {
 			ex.printStackTrace();
