@@ -47,7 +47,7 @@ dependencies {
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
 	// WebSocket Client for Twitch PubSub
-	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '1.31'
+	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.2'
 
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
 	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.0.3'
@@ -56,7 +56,7 @@ dependencies {
 	compile group: 'commons-io', 					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.8.7'
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr2'
 
 	// Bucket for rate-limiting
 	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'

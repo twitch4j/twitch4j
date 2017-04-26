@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.chat.commands.CommandPermission;
+import me.philippheuer.twitch4j.enums.SubPlan;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;
 import me.philippheuer.twitch4j.model.Channel;
@@ -143,10 +144,41 @@ public class IrcEventHandler {
 			// Events
 			else if (event.getCommand().equals("PRIVMSG")) {
 				// First Subscribers Subscriptions
+				// Deprecated: To be removed as soon as the beta is over
 				String rawMessage = event.getServerMessage().getMessage();
 				if (event.getServerMessage().getMessage().startsWith(":twitchnotify")) {
 					Pattern regExpr = null;
 					Matcher matcher = null;
+
+					// Subscription: Tier 1
+					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $4.99 sub");
+					matcher = regExpr.matcher(rawMessage);
+					if (matcher.matches()) {
+						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
+						// was: matcher.group("channel")
+						onSubscription(userId, channel, 1, false, "", "1000");
+						return;
+					}
+
+					// Subscription: Tier 2
+					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $9.99 sub");
+					matcher = regExpr.matcher(rawMessage);
+					if (matcher.matches()) {
+						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
+						// was: matcher.group("channel")
+						onSubscription(userId, channel, 1, false, "", "2000");
+						return;
+					}
+
+					// Subscription: Tier 3
+					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $24.99 sub");
+					matcher = regExpr.matcher(rawMessage);
+					if (matcher.matches()) {
+						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
+						// was: matcher.group("channel")
+						onSubscription(userId, channel, 1, false, "", "3000");
+						return;
+					}
 
 					// Subscription: Normal
 					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed!$");
@@ -154,7 +186,7 @@ public class IrcEventHandler {
 					if (matcher.matches()) {
 						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
 						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, false, "");
+						onSubscription(userId, channel, 1, false, "", "1000");
 						return;
 					}
 
@@ -164,7 +196,7 @@ public class IrcEventHandler {
 					if (matcher.matches()) {
 						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
 						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, true, "");
+						onSubscription(userId, channel, 1, true, "", "1000");
 						return;
 					}
 				}
@@ -187,7 +219,7 @@ public class IrcEventHandler {
 					if (tagMap.get("msg-id").equals("resub") && Integer.parseInt(tagMap.get("msg-param-months")) > 1) {
 						Boolean isPrime = tagMap.get("system-msg").toLowerCase().contains("twitch prime");
 
-						onSubscription(Long.parseLong(tagMap.get("user-id")), channel, Integer.parseInt(tagMap.get("msg-param-months")), isPrime, subMessage.orElse(""));
+						onSubscription(Long.parseLong(tagMap.get("user-id")), channel, Integer.parseInt(tagMap.get("msg-param-months")), isPrime, subMessage.orElse(""), tagMap.getOrDefault("msg-param-sub-plan", "1000"));
 						return;
 					}
 				}
@@ -355,7 +387,7 @@ public class IrcEventHandler {
 	/**
 	 * Gets called when a new subscription is announced to the stream.
 	 */
-	private void onSubscription(Long userId, Channel channel, Integer streak, Boolean isPrime, String message) {
+	private void onSubscription(Long userId, Channel channel, Integer streak, Boolean isPrime, String message, String subPlan) {
 		// Build Subscription Entity
 		Subscription entity = new Subscription();
 		entity.setCreatedAt(Optional.ofNullable(new Date()));
@@ -363,6 +395,17 @@ public class IrcEventHandler {
 		entity.setIsPrimeSub(Optional.ofNullable(isPrime));
 		entity.setStreak(Optional.ofNullable(streak));
 		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
+
+		// Sub Tiers
+		if(subPlan.equals("Prime")) {
+			entity.setSubPlan(Optional.ofNullable(SubPlan.PRIME));
+		} else if(subPlan.equals("1000")) {
+			entity.setSubPlan(Optional.ofNullable(SubPlan.TIER_1));
+		} else if(subPlan.equals("2000")) {
+			entity.setSubPlan(Optional.ofNullable(SubPlan.TIER_2));
+		} else if(subPlan.equals("3000")) {
+			entity.setSubPlan(Optional.ofNullable(SubPlan.TIER_3));
+		}
 
 		// Prevent multi-firing of the same subscription (is sometimes send 2. times)
 		String subHistoryKey = String.format("%s|%s", entity.getUser().getId(), entity.getStreak());
