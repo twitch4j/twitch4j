@@ -22,12 +22,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class ChannelMessageEvent extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class ChannelMessageEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
@@ -53,7 +48,7 @@ public class ChannelMessageEvent extends Event {
 	 * @param permissions The permissions of the triggering user.
 	 */
 	public ChannelMessageEvent(Channel channel, User user, String message, Set<CommandPermission> permissions) {
-		this.channel = channel;
+		super(channel);
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;

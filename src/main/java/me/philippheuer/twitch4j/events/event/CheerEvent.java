@@ -20,12 +20,7 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class CheerEvent extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class CheerEvent extends AbstractChannelEvent {
 
 	/**
 	 * Event Target User
@@ -45,7 +40,7 @@ public class CheerEvent extends Event {
 	 * @see Cheer
 	 */
 	public CheerEvent(Channel channel, Cheer cheer) {
-		this.channel = channel;
+		super(channel);
 		this.user = cheer.getUser();
 		this.cheer = cheer;
 	}

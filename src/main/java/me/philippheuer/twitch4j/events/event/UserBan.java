@@ -19,12 +19,7 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class UserBan extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class UserBan extends AbstractChannelEvent {
 
 	/**
 	 * Event Target User
@@ -44,8 +39,7 @@ public class UserBan extends Event {
 	 * @param reason  Reason for Ban.
 	 */
 	public UserBan(Channel channel, User user, String reason) {
-		super();
-		this.channel = channel;
+		super(channel);
 		this.user = user;
 		this.reason = reason;
 	}

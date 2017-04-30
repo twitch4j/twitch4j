@@ -21,12 +21,7 @@ import java.util.Currency;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class DonationEvent extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class DonationEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
@@ -64,7 +59,7 @@ public class DonationEvent extends Event {
 	 * @param message  The plain text of the message.
 	 */
 	public DonationEvent(Channel channel, User user, String source, Currency currency, Double amount, String message) {
-		this.channel = channel;
+		super(channel);
 		this.user = user;
 		this.source = source;
 		this.currency = currency;

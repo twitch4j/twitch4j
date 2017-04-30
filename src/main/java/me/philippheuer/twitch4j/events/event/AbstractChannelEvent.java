@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
 
 /**
- * This event gets called when a user gets a new follower.
+ * This event is a base for events that originate from a channel.
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%
@@ -19,21 +18,29 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class FollowEvent extends AbstractChannelEvent {
+public class AbstractChannelEvent extends Event {
 
 	/**
-	 * User
+	 * Event Channel
 	 */
-	private final User user;
+	private final Channel channel;
 
 	/**
 	 * Event Constructor
 	 *
 	 * @param channel The channel that this event originates from.
-	 * @param user    The user who triggered the event.
 	 */
-	public FollowEvent(Channel channel, User user) {
-		super(channel);
-		this.user = user;
+	public AbstractChannelEvent(Channel channel) {
+		this.channel = channel;
 	}
+
+	/**
+	 * Method to send messages to the channel the event originates from.
+	 *
+	 * @param message  The plain text of the message.
+	 */
+	public void sendMessage(String message) {
+		getClient().getIrcClient().sendMessage(channel.getName(), message);
+	}
+
 }

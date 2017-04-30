@@ -19,12 +19,7 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class UserTimeout extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class UserTimeout extends AbstractChannelEvent {
 
 	/**
 	 * Event Target User
@@ -50,8 +45,7 @@ public class UserTimeout extends Event {
 	 * @param reason   Reason for Ban.
 	 */
 	public UserTimeout(Channel channel, User user, Integer duration, String reason) {
-		super();
-		this.channel = channel;
+		super(channel);
 		this.user = user;
 		this.duration = duration;
 		this.reason = reason;

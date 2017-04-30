@@ -18,12 +18,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class HostOnEvent extends Event {
-
-	/**
-	 * Event Channel
-	 */
-	private final Channel channel;
+public class HostOnEvent extends AbstractChannelEvent {
 
 	/**
 	 * Event Target Channel
@@ -37,7 +32,7 @@ public class HostOnEvent extends Event {
 	 * @param targetChannel The channel that was hosted.
 	 */
 	public HostOnEvent(Channel channel, Channel targetChannel) {
-		this.channel = channel;
+		super(channel);
 		this.targetChannel = targetChannel;
 	}
 
