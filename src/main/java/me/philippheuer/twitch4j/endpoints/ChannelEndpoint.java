@@ -19,6 +19,7 @@ import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -495,6 +496,56 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		} catch (Exception ex) {
 			return false;
 		}
+	}
+
+	/**
+	 * IRC: Ban User
+	 * This command will allow you to permanently ban a user from the chat room.
+	 *
+	 * @param user Username.
+	 */
+	public void ban(String user) {
+		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".ban %s", user));
+	}
+
+	/**
+	 * IRC: Unban User
+	 * This command will allow you to lift a permanent ban on a user from the chat room. You can also use this command to end a ban early; this also applies to timeouts.
+	 *
+	 * @param user Username.
+	 */
+	public void unban(String user) {
+		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".unban %s", user));
+	}
+
+	/**
+	 * IRC: Timeout User
+	 * This command allows you to temporarily ban someone from the chat room for 10 minutes by default.
+	 * This will be indicated to yourself and the temporarily banned subject in chat on a successful temporary ban.
+	 * A new timeout command will overwrite an old one.
+	 *
+	 * @param user Username.
+	 */
+	public void timeout(String user, Duration duration) {
+		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
+	}
+
+	/**
+	 * IRC: Purge Chat of User
+	 * Permanently bans a user from the channel.
+	 *
+	 * @param user          User.
+	 */
+	public void purgeChat(String user) {
+		timeout(user, Duration.ofSeconds(1));
+	}
+
+	/**
+	 * IRC: Purge Chat
+	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
+	 */
+	public void purgeChat() {
+		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), ".clear");
 	}
 
 	/**

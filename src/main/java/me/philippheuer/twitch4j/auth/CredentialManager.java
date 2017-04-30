@@ -165,6 +165,7 @@ public class CredentialManager {
 	public void addTwitchCredential(String key, OAuthCredential credential) {
 		// Check Credential Content
 		Token token = getTwitchClient().getKrakenEndpoint().getToken(credential);
+		credential.setType("twitch");
 		credential.setUserId(token.getUserId());
 		credential.setUserName(token.getUserName());
 		credential.setDisplayName(token.getUserName());
@@ -182,6 +183,7 @@ public class CredentialManager {
 	 */
 	public void addStreamlabsCredential(String key, OAuthCredential credential) {
 		// OAuthCredential Prefix
+		credential.setType("streamlabs");
 		addAnyCredential("STREAMLABS-" + key, credential);
 	}
 

@@ -193,17 +193,6 @@ public class IrcClient {
 	}
 
 	/**
-	 * Purges all chat messages for a user.
-	 *
-	 * @param channelName Name of the channel.
-	 * @param userName Name of the user.
-	 */
-	public void purgeChatOfUser(final String channelName, final String userName) {
-		// Send Message
-		sendMessage(channelName, String.format(".timeout %s 1", userName));
-	}
-
-	/**
 	 * Gets the status of the IRC Client.
 	 *
 	 * @return Whether the service or operating normally or not.
