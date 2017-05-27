@@ -169,6 +169,13 @@ public class CommandHandler {
 		if (cmd.isPresent()) {
 			// Enabled?
 			if (cmd.get().getEnabled()) {
+				// Need to fetch permissions?
+				if(cmd.get().getRequiredPermissions().contains(CommandPermission.MODERATOR)) {
+					// Moderator
+					if (twitchClient.getTMIEndpoint().isUserModerator(messageEvent.getChannel(), messageEvent.getUser())) {
+						messageEvent.getPermissions().add(CommandPermission.MODERATOR);
+					}
+				}
 				// Check Command Permissions
 				if (cmd.get().hasPermissions(messageEvent)) {
 					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());

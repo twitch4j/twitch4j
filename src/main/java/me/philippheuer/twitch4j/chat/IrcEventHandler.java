@@ -349,7 +349,7 @@ public class IrcEventHandler {
 		// User Information
 		User user = new User();
 		user.setId(userId);
-		user.setName(userName);
+		user.setName(userName.toLowerCase());
 		user.setDisplayName(userName);
 
 		// Check for Permissions
@@ -371,10 +371,6 @@ public class IrcEventHandler {
 		// Subscriber
 		if (tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
 			userPermissions.add(CommandPermission.SUBSCRIBER);
-		}
-		// Moderator
-		if (twitchClient.getTMIEndpoint().isUserModerator(channel, user)) {
-			userPermissions.add(CommandPermission.MODERATOR);
 		}
 		// Everyone
 		userPermissions.add(CommandPermission.EVERYONE);

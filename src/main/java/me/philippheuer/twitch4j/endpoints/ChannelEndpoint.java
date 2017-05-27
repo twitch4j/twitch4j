@@ -532,7 +532,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * IRC: Purge Chat of User
-	 * Permanently bans a user from the channel.
+	 * Clears all messages in a channel.
 	 *
 	 * @param user          User.
 	 */

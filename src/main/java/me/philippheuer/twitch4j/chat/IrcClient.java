@@ -161,6 +161,8 @@ public class IrcClient {
 	 * @param message The message to send.
 	 */
 	public void sendMessage(final String channelName, final String message) {
+		Logger.debug(this, "Sending message to channel [%s] with content [%s].!", channelName, message);
+
 		new Thread(() -> {
 			// Consume 1 Token (wait's in case the limit has been exceeded)
 			getMessageBucket().consume(1);
