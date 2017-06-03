@@ -6,8 +6,10 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
+import me.philippheuer.twitch4j.events.event.UnknownCommandEvent;
 
 import java.io.File;
 import java.util.*;
@@ -21,14 +23,17 @@ public class CommandHandler {
 	 * A map routing command aliases to the primary command
 	 */
 	public HashMap<String, String> commandAliasToPrimaryMap = new HashMap<String, String>();
+
 	/**
 	 * Holds the Twitch Instance
 	 */
 	private TwitchClient twitchClient;
+
 	/**
 	 * Holds all available Commands
 	 */
 	private HashMap<String, Command> commandMap = new HashMap<String, Command>();
+
 	/**
 	 * Command Trigger
 	 */
@@ -153,15 +158,25 @@ public class CommandHandler {
 	 */
 	@EventSubscriber
 	public void processCommand(ChannelMessageEvent messageEvent) {
-		// Get real command name from alias
-		String cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().length()));
-		if (messageEvent.getMessage().contains(" ")) {
-			cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().indexOf(" ")));
-		}
+		String cmdTrigger = messageEvent.getMessage().substring(0, getCommandTrigger().length());
+		String cmdName = null;
 
-		// Command existing, or a general message?
-		if (cmdName == null) {
-			return;
+		if(messageEvent.getMessage().startsWith(getCommandTrigger())) {
+			// Get real command name from alias - With Trigger
+			if (messageEvent.getMessage().contains(" ")) {
+				cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().indexOf(" ")));
+			} else {
+				cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().length()));
+			}
+		} else {
+			// Get real command name from alias - Without Trigger
+			if (messageEvent.getMessage().contains(" ")) {
+				cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(0, messageEvent.getMessage().indexOf(" ")));
+			} else {
+				cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(0, messageEvent.getMessage().length()));
+			}
+
+			cmdTrigger = "";
 		}
 
 		Optional<Command> cmd = getCommand(cmdName);
@@ -169,6 +184,19 @@ public class CommandHandler {
 		if (cmd.isPresent()) {
 			// Enabled?
 			if (cmd.get().getEnabled()) {
+				// Check for Command Trigger
+				if(cmd.get().getRequiresCommandTrigger()) {
+					if(!cmdTrigger.equals(getCommandTrigger())) {
+						// Invalid CommandTrigger
+						return;
+					}
+				} else {
+					if(!cmdTrigger.equals(getCommandTrigger()) && !cmdTrigger.equals("")) {
+						// Only accepting the right or no CommandTrigger
+						return;
+					}
+				}
+
 				// Need to fetch permissions?
 				if(cmd.get().getRequiredPermissions().contains(CommandPermission.MODERATOR)) {
 					// Moderator
@@ -176,6 +204,7 @@ public class CommandHandler {
 						messageEvent.getPermissions().add(CommandPermission.MODERATOR);
 					}
 				}
+
 				// Check Command Permissions
 				if (cmd.get().hasPermissions(messageEvent)) {
 					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
@@ -186,6 +215,12 @@ public class CommandHandler {
 				}
 			} else {
 				Logger.info(this, "Access to command [%s] denied for user [%s].! (Command Disabled)", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
+			}
+		} else {
+			if(cmdTrigger.equals(getCommandTrigger())) {
+				// Dispatch UnknownCommandEvent
+				Event event = new UnknownCommandEvent(messageEvent.getChannel(), messageEvent.getUser(), messageEvent);
+				getTwitchClient().getDispatcher().dispatch(event);
 			}
 		}
 	}
