@@ -358,10 +358,15 @@ public class IrcEventHandler {
 			// - Broadcaster
 			if (badges.contains("broadcaster/1")) {
 				userPermissions.add(CommandPermission.BROADCASTER);
+				userPermissions.add(CommandPermission.MODERATOR);
 			}
 			// Twitch Prime
 			if (badges.contains("premium/1")) {
 				userPermissions.add(CommandPermission.PRIME_TURBO);
+			}
+			// Moderator
+			if (badges.contains("moderator/1")) {
+				userPermissions.add(CommandPermission.MODERATOR);
 			}
 		}
 		// Twitch Turbo
