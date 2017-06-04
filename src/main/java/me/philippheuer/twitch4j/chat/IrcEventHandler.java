@@ -327,20 +327,19 @@ public class IrcEventHandler {
 	 */
 	@Handler(priority = Integer.MAX_VALUE)
 	protected void onMessageEvent(org.kitteh.irc.client.library.event.channel.ChannelMessageEvent event) {
-		String channelName = event.getChannel().getName().replace("#", "");
-		String userName = event.getActor().getNick();
-		String userMessage = event.getMessage();
-		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
-
 		// Build Map from Tags
 		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
 
 		// Cancel, if there is no information about the user.
-		if(!tagMap.containsKey("user-id")) {
+		if(!tagMap.containsKey("user-id") || !tagMap.containsKey("display-name")) {
 			return;
 		}
 
+		String channelName = event.getChannel().getName().replace("#", "");
+		String userMessage = event.getMessage();
+		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
 		Long userId = Long.parseLong(tagMap.get("user-id"));
+		String userName = tagMap.get("display-name");
 
 		// Channel Information
 		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).orElse(null);
