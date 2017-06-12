@@ -43,20 +43,20 @@ dependencies {
 	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
 	// Spring (RestTemplate)
-	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.8.RELEASE'
+	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.9.RELEASE'
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
 	// WebSocket Client for Twitch PubSub
 	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.2'
 
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.0.3'
+	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.1.0'
 
 	// Apache Commons IO
 	compile group: 'commons-io', 					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr2'
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr3'
 
 	// Bucket for rate-limiting
 	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'
@@ -66,7 +66,7 @@ dependencies {
 
 
 	// TypeTools
-	compile group: 'net.jodah', 					name: 'typetools', 				version: '0.4.9'
+	compile group: 'net.jodah', 					name: 'typetools', 				version: '0.5.0'
 
 	// Args4J - CommandLineArgumentParser
 	compile group: 'args4j', 						name: 'args4j', 				version: '2.33'

@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.events.event.ChannelJoinEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
@@ -143,7 +144,7 @@ public class IrcClient {
 	 */
 	public void joinChannel(String channelName) {
 		if(getIrcClient() == null) {
-			Logger.warn(this, "IRC Client not initalized. Can't join [%s]!", channelName);
+			Logger.warn(this, "IRC Client not initialized. Can't join [%s]!", channelName);
 		}
 
 		String ircChannel = String.format("#%s", channelName);
@@ -151,6 +152,10 @@ public class IrcClient {
 			getIrcClient().addChannel(ircChannel);
 
 			Logger.info(this, "Joined Channel [%s]!", channelName);
+
+			// Trigger JoinEvent
+			ChannelJoinEvent event = new ChannelJoinEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
+			getTwitchClient().getDispatcher().dispatch(event);
 		}
 	}
 
