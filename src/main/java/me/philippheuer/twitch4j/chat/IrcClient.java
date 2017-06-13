@@ -20,6 +20,8 @@ import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
+import org.kitteh.irc.client.library.feature.twitch.TwitchDelaySender;
+import org.kitteh.irc.client.library.feature.twitch.TwitchListener;
 
 @Getter
 @Setter
@@ -88,33 +90,8 @@ public class IrcClient {
         		.serverPassword("oauth:"+twitchCredential.get().getToken())
         		.nick(twitchCredential.get().getUserName())
         		.build());
+        	getIrcClient().getEventManager().registerEventListener(new TwitchListener(getIrcClient()));
         	getIrcClient().getEventManager().registerEventListener(new IrcEventHandler(getTwitchClient()));
-
-        	// Request Capabilities
-        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/tags");
-        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/membership"); // NAMES, JOIN, PART, MODE
-        	getIrcClient().sendRawLine("CAP REQ :twitch.tv/commands");
-
-        	// Exception Handling
-        	getIrcClient().setExceptionListener(new Consumer<Exception>() {
-
-				@Override
-				public void accept(Exception ex) {
-					// Filter Exceptions
-					if(ex.getMessage().length() > 0 && ex.getMessage().contains("Server version missing")) {
-						// Suppress Server version missing exception for twitch compability.
-						return;
-					} else {
-						if(ex instanceof KittehConnectionException) {
-							Logger.warn(this, "Connection to Twitch IRC lost. [%s]", getTwitchClient().getTwitchIrcEndpoint());
-							reconnect();
-							return;
-						}
-
-						ex.printStackTrace();
-					}
-				}
-        	});
 
 			Logger.info(this, "Connected to Twitch IRC! [%s]", getTwitchClient().getTwitchIrcEndpoint());
 
@@ -187,6 +164,8 @@ public class IrcClient {
 	 * @param message The message to send.
 	 */
 	public void sendPrivateMessage(final String userName, final String message) {
+		Logger.debug(this, "Sending private message to [%s] with content [%s].!", userName, message);
+
 		new Thread(() -> {
 			// Consume 1 Token (wait's in case the limit has been exceeded)
 			getMessageBucket().consume(1);
