@@ -47,7 +47,7 @@ public class Stream {
 	 * @return The stream uptime.
 	 */
 	public Duration getUptime() {
-		Duration uptime = Duration.between(Calendar.getInstance().toInstant(), getCreatedAt().toInstant());
+		Duration uptime = Duration.between(getCreatedAt().toInstant(), Calendar.getInstance().toInstant());
 
 		return uptime;
 	}
