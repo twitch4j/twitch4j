@@ -31,8 +31,6 @@ public class Subscription {
 
 	private Optional<String> message;
 
-	private Optional<Boolean> isPrimeSub;
-
 	private User user;
 
 	/**

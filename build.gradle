@@ -39,6 +39,7 @@ def gitVersion() {
 // Dependencies
 dependencies {
 	// Logging
+	compile group: 'org.slf4j', 					name: 'slf4j-api', 				version: '1.7.25'
 	compile group: 'ch.qos.logback', 				name: 'logback-classic', 		version: '1.2.3'
 	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
@@ -50,20 +51,19 @@ dependencies {
 	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.2'
 
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.1.0'
+	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
 
 	// Apache Commons IO
 	compile group: 'commons-io', 					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr3'
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr4'
 
 	// Bucket for rate-limiting
 	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'
 
 	// Expiring Map
 	compile group: 'net.jodah', 					name: 'expiringmap', 			version: '0.5.8'
-
 
 	// TypeTools
 	compile group: 'net.jodah', 					name: 'typetools', 				version: '0.5.0'

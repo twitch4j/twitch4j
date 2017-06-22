@@ -18,6 +18,9 @@ import net.jodah.expiringmap.ExpiringMap;
 import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
+import org.kitteh.irc.client.library.feature.twitch.TwitchDelaySender;
+import org.kitteh.irc.client.library.feature.twitch.event.TwitchSingleMessageEvent;
+import org.kitteh.irc.client.library.feature.twitch.event.UserNoticeEvent;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -143,85 +146,9 @@ public class IrcEventHandler {
 			}
 			// Events
 			else if (event.getCommand().equals("PRIVMSG")) {
-				// First Subscribers Subscriptions
-				// Deprecated: To be removed as soon as the beta is over
-				String rawMessage = event.getServerMessage().getMessage();
-				if (event.getServerMessage().getMessage().startsWith(":twitchnotify")) {
-					Pattern regExpr = null;
-					Matcher matcher = null;
-
-					// Subscription: Tier 1
-					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $4.99 sub");
-					matcher = regExpr.matcher(rawMessage);
-					if (matcher.matches()) {
-						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
-						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, false, "", "1000");
-						return;
-					}
-
-					// Subscription: Tier 2
-					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $9.99 sub");
-					matcher = regExpr.matcher(rawMessage);
-					if (matcher.matches()) {
-						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
-						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, false, "", "2000");
-						return;
-					}
-
-					// Subscription: Tier 3
-					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with a $24.99 sub");
-					matcher = regExpr.matcher(rawMessage);
-					if (matcher.matches()) {
-						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
-						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, false, "", "3000");
-						return;
-					}
-
-					// Subscription: Normal
-					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed!$");
-					matcher = regExpr.matcher(rawMessage);
-					if (matcher.matches()) {
-						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
-						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, false, "", "1000");
-						return;
-					}
-
-					// Subscription: Twitch Prime
-					regExpr = Pattern.compile("^:twitchnotify!twitchnotify@twitchnotify\\.tmi\\.twitch\\.tv PRIVMSG #(?<channel>[a-zA-Z0-9_]{4,25}) :(?<userName>[a-zA-Z0-9_]{4,25}) just subscribed with Twitch Prime!$");
-					matcher = regExpr.matcher(rawMessage);
-					if (matcher.matches()) {
-						Long userId = getTwitchClient().getUserEndpoint().getUserIdByUserName(matcher.group("userName")).get();
-						// was: matcher.group("channel")
-						onSubscription(userId, channel, 1, true, "", "1000");
-						return;
-					}
-				}
-
 				// Cheers
 				if (tagMap.containsKey("bits")) {
 					onCheer(Long.parseLong(tagMap.get("user-id")), channel, tagMap.get("bits"), event.getParameters().get(1));
-				}
-			}
-			// Resubscriptions
-			else if (event.getCommand().equals("USERNOTICE")) {
-				// Get SubMessage if user wrote one
-				Optional<String> subMessage = Optional.empty();
-				if (event.getParameters().size() > 1) {
-					subMessage = Optional.ofNullable(event.getParameters().get(1));
-				}
-
-				// Check Tags
-				if (tagMap.containsKey("msg-id") && tagMap.containsKey("msg-param-months") && tagMap.containsKey("display-name") && tagMap.containsKey("system-msg")) {
-					if (tagMap.get("msg-id").equals("resub") && Integer.parseInt(tagMap.get("msg-param-months")) > 1) {
-						Boolean isPrime = tagMap.get("system-msg").toLowerCase().contains("twitch prime");
-
-						onSubscription(Long.parseLong(tagMap.get("user-id")), channel, Integer.parseInt(tagMap.get("msg-param-months")), isPrime, subMessage.orElse(""), tagMap.getOrDefault("msg-param-sub-plan", "1000"));
-						return;
-					}
 				}
 			}
 			// Notices
@@ -331,15 +258,22 @@ public class IrcEventHandler {
 		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
 
 		// Cancel, if there is no information about the user.
-		if(!tagMap.containsKey("user-id") || !tagMap.containsKey("display-name")) {
+		if(!tagMap.containsKey("user-id")) {
 			return;
 		}
 
 		String channelName = event.getChannel().getName().replace("#", "");
 		String userMessage = event.getMessage();
 		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
+
+		// User Id
 		Long userId = Long.parseLong(tagMap.get("user-id"));
-		String userName = tagMap.get("display-name");
+
+		// User Name
+		String userName = event.getActor().getNick();
+		if(tagMap.containsKey("display-name")) {
+			userName = tagMap.get("display-name");
+		}
 
 		// Channel Information
 		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).orElse(null);
@@ -384,15 +318,28 @@ public class IrcEventHandler {
 		getTwitchClient().getDispatcher().dispatch(channelMessageEvent);
 	}
 
+	// Sub / Resubs
+	@Handler(priority = Integer.MAX_VALUE)
+	private void onTwitchUserNoticeEvent(UserNoticeEvent event) {
+		// Parameters
+		Optional<String> subMessage = event.getMessage();
+		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(event.getChannel().getName().substring(1)).orElse(null);
+		Channel channel = getTwitchClient().getChannelEndpoint(chanelId).getChannel();
+
+		if(event.getTag("msg-id").isPresent() && event.getTag("msg-param-months").isPresent() && event.getTag("msg-param-sub-plan").isPresent()) {
+			onSubscription(Long.parseLong(event.getTag("user-id").get().getValue().get()), channel, Integer.parseInt(event.getTag("msg-param-months").get().getValue().get()), subMessage.orElse(""), event.getTag("msg-param-sub-plan").get().getValue().get());
+			return;
+		}
+	}
+
 	/**
 	 * Gets called when a new subscription is announced to the stream.
 	 */
-	private void onSubscription(Long userId, Channel channel, Integer streak, Boolean isPrime, String message, String subPlan) {
+	private void onSubscription(Long userId, Channel channel, Integer streak, String message, String subPlan) {
 		// Build Subscription Entity
 		Subscription entity = new Subscription();
 		entity.setCreatedAt(Optional.ofNullable(new Date()));
 		entity.setMessage(Optional.ofNullable(streak > 1 ? message : null)); // You can't write a message for the first sub.
-		entity.setIsPrimeSub(Optional.ofNullable(isPrime));
 		entity.setStreak(Optional.ofNullable(streak));
 		entity.setUser(getTwitchClient().getUserEndpoint().getUser(userId).get());
 
