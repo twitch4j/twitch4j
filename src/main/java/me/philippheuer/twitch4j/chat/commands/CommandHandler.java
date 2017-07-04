@@ -45,6 +45,11 @@ public class CommandHandler {
 	private File commandSaveFile;
 
 	/**
+	 * Custom Permissions
+	 */
+	private Map<Long, List<CommandPermission>> customPermissions = new HashMap<Long, List<CommandPermission>>();
+
+	/**
 	 * Class Constructor
 	 *
 	 * @param twitchClient Instance of TwitchClient
@@ -197,6 +202,13 @@ public class CommandHandler {
 					}
 				}
 
+				// Check for custom defined permissions
+				if(customPermissions.containsKey(messageEvent.getUser().getId())) {
+					List<CommandPermission> userCustomPermissions = customPermissions.get(messageEvent.getUser().getId());
+
+					messageEvent.getPermissions().addAll(userCustomPermissions);
+				}
+
 				// Check Command Permissions
 				if (cmd.get().hasPermissions(messageEvent)) {
 					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
@@ -311,4 +323,19 @@ public class CommandHandler {
 		}
 	}
 
+	/**
+	 * Method to grant custom permissions (Owner,Broadcaster,...)
+	 *
+	 * @param userId Twitch User Id
+	 * @param permission Permission
+	 */
+	public void grantCustomPermission(Long userId, CommandPermission permission) {
+		if(customPermissions.containsKey(userId)) {
+			customPermissions.get(userId).add(permission);
+		} else {
+			List<CommandPermission> permissions = new ArrayList<CommandPermission>();
+			permissions.add(permission);
+			customPermissions.put(userId, permissions);
+		}
+	}
 }
