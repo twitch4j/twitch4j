@@ -15,11 +15,10 @@ import me.philippheuer.twitch4j.model.User;
 import net.engio.mbassy.listener.Handler;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import org.apache.commons.lang3.StringUtils;
 import org.kitteh.irc.client.library.element.MessageTag;
 import org.kitteh.irc.client.library.element.ServerMessage;
 import org.kitteh.irc.client.library.event.abstractbase.ClientReceiveServerMessageEventBase;
-import org.kitteh.irc.client.library.feature.twitch.TwitchDelaySender;
-import org.kitteh.irc.client.library.feature.twitch.event.TwitchSingleMessageEvent;
 import org.kitteh.irc.client.library.feature.twitch.event.UserNoticeEvent;
 
 import java.util.*;
@@ -146,9 +145,25 @@ public class IrcEventHandler {
 			}
 			// Events
 			else if (event.getCommand().equals("PRIVMSG")) {
+				String rawMessage = event.getServerMessage().getMessage();
+
 				// Cheers
 				if (tagMap.containsKey("bits")) {
 					onCheer(Long.parseLong(tagMap.get("user-id")), channel, tagMap.get("bits"), event.getParameters().get(1));
+				}
+				// Action Messages
+				if(event.getServerMessage().getMessage().contains(":\u0001ACTION")) {
+					String userMessage = StringUtils.substringBetween(rawMessage, ":\u0001ACTION ", "\u0001");
+
+					// User Information
+					User user = getUserByTags(tagMap);
+					if(user == null) {
+						return;
+					}
+
+					// Dispatch Event
+					ChannelMessageActionEvent channelMessageActionEvent = new ChannelMessageActionEvent(channel, user, userMessage, getUserPermissionsByTags(tagMap));
+					getTwitchClient().getDispatcher().dispatch(channelMessageActionEvent);
 				}
 			}
 			// Notices
@@ -257,64 +272,21 @@ public class IrcEventHandler {
 		// Build Map from Tags
 		Map<String, String> tagMap = getTagMap(event.getOriginalMessages().get(0));
 
-		// Cancel, if there is no information about the user.
-		if(!tagMap.containsKey("user-id")) {
-			return;
-		}
-
-		String channelName = event.getChannel().getName().replace("#", "");
-		String userMessage = event.getMessage();
-		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
-
-		// User Id
-		Long userId = Long.parseLong(tagMap.get("user-id"));
-
-		// User Name
-		String userName = event.getActor().getNick();
-		if(tagMap.containsKey("display-name")) {
-			userName = tagMap.get("display-name");
-		}
-
 		// Channel Information
+		String channelName = event.getChannel().getName().replace("#", "");
 		Long chanelId = getTwitchClient().getUserEndpoint().getUserIdByUserName(channelName).orElse(null);
 		Channel channel = getTwitchClient().getChannelEndpoint(chanelId).getChannel();
 
-		// User Information
-		User user = new User();
-		user.setId(userId);
-		user.setName(userName.toLowerCase());
-		user.setDisplayName(userName);
+		String userMessage = event.getMessage();
 
-		// Check for Permissions
-		if (tagMap.containsKey("badges")) {
-			List<String> badges = Arrays.asList(tagMap.get("badges").split(","));
-			// - Broadcaster
-			if (badges.contains("broadcaster/1")) {
-				userPermissions.add(CommandPermission.BROADCASTER);
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
-			// Twitch Prime
-			if (badges.contains("premium/1")) {
-				userPermissions.add(CommandPermission.PRIME_TURBO);
-			}
-			// Moderator
-			if (badges.contains("moderator/1")) {
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
+		// User Information
+		User user = getUserByTags(tagMap);
+		if(user == null) {
+			return;
 		}
-		// Twitch Turbo
-		if (tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
-			userPermissions.add(CommandPermission.PRIME_TURBO);
-		}
-		// Subscriber
-		if (tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
-			userPermissions.add(CommandPermission.SUBSCRIBER);
-		}
-		// Everyone
-		userPermissions.add(CommandPermission.EVERYONE);
 
 		// Dispatch Event
-		ChannelMessageEvent channelMessageEvent = new ChannelMessageEvent(channel, user, userMessage, userPermissions);
+		ChannelMessageEvent channelMessageEvent = new ChannelMessageEvent(channel, user, userMessage, getUserPermissionsByTags(tagMap));
 		getTwitchClient().getDispatcher().dispatch(channelMessageEvent);
 	}
 
@@ -391,5 +363,68 @@ public class IrcEventHandler {
 		}
 
 		return tagMap;
+	}
+
+	/**
+	 * Get UserInfo using the IRC Tags.
+	 */
+	private User getUserByTags(Map<String, String> tagMap) {
+		// Cancel, if there is no information about the user.
+		if(!tagMap.containsKey("user-id") || !tagMap.containsKey("display-name")) {
+			return null;
+		}
+
+		// User Id
+		Long userId = Long.parseLong(tagMap.get("user-id"));
+
+		// User Name
+		String userName = tagMap.get("display-name");
+
+		// User Information
+		User user = new User();
+		user.setId(userId);
+		user.setName(userName.toLowerCase());
+		user.setDisplayName(userName);
+
+		return user;
+	}
+
+	/**
+	 * Gets the UserPermission using the IRC Tags.
+	 *
+	 * @param tagMap The TagMap.
+	 */
+	private Set<CommandPermission> getUserPermissionsByTags(Map<String, String> tagMap) {
+		Set<CommandPermission> userPermissions = new HashSet<CommandPermission>();
+
+		// Check for Permissions
+		if (tagMap.containsKey("badges")) {
+			List<String> badges = Arrays.asList(tagMap.get("badges").split(","));
+			// - Broadcaster
+			if (badges.contains("broadcaster/1")) {
+				userPermissions.add(CommandPermission.BROADCASTER);
+				userPermissions.add(CommandPermission.MODERATOR);
+			}
+			// Twitch Prime
+			if (badges.contains("premium/1")) {
+				userPermissions.add(CommandPermission.PRIME_TURBO);
+			}
+			// Moderator
+			if (badges.contains("moderator/1")) {
+				userPermissions.add(CommandPermission.MODERATOR);
+			}
+		}
+		// Twitch Turbo
+		if (tagMap.containsKey("turbo") && tagMap.get("turbo").equals("1")) {
+			userPermissions.add(CommandPermission.PRIME_TURBO);
+		}
+		// Subscriber
+		if (tagMap.containsKey("subscriber") && tagMap.get("subscriber").equals("1")) {
+			userPermissions.add(CommandPermission.SUBSCRIBER);
+		}
+		// Everyone
+		userPermissions.add(CommandPermission.EVERYONE);
+
+		return userPermissions;
 	}
 }

@@ -53,8 +53,11 @@ dependencies {
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
 	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
 
-	// Apache Commons IO
-	compile group: 'commons-io', 					name: 'commons-io', 			version: '2.5'
+	// Apache Commons
+	// - Lang
+	compile group: 'org.apache.commons',			name: 'commons-lang3', 			version: '3.6'
+	// - IO
+	compile group: 'commons-io',					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
 	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr4'
