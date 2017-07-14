@@ -37,6 +37,8 @@ public class Stream {
 
 	private double averageFps;
 
+	private boolean isPlaylist;
+
 	private TwitchImages preview;
 
 	private Channel channel;

@@ -318,6 +318,40 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	}
 
 	/**
+	 * Checks if a stream is live (includes replays)
+	 * Requires Scope: none
+	 *
+	 * @param channel Get stream object of Channel Entity
+	 */
+	public boolean isLive(Channel channel) {
+		Optional<Stream> stream = this.getByChannel(channel);
+
+		if(stream.isPresent()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if a stream is currently live and running a replay
+	 * Requires Scope: none
+	 *
+	 * @param channel Get stream object of Channel Entity
+	 */
+	public boolean isReplaying(Channel channel) {
+		Optional<Stream> stream = this.getByChannel(channel);
+
+		if(stream.isPresent()) {
+			if(stream.get().isPlaylist()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Whether a stream is on the frontpage.
 	 * <p>
 	 * This method check's if the stream is on the frontpage for a certain region.

@@ -48,7 +48,7 @@ dependencies {
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
 	// WebSocket Client for Twitch PubSub
-	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.2'
+	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.3'
 
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
 	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
@@ -75,7 +75,7 @@ dependencies {
 	compile group: 'args4j', 						name: 'args4j', 				version: '2.33'
 
 	// Getter & Setter
-	compile group: 'org.projectlombok', 			name: 'lombok', 				version: '1.16.16'
+	compile group: 'org.projectlombok', 			name: 'lombok', 				version: '1.16.18'
 
 	// Testing
 	testCompile group: 'junit', 					name: 'junit', 					version: '4.12'
