@@ -11,7 +11,7 @@ plugins {
 	id 'java'
 	id 'eclipse'
 	id 'idea'
-	id 'io.ratpack.ratpack-java' version '1.4.5'
+	id 'io.ratpack.ratpack-java' version '1.4.6'
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -52,6 +52,12 @@ dependencies {
 
 	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
 	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
+	// - Transitive Dependency Conflict: Ratpack <-> Kitteh IRC Client
+	compile group: 'io.netty', 						name: 'netty-codec-http', 		version: '4.1.13.Final'
+	compile group: 'io.netty', 						name: 'netty-codec', 			version: '4.1.13.Final'
+	compile group: 'io.netty', 						name: 'netty-handler', 			version: '4.1.13.Final'
+	compile group: 'io.netty', 						name: 'netty-common', 			version: '4.1.13.Final'
+	compile group: 'io.netty', 						name: 'netty-transport-native-epoll', version: '4.1.13.Final'
 
 	// Apache Commons
 	// - Lang
