@@ -62,7 +62,7 @@ public class IrcClient {
 		connect();
 	}
 
-	private Boolean connect() {
+	private boolean connect() {
 		Logger.info(this, "Connecting to Twitch IRC [%s]", getTwitchClient().getTwitchIrcEndpoint());
 
 		// Shutdown, if the client is still running
@@ -115,7 +115,7 @@ public class IrcClient {
 		connect();
 	}
 
-	private void disconnect() {
+	public void disconnect() {
 		Logger.info(this, "Disconnecting from Twitch IRC!");
 		getIrcClient().shutdown();
 	}
@@ -147,6 +147,30 @@ public class IrcClient {
 						.build();
 				modMessageBucket.put(channelName, modBucket);
 			}
+		}
+	}
+
+	/**
+	 * Leaving a channel, required to listen for messages
+	 * @param channelName The channel to join.
+	 */
+	public void partChannel(String channelName) {
+		if(getIrcClient() == null) {
+			Logger.warn(this, "IRC Client not initialized. Can't join [%s]!", channelName);
+		}
+
+		String ircChannel = String.format("#%s", channelName);
+		if(getIrcClient().getChannels().contains(ircChannel)) {
+			getIrcClient().removeChannel(ircChannel);
+
+			Logger.info(this, "Leaving Channel [%s]!", channelName);
+
+			// Trigger JoinEvent
+			ChannelJoinEvent event = new ChannelJoinEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
+			getTwitchClient().getDispatcher().dispatch(event);
+
+			// dropping moderations
+			if (modMessageBucket.containsKey(channelName)) modMessageBucket.remove(channelName);
 		}
 	}
 

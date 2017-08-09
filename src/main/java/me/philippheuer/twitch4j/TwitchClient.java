@@ -212,6 +212,22 @@ public class TwitchClient {
 	}
 
 	/**
+	 * Connect to other related services.
+	 * <p>
+	 * This methods opens the connection to the twitch irc server and the pubsub endpoint.
+	 * Connect needs to be called after initalizing the {@link CredentialManager}.
+	 */
+	public void disconnect() {
+		getIrcClient().disconnect();
+		getPubSub().disconnect();
+	}
+
+	public void reconnect() {
+		disconnect();
+		connect();
+	}
+
+	/**
 	 * Returns an a new KrakenEndpoint instance.
 	 * <p>
 	 * The Kraken Endpoint is the root of the twitch api.

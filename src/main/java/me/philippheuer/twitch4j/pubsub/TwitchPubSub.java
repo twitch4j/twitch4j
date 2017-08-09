@@ -156,7 +156,7 @@ public class TwitchPubSub {
 	}
 
 	private void reconnect() {
-		cancelTasks();
+		disconnect();
 		if (connect()) {
 			scheduleTasks();
 		} else {
@@ -186,8 +186,13 @@ public class TwitchPubSub {
 		}, 7000, 282000);
 	}
 
+	public void disconnect() {
+		getWebSocket().disconnect();
+		cancelTasks();
+	}
+
 	/**
-	 * Purge the current tasks to prepare for a reconnect.
+	 * Disconnect and purge the current tasks to prepare for a reconnect.
 	 */
 	private void cancelTasks() {
 		timer.cancel();
