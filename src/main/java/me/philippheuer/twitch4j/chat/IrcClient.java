@@ -14,6 +14,7 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.endpoints.TMIEndpoint;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.event.ChannelJoinEvent;
+import me.philippheuer.twitch4j.events.event.ChannelLeaveEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 import org.isomorphism.util.TokenBucket;
@@ -46,6 +47,7 @@ public class IrcClient {
 			.withCapacity(20)
 			.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
 			.build();
+
 	// Token bucket for moderated channels by bot
 	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
 
@@ -151,7 +153,7 @@ public class IrcClient {
 	}
 
 	/**
-	 * Leaving a channel, required to listen for messages
+	 * Leaving a channel, required to stop listening to specific messsages.
 	 * @param channelName The channel to join.
 	 */
 	public void partChannel(String channelName) {
@@ -166,11 +168,13 @@ public class IrcClient {
 			Logger.info(this, "Leaving Channel [%s]!", channelName);
 
 			// Trigger JoinEvent
-			ChannelJoinEvent event = new ChannelJoinEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
+			ChannelLeaveEvent event = new ChannelLeaveEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
 			getTwitchClient().getDispatcher().dispatch(event);
 
-			// dropping moderations
-			if (modMessageBucket.containsKey(channelName)) modMessageBucket.remove(channelName);
+			// Remove rate-limiting bucket for moderated channels
+			if (modMessageBucket.containsKey(channelName)) {
+				modMessageBucket.remove(channelName);
+			}
 		}
 	}
 

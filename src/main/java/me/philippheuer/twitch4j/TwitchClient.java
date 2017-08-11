@@ -212,16 +212,20 @@ public class TwitchClient {
 	}
 
 	/**
-	 * Connect to other related services.
+	 * Disconnect from other related services.
 	 * <p>
-	 * This methods opens the connection to the twitch irc server and the pubsub endpoint.
-	 * Connect needs to be called after initalizing the {@link CredentialManager}.
+	 * This methods closes the connection to the twitch irc server and the pubsub endpoint.
 	 */
 	public void disconnect() {
 		getIrcClient().disconnect();
 		getPubSub().disconnect();
 	}
 
+	/**
+	 * Reconnect to other related services.
+	 * <p>
+	 * This methods reconnects to the twitch irc server and the pubsub endpoint.
+	 */
 	public void reconnect() {
 		disconnect();
 		connect();

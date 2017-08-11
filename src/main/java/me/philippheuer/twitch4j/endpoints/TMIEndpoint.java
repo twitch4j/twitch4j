@@ -43,7 +43,7 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 			if (!restObjectCache.containsKey(requestUrl)) {
 				Logger.trace(this, "Rest Request to [%s]", requestUrl);
 				ChatterResult responseObject = restTemplate.getForObject(requestUrl, ChatterResult.class);
-				restObjectCache.put(requestUrl, responseObject, ExpirationPolicy.CREATED, 20, TimeUnit.SECONDS);
+				restObjectCache.put(requestUrl, responseObject, ExpirationPolicy.CREATED, 60, TimeUnit.SECONDS);
 			}
 
 			return ((ChatterResult) restObjectCache.get(requestUrl)).getChatters();
