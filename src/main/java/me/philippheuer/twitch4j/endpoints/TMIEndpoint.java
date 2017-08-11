@@ -68,11 +68,6 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	public Boolean isUserModerator(Channel channel, User user) {
 		Chatter chatter = getChatters(channel.getName());
 
-		if (chatter.getModerators().contains(user.getName())) {
-			return true;
-		}
-
-		return false;
+		return chatter.getModerators().contains(user.getName());
 	}
-
 }

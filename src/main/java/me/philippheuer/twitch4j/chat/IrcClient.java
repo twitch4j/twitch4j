@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.chat;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -10,9 +11,11 @@ import java.util.function.Consumer;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.endpoints.TMIEndpoint;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.event.ChannelJoinEvent;
 import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 import org.kitteh.irc.client.library.Client;
@@ -43,6 +46,8 @@ public class IrcClient {
 			.withCapacity(20)
 			.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
 			.build();
+	// Token bucket for moderated channels by bot
+	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
 
 	/**
 	 * Class Constructor
@@ -57,7 +62,7 @@ public class IrcClient {
 		connect();
 	}
 
-	private Boolean connect() {
+	private boolean connect() {
 		Logger.info(this, "Connecting to Twitch IRC [%s]", getTwitchClient().getTwitchIrcEndpoint());
 
 		// Shutdown, if the client is still running
@@ -110,7 +115,7 @@ public class IrcClient {
 		connect();
 	}
 
-	private void disconnect() {
+	public void disconnect() {
 		Logger.info(this, "Disconnecting from Twitch IRC!");
 		getIrcClient().shutdown();
 	}
@@ -133,6 +138,39 @@ public class IrcClient {
 			// Trigger JoinEvent
 			ChannelJoinEvent event = new ChannelJoinEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
 			getTwitchClient().getDispatcher().dispatch(event);
+
+			// Checking user if it is moderator
+			if (getTwitchClient().getTMIEndpoint().getChatters(channelName).getModerators().contains(getIrcClient().getName())){
+				TokenBucket modBucket = TokenBuckets.builder()
+						.withCapacity(100)
+						.withFixedIntervalRefillStrategy(1, 300, TimeUnit.MILLISECONDS)
+						.build();
+				modMessageBucket.put(channelName, modBucket);
+			}
+		}
+	}
+
+	/**
+	 * Leaving a channel, required to listen for messages
+	 * @param channelName The channel to join.
+	 */
+	public void partChannel(String channelName) {
+		if(getIrcClient() == null) {
+			Logger.warn(this, "IRC Client not initialized. Can't join [%s]!", channelName);
+		}
+
+		String ircChannel = String.format("#%s", channelName);
+		if(getIrcClient().getChannels().contains(ircChannel)) {
+			getIrcClient().removeChannel(ircChannel);
+
+			Logger.info(this, "Leaving Channel [%s]!", channelName);
+
+			// Trigger JoinEvent
+			ChannelJoinEvent event = new ChannelJoinEvent(this.getTwitchClient().getChannelEndpoint(channelName).getChannel());
+			getTwitchClient().getDispatcher().dispatch(event);
+
+			// dropping moderations
+			if (modMessageBucket.containsKey(channelName)) modMessageBucket.remove(channelName);
 		}
 	}
 
@@ -147,8 +185,12 @@ public class IrcClient {
 
 		new Thread(() -> {
 			// Consume 1 Token (wait's in case the limit has been exceeded)
-			getMessageBucket().consume(1);
-
+			if (getTwitchClient().getTMIEndpoint().getChatters(channelName).getModerators().contains(getIrcClient().getName())) {
+				// Only for channels if bot is moderator
+				getModMessageBucket().get(channelName).consume(1);
+			} else {
+				getMessageBucket().consume(1);
+			}
 			// Send Message
 			getIrcClient().sendMessage("#" + channelName, message);
 
