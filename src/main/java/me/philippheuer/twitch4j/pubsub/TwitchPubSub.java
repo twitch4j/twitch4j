@@ -57,84 +57,7 @@ public class TwitchPubSub {
 		}
 
 		// Register Listener
-		getWebSocket().addListener(new WebSocketAdapter() {
-			/**
-			 * Event: OnConnect (and Reconnect)
-			 */
-			@Override
-			public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
-				// Connected Successfully - Send Channel Subscriptions
-				for (Channel channel : getRegisteredChannels()) {
-					subscribeToBitsTopic(channel);
-				}
-			}
-
-			/**
-			 * Event: Message Received
-			 */
-			@Override
-			public void onTextMessage(WebSocket ws, String message) {
-				// Parse Message
-				try {
-					ObjectMapper mapper = new ObjectMapper();
-					JsonNode jsonNode = mapper.readTree(message);
-
-					// Only Handle Messages with a Type
-					if (jsonNode.get("type") == null) {
-						return;
-					}
-
-					/**
-					 * Handle: PONG
-					 *  If a client does not receive a PONG message within 10 seconds
-					 *  of issuing a PING command, it should reconnect to the server.
-					 */
-					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("pong")) {
-						Logger.debug(this, "Recieved PONG Response from Twitch PubSub.");
-					}
-
-					/**
-					 * Handle: Reconnect
-					 *  Clients may receive a RECONNECT message at any time.
-					 *  This indicates that the server is about to restart (typically for maintenance)
-					 *  and will disconnect the client within 30 seconds.
-					 *  During this time, we recommend that clients reconnect to the server.
-					 *  Otherwise, the client will be forcibly disconnected.
-					 */
-					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("reconnect")) {
-						Logger.debug(this, "Twitch PubSub is asking us to reconnect ...");
-						reconnect();
-					}
-
-					// Handle Error
-					if (jsonNode.has("error") && jsonNode.get("error") != null & jsonNode.get("error").textValue().length() > 0) {
-						Logger.error(this, "Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue());
-					}
-
-					// Handle Message
-					if (jsonNode.has("type") && jsonNode.get("type").textValue().equalsIgnoreCase("message")) {
-						Logger.debug(this, "Recieved a message from Twitch PubSub: [%s]", message);
-						// TODO: parse Messages
-					}
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-			/**
-			 * Event: ConnectionClosed
-			 */
-			@Override
-			public void onDisconnected(WebSocket websocket,
-									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
-									   boolean closedByServer) {
-
-				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint());
-
-				reconnect();
-			}
-		});
+		getWebSocket().addListener(new TwitchPubSubListener(getTwitchClient()));
 
 		// Connect
 		connect();
@@ -155,7 +78,7 @@ public class TwitchPubSub {
 		}
 	}
 
-	private void reconnect() {
+	void reconnect() {
 		disconnect();
 		if (connect()) {
 			scheduleTasks();
@@ -256,5 +179,14 @@ public class TwitchPubSub {
 		// TODO
 
 		return true;
+	}
+
+	/**
+	 * register channel for {@link TwitchPubSubListener}
+	 */
+	void registerChannels() {
+		for (Channel channel : getRegisteredChannels()) {
+			subscribeToBitsTopic(channel);
+		}
 	}
 }
