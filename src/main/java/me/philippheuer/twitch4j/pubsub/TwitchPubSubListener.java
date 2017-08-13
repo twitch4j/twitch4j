@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class TwitchPubSubListener extends WebSocketAdapter {
+class TwitchPubSubListener extends WebSocketAdapter {
 
 	/**
 	 * Holds the API Instance
