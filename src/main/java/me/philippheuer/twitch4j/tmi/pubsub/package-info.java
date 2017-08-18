@@ -1,4 +1,4 @@
 /**
  * This package contains all classes to interact with the twitch pubsub service.
  */
-package me.philippheuer.twitch4j.pubsub;
+package me.philippheuer.twitch4j.tmi.pubsub;

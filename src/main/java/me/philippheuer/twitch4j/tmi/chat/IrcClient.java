@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.chat;
+package me.philippheuer.twitch4j.tmi.chat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,24 +7,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.endpoints.TMIEndpoint;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.event.ChannelJoinEvent;
 import me.philippheuer.twitch4j.events.event.ChannelLeaveEvent;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 import org.kitteh.irc.client.library.Client;
-import org.kitteh.irc.client.library.exception.KittehConnectionException;
 
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import org.kitteh.irc.client.library.feature.twitch.TwitchDelaySender;
 import org.kitteh.irc.client.library.feature.twitch.TwitchListener;
 
 @Getter

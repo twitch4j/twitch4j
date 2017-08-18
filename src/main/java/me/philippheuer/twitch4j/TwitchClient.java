@@ -6,13 +6,13 @@ import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.chat.IrcClient;
-import me.philippheuer.twitch4j.chat.commands.CommandHandler;
+import me.philippheuer.twitch4j.tmi.chat.IrcClient;
+import me.philippheuer.twitch4j.tmi.chat.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
+import me.philippheuer.twitch4j.tmi.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
@@ -83,12 +83,12 @@ public class TwitchClient {
 	/**
 	 * Twitch PubSub Endpoint
 	 */
-	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv";
+	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv:443";
 
 	/**
 	 * Twitch IRC Endpoint
 	 */
-	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
+	public final String twitchIrcEndpoint = "wss://irc-ws.chat.twitch.tv:443";
 
 	/**
 	 * Twitch Application - Client Id
@@ -137,7 +137,7 @@ public class TwitchClient {
 
 		// Initialize REST Client
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
+		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
 		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
 	}
 

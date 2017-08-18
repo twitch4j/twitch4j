@@ -1,10 +1,10 @@
-package me.philippheuer.twitch4j.chat;
+package me.philippheuer.twitch4j.tmi.chat;
 
 import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.chat.commands.CommandPermission;
+import me.philippheuer.twitch4j.tmi.chat.commands.CommandPermission;
 import me.philippheuer.twitch4j.enums.SubPlan;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.*;

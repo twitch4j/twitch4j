@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.chat.commands;
+package me.philippheuer.twitch4j.tmi.chat.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.pubsub;
+package me.philippheuer.twitch4j.tmi.pubsub;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
