@@ -204,14 +204,11 @@ public class TwitchClient {
 	 * Connect needs to be called after initalizing the {@link CredentialManager}.
 	 */
 	public void connect() {
-		if (!getCredentialManager().getOAuthCredentials().containsKey("TWITCH-" + CREDENTIAL_IRC)) throw new RuntimeException("There is missing credentials to connecting chat. Please add it first.");
-		else {
-			// Init IRC
-			setIrcClient(new IrcClient(this));
+		// Init IRC
+		setIrcClient(new IrcClient(this));
 
-			// Init PubSub API
-			setPubSub(new TwitchPubSub(this));
-		}
+		// Init PubSub API
+		setPubSub(new TwitchPubSub(this));
 	}
 
 	/**
