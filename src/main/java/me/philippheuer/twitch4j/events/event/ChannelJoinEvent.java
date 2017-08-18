@@ -4,11 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.chat.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
-
-import java.util.Set;
 
 /**
  * This event gets called when a message is received in a channel.

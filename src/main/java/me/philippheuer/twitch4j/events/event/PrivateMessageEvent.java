@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.chat.commands.CommandPermission;
+import me.philippheuer.twitch4j.tmi.chat.commands.CommandPermission;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.User;
 
