@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.model.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,7 +32,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<TopGame> getTopGames() {
 		// Endpoint
-		String requestUrl = String.format("%s/games/top", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/games/top", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request

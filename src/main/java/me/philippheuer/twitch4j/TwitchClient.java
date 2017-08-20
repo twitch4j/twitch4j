@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
@@ -61,29 +62,9 @@ public class TwitchClient {
 	private StreamlabsClient streamLabsClient;
 
 	/**
-	 * Twitch API Endpoint
-	 */
-	public final String twitchEndpoint = "https://api.twitch.tv/kraken";
-
-	/**
 	 * Twitch API Version
 	 */
 	public final int twitchEndpointVersion = 5;
-
-	/**
-	 * Twitch TMI Endpoint
-	 */
-	public final String twitchMessagingInterfaceEndpoint = "http://tmi.twitch.tv";
-
-	/**
-	 * Twitch PubSub Endpoint
-	 */
-	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv:443";
-
-	/**
-	 * Twitch IRC Endpoint
-	 */
-	public final String twitchIrcEndpoint = "wss://irc-ws.chat.twitch.tv:443";
 
 	/**
 	 * Twitch Application - Client Id

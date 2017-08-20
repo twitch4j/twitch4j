@@ -36,7 +36,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Video getVideo(String videoId) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/%s", getTwitchClient().getTwitchEndpoint(), videoId);
+		String requestUrl = String.format("%s/videos/%s", Endpoints.API.getURL(), videoId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -65,7 +65,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Video> getTopVideos(Optional<Game> game, Optional<String> period, Optional<String> broadcast_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/top", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/videos/top", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -100,7 +100,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Video> getFollowedVideos(OAuthCredential oAuthCredential, Optional<String> broadcast_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/followed", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/videos/followed", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(oAuthCredential);
 
 		// Parameters

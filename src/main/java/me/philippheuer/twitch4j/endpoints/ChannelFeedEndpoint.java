@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.ChannelFeed;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
@@ -43,7 +44,7 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<ChannelFeedPost> getFeedPosts(Long channelId, Optional<Long> limit, Optional<String> cursor, Optional<Long> commentLimit) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts", getTwitchClient().getTwitchEndpoint(), channelId);
+		String requestUrl = String.format("%s/feed/%s/posts", Endpoints.API.getURL(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -76,7 +77,7 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public ChannelFeedPost getFeedPost(Long channelId, String postId, Optional<Long> commentLimit) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts/%s", getTwitchClient().getTwitchEndpoint(), channelId, postId);
+		String requestUrl = String.format("%s/feed/%s/posts/%s", Endpoints.API.getURL(), channelId, postId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -107,7 +108,7 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
 		// Endpoint
-		String requestUrl = String.format("%s//feed/%s/posts", getTwitchClient().getTwitchEndpoint(), channelId);
+		String requestUrl = String.format("%s//feed/%s/posts", Endpoints.API.getURL(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// Parameters

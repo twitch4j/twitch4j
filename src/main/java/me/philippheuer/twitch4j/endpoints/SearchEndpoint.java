@@ -4,6 +4,7 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
@@ -36,7 +37,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Channel> getChannels(String query, Optional<Long> limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/channels", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/channels", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -68,7 +69,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Game> getGames(String query, Optional<Boolean> live) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/games", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/games", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -100,7 +101,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Stream> getStreams(String query, Optional<Long> limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/streams", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/streams", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters

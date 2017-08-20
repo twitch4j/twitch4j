@@ -38,7 +38,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.hasLength(userName, "Please provide a Username!");
 
 		// REST Request
-		String requestUrl = String.format("%s/users?login=%s", getTwitchClient().getTwitchEndpoint(), userName);
+		String requestUrl = String.format("%s/users?login=%s", Endpoints.API.getURL(), userName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -93,7 +93,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.notNull(credential, "Please provide Twitch Credentials!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/user", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/user", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -122,7 +122,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.notNull(userId, "Please provide a User ID!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/users/%d", getTwitchClient().getTwitchEndpoint(), userId);
+		String requestUrl = String.format("%s/users/%d", Endpoints.API.getURL(), userId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -165,7 +165,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/emotes", getTwitchClient().getTwitchEndpoint(), userId);
+		String requestUrl = String.format("%s/users/%s/emotes", Endpoints.API.getURL(), userId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential.get());
 
 		// REST Request
@@ -200,7 +200,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(Long userId, Long channelId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/subscriptions/%s", getTwitchClient().getTwitchEndpoint(), userId, channelId);
+		String requestUrl = String.format("%s/users/%s/subscriptions/%s", Endpoints.API.getURL(), userId, channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -237,7 +237,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Follow> getUserFollows(Long userId, Optional<Long> limit, Optional<Long> offset, Optional<String> direction, Optional<String> sortBy) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels", getTwitchClient().getTwitchEndpoint(), userId);
+		String requestUrl = String.format("%s/users/%s/follows/channels", Endpoints.API.getURL(), userId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -282,7 +282,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Follow> checkUserFollowByChannel(Long userId, Long channelId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), userId, channelId);
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), userId, channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -317,7 +317,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean followChannel(OAuthCredential credential, Long channelId, Optional<Boolean> notifications) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), channelId);
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), credential.getUserId(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -346,7 +346,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean unfollowChannel(OAuthCredential credential, Long channelId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), channelId);
+		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), credential.getUserId(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -376,7 +376,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Block> getUserBlockList(OAuthCredential credential, Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks", getTwitchClient().getTwitchEndpoint(), credential.getUserId());
+		String requestUrl = String.format("%s/users/%s/blocks", Endpoints.API.getURL(), credential.getUserId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// Parameters
@@ -409,7 +409,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean addBlock(OAuthCredential credential, Long targetUserId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), targetUserId);
+		String requestUrl = String.format("%s/users/%s/blocks/%s", Endpoints.API.getURL(), credential.getUserId(), targetUserId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -438,7 +438,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean deleteBlock(OAuthCredential credential, Long targetUserId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks/%s", getTwitchClient().getTwitchEndpoint(), credential.getUserId(), targetUserId);
+		String requestUrl = String.format("%s/users/%s/blocks/%s", Endpoints.API.getURL(), credential.getUserId(), targetUserId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request

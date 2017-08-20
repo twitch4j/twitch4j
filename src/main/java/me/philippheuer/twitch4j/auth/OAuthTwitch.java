@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.auth;
 
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Token;
 import org.springframework.util.LinkedMultiValueMap;
@@ -69,7 +70,7 @@ public class OAuthTwitch {
 	 */
 	private String getAuthenticationUrl(String state, TwitchScopes... scopes) {
 		return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
-				getCredentialManager().getTwitchClient().getTwitchEndpoint(),
+				Endpoints.API.getURL(),
 				getCredentialManager().getTwitchClient().getClientId(),
 				getRedirectUri(),
 				TwitchScopes.join(scopes),
@@ -98,7 +99,7 @@ public class OAuthTwitch {
 	public OAuthCredential handleAuthenticationCodeResponseTwitch(String authenticationCode) {
 		try {
 			// Validate on Server
-			String requestUrl = String.format("%s/oauth2/token", getCredentialManager().getTwitchClient().getTwitchEndpoint());
+			String requestUrl = String.format("%s/oauth2/token", Endpoints.API.getURL());
 			RestTemplate restTemplate = getCredentialManager().getTwitchClient().getRestClient().getRestTemplate();
 
 			// Prepare HTTP Post Data

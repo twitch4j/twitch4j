@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.annotation.Unofficial;
@@ -47,7 +48,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Stream> getByChannel(Channel channel) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams/%s", getTwitchClient().getTwitchEndpoint(), channel.getId());
+		String requestUrl = String.format("%s/streams/%s", Endpoints.API.getURL(), channel.getId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -86,7 +87,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Stream> getAll(Optional<Long> limit, Optional<Long> offset, Optional<String> language, Optional<Game> game, Optional<String> channelIds, Optional<String> stream_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/streams", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -121,7 +122,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Stream> getFollowed(OAuthCredential credential) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams/followed", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/streams/followed", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -148,7 +149,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<StreamFeatured> getFeatured(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams/featured", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/streams/featured", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -178,7 +179,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public StreamSummary getSummary(Optional<Game> game) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams/summary", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/streams/summary", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -210,7 +211,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	@Unofficial
 	public List<Recommendation> getRecommendations(OAuthCredential credential) {
 		// Endpoint
-		String requestUrl = String.format("%s/streams/recommended", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/streams/recommended", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
