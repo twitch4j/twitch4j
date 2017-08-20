@@ -60,7 +60,7 @@ public class TwitchPubSub {
 		this.twitchClient = twitchClient;
 		// Connect to twitch pubsub server
 		try {
-			webSocket = new WebSocketFactory().createSocket(getTwitchClient().getTwitchPubSubEndpoint());
+			webSocket = new WebSocketFactory().createSocket(Endpoints.PUBSUB.getURL());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
