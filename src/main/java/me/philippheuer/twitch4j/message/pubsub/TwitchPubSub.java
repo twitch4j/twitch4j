@@ -1,5 +1,6 @@
-package me.philippheuer.twitch4j.tmi.pubsub;
+package me.philippheuer.twitch4j.message.pubsub;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,6 +18,16 @@ import java.util.*;
 @Getter
 @Setter
 public class TwitchPubSub {
+	/**
+	 * Connection statement
+	 */
+	public enum Connection {
+		DISCONNECTING,
+		RECONNECTING,
+		DISCONNECTED,
+		CONNECTING,
+		CONNECTED
+	}
 
 	/**
 	 * List fo subscribed channels
@@ -29,11 +40,15 @@ public class TwitchPubSub {
 	/**
 	 * Holds the API Instance
 	 */
-	private TwitchClient twitchClient;
+	private final TwitchClient twitchClient;
 	/**
 	 * WebSocketFactory
 	 */
 	private WebSocket webSocket;
+	/**
+	 * Connection Statement
+	 */
+	private Connection connection = Connection.DISCONNECTED;
 
 	/**
 	 * Class Constructor
@@ -41,49 +56,93 @@ public class TwitchPubSub {
 	 * @param twitchClient TwitchClient is the core class for all api operations.
 	 */
 	public TwitchPubSub(TwitchClient twitchClient) {
-		setTwitchClient(twitchClient);
-
-		// TODO PubSub needs to be implemented
-		if (true) {
-			return;
-		}
-
+		this.twitchClient = twitchClient;
 		// Connect to twitch pubsub server
 		try {
-			setWebSocket(new WebSocketFactory().createSocket(getTwitchClient().getTwitchPubSubEndpoint()));
+			webSocket = new WebSocketFactory().createSocket(getTwitchClient().getTwitchPubSubEndpoint());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		// Register Listener
-		getWebSocket().addListener(new TwitchPubSubListener(getTwitchClient()));
+		webSocket.addListener(new WebSocketAdapter() {
+			@Override
+			public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+				registerChannels();
+				setConnection(Connection.CONNECTED);
+			}
 
-		// Connect
-		connect();
+			@Override
+			public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint());
+				if (!getConnection().equals(Connection.DISCONNECTING)) {
+					connect();
+				} else setConnection(Connection.DISCONNECTED);
+			}
+
+			@Override
+			public void onTextMessage(WebSocket websocket, String text) throws Exception {
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode jsonNode = mapper.readTree(text);
+
+				if (jsonNode.has("type")) {
+					switch (jsonNode.get("type").textValue().toLowerCase()) {
+						case "pong":
+					/*
+					 * Handle: PONG
+					 *  If a client does not receive a PONG message within 10 seconds
+					 *  of issuing a PING command, it should reconnect to the server.
+					 */
+							Logger.debug(this, "Recieved PONG Response from Twitch PubSub.");
+							break;
+						case "reconnect":
+					/*
+					 * Handle: Reconnect
+					 *  Clients may receive a RECONNECT message at any time.
+					 *  This indicates that the server is about to restart (typically for maintenance)
+					 *  and will disconnect the client within 30 seconds.
+					 *  During this time, we recommend that clients reconnect to the server.
+					 *  Otherwise, the client will be forcibly disconnected.
+					 */
+							Logger.debug(this, "Twitch PubSub is asking us to reconnect ...");
+							reconnect();
+							break;
+						case "message":
+							Logger.debug(this, "Recieved a message from Twitch PubSub: [%s]", text);
+							// TODO: parse Messages
+						default:
+							return;
+					}
+				}
+
+				if (jsonNode.has("error") && jsonNode.get("error") != null & jsonNode.get("error").textValue().length() > 0) {
+					Logger.error(this, "Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue());
+				}
+			}
+		});
 	}
 
-	private Boolean connect() {
-		Logger.info(this, "Connecting to Twitch PubSub: [%s]",  getTwitchClient().getTwitchPubSubEndpoint());
+	public void connect() {
+		if (connection.equals(Connection.DISCONNECTED)) {
+			Logger.info(this, "Connecting to Twitch PubSub: [%s]", getTwitchClient().getTwitchPubSubEndpoint());
 
-		try {
-			getWebSocket().connect();
-
-			// Schedule Tasks
-			scheduleTasks();
-			return true;
-		} catch (Exception ex) {
-			Logger.error(this, "Connection to Twitch PubSub failed: [%s]",  ex.getMessage());
-			return false;
-		}
-	}
-
-	void reconnect() {
-		disconnect();
-		if (connect()) {
-			scheduleTasks();
+			try {
+				getWebSocket().connect();
+				connection = Connection.CONNECTING;
+				// Schedule Tasks
+				scheduleTasks();
+			} catch (Exception ex) {
+				Logger.error(this, "Connection to Twitch PubSub failed: [%s]", ex.getMessage());
+			}
 		} else {
-			// Reconnect failed, wait xxx
+			Logger.warn(this, "Cannot connecting to Twitch PubSub: is already [%s].", connection.name().toUpperCase());
 		}
+	}
+
+	public void reconnect() {
+		setConnection(Connection.RECONNECTING);
+		disconnect(false);
+		scheduleTasks();
 	}
 
 	private void scheduleTasks() {
@@ -111,8 +170,9 @@ public class TwitchPubSub {
 	/**
 	 * Disconnect
 	 */
-	public void disconnect() {
-		getWebSocket().disconnect();
+	public void disconnect(boolean forceDisconnect) {
+		if (forceDisconnect) connection = Connection.DISCONNECTING;
+		webSocket.disconnect();
 		cancelTasks();
 	}
 
