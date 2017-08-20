@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.tmi.chat.commands;
+package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -166,9 +166,8 @@ public abstract class Command {
 
 
 	public String[] getCommandArgumentSeperatedList(String regexprSeperator) {
-		String[] choices = getParsedContent().split(String.format("\\s%s\\s", regexprSeperator));
 
-		return choices;
+		return getParsedContent().split(String.format("\\s%s\\s", regexprSeperator));
 	}
 
 	/**
@@ -177,7 +176,7 @@ public abstract class Command {
 	 * @return Returns a {@link List} of type string that contains all usernames, that have been mentioned in the message.
 	 */
 	public List<User> getCommandArgumentTargetUsers() {
-		Pattern patternMention = Pattern.compile("\\@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
+		Pattern patternMention = Pattern.compile("@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
 
 		List<User> targetUserList = new ArrayList<User>();
 		List<String> targetUserNameList = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
@@ -186,10 +185,8 @@ public abstract class Command {
 			Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUserByUserName(userName);
 
 			// Username Valid?
-			if (targetUser.isPresent()) {
-				// Add to Targets
-				targetUserList.add(targetUser.get());
-			}
+			// Add to Targets
+			targetUser.ifPresent(targetUserList::add);
 		}
 
 		return targetUserList;
@@ -218,7 +215,7 @@ public abstract class Command {
 	 * @param message     The message to send to the specified channel.
 	 */
 	public void sendMessageToChannel(String channelName, String message) {
-		getTwitchClient().getIrcClient().sendMessage(channelName, message);
+		getTwitchClient().getTMI().sendMessage(channelName, message);
 	}
 
 	/**
@@ -228,7 +225,7 @@ public abstract class Command {
 	 * @param message  The message to send to the specified channel.
 	 */
 	public void sendMessageToUser(String userName, String message) {
-		getTwitchClient().getIrcClient().sendPrivateMessage(userName, message);
+		getTwitchClient().getTMI().sendPrivateMessage(userName, message);
 	}
 
 

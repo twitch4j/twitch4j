@@ -9,6 +9,7 @@ import com.neovisionaries.ws.client.*;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.model.Channel;
 import org.springframework.util.Assert;
 
@@ -74,7 +75,7 @@ public class TwitchPubSub {
 
 			@Override
 			public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", getTwitchClient().getTwitchPubSubEndpoint());
+				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", Endpoints.PUBSUB.getURL());
 				if (!getConnection().equals(Connection.DISCONNECTING)) {
 					connect();
 				} else setConnection(Connection.DISCONNECTED);
@@ -124,7 +125,7 @@ public class TwitchPubSub {
 
 	public void connect() {
 		if (connection.equals(Connection.DISCONNECTED)) {
-			Logger.info(this, "Connecting to Twitch PubSub: [%s]", getTwitchClient().getTwitchPubSubEndpoint());
+			Logger.info(this, "Connecting to Twitch PubSub: [%s]", Endpoints.PUBSUB.getURL());
 
 			try {
 				getWebSocket().connect();
@@ -169,11 +170,19 @@ public class TwitchPubSub {
 
 	/**
 	 * Disconnect
+	 * @param forceDisconnect forcing disconnection
 	 */
 	public void disconnect(boolean forceDisconnect) {
 		if (forceDisconnect) connection = Connection.DISCONNECTING;
 		webSocket.disconnect();
 		cancelTasks();
+	}
+
+	/**
+	 * Disconnect with forcing disconnection
+	 */
+	public void disconnect() {
+		disconnect(true);
 	}
 
 	/**

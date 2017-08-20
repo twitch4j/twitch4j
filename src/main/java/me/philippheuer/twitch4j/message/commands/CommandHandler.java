@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.tmi.chat.commands;
+package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
