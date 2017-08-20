@@ -11,6 +11,7 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.enums.TMIConnection;
 import me.philippheuer.twitch4j.model.Channel;
 
 import java.io.IOException;
@@ -21,17 +22,6 @@ import java.util.Map;
 @Setter
 @Getter
 public class IRCWebSocket {
-
-	/**
-	 * Connection statement
-	 */
-	public enum Connection {
-		DISCONNECTING,
-		RECONNECTING,
-		DISCONNECTED,
-		CONNECTING,
-		CONNECTED
-	}
 
 	/**
 	 * WebSocket Client
@@ -55,9 +45,9 @@ public class IRCWebSocket {
 
 	/**
 	 * The connection statement
-	 * Default: ({@link Connection#DISCONNECTED})
+	 * Default: ({@link TMIConnection#DISCONNECTED})
 	 */
-	private Connection connection = Connection.DISCONNECTED;
+	private TMIConnection connection = TMIConnection.DISCONNECTED;
 
 	public IRCWebSocket(TwitchClient client) {
 		this.twitchClient = client;
@@ -72,7 +62,7 @@ public class IRCWebSocket {
 		this.ws.addListener(new WebSocketAdapter() {
 			@Override
 			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
-				changeState(Connection.CONNECTING);
+				setConnection(TMIConnection.CONNECTING);
 				Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
 
 				sendCommand("cap req", ":twitch.tv/membership");
@@ -81,7 +71,7 @@ public class IRCWebSocket {
 				// if credentials is null, it will automatically disconnect
 				if (getCredential() == null) {
 					Logger.error(this, "The Twitch IRC Client needs valid Credentials from the CredentialManager.");
-					changeState(Connection.DISCONNECTING); // set state to graceful disconnect (without reconnect looping)
+					setConnection(TMIConnection.DISCONNECTING); // set state to graceful disconnect (without reconnect looping)
 					ws.disconnect();
 				}
 				sendCommand("pass", String.format("oauth:%s", getCredential().getToken()));
@@ -97,7 +87,7 @@ public class IRCWebSocket {
 				} else if (message.startsWith(":tmi.twitch.tv PONG")) {
 					// Log pong received message
 				} else if (message.contains(":tmi.twitch.tv 001 " + credential.getUserName() + " :Welcome, GLHF!")) {
-					changeState(Connection.CONNECTED);
+					setConnection(TMIConnection.CONNECTED);
 					Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 				} else {
 					IRCParser parser = new IRCParser(getTwitchClient(), message);
@@ -107,13 +97,13 @@ public class IRCWebSocket {
 			public void onDisconnected(WebSocket websocket,
 									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
 									   boolean closedByServer) {
-				if (!getConnection().equals(Connection.DISCONNECTING)) {
+				if (!getConnection().equals(TMIConnection.DISCONNECTING)) {
 					// connection lost - reconnecting
 					Logger.info(this, "Connection lost from Twitch IRC (WebSocket)! Reconnecting...");
-					changeState(Connection.RECONNECTING);
+					setConnection(TMIConnection.RECONNECTING);
 					connect();
 				} else {
-					changeState(Connection.DISCONNECTED);
+					setConnection(TMIConnection.DISCONNECTED);
 				}
 			}
 		});
@@ -122,7 +112,7 @@ public class IRCWebSocket {
 	}
 
 	public void connect() {
-		if (connection.equals(Connection.DISCONNECTED)) {
+		if (connection.equals(TMIConnection.DISCONNECTED)) {
 			try {
 				this.ws.connect();
 			} catch (Exception ex) {
@@ -132,9 +122,9 @@ public class IRCWebSocket {
 	}
 
 	public void disconnect() {
-		if (connection.equals(Connection.CONNECTED)) {
+		if (connection.equals(TMIConnection.CONNECTED)) {
 			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
-			changeState(Connection.DISCONNECTING);
+			connection = TMIConnection.DISCONNECTING;
 			this.ws.disconnect();
 		}
 	}
@@ -143,8 +133,6 @@ public class IRCWebSocket {
 		disconnect();
 		connect();
 	}
-
-	private void changeState(Connection connection) { this.connection = connection; }
 
 	public void sendCommand(String command, String... args) {
 		// command will be uppercase.
