@@ -14,14 +14,13 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnection;
 import me.philippheuer.twitch4j.model.Channel;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Setter
 @Getter
-public class IRCWebSocket {
+class IRCWebSocket {
 
 	/**
 	 * WebSocket Client
@@ -76,6 +75,11 @@ public class IRCWebSocket {
 				}
 				sendCommand("pass", String.format("oauth:%s", getCredential().getToken()));
 				sendCommand("nick", getCredential().getUserName());
+				if (!getChannels().isEmpty()) {
+					for (Channel channel : getChannels()) {
+						sendCommand("join", channel.getName());
+					}
+				}
 			}
 
 			@Override
@@ -90,6 +94,7 @@ public class IRCWebSocket {
 					setConnection(TMIConnection.CONNECTED);
 					Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 				} else {
+					Logger.debug(this, "Received Twitch IRC (WebSocket): [%s]", message);
 					IRCParser parser = new IRCParser(getTwitchClient(), message);
 					listeners.listen(parser);
 				}
@@ -135,21 +140,34 @@ public class IRCWebSocket {
 	}
 
 	public void sendCommand(String command, String... args) {
-		// command will be uppercase.
-		this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+		// will send command if connection has been established
+		if (connection.equals(TMIConnection.CONNECTED)) {
+			// command will be uppercase.
+			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+		}
 	}
 
 	public void joinChannel(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
-		if (!channels.contains(ch)) sendCommand("join", "#" + ch.getName());
+		if (!channels.contains(ch)) {
+			sendCommand("join", "#" + ch.getName());
+			channels.add(ch);
+		}
 	}
 
 	public void partChannel(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
-		if (channels.contains(ch)) sendCommand("part", "#" + ch.getName());
+		if (channels.contains(ch)) {
+			sendCommand("part", "#" + ch.getName());
+			channels.remove(ch);
+		}
 	}
 	public void sendMessage(String channel, String message) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		sendCommand("privmsg", "#" + ch.getName(), message);
+	}
+	public void sendPrivateMessage(String channel, String message) {
+		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		sendCommand("privmsg", "#" + credential.getUserName(), "/w", ch.getName(), message);
 	}
 }
