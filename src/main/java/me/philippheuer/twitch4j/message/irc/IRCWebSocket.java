@@ -100,10 +100,6 @@ class IRCWebSocket {
 
 			@Override
 			public void onTextMessage(WebSocket ws, String message) {
-				// TODO: Remove
-				Logger.error(this, message);
-				System.out.println("MessageWebIrc:" + message);
-
 				if (message.contains("PING")) {
 					// Log ping received message
 					sendCommand("PONG", ":tmi.twitch.tv");
@@ -162,7 +158,7 @@ class IRCWebSocket {
 
 	public void sendCommand(String command, String... args) {
 		// will send command if connection has been established
-		if (getConnectionState().equals(TMIConnectionState.CONNECTED)) {
+		if (getConnectionState().equals(TMIConnectionState.CONNECTED) || getConnectionState().equals(TMIConnectionState.CONNECTING)) {
 			// command will be uppercase.
 			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
 		}

@@ -4,9 +4,9 @@ package me.philippheuer.twitch4j.message;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.message.irc.Chat;
-import me.philippheuer.twitch4j.enums.TMIConnection;
 import me.philippheuer.twitch4j.enums.PubSubTopics;
+import me.philippheuer.twitch4j.enums.TMIConnectionState;
+import me.philippheuer.twitch4j.message.irc.TwitchChat;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.model.Channel;
 
@@ -62,11 +62,11 @@ public class MessageInterface {
 	public boolean isJoined(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		// syncing channels
-		if (chat.getChannels().contains(ch) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
-		if (!chat.getChannels().contains(ch) && pubSub.getChannelList().containsKey(ch)) chat.getChannels().add(ch);
+		if (twitchChat.getChannels().contains(ch) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
+		if (!twitchChat.getChannels().contains(ch) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannels().add(ch);
 
-		return (chat.getConnection().equals(TMIConnection.CONNECTED) && pubSub.getConnection().equals(TMIConnection.CONNECTED)) &&
-				(chat.getChannels().contains(ch) && pubSub.getChannelList().containsKey(ch));
+		return (twitchChat.getConnectionState().equals(TMIConnectionState.CONNECTED) && pubSub.getConnectionState().equals(TMIConnectionState.CONNECTED)) &&
+				(twitchChat.getChannels().contains(ch) && pubSub.getChannelList().containsKey(ch));
 	}
 
 	public void sendMessage(String channel, String message) {
