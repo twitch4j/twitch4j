@@ -215,7 +215,7 @@ public abstract class Command {
 	 * @param message     The message to send to the specified channel.
 	 */
 	public void sendMessageToChannel(String channelName, String message) {
-		getTwitchClient().getTMI().sendMessage(channelName, message);
+		getTwitchClient().getMessageInterface().sendMessage(channelName, message);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public abstract class Command {
 	 * @param message  The message to send to the specified channel.
 	 */
 	public void sendMessageToUser(String userName, String message) {
-		getTwitchClient().getTMI().sendPrivateMessage(userName, message);
+		getTwitchClient().getMessageInterface().sendPrivateMessage(userName, message);
 	}
 
 

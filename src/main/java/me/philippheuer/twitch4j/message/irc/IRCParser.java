@@ -137,9 +137,9 @@ public class IRCParser {
 	 */
 	public void replay(String message) {
 		if (this.message.getCommand().equalsIgnoreCase("PRIVMSG")) {
-			twitchClient.getTMI().sendMessage(this.message.getParams().get(0).substring(1), message);
+			twitchClient.getMessageInterface().sendMessage(this.message.getParams().get(0).substring(1), message);
 		} else if (this.message.getCommand().equalsIgnoreCase("WHISPER")) {
-			twitchClient.getTMI().sendPrivateMessage(this.message.getParams().get(0), message);
+			twitchClient.getMessageInterface().sendPrivateMessage(this.message.getParams().get(0), message);
 		}
 	}
 

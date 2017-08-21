@@ -506,7 +506,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void ban(String user) {
-		getTwitchClient().getTMI().sendMessage(getChannel().getName(), String.format(".ban %s", user));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".ban %s", user));
 	}
 
 	/**
@@ -516,7 +516,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void unban(String user) {
-		getTwitchClient().getTMI().sendMessage(getChannel().getName(), String.format(".unban %s", user));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".unban %s", user));
 	}
 
 	/**
@@ -528,7 +528,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void timeout(String user, Duration duration) {
-		getTwitchClient().getTMI().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
 	}
 
 	/**
@@ -546,7 +546,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
 	 */
 	public void purgeChat() {
-		getTwitchClient().getTMI().sendMessage(getChannel().getName(), ".clear");
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), ".clear");
 	}
 
 	/**
@@ -563,13 +563,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// - Check Rest API
 		// - Check IRC
 		{
-			Map.Entry<Boolean, String> result = getTwitchClient().getTMI().getChat().checkEndpointStatus();
+			Map.Entry<Boolean, String> result = getTwitchClient().getMessageInterface().getTwitchChat().checkEndpointStatus();
 			if (!result.getKey()) {
 				Logger.warn(this, "IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
 			}
 		}
 		// - Check PubSub
-		if (!getTwitchClient().getTMI().getPubSub().checkEndpointStatus()) {
+		if (!getTwitchClient().getMessageInterface().getPubSub().checkEndpointStatus()) {
 			// We can ignore this right now, because we will reconnect as soon as pubsub is back up.
 			Logger.warn(this, "PubSub Client not operating. You will not recieve any pubsub events!");
 		}
@@ -577,7 +577,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Get Channel Information
 		Channel channel = getChannel();
 		// - Listen: IRC
-		getTwitchClient().getTMI().joinChannel(channel.getName());
+		getTwitchClient().getMessageInterface().joinChannel(channel.getName());
 		// - Listen: PubSub
 		// NYI
 

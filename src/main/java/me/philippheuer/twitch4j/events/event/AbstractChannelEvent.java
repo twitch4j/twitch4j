@@ -40,7 +40,7 @@ public class AbstractChannelEvent extends Event {
 	 * @param message  The plain text of the message.
 	 */
 	public void sendMessage(String message) {
-		getClient().getTMI().sendMessage(channel.getName(), message);
+		getClient().getMessageInterface().sendMessage(channel.getName(), message);
 	}
 
 }

@@ -54,7 +54,7 @@ public class TwitchClient {
 	/**
 	 * Twitch IRC Client
 	 */
-	private final MessageInterface TMI;
+	private final MessageInterface messageInterface = new MessageInterface(this);
 
 	/**
 	 * Integration: Streamlabs Client
@@ -113,7 +113,6 @@ public class TwitchClient {
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
-		TMI = new MessageInterface(this);
 	}
 
 	/**
@@ -165,6 +164,9 @@ public class TwitchClient {
 			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
 		}
 
+		// Initial Connect
+		twitchClient.connect();
+
 		// Return builded instance
 		return twitchClient;
 	}
@@ -176,7 +178,7 @@ public class TwitchClient {
 	 * Connect needs to be called after initalizing the {@link CredentialManager}.
 	 */
 	public void connect() {
-		TMI.connect();
+		getMessageInterface().connect();
 	}
 
 	/**
@@ -185,7 +187,7 @@ public class TwitchClient {
 	 * This methods closes the connection to the twitch irc server and the pubsub endpoint.
 	 */
 	public void disconnect() {
-		TMI.disconnect();
+		getMessageInterface().disconnect();
 	}
 
 	/**
@@ -194,7 +196,7 @@ public class TwitchClient {
 	 * This methods reconnects to the twitch irc server and the pubsub endpoint.
 	 */
 	public void reconnect() {
-		TMI.reconnect();
+		getMessageInterface().reconnect();
 	}
 
 	/**

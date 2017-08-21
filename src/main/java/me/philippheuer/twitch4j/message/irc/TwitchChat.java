@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class Chat extends IRCWebSocket {
+public class TwitchChat extends IRCWebSocket {
 
 	private final TokenBucket messageBucket = TokenBuckets.builder()
 			.withCapacity(20)
@@ -21,22 +22,38 @@ public class Chat extends IRCWebSocket {
 
 	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
 
-	public Chat(TwitchClient client) {
+	/**
+	 * Twitch Chat IRC Wrapper
+	 *
+	 * @param client Twitch Client.
+	 */
+	public TwitchChat(TwitchClient client) {
 		super(client);
 	}
 
+	/**
+	 * Check if the user has moderator permissions in a channel.
+	 *
+	 * @param channel Channel.
+	 * @return Boolean
+	 */
 	public boolean isModerator(String channel) {
-		return getTwitchClient()
+		// No Credentials for Channel
+		return false;
+
+		/* TODO: TEMP
+		return modMessageBucket.containsKey(channel) || getTwitchClient()
 				.getTMIEndpoint()
 				.getChatters(channel)
 				.getModerators()
-				.contains(getCredential().getUserName()) || modMessageBucket.containsKey(channel);
+				.contains(getCredential().getUserName());
+				*/
 	}
 
 	@Override
 	public void joinChannel(String channel) {
 		super.joinChannel(channel);
-		if (isModerator(channel)){
+		if (isModerator(channel)) {
 			TokenBucket modBucket = TokenBuckets.builder()
 					.withCapacity(100)
 					.withFixedIntervalRefillStrategy(1, 300, TimeUnit.MILLISECONDS)
@@ -48,7 +65,11 @@ public class Chat extends IRCWebSocket {
 	@Override
 	public void partChannel(String channel) {
 		super.partChannel(channel);
-		if (modMessageBucket.containsKey(channel)) modMessageBucket.remove(channel);
+
+		// Remove message bucket
+		if (modMessageBucket.containsKey(channel)) {
+			modMessageBucket.remove(channel);
+		}
 	}
 
 	@Override
@@ -78,15 +99,16 @@ public class Chat extends IRCWebSocket {
 	 */
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
 		// Check
-		if(getCredential() == null) {
-			return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials not present!");
+		OAuthCredential credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
+		if(credential == null) {
+			return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials not present!");
 		} else {
-			if(!getCredential().getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
-				return new AbstractMap.SimpleEntry<Boolean, String>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
+			if(!credential.getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
+				return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
 			}
 		}
 
-		return new AbstractMap.SimpleEntry<Boolean, String>(true, "");
+		return new AbstractMap.SimpleEntry<>(true, "");
 	}
 
 }

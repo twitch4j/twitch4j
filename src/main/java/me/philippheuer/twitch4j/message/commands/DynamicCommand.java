@@ -48,6 +48,6 @@ public class DynamicCommand extends Command {
 		String response = commandReturnText;
 
 		// Send Response
-		getTwitchClient().getTMI().sendMessage(messageEvent.getChannel().getName(), response);
+		getTwitchClient().getMessageInterface().sendMessage(messageEvent.getChannel().getName(), response);
 	}
 }
