@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.message.irc.Chat;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
+import me.philippheuer.twitch4j.model.Channel;
 
 @Getter
 @Setter
@@ -33,15 +34,18 @@ public class MessageInterface {
 		chat.reconnect();
 		pubSub.reconnect();
 	}
-	public void sendMessage(String channel, String message) {}
-	public void sendPrivateMessage(String username, String message) {
-		// using pubsub endpoint to send private message
-	}
+
+	public void sendMessage(String channel, String message) { chat.sendMessage(channel, message); }
+	public void sendPrivateMessage(String username, String message) { chat.sendPrivateMessage(username, message); } // I don't know it will works.
 
 	public void joinChannel(String channel) {
-
+		chat.joinChannel(channel);
+		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		pubSub.listenChannel(ch, true);
 	}
-	public void partChannel() {
-
+	public void partChannel(String channel) {
+		chat.partChannel(channel);
+		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		pubSub.unlistenChannel(ch);
 	}
 }
