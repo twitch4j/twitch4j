@@ -9,9 +9,13 @@ import com.neovisionaries.ws.client.*;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.enums.PubSubTopics;
+import me.philippheuer.twitch4j.enums.TMIConnection;
+import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Channel;
-import org.springframework.util.Assert;
+import me.philippheuer.util.conversion.RandomizeString;
 
 import java.io.IOException;
 import java.util.*;
@@ -19,21 +23,7 @@ import java.util.*;
 @Getter
 @Setter
 public class TwitchPubSub {
-	/**
-	 * Connection statement
-	 */
-	public enum Connection {
-		DISCONNECTING,
-		RECONNECTING,
-		DISCONNECTED,
-		CONNECTING,
-		CONNECTED
-	}
 
-	/**
-	 * List fo subscribed channels
-	 */
-	private final List<Channel> registeredChannels = new ArrayList<Channel>();
 	/**
 	 * Timer for Scheduler Tasks
 	 */
@@ -46,10 +36,20 @@ public class TwitchPubSub {
 	 * WebSocketFactory
 	 */
 	private WebSocket webSocket;
+
 	/**
-	 * Connection Statement
+	 * The connection statement
+	 * Default: ({@link TMIConnection#DISCONNECTED})
 	 */
-	private Connection connection = Connection.DISCONNECTED;
+	private TMIConnection connection = TMIConnection.DISCONNECTED;
+	/**
+	 * Random string to identify the response associated with this request. Using {@link RandomizeString} script
+	 */
+	private final String identifyNonce = new RandomizeString(16).toString();
+	/**
+	 * Listening channel list
+	 */
+	private final Map<Channel, List<PubSubTopics>> channelList = new HashMap<Channel, List<PubSubTopics>>();
 
 	/**
 	 * Class Constructor
@@ -69,16 +69,18 @@ public class TwitchPubSub {
 		webSocket.addListener(new WebSocketAdapter() {
 			@Override
 			public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-				registerChannels();
-				setConnection(Connection.CONNECTED);
+				listenAll();
+				setConnection(TMIConnection.CONNECTED);
+				// Schedule Tasks
+				scheduleTasks();
 			}
 
 			@Override
 			public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
 				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", Endpoints.PUBSUB.getURL());
-				if (!getConnection().equals(Connection.DISCONNECTING)) {
+				if (!getConnection().equals(TMIConnection.DISCONNECTING)) {
 					connect();
-				} else setConnection(Connection.DISCONNECTED);
+				} else setConnection(TMIConnection.DISCONNECTED);
 			}
 
 			@Override
@@ -110,42 +112,110 @@ public class TwitchPubSub {
 							break;
 						case "message":
 							Logger.debug(this, "Recieved a message from Twitch PubSub: [%s]", text);
-							// TODO: parse Messages
+							// TODO: parse Messages (I'm on it [D.S.])
 						default:
 							return;
 					}
 				}
 
-				if (jsonNode.has("error") && jsonNode.get("error") != null & jsonNode.get("error").textValue().length() > 0) {
-					Logger.error(this, "Twitch PubSub encountered an error: %s", jsonNode.get("error").textValue());
+				if (jsonNode.has("error") && jsonNode.get("error") != null & !jsonNode.get("error").textValue().isEmpty()) {
+					switch (jsonNode.get("error").textValue().toUpperCase()) {
+						case "ERR_BADMESSAGE":
+							Logger.error(this, "Twitch PubSub encountered an error: %s", "Wrong message format.");
+							break;
+						case "ERR_BADAUTH":
+							Logger.error(this, "Twitch PubSub encountered an error: %s", "Bad OAuth key or OAuth key doesn't have authorized scope to specify topic.");
+							break;
+						case "ERR_SERVER":
+							Logger.error(this, "Twitch PubSub encountered an error: %s", "Server Error.");
+							break;
+						case "ERR_BADTOPIC":
+							Logger.error(this, "Twitch PubSub encountered an error: %s", "Some topics is unknown.");
+							break;
+						default:
+							return;
+					}
 				}
 			}
 		});
 	}
 
+	/**
+	 * Setting topic
+	 * @param channel {@link Channel} user model
+	 * @param topics list of {@link PubSubTopics}
+	 */
+	private void setTopic(Channel channel, PubSubTopics... topics) {
+		List<PubSubTopics> topicList;
+		if (!channelList.containsKey(channel)) topicList = new ArrayList<PubSubTopics>();
+		else topicList = channelList.get(channel);
+		for (PubSubTopics topic : topics) {
+			if (!hasTopic(channel, topic) && !topicList.contains(topic)) {
+				topicList.add(topic);
+			}
+		}
+		if (channelList.containsKey(channel)) channelList.replace(channel, topicList);
+		else channelList.put(channel, topicList);
+	}
+
+	/**
+	 * Releasing topic
+	 * @param channel {@link Channel} user model
+	 * @param topics list of {@link PubSubTopics}
+	 */
+	private void releaseTopic(Channel channel, PubSubTopics... topics) {
+		List<PubSubTopics> topicList;
+		if (channelList.containsKey(channel)) topicList = channelList.get(channel);
+		else return;
+		for (PubSubTopics topic : topics) {
+			if (topicList.contains(topic)) topicList.remove(topic);
+		}
+		if (topicList.isEmpty()) channelList.remove(channel);
+		else channelList.replace(channel, topicList);
+	}
+
+	/**
+	 * Checking topic existence
+	 * @param channel {@link Channel} user model
+	 * @param topic {@link PubSubTopics} enum
+	 * @return topic exists
+	 */
+	private boolean hasTopic(Channel channel, PubSubTopics topic) {
+		return channelList.containsKey(channel) && channelList.get(channel).contains(topic);
+	}
+
+	/**
+	 * Connecto to PubSub
+	 */
 	public void connect() {
-		if (connection.equals(Connection.DISCONNECTED)) {
+		if (connection.equals(TMIConnection.DISCONNECTED)) {
 			Logger.info(this, "Connecting to Twitch PubSub: [%s]", Endpoints.PUBSUB.getURL());
 
 			try {
 				getWebSocket().connect();
-				connection = Connection.CONNECTING;
-				// Schedule Tasks
-				scheduleTasks();
+				connection = TMIConnection.CONNECTING;
 			} catch (Exception ex) {
 				Logger.error(this, "Connection to Twitch PubSub failed: [%s]", ex.getMessage());
+				connection = TMIConnection.DISCONNECTED;
 			}
 		} else {
 			Logger.warn(this, "Cannot connecting to Twitch PubSub: is already [%s].", connection.name().toUpperCase());
 		}
 	}
 
+	/**
+	 * Reconnecting to PubSub
+	 */
 	public void reconnect() {
-		setConnection(Connection.RECONNECTING);
+		setConnection(TMIConnection.RECONNECTING);
 		disconnect(false);
 		scheduleTasks();
+		listenAll();
 	}
 
+	/**
+	 * schedule tasks for pinging WebSocket server.
+	 */
 	private void scheduleTasks() {
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -169,17 +239,18 @@ public class TwitchPubSub {
 	}
 
 	/**
-	 * Disconnect
-	 * @param forceDisconnect forcing disconnection
+	 * Disconnect from PubSub
+	 * @param forceDisconnect forcing disconnection - if it false will reconnecting automatically
 	 */
 	public void disconnect(boolean forceDisconnect) {
-		if (forceDisconnect) connection = Connection.DISCONNECTING;
+		if (forceDisconnect) connection = TMIConnection.DISCONNECTING;
+		unlistenAll();
 		webSocket.disconnect();
 		cancelTasks();
 	}
 
 	/**
-	 * Disconnect with forcing disconnection
+	 * Disconnect from PubSub with force disconnection
 	 */
 	public void disconnect() {
 		disconnect(true);
@@ -194,67 +265,107 @@ public class TwitchPubSub {
 	}
 
 	/**
-	 * Subscribe to Bits Topic
-	 *
-	 * @param channel Channel
-	 * @see Channel
+	 * listen all defined channels by {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)} or {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
 	 */
-	public void addChannel(Channel channel) {
-		// Validate Arguments
-		Assert.isTrue(channel.getTwitchCredential().isPresent(), "You need to provide twitch credentials with an oauth token to use pubsub.");
+	public void listenAll() {
+		if (!channelList.isEmpty() && connection.equals(TMIConnection.CONNECTED))
+			channelList.forEach((channel, topics) -> listenChannel(channel, (PubSubTopics[]) topics.toArray()));
+	}
 
-		// Add if new
-		if (!getRegisteredChannels().contains(channel)) {
-			getRegisteredChannels().add(channel);
+	/**
+	 * unlisten all defined channels by {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)} or {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
+	 */
+	public void unlistenAll() {
+		if (!channelList.isEmpty() && connection.equals(TMIConnection.CONNECTED))
+			channelList.forEach((channel, topics) -> unlistenChannel(channel, (PubSubTopics[]) topics.toArray()));
+
+	}
+
+	/**
+	 * Executing data to Twitch PubSub
+	 * @param type data type ("LISTEN" or "UNLISTEN")
+	 * @param topics string {@link List} of topics
+	 */
+	private void execType(String type, List<String> topics) {
+		if (!connection.equals(TMIConnection.CONNECTED)) return;
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode node = mapper.createObjectNode();
+		node.put("type", type.toUpperCase())
+				.put("nonce", identifyNonce);
+		ArrayNode topicList = mapper.createArrayNode();
+		topics.forEach(topicList::add);
+		node.putObject("data")
+				.put("auth_token", "") // TODO: OAuth if exist.
+				.putArray("topics").addAll(topicList);
+		Logger.debug(this, "Sending to PubSub - type: %s, topics: [ %s ]", type.toUpperCase(), String.join(", ", topics));
+		webSocket.sendText(node.toString());
+	}
+
+	/**
+	 * Listening channel
+	 * @param channel {@link Channel} user model
+	 * @param getAll force all {@link PubSubTopics}. To using specified topics use {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
+	 */
+	public void listenChannel(Channel channel, boolean getAll) {
+		List<String> topicList = new ArrayList<String>();
+		if (!getAll && channelList.containsKey(channel) && channelList.get(channel).size() > 0)
+			listenChannel(channel, (PubSubTopics[]) channelList.get(channel).toArray());
+		else listenChannel(channel, PubSubTopics.values());
+	}
+
+	/**
+	 * Listening specified topics channel
+	 * @param channel {@link Channel} user model
+	 * @param topics list of {@link PubSubTopics}
+	 */
+	public void listenChannel(Channel channel, PubSubTopics... topics) {
+		List<String> topicList = new ArrayList<String>();
+		OAuthCredential channelCredential = null;
+		if (channel.getTwitchCredential().isPresent()) {
+			channelCredential = channel.getTwitchCredential().get();
 		}
-
-		if (checkEndpointStatus()) {
-			subscribeToBitsTopic(channel);
+		if (channelCredential != null) {
+			for (PubSubTopics topic : topics) {
+				if (topic.isInRequiredScope((TwitchScopes[]) channelCredential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
+			}
+			if (topicList.size() > 0) {
+				execType("LISTEN", topicList);
+				setTopic(channel, (PubSubTopics[]) topicList.toArray());
+			}
 		}
 	}
 
 	/**
-	 * Subscribe to Bits Topic
+	 * Un-Listening specified topics channel
+	 * @param channel {@link Channel} user model
+	 * @param topics list of {@link PubSubTopics}
 	 */
-	private void subscribeToBitsTopic(Channel channel) {
-		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode objectNode = mapper.createObjectNode();
-
-		objectNode.put("type", "LISTEN");
-		objectNode.put("nonce", channel.getId() + ".pubsub.bitevents");
-
-		ObjectNode dataMap = objectNode.putObject("data");
-		dataMap.put("auth_token", channel.getTwitchCredential().get().getToken());
-		ArrayNode topicArray = dataMap.putArray("topics");
-		topicArray.add("channel-bitsevents." + channel.getId());
-
-		Logger.error(this, "Sending BitEvents-Subscription to PubSub: %s", objectNode.toString());
-
-		webSocket.sendText(objectNode.toString());
+	public void unlistenChannel(Channel channel, PubSubTopics... topics) {
+		List<String> topicList = new ArrayList<String>();
+		for (PubSubTopics topic : topics) {
+			if (hasTopic(channel, topic)) topicList.add(topic.getTopic(channel));
+		}
+		if (topicList.size() > 0) {
+			execType("UNLISTEN", topicList);
+			releaseTopic(channel, (PubSubTopics[]) topicList.toArray());
+		}
 	}
+
+	/**
+	 * Un-Listening channel
+	 * @param channel {@link Channel} user model
+	 */
+	public void unlistenChannel(Channel channel) {
+		unlistenChannel(channel, (PubSubTopics[]) channelList.get(channel).toArray());
+	}
+
 
 	/**
 	 * Method: Check PubSub Socket Status
 	 *
 	 * @return True, if the socket is connected. False, if there are problems with the pubsub endpoint.
 	 */
-	public Boolean checkEndpointStatus() {
-		// WebSocket needs to be open
-		if (getWebSocket() == null || !getWebSocket().getState().equals(WebSocketState.OPEN)) {
-			return false;
-		}
-
-		// TODO
-
-		return true;
-	}
-
-	/**
-	 * register channel for {@link TwitchPubSubListener}
-	 */
-	void registerChannels() {
-		for (Channel channel : getRegisteredChannels()) {
-			subscribeToBitsTopic(channel);
-		}
+	public boolean checkEndpointStatus() {
+		return connection.equals(TMIConnection.CONNECTED);
 	}
 }
