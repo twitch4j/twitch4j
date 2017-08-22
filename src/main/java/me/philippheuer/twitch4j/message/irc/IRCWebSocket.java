@@ -78,7 +78,7 @@ class IRCWebSocket {
 				sendCommand("cap req", ":twitch.tv/commands");
 
 				// Find Credential
-				OAuthCredential credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
+				OAuthCredential credential = client.getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
 
 				// if credentials is null, it will automatically disconnect
 				if (credential == null) {
@@ -99,25 +99,21 @@ class IRCWebSocket {
 			}
 
 			@Override
-			public void onTextMessage(WebSocket ws, String text) {
-				String[] messages = {};
-				if (text.contains(System.getProperty("line.separator"))) messages = text.split(System.getProperty("line.separator"));
-				else messages[0] = text;
-				for (String message: messages) {
-					Logger.debug(this, "[IRC-WS] > %s", message); // raw message debugging
-					if (message.startsWith("PING")) {
-						Logger.debug(this, "Pings received, sending Pong to the Twitch IRC (WebSocket)");
-						sendCommand("PONG", ":tmi.twitch.tv");
-					} else if (message.startsWith(":tmi.twitch.tv PONG")) {
-						// Log pong received message
-					} else if (message.contains(":tmi.twitch.tv 001 " + credential.getUserName() + " :Welcome, GLHF!")) {
-						Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
+			public void onTextMessage(WebSocket ws, String message) {
+				if (message.contains("PING")) {
+					// Log ping received message
+					sendCommand("PONG", ":tmi.twitch.tv");
+				} else if (message.startsWith(":tmi.twitch.tv PONG")) {
+					// Log pong received message
+				} else if (message.contains(":tmi.twitch.tv 001 " + credential.getUserName() + " :Welcome, GLHF!")) {
+					Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 
-						setConnectionState(TMIConnectionState.CONNECTED);
-					} else {
-						IRCParser parser = new IRCParser(getTwitchClient(), message);
-						listeners.listen(parser);
-					}
+					setConnectionState(TMIConnectionState.CONNECTED);
+				} else {
+					Logger.debug(this, "Received Twitch IRC (WebSocket): [%s]", message);
+
+					IRCParser parser = new IRCParser(getTwitchClient(), message);
+					listeners.listen(parser);
 				}
 			}
 			public void onDisconnected(WebSocket websocket,
@@ -163,9 +159,8 @@ class IRCWebSocket {
 	public void sendCommand(String command, String... args) {
 		// will send command if connection has been established
 		if (getConnectionState().equals(TMIConnectionState.CONNECTED) || getConnectionState().equals(TMIConnectionState.CONNECTING)) {
-			String text = String.format("%s %s", command.toUpperCase(), String.join(" ", args));
-			Logger.debug(this, "[IRC-WS] < %s", text);
-			this.ws.sendText(text);
+			// command will be uppercase.
+			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
 		}
 	}
 

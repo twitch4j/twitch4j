@@ -50,13 +50,6 @@ dependencies {
 	// WebSocket Client for Twitch PubSub and Twitch IRC
 	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.3'
 
-	// - Transitive Dependency Conflict: Ratpack <-> Kitteh IRC Client
-	compile group: 'io.netty', 						name: 'netty-codec-http', 		version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-codec', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-handler', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-common', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-transport-native-epoll', version: '4.1.13.Final'
-
 	// Apache Commons
 	// - Lang
 	compile group: 'org.apache.commons',			name: 'commons-lang3', 			version: '3.6'
