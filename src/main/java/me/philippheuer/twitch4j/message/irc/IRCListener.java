@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.message.irc;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 
+// TODO: listener
 @Getter
 public class IRCListener {
 
