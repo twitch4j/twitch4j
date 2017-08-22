@@ -84,7 +84,7 @@ public class TwitchPubSub {
 
 			@Override
 			public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", Endpoints.PUBSUB.getURL());
+				if (closedByServer) Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", Endpoints.PUBSUB.getURL());
 
 				if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
 					reconnect();
@@ -97,7 +97,7 @@ public class TwitchPubSub {
 			public void onTextMessage(WebSocket websocket, String text) throws Exception {
 				ObjectMapper mapper = new ObjectMapper();
 				JsonNode jsonNode = mapper.readTree(text);
-
+				Logger.debug(this, "[PubSub] > %s" , jsonNode.toString());
 				if (jsonNode.has("type")) {
 					switch (jsonNode.get("type").textValue().toLowerCase()) {
 						case "pong":
@@ -235,6 +235,7 @@ public class TwitchPubSub {
 					ObjectNode objectNode = mapper.createObjectNode();
 					objectNode.put("type", "PING");
 
+					Logger.debug(this, "[PubSub] < %s", objectNode.toString());
 					webSocket.sendText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
 
 					Logger.debug(this, "Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
@@ -313,7 +314,8 @@ public class TwitchPubSub {
 		node.putObject("data")
 				.put("auth_token", "") // TODO: OAuth if exist.
 				.putArray("topics").addAll(topicList);
-		Logger.debug(this, "Sending to PubSub - type: %s, topics: [ %s ]", type.toUpperCase(), String.join(", ", topics));
+//		Logger.debug(this, "Sending to PubSub - type: %s, topics: [ %s ]", type.toUpperCase(), String.join(", ", topics));
+		Logger.debug(this, "[PubSub] < %s", node.toString());
 		webSocket.sendText(node.toString());
 	}
 
