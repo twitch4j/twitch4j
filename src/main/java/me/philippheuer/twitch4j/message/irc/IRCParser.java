@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
+@SuppressWarnings("unchecked")
 public class IRCParser {
 
 	private final TwitchClient twitchClient;
