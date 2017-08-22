@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.chat.commands;
+package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -48,6 +48,6 @@ public class DynamicCommand extends Command {
 		String response = commandReturnText;
 
 		// Send Response
-		getTwitchClient().getIrcClient().sendMessage(messageEvent.getChannel().getName(), response);
+		getTwitchClient().getMessageInterface().sendMessage(messageEvent.getChannel().getName(), response);
 	}
 }

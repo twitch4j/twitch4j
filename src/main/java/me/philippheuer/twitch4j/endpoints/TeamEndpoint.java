@@ -4,6 +4,7 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.RestError;
@@ -38,7 +39,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Team> getTeams(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/teams", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -70,7 +71,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Team> getTeam(String teamName) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams/%s", getTwitchClient().getTwitchEndpoint(), teamName);
+		String requestUrl = String.format("%s/teams/%s", Endpoints.API.getURL(), teamName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request

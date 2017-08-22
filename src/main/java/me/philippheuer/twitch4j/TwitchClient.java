@@ -6,13 +6,14 @@ import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.chat.IrcClient;
-import me.philippheuer.twitch4j.chat.commands.CommandHandler;
+import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.message.MessageInterface;
+import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
+import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
@@ -48,17 +49,12 @@ public class TwitchClient {
 	/**
 	 * RestClient to build the rest requests
 	 */
-	private RestClient restClient = new RestClient();
+	private final RestClient restClient = new RestClient();
 
 	/**
 	 * Twitch IRC Client
 	 */
-	private IrcClient ircClient;
-
-	/**
-	 * Twitch PubSub Client
-	 */
-	private TwitchPubSub pubSub;
+	private final MessageInterface messageInterface = new MessageInterface(this);
 
 	/**
 	 * Integration: Streamlabs Client
@@ -66,29 +62,9 @@ public class TwitchClient {
 	private StreamlabsClient streamLabsClient;
 
 	/**
-	 * Twitch API Endpoint
-	 */
-	public final String twitchEndpoint = "https://api.twitch.tv/kraken";
-
-	/**
 	 * Twitch API Version
 	 */
 	public final int twitchEndpointVersion = 5;
-
-	/**
-	 * Twitch TMI Endpoint
-	 */
-	public final String twitchMessagingInterfaceEndpoint = "http://tmi.twitch.tv";
-
-	/**
-	 * Twitch PubSub Endpoint
-	 */
-	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv";
-
-	/**
-	 * Twitch IRC Endpoint
-	 */
-	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
 
 	/**
 	 * Twitch Application - Client Id
@@ -124,21 +100,19 @@ public class TwitchClient {
 	 * @param clientSecret Twitch Application - Secret
 	 */
 	public TwitchClient(String clientId, String clientSecret) {
-		super();
-
-		setClientId(clientId);
-		setClientSecret(clientSecret);
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 
 		// Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
 
 		// EventSubscribers
-		getDispatcher().registerListener(getCommandHandler());
+		dispatcher.registerListener(getCommandHandler());
 
 		// Initialize REST Client
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
 	}
 
 	/**
@@ -190,7 +164,7 @@ public class TwitchClient {
 			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
 		}
 
-		// Connect to API Endpoints
+		// Initial Connect
 		twitchClient.connect();
 
 		// Return builded instance
@@ -204,11 +178,7 @@ public class TwitchClient {
 	 * Connect needs to be called after initalizing the {@link CredentialManager}.
 	 */
 	public void connect() {
-		// Init IRC
-		setIrcClient(new IrcClient(this));
-
-		// Init PubSub API
-		setPubSub(new TwitchPubSub(this));
+		getMessageInterface().connect();
 	}
 
 	/**
@@ -217,8 +187,7 @@ public class TwitchClient {
 	 * This methods closes the connection to the twitch irc server and the pubsub endpoint.
 	 */
 	public void disconnect() {
-		getIrcClient().disconnect();
-		getPubSub().disconnect();
+		getMessageInterface().disconnect();
 	}
 
 	/**
@@ -227,8 +196,7 @@ public class TwitchClient {
 	 * This methods reconnects to the twitch irc server and the pubsub endpoint.
 	 */
 	public void reconnect() {
-		disconnect();
-		connect();
+		getMessageInterface().reconnect();
 	}
 
 	/**

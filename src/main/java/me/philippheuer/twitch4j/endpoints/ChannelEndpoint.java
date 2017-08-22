@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.DonationEvent;
@@ -104,7 +105,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Channel getChannel() {
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -161,7 +162,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		// Endpoint
-		String requestUrl = String.format("%s/channel", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/channel", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -203,7 +204,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/editors", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s/editors", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -229,7 +230,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public FollowList getFollowers(Optional<Long> limit, Optional<String> cursor, Optional<String> direction) {
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/follows", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s/follows", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -300,7 +301,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Team> getTeams() {
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/teams", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s/teams", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -338,7 +339,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/subscriptions", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s/subscriptions", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -382,7 +383,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		Assert.notNull(user, "Please provide a User!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/subscriptions/%d", getTwitchClient().getTwitchEndpoint(), getChannelId(), user.getId());
+		String requestUrl = String.format("%s/channels/%s/subscriptions/%d", Endpoints.API.getURL(), getChannelId(), user.getId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -414,7 +415,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Video> getVideos(Optional<Long> limit, Optional<Long> offset, Optional<String> sort, Optional<String> language, Optional<String> broadcast_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/channels/%s/videos", getTwitchClient().getTwitchEndpoint(), getChannelId());
+		String requestUrl = String.format("%s/channels/%s/videos", Endpoints.API.getURL(), getChannelId());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -489,7 +490,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
-			String requestUrl = String.format("%s/channels/%s/stream_key", getTwitchClient().getTwitchEndpoint(), getChannelId());
+			String requestUrl = String.format("%s/channels/%s/stream_key", Endpoints.API.getURL(), getChannelId());
 			getTwitchClient().getRestClient().getRestTemplate().delete(requestUrl);
 
 			return true;
@@ -505,7 +506,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void ban(String user) {
-		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".ban %s", user));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".ban %s", user));
 	}
 
 	/**
@@ -515,7 +516,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void unban(String user) {
-		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".unban %s", user));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".unban %s", user));
 	}
 
 	/**
@@ -527,7 +528,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * @param user Username.
 	 */
 	public void timeout(String user, Duration duration) {
-		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
 	}
 
 	/**
@@ -545,7 +546,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
 	 */
 	public void purgeChat() {
-		getTwitchClient().getIrcClient().sendMessage(getChannel().getName(), ".clear");
+		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), ".clear");
 	}
 
 	/**
@@ -562,13 +563,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// - Check Rest API
 		// - Check IRC
 		{
-			Map.Entry<Boolean, String> result = getTwitchClient().getIrcClient().checkEndpointStatus();
+			Map.Entry<Boolean, String> result = getTwitchClient().getMessageInterface().getTwitchChat().checkEndpointStatus();
 			if (!result.getKey()) {
 				Logger.warn(this, "IRC Client not operating. You will not receive any irc events! [" + result.getValue() + "]");
 			}
 		}
 		// - Check PubSub
-		if (!getTwitchClient().getPubSub().checkEndpointStatus()) {
+		if (!getTwitchClient().getMessageInterface().getPubSub().checkEndpointStatus()) {
 			// We can ignore this right now, because we will reconnect as soon as pubsub is back up.
 			Logger.warn(this, "PubSub Client not operating. You will not recieve any pubsub events!");
 		}
@@ -576,7 +577,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Get Channel Information
 		Channel channel = getChannel();
 		// - Listen: IRC
-		getTwitchClient().getIrcClient().joinChannel(channel.getName());
+		getTwitchClient().getMessageInterface().joinChannel(channel.getName());
 		// - Listen: PubSub
 		// NYI
 

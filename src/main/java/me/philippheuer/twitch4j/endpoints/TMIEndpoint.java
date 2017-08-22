@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.endpoints;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -35,7 +36,7 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Chatter getChatters(String channelName) {
 		// Endpoint
-		String requestUrl = String.format("%s/group/user/%s/chatters", getTwitchClient().getTwitchMessagingInterfaceEndpoint(), channelName);
+		String requestUrl = String.format("%s/group/user/%s/chatters", Endpoints.TMI.getURL(), channelName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request

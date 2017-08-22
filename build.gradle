@@ -47,11 +47,9 @@ dependencies {
 	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.9.RELEASE'
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
-	// WebSocket Client for Twitch PubSub
+	// WebSocket Client for Twitch PubSub and Twitch IRC
 	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.3'
 
-	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
 	// - Transitive Dependency Conflict: Ratpack <-> Kitteh IRC Client
 	compile group: 'io.netty', 						name: 'netty-codec-http', 		version: '4.1.13.Final'
 	compile group: 'io.netty', 						name: 'netty-codec', 			version: '4.1.13.Final'

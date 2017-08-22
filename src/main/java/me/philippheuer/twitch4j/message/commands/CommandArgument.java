@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.chat.commands;
+package me.philippheuer.twitch4j.message.commands;
 
 import lombok.Getter;
 import lombok.Setter;
