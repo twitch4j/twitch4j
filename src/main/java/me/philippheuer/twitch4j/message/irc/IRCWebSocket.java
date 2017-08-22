@@ -8,13 +8,13 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.model.Channel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -99,21 +99,37 @@ class IRCWebSocket {
 			}
 
 			@Override
-			public void onTextMessage(WebSocket ws, String message) {
-				if (message.contains("PING")) {
-					// Log ping received message
-					sendCommand("PONG", ":tmi.twitch.tv");
-				} else if (message.startsWith(":tmi.twitch.tv PONG")) {
-					// Log pong received message
-				} else if (message.contains(":tmi.twitch.tv 001 " + credential.getUserName() + " :Welcome, GLHF!")) {
-					Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
+			public void onTextMessage(WebSocket ws, String text) {
+				String[] messages = text
+						.replace("\n\r", "\n")
+						.replace("\r", "\n").split("\n");
+				List<String> msgs = Arrays.asList(messages);
+				msgs.removeAll(Arrays.asList(""));
+				msgs.toArray(messages);
+				for (String message : messages) {
+//					final Pattern MESSAGE_REGEX = Pattern.compile("^(?:@(.*?) )?(?::(.+?)(?:!(.+?))?(?:@(.+?))? )?((?:[A-z]+)|(?:[0-9]{3}))(?: (?!:)(.+?))?(?: :(.*))?$");
+//					final Matcher matcher = MESSAGE_REGEX.matcher(message);
+//					matcher.find();
+//					for(int i = 0; i <= matcher.groupCount(); ++i) {
+//						if (i == 0) Logger.debug(this,"[IRC-WS] > %s" , matcher.group(i));
+//						else System.out.println(matcher.group(i));
+//					}
+					if (!message.isEmpty() || message != null) {
+						IRCParser parser = new IRCParser(getTwitchClient(), message);
+						Logger.debug(this, "[IRC-WS] > %s", parser.toString()); // raw message debugging
+						if (message.contains("PING")) {
+							Logger.debug(this, "Pings received, sending Pong to the Twitch IRC (WebSocket)");
+							sendCommand("PONG", ":tmi.twitch.tv");
+						} else if (message.contains("PONG")) {
+							Logger.debug(this, "Pongs received from Twitch IRC (WebSocket)");
+						} else if (message.contains("001")) {
+							Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 
-					setConnectionState(TMIConnectionState.CONNECTED);
-				} else {
-					Logger.debug(this, "Received Twitch IRC (WebSocket): [%s]", message);
-
-					IRCParser parser = new IRCParser(getTwitchClient(), message);
-					listeners.listen(parser);
+							setConnectionState(TMIConnectionState.CONNECTED);
+						} else {
+							listeners.listen(parser);
+						}
+					} else continue;
 				}
 			}
 			public void onDisconnected(WebSocket websocket,
