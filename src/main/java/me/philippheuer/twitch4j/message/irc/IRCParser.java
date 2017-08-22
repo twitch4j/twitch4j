@@ -9,9 +9,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Getter
 public class IRCParser {
 
-	@Getter
 	private final TwitchClient twitchClient;
 	private final Matcher message;
 
@@ -23,32 +23,50 @@ public class IRCParser {
 		this.message = matcher;
 	}
 
-//	@Override
-//	public String toString() {
-//		return message.group();
-//	}
-
 	private String shapeParser() {
 		if (getCommand().equalsIgnoreCase("PRIVMSG"))
-			return String.format("[%s] #%s | %s: %s", getCommand(), getChannel().getName(), getSender().getName(), getMessage());
+			return String.format("[%s] [#%s] %s: %s", getCommand(), getChannel().getName(), getUser().getName(), getMessage());
 		else if (getCommand().equalsIgnoreCase("WHISPER"))
-			return String.format("[%s] %s: %s", getCommand(), getSender().getName(), getMessage());
+			return String.format("[%s] %s: %s", getCommand(), getUser().getName(), getMessage());
 		else if (getCommand().equalsIgnoreCase("JOIN") || getCommand().equalsIgnoreCase("PART"))
-            return String.format("[%s] #%s | @%s", getCommand(), getChannel().getName(), getSender().getName());
-        else if (getCommand().equalsIgnoreCase("ROOMSTATE") || getCommand().equalsIgnoreCase("USERSTATE"))
-            return String.format("[%s] #%s @T=%s", getCommand(), getChannel().getName(), getTags().toString());
-        else return String.format("[%s]", getCommand());
-
-//		StringBuilder builder = new StringBuilder();
-//		builder.append("[")
-//				.append(message.group(5))
-//				.append("] ")
-//				.append((message.group(5).equalsIgnoreCase("PRIVMSG")) ? getChannel().getName() + " | " : null)
-//				.append(getSender().getName())
-//				.append(": ")
-//				.append(message.group(7));
-//		System.out.println(builder.toString());
-//		return builder.toString();
+            return String.format("[%s] [#%s] @%s", getCommand(), getChannel().getName(), getUser().getName());
+		else if (getCommand().equalsIgnoreCase("ROOMSTATE") || getCommand().equalsIgnoreCase("USERSTATE"))
+			return String.format("[%s] [#%s] @T=%s", getCommand(), getChannel().getName(), getTags().toString());
+		else if (getCommand().equalsIgnoreCase("GLOBALUSERSTATE"))
+			return String.format("[%s] @T=%s", getCommand(), getTags().toString());
+        else if (getCommand().equalsIgnoreCase("001") ||
+				getCommand().equalsIgnoreCase("002") ||
+				getCommand().equalsIgnoreCase("003") ||
+				getCommand().equalsIgnoreCase("372") ||
+				getCommand().equalsIgnoreCase("421") ||
+				getCommand().equalsIgnoreCase("RECONNECT"))
+			return String.format("[%s]%s", getCommand(), (getMessage() != null) ? " :" + getMessage() : "");
+		else if (getCommand().equalsIgnoreCase("USERNOTICE")) {
+			boolean isResub = getTag("msg-id").toString().equalsIgnoreCase("resub");
+			int months = (isResub) ? Integer.parseInt(getTag("msg-param-months")) : 1;
+			String plan = getTag("msg-param-sub-plan").toString();
+			return String.format("[%s] [#%s] %s",
+					getCommand(),
+					getChannel().getName(),
+					String.format("[%s] %s %s",
+							plan,
+							(isResub) ?
+									String.format("[%s|%s]",
+											getTag("msg-id").toString().toUpperCase(),
+											String.valueOf(months)) :
+									"[" + getTag("msg-id") + "]",
+							getUser().getName() + ((isResub) ? ": " + getMessage() : "")));
+		} else if (getCommand().equalsIgnoreCase("MODE")) {
+			String channel = message.group(6).substring(0, message.group(6).indexOf(" "));
+			String msg = message.group(6).substring(message.group(6).indexOf(" ") + 1);
+			return String.format("[%s] [%s] %s", getCommand(), channel, msg);
+		} else if (getCommand().equalsIgnoreCase("CLEARCHAT"))
+			return String.format("[%s] [#%s] @%s", getCommand(), getChannel().getName(), getUser().getName());
+		else if (getCommand().equalsIgnoreCase("NOTICE"))
+			return String.format("[%s] [#%s] [%s] :%s", getCommand(), getChannel().getName(), getTag("msg-id").toString(), getMessage());
+		else if (getCommand().equalsIgnoreCase("CAP"))
+			return String.format("[%s %s] :%s", getCommand(), message.group(6), getMessage());
+		else return String.format("[%s]", getCommand());
 	}
 
 	@Override
@@ -64,7 +82,7 @@ public class IRCParser {
 		if (getCommand().equalsIgnoreCase("PRIVMSG")) {
 			twitchClient.getMessageInterface().sendMessage(getChannel().getName(), message);
 		} else if (getCommand().equalsIgnoreCase("WHISPER")) {
-			twitchClient.getMessageInterface().sendPrivateMessage(getSender().getName(), message);
+			twitchClient.getMessageInterface().sendPrivateMessage(getUser().getName(), message);
 		}
 	}
 
@@ -118,10 +136,12 @@ public class IRCParser {
 		return (T) getTags().get(name);
 	}
 
-	public User getSender() {
+	public User getUser() {
 	    long userId;
 	    if (getCommand().equalsIgnoreCase("JOIN") || getCommand().equalsIgnoreCase("PART"))
 	        userId = twitchClient.getUserEndpoint().getUserIdByUserName(message.group(3)).get();
+	    else if (getCommand().equalsIgnoreCase("CLEARCHAT"))
+	    	userId = twitchClient.getUserEndpoint().getUserIdByUserName(message.group(7)).get();
 		else if (hasTag("user-id"))
 		    userId = Long.parseLong(getTag("user-id"));
 		else return null;
@@ -140,6 +160,7 @@ public class IRCParser {
 	}
 
 	public String getMessage() {
-		return message.group(7);
+		if (!getCommand().equalsIgnoreCase("CLEARCHAT")) return message.group(7);
+		else return null;
 	}
 }
