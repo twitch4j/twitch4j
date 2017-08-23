@@ -24,7 +24,8 @@ public class IRCParser {
 		this.message = matcher;
 	}
 
-	private String shapeParser() {
+	@Override
+	public String toString() {
 		if (getCommand().equalsIgnoreCase("PRIVMSG"))
 			return String.format("[%s] [#%s] %s: %s", getCommand(), getChannel().getName(), getUser().getName(), getMessage());
 		else if (getCommand().equalsIgnoreCase("WHISPER"))
@@ -69,11 +70,6 @@ public class IRCParser {
 			return String.format("[%s %s] :%s", getCommand(), message.group(6), getMessage());
 		else return String.format("[%s]", getCommand());
 	}
-
-	@Override
-    public String toString() {
-        return shapeParser();
-    }
 
 	/**
 	 * Replaying message to the last sender where received message
