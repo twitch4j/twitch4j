@@ -89,10 +89,25 @@ and:
 #### Twitch PubSub
  - [x] Bits
  - [x] Whispers
+ - [x] Subscriptions
+ - [x] Commercial
  
 #### Twitch IRC (WebSocket)
  - [x] Subscriptions
  - [x] Cheers (Bits)
+ - [ ] `/me` interactions chat
+ - [ ] `/color` changer
+ - [ ] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
+   - [ ] Ban (with reason)
+   - [ ] Timeout (with reason)
+   - [ ] Slow mode
+   - [ ] Sub mode
+   - [ ] Follow mode
+   - [ ] R9K mode
+   - [ ] Emote Only mode
+ - [ ] Channel Editor
+   - [ ] Commercial
+   - [ ] Host mode
 
 #### 3rd Party
 ##### [Streamlabs](https://streamlabs.com/)
