@@ -87,10 +87,10 @@ and:
  - [x] Videos
 
 #### Twitch PubSub
- - [ ] Bits
- - [ ] Whispers
+ - [x] Bits
+ - [x] Whispers
  
-#### Twitch IRC
+#### Twitch IRC (WebSocket)
  - [x] Subscriptions
  - [x] Cheers (Bits)
 
