@@ -47,17 +47,7 @@ public class IRCParser {
 			boolean isResub = getTag("msg-id").toString().equalsIgnoreCase("resub");
 			int months = (isResub) ? Integer.parseInt(getTag("msg-param-months")) : 1;
 			String plan = getTag("msg-param-sub-plan").toString();
-			return String.format("[%s] [#%s] %s",
-					getCommand(),
-					getChannel().getName(),
-					String.format("[%s] %s %s",
-							plan,
-							(isResub) ?
-									String.format("[%s|%s]",
-											getTag("msg-id").toString().toUpperCase(),
-											String.valueOf(months)) :
-									"[" + getTag("msg-id") + "]",
-							getUser().getName() + ((isResub) ? ": " + getMessage() : "")));
+			return String.format("[%s] [#%s] %s", getCommand(), getChannel().getName(), String.format("[%s] %s %s", plan, (isResub) ? String.format("[%s|%s]", getTag("msg-id").toString().toUpperCase(), String.valueOf(months)) : "[" + getTag("msg-id") + "]", getUser().getName() + ((isResub) ? ": " + getMessage() : "")));
 		} else if (getCommand().equalsIgnoreCase("MODE")) {
 			String channel = message.group(6).substring(0, message.group(6).indexOf(" "));
 			String msg = message.group(6).substring(message.group(6).indexOf(" ") + 1);
