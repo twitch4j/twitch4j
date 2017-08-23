@@ -15,12 +15,19 @@ import java.util.concurrent.TimeUnit;
 
 public class TwitchChat extends IRCWebSocket {
 
+	/**
+	 * Token Bucket for message limits
+	 */
 	private final TokenBucket messageBucket = TokenBuckets.builder()
 			.withCapacity(20)
 			.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
 			.build();
 
+	/**
+	 * Token Bucket for moderated channels
+	 */
 	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
+	// TODO: Token Bucket for increased rate limits - annotating thread: https://discuss.dev.twitch.tv/t/have-a-chat-whisper-bot-let-us-know/10651
 
 	/**
 	 * Twitch Chat IRC Wrapper
@@ -50,6 +57,10 @@ public class TwitchChat extends IRCWebSocket {
 				*/
 	}
 
+	/**
+	 * Joining the channel
+	 * @param channel channel name
+	 */
 	@Override
 	public void joinChannel(String channel) {
 		super.joinChannel(channel);
@@ -62,6 +73,10 @@ public class TwitchChat extends IRCWebSocket {
 		}
 	}
 
+	/**
+	 * Leaving the channel
+	 * @param channel channel name
+	 */
 	@Override
 	public void partChannel(String channel) {
 		super.partChannel(channel);
@@ -72,6 +87,12 @@ public class TwitchChat extends IRCWebSocket {
 		}
 	}
 
+
+	/**
+	 * Sending message to the joined channel
+	 * @param channel channel name
+	 * @param message message
+	 */
 	@Override
 	public void sendMessage(String channel, String message) {
 		Logger.debug(this, "Sending message to channel [%s] with content [%s].!", channel, message);

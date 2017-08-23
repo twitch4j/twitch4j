@@ -12,10 +12,20 @@ import java.util.regex.Pattern;
 @Getter
 @SuppressWarnings("unchecked")
 public class IRCParser {
-
+	/**
+	 * Twitch Client
+	 */
 	private final TwitchClient twitchClient;
+	/**
+	 * Raw Message using {@link Matcher} pattern
+	 */
 	private final Matcher message;
 
+	/**
+	 * IRC Parser for Twitch IRC-WS
+	 * @param client {@link TwitchClient} endpoint
+	 * @param message Raw Message received from IRC-WS
+	 */
 	public IRCParser(TwitchClient client, String message) {
 		this.twitchClient = client;
 		final Pattern MESSAGE_REGEX = Pattern.compile("^(?:@(.*?) )?(?::(.+?)(?:!(.+?))?(?:@(.+?))? )?((?:[A-z]+)|(?:[0-9]{3}))(?: (?!:)(.+?))?(?: :(.*))?$");
@@ -24,6 +34,10 @@ public class IRCParser {
 		this.message = matcher;
 	}
 
+	/**
+	 * Getting stringify message
+	 * @return IRC format Message
+	 */
 	@Override
 	public String toString() {
 		if (getCommand().equalsIgnoreCase("PRIVMSG"))
@@ -73,6 +87,11 @@ public class IRCParser {
 		}
 	}
 
+	/**
+	 * getting list of tags
+	 * @param <T> some classes extends Object
+	 * @return {@link Map} tag list
+	 */
 	public <T extends Object> Map<String, T> getTags() {
 		Map<String, T> tagList = new HashMap<>();
 		String rawTags = message.group(1);
@@ -84,6 +103,13 @@ public class IRCParser {
 		return tagList;
 	}
 
+	/**
+	 * Parsing tag value
+	 * @param key key
+	 * @param value value
+	 * @param <T> some classes extends Object
+	 * @return value converted to Object class
+	 */
 	private <T extends Object> T parseTagValue(String key, String value) {
         if ((value.contains(",") || value.contains("/")) && key.equalsIgnoreCase("badges")) {
             Map<String, Integer> badges = new HashMap<String, Integer>();
@@ -114,15 +140,31 @@ public class IRCParser {
 
 	public String getRawMessage() { return message.group(0); }
 
+	/**
+	 * Getting tag exists
+	 * @param name tag name
+	 * @param <T> some classes extends Object
+	 * @return tag existence
+	 */
 	public <T extends Object> boolean hasTag(String name) {
 		Map<String, T> tags = getTags();
 		return !tags.isEmpty() && tags.containsKey(name);
 	}
 
+	/**
+	 * Get one tag
+	 * @param name tag name
+	 * @param <T> some classes extends Object
+	 * @return getting tag data returned classes extends Object
+	 */
 	public <T extends Object> T getTag(String name) {
 		return (T) getTags().get(name);
 	}
 
+	/**
+	 * Getting user interacted with channel or private message's
+	 * @return {@link User} data
+	 */
 	public User getUser() {
 	    long userId;
 	    if (getCommand().equalsIgnoreCase("JOIN") || getCommand().equalsIgnoreCase("PART"))
@@ -136,16 +178,28 @@ public class IRCParser {
 		return sender.orElse(null);
 	}
 
+	/**
+	 * Getting channel
+	 * @return {@link Channel} data
+	 */
 	public Channel getChannel() {
 		if (message.group(6).startsWith("#"))
 			return twitchClient.getChannelEndpoint(message.group(6).substring(1)).getChannel();
 		else return null;
 	}
 
+	/**
+	 * Getting command
+	 * @return IRC Received Command
+	 */
 	public String getCommand() {
 		return message.group(5);
 	}
 
+	/**
+	 * Getting message
+	 * @return IRC Message
+	 */
 	public String getMessage() {
 		if (!getCommand().equalsIgnoreCase("CLEARCHAT")) return message.group(7);
 		else return null;

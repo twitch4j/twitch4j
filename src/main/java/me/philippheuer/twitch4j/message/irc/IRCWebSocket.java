@@ -12,11 +12,9 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Setter
 @Getter
@@ -133,6 +131,9 @@ class IRCWebSocket {
 		});
 	}
 
+	/**
+	 * Connecting to IRC-WS
+	 */
 	public void connect() {
 		if (getConnectionState().equals(TMIConnectionState.DISCONNECTED)) {
 			try {
@@ -143,6 +144,9 @@ class IRCWebSocket {
 		}
 	}
 
+	/**
+	 * Disconnecting from IRC-WS
+	 */
 	public void disconnect() {
 		if (getConnectionState().equals(TMIConnectionState.CONNECTED)) {
 			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
@@ -152,11 +156,19 @@ class IRCWebSocket {
 		}
 	}
 
+	/**
+	 * Reconnecting to IRC-WS
+	 */
 	public void reconnect() {
 		disconnect();
 		connect();
 	}
 
+	/**
+	 * Send IRC Command
+	 * @param command IRC Command
+	 * @param args command arguments
+	 */
 	public void sendCommand(String command, String... args) {
 		// will send command if connection has been established
 		if (getConnectionState().equals(TMIConnectionState.CONNECTED) || getConnectionState().equals(TMIConnectionState.CONNECTING)) {
@@ -165,6 +177,10 @@ class IRCWebSocket {
 		}
 	}
 
+	/**
+	 * Joining the channel
+	 * @param channelName channel name
+	 */
 	public void joinChannel(String channelName) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
 
@@ -176,6 +192,10 @@ class IRCWebSocket {
 		}
 	}
 
+	/**
+	 * leaving the channel
+	 * @param channelName channel name
+	 */
 	public void partChannel(String channelName) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
 		if (channels.contains(channel)) {
@@ -186,13 +206,25 @@ class IRCWebSocket {
 		}
 	}
 
+	/**
+	 * Sending message to the joined channel
+	 * @param channelName channel name
+	 * @param message message
+	 */
 	public void sendMessage(String channelName, String message) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
-		sendCommand("privmsg", "#" + channel.getName(), message);
+		if (channels.contains(channel)) {
+			sendCommand("privmsg", "#" + channel.getName(), message);
+		}
 	}
 
-	public void sendPrivateMessage(String channelName, String message) {
-		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
-		sendCommand("privmsg", "#" + channelName, "/w", channel.getName(), message);
+	/**
+	 * sending private message
+	 * @param username username
+	 * @param message message
+	 */
+	public void sendPrivateMessage(String username, String message) {
+		Optional<User> twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
+		twitchUser.ifPresent(user -> sendCommand("privmsg", "#" + user.getName(), "/w", user.getName(), message));
 	}
 }
