@@ -12,6 +12,11 @@ public enum CommandPermission {
 	PRIME_TURBO,
 
 	/**
+	 * Twitch Partners
+	 */
+	PARTNER,
+
+	/**
 	 * Subscriber (any Tier)
 	 */
 	SUBSCRIBER,

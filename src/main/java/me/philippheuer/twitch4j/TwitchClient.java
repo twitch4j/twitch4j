@@ -11,6 +11,7 @@ import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
+import me.philippheuer.twitch4j.message.irc.listeners.ChannelMessageListener;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
@@ -107,7 +108,11 @@ public class TwitchClient {
 		credentialManager.setTwitchClient(this);
 
 		// EventSubscribers
+		// - Commands
 		dispatcher.registerListener(getCommandHandler());
+		// - IRC Event Listeners
+		// TODO: Replace with reflection for the package
+		dispatcher.registerListener(new ChannelMessageListener());
 
 		// Initialize REST Client
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));

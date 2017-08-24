@@ -11,6 +11,8 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
+import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.IrcRawMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -24,11 +26,6 @@ class IRCWebSocket {
 	 * WebSocket Client
 	 */
 	private WebSocket ws;
-
-	/**
-	 * IRC Listeners
-	 */
-	private final IRCListener listeners;
 
 	/**
 	 * Twitch Client
@@ -52,7 +49,6 @@ class IRCWebSocket {
 	 */
 	public IRCWebSocket(TwitchClient client) {
 		this.twitchClient = client;
-		this.listeners = new IRCListener(client);
 
 		// Create WebSocket
 		try {
@@ -63,6 +59,12 @@ class IRCWebSocket {
 
 		// WebSocket Listener
 		this.ws.addListener(new WebSocketAdapter() {
+
+			/**
+			 * Twitch Client
+			 */
+			private TwitchClient twitchClient = getTwitchClient();
+
 			@Override
 			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
 				setConnectionState(TMIConnectionState.CONNECTING);
@@ -99,8 +101,8 @@ class IRCWebSocket {
 						.replace("\r", "\n").split("\n"))
 						.forEach(message -> {
 					if (!message.equals("")) {
-						IRCParser parser = new IRCParser(getTwitchClient(), message);
-						Logger.debug(this, "[IRC-WS] > %s", parser.toString());
+
+						IRCParser parser = new IRCParser(message);
 						if (parser.getCommand().equalsIgnoreCase("ping")) {
 							Logger.debug(this, "Pings received, sending Pong to the Twitch IRC (WebSocket)");
 							sendCommand("PONG", ":tmi.twitch.tv");
@@ -110,7 +112,9 @@ class IRCWebSocket {
 							Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 							setConnectionState(TMIConnectionState.CONNECTED);
 						} else {
-							listeners.listen(parser);
+							// Trigger Event
+							Event event = new IrcRawMessageEvent(parser);
+							getTwitchClient().getDispatcher().dispatch(event);
 						}
 					}
 				});
