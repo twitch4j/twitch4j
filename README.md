@@ -74,9 +74,12 @@ and:
  - [x] StreamLabs
  
 #### Twitch REST Endpoints
+ - [ ] Bits
  - [ ] Channel Feed
  - [x] Channels
  - [ ] Chat
+ - [ ] Clips
+ - [ ] Collections
  - [x] Communities (Released: 10.02.2017)
  - [x] Games
  - [x] Ingests
