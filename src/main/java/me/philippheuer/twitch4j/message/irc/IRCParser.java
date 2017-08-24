@@ -1,10 +1,7 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import lombok.Getter;
-import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -26,7 +23,7 @@ public class IRCParser {
 	public IRCParser(String message) {
 		final Pattern MESSAGE_REGEX = Pattern.compile("^(?:@(.*?) )?(?::(.+?)(?:!(.+?))?(?:@(.+?))? )?((?:[A-z]+)|(?:[0-9]{3}))(?: (?!:)(.+?))?(?: :(.*))?$");
 		final Matcher matcher = MESSAGE_REGEX.matcher(message);
-		matcher.find();
+		matcher.find(); // triggering matcher (he returns boolean)
 		this.matcher = matcher;
 	}
 
@@ -36,87 +33,39 @@ public class IRCParser {
 	 */
 	@Override
 	public String toString() {
-		/**
-		 * Handle each type different
-		 */
-		switch (getCommand().toUpperCase()) {
-			case "PRIVMSG": {
+		switch (getCommand().toUpperCase()) { // Handle each type different
+			case "PRIVMSG": // User Message from specified joined Channel
 				return String.format("[%s] [#%s] %s: %s", getCommand(), getChannelName(), getUserName(), getMessage());
-			}
-			case "WHISPER": {
+			case "WHISPER": // Whisper from User
 				return String.format("[%s] %s: %s", getCommand(), getUserName(), getMessage());
-			}
-			/**
-			 * A user is entering a channel
-			 */
-			case "JOIN": {
+			case "JOIN": // User Join Channel
+			case "PART": // User Leave Channel
 				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
-			}
-			/**
-			 * A user is leaving a Channel
-			 */
-			case "PART": {
-				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
-			}
-			/**
-			 * USERSTATE
-			 */
-			case "USERSTATE": {
+			case "USERSTATE": // User status
+			case "ROOMSTATE": // Channel status
 				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), getTags().toString());
-			}
-			/**
-			 * ROOMSTATE
-			 */
-			case "ROOMSTATE": {
-				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), getTags().toString());
-			}
-			/**
-			 * GLOBALUSERSTATE
-			 */
-			case "GLOBALUSERSTATE": {
+			case "GLOBALUSERSTATE":  // Global user state shows connection established
 				return String.format("[%s] @T=%s", getCommand(), getTags().toString());
-			}
-			/**
-			 * A usernotice are sub/resub notifications
-			 */
-			case "USERNOTICE": {
+			case "USERNOTICE": // Subscribe notification
 				boolean isResub = getTag("msg-id").toString().equalsIgnoreCase("resub");
 				int months = (isResub) ? Integer.parseInt(getTag("msg-param-months")) : 1;
 				String plan = getTag("msg-param-sub-plan").toString();
-				return String.format("[%s] [#%s] %s", getCommand(), getChannelName(), String.format("[%s] %s %s", plan, (isResub) ? String.format("[%s|%s]", getTag("msg-id").toString().toUpperCase(), String.valueOf(months)) : "[" + getTag("msg-id") + "]", getUserName() + ((isResub) ? ": " + getMessage() : "")));
-			}
-			/**
-			 * MODE
-			 */
-			case "MODE": {
+
+				String subType = (isResub) ? String.format("[%s|%s]", getTag("msg-id").toString().toUpperCase(), String.valueOf(months)) : "[" + getTag("msg-id") + "]";
+				String formatMsg = String.format("[%s] %s %s", plan, subType , getUserName() + ((isResub) ? ": " + getMessage() : ""));
+				return String.format("[%s] [#%s] %s", getCommand(), getChannelName(), subType );
+			case "MODE": // Permissions Mode (+o)
 				String channelName = matcher.group(6).substring(0, matcher.group(6).indexOf(" "));
 				String message = matcher.group(6).substring(matcher.group(6).indexOf(" ") + 1);
 				return String.format("[%s] [%s] %s", getCommand(), channelName, message);
-			}
-			/**
-			 * CLEARCHAT
-			 */
-			case "CLEARCHAT": {
+			case "CLEARCHAT": // Clearing chat for specify user (only for banning or timeouting)
 				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
-			}
-			/**
-			 * NOTICE
-			 */
-			case "NOTICE": {
+			case "NOTICE": // Server Notice
 				return String.format("[%s] [#%s] [%s] :%s", getCommand(), getChannelName(), getTag("msg-id").toString(), getMessage());
-			}
-			/**
-			 * CAP
-			 */
-			case "CAP": {
+			case "CAP": // Tags capturing
 				return String.format("[%s %s] :%s", getCommand(), matcher.group(6), getMessage());
-			}
-			/**
-			 * Default Case
-			 */
-			default: {
+			default: // Default Case
 				return String.format("[%s]%s", getCommand(), (getMessage() != null) ? " :" + getMessage() : "");
-			}
 		}
 	}
 
@@ -134,7 +83,7 @@ public class IRCParser {
 
 			if(tagData.split("=").length == 1) {
 				// No Value
-				T value = parseTagValue(tagData.split("=")[0], "");
+				T value = parseTagValue(tagData.split("=")[0], null); // should be null
 				tagList.put(key, value);
 			} else {
 				// Typed Value
@@ -154,6 +103,7 @@ public class IRCParser {
 	 * @return value converted to Object class
 	 */
 	private <T extends Object> T parseTagValue(String key, String value) {
+		if (value == null) return null;
 		try {
 			if (key.equalsIgnoreCase("badges")) {
 				Map<String, Integer> badges = new HashMap<String, Integer>();
@@ -177,8 +127,7 @@ public class IRCParser {
 		} catch (Exception ex) {
 			// ex.printStackTrace();
 		}
-
-        return  (T) value;
+        return (T) value;
     }
 
 	/**
