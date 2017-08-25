@@ -103,7 +103,6 @@ public class IRCParser {
 	 * @return value converted to Object class
 	 */
 	private <T extends Object> T parseTagValue(String key, String value) {
-		if (value == null) return null;
 		try {
 			if (key.equalsIgnoreCase("badges")) {
 				Map<String, Integer> badges = new HashMap<String, Integer>();
@@ -230,22 +229,24 @@ public class IRCParser {
 		if (getTags().containsKey("badges")) {
 			HashMap<String, String> badges = (HashMap)getTags().get("badges");
 
-			// - Broadcaster
-			if (badges.containsKey("broadcaster")) {
-				userPermissions.add(CommandPermission.BROADCASTER);
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
-			// Twitch Prime
-			if (badges.containsKey("premium")) {
-				userPermissions.add(CommandPermission.PRIME_TURBO);
-			}
-			// Moderator
-			if (badges.containsKey("moderator")) {
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
-			// Partner
-			if (badges.containsKey("partner")) {
-				userPermissions.add(CommandPermission.PARTNER);
+			if(badges != null) {
+				// - Broadcaster
+				if (badges.containsKey("broadcaster")) {
+					userPermissions.add(CommandPermission.BROADCASTER);
+					userPermissions.add(CommandPermission.MODERATOR);
+				}
+				// Twitch Prime
+				if (badges.containsKey("premium")) {
+					userPermissions.add(CommandPermission.PRIME_TURBO);
+				}
+				// Moderator
+				if (badges.containsKey("moderator")) {
+					userPermissions.add(CommandPermission.MODERATOR);
+				}
+				// Partner
+				if (badges.containsKey("partner")) {
+					userPermissions.add(CommandPermission.PARTNER);
+				}
 			}
 		}
 		// Twitch Turbo
