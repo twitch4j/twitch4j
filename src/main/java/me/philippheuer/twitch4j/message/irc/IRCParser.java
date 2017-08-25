@@ -36,6 +36,8 @@ public class IRCParser {
 		switch (getCommand().toUpperCase()) { // Handle each type different
 			case "PRIVMSG": // User Message from specified joined Channel
 				return String.format("[%s] [#%s] %s: %s", getCommand(), getChannelName(), getUserName(), getMessage());
+			case "ACTION": // someone on the chat use '/me'
+				return String.format("[%s] [#%s] %s %s", getCommand(), getChannelName(), getUserName(), getMessage());
 			case "WHISPER": // Whisper from User
 				return String.format("[%s] %s: %s", getCommand(), getUserName(), getMessage());
 			case "JOIN": // User Join Channel
@@ -205,7 +207,9 @@ public class IRCParser {
 	 * @return IRC Received Command
 	 */
 	public String getCommand() {
-		return matcher.group(5);
+		if (matcher.group(5).equalsIgnoreCase("PRIVMSG") && matcher.group(7).contains("ACTION")) {
+			return "ACTION";
+		} else return matcher.group(5);
 	}
 
 	/**
@@ -214,7 +218,10 @@ public class IRCParser {
 	 */
 	public String getMessage() {
 		if (!getCommand().equalsIgnoreCase("CLEARCHAT")) {
-			return matcher.group(7);
+			String msg = matcher.group(7);
+			if (msg.contains("ACTION")) {
+				return matcher.group(7).substring(8, matcher.group(7).length() - 1);
+			} else return msg;
 		}
 
 		return null;
