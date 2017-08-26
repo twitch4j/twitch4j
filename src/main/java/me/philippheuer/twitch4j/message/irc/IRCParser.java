@@ -15,6 +15,7 @@ public class IRCParser {
 	 * Raw Message using {@link Matcher} pattern
 	 */
 	private final Matcher matcher;
+	private final IRCTags tags;
 
 	/**
 	 * IRC Parser for Twitch IRC-WS
@@ -25,6 +26,12 @@ public class IRCParser {
 		final Matcher matcher = MESSAGE_REGEX.matcher(message);
 		matcher.find(); // triggering matcher (he returns boolean)
 		this.matcher = matcher;
+		if (matcher.group(0) != null) tags = new IRCTags(matcher.group(0));
+		else tags = null;
+		// testing matcher's - uncomment it for test
+//		for (int o = 1; matcher.groupCount() >= o; ++o) {
+//			System.out.println(matcher.group(o));
+//		}
 	}
 
 	/**
@@ -33,7 +40,7 @@ public class IRCParser {
 	 */
 	@Override
 	public String toString() {
-		switch (getCommand().toUpperCase()) { // Handle each type different
+		switch (getFormedCommand().toUpperCase()) { // Handle each type different
 			case "PRIVMSG": // User Message from specified joined Channel
 				return String.format("[%s] [#%s] %s: %s", getCommand(), getChannelName(), getUserName(), getMessage());
 			case "ACTION": // someone on the chat use '/me'
@@ -45,92 +52,36 @@ public class IRCParser {
 				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
 			case "USERSTATE": // User status
 			case "ROOMSTATE": // Channel status
-				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), getTags().toString());
+				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), tags.getTags().toString());
 			case "GLOBALUSERSTATE":  // Global user state shows connection established
-				return String.format("[%s] @T=%s", getCommand(), getTags().toString());
+				return String.format("[%s] @T=%s", getCommand(), tags.getTags().toString());
 			case "USERNOTICE": // Subscribe notification
-				boolean isResub = getTag("msg-id").toString().equalsIgnoreCase("resub");
-				int months = (isResub) ? Integer.parseInt(getTag("msg-param-months")) : 1;
-				String plan = getTag("msg-param-sub-plan").toString();
-
-				String subType = (isResub) ? String.format("[%s|%s]", getTag("msg-id").toString().toUpperCase(), String.valueOf(months)) : "[" + getTag("msg-id") + "]";
-				String formatMsg = String.format("[%s] %s %s", plan, subType , getUserName() + ((isResub) ? ": " + getMessage() : ""));
-				return String.format("[%s] [#%s] %s", getCommand(), getChannelName(), subType );
+				boolean isResub = tags.getTag("msg-id").toString().equalsIgnoreCase("resub");
+				int months = (isResub) ? Integer.parseInt((String) tags.getTag("msg-param-months")) : 1;
+				String plan = tags.getTag("msg-param-sub-plan").toString();
+				String subType = (isResub) ? String.format("[%s|%s]", tags.getTag("msg-id").toString().toUpperCase(), String.valueOf(months)) : "[" + tags.getTag("msg-id") + "]";
+				String formatMsg = String.format("[%s] %s %s", plan, subType, getUserName() + ((isResub) ? ": " + getMessage() : ""));
+				return String.format("[%s] [#%s] %s", getCommand(), getChannelName(), formatMsg);
 			case "MODE": // Permissions Mode (+o)
 				String channelName = matcher.group(6).substring(0, matcher.group(6).indexOf(" "));
 				String message = matcher.group(6).substring(matcher.group(6).indexOf(" ") + 1);
 				return String.format("[%s] [%s] %s", getCommand(), channelName, message);
-			case "CLEARCHAT": // Clearing chat for specify user (only for banning or timeouting)
-				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
+			case "BAN": // User banned on channel
+			case "TIMEOUT": // User timeouted on channel
+				String reason = (String) tags.getTag("ban-reason");
+				if (tags.hasTag("ban-duration"))
+					return String.format("[TIMEOUT] [#%s] %s @%s", getChannelName(), tags.getTag("ban-duration").toString(), getUserName() + ((reason != null) ? " :" + reason : ""));
+				else return String.format("[BAN] [#%s] %s @%s", getChannelName(), tags.getTag("ban-duration").toString(), getUserName() + ((reason != null) ? " :" + reason : ""));
+			case "CLEARCHAT": // Clearing chat on channel
+				return String.format("[%s] [#%s]", getCommand(), getChannelName());
 			case "NOTICE": // Server Notice
-				return String.format("[%s] [#%s] [%s] :%s", getCommand(), getChannelName(), getTag("msg-id").toString(), getMessage());
+				return String.format("[%s] [#%s] [%s] :%s", getCommand(), getChannelName(), tags.getTag("msg-id").toString(), getMessage());
 			case "CAP": // Tags capturing
 				return String.format("[%s %s] :%s", getCommand(), matcher.group(6), getMessage());
 			default: // Default Case
 				return String.format("[%s]%s", getCommand(), (getMessage() != null) ? " :" + getMessage() : "");
 		}
 	}
-
-	/**
-	 * Gets the TagList of the IRC Message
-	 * @param <T> some classes extends Object
-	 * @return {@link Map} tag list
-	 */
-	public <T extends Object> Map<String, T> getTags() {
-		Map<String, T> tagList = new HashMap<>();
-		String rawTags = matcher.group(1);
-
-		for (String tagData: rawTags.split(";")) {
-			String key = tagData.split("=")[0];
-
-			if(tagData.split("=").length == 1) {
-				// No Value
-				T value = parseTagValue(tagData.split("=")[0], null); // should be null
-				tagList.put(key, value);
-			} else {
-				// Typed Value
-				T value = parseTagValue(tagData.split("=")[0], tagData.split("=")[1]);
-				tagList.put(key, value);
-			}
-		}
-
-		return tagList;
-	}
-
-	/**
-	 * Parsing tag value
-	 * @param key key
-	 * @param value value
-	 * @param <T> some classes extends Object
-	 * @return value converted to Object class
-	 */
-	private <T extends Object> T parseTagValue(String key, String value) {
-		if (value == null) return null;
-		try {
-			if (key.equalsIgnoreCase("badges")) {
-				Map<String, Integer> badges = new HashMap<String, Integer>();
-
-				if((value.contains(",") || value.contains("/"))) {
-					for (String badge : value.split(",")) {
-						badges.put(badge.split("/")[0], Integer.parseInt(badge.split("/")[1]));
-					}
-				}
-
-				return (T) badges;
-			} else if ((value.contains("/") || value.contains(":")) && key.equalsIgnoreCase("emotes")) {
-				Map<Integer, Map.Entry<Integer, Integer>> emotes = new HashMap<Integer, Map.Entry<Integer, Integer>>();
-				for (String emote : value.split("/")) {
-					emotes.put(Integer.parseInt(emote.split(":")[0]), new AbstractMap.SimpleEntry<>(Integer.parseInt(emote.split(":")[1].split("-")[0]), Integer.parseInt(emote.split(":")[1].split("-")[1])));
-				}
-				return (T) emotes;
-			} else if (key.equalsIgnoreCase("subscriber") || key.equalsIgnoreCase("mod") || key.equalsIgnoreCase("turbo")) {
-				return (T) Boolean.valueOf(value.equals("1"));
-			}
-		} catch (Exception ex) {
-			// ex.printStackTrace();
-		}
-        return (T) value;
-    }
 
 	/**
 	 * Gets the raw message
@@ -142,36 +93,13 @@ public class IRCParser {
 	}
 
 	/**
-	 * Getting tag exists
-	 *
-	 * @param name tag name
-	 * @param <T> some classes extends Object
-	 * @return tag existence
-	 */
-	public <T extends Object> Boolean hasTag(String name) {
-		Map<String, T> tags = getTags();
-		return !tags.isEmpty() && tags.containsKey(name);
-	}
-
-	/**
-	 * Get one tag
-	 *
-	 * @param name tag name
-	 * @param <T> some classes extends Object
-	 * @return getting tag data returned classes extends Object
-	 */
-	public <T extends Object> T getTag(String name) {
-		return (T) getTags().get(name);
-	}
-
-	/**
 	 * Getting the id of the user triggering this event
 	 *
 	 * @return the id of the user
 	 */
 	public Long getUserId() {
-	    if (hasTag("user-id")) {
-			return Long.parseLong(getTag("user-id"));
+	    if (tags.hasTag("user-id")) {
+			return Long.parseLong((String) tags.getTag("user-id"));
 		}
 
 		return null;
@@ -183,8 +111,19 @@ public class IRCParser {
 	 * @return display name of the user
 	 */
 	public String getUserName() {
-		if (hasTag("display-name")) {
-			return (String) getTag("display-name");
+		if (getCommand().equalsIgnoreCase("CLEARCHAT") && matcher.group(7) != null)
+			return matcher.group(7);
+		else return matcher.group(3);
+	}
+
+	/**
+	 * Getting the name of the user triggering this event
+	 *
+	 * @return display name of the user
+	 */
+	public String getDisplayName() {
+		if (tags.hasTag("display-name")) {
+			return (String) tags.getTag("display-name");
 		}
 
 		return null;
@@ -198,8 +137,25 @@ public class IRCParser {
 		if (matcher.group(6).startsWith("#")) {
 			return matcher.group(6).substring(1);
 		}
-
 		return null;
+	}
+
+	public String getFormedCommand() {
+		switch (getCommand().toUpperCase()) {
+			case "PRIVMSG":
+				if (matcher.group(7).contains("ACTION")) return "ACTION"; // using `/me` by chat user
+				return getCommand();
+			case "CLEARCHAT": // clear chat have 3 ways
+				if (matcher.group(7).contains("ACTION")) return "ACTION";
+				if (tags.hasTag("ban-reason")) {
+					if (tags.hasTag("ban-duration"))
+						return "TIMEOUT"; // timeouting
+					else return "BAN"; // banning
+				}
+				return getCommand(); // chat clearing
+			default:
+				return getCommand();
+		}
 	}
 
 	/**
@@ -207,9 +163,7 @@ public class IRCParser {
 	 * @return IRC Received Command
 	 */
 	public String getCommand() {
-		if (matcher.group(5).equalsIgnoreCase("PRIVMSG") && matcher.group(7).contains("ACTION")) {
-			return "ACTION";
-		} else return matcher.group(5);
+		return matcher.group(5);
 	}
 
 	/**
@@ -234,8 +188,8 @@ public class IRCParser {
 		Set<CommandPermission> userPermissions = new HashSet<>();
 
 		// Check for Permissions
-		if (getTags().containsKey("badges")) {
-			HashMap<String, String> badges = (HashMap)getTags().get("badges");
+		if (tags.hasTag("badges")) {
+			HashMap<String, String> badges = (HashMap) tags.getTag("badges");
 
 			// - Broadcaster
 			if (badges.containsKey("broadcaster")) {
@@ -256,11 +210,11 @@ public class IRCParser {
 			}
 		}
 		// Twitch Turbo
-		if (getTags().containsKey("turbo") && getTags().get("turbo").equals("1")) {
+		if (tags.hasTag("turbo") && tags.getTag("turbo").equals("1")) {
 			userPermissions.add(CommandPermission.PRIME_TURBO);
 		}
 		// Subscriber
-		if (getTags().containsKey("subscriber") && getTags().get("subscriber").equals("1")) {
+		if (tags.hasTag("subscriber") && tags.getTag("subscriber").equals("1")) {
 			userPermissions.add(CommandPermission.SUBSCRIBER);
 		}
 		// Everyone
