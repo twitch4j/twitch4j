@@ -5,6 +5,11 @@ package me.philippheuer.twitch4j.enums;
  */
 public enum SubPlan {
 	/**
+	 * Unknown
+	 */
+	UNKNOWN("Unknown"),
+
+	/**
 	 * Twitch Prime
 	 */
 	PRIME("Prime"),

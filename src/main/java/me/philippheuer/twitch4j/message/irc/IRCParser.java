@@ -191,22 +191,24 @@ public class IRCParser {
 		if (tags.hasTag("badges")) {
 			HashMap<String, String> badges = (HashMap) tags.getTag("badges");
 
-			// - Broadcaster
-			if (badges.containsKey("broadcaster")) {
-				userPermissions.add(CommandPermission.BROADCASTER);
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
-			// Twitch Prime
-			if (badges.containsKey("premium")) {
-				userPermissions.add(CommandPermission.PRIME_TURBO);
-			}
-			// Moderator
-			if (badges.containsKey("moderator")) {
-				userPermissions.add(CommandPermission.MODERATOR);
-			}
-			// Partner
-			if (badges.containsKey("partner")) {
-				userPermissions.add(CommandPermission.PARTNER);
+			if(badges != null) {
+				// - Broadcaster
+				if (badges.containsKey("broadcaster")) {
+					userPermissions.add(CommandPermission.BROADCASTER);
+					userPermissions.add(CommandPermission.MODERATOR);
+				}
+				// Twitch Prime
+				if (badges.containsKey("premium")) {
+					userPermissions.add(CommandPermission.PRIME_TURBO);
+				}
+				// Moderator
+				if (badges.containsKey("moderator")) {
+					userPermissions.add(CommandPermission.MODERATOR);
+				}
+				// Partner
+				if (badges.containsKey("partner")) {
+					userPermissions.add(CommandPermission.PARTNER);
+				}
 			}
 		}
 		// Twitch Turbo

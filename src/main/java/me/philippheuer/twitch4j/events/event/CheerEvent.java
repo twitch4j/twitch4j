@@ -4,9 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.Cheer;
 import me.philippheuer.twitch4j.model.User;
 
 /**
@@ -28,21 +26,28 @@ public class CheerEvent extends AbstractChannelEvent {
 	private final User user;
 
 	/**
-	 * Cheer
+	 * Message
 	 */
-	private final Cheer cheer;
+	private final String message;
+
+	/**
+	 * Amount of Bits
+	 */
+	private final Integer bits;
+
 
 	/**
 	 * Event Constructor
 	 *
 	 * @param channel The channel that this event originates from.
-	 * @param cheer   The cheer, containing all relevant information.
-	 * @see Cheer
+	 * @param user The donating user.
+	 * @param message The donation message.
+	 * @param bits The amount of bits.
 	 */
-	public CheerEvent(Channel channel, Cheer cheer) {
+	public CheerEvent(Channel channel, User user, String message, Integer bits) {
 		super(channel);
-		this.user = cheer.getUser();
-		this.cheer = cheer;
+		this.user = user;
+		this.message = message;
+		this.bits = bits;
 	}
-
 }

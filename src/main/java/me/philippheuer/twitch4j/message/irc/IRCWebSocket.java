@@ -104,10 +104,10 @@ class IRCWebSocket {
 
 						IRCParser parser = new IRCParser(message);
 						if (parser.getCommand().equalsIgnoreCase("ping")) {
-							Logger.debug(this, "Pings received, sending Pong to the Twitch IRC (WebSocket)");
+							Logger.debug(this, "Ping received, sending Pong to the Twitch IRC (WebSocket)");
 							sendCommand("PONG", ":tmi.twitch.tv");
 						} else if (parser.getCommand().equalsIgnoreCase("pong")) {
-							Logger.debug(this, "Pongs received from Twitch IRC (WebSocket)");
+							Logger.debug(this, "Pong received from Twitch IRC (WebSocket)");
 						} else if (parser.getCommand().contains("GLOBALUSERSTATE")) {
 							Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 							setConnectionState(TMIConnectionState.CONNECTED);
