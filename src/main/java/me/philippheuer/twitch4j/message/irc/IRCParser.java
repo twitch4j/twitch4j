@@ -30,7 +30,7 @@ public class IRCParser {
 		final Matcher matcher = MESSAGE_REGEX.matcher(message);
 		matcher.find(); // triggering matcher (he returns boolean)
 		this.matcher = matcher;
-		if (matcher.group(0) != null) tags = new IRCTags(matcher.group(0));
+		if (matcher.group(0) != null) tags = new IRCTags(matcher.group(1));
 		else tags = null;
 		// testing matcher's - uncomment it for test
 //		for (int o = 1; matcher.groupCount() >= o; ++o) {
