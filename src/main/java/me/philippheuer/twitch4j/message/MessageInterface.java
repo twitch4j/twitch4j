@@ -70,6 +70,8 @@ public class MessageInterface {
 
 	/**
 	 * Checking join channel status
+	 * @param channel Channel name
+	 * @return bot has been joined to this channel
 	 */
 	public boolean isJoined(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();

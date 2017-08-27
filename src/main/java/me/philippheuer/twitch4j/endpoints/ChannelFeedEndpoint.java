@@ -104,7 +104,9 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 * Requires the Twitch *channel_feed_edit* Scope.
 	 *
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param channelId
+	 * @param channelId Channel ID
+	 * @param message message to feed
+	 * @param share Share to Twitter if is connected
 	 */
 	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
 		// Endpoint

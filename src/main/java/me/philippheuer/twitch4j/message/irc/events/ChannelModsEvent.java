@@ -8,11 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
-public class ChannelMods {
+public class ChannelModsEvent {
 	private final String channel;
 	private final List<String> mods = new ArrayList<String>();
 
-	public ChannelMods(IRCParser parser) {
+	public ChannelModsEvent(IRCParser parser) {
 		this.channel = parser.getChannelName();
 		this.mods.addAll(Arrays.asList(parser.getMessage().replace("The moderators of this room are: ", "").split(", ")));
 	}

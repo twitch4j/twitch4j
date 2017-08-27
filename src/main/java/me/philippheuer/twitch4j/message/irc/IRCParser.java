@@ -7,6 +7,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * IRC Parser for Twitch Message Interface
+ * @author Damian Staszewski
+ */
 @Getter
 @SuppressWarnings("unchecked")
 public class IRCParser {
@@ -52,9 +56,9 @@ public class IRCParser {
 				return String.format("[%s] [#%s] @%s", getCommand(), getChannelName(), getUserName());
 			case "USERSTATE": // User status
 			case "ROOMSTATE": // Channel status
-				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), tags.getTags().toString());
+				return String.format("[%s] [#%s] @T=%s", getCommand(), getChannelName(), tags.toString());
 			case "GLOBALUSERSTATE":  // Global user state shows connection established
-				return String.format("[%s] @T=%s", getCommand(), tags.getTags().toString());
+				return String.format("[%s] @T=%s", getCommand(), tags.toString());
 			case "USERNOTICE": // Subscribe notification
 				boolean isResub = tags.getTag("msg-id").toString().equalsIgnoreCase("resub");
 				int months = (isResub) ? Integer.parseInt((String) tags.getTag("msg-param-months")) : 1;
@@ -185,6 +189,7 @@ public class IRCParser {
 
 	/**
 	 * Get User Permissions using the IRC Tags
+	 * @return list {@link CommandPermission} user
 	 */
 	public Set<CommandPermission> getPermissions() {
 		Set<CommandPermission> userPermissions = new HashSet<>();

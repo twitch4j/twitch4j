@@ -7,12 +7,24 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-@Getter
+/**
+ * Tag list
+ * @author Damian Staszewski
+ * @param <T> extended {@link Object}
+ */
+
 @SuppressWarnings("unchecked")
 public class IRCTags <T extends Object> {
 
+	/**
+	 * Tag List
+	 */
 	private final Map<String, T> tags = new HashMap<String, T>();
 
+	/**
+	 * Constructor class
+	 * @param rawTags raw tags
+	 */
 	public IRCTags(String rawTags) {
 		for (String tagData: rawTags.split(";")) {
 			String key = tagData.split("=")[0];
@@ -87,7 +99,20 @@ public class IRCTags <T extends Object> {
 		return (T) tags.get(name);
 	}
 
+	/**
+	 * annotated to {@link Map#forEach(BiConsumer)}
+	 * @param action method from {@link BiConsumer} interface;
+	 */
 	public void forEach(BiConsumer action) {
 		tags.forEach(action);
+	}
+
+	@Override
+	public String toString() {
+		return tags.toString();
+	}
+
+	public T getOrDefaultTag(String key, T value) {
+		return tags.getOrDefault(key, value);
 	}
 }

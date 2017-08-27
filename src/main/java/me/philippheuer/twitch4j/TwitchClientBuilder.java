@@ -10,29 +10,66 @@ import java.io.File;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
+ * @author Damian Staszewski
  */
 @Setter
 @Accessors(chain = true)
 public class TwitchClientBuilder {
 
+	/**
+	 * Client ID
+	 */
 	private String clientId;
+	/**
+	 * Client Secret
+	 */
 	private String clientSecret;
+	/**
+	 * IRC Credential
+	 */
 	private String ircCredential;
+	/**
+	 * Auto Saving Configuration
+	 */
 	private boolean autoSaveConfiguration = false;
+	/**
+	 * Configuration Directory
+	 */
 	private File configurationDirectory;
 
+	/**
+	 * Initializing builder
+	 * @return Client Builder
+	 */
 	public static TwitchClientBuilder init() {
 		return new TwitchClientBuilder();
 	}
 
+	/**
+	 * Builder
+	 */
+	private TwitchClientBuilder() {}
+
+	/**
+	 * Setting Configuration Directory
+	 * @param directory directory name
+	 */
 	public void setConfigurationDirectory(String directory) {
 		setConfigurationDirectory(new File(directory));
 	}
 
+	/**
+	 * Setting Configuration Directory
+	 * @param directory {@link File} directory
+	 */
 	public void setConfigurationDirectory(File directory) {
 		configurationDirectory = directory;
 	}
 
+	/**
+	 * Initialization
+	 * @return {@link TwitchClient} initialized class
+	 */
 	public TwitchClient build() {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
@@ -55,6 +92,10 @@ public class TwitchClientBuilder {
 		return client;
 	}
 
+	/**
+	 * Initialization with connecting to the chat
+	 * @return {@link TwitchClient} initialized class
+	 */
 	public TwitchClient login() {
 		TwitchClient client = build();
 		client.connect();

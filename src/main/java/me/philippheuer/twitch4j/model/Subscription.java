@@ -40,6 +40,7 @@ public class Subscription {
 
 	/**
 	 * Sets the subplan using the string
+	 * @param code sub plan by code
 	 */
 	public void setSubPlanByCode(String code) {
 		if(code.equals("Prime")) {

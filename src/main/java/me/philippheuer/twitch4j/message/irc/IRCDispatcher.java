@@ -1,16 +1,19 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
-import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.message.irc.events.*;
 import me.philippheuer.twitch4j.message.irc.listeners.ITMIListener;
-import me.philippheuer.twitch4j.model.Channel;
 
 import java.util.*;
 
+/**
+ * Dispatcher for Twitch Message Interface
+ * @author Damina Staszewski
+ * @param <T> extended {@link ITMIListener}
+ */
 @SuppressWarnings("unchecked")
 public class IRCDispatcher <T extends ITMIListener> {
 	private final TwitchClient twitchClient;
@@ -98,6 +101,7 @@ public class IRCDispatcher <T extends ITMIListener> {
 				// Describe non-channel-specific state informations. (On successful login.)
 				case "GLOBALUSERSTATE":
 					twitchClient.getMessageInterface().getTwitchChat().setConnectionState(TMIConnectionState.CONNECTED);
+					break;
 				// Received when joining a channel and every time one of the chat room settings, like slow mode, change.
 				// The message on join contains all room settings.
 				case "ROOMSTATE":
@@ -133,7 +137,7 @@ public class IRCDispatcher <T extends ITMIListener> {
 					});
 				// Messages from jtv. (Moderators)
 				case "MODE":
-					ChannelMod mod = new ChannelMod(parser);
+					ChannelModEvent mod = new ChannelModEvent(parser);
 					if (parser.getMessage().startsWith("+o"))
 						listener.onMod(mod);
 					else if (parser.getMessage().startsWith("-o"))
@@ -144,7 +148,7 @@ public class IRCDispatcher <T extends ITMIListener> {
 					userlist.addAll(Arrays.asList(parser.getMessage().split(" ")));
 					break;
 				case "366":
-					listener.onNames(userlist);
+					listener.onNames(parser.getChannelName(), userlist);
 					break;
 				// Someone has joined the channel.
 				case "JOIN":
@@ -192,7 +196,16 @@ public class IRCDispatcher <T extends ITMIListener> {
 	}
 
 	private void listenClear(IRCParser parser, T listener) {
-
+		if (parser.getMessage() != null) {
+			int duration = (int) parser.getTags().getOrDefaultTag("ban-duration", -1);
+			ClearChatEvent event = new ClearChatEvent(parser);
+			if (duration < 0) {
+				listener.onBan(event);
+			} else {
+				listener.onTimeout(event, duration);
+			}
+		} else
+			listener.onClearchat(parser.getChannelName());
 	}
 
 	private void listenHost(IRCParser parser, T listener) {
@@ -244,7 +257,7 @@ public class IRCDispatcher <T extends ITMIListener> {
 			case "room_mods":
 			// There are no moderators for this room.
 			case "no_mods":
-				listener.onMods(new ChannelMods(parser));
+				listener.onMods(new ChannelModsEvent(parser));
 				break;
 			// Channel is suspended..
 			case "msg_channel_suspended":
