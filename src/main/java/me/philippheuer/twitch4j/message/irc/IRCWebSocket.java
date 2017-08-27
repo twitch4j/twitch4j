@@ -108,7 +108,6 @@ class IRCWebSocket {
 					if (!message.equals("")) {
 
 						IRCParser parser = new IRCParser(message);
-						Logger.debug(this, parser.toString());
 						dispatcher.dispatch(parser);
 						Event event = new IrcRawMessageEvent(parser);
 						getTwitchClient().getDispatcher().dispatch(event);
