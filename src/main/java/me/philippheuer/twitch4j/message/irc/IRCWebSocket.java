@@ -71,6 +71,7 @@ class IRCWebSocket {
 			@Override
 			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
 				setConnectionState(TMIConnectionState.CONNECTING);
+				dispatcher.dispatchConnection();
 				Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
 
 				sendCommand("cap req", ":twitch.tv/membership");
@@ -128,13 +129,16 @@ class IRCWebSocket {
 									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
 									   boolean closedByServer) {
 				if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
-					Logger.info(this, "Connection to Twitch IRC lost (WebSocket)! Reconnecting...");
+					String reason = "Connection to Twitch IRC lost (WebSocket)! Reconnecting...";
+					Logger.info(this, reason);
 
 					// connection lost - reconnecting
 					setConnectionState(TMIConnectionState.RECONNECTING);
+					dispatcher.dispatchConnection(reason);
 					connect();
 				} else {
 					setConnectionState(TMIConnectionState.DISCONNECTED);
+					dispatcher.dispatchConnection("Disconnected");
 				}
 			}
 		});
@@ -144,7 +148,7 @@ class IRCWebSocket {
 	 * Connecting to IRC-WS
 	 */
 	public void connect() {
-		if (getConnectionState().equals(TMIConnectionState.DISCONNECTED)) {
+		if (getConnectionState().equals(TMIConnectionState.DISCONNECTED) || getConnectionState().equals(TMIConnectionState.RECONNECTING)) {
 			try {
 				this.ws.connect();
 			} catch (Exception ex) {
@@ -161,14 +165,18 @@ class IRCWebSocket {
 			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
 
 			setConnectionState(TMIConnectionState.DISCONNECTING);
-			this.ws.disconnect();
+			dispatcher.dispatchConnection();
+			sendCommand("QUIT"); // safe disconnect
 		}
+		this.ws.disconnect();
 	}
 
 	/**
 	 * Reconnecting to IRC-WS
 	 */
 	public void reconnect() {
+		setConnectionState(TMIConnectionState.RECONNECTING);
+		dispatcher.dispatchConnection();
 		disconnect();
 		connect();
 	}
@@ -184,6 +192,11 @@ class IRCWebSocket {
 			// command will be uppercase.
 			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
 		}
+	}
+
+	public void ping() {
+		dispatcher.setPingtimer(System.currentTimeMillis()); // setting ping timer after ping
+		sendCommand("PING");
 	}
 
 	/**
