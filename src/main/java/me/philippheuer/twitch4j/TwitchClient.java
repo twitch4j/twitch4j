@@ -125,62 +125,6 @@ public class TwitchClient {
 	}
 
 	/**
-	 * Builder to get a TwitchClient Instance by provided varius options, to provide the user with a lot of customizable options.
-	 *
-	 * @param clientId Twitch Application - Id
-	 * @param clientSecret Twitch Application - Secret
-	 * @param configurationDirectory The directory the configuraton files should be stored in.
-	 * @param configurationAutoSave Whether the configuration should be saved automatically.
-	 * @param streamlabsClient The streamlabs client instance, to enable streamlabs related events and requests.
-	 * @param ircCredential The irc credential to use for chat messages. Should only be provided for bots.
-	 * @return A new twitch client instance, that will be initalized with the specified options.
-	 */
-	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
-		// Reqired Parameters
-		Assert.notNull(clientId, "You need to provide a client id!");
-		Assert.notNull(clientSecret, "You need to provide a client secret!");
-
-		// Initialize instance
-		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
-		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
-
-		// Optional Parameters
-		if (streamlabsClient != null) {
-			twitchClient.setStreamLabsClient(streamlabsClient);
-			twitchClient.getCredentialManager().provideStreamlabsClient(twitchClient.getStreamLabsClient());
-		}
-
-		if (configurationAutoSave != null) {
-			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
-		} else {
-			twitchClient.getCredentialManager().setSaveCredentials(false);
-		}
-
-		if (configurationDirectory != null) {
-			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
-
-			// Create ConfigurationDirectory, if it does not exist
-			twitchClient.getConfigurationDirectory().mkdirs();
-
-			// Initialize Managers dependening on the configuration
-			twitchClient.getCredentialManager().initializeConfiguration();
-			twitchClient.getCommandHandler().initializeConfiguration();
-		}
-
-		// Credentials
-		if (ircCredential != null) {
-			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
-		}
-
-		// Initial Connect
-		twitchClient.connect();
-
-		// Return builded instance
-		return twitchClient;
-	}
-
-	/**
 	 * Connect to other related services.
 	 * <p>
 	 * This methods opens the connection to the twitch irc server and the pubsub endpoint.
