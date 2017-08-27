@@ -2,6 +2,7 @@ package me.philippheuer.twitch4j.test;
 
 import junit.framework.TestCase;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.TwitchClientBuilder;
 import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.experimental.categories.Category;
 
@@ -42,9 +43,9 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 
 		// Initalize the Client a single time
 		if(twitchClient == null) {
-			twitchClient = TwitchClient.builder()
-					.clientId("jzkbprff40iqj646a697cyrvl0zt2m6")
-					.clientSecret("**SECRET**")
+			twitchClient = TwitchClientBuilder.init()
+					.setClientId("jzkbprff40iqj646a697cyrvl0zt2m6")
+					.setClientSecret("**SECRET**")
 					.build();
 		}
 	}

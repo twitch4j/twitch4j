@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j;
 
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.springframework.util.Assert;
@@ -11,6 +12,7 @@ import java.io.File;
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
  */
 @Setter
+@Accessors(chain = true)
 public class TwitchClientBuilder {
 
 	private String clientId;
