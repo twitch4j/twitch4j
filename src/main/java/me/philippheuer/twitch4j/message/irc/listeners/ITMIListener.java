@@ -28,7 +28,7 @@ public interface ITMIListener {
 	 * Username has cheered to a channel.
 	 * @param event Event emmiter
 	 */
-	void onCheer(CheerEvent event);
+	void onCheer(ChatEvent event);
 
 	/**
 	 * Chat of a channel got cleared.
@@ -61,16 +61,10 @@ public interface ITMIListener {
 	void onEmoteOnly(ChannelState event);
 
 	/**
-	 * Received the emote-sets from Twitch.
-	 * @param event Event emmiter
-	 */
-	void onEmotesets(Map<String, Map.Entry<Integer, Integer>> event);
-
-	/**
 	 * Channel enabled or disabled followers-only mode.
 	 * @param event Event emmiter
 	 */
-	void onFollowersonly(ChannelEvent event);
+	void onFollowersonly(RoomStateEvent.Status event);
 
 	/**
 	 * Channel is now hosted by another broadcaster.
@@ -88,13 +82,7 @@ public interface ITMIListener {
 	 * Username has joined a channel.
 	 * @param event Event emmiter
 	 */
-	void onJoin(ServerStatusEvent event);
-
-	/**
-	 * Connection established, sending informations to server.
-	 * @param event Event emmiter
-	 */
-	void onLogon(ConnectionEvent event);
+	void onJoin(UserStatusEvent event);
 
 	/**
 	 * Received a message.
@@ -106,7 +94,7 @@ public interface ITMIListener {
 	 * Someone got modded on a channel.
 	 * @param event Event emmiter
 	 */
-	void onMod(ChannelEvent event);
+	void onMod(ChannelMod event);
 
 	/**
 	 * Received the list of moderators of a channel.
@@ -124,7 +112,7 @@ public interface ITMIListener {
 	 * User has left a channel.
 	 * @param event Event emmiter
 	 */
-	void onPart(ServerStatusEvent event);
+	void onPart(UserStatusEvent event);
 
 	/**
 	 * Received PING from server.
@@ -158,19 +146,19 @@ public interface ITMIListener {
 	 * The current state of the channel.
 	 * @param event Event emmiter
 	 */
-	void onRoomstate(ChannelEvent event);
+	void onRoomstate(RoomStateEvent event);
 
 	/**
 	 * Channel is no longer located on this cluster.
 	 * @param event Event emmiter
 	 */
-	void onServerchange(ServerStatusEvent event);
+	void onServerchange(UserStatusEvent event);
 
 	/**
 	 * Gives you the current state of the channel.
 	 * @param event Event emmiter
 	 */
-	void onSlowmode(ChannelEvent event);
+	void onSlowmode(RoomStateEvent.Status event);
 
 	/**
 	 * Channel enabled or disabled subscribers-only mode.
@@ -199,7 +187,7 @@ public interface ITMIListener {
 	 * Someone got unmodded on a channel.
 	 * @param event Event emmiter
 	 */
-	void onUnmod(ChannelEvent event);
+	void onUnmod(ChannelMod event);
 
 	/**
 	 * Received a whisper.
@@ -208,6 +196,8 @@ public interface ITMIListener {
 	void onWhisper(ChatEvent event);
 
 	void onNames(List<String> userlist);
+
+	void onDisconnecting(ConnectionEvent connectionEvent);
 }
 
 

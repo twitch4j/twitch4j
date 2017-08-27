@@ -135,7 +135,7 @@ public class IRCParser {
 	 */
 	public String getChannelName() {
 		if (matcher.group(6).startsWith("#")) {
-			return matcher.group(6).substring(1);
+			return matcher.group(6).split(" ")[0].substring(1);
 		}
 		return null;
 	}
@@ -175,7 +175,9 @@ public class IRCParser {
 			String msg = matcher.group(7);
 			if (msg.contains("ACTION")) {
 				return matcher.group(7).substring(8, matcher.group(7).length() - 1);
-			} else return msg;
+			} else if (getCommand().equalsIgnoreCase("HOSTTARGET") || getCommand().equalsIgnoreCase("MODE"))
+				return (msg != null) ? msg : matcher.group(6).substring(2 + getChannelName().length());
+			else return msg;
 		}
 
 		return null;

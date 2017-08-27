@@ -1,9 +1,13 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.message.irc.events.*;
 import me.philippheuer.twitch4j.message.irc.listeners.ITMIListener;
+import me.philippheuer.twitch4j.model.Channel;
 
 import java.util.*;
 
@@ -12,13 +16,40 @@ public class IRCDispatcher <T extends ITMIListener> {
 	private final TwitchClient twitchClient;
 	private final List<T> listeners = new LinkedList<T>();
 
+	private Map<String, Map<String, Integer>> roomstate = new LinkedHashMap<>(); // ROOMSTATE for each channels
+	private String lastJoined; // getting last joined for ROOMSTATE
+
+	@Setter
+	private long pingtimer; // for calculating pings
+
 	IRCDispatcher(TwitchClient client) {
 		twitchClient = client;
 	}
+	void dispatchConnection() { dispatchConnection(null); }
+	void dispatchConnection(String reason) {
+		ConnectionEvent connection = new ConnectionEvent();
+		if (reason != null && (connection.equals(TMIConnectionState.RECONNECTING) || connection.equals(TMIConnectionState.DISCONNECTED) || connection.equals(TMIConnectionState.DISCONNECTED)))
+			connection.setReason(reason);
+		listeners.forEach(listener -> {
+			switch (twitchClient.getMessageInterface().getTwitchChat().getConnectionState()) {
+				case CONNECTED:
+					listener.onConnected(connection);
+				case CONNECTING:
+					listener.onConnecting(connection);
+				case DISCONNECTED:
+					listener.onDisconnected(connection);
+				case DISCONNECTING:
+					listener.onDisconnecting(connection);
+				case RECONNECTING:
+					listener.onReconnect(connection);
+				default:
+					break;
+			}
+		});
+	}
 
-	void dispatch(IRCParser parser, Object... data) {
+	void dispatch(IRCParser parser) {
 		Logger.debug(this, parser.toString());
-		String botname = twitchClient.getCredentialManager().getTwitchCredentialsForIRC().get().getUserName();
 		listeners.forEach(listener -> {
 			List<String> userlist = new ArrayList<String>(); // onNames(List<String> userlist)
 			switch (parser.getCommand().toUpperCase()) {
@@ -33,6 +64,13 @@ public class IRCDispatcher <T extends ITMIListener> {
 				// Wrong cluster..
 				case "SERVERCHANGE":
 					break;
+				case "PING":
+					twitchClient.getMessageInterface().getTwitchChat().sendCommand("PONG", ":tmi.twitch.tv");
+					listener.onPing();
+					break;
+				case "PONG":
+					long latency = System.currentTimeMillis() - pingtimer;
+					listener.onPong(latency);
 				// https://dev.twitch.tv/docs/v5/guides/irc/#msg-id-tags-for-the-notice-commands-capability
 				case "NOTICE":
 					listenNotice(parser, listener);
@@ -56,13 +94,50 @@ public class IRCDispatcher <T extends ITMIListener> {
 					break;
 				// Received when joining a channel and every time you send a PRIVMSG to a channel.
 				case "USERSTATE":
+					break;
 				// Describe non-channel-specific state informations. (On successful login.)
 				case "GLOBALUSERSTATE":
+					twitchClient.getMessageInterface().getTwitchChat().setConnectionState(TMIConnectionState.CONNECTED);
 				// Received when joining a channel and every time one of the chat room settings, like slow mode, change.
 				// The message on join contains all room settings.
 				case "ROOMSTATE":
+					Map<String, Integer> room;
+					IRCTags tags = parser.getTags();
+					// We use this notice to know if we successfully joined a channel
+					if (lastJoined.equalsIgnoreCase(parser.getChannelName()) && !roomstate.containsKey(parser.getChannelName())) {
+						room = new LinkedHashMap<>();
+					} else
+						room = roomstate.get(parser.getChannelName());
+
+					RoomStateEvent rsEvent = new RoomStateEvent(parser);
+					// Provide the channel name in the tags before emitting it.
+					listener.onRoomstate(rsEvent);
+
+					tags.forEach((key, value) -> {
+						String[] keys = {"slow", "followers-only"};
+						if (Arrays.asList(keys).contains(key.toString())) {
+							boolean changed = false;
+							if (room.containsKey(key.toString())) {
+								changed = (!room.get(key.toString()).equals(value));
+								room.put(key.toString(), (int) value);
+							} else
+								room.put(key.toString(), (int) value);
+
+							switch (key.toString()) {
+								case "slow":
+									if (changed) listener.onSlowmode(rsEvent.getStatus(key.toString()));
+								case "followers-only":
+									if (changed) listener.onFollowersonly(rsEvent.getStatus(key.toString()));
+							}
+						}
+					});
 				// Messages from jtv. (Moderators)
 				case "MODE":
+					ChannelMod mod = new ChannelMod(parser);
+					if (parser.getMessage().startsWith("+o"))
+						listener.onMod(mod);
+					else if (parser.getMessage().startsWith("-o"))
+						listener.onUnmod(mod);
 					break;
 				// User chat list
 				case "353":
@@ -73,13 +148,41 @@ public class IRCDispatcher <T extends ITMIListener> {
 					break;
 				// Someone has joined the channel.
 				case "JOIN":
+					lastJoined = parser.getChannelName();
+					listener.onJoin(new UserStatusEvent(twitchClient, parser));
 				// Someone has left the channel.
 				case "PART":
+					roomstate.remove(parser.getChannelName());
+					listener.onPart(new UserStatusEvent(twitchClient, parser));
 				// Received a whisper.
 				case "WHISPER":
 				// Received channel message
 				case "PRIVMSG":
-
+					if (!parser.getUserName().equalsIgnoreCase("jtv")) {
+						ChatEvent chat = new ChatEvent(twitchClient, parser);
+						switch (chat.getType()) {
+							case WHISPER:
+								listener.onMessage(chat);
+								listener.onWhisper(chat);
+								break;
+							case CHAT:
+								if (chat.getTags().hasTag("bits")) {
+									listener.onCheer(chat);
+								} else {
+									listener.onChat(chat);
+									listener.onMessage(chat);
+								}
+								break;
+							case ACTION:
+								listener.onAction(chat);
+								listener.onMessage(chat);
+								break;
+						} // listen everything
+					} else {
+						if (parser.getMessage().contains("hosting you")) {
+							listener.onHosted(new HostEvent(twitchClient, parser));
+						}
+					}
 				// Could not parse message
 				default:
 					// TODO: warn-debugged message without exception
@@ -93,7 +196,9 @@ public class IRCDispatcher <T extends ITMIListener> {
 	}
 
 	private void listenHost(IRCParser parser, T listener) {
-
+		HostEvent event = new HostEvent(twitchClient, parser);
+		if (parser.getMessage().startsWith("-")) listener.onUnhost(event);
+		else listener.onHosting(event);
 	}
 
 	private void listenSub(IRCParser parser, T listener) {

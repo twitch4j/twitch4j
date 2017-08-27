@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Getter
 @SuppressWarnings("unchecked")
@@ -84,5 +85,9 @@ public class IRCTags <T extends Object> {
 	 */
 	public <T extends Object> T getTag(String name) {
 		return (T) tags.get(name);
+	}
+
+	public void forEach(BiConsumer action) {
+		tags.forEach(action);
 	}
 }

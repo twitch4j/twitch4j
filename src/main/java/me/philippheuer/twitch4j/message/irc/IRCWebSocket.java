@@ -109,7 +109,7 @@ class IRCWebSocket {
 
 						IRCParser parser = new IRCParser(message);
 						Logger.debug(this, parser.toString());
-
+						dispatcher.dispatch(parser);
 						if (parser.getCommand().equalsIgnoreCase("ping")) {
 							Logger.debug(this, "Ping received, sending Pong to the Twitch IRC (WebSocket)");
 							sendCommand("PONG", ":tmi.twitch.tv");

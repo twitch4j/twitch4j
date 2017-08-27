@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.message.irc.events;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.message.irc.IRCParser;
@@ -12,22 +13,18 @@ public class ChatEvent {
 	public enum Types {
 		ACTION,
 		CHAT,
-		WHISPER;
-
-		static Types getType(String name) {
-			for(Types type : Types.values()) {
-				if (type.name().equalsIgnoreCase(name)) return type;
-			}
-			return null;
-		}
+		WHISPER
 	}
-
-	private final TwitchClient twitchClient;
 	private final IRCTags tags;
 	private final String message;
 	private final Channel channel;
 	private final User sender;
 	private final Types type;
+
+	private final boolean bot;
+
+	@Getter(AccessLevel.NONE)
+	private final TwitchClient twitchClient;
 
 	public ChatEvent(TwitchClient client, IRCParser parser) {
 		twitchClient = client;
@@ -41,5 +38,20 @@ public class ChatEvent {
 			type = Types.ACTION;
 		else type = Types.CHAT;
 		channel = (parser.getCommand().equalsIgnoreCase("WHISPER")) ? null : client.getChannelEndpoint(parser.getChannelName()).getChannel();
+		bot = twitchClient.getCredentialManager().getTwitchCredentialsForIRC().get().getUserName().equalsIgnoreCase(sender.getType());
+	}
+
+	public void replay(String message) {
+		switch (type) {
+			case ACTION:
+			case CHAT:
+				twitchClient.getMessageInterface().sendMessage(channel.getName(), message);
+				break;
+			case WHISPER:
+				twitchClient.getMessageInterface().sendPrivateMessage(sender.getName(), message);
+				break;
+			default:
+				break;
+		}
 	}
 }

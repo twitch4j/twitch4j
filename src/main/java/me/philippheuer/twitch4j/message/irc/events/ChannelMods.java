@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.philippheuer.twitch4j.message.irc.IRCParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,10 @@ public class ChannelMods {
 
 	public ChannelMods(IRCParser parser) {
 		this.channel = parser.getChannelName();
-		parser.getMessage();
+		this.mods.addAll(Arrays.asList(parser.getMessage().replace("The moderators of this room are: ", "").split(", ")));
+	}
+
+	public boolean hasMod(String username) {
+		return mods.contains(username);
 	}
 }

@@ -22,7 +22,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onCheer(CheerEvent event) {
+	public void onCheer(ChatEvent event) {
 
 	}
 
@@ -52,12 +52,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onEmotesets(Map<String, Map.Entry<Integer, Integer>> event) {
-
-	}
-
-	@Override
-	public void onFollowersonly(ChannelEvent event) {
+	public void onFollowersonly(RoomStateEvent.Status event) {
 
 	}
 
@@ -72,12 +67,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onJoin(ServerStatusEvent event) {
-
-	}
-
-	@Override
-	public void onLogon(ConnectionEvent event) {
+	public void onJoin(UserStatusEvent event) {
 
 	}
 
@@ -87,7 +77,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onMod(ChannelEvent event) {
+	public void onMod(ChannelMod event) {
 
 	}
 
@@ -102,7 +92,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onPart(ServerStatusEvent event) {
+	public void onPart(UserStatusEvent event) {
 
 	}
 
@@ -132,17 +122,17 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onRoomstate(ChannelEvent event) {
+	public void onRoomstate(RoomStateEvent event) {
 
 	}
 
 	@Override
-	public void onServerchange(ServerStatusEvent event) {
+	public void onServerchange(UserStatusEvent event) {
 
 	}
 
 	@Override
-	public void onSlowmode(ChannelEvent event) {
+	public void onSlowmode(RoomStateEvent.Status event) {
 
 	}
 
@@ -167,7 +157,7 @@ public class DefaultListener implements ITMIListener {
 	}
 
 	@Override
-	public void onUnmod(ChannelEvent event) {
+	public void onUnmod(ChannelMod event) {
 
 	}
 
@@ -178,6 +168,11 @@ public class DefaultListener implements ITMIListener {
 
 	@Override
 	public void onNames(List<String> userlist) {
+
+	}
+
+	@Override
+	public void onDisconnecting(ConnectionEvent connectionEvent) {
 
 	}
 }
