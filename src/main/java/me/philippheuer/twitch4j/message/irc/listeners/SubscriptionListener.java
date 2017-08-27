@@ -21,14 +21,14 @@ public class SubscriptionListener {
 
 	@EventSubscriber
 	public void onRawIrcMessage(IrcRawMessageEvent event) {
-		if(event.getIrcParser().getCommand().equals("USERNOTICE") && event.getIrcParser().hasTag("msg-id")) {
-			if(event.getIrcParser().getTag("msg-id").toString().equalsIgnoreCase("sub") || event.getIrcParser().getTag("msg-id").toString().equalsIgnoreCase("resub")) {
+		if(event.getIrcParser().getCommand().equals("USERNOTICE") && event.getIrcParser().getTags().hasTag("msg-id")) {
+			if(event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("sub") || event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("resub")) {
 				// Load User Info
 				Channel channel = event.getClient().getChannelEndpoint(event.getIrcParser().getChannelName()).getChannel();
 				User user = event.getClient().getUserEndpoint().getUser(event.getIrcParser().getUserId()).get();
-				String subPlan = event.getIrcParser().getTag("msg-param-sub-plan");
-				boolean isResub = event.getIrcParser().getTag("msg-id").toString().equalsIgnoreCase("resub");
-				Integer subStreak = Integer.parseInt(event.getIrcParser().getTag("msg-param-months"));
+				String subPlan = event.getIrcParser().getTags().getTag("msg-param-sub-plan").toString();
+				boolean isResub = event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("resub");
+				Integer subStreak = Integer.parseInt(event.getIrcParser().getTags().getTag("msg-param-months").toString());
 
 				// Twitch sometimes returns 0 months for new subs
 				if(subStreak == 0) {

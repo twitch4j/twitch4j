@@ -17,12 +17,12 @@ public class CheerListener {
 	@EventSubscriber
 	public void onRawIrcMessage(IrcRawMessageEvent event) {
 		if(event.getIrcParser().getCommand().equals("PRIVMSG")) {
-			if(event.getIrcParser().hasTag("bits")) {
+			if(event.getIrcParser().getTags().hasTag("bits")) {
 				// Load User Info
 				Channel channel = event.getClient().getChannelEndpoint(event.getIrcParser().getChannelName()).getChannel();
 				User user = event.getClient().getUserEndpoint().getUser(event.getIrcParser().getUserId()).get();
 				String message = event.getIrcParser().getMessage();
-				Integer bits = Integer.parseInt(event.getIrcParser().getTag("bits"));
+				Integer bits = Integer.parseInt(event.getIrcParser().getTags().getTag("bits").toString());
 
 				// Dispatch Event
 				event.getClient().getDispatcher().dispatch(new CheerEvent(channel, user, message, bits));
