@@ -1,8 +1,6 @@
 package me.philippheuer.twitch4j.message.irc.listeners;
 
-import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.irc.events.*;
-import me.philippheuer.twitch4j.model.User;
 
 import java.util.List;
 import java.util.Map;
@@ -60,7 +58,7 @@ public interface ITMIListener {
 	 * Channel enabled or disabled emote-only mode.
 	 * @param event Event emmiter
 	 */
-	void onEmoteonly(ChannelEvent event);
+	void onEmoteOnly(ChannelState event);
 
 	/**
 	 * Received the emote-sets from Twitch.
@@ -114,13 +112,13 @@ public interface ITMIListener {
 	 * Received the list of moderators of a channel.
 	 * @param userMods Event emmiter
 	 */
-	void onMods(List<User> userMods);
+	void onMods(ChannelMods userMods);
 
 	/**
 	 * Received a notice from server.
 	 * @param event Event emmiter
 	 */
-	void onNotice(ServerStatusEvent event);
+	void onNotice(ChannelEvent event);
 
 	/**
 	 * User has left a channel.
@@ -143,7 +141,7 @@ public interface ITMIListener {
 	 * Channel enabled or disabled R9K mode.
 	 * @param event Event emmiter
 	 */
-	void onR9kmode(ChannelEvent event);
+	void onR9kMode(ChannelState event);
 
 	/**
 	 * Trying to reconnect to server.
@@ -178,7 +176,7 @@ public interface ITMIListener {
 	 * Channel enabled or disabled subscribers-only mode.
 	 * @param event Event emmiter
 	 */
-	void onSubscribers(ChannelEvent event);
+	void onSubscribers(ChannelState event);
 
 	/**
 	 * Username has subscribed to a channel.
@@ -208,6 +206,8 @@ public interface ITMIListener {
 	 * @param event Event emmiter
  	 */
 	void onWhisper(ChatEvent event);
+
+	void onNames(List<String> userlist);
 }
 
 
