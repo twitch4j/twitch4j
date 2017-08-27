@@ -2,12 +2,12 @@ package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.SubPlan;
 import me.philippheuer.twitch4j.message.irc.events.*;
 import me.philippheuer.twitch4j.message.irc.listeners.ITMIListener;
 
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class IRCDispatcher <T extends ITMIListener> {
 	private final TwitchClient twitchClient;
 	private final List<T> listeners = new LinkedList<T>();
