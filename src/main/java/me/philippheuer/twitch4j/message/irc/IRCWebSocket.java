@@ -43,12 +43,15 @@ class IRCWebSocket {
 	 */
 	private TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
+	private final IRCDispatcher dispatcher;
+
 	/**
 	 * IRC WebSocket
 	 * @param client TwitchClient.
 	 */
 	public IRCWebSocket(TwitchClient client) {
 		this.twitchClient = client;
+		this.dispatcher = new IRCDispatcher(client);
 
 		// Create WebSocket
 		try {
@@ -86,6 +89,7 @@ class IRCWebSocket {
 
 				sendCommand("pass", String.format("oauth:%s", credential.getToken()));
 				sendCommand("nick", credential.getUserName());
+				joinChannel(credential.getUserName()); // join to own channel - required for sending or receiving whispers
 
 				// Rejoin Channels on Reconnect
 				if (!getChannels().isEmpty()) {
@@ -103,6 +107,8 @@ class IRCWebSocket {
 					if (!message.equals("")) {
 
 						IRCParser parser = new IRCParser(message);
+						Logger.debug(this, parser.toString());
+
 						if (parser.getCommand().equalsIgnoreCase("ping")) {
 							Logger.debug(this, "Ping received, sending Pong to the Twitch IRC (WebSocket)");
 							sendCommand("PONG", ":tmi.twitch.tv");
@@ -112,7 +118,6 @@ class IRCWebSocket {
 							Logger.info(this, "Connected to Twitch IRC (WebSocket)! [%s]", Endpoints.IRC.getURL());
 							setConnectionState(TMIConnectionState.CONNECTED);
 						} else {
-							// Trigger Event
 							Event event = new IrcRawMessageEvent(parser);
 							getTwitchClient().getDispatcher().dispatch(event);
 						}
@@ -229,6 +234,7 @@ class IRCWebSocket {
 	 */
 	public void sendPrivateMessage(String username, String message) {
 		Optional<User> twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
-		twitchUser.ifPresent(user -> sendCommand("privmsg", "#" + user.getName(), "/w", user.getName(), message));
+		OAuthCredential credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
+		twitchUser.ifPresent(user -> sendCommand("privmsg", "#" + credential.getUserName(), "/w", user.getName(), message));
 	}
 }
