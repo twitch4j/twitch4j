@@ -74,9 +74,12 @@ and:
  - [x] StreamLabs
  
 #### Twitch REST Endpoints
+ - [ ] Bits
  - [ ] Channel Feed
  - [x] Channels
  - [ ] Chat
+ - [ ] Clips
+ - [ ] Collections
  - [x] Communities (Released: 10.02.2017)
  - [x] Games
  - [x] Ingests
@@ -87,12 +90,27 @@ and:
  - [x] Videos
 
 #### Twitch PubSub
- - [ ] Bits
- - [ ] Whispers
+ - [x] Bits
+ - [x] Whispers
+ - [x] Subscriptions
+ - [x] Commercial
  
-#### Twitch IRC
+#### Twitch IRC (WebSocket)
  - [x] Subscriptions
  - [x] Cheers (Bits)
+ - [ ] `/me` interactions chat
+ - [ ] `/color` changer
+ - [ ] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
+   - [ ] Ban (with reason)
+   - [ ] Timeout (with reason)
+   - [ ] Slow mode
+   - [ ] Sub mode
+   - [ ] Follow mode
+   - [ ] R9K mode
+   - [ ] Emote Only mode
+ - [ ] Channel Editor
+   - [ ] Commercial
+   - [ ] Host mode
 
 #### 3rd Party
 ##### [Streamlabs](https://streamlabs.com/)

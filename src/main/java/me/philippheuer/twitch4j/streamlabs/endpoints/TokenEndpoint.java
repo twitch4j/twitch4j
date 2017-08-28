@@ -35,7 +35,7 @@ public class TokenEndpoint extends AbstractStreamlabsEndpoint {
 	 * @param grant_type Valid values: authorization_code or refresh_token.
 	 * @param redirect_url Redirect url.
 	 * @param code authentication_code or refresh_token
-	 * @return
+	 * @return {@link Authorize} data on {@link Optional} container class
 	 */
 	public Optional<Authorize> getToken(String grant_type, String redirect_url, String code) {
 		// Endpoint

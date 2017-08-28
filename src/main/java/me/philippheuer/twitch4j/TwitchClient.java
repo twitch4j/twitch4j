@@ -11,6 +11,9 @@ import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
+import me.philippheuer.twitch4j.message.irc.listeners.ChannelMessageListener;
+import me.philippheuer.twitch4j.message.irc.listeners.CheerListener;
+import me.philippheuer.twitch4j.message.irc.listeners.SubscriptionListener;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
@@ -107,68 +110,18 @@ public class TwitchClient {
 		credentialManager.setTwitchClient(this);
 
 		// EventSubscribers
+		// - Commands
 		dispatcher.registerListener(getCommandHandler());
+		// - IRC Event Listeners
+		// TODO: Replace with reflection for the package
+		dispatcher.registerListener(new ChannelMessageListener());
+		dispatcher.registerListener(new CheerListener());
+		dispatcher.registerListener(new SubscriptionListener());
 
 		// Initialize REST Client
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
-	}
-
-	/**
-	 * Builder to get a TwitchClient Instance by provided varius options, to provide the user with a lot of customizable options.
-	 *
-	 * @param clientId Twitch Application - Id
-	 * @param clientSecret Twitch Application - Secret
-	 * @param configurationDirectory The directory the configuraton files should be stored in.
-	 * @param configurationAutoSave Whether the configuration should be saved automatically.
-	 * @param streamlabsClient The streamlabs client instance, to enable streamlabs related events and requests.
-	 * @param ircCredential The irc credential to use for chat messages. Should only be provided for bots.
-	 * @return A new twitch client instance, that will be initalized with the specified options.
-	 */
-	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
-		// Reqired Parameters
-		Assert.notNull(clientId, "You need to provide a client id!");
-		Assert.notNull(clientSecret, "You need to provide a client secret!");
-
-		// Initialize instance
-		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
-		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
-
-		// Optional Parameters
-		if (streamlabsClient != null) {
-			twitchClient.setStreamLabsClient(streamlabsClient);
-			twitchClient.getCredentialManager().provideStreamlabsClient(twitchClient.getStreamLabsClient());
-		}
-
-		if (configurationAutoSave != null) {
-			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
-		} else {
-			twitchClient.getCredentialManager().setSaveCredentials(false);
-		}
-
-		if (configurationDirectory != null) {
-			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
-
-			// Create ConfigurationDirectory, if it does not exist
-			twitchClient.getConfigurationDirectory().mkdirs();
-
-			// Initialize Managers dependening on the configuration
-			twitchClient.getCredentialManager().initializeConfiguration();
-			twitchClient.getCommandHandler().initializeConfiguration();
-		}
-
-		// Credentials
-		if (ircCredential != null) {
-			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
-		}
-
-		// Initial Connect
-		twitchClient.connect();
-
-		// Return builded instance
-		return twitchClient;
 	}
 
 	/**

@@ -234,62 +234,64 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get the streams on the frontpage for a specific region (UnofficialEndpoint)
-	 * <p>
-	 * Valid Regions:
-	 * AT: Austria
-	 * BE: Belgium
-	 * BG: Bulgaria
-	 * CY: Cyprus
-	 * CZ: Czech Republic
-	 * DE: Germany
-	 * DK: Denmark
-	 * EE: Estonia
-	 * FI: Finland
-	 * FR: France
-	 * GR: Greece
-	 * GL: Greenland
-	 * HU: Hungary
-	 * IS: Iceland
-	 * IT: Italy
-	 * LT: Lithuania
-	 * LU: Luxembourg
-	 * NL: Netherlands
-	 * NO: Norway
-	 * PL: Poland
-	 * PT: Portugal
-	 * RO: Romania
-	 * RU: Russia
-	 * SK: Slovakia
-	 * SI: Slovenia
-	 * ES: Spain
-	 * SE: Sweden
-	 * CH: Switzerland
-	 * TR: Turkey
-	 * LV: Latvia
-	 * MT: Malta
-	 * RS: Serbia
-	 * AL: Albania
-	 * AD: Andorra
-	 * AM: Armenia
-	 * AZ: Azerbaijan
-	 * BY: Belarus
-	 * BA: Bosnia + Herzegovina
-	 * HR: Croatia
-	 * GE: Georgia
-	 * IL: Israel
-	 * LI: Liechtenstein
-	 * MK: Macedonia
-	 * MD: Moldova
-	 * MC: Monaco
-	 * ME: Montenegro
-	 * QA: Qatar
-	 * SM: San Marino
-	 * UA: Ukraine
-	 * UK: United Kingdom
-	 * GB: Great Britain
-	 * IE: Ireland
-	 * US: USA
+	 * <table summary="Valid Regions:">
+	 *     <tr><th>Code</th><th>Region</th></tr>
+	 *     <tr><td>AT</td><td>Austria</td></tr>
+	 *     <tr><td>BE</td><td>Belgium</td></tr>
+	 *     <tr><td>BG</td><td>Bulgaria</td></tr>
+	 *     <tr><td>CY</td><td>Cyprus</td></tr>
+	 *     <tr><td>CZ</td><td>Czech Republic</td></tr>
+	 *     <tr><td>DE</td><td>Germany</td></tr>
+	 *     <tr><td>DK</td><td>Denmark</td></tr>
+	 *     <tr><td>EE</td><td>Estonia</td></tr>
+	 *     <tr><td>FI</td><td>Finland</td></tr>
+	 *     <tr><td>FR</td><td>France</td></tr>
+	 *     <tr><td>GR</td><td>Greece</td></tr>
+	 *     <tr><td>GL</td><td>Greenland</td></tr>
+	 *     <tr><td>HU</td><td>Hungary</td></tr>
+	 *     <tr><td>IS</td><td>Iceland</td></tr>
+	 *     <tr><td>IT</td><td>Italy</td></tr>
+	 *     <tr><td>LT</td><td>Lithuania</td></tr>
+	 *     <tr><td>LU</td><td>Luxembourg</td></tr>
+	 *     <tr><td>NL</td><td>Netherlands</td></tr>
+	 *     <tr><td>NO</td><td>Norway</td></tr>
+	 *     <tr><td>PL</td><td>Poland</td></tr>
+	 *     <tr><td>PT</td><td>Portugal</td></tr>
+	 *     <tr><td>RO</td><td>Romania</td></tr>
+	 *     <tr><td>RU</td><td>Russia</td></tr>
+	 *     <tr><td>SK</td><td>Slovakia</td></tr>
+	 *     <tr><td>SI</td><td>Slovenia</td></tr>
+	 *     <tr><td>ES</td><td>Spain</td></tr>
+	 *     <tr><td>SE</td><td>Sweden</td></tr>
+	 *     <tr><td>CH</td><td>Switzerland</td></tr>
+	 *     <tr><td>TR</td><td>Turkey</td></tr>
+	 *     <tr><td>LV</td><td>Latvia</td></tr>
+	 *     <tr><td>MT</td><td>Malta</td></tr>
+	 *     <tr><td>RS</td><td>Serbia</td></tr>
+	 *     <tr><td>AL</td><td>Albania</td></tr>
+	 *     <tr><td>AD</td><td>Andorra</td></tr>
+	 *     <tr><td>AM</td><td>Armenia</td></tr>
+	 *     <tr><td>AZ</td><td>Azerbaijan</td></tr>
+	 *     <tr><td>BY</td><td>Belarus</td></tr>
+	 *     <tr><td>BA</td><td>Bosnia and Herzegovina</td></tr>
+	 *     <tr><td>HR</td><td>Croatia</td></tr>
+	 *     <tr><td>GE</td><td>Georgia</td></tr>
+	 *     <tr><td>IL</td><td>Israel</td></tr>
+	 *     <tr><td>LI</td><td>Liechtenstein</td></tr>
+	 *     <tr><td>MK</td><td>Macedonia</td></tr>
+	 *     <tr><td>MD</td><td>Moldova</td></tr>
+	 *     <tr><td>MC</td><td>Monaco</td></tr>
+	 *     <tr><td>ME</td><td>Montenegro</td></tr>
+	 *     <tr><td>QA</td><td>Qatar</td></tr>
+	 *     <tr><td>SM</td><td>San Marino</td></tr>
+	 *     <tr><td>UA</td><td>Ukraine</td></tr>
+	 *     <tr><td>UK</td><td>United Kingdom</td></tr>
+	 *     <tr><td>GB</td><td>Great Britain</td></tr>
+	 *     <tr><td>IE</td><td>Ireland</td></tr>
+	 *     <tr><td>US</td><td>USA</td></tr>
+	 * </table>
 	 *
+	 * @param geo using {@link Optional} Valid Code Regions below
 	 * @return The 6 streams of the frontpage for the specified region.
 	 */
 	@Unofficial
@@ -323,6 +325,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param channel Get stream object of Channel Entity
+	 * @return Channel is live
 	 */
 	public boolean isLive(Channel channel) {
 		Optional<Stream> stream = this.getByChannel(channel);
@@ -338,7 +341,8 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Checks if a stream is currently live and running a replay
 	 * Requires Scope: none
 	 *
-	 * @param channel Get stream object of Channel Entity
+	 * @param channel Get stream object of Channel Entity.
+	 * @return Channel is live and playing replay.
 	 */
 	public boolean isReplaying(Channel channel) {
 		Optional<Stream> stream = this.getByChannel(channel);
@@ -357,6 +361,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * <p>
 	 * This method check's if the stream is on the frontpage for a certain region.
 	 *
+	 * @param stream Stream object
 	 * @return Whether a stream is on the frontpage.
 	 */
 	@Unofficial

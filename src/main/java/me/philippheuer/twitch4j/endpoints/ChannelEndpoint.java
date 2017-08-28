@@ -436,6 +436,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 	}
 
+// TODO: moving to TMI
+// NOTE: using `/commercial (time)` in the chat
 	/**
 	 * Endpoint: Start Channel Commercial
 	 * Starts a commercial (advertisement) on a specified channel. This is valid only for channels that are Twitch partners.
@@ -498,7 +500,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			return false;
 		}
 	}
-
+// TODO: moving to TMI
 	/**
 	 * IRC: Ban User
 	 * This command will allow you to permanently ban a user from the chat room.
@@ -508,7 +510,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void ban(String user) {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".ban %s", user));
 	}
-
+// TODO: moving to TMI
 	/**
 	 * IRC: Unban User
 	 * This command will allow you to lift a permanent ban on a user from the chat room. You can also use this command to end a ban early; this also applies to timeouts.
@@ -518,7 +520,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void unban(String user) {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".unban %s", user));
 	}
-
+// TODO: moving to TMI
 	/**
 	 * IRC: Timeout User
 	 * This command allows you to temporarily ban someone from the chat room for 10 minutes by default.
@@ -526,11 +528,12 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * A new timeout command will overwrite an old one.
 	 *
 	 * @param user Username.
+	 * @param duration {@link Duration} in seconds
 	 */
 	public void timeout(String user, Duration duration) {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
 	}
-
+// TODO: moving to TMI
 	/**
 	 * IRC: Purge Chat of User
 	 * Clears all messages in a channel.
@@ -540,7 +543,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void purgeChat(String user) {
 		timeout(user, Duration.ofSeconds(1));
 	}
-
+// TODO: moving to TMI
 	/**
 	 * IRC: Purge Chat
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.

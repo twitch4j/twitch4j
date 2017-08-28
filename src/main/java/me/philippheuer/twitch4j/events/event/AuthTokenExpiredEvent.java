@@ -6,9 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.Cheer;
-import me.philippheuer.twitch4j.model.User;
 
 /**
  * This event gets called an oauth token expires.

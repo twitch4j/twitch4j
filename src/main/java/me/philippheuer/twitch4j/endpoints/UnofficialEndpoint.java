@@ -28,6 +28,7 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets the primary team for a channel, which is displayed in the channel.
 	 *
+	 * @param userName Twitch username
 	 * @return todo
 	 */
 	public Ember getEmber(String userName) {
@@ -51,6 +52,7 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets the steam profile id, if the streamer has linked his steam account.
 	 *
+	 * @param userName Twitch username
 	 * @return todo
 	 */
 	public String getConnectedSteamProfile(String userName) {

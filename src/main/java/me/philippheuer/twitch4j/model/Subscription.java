@@ -25,16 +25,34 @@ public class Subscription {
 	@JsonProperty("_id")
 	private Long id;
 
-	private Optional<Date> createdAt;
+	private Date createdAt;
 
-	private Optional<Integer> streak;
+	private Integer streak;
 
-	private Optional<String> message;
+	private String message;
 
 	private User user;
 
 	/**
 	 * Holds the subscription plan
 	 */
-	private Optional<SubPlan> subPlan;
+	private SubPlan subPlan;
+
+	/**
+	 * Sets the subplan using the string
+	 * @param code sub plan by code
+	 */
+	public void setSubPlanByCode(String code) {
+		if(code.equals("Prime")) {
+			setSubPlan(SubPlan.PRIME);
+		} else if(code.equals("1000")) {
+			setSubPlan(SubPlan.TIER_1);
+		} else if(code.equals("2000")) {
+			setSubPlan(SubPlan.TIER_2);
+		} else if(code.equals("3000")) {
+			setSubPlan(SubPlan.TIER_3);
+		} else {
+			setSubPlan(SubPlan.UNKNOWN);
+		}
+	}
 }

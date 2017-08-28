@@ -44,21 +44,35 @@ public class MessageInterface {
 		this.pubSub = new TwitchPubSub(client);
 	}
 
+	/**
+	 * Connect to the TMI
+	 */
 	public void connect() {
 		twitchChat.connect();
 		pubSub.connect();
 	}
 
+	/**
+	 * Connect from TMI
+	 */
 	public void disconnect() {
 		twitchChat.disconnect();
 		pubSub.disconnect();
 	}
 
+	/**
+	 * Reconnect to the TMI
+	 */
 	public void reconnect() {
 		twitchChat.reconnect();
 		pubSub.reconnect();
 	}
 
+	/**
+	 * Checking join channel status
+	 * @param channel Channel name
+	 * @return bot has been joined to this channel
+	 */
 	public boolean isJoined(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		// syncing channels
@@ -69,20 +83,38 @@ public class MessageInterface {
 				(twitchChat.getChannels().contains(ch) && pubSub.getChannelList().containsKey(ch));
 	}
 
+	/**
+	 * Sending message to the joined channel
+	 * @param channel channel name
+	 * @param message message
+	 */
 	public void sendMessage(String channel, String message) {
 		twitchChat.sendMessage(channel, message);
 	}
 
+	/**
+	 * sending private message
+	 * @param username username
+	 * @param message message
+	 */
 	public void sendPrivateMessage(String username, String message) {
 		twitchChat.sendPrivateMessage(username, message);
-	} // I don't know it will works.
+	}
 
+	/**
+	 * Joining the channel
+	 * @param channel channel name
+	 */
 	public void joinChannel(String channel) {
 		twitchChat.joinChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		pubSub.listenChannel(ch, true);
 	}
 
+	/**
+	 * Leaving the channel
+	 * @param channel channel name
+	 */
 	public void partChannel(String channel) {
 		twitchChat.partChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
