@@ -6,8 +6,8 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;

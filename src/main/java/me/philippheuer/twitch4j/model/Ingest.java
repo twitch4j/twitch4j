@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * Model representing a twitch ingest server.
  * <p>

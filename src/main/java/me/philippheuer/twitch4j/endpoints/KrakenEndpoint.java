@@ -7,7 +7,8 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Token;
+import me.philippheuer.twitch4j.model.TokenResponse;
 import org.springframework.web.client.RestTemplate;
 
 @Getter

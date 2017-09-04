@@ -4,13 +4,9 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.model.TopGame;
-import me.philippheuer.twitch4j.model.TopGameList;
 import me.philippheuer.twitch4j.model.unofficial.AdvancedChannelInformation;
 import me.philippheuer.twitch4j.model.unofficial.Ember;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @Getter
 @Setter

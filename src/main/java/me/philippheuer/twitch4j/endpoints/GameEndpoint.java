@@ -1,14 +1,15 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.jcabi.log.Logger;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.TopGame;
+import me.philippheuer.twitch4j.model.TopGameList;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Getter
 @Setter

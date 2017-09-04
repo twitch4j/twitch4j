@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import net.jodah.typetools.TypeResolver;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;

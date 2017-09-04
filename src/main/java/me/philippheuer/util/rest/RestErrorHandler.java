@@ -3,13 +3,11 @@ package me.philippheuer.util.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.exceptions.RestException;
+import me.philippheuer.twitch4j.model.RestError;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import me.philippheuer.twitch4j.model.RestError;
 
 import java.io.IOException;
 

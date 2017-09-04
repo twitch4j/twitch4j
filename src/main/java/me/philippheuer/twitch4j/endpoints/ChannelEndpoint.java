@@ -8,8 +8,8 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.event.DonationEvent;
-import me.philippheuer.twitch4j.events.event.FollowEvent;
+import me.philippheuer.twitch4j.events.event.channel.DonationEvent;
+import me.philippheuer.twitch4j.events.event.channel.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
 import me.philippheuer.twitch4j.model.*;
@@ -21,7 +21,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
 @Getter

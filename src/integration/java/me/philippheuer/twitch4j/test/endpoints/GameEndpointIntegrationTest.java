@@ -1,7 +1,5 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.model.Ingest;
 import me.philippheuer.twitch4j.model.TopGame;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
 import me.philippheuer.util.test.IntegrationTestCategory;

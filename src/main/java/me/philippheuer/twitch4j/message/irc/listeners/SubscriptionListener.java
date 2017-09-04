@@ -1,16 +1,13 @@
 package me.philippheuer.twitch4j.message.irc.listeners;
 
-import me.philippheuer.twitch4j.enums.SubPlan;
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
-import me.philippheuer.twitch4j.events.event.IrcRawMessageEvent;
-import me.philippheuer.twitch4j.events.event.SubscriptionEvent;
+import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
+import me.philippheuer.twitch4j.events.event.irc.IrcRawMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
 
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * Channel Message Listener
@@ -21,14 +18,14 @@ public class SubscriptionListener {
 
 	@EventSubscriber
 	public void onRawIrcMessage(IrcRawMessageEvent event) {
-		if(event.getIrcParser().getCommand().equals("USERNOTICE") && event.getIrcParser().getTags().hasTag("msg-id")) {
-			if(event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("sub") || event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("resub")) {
+		if(event.getIrcParser().getCommand().equals("USERNOTICE") && event.hasTag("msg-id")) {
+			if(event.getTag("msg-id").toString().equalsIgnoreCase("sub") || event.getTag("msg-id").toString().equalsIgnoreCase("resub")) {
 				// Load User Info
 				Channel channel = event.getClient().getChannelEndpoint(event.getIrcParser().getChannelName()).getChannel();
 				User user = event.getClient().getUserEndpoint().getUser(event.getIrcParser().getUserId()).get();
-				String subPlan = event.getIrcParser().getTags().getTag("msg-param-sub-plan").toString();
-				boolean isResub = event.getIrcParser().getTags().getTag("msg-id").toString().equalsIgnoreCase("resub");
-				Integer subStreak = Integer.parseInt(event.getIrcParser().getTags().getTag("msg-param-months").toString());
+				String subPlan = event.getTag("msg-param-sub-plan");
+				boolean isResub = event.getTag("msg-id").toString().equalsIgnoreCase("resub");
+				Integer subStreak = Integer.parseInt(event.getTag("msg-param-months"));
 
 				// Twitch sometimes returns 0 months for new subs
 				if(subStreak == 0) {

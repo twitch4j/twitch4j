@@ -1,8 +1,8 @@
 package me.philippheuer.twitch4j.message.irc.listeners;
 
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
-import me.philippheuer.twitch4j.events.event.IrcRawMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.IrcRawMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -16,7 +16,7 @@ public class ChannelMessageListener {
 	@EventSubscriber
 	public void onRawIrcMessage(IrcRawMessageEvent event) {
 		if(event.getIrcParser().getCommand().equals("PRIVMSG")) {
-			if(!event.getIrcParser().getTags().hasTag("bits")) {
+			if(!event.hasTag("bits")) {
 				// Load User Info
 				Channel channel = event.getClient().getChannelEndpoint(event.getIrcParser().getChannelName()).getChannel();
 				User user = event.getClient().getUserEndpoint().getUser(event.getIrcParser().getUserId()).get();

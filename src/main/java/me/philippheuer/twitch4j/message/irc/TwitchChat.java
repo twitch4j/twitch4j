@@ -7,7 +7,6 @@ import me.philippheuer.twitch4j.enums.TwitchScopes;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 
-import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;

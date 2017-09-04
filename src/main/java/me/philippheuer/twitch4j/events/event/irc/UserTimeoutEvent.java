@@ -1,10 +1,10 @@
-package me.philippheuer.twitch4j.events.event;
+package me.philippheuer.twitch4j.events.event.irc;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -19,7 +19,7 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public class UserTimeout extends AbstractChannelEvent {
+public class UserTimeoutEvent extends AbstractChannelEvent {
 
 	/**
 	 * Event Target User
@@ -44,7 +44,7 @@ public class UserTimeout extends AbstractChannelEvent {
 	 * @param duration Timeout Duration in Minutes.
 	 * @param reason   Reason for Ban.
 	 */
-	public UserTimeout(Channel channel, User user, Integer duration, String reason) {
+	public UserTimeoutEvent(Channel channel, User user, Integer duration, String reason) {
 		super(channel);
 		this.user = user;
 		this.duration = duration;

@@ -12,7 +12,7 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.event.IrcRawMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.IrcRawMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -43,15 +43,12 @@ class IRCWebSocket {
 	 */
 	private TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
-	private final IRCDispatcher dispatcher;
-
 	/**
 	 * IRC WebSocket
 	 * @param client TwitchClient.
 	 */
 	public IRCWebSocket(TwitchClient client) {
 		this.twitchClient = client;
-		this.dispatcher = new IRCDispatcher(client);
 
 		// Create WebSocket
 		try {
@@ -71,7 +68,6 @@ class IRCWebSocket {
 			@Override
 			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
 				setConnectionState(TMIConnectionState.CONNECTING);
-				dispatcher.dispatchConnection();
 				Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
 
 				sendCommand("cap req", ":twitch.tv/membership");
@@ -106,9 +102,7 @@ class IRCWebSocket {
 						.replace("\r", "\n").split("\n"))
 						.forEach(message -> {
 					if (!message.equals("")) {
-
 						IRCParser parser = new IRCParser(message);
-						dispatcher.dispatch(parser);
 						Event event = new IrcRawMessageEvent(parser);
 						getTwitchClient().getDispatcher().dispatch(event);
 					}
@@ -123,11 +117,9 @@ class IRCWebSocket {
 
 					// connection lost - reconnecting
 					setConnectionState(TMIConnectionState.RECONNECTING);
-					dispatcher.dispatchConnection(reason);
 					connect();
 				} else {
 					setConnectionState(TMIConnectionState.DISCONNECTED);
-					dispatcher.dispatchConnection("Disconnected");
 				}
 			}
 		});
@@ -154,7 +146,6 @@ class IRCWebSocket {
 			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
 
 			setConnectionState(TMIConnectionState.DISCONNECTING);
-			dispatcher.dispatchConnection();
 			sendCommand("QUIT"); // safe disconnect
 		}
 		this.ws.disconnect();
@@ -165,7 +156,6 @@ class IRCWebSocket {
 	 */
 	public void reconnect() {
 		setConnectionState(TMIConnectionState.RECONNECTING);
-		dispatcher.dispatchConnection();
 		disconnect();
 		connect();
 	}
@@ -181,11 +171,6 @@ class IRCWebSocket {
 			// command will be uppercase.
 			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
 		}
-	}
-
-	public void ping() {
-		dispatcher.setPingtimer(System.currentTimeMillis()); // setting ping timer after ping
-		sendCommand("PING");
 	}
 
 	/**

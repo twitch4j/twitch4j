@@ -8,7 +8,6 @@ import lombok.Data;
 import me.philippheuer.twitch4j.enums.SubPlan;
 
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * Model representing a subscription.

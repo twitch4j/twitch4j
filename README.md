@@ -138,12 +138,13 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 
 ### Client Builder (Twitch Standalone)
 ```java
-TwitchClient twitchClient = TwitchClient.builder()
-	.clientId("Twitch App ID")
-	.clientSecret("Twitch App SECRET")
-	.configurationAutoSave(true)
-	.configurationDirectory(new File("").getAbsolutePath())
-	.build();
+TwitchClient twitchClient = TwitchClientBuilder.builder()
+	.setClientId("Twitch App Id")
+	.setClientSecret("Twitch App Secret")
+	.setAutoSaveConfiguration(true)
+	.setConfigurationDirectory(new File("config"))
+	.setIrcCredential("ixsxu9123xzmlx798xooa3f91q1e9c") // Get your token at: https://twitchapps.com/tmi/
+	.connect();
 ```
 
 ### Get User Id from UserName

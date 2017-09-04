@@ -1,9 +1,11 @@
 package me.philippheuer.twitch4j;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -20,54 +22,52 @@ public class TwitchClientBuilder {
 	 * Client ID
 	 */
 	private String clientId;
+
 	/**
 	 * Client Secret
 	 */
 	private String clientSecret;
+
 	/**
 	 * IRC Credential
 	 */
 	private String ircCredential;
+
 	/**
 	 * Auto Saving Configuration
 	 */
 	private boolean autoSaveConfiguration = false;
+
 	/**
 	 * Configuration Directory
 	 */
 	private File configurationDirectory;
 
 	/**
+	 * StreamLabs Client
+	 * TODO: Remove
+	 */
+	@Getter
+	private StreamlabsClient streamlabsClient = null;
+
+	/**
 	 * Initializing builder
 	 * @return Client Builder
 	 */
-	public static TwitchClientBuilder init() {
+	public static TwitchClientBuilder builder() {
 		return new TwitchClientBuilder();
 	}
 
 	/**
 	 * Builder
 	 */
-	private TwitchClientBuilder() {}
+	private TwitchClientBuilder()
+	{
 
-	/**
-	 * Setting Configuration Directory
-	 * @param directory directory name
-	 */
-	public void setConfigurationDirectory(String directory) {
-		setConfigurationDirectory(new File(directory));
 	}
 
 	/**
-	 * Setting Configuration Directory
-	 * @param directory {@link File} directory
-	 */
-	public void setConfigurationDirectory(File directory) {
-		configurationDirectory = directory;
-	}
-
-	/**
-	 * Initialization
+	 * Initialize
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient build() {
@@ -77,26 +77,36 @@ public class TwitchClientBuilder {
 
 		final TwitchClient client = new TwitchClient(clientId, clientSecret);
 		client.getCredentialManager().provideTwitchClient(client);
-
 		client.getCredentialManager().setSaveCredentials(autoSaveConfiguration);
 		if (configurationDirectory != null) {
-			if (!configurationDirectory.exists()) configurationDirectory.mkdirs();
+			if (!configurationDirectory.exists()) {
+				configurationDirectory.mkdirs();
+			}
+
 			client.setConfigurationDirectory(configurationDirectory);
 			client.getCredentialManager().initializeConfiguration();
 			client.getCommandHandler().initializeConfiguration();
 		}
 
 		if (ircCredential != null)
+		{
 			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, new OAuthCredential(ircCredential));
+		}
+
+		// Streamlabs
+		if(getStreamlabsClient() != null) {
+			client.setStreamLabsClient(getStreamlabsClient());
+			client.getCredentialManager().provideStreamlabsClient(client.getStreamLabsClient());
+		}
 
 		return client;
 	}
 
 	/**
-	 * Initialization with connecting to the chat
+	 * Initialize and connect to twitch
 	 * @return {@link TwitchClient} initialized class
 	 */
-	public TwitchClient login() {
+	public TwitchClient connect() {
 		TwitchClient client = build();
 		client.connect();
 		return client;

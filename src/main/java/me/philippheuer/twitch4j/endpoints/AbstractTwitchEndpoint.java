@@ -1,18 +1,14 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter

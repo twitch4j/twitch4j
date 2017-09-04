@@ -8,8 +8,8 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
 import me.philippheuer.twitch4j.events.event.UnknownCommandEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
 
 import java.io.File;
 import java.util.*;

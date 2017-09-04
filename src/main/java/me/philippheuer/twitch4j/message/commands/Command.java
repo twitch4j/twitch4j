@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.events.event.ChannelMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;

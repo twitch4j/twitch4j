@@ -3,7 +3,9 @@ package me.philippheuer.twitch4j.message.irc;
 import lombok.Getter;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,16 +28,19 @@ public class IRCParser {
 	 * @param message Raw Message received from IRC-WS
 	 */
 	public IRCParser(String message) {
-		final Pattern MESSAGE_REGEX = Pattern.compile("^(?:@(.*?) )?(?::(.+?)(?:!(.+?))?(?:@(.+?))? )?((?:[A-z]+)|(?:[0-9]{3}))(?: (?!:)(.+?))?(?: :(.*))?$");
+		final Pattern MESSAGE_REGEX = Pattern.compile("^(?:@(?<tags>.*?) )?(?::(?:(?:.*)!(?<user>.*)@(?:.*))?tmi.twitch.tv )?(?<command>[A-Z]+|[0-9]{3}) (?<message>.*)$");
 		final Matcher matcher = MESSAGE_REGEX.matcher(message);
-		matcher.find(); // triggering matcher (he returns boolean)
+
+		// triggering matcher
+		matcher.find();
+
 		this.matcher = matcher;
-		if (matcher.group(0) != null) tags = new IRCTags(matcher.group(1));
-		else tags = null;
-		// testing matcher's - uncomment it for test
-//		for (int o = 1; matcher.groupCount() >= o; ++o) {
-//			System.out.println(matcher.group(o));
-//		}
+
+		if (matcher.group("tags") != null) {
+			tags = new IRCTags(matcher.group("tags"));
+		} else {
+			tags = null;
+		}
 	}
 
 	/**
@@ -44,7 +49,7 @@ public class IRCParser {
 	 */
 	@Override
 	public String toString() {
-		switch (getFormedCommand().toUpperCase()) { // Handle each type different
+		switch (getTwitchCommandType().toUpperCase()) { // Handle each type different
 			case "PRIVMSG": // User Message from specified joined Channel
 				return String.format("[%s] [#%s] %s: %s", getCommand(), getChannelName(), getUserName(), getMessage());
 			case "ACTION": // someone on the chat use '/me'
@@ -75,7 +80,7 @@ public class IRCParser {
 				String reason = (String) tags.getTag("ban-reason");
 				if (tags.hasTag("ban-duration"))
 					return String.format("[TIMEOUT] [#%s] %s @%s", getChannelName(), tags.getTag("ban-duration").toString(), getUserName() + ((reason != null) ? " :" + reason : ""));
-				else return String.format("[BAN] [#%s] %s @%s", getChannelName(), tags.getTag("ban-duration").toString(), getUserName() + ((reason != null) ? " :" + reason : ""));
+				return String.format("[BAN] [#%s] %s @%s", getChannelName(), tags.getTag("ban-duration").toString(), getUserName() + ((reason != null) ? " :" + reason : ""));
 			case "CLEARCHAT": // Clearing chat on channel
 				return String.format("[%s] [#%s]", getCommand(), getChannelName());
 			case "NOTICE": // Server Notice
@@ -115,22 +120,14 @@ public class IRCParser {
 	 * @return display name of the user
 	 */
 	public String getUserName() {
-		if (getCommand().equalsIgnoreCase("CLEARCHAT") && matcher.group(7) != null)
-			return matcher.group(7);
-		else return matcher.group(3);
-	}
-
-	/**
-	 * Getting the name of the user triggering this event
-	 *
-	 * @return display name of the user
-	 */
-	public String getDisplayName() {
-		if (tags.hasTag("display-name")) {
-			return (String) tags.getTag("display-name");
+		/*
+		if (getCommand().equalsIgnoreCase("CLEARCHAT")) {
+			return getMessage();
+		} else {
+			return matcher.group("user");
 		}
-
-		return null;
+		*/
+		return matcher.group("user");
 	}
 
 	/**
@@ -138,28 +135,29 @@ public class IRCParser {
 	 * @return the channel the message originates from
 	 */
 	public String getChannelName() {
-		if (matcher.group(6).startsWith("#")) {
-			return matcher.group(6).split(" ")[0].substring(1);
+		if (matcher.group("message").startsWith("#")) {
+			return matcher.group("message").split(" ")[0].substring(1);
 		}
+
 		return null;
 	}
 
-	public String getFormedCommand() {
-		switch (getCommand().toUpperCase()) {
-			case "PRIVMSG":
-				if (matcher.group(7).contains("ACTION")) return "ACTION"; // using `/me` by chat user
-				return getCommand();
-			case "CLEARCHAT": // clear chat have 3 ways
-				if (matcher.group(7).contains("ACTION")) return "ACTION";
-				if (tags.hasTag("ban-reason")) {
-					if (tags.hasTag("ban-duration"))
-						return "TIMEOUT"; // timeouting
-					else return "BAN"; // banning
-				}
-				return getCommand(); // chat clearing
-			default:
-				return getCommand();
+	public String getTwitchCommandType() {
+		if("PRIVMSG".equals(getCommand().toUpperCase())) {
+			if (matcher.group("message").contains("ACTION"))
+				return "ACTION"; // using `/me` by chat user
 		}
+		else if("CLEARCHAT".equals(getCommand().toUpperCase())) {
+			if (tags.hasTag("ban-reason")) {
+				if (tags.hasTag("ban-duration")) {
+					return "TIMEOUT";
+				} else {
+					return "BAN";
+				}
+			}
+		}
+
+		return getCommand();
 	}
 
 	/**
@@ -167,7 +165,7 @@ public class IRCParser {
 	 * @return IRC Received Command
 	 */
 	public String getCommand() {
-		return matcher.group(5);
+		return matcher.group("command");
 	}
 
 	/**
@@ -175,13 +173,18 @@ public class IRCParser {
 	 * @return IRC Message
 	 */
 	public String getMessage() {
-		if (!getCommand().equalsIgnoreCase("CLEARCHAT")) {
-			String msg = matcher.group(7);
-			if (msg.contains("ACTION")) {
-				return matcher.group(7).substring(8, matcher.group(7).length() - 1);
-			} else if (getCommand().equalsIgnoreCase("HOSTTARGET") || getCommand().equalsIgnoreCase("MODE"))
+		String rawMsg = matcher.group("message");
+
+		if(rawMsg.length() > getChannelName().length() + 3) {
+			String msg = rawMsg.substring(getChannelName().length() + 3);
+
+			if (msg != null && msg.contains("ACTION")) {
+				return msg.substring(8, msg.length() - 1);
+			} else if (getCommand().equalsIgnoreCase("HOSTTARGET") || getCommand().equalsIgnoreCase("MODE"))  {
 				return (msg != null) ? msg : matcher.group(6).substring(2 + getChannelName().length());
-			else return msg;
+			}
+
+			return msg;
 		}
 
 		return null;

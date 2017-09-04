@@ -9,7 +9,6 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.ChannelFeed;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
-import me.philippheuer.twitch4j.model.CommunityCreate;
 import me.philippheuer.twitch4j.model.Void;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.LinkedMultiValueMap;

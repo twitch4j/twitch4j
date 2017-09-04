@@ -1,28 +1,19 @@
 package me.philippheuer.twitch4j;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.message.MessageInterface;
-import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
-import me.philippheuer.twitch4j.message.irc.listeners.ChannelMessageListener;
-import me.philippheuer.twitch4j.message.irc.listeners.CheerListener;
-import me.philippheuer.twitch4j.message.irc.listeners.SubscriptionListener;
+import me.philippheuer.twitch4j.message.MessageInterface;
+import me.philippheuer.twitch4j.message.commands.CommandHandler;
+import me.philippheuer.twitch4j.message.irc.listeners.*;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import org.springframework.util.Assert;
 
 import java.io.File;
-
-import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 
 /**
  * TwitchClient is the core class for all api operations.
@@ -117,6 +108,9 @@ public class TwitchClient {
 		dispatcher.registerListener(new ChannelMessageListener());
 		dispatcher.registerListener(new CheerListener());
 		dispatcher.registerListener(new SubscriptionListener());
+		dispatcher.registerListener(new WhisperListener());
+		dispatcher.registerListener(new ModListener());
+		dispatcher.registerListener(new NoticeListener());
 
 		// Initialize REST Client
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));

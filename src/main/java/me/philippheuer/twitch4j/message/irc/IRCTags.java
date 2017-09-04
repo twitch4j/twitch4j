@@ -1,7 +1,5 @@
 package me.philippheuer.twitch4j.message.irc;
 
-import lombok.Getter;
-
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +41,6 @@ public class IRCTags <T extends Object> {
 	 * @return value converted to Object class
 	 */
 	private T parseTagValue(String key, String value) {
-		if (value == null) return null;
 		try {
 			if (key.equalsIgnoreCase("badges")) {
 				Map<String, Integer> badges = new HashMap<String, Integer>();
@@ -63,36 +60,40 @@ public class IRCTags <T extends Object> {
 				return (T) emotes;
 			} else if (key.equalsIgnoreCase("subscriber") || key.equalsIgnoreCase("mod") || key.equalsIgnoreCase("turbo")) {
 				return (T) Boolean.valueOf(value.equals("1"));
+			} else if (value == null) {
+				return null;
 			}
 		} catch (Exception ex) {
 			// ex.printStackTrace();
 		}
+
 		return (T) value;
 	}
 
 	/**
-	 * Tag size
+	 * Gets the count of tags
+	 *
 	 * @return Tag size
 	 */
-	public int size() {
+	public int getCount() {
 		return tags.size();
 	}
 
 	/**
-	 * Getting tag exists
+	 * Check if the irc message contains a tag
 	 *
 	 * @param name tag name
-	 * @return tag existence
+	 * @return If the tag is existing
 	 */
 	public boolean hasTag(String name) {
 		return tags.containsKey(name);
 	}
 
 	/**
-	 * Get one tag
+	 * Get the tag value
 	 *
 	 * @param name tag name
-	 * @param <T> some classes extends Object
+	 * @param <T> class that extends Object
 	 * @return getting tag data returned classes extends Object
 	 */
 	public <T extends Object> T getTag(String name) {

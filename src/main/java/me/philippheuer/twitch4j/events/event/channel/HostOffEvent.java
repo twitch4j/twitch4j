@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.events.event;
+package me.philippheuer.twitch4j.events.event.channel;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

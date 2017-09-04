@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.streamlabs.endpoints.TokenEndpoint;
-import me.philippheuer.util.rest.HeaderRequestInterceptor;
-import me.philippheuer.util.rest.RestClient;
 import me.philippheuer.twitch4j.streamlabs.endpoints.AlertEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
+import me.philippheuer.twitch4j.streamlabs.endpoints.TokenEndpoint;
 import me.philippheuer.twitch4j.streamlabs.endpoints.UserEndpoint;
+import me.philippheuer.util.rest.HeaderRequestInterceptor;
+import me.philippheuer.util.rest.RestClient;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
