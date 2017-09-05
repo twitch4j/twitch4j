@@ -52,6 +52,7 @@ public class IrcRawMessageEvent extends Event {
 	 * @param <T> class that extends Object
 	 * @return getting tag data returned classes extends Object
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends Object> T getTag(String name) {
 		return (T) getIrcParser().getTags().getTag(name);
 	}
