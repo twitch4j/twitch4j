@@ -4,12 +4,14 @@ import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.model.UserChat;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class TwitchChat extends IRCWebSocket {
@@ -17,16 +19,12 @@ public class TwitchChat extends IRCWebSocket {
 	/**
 	 * Token Bucket for message limits
 	 */
-	private final TokenBucket messageBucket = TokenBuckets.builder()
-			.withCapacity(20)
-			.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
-			.build();
+	private final TokenBucket messageBucket;
 
 	/**
 	 * Token Bucket for moderated channels
 	 */
 	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
-	// TODO: Token Bucket for increased rate limits - annotating thread: https://discuss.dev.twitch.tv/t/have-a-chat-whisper-bot-let-us-know/10651
 
 	/**
 	 * Twitch Chat IRC Wrapper
@@ -35,6 +33,31 @@ public class TwitchChat extends IRCWebSocket {
 	 */
 	public TwitchChat(TwitchClient client) {
 		super(client);
+		Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC();
+		Optional<UserChat> userChat = getTwitchClient().getUserEndpoint().getUserChat(credential.get().getUserId());
+		messageBucket = (userChat.isPresent() && userChat.get().getIsKnownBot()) ? setIncreasedMessageBucket() : setDefaultMessageBucket();
+	}
+
+	/**
+	 * Increased Token Bucket, when <b>isKnownBot</b> is <b>true</b>
+	 * @return increased token bucket
+	 */
+	private TokenBucket setIncreasedMessageBucket() {
+		return TokenBuckets.builder()
+				.withCapacity(50)
+				.withFixedIntervalRefillStrategy(1, 600, TimeUnit.MILLISECONDS)
+				.build();
+	}
+
+	/**
+	 * Default Token Bucket, when <b>isKnownBot</b> is <b>false</b>
+	 * @return default token bucket
+	 */
+	private TokenBucket setDefaultMessageBucket() {
+		return TokenBuckets.builder()
+				.withCapacity(20)
+				.withFixedIntervalRefillStrategy(1, 1500, TimeUnit.MILLISECONDS)
+				.build();
 	}
 
 	/**
