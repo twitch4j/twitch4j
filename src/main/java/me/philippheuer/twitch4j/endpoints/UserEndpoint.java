@@ -457,4 +457,35 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		return false;
 	}
 
+	public Optional<UserChat> getUserChatByUserName(String username) {
+		Optional<Long> user = getUserIdByUserName(username);
+		return getUserChat(user.get());
+	}
+
+	public Optional<UserChat> getUserChat(Long userId) {
+		// Validate Arguments
+		Assert.notNull(userId, "Please provide a User ID!");
+
+		// Endpoint
+		String reqUrl = String.format("%s/users/%s/chat", Endpoints.API.getURL(), userId);
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+
+		// REST Request
+		try {
+			if (!restObjectCache.containsKey(reqUrl)) {
+				Logger.trace(this, "Rest Request to [%s]", reqUrl);
+				UserChat responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(reqUrl, UserChat.class);
+				restObjectCache.put(reqUrl, responseObject);
+			}
+
+			return Optional.ofNullable((UserChat) restObjectCache.get(reqUrl));
+		} catch (RestException restException) {
+			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return Optional.empty();
+	}
+
 }
