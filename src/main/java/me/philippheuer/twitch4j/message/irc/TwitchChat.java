@@ -1,41 +1,167 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.irc.IrcRawMessageEvent;
+import me.philippheuer.twitch4j.message.irc.parsers.Parser;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.twitch4j.model.UserChat;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
+import org.springframework.util.Assert;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class TwitchChat extends IRCWebSocket {
+@Data
+public class TwitchChat {
+	public enum Color {
+		Blue,
+		BlueViolet,
+		CadetBlue,
+		Chocolate,
+		Coral,
+		DodgerBlue,
+		Firebrick,
+		GoldenRod,
+		Green,
+		HotPink,
+		OrangeRed,
+		Red,
+		SeaGreen,
+		SpringGreen,
+		YellowGreen
+	}
 
+	/**
+	 * WebSocket Client
+	 */
+	@Setter(AccessLevel.NONE)
+	private WebSocket ws;
+	/**
+	 * Twitch Client
+	 */
+	@Setter(AccessLevel.NONE)
+	private final TwitchClient twitchClient;
+	/**
+	 * List of Joined channels
+	 */
+	private final Map<String, ChannelCache> channels = new HashMap<String, ChannelCache>();
+	/**
+	 * The connection state
+	 * Default: ({@link TMIConnectionState#DISCONNECTED})
+	 */
+	private TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 	/**
 	 * Token Bucket for message limits
 	 */
 	private final TokenBucket messageBucket;
-
 	/**
 	 * Token Bucket for moderated channels
 	 */
+	// TODO: Moderator Message Bucket moved to channel cache
 	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
 
+	@Getter(AccessLevel.NONE)
+	private final OAuthCredential credentials;
+	@Getter(AccessLevel.NONE)
+	private final Parser parser = new Parser(this);
+
 	/**
-	 * Twitch Chat IRC Wrapper
-	 *
-	 * @param client Twitch Client.
+	 * IRC WebSocket
+	 * @param client TwitchClient.
 	 */
 	public TwitchChat(TwitchClient client) {
-		super(client);
-		Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC();
-		Optional<UserChat> userChat = getTwitchClient().getUserEndpoint().getUserChat(credential.get().getUserId());
-		messageBucket = (userChat.isPresent() && userChat.get().getIsKnownBot()) ? setIncreasedMessageBucket() : setDefaultMessageBucket();
+		this.twitchClient = client;
+
+		Optional<OAuthCredential> credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC();
+		this.credentials = credential.orElse(null);
+		Assert.notNull(this.credentials, "Credentials doesn't even exists");
+		if (credential != null) {
+			Optional<UserChat> userChat = twitchClient.getUserEndpoint().getUserChat(this.credentials.getUserId());
+			messageBucket = (userChat.isPresent() && userChat.get().getIsKnownBot()) ? setIncreasedMessageBucket() : setDefaultMessageBucket();
+		} else messageBucket = setDefaultMessageBucket();
+		// Create WebSocket
+		try {
+			this.ws = new WebSocketFactory().createSocket(Endpoints.IRC.getURL());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		// WebSocket Listener
+		this.ws.addListener(new WebSocketAdapter() {
+
+			@Override
+			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
+				setConnectionState(TMIConnectionState.CONNECTING);
+				Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
+
+				sendCommand("cap req", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands");
+
+				// if credentials is null, it will automatically disconnect
+				if (credentials == null) {
+					Logger.error(this, "The Twitch IRC Client needs valid Credentials from the CredentialManager.");
+					setConnectionState(TMIConnectionState.DISCONNECTING); // set state to graceful disconnect (without reconnect looping)
+					ws.disconnect();
+					return; // do not continue script
+				}
+
+				sendCommand("pass", String.format("oauth:%s", credentials.getToken()));
+				sendCommand("nick", credentials.getUserName());
+
+				// Join defined channels
+				if (!getChannels().isEmpty()) {
+					for (String channel : getChannels().keySet()) {
+						sendCommand("join", "#" + channel);
+					}
+				}
+				// then join to own channel - required for sending or receiving whispers
+				joinChannel(credentials.getUserName());
+			}
+
+			@Override
+			public void onTextMessage(WebSocket ws, String text) {
+				Arrays.asList(text.replace("\n\r", "\n")
+						.replace("\r", "\n").split("\n"))
+						.forEach(message -> {
+							if (!message.equals("")) {
+								//Event event = new IRCMessageEvent(parser.parse(message));
+								// use new parser - uncomment above
+								IRCParser parser = new IRCParser(message);
+								Event event = new IrcRawMessageEvent(parser);
+								getTwitchClient().getDispatcher().dispatch(event);
+							}
+						});
+			}
+			public void onDisconnected(WebSocket websocket,
+									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
+									   boolean closedByServer) {
+				if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
+					String reason = "Connection to Twitch IRC lost (WebSocket)! Reconnecting...";
+					Logger.info(this, reason);
+
+					// connection lost - reconnecting
+					setConnectionState(TMIConnectionState.RECONNECTING);
+					connect();
+				} else {
+					setConnectionState(TMIConnectionState.DISCONNECTED);
+				}
+			}
+		});
 	}
 
 	/**
@@ -61,6 +187,58 @@ public class TwitchChat extends IRCWebSocket {
 	}
 
 	/**
+	 * Connecting to IRC-WS
+	 */
+	public void connect() {
+		if (getConnectionState().equals(TMIConnectionState.DISCONNECTED) || getConnectionState().equals(TMIConnectionState.RECONNECTING)) {
+			try {
+				this.ws.connect();
+			} catch (Exception ex) {
+				Logger.warn(this, "Connection to Twitch IRC failed: %s", ex.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Disconnecting from IRC-WS
+	 */
+	public void disconnect() {
+		if (getConnectionState().equals(TMIConnectionState.CONNECTED)) {
+			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
+
+			setConnectionState(TMIConnectionState.DISCONNECTING);
+			sendCommand("QUIT"); // safe disconnect
+		}
+		this.ws.disconnect();
+	}
+
+	/**
+	 * Reconnecting to IRC-WS
+	 */
+	public void reconnect() {
+		setConnectionState(TMIConnectionState.RECONNECTING);
+		disconnect();
+		connect();
+	}
+
+	/**
+	 * Send IRC Command
+	 * @param command IRC Command
+	 * @param args command arguments
+	 */
+	private void sendCommand(String command, String... args) {
+		// will send command if connection has been established
+		if (getConnectionState().equals(TMIConnectionState.CONNECTED) || getConnectionState().equals(TMIConnectionState.CONNECTING)) {
+			// command will be uppercase.
+			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+		}
+	}
+
+	public void sendPong(String arg) {
+		sendCommand("PONG", arg);
+	}
+
+	/**
 	 * Check if the user has moderator permissions in a channel.
 	 *
 	 * @param channel Channel.
@@ -70,7 +248,7 @@ public class TwitchChat extends IRCWebSocket {
 		// No Credentials for Channel
 		return false;
 
-		/* TODO: TEMP
+		/* TODO: Get moderator status for channel cache
 		return modMessageBucket.containsKey(channel) || getTwitchClient()
 				.getTMIEndpoint()
 				.getChatters(channel)
@@ -83,9 +261,14 @@ public class TwitchChat extends IRCWebSocket {
 	 * Joining the channel
 	 * @param channel channel name
 	 */
-	@Override
 	public void joinChannel(String channel) {
-		super.joinChannel(channel);
+		if (!channels.containsKey(channel)) {
+			sendCommand("join", "#" + channel);
+			channels.put(channel, new ChannelCache(this, channel));
+
+			Logger.debug(this, "Joining Channel [%s].", channel);
+		}
+
 		if (isModerator(channel)) {
 			TokenBucket modBucket = TokenBuckets.builder()
 					.withCapacity(100)
@@ -96,12 +279,17 @@ public class TwitchChat extends IRCWebSocket {
 	}
 
 	/**
-	 * Leaving the channel
-	 * @param channel channel name
+	 * leaving the channel
+	 * @param channelName channel name
 	 */
-	@Override
-	public void partChannel(String channel) {
-		super.partChannel(channel);
+	public void partChannel(String channelName) {
+		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
+		if (channels.containsKey(channel)) {
+			sendCommand("part", "#" + channel.getName());
+			channels.remove(channel);
+
+			Logger.debug(this, "Leaving Channel [%s].", channelName);
+		}
 
 		// Remove message bucket
 		if (modMessageBucket.containsKey(channel)) {
@@ -109,13 +297,11 @@ public class TwitchChat extends IRCWebSocket {
 		}
 	}
 
-
 	/**
 	 * Sending message to the joined channel
 	 * @param channel channel name
 	 * @param message message
 	 */
-	@Override
 	public void sendMessage(String channel, String message) {
 		Logger.debug(this, "Sending message to channel [%s] with content [%s].!", channel, message);
 		new Thread(() -> {
@@ -128,11 +314,36 @@ public class TwitchChat extends IRCWebSocket {
 			}
 
 			// Send Message
-			super.sendMessage(channel, message);
+			if (channels.containsKey(channel)) {
+				sendCommand("privmsg", "#" + channel, message);
+			}
 
 			// Logging
 			Logger.debug(this, "Message send to Channel [%s] with content [%s].", channel, message);
 		}).start();
+	}
+
+	public void setColor(String hexColor) {
+		// TODO: Assert for Twitch Prime or Turbo subscriptions - don't continue if conditions dose not met
+		if (hexColor.matches("[#]?[0-9a-fA-F]{6}$")) {
+			if (!hexColor.startsWith("#")) hexColor = "#" + hexColor;
+			sendMessage(credentials.getUserName(), "/color " + hexColor);
+		}
+	}
+
+	public void setColor(Color color) {
+		sendMessage(credentials.getUserName(), "/color " + color.name());
+	}
+
+	/**
+	 * sending private message
+	 * @param username username
+	 * @param message message
+	 */
+	public void sendPrivateMessage(String username, String message) {
+		Optional<User> twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
+		OAuthCredential credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
+		twitchUser.ifPresent(user -> sendCommand("privmsg", "#" + credential.getUserName(), "/w", user.getName(), message));
 	}
 
 	/**
@@ -153,5 +364,4 @@ public class TwitchChat extends IRCWebSocket {
 
 		return new AbstractMap.SimpleEntry<>(true, "");
 	}
-
 }
