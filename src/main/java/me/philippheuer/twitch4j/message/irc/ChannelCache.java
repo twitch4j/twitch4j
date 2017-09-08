@@ -19,7 +19,7 @@ public class ChannelCache {
 	@Getter
 	private final Map<String, ?> channelStates = new HashMap<>();
 
-	ChannelCache(TwitchChat chat, String channel) {
+	public ChannelCache(TwitchChat chat, String channel) {
 		this.chat = chat;
 		this.channel = channel;
 	}
