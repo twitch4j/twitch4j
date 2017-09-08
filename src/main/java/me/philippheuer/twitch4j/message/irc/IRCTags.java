@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
  * @param <T> extended {@link Object}
  */
 
+@Deprecated
 @SuppressWarnings("unchecked")
 public class IRCTags <T extends Object> {
 

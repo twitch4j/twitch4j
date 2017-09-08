@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  * IRC Parser for Twitch Message Interface
  * @author Damian Staszewski
  */
+@Deprecated
 @Getter
 @SuppressWarnings("unchecked")
 public class IRCParser {

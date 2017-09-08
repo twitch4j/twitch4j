@@ -17,6 +17,7 @@ import me.philippheuer.twitch4j.message.irc.IRCParser;
 @Data
 @Getter
 @Setter
+@Deprecated
 @EqualsAndHashCode(callSuper = false)
 public class IrcRawMessageEvent extends Event {
 
