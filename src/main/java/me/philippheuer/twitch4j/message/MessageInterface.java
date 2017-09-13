@@ -77,11 +77,11 @@ public class MessageInterface {
 	public boolean isJoined(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		// syncing channels
-		if (twitchChat.getChannels().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
-		if (!twitchChat.getChannels().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannels().put(channel, new ChannelCache(twitchChat, channel));
+		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
+		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
 
 		return (twitchChat.getConnectionState().equals(TMIConnectionState.CONNECTED) && pubSub.getConnectionState().equals(TMIConnectionState.CONNECTED)) &&
-				(twitchChat.getChannels().containsKey(channel) && pubSub.getChannelList().containsKey(ch));
+				(twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch));
 	}
 
 	/**

@@ -1,56 +1,62 @@
 package me.philippheuer.twitch4j.message.irc;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import me.philippheuer.twitch4j.message.commands.CommandPermission;
+import lombok.Setter;
+import me.philippheuer.twitch4j.events.EventSubscriber;
+import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
+import me.philippheuer.twitch4j.model.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+@Setter(AccessLevel.PROTECTED)
+@Getter(AccessLevel.PUBLIC)
 public class ChannelCache {
+	/**
+	 * Twitch Chat
+	 */
 	private final TwitchChat chat;
+
+	/**
+	 * The channel this cache instance is for
+	 */
 	private final String channel;
 
-	@Getter
-	private final List<CommandPermission> permissions = new ArrayList<CommandPermission>();
-	@Getter
-	private final Map<String, List<CommandPermission>> chatterList = new HashMap<String, List<CommandPermission>>();
-	@Getter
-	private final Map<String, ?> channelStates = new HashMap<>();
+	/**
+	 * Moderators
+	 */
+	private final List<User> moderators = new ArrayList<User>();
 
+	/**
+	 * Channel Cache
+	 *
+	 * @param chat TwitchChat Instance
+	 * @param channel The channel this cache is for
+	 */
 	public ChannelCache(TwitchChat chat, String channel) {
 		this.chat = chat;
 		this.channel = channel;
+
+		// Register for Events from the EventDispatcher
+		chat.getTwitchClient().getDispatcher().registerListener(this);
 	}
 
-	public void timeout(String user, int seconds, String reason) {
-		sendMessage(String.format(".timeout %s %d%s", user, seconds, (reason!= null) ? " " + reason : ""));
-	}
-	public void timeout(String user, int seconds) {
-		timeout(user, seconds, null);
-	}
-
-	public void ban(String user, String reason) {
-		sendMessage(String.format(".ban %s%s", user, (reason!= null) ? " " + reason : ""));
-	}
-	public void ban(String user) {
-		ban(user, null);
-	}
-
-	public void clearChat() {
-		sendMessage(".purge");
-	}
-
-	public void unban(String user) {
-		sendMessage(".unban " + user);
+	/**
+	 * Mod Grant/Removed
+	 */
+	@EventSubscriber
+	public void onChannelModStatusChange(ChannelModEvent event) {
+		if(event.getChannel().getName().equals(getChannel())) {
+			// Add or remove moderator from cache
+			if(event.isMod()) {
+				if(!getModerators().contains(event.getUser())) {
+					getModerators().add(event.getUser());
+				}
+			} else {
+				getModerators().remove(event.getUser());
+			}
+		}
 	}
 
-	public void sendActionMessage(String message) {
-		sendMessage(String.format(".me %s", message));
-	}
-
-	public void sendMessage(String message) {
-		chat.sendMessage(channel, message);
-	}
 }

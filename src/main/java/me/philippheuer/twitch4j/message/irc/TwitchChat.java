@@ -61,7 +61,7 @@ public class TwitchChat {
 	/**
 	 * List of Joined channels
 	 */
-	private final Map<String, ChannelCache> channels = new HashMap<String, ChannelCache>();
+	private final Map<String, ChannelCache> channelCache = new HashMap<>();
 
 	/**
 	 * The connection state
@@ -78,7 +78,7 @@ public class TwitchChat {
 	 * Token Bucket for moderated channels
 	 */
 	// TODO: Moderator Message Bucket moved to channel cache
-	private final Map<String, TokenBucket> modMessageBucket = new HashMap<String, TokenBucket>();
+	private final Map<String, TokenBucket> modMessageBucket = new HashMap<>();
 
 	@Getter(AccessLevel.NONE)
 	private Optional<OAuthCredential> credential = Optional.empty();
@@ -115,8 +115,8 @@ public class TwitchChat {
 				sendCommand("nick", credential.get().getUserName());
 
 				// Join defined channels
-				if (!getChannels().isEmpty()) {
-					for (String channel : getChannels().keySet()) {
+				if (!getChannelCache().isEmpty()) {
+					for (String channel : getChannelCache().keySet()) {
 						sendCommand("join", "#" + channel);
 					}
 				}
@@ -130,16 +130,29 @@ public class TwitchChat {
 						.replace("\r", "\n").split("\n"))
 						.forEach(message -> {
 							if (!message.equals("")) {
-								try {
-									IRCMessageEvent event = new IRCMessageEvent(message);
+								// Handle messages
+								// - Ping
+								if(message.contains("PING :tmi.twitch.tv")) {
+									sendPong(":tmi.twitch.tv");
+								}
+								// - Login failed.
+								else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+									Logger.error(this, "Invalid IRC Credentials. Login failed!");
+								}
+								// - Parse IRC Message
+								else
+								{
+									try {
+										IRCMessageEvent event = new IRCMessageEvent(message);
 
-									if(event.isValid()) {
-										getTwitchClient().getDispatcher().dispatch(event);
-									} else {
-										// Logger.warn(this, "Can't parse " + event.getRawMessage());
+										if(event.isValid()) {
+											getTwitchClient().getDispatcher().dispatch(event);
+										} else {
+											// Logger.debug(this, "Can't parse " + event.getRawMessage());
+										}
+									} catch (Exception ex) {
+										ex.printStackTrace();
 									}
-								} catch (Exception ex) {
-									ex.printStackTrace();
 								}
 							}
 						});
@@ -268,22 +281,24 @@ public class TwitchChat {
 	}
 
 	/**
-	 * Check if the user has moderator permissions in a channel.
+	 * Check if the bot has moderator permissions in a channel.
+	 * Uses the channel cache, so it will always return false for channel you didn't join before.
 	 *
 	 * @param channel Channel.
-	 * @return Boolean
+	 * @return Moderator (true) or User (false)
 	 */
 	public boolean isModerator(String channel) {
-		// No Credentials for Channel
-		return false;
+		Optional<User> botUser = getTwitchClient().getUserEndpoint().getUser(credential.get().getUserId());
+		// Get Credential from CredentialManager
+		if(getChannelCache().containsKey(channel) && botUser.isPresent()) {
+			for(User mod : getChannelCache().get(channel).getModerators()) {
+				if(mod.getId().equals(botUser.get().getId())) {
+					return true;
+				}
+			}
+		}
 
-		/* TODO: Get moderator status for channel cache
-		return modMessageBucket.containsKey(channel) || getTwitchClient()
-				.getTMIEndpoint()
-				.getChatters(channel)
-				.getModerators()
-				.contains(getCredential().getUserName());
-				*/
+		return false;
 	}
 
 	/**
@@ -291,9 +306,9 @@ public class TwitchChat {
 	 * @param channel channel name
 	 */
 	public void joinChannel(String channel) {
-		if (!channels.containsKey(channel)) {
+		if (!channelCache.containsKey(channel)) {
 			sendCommand("join", "#" + channel);
-			channels.put(channel, new ChannelCache(this, channel));
+			channelCache.put(channel, new ChannelCache(this, channel));
 
 			Logger.debug(this, "Joining Channel [%s].", channel);
 		}
@@ -313,9 +328,9 @@ public class TwitchChat {
 	 */
 	public void partChannel(String channelName) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
-		if (channels.containsKey(channel)) {
+		if (channelCache.containsKey(channel)) {
 			sendCommand("part", "#" + channel.getName());
-			channels.remove(channel);
+			channelCache.remove(channel);
 
 			Logger.debug(this, "Leaving Channel [%s].", channelName);
 		}
@@ -343,7 +358,7 @@ public class TwitchChat {
 			}
 
 			// Send Message
-			if (channels.containsKey(channel)) {
+			if (channelCache.containsKey(channel)) {
 				sendCommand("privmsg", "#" + channel, message);
 			}
 

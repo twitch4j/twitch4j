@@ -198,27 +198,4 @@ public class IRCEventListener {
 			}
 		}
 	}
-
-	/**
-	 * Listens for the list of moderators
-	 * @param event IRC Event
-	 */
-	/*
-	@EventSubscriber
-	public void onRoomState(IrcRawMessageEvent event) {
-		if(event.getIrcParser().getTwitchCommandType().equals("ROOMSTATE")) {
-			// Load User Info
-			Channel channel = event.getClient().getChannelEndpoint(event.getIrcParser().getChannelName()).getChannel();
-			Boolean subMode = Boolean.parseBoolean(event.getTag("subs-only"));
-			Boolean emoteOnlyMode = Boolean.parseBoolean(event.getTag("emote-only"));
-			Boolean r9kMode = Boolean.parseBoolean(event.getTag("r9k"));
-			Integer slowMode = Integer.parseInt(event.getTag("slow"));
-			Integer followersMode = Integer.parseInt(event.getTag("followers-only"));
-
-			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new ChannelStateEvent(channel, subMode, emoteOnlyMode, r9kMode, slowMode, followersMode));
-		}
-	}
-	*/
-
 }
