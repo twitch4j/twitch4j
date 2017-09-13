@@ -1,13 +1,15 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.User;
 
 import java.util.Set;
 
-@Data
+@Getter
 public class PrivateMessageEvent extends Event {
 
 	/**

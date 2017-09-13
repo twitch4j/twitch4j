@@ -54,7 +54,7 @@ public class TwitchClientBuilder {
 	 * Initializing builder
 	 * @return Client Builder
 	 */
-	public static TwitchClientBuilder builder() {
+	public static TwitchClientBuilder init() {
 		return new TwitchClientBuilder();
 	}
 
