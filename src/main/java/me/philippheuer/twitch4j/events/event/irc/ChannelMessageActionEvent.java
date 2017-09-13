@@ -1,9 +1,6 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.Channel;
@@ -20,7 +17,7 @@ import java.util.Set;
  */
 @Data
 @Getter
-@Setter
+@Setter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class ChannelMessageActionEvent extends AbstractChannelEvent {
 

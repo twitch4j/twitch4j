@@ -8,7 +8,7 @@ import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
-import me.philippheuer.twitch4j.message.irc.listeners.*;
+import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
@@ -104,14 +104,7 @@ public class TwitchClient {
 		// - Commands
 		dispatcher.registerListener(getCommandHandler());
 		// - IRC Event Listeners
-		// TODO: Replace with reflection for the package
-		dispatcher.registerListener(new ChannelMessageListener());
-		dispatcher.registerListener(new CheerListener());
-		dispatcher.registerListener(new SubscriptionListener());
-		dispatcher.registerListener(new WhisperListener());
-		dispatcher.registerListener(new ModListener());
-		dispatcher.registerListener(new NoticeListener());
-
+		dispatcher.registerListener(new IRCEventListener());
 		// Initialize REST Client
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));

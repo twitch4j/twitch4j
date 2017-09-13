@@ -6,7 +6,7 @@ import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
 /**
- * This event gets called when a user gets banned.
+ * This event gets called when a client gains/loses mod status.
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%
@@ -16,28 +16,28 @@ import me.philippheuer.twitch4j.model.User;
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
-public class UserBanEvent extends AbstractChannelEvent {
+public class ChannelModEvent extends AbstractChannelEvent {
 
 	/**
-	 * Event Target User
+	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
-	 * Reason for Punishment
+	 * Is Moderator?
 	 */
-	private final String reason;
+	private boolean isMod;
 
 	/**
 	 * Event Constructor
 	 *
-	 * @param channel The channel that this event originates from.
-	 * @param user    The user who triggered the event.
-	 * @param reason  Reason for Ban.
+	 * @param channel     The channel that this event originates from.
+	 * @param user 		  The user that gained/lost mod status.
+	 * @param isMod		  Did the use gain or lose mod status?
 	 */
-	public UserBanEvent(Channel channel, User user, String reason) {
+	public ChannelModEvent(Channel channel, User user, boolean isMod) {
 		super(channel);
-		this.user = user;
-		this.reason = reason;
+		setUser(user);
+		setMod(isMod);
 	}
 }
