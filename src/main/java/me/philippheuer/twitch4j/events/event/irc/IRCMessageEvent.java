@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.events.event.irc;
 import lombok.*;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -117,7 +118,7 @@ public class IRCMessageEvent extends Event {
 	 */
 	public Map parseTags(String raw) {
 		Map<String, String> map = new HashMap<>();
-		if (raw == null) return map;
+		if(StringUtils.isBlank(raw)) return map;
 
 		for (String tag: raw.split(";")) {
 			String[] val = tag.split("=");
@@ -137,7 +138,7 @@ public class IRCMessageEvent extends Event {
 	 */
 	public Map parseBadges(String raw) {
 		Map<String, String> map = new HashMap<>();
-		if (raw == null) return map;
+		if(StringUtils.isBlank(raw)) return map;
 
 		// Fix Whitespaces
 		raw = raw.replace("\\s", " ");
@@ -238,6 +239,8 @@ public class IRCMessageEvent extends Event {
 	public Optional<String> getTagValue(String tagName) {
 		if(getTags().containsKey(tagName)) {
 			String value = getTags().get(tagName);
+			if(StringUtils.isBlank(value)) return Optional.empty();
+
 			value = value.replaceAll("\\\\s", " ");
 			return Optional.ofNullable(value);
 		}
