@@ -1,8 +1,8 @@
 package me.philippheuer.twitch4j.events.event;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Value;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 
@@ -13,7 +13,7 @@ import me.philippheuer.twitch4j.model.Channel;
  * @version %I%, %G%
  * @since 1.0
  */
-@Value
+@Data
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class AbstractChannelEvent extends Event {
@@ -21,7 +21,7 @@ public class AbstractChannelEvent extends Event {
 	/**
 	 * Event Channel
 	 */
-	private Channel channel;
+	private final Channel channel;
 
 	/**
 	 * Event Constructor

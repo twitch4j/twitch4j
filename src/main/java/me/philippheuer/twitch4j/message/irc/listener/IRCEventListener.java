@@ -1,9 +1,13 @@
 package me.philippheuer.twitch4j.message.irc.listener;
 
+import lombok.Getter;
+import lombok.Setter;
+import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
 import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
 import me.philippheuer.twitch4j.events.event.irc.*;
+import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
@@ -15,7 +19,22 @@ import java.util.Date;
  *
  * Listens for any irc triggered events and created the corresponding events for the EventDispatcher.
  */
+@Getter
 public class IRCEventListener {
+
+	/**
+	 * Twitch Client
+	 */
+	private final TwitchClient twitchClient;
+
+	/**
+	 * Constructor
+	 *
+	 * @param twitchClient The Twitch Client instance.
+	 */
+	public IRCEventListener(TwitchClient twitchClient) {
+		this.twitchClient = twitchClient;
+	}
 
 	/**
 	 * Channel Message Event
@@ -124,16 +143,26 @@ public class IRCEventListener {
 					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id"))).get();
 					Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
 					String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
+					UserTimeoutEvent timeoutEvent = new UserTimeoutEvent(channel, user, duration, banReason);
+
+					// Check ChannelCache to prevent duplicate events
+					ChannelCache cache = getTwitchClient().getMessageInterface().getTwitchChat().getChannelCache().getOrDefault(channel.getName(), null);
+					if(cache != null && cache.isTimeoutCached(timeoutEvent)) return;
 
 					// Dispatch Event
-					event.getClient().getDispatcher().dispatch(new UserTimeoutEvent(channel, user, duration, banReason));
+					event.getClient().getDispatcher().dispatch(timeoutEvent);
 				} else { // ban
 					// Load Info
 					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get())).get();
 					String banReason = event.getTagValue("ban-reason").orElse("");
+					UserBanEvent banEvent = new UserBanEvent(channel, user, banReason);
+
+					// Check ChannelCache to prevent duplicate events
+					ChannelCache cache = getTwitchClient().getMessageInterface().getTwitchChat().getChannelCache().getOrDefault(channel.getName(), null);
+					if(cache != null && cache.isBanCached(banEvent)) return;
 
 					// Dispatch Event
-					event.getClient().getDispatcher().dispatch(new UserBanEvent(channel, user, banReason));
+					event.getClient().getDispatcher().dispatch(banEvent);
 				}
 			} else { // Clear chat event
 
