@@ -111,31 +111,34 @@ public class IRCEventListener {
 	}
 
 	/**
-	 * Channel Subscription Event
+	 * Channel clearing chat, timeouting or banning user Event
 	 * @param event IRCMessageEvent
 	 */
 	@EventSubscriber
-	public void onBanOrTimeout(IRCMessageEvent event) {
-		if(event.getCommandType().equals("TIMEOUT")) // Timeout
-		{
-			// Load Info
+	public void onClearChat(IRCMessageEvent event) {
+		if (event.getCommandType().equals("CLEARCHAT")) {
 			Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
-			User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id"))).get();
-			Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
-			String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
+			if (event.getTags().containsKey("target-user-id")) { // ban or timeout
+				if (event.getTags().containsKey("ban-duration")) { // timeout
+					// Load Info
+					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id"))).get();
+					Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
+					String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
 
-			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new UserTimeoutEvent(channel, user, duration, banReason));
-		}
-		else if(event.getCommandType().equals("BAN")) // Permanent Ban
-		{
-			// Load Info
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
-			User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get())).get();
-			String banReason = event.getTagValue("ban-reason").orElse("");
+					// Dispatch Event
+					event.getClient().getDispatcher().dispatch(new UserTimeoutEvent(channel, user, duration, banReason));
+				} else { // ban
+					// Load Info
+					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get())).get();
+					String banReason = event.getTagValue("ban-reason").orElse("");
 
-			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new UserBanEvent(channel, user, banReason));
+					// Dispatch Event
+					event.getClient().getDispatcher().dispatch(new UserBanEvent(channel, user, banReason));
+				}
+			} else { // Clear chat event
+
+				event.getClient().getDispatcher().dispatch(new ClearChatEvent(channel));
+			}
 		}
 	}
 
