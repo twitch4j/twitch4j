@@ -3,7 +3,6 @@ package me.philippheuer.twitch4j.events.event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.model.Channel;
 
@@ -16,7 +15,6 @@ import me.philippheuer.twitch4j.model.Channel;
  */
 @Data
 @Getter
-@Setter
 @EqualsAndHashCode(callSuper = false)
 public class AbstractChannelEvent extends Event {
 
@@ -31,6 +29,7 @@ public class AbstractChannelEvent extends Event {
 	 * @param channel The channel that this event originates from.
 	 */
 	public AbstractChannelEvent(Channel channel) {
+		super();
 		this.channel = channel;
 	}
 
@@ -40,7 +39,7 @@ public class AbstractChannelEvent extends Event {
 	 * @param message  The plain text of the message.
 	 */
 	public void sendMessage(String message) {
-		getClient().getMessageInterface().sendMessage(channel.getName(), message);
+		getClient().getMessageInterface().sendMessage(getChannel().getName(), message);
 	}
 
 }

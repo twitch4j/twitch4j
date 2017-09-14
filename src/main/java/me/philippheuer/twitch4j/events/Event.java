@@ -1,8 +1,12 @@
 package me.philippheuer.twitch4j.events;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Used to represent an event.
@@ -12,12 +16,23 @@ import me.philippheuer.twitch4j.TwitchClient;
  * @since 1.0
  */
 @Getter
-@Setter
 public abstract class Event {
 
 	/**
 	 * Holds the TwitchClient Instance this event belongs to.
 	 */
-	protected TwitchClient client;
+	@Setter(AccessLevel.PUBLIC)
+	private TwitchClient client;
 
+	/**
+	 * Created At
+	 */
+	private final Calendar createdAt;
+
+	/**
+	 * Constructor
+	 */
+	public Event() {
+		this.createdAt = Calendar.getInstance();
+	}
 }

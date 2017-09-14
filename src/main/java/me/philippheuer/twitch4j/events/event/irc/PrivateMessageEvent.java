@@ -1,15 +1,24 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.User;
 
 import java.util.Set;
 
+/**
+ * This event gets called when the bot gets a private message.
+ *
+ * @author Philipp Heuer [https://github.com/PhilippHeuer]
+ * @version %I%, %G%
+ * @since 1.0
+ */
+@Data
 @Getter
+@EqualsAndHashCode(callSuper = false)
 public class PrivateMessageEvent extends Event {
 
 	/**

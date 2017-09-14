@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 @Data
 @Getter
-@Setter(AccessLevel.PROTECTED)
+@Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends Event {
 
@@ -65,7 +65,7 @@ public class IRCMessageEvent extends Event {
 	/**
 	 * RAW Message
 	 */
-	private String rawMessage;
+	private final String rawMessage;
 
 	/**
 	 * Event Constructor
@@ -73,7 +73,7 @@ public class IRCMessageEvent extends Event {
 	 * @param rawMessage      The raw message.
 	 */
 	public IRCMessageEvent(String rawMessage) {
-		setRawMessage(rawMessage);
+		this.rawMessage = rawMessage;
 
 		this.parseRawMessage();
 		this.parsePermissions();

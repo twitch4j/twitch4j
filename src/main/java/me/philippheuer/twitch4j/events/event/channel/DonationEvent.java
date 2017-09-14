@@ -41,12 +41,12 @@ public class DonationEvent extends AbstractChannelEvent {
 	/**
 	 * Donation Amount
 	 */
-	private Double amount;
+	private final Double amount;
 
 	/**
 	 * Donation Message
 	 */
-	private String message;
+	private final String message;
 
 	/**
 	 * Event Constructor

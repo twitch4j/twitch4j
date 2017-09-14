@@ -1,6 +1,8 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -14,19 +16,18 @@ import me.philippheuer.twitch4j.model.User;
  */
 @Data
 @Getter
-@Setter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class ChannelModEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Is Moderator?
 	 */
-	private boolean isMod;
+	private final boolean isMod;
 
 	/**
 	 * Event Constructor
@@ -37,7 +38,7 @@ public class ChannelModEvent extends AbstractChannelEvent {
 	 */
 	public ChannelModEvent(Channel channel, User user, boolean isMod) {
 		super(channel);
-		setUser(user);
-		setMod(isMod);
+		this.user = user;
+		this.isMod = isMod;
 	}
 }

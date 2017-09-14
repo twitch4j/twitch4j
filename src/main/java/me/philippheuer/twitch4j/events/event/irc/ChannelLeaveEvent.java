@@ -21,7 +21,7 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Event Constructor
@@ -31,6 +31,6 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	 */
 	public ChannelLeaveEvent(Channel channel, User user) {
 		super(channel);
-		setUser(user);
+		this.user = user;
 	}
 }

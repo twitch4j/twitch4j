@@ -1,6 +1,8 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -14,14 +16,13 @@ import me.philippheuer.twitch4j.model.User;
  */
 @Data
 @Getter
-@Setter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class ChannelJoinEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Event Constructor
@@ -31,6 +32,6 @@ public class ChannelJoinEvent extends AbstractChannelEvent {
 	 */
 	public ChannelJoinEvent(Channel channel, User user) {
 		super(channel);
-		setUser(user);
+		this.user = user;
 	}
 }
