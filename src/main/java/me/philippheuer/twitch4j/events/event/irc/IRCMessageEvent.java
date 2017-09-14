@@ -178,7 +178,7 @@ public class IRCMessageEvent extends Event {
 	public void parsePermissions() {
 		// Check for Permissions
 		if (getTags().containsKey("badges")) {
-			Boolean isChannelOwner = getTags().containsKey("user-id") && getTags().containsKey("room-id") && getTags().get("user-id") == getTags().get("room-id");
+			Boolean isChannelOwner = getTags().containsKey("user-id") && getTags().containsKey("room-id") && getTags().get("user-id").equals(getTags().get("room-id"));
 
 			// - Broadcaster
 			if (getBadges().containsKey("broadcaster") || isChannelOwner) {
@@ -189,14 +189,14 @@ public class IRCMessageEvent extends Event {
 			if (getBadges().containsKey("premium")) {
 				getClientPermissions().add(CommandPermission.PRIME_TURBO);
 			}
-			// Moderator
-			if (getBadges().containsKey("moderator")) {
-				getClientPermissions().add(CommandPermission.MODERATOR);
-			}
 			// Partner
 			if (getBadges().containsKey("partner")) {
 				getClientPermissions().add(CommandPermission.PARTNER);
 			}
+		}
+		// Moderator
+		if (getTags().containsKey("mod") && getTags().get("mod").equals("1")) {
+			getClientPermissions().add(CommandPermission.MODERATOR);
 		}
 		// Twitch Turbo
 		if (getTags().containsKey("turbo") && getTags().get("turbo").equals("1")) {
