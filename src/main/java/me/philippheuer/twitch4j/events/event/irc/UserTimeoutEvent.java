@@ -1,8 +1,8 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -14,7 +14,7 @@ import me.philippheuer.twitch4j.model.User;
  * @version %I%, %G%
  * @since 1.0
  */
-@Data
+@Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class UserTimeoutEvent extends AbstractChannelEvent {
@@ -22,17 +22,17 @@ public class UserTimeoutEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Duration in Minutes
 	 */
-	private final Integer duration;
+	private Integer duration;
 
 	/**
 	 * Reason for Punishment
 	 */
-	private final String reason;
+	private String reason;
 
 	/**
 	 * Event Constructor

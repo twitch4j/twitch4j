@@ -1,8 +1,8 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.User;
@@ -16,7 +16,7 @@ import java.util.Set;
  * @version %I%, %G%
  * @since 1.0
  */
-@Data
+@Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class PrivateMessageEvent extends Event {
@@ -24,17 +24,17 @@ public class PrivateMessageEvent extends Event {
 	/**
 	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Message
 	 */
-	private final String message;
+	private String message;
 
 	/**
 	 * Permissions of the user
 	 */
-	private final Set<CommandPermission> permissions;
+	private Set<CommandPermission> permissions;
 
 	/**
 	 * Event Constructor

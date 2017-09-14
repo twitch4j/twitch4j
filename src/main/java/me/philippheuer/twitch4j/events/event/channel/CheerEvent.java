@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.events.event.channel;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -15,27 +14,25 @@ import me.philippheuer.twitch4j.model.User;
  * @version %I%, %G%
  * @since 1.0
  */
-@Data
+@Value
 @Getter
-@Setter
 @EqualsAndHashCode(callSuper = false)
 public class CheerEvent extends AbstractChannelEvent {
 
 	/**
 	 * Event Target User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Message
 	 */
-	private final String message;
+	private String message;
 
 	/**
 	 * Amount of Bits
 	 */
-	private final Integer bits;
-
+	private Integer bits;
 
 	/**
 	 * Event Constructor

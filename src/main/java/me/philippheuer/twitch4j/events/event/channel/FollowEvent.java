@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.events.event.channel;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -15,16 +14,15 @@ import me.philippheuer.twitch4j.model.User;
  * @version %I%, %G%
  * @since 1.0
  */
-@Data
+@Value
 @Getter
-@Setter
 @EqualsAndHashCode(callSuper = false)
 public class FollowEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Event Constructor

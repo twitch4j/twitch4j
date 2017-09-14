@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.events.event.channel;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -17,36 +16,35 @@ import java.util.Currency;
  * @version %I%, %G%
  * @since 1.0
  */
-@Data
+@Value
 @Getter
-@Setter
 @EqualsAndHashCode(callSuper = false)
 public class DonationEvent extends AbstractChannelEvent {
 
 	/**
 	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Donation Source
 	 */
-	private final String source;
+	private String source;
 
 	/**
 	 * Donation Currency
 	 */
-	private final Currency currency;
+	private Currency currency;
 
 	/**
 	 * Donation Amount
 	 */
-	private final Double amount;
+	private Double amount;
 
 	/**
 	 * Donation Message
 	 */
-	private final String message;
+	private String message;
 
 	/**
 	 * Event Constructor

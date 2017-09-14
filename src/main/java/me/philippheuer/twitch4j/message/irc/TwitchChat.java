@@ -328,16 +328,16 @@ public class TwitchChat {
 	 */
 	public void partChannel(String channelName) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
-		if (channelCache.containsKey(channel)) {
+		if (channelCache.containsKey(channelName)) {
 			sendCommand("part", "#" + channel.getName());
-			channelCache.remove(channel);
+			channelCache.remove(channelName);
 
 			Logger.debug(this, "Leaving Channel [%s].", channelName);
 		}
 
 		// Remove message bucket
-		if (modMessageBucket.containsKey(channel)) {
-			modMessageBucket.remove(channel);
+		if (modMessageBucket.containsKey(channelName)) {
+			modMessageBucket.remove(channelName);
 		}
 	}
 

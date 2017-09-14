@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Used to represent an event.

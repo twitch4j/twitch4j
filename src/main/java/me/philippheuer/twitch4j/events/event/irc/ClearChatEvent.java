@@ -1,12 +1,12 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 
-@Data
+@Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class ClearChatEvent extends AbstractChannelEvent {
