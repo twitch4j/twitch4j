@@ -143,6 +143,7 @@ public class IRCEventListener {
 					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id"))).get();
 					Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
 					String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
+					banReason = banReason.replaceAll("\\\\s", " ");
 					UserTimeoutEvent timeoutEvent = new UserTimeoutEvent(channel, user, duration, banReason);
 
 					// Check ChannelCache to prevent duplicate events
@@ -155,6 +156,7 @@ public class IRCEventListener {
 					// Load Info
 					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get())).get();
 					String banReason = event.getTagValue("ban-reason").orElse("");
+					banReason = banReason.replaceAll("\\\\s", " ");
 					UserBanEvent banEvent = new UserBanEvent(channel, user, banReason);
 
 					// Check ChannelCache to prevent duplicate events
