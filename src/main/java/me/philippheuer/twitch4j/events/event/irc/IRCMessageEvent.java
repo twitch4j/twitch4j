@@ -90,6 +90,7 @@ public class IRCMessageEvent extends Event {
 	/**
 	 * Parse RAW Message
 	 */
+	@SuppressWarnings("unchecked")
 	private void parseRawMessage() {
 		// Parse using Regex
 		Pattern pattern = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
