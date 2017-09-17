@@ -45,7 +45,7 @@ public class IRCMessageEvent extends Event {
 	/**
 	 * Channel
 	 */
-	private Optional<String> channel = Optional.empty();
+	private Optional<String> channelName = Optional.empty();
 
 	/**
 	 * Message
@@ -104,7 +104,7 @@ public class IRCMessageEvent extends Event {
 
 			setClientName(parseClientName(matcher.group("clientName")));
 			setCommandType(matcher.group("command"));
-			setChannel(Optional.ofNullable(matcher.group("channel")));
+			setChannelName(Optional.ofNullable(matcher.group("channel")));
 			setMessage(Optional.ofNullable(matcher.group("message")));
 			setPayload(Optional.ofNullable(matcher.group("payload")));
 		}
