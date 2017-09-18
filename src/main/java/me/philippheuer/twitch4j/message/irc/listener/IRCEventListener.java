@@ -244,7 +244,7 @@ public class IRCEventListener {
 				event.getTags().forEach((k, v) -> {
 					switch (k) {
 						case "broadcaster-lang":
-							states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, Locale.forLanguageTag(v));
+							states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, (v != null) ? Locale.forLanguageTag(v) : v);
 							break;
 						case "emote-only":
 							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
