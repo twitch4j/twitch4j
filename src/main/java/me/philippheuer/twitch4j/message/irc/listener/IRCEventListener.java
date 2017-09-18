@@ -250,13 +250,13 @@ public class IRCEventListener {
 							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
 							break;
 						case "followers-only":
-							states.put(ChannelStateEvent.ChannelState.FOLLOWERS, v);
+							states.put(ChannelStateEvent.ChannelState.FOLLOWERS, Long.parseLong(v));
 							break;
 						case "r9k":
 							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
 							break;
 						case "slow":
-							states.put(ChannelStateEvent.ChannelState.SLOW, v);
+							states.put(ChannelStateEvent.ChannelState.SLOW, Long.parseLong(v));
 							break;
 						case "subs-only":
 							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
