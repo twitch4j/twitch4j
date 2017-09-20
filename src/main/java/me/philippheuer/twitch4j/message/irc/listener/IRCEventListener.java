@@ -1,7 +1,6 @@
 package me.philippheuer.twitch4j.message.irc.listener;
 
 import lombok.Getter;
-import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
@@ -230,7 +229,7 @@ public class IRCEventListener {
 			String messageId = event.getTagValue("msg-id").get();
 			String message = event.getMessage().get();
 
-			event.getClient().getDispatcher().dispatch(new NoticeEvent(channel, messageId, message));
+			event.getClient().getDispatcher().dispatch(new ChannelNoticeEvent(channel, messageId, message));
 		}
 	}
 

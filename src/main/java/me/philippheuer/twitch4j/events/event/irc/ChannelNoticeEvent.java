@@ -9,12 +9,12 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class NoticeEvent extends AbstractChannelEvent {
+public class ChannelNoticeEvent extends AbstractChannelEvent {
 
 	private final String msgId;
 	private final String message;
 
-	public NoticeEvent(Channel channel, String msgId, String message) {
+	public ChannelNoticeEvent(Channel channel, String msgId, String message) {
 		super(channel);
 		this.msgId = msgId;
 		this.message = message;
