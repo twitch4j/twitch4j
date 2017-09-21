@@ -6,6 +6,7 @@ import lombok.Getter;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -38,6 +39,16 @@ public class AbstractChannelEvent extends Event {
 		this.channel = channel;
 	}
 
+	private boolean isBotModerator() {
+		User botUser = getClient().getUserEndpoint().getUser(getClient().getCredentialManager().getTwitchCredentialsForIRC().get()).get();
+		return getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getModerators().contains(botUser);
+	}
+
+	private boolean isBotChannelEditor() {
+		User botUser = getClient().getUserEndpoint().getUser(getClient().getCredentialManager().getTwitchCredentialsForIRC().get()).get();
+		return getClient().getChannelEndpoint(channel.getId()).getEditors().contains(botUser);
+	}
+
 	/**
 	 * Method to send messages to the channel the event originates from.
 	 *
@@ -56,24 +67,25 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void timeoutUser(String username, long time, String reason) {
-		sendMessage(String.format("/timeout %s %d%s", username, time, (reason != null) ? " " + reason : ""));
+		if (isBotModerator()) sendMessage(String.format("/timeout %s %d%s", username, time, (reason != null) ? " " + reason : ""));
 	}
 	public void timeoutUser(String username, long time) {
 		timeoutUser(username, time, null);
 	}
 
 	public void banUser(String username, String reason) {
-		sendMessage(String.format("/ban %s%s", username, (reason != null) ? " " + reason : ""));
+		if (isBotModerator()) sendMessage(String.format("/ban %s%s", username, (reason != null) ? " " + reason : ""));
 	}
 	public void banUser(String username) {
 		banUser(username, null);
 	}
 
 	public void unbanUser(String username) {
-		sendMessage(String.format("/unban %s", username));
+		if (isBotModerator()) sendMessage(String.format("/unban %s", username));
 	}
 
 	public void enableSlow(long seconds) {
+		if (!isBotModerator()) return;
 		Map<ChannelStateEvent.ChannelState, Object> states = getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
@@ -81,6 +93,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 	public void disableSlow() {
+		if (!isBotModerator()) return;
 		long seconds = (Long) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
 		Assert.isTrue(seconds == 0L, "Slow mode is already disabled");
 		if (seconds > 0L) {
@@ -89,6 +102,7 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableR9K() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.R9K);
 		Assert.isTrue(enabled, "R9k mode is already enabled");
 		if (!enabled) {
@@ -96,6 +110,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 	public void disableR9K() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.R9K);
 		Assert.isTrue(!enabled, "R9k mode is already disabled");
 		if (enabled) {
@@ -104,6 +119,7 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableSubscribers() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
 		Assert.isTrue(enabled, "Subscribers mode is already enabled");
 		if (!enabled) {
@@ -111,6 +127,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 	public void disableSubscribers() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
 		Assert.isTrue(!enabled, "Subscribers mode is already disabled");
 		if (enabled) {
@@ -119,6 +136,7 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableEmoteOnly() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
 		Assert.isTrue(enabled, "Emote only mode is already enabled");
 		if (!enabled) {
@@ -126,6 +144,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 	public void disableEmoteOnly() {
+		if (!isBotModerator()) return;
 		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
 		Assert.isTrue(!enabled, "Emote only mode is already disabled");
 		if (enabled) {
@@ -134,6 +153,7 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableFollowers(long seconds) {
+		if (!isBotModerator()) return;
 		Map<ChannelStateEvent.ChannelState, Object> states = getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
@@ -141,6 +161,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 	public void disableFollowers() {
+		if (!isBotModerator()) return;
 		long seconds = (Long) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
 		Assert.isTrue(seconds == -1L, "Slow mode is already disabled");
 		if (seconds > 0L) {
@@ -148,18 +169,18 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 
+	public void clearChat() {
+		if (isBotModerator()) sendMessage("/clear");
+	}
+
 	public void startHost(String channel) {
-		sendMessage(String.format("/host %s", channel));
+		if (isBotChannelEditor()) sendMessage(String.format("/host %s", channel));
 	}
 	public void stopHost() {
-		sendMessage("/unhost");
+		if (isBotChannelEditor()) sendMessage("/unhost");
 	}
 
 	public void startComercial(long time) {
-		sendMessage(String.format("/commercial%s", (time > 0L) ? " " + time : "" ));
-	}
-
-	public void clearChat() {
-		sendMessage("/clear");
+		if (isBotChannelEditor()) sendMessage(String.format("/commercial%s", (time > 0L) ? " " + time : "" ));
 	}
 }
