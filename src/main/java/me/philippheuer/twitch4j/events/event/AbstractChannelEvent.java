@@ -1,6 +1,5 @@
 package me.philippheuer.twitch4j.events.event;
 
-import com.sun.istack.internal.Nullable;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -80,7 +79,7 @@ public class AbstractChannelEvent extends Event {
 		sendMessage(String.format("/unban %s", username));
 	}
 
-	public void enableSlow(@Nullable long seconds) {
+	public void enableSlow(long seconds) {
 		Map<ChannelStateEvent.ChannelState, Object> states = cache.getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
@@ -140,7 +139,7 @@ public class AbstractChannelEvent extends Event {
 		}
 	}
 
-	public void enableFollowers(@Nullable long seconds) {
+	public void enableFollowers(long seconds) {
 		Map<ChannelStateEvent.ChannelState, Object> states = cache.getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
