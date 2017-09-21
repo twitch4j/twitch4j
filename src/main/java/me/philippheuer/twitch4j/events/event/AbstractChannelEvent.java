@@ -30,9 +30,6 @@ public class AbstractChannelEvent extends Event {
 	 */
 	private final Channel channel;
 
-	@Getter(AccessLevel.NONE)
-	private final ChannelCache cache;
-
 	/**
 	 * Event Constructor
 	 *
@@ -41,7 +38,6 @@ public class AbstractChannelEvent extends Event {
 	public AbstractChannelEvent(Channel channel) {
 		super();
 		this.channel = channel;
-		this.cache = getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName());
 	}
 
 	/**
@@ -80,14 +76,14 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableSlow(long seconds) {
-		Map<ChannelStateEvent.ChannelState, Object> states = cache.getChannelState();
+		Map<ChannelStateEvent.ChannelState, Object> states = getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
 			sendMessage(String.format("/slow %d", (seconds > 0L) ? seconds : 30L));
 		}
 	}
 	public void disableSlow() {
-		long seconds = (Long) cache.getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
+		long seconds = (Long) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
 		Assert.isTrue(seconds == 0L, "Slow mode is already disabled");
 		if (seconds > 0L) {
 			sendMessage("/slowoff");
@@ -95,14 +91,14 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableR9K() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.R9K);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.R9K);
 		Assert.isTrue(enabled, "R9k mode is already enabled");
 		if (!enabled) {
 			sendMessage("/r9kbeta");
 		}
 	}
 	public void disableR9K() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.R9K);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.R9K);
 		Assert.isTrue(!enabled, "R9k mode is already disabled");
 		if (enabled) {
 			sendMessage("/r9kbetaoff");
@@ -110,14 +106,14 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableSubscribers() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
 		Assert.isTrue(enabled, "Subscribers mode is already enabled");
 		if (!enabled) {
 			sendMessage("/subscribers");
 		}
 	}
 	public void disableSubscribers() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SUBSCRIBERS);
 		Assert.isTrue(!enabled, "Subscribers mode is already disabled");
 		if (enabled) {
 			sendMessage("/subscribersoff");
@@ -125,14 +121,14 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableEmoteOnly() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
 		Assert.isTrue(enabled, "Emote only mode is already enabled");
 		if (!enabled) {
 			sendMessage("/emoteonly");
 		}
 	}
 	public void disableEmoteOnly() {
-		boolean enabled = (Boolean) cache.getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
+		boolean enabled = (Boolean) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.EMOTE);
 		Assert.isTrue(!enabled, "Emote only mode is already disabled");
 		if (enabled) {
 			sendMessage("/emoteonlyoff");
@@ -140,14 +136,14 @@ public class AbstractChannelEvent extends Event {
 	}
 
 	public void enableFollowers(long seconds) {
-		Map<ChannelStateEvent.ChannelState, Object> states = cache.getChannelState();
+		Map<ChannelStateEvent.ChannelState, Object> states = getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState();
 		Assert.isTrue(seconds <= 0L, "Time must be greater and positively than 0");
 		if (seconds > 0L) {
 			sendMessage(String.format("/followers%s", (seconds > 0L) ? " " + TimeUnit.SECONDS.toMinutes(seconds) : ""));
 		}
 	}
 	public void disableFollowers() {
-		long seconds = (Long) cache.getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
+		long seconds = (Long) getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getChannelState().get(ChannelStateEvent.ChannelState.SLOW);
 		Assert.isTrue(seconds == -1L, "Slow mode is already disabled");
 		if (seconds > 0L) {
 			sendMessage("/followersoff");
