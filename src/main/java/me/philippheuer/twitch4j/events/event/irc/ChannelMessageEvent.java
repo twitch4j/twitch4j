@@ -25,17 +25,17 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Message
 	 */
-	private String message;
+	private final String message;
 
 	/**
 	 * Permissions of the user
 	 */
-	private Set<CommandPermission> permissions;
+	private final Set<CommandPermission> permissions;
 
 	/**
 	 * Event Constructor

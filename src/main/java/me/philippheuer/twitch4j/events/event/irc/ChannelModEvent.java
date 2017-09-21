@@ -22,12 +22,12 @@ public class ChannelModEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Is Moderator?
 	 */
-	private boolean isMod;
+	private final boolean isMod;
 
 	/**
 	 * Event Constructor

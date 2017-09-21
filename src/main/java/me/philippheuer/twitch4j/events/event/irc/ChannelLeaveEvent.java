@@ -22,7 +22,7 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Event Constructor
