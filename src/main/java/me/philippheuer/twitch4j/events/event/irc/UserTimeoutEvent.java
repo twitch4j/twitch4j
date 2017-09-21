@@ -22,17 +22,17 @@ public class UserTimeoutEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Duration in Minutes
 	 */
-	private final Integer duration;
+	private Integer duration;
 
 	/**
 	 * Reason for Punishment
 	 */
-	private final String reason;
+	private String reason;
 
 	/**
 	 * Event Constructor

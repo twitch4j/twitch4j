@@ -22,12 +22,12 @@ public class UserBanEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Reason for Punishment
 	 */
-	private final String reason;
+	private String reason;
 
 	/**
 	 * Event Constructor

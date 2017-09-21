@@ -1,6 +1,5 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
@@ -26,17 +25,17 @@ public class ChannelMessageActionEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Message
 	 */
-	private final String message;
+	private String message;
 
 	/**
 	 * Permissions of the user
 	 */
-	private final Set<CommandPermission> permissions;
+	private Set<CommandPermission> permissions;
 
 	/**
 	 * Event Constructor

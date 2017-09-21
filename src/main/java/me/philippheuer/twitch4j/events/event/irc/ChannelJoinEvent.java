@@ -22,7 +22,7 @@ public class ChannelJoinEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private final User user;
+	private User user;
 
 	/**
 	 * Event Constructor
