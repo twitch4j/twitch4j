@@ -3,6 +3,13 @@ package me.philippheuer.util.conversion;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+/**
+ * Abstract base for result lists.
+ *
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 public class RandomizeString {
 	private final String saltStr;
 
