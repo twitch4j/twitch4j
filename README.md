@@ -93,24 +93,25 @@ and:
  - [x] Bits
  - [x] Whispers
  - [x] Subscriptions
- - [x] Commercial
+ - [x] Stream Status - *Unofficial*
+ - [x] Moderation Action (from specified moderator in specified channel) - *Unofficial*
  
 #### Twitch IRC (WebSocket)
  - [x] Subscriptions
  - [x] Cheers (Bits)
- - [ ] `/me` interactions chat
- - [ ] `/color` changer
- - [ ] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
-   - [ ] Ban (with reason)
-   - [ ] Timeout (with reason)
-   - [ ] Slow mode
-   - [ ] Sub mode
-   - [ ] Follow mode
-   - [ ] R9K mode
-   - [ ] Emote Only mode
- - [ ] Channel Editor
-   - [ ] Commercial
-   - [ ] Host mode
+ - [x] `/me` interactions chat
+ - [x] `/color` changer
+ - [x] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
+   - [x] Ban (with reason)
+   - [x] Timeout (with reason)
+   - [x] Slow mode
+   - [x] Sub mode
+   - [x] Follow mode
+   - [x] R9K mode
+   - [x] Emote Only mode
+ - [x] Channel Editor
+   - [x] Commercial
+   - [x] Host mode
 
 #### 3rd Party
 ##### [Streamlabs](https://streamlabs.com/)

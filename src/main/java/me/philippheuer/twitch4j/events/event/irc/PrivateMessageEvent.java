@@ -24,17 +24,17 @@ public class PrivateMessageEvent extends Event {
 	/**
 	 * User
 	 */
-	private User user;
+	private final User user;
 
 	/**
 	 * Message
 	 */
-	private String message;
+	private final String message;
 
 	/**
 	 * Permissions of the user
 	 */
-	private Set<CommandPermission> permissions;
+	private final Set<CommandPermission> permissions;
 
 	/**
 	 * Event Constructor
@@ -47,5 +47,9 @@ public class PrivateMessageEvent extends Event {
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;
+	}
+
+	public void sendMessage(String message) {
+		getClient().getMessageInterface().sendPrivateMessage(user.getName(), message);
 	}
 }
