@@ -46,12 +46,12 @@ public class RestErrorHandler implements ResponseErrorHandler {
 				RestError restError = mapper.readValue(content, RestError.class);
 
 				// Add HTTP Status Code to Error
-				if(restError.getStatus() == null) {
+				if (restError.getStatus() == null) {
 					restError.setStatus(clienthttpresponse.getStatusCode().ordinal());
 				}
 
 				throw new RestException(restError);
-
+				
 			} catch (RestException restException) {
 				// Rethrow
 				throw restException;

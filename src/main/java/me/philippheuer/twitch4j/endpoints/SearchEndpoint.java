@@ -8,6 +8,7 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -52,7 +53,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -84,7 +86,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -117,7 +120,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

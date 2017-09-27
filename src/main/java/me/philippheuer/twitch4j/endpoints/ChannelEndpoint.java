@@ -17,6 +17,7 @@ import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
 import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
@@ -136,7 +137,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -178,7 +180,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -212,7 +215,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getUsers();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -248,7 +252,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -309,7 +314,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getTeams();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -352,7 +358,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getSubscriptions();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -394,7 +401,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			}
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return false;
@@ -430,7 +438,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getVideos();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 			return null;
 		}
 	}
@@ -625,7 +634,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 						}
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					Logger.warn(this, "Couldn't fetch Followers to trigger FollowEvents!");
+
+					// Delay next execution
+					try {
+						Thread.sleep(1000);
+					} catch (Exception et) {
+						Logger.error(this, ExceptionUtils.getStackTrace(et));
+					}
 				}
 			}
 		};
@@ -676,7 +692,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 						// No donations created yet!
 					}
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					Logger.error(this, "Failed to get Donations: " +ex.getMessage());
+
+					// Delay next execution
+					try {
+						Thread.sleep(1000);
+					} catch (Exception et) {
+						Logger.error(this, ExceptionUtils.getStackTrace(et));
+					}
 				}
 			}
 		};

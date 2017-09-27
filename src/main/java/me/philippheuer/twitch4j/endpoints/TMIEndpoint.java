@@ -9,6 +9,7 @@ import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.twitch4j.model.tmi.Chatter;
 import me.philippheuer.twitch4j.model.tmi.ChatterResult;
 import net.jodah.expiringmap.ExpirationPolicy;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
@@ -52,7 +53,8 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		// OnError: Return empty result

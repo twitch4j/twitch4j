@@ -10,6 +10,7 @@ import me.philippheuer.twitch4j.model.RestError;
 import me.philippheuer.twitch4j.model.Team;
 import me.philippheuer.twitch4j.model.TeamList;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -55,7 +56,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -89,7 +91,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 				return Optional.empty();
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		throw new RuntimeException("Unhandled Exception!");

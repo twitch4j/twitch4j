@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.unofficial.AdvancedChannelInformation;
 import me.philippheuer.twitch4j.model.unofficial.Ember;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Getter
@@ -39,7 +40,8 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -63,7 +65,8 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getSteamId();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

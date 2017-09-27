@@ -11,6 +11,7 @@ import me.philippheuer.twitch4j.model.Community;
 import me.philippheuer.twitch4j.model.CommunityCreate;
 import me.philippheuer.twitch4j.model.CommunityList;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -56,7 +57,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -83,7 +85,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -121,7 +124,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -158,7 +162,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return;
@@ -190,7 +195,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

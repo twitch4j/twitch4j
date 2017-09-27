@@ -9,6 +9,7 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.model.TokenResponse;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Getter
@@ -46,7 +47,8 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		// Default Response: Invalid Token

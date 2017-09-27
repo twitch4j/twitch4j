@@ -7,6 +7,7 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.model.TopGame;
 import me.philippheuer.twitch4j.model.TopGameList;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -43,7 +44,8 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getTop();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

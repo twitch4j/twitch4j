@@ -11,6 +11,7 @@ import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			} catch (RestException restException) {
 				Logger.error(this, "RestException: " + restException.getRestError().toString());
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				Logger.error(this, "Request failed: " + ex.getMessage());
+				Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 				return Optional.empty();
 			}
 		}
@@ -106,7 +108,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return Optional.empty();
@@ -138,7 +141,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return Optional.empty();
@@ -184,7 +188,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return new ArrayList<Emote>();
@@ -218,7 +223,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 				Logger.error(this, "RestException: " + restException.getRestError().toString());
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return Optional.empty();
@@ -266,7 +272,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return new ArrayList<Follow>();
@@ -300,7 +307,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 				Logger.error(this, "RestException: " + restException.getRestError().toString());
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return Optional.empty();
@@ -330,7 +338,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return false;
@@ -359,7 +368,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return false;
@@ -393,7 +403,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return new ArrayList<Block>();
@@ -422,7 +433,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return false;
@@ -451,7 +463,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return false;
@@ -482,7 +495,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return Optional.empty();

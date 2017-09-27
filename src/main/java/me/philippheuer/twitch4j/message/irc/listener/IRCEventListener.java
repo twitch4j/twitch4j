@@ -45,15 +45,18 @@ public class IRCEventListener {
 			if(!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
 				// Load Info
 				Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
-				User user = event.getClient().getUserEndpoint().getUser(event.getUserId()).get();
+				Optional<User> user = event.getClient().getUserEndpoint().getUser(event.getUserId());
 
-				// Dispatch Event
-				if(event.getMessage().get().startsWith("\u0001ACTION ")) {
-					// Action
-					event.getClient().getDispatcher().dispatch(new ChannelMessageActionEvent(channel, user, event.getMessage().get().substring(8), event.getClientPermissions()));
-				} else {
-					// Regular Message
-					event.getClient().getDispatcher().dispatch(new ChannelMessageEvent(channel, user, event.getMessage().get(), event.getClientPermissions()));
+				if(user.isPresent())
+				{
+					// Dispatch Event
+					if(event.getMessage().get().startsWith("\u0001ACTION ")) {
+						// Action
+						event.getClient().getDispatcher().dispatch(new ChannelMessageActionEvent(channel, user.get(), event.getMessage().get().substring(8), event.getClientPermissions()));
+					} else {
+						// Regular Message
+						event.getClient().getDispatcher().dispatch(new ChannelMessageEvent(channel, user.get(), event.getMessage().get(), event.getClientPermissions()));
+					}
 				}
 			}
 		}
