@@ -222,6 +222,9 @@ public class TwitchChat {
 
 				// Connect to IRC WebSocket
 				this.ws.connect();
+
+				// Message Bucket
+				updateMessageBucket();
 			} catch (Exception ex) {
 				Logger.error(this, "Connection to Twitch IRC failed: %s", ex.getMessage());
 			}
