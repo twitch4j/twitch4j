@@ -15,12 +15,14 @@ import me.philippheuer.twitch4j.events.event.irc.IRCMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.twitch4j.model.UserChat;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Data
 public class TwitchChat {
@@ -51,6 +53,11 @@ public class TwitchChat {
 	 */
 	@Setter(AccessLevel.NONE)
 	private WebSocket ws;
+
+	/**
+	 * Web Socket Lock
+	 */
+	private ReentrantLock wsLock = new ReentrantLock();
 
 	/**
 	 * Twitch Client
@@ -92,85 +99,6 @@ public class TwitchChat {
 
 		// Create WebSocket
 		createWebSocket();
-
-		// WebSocket Listener
-		this.ws.addListener(new WebSocketAdapter() {
-
-			@Override
-			public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
-				setConnectionState(TMIConnectionState.CONNECTING);
-				Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
-
-				sendCommand("cap req", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands");
-
-				// if credentials is null, it will automatically disconnect
-				if (!credential.isPresent()) {
-					Logger.error(this, "The Twitch IRC Client needs valid Credentials from the CredentialManager.");
-					setConnectionState(TMIConnectionState.DISCONNECTING); // set state to graceful disconnect (without reconnect looping)
-					ws.disconnect();
-					return; // do not continue script
-				}
-
-				sendCommand("pass", String.format("oauth:%s", credential.get().getToken()));
-				sendCommand("nick", credential.get().getUserName());
-
-				// Join defined channels
-				if (!getChannelCache().isEmpty()) {
-					for (String channel : getChannelCache().keySet()) {
-						sendCommand("join", "#" + channel);
-					}
-				}
-				// then join to own channel - required for sending or receiving whispers
-				joinChannel(credential.get().getUserName());
-			}
-
-			@Override
-			public void onTextMessage(WebSocket ws, String text) {
-				Arrays.asList(text.replace("\n\r", "\n")
-						.replace("\r", "\n").split("\n"))
-						.forEach(message -> {
-							if (!message.equals("")) {
-								// Handle messages
-								// - Ping
-								if(message.contains("PING :tmi.twitch.tv")) {
-									sendPong(":tmi.twitch.tv");
-								}
-								// - Login failed.
-								else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
-									Logger.error(this, "Invalid IRC Credentials. Login failed!");
-								}
-								// - Parse IRC Message
-								else
-								{
-									try {
-										IRCMessageEvent event = new IRCMessageEvent(message);
-
-										if(event.isValid()) {
-											getTwitchClient().getDispatcher().dispatch(event);
-										} else {
-											// Logger.debug(this, "Can't parse " + event.getRawMessage());
-										}
-									} catch (Exception ex) {
-										ex.printStackTrace();
-									}
-								}
-							}
-						});
-			}
-			public void onDisconnected(WebSocket websocket,
-									   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
-									   boolean closedByServer) {
-				if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
-					Logger.info(this, "Connection to Twitch IRC lost (WebSocket)! Reconnecting...");
-
-					// connection lost - reconnecting
-					setConnectionState(TMIConnectionState.RECONNECTING);
-					connect();
-				} else {
-					setConnectionState(TMIConnectionState.DISCONNECTED);
-				}
-			}
-		});
 	}
 
 	/**
@@ -178,9 +106,93 @@ public class TwitchChat {
 	 */
 	private void createWebSocket() {
 		try {
+			// WebSocket
 			this.ws = new WebSocketFactory().createSocket(Endpoints.IRC.getURL());
+
+			// WebSocket Listeners
+			this.ws.clearListeners();
+			this.ws.addListener(new WebSocketAdapter() {
+
+				@Override
+				public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
+					Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
+
+					sendCommand("cap req", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands");
+
+					// if credentials is null, it will automatically disconnect
+					if (!credential.isPresent()) {
+						Logger.error(this, "The Twitch IRC Client needs valid Credentials from the CredentialManager.");
+						disconnect();
+						return; // do not continue script
+					}
+
+					sendCommand("pass", String.format("oauth:%s", credential.get().getToken()));
+					sendCommand("nick", credential.get().getUserName());
+
+					// Join defined channels
+					if (!getChannelCache().isEmpty()) {
+						for (String channel : getChannelCache().keySet()) {
+							sendCommand("join", "#" + channel);
+						}
+					}
+					// then join to own channel - required for sending or receiving whispers
+					sendCommand("join", "#" + credential.get().getUserName());
+
+					// Connection Success
+					setConnectionState(TMIConnectionState.CONNECTED);
+				}
+
+				@Override
+				public void onTextMessage(WebSocket ws, String text) {
+					Arrays.asList(text.replace("\n\r", "\n")
+							.replace("\r", "\n").split("\n"))
+							.forEach(message -> {
+								if (!message.equals("")) {
+									// Handle messages
+									// - Ping
+									if(message.contains("PING :tmi.twitch.tv")) {
+										sendPong(":tmi.twitch.tv");
+									}
+									// - Login failed.
+									else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+										Logger.error(this, "Invalid IRC Credentials. Login failed!");
+									}
+									// - Parse IRC Message
+									else
+									{
+										try {
+											IRCMessageEvent event = new IRCMessageEvent(message);
+
+											if(event.isValid()) {
+												getTwitchClient().getDispatcher().dispatch(event);
+											} else {
+												Logger.trace(this, "Can't parse " + event.getRawMessage());
+											}
+										} catch (Exception ex) {
+											Logger.error(this, ExceptionUtils.getStackTrace(ex));
+										}
+									}
+								}
+							});
+				}
+				public void onDisconnected(WebSocket websocket,
+										   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
+										   boolean closedByServer) {
+					if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
+						Logger.info(this, "Connection to Twitch IRC lost (WebSocket)! Retrying ...");
+
+						// connection lost - reconnecting
+						reconnect();
+					} else {
+						setConnectionState(TMIConnectionState.DISCONNECTED);
+						Logger.info(this, "Disconnected from Twitch IRC (WebSocket)!");
+					}
+				}
+			});
+
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 	}
 	/**
@@ -209,24 +221,38 @@ public class TwitchChat {
 	 * Connecting to IRC-WS
 	 */
 	public void connect() {
+		// Lock
+		wsLock.lock();
+
 		if (getConnectionState().equals(TMIConnectionState.DISCONNECTED) || getConnectionState().equals(TMIConnectionState.RECONNECTING)) {
 			try {
+				// Change Connection State
+				setConnectionState(TMIConnectionState.CONNECTING);
+
 				// Get Credential from CredentialManager
-				this.credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC();
+				credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC();
 				Assert.isTrue(credential.isPresent(), "No valid IRC Credential!");
 
 				// Recreate Socket if state does not equal CREATED
-				if(!ws.getState().equals(WebSocketState.CREATED)) {
-					createWebSocket();
-				}
+				createWebSocket();
 
 				// Connect to IRC WebSocket
 				this.ws.connect();
+				wsLock.unlock();
 
 				// Message Bucket
 				updateMessageBucket();
 			} catch (Exception ex) {
-				Logger.error(this, "Connection to Twitch IRC failed: %s", ex.getMessage());
+				Logger.error(this, "Connection to Twitch IRC failed: %s - Retrying ...", ex.getMessage());
+
+				try {
+					Thread.sleep(1000);
+				} catch (Exception et) {
+					et.printStackTrace();
+				}
+
+				wsLock.unlock();
+				reconnect();
 			}
 		}
 	}
@@ -235,13 +261,21 @@ public class TwitchChat {
 	 * Disconnecting from IRC-WS
 	 */
 	public void disconnect() {
-		if (getConnectionState().equals(TMIConnectionState.CONNECTED)) {
-			Logger.info(this, "Disconnecting from Twitch IRC (WebSocket)!");
+		wsLock.lock();
 
+		if (getConnectionState().equals(TMIConnectionState.CONNECTED)) {
 			setConnectionState(TMIConnectionState.DISCONNECTING);
 			sendCommand("QUIT"); // safe disconnect
 		}
+
+		setConnectionState(TMIConnectionState.DISCONNECTED);
+
+		// CleanUp
+		this.ws.clearListeners();
 		this.ws.disconnect();
+		this.ws = null;
+
+		wsLock.unlock();
 	}
 
 	/**
@@ -276,9 +310,16 @@ public class TwitchChat {
 		if (getConnectionState().equals(TMIConnectionState.CONNECTED) || getConnectionState().equals(TMIConnectionState.CONNECTING)) {
 			// command will be uppercase.
 			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+		} else {
+			Logger.warn(this, String.format("Can't send IRC-WS Command [%s %s]", command.toUpperCase(), String.join(" ", args)));
 		}
 	}
 
+	/**
+	 * Answer to twitch's ping request
+	 *
+	 * @param arg
+	 */
 	public void sendPong(String arg) {
 		sendCommand("PONG", arg);
 	}
@@ -314,9 +355,7 @@ public class TwitchChat {
 			channelCache.put(channel, new ChannelCache(this, channel));
 
 			Logger.debug(this, "Joining Channel [%s].", channel);
-		}
 
-		if (isModerator(channel)) {
 			TokenBucket modBucket = TokenBuckets.builder()
 					.withCapacity(100)
 					.withFixedIntervalRefillStrategy(1, 300, TimeUnit.MILLISECONDS)
@@ -361,9 +400,7 @@ public class TwitchChat {
 			}
 
 			// Send Message
-			if (channelCache.containsKey(channel)) {
-				sendCommand("privmsg", "#" + channel, message);
-			}
+			sendCommand("privmsg", "#" + channel, ":" + message);
 
 			// Logging
 			Logger.debug(this, "Message send to Channel [%s] with content [%s].", channel, message);
