@@ -4,7 +4,6 @@ package me.philippheuer.twitch4j.message;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.PubSubTopics;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.message.irc.TwitchChat;
@@ -69,20 +68,20 @@ public class MessageInterface {
 		pubSub.reconnect();
 	}
 
-	/**
-	 * Checking join channel status
-	 * @param channel Channel name
-	 * @return bot has been joined to this channel
-	 */
-	public boolean isJoined(String channel) {
-		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
-		// syncing channels
-		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
-		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
-
-		return (twitchChat.getConnectionState().equals(TMIConnectionState.CONNECTED) && pubSub.getConnectionState().equals(TMIConnectionState.CONNECTED)) &&
-				(twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch));
-	}
+//	/**
+//	 * Checking join channel status
+//	 * @param channel Channel name
+//	 * @return bot has been joined to this channel
+//	 */
+//	public boolean isJoined(String channel) {
+//		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+//		// syncing channels
+//		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
+//		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
+//
+//		return (twitchChat.getConnectionState().equals(TMIConnectionState.CONNECTED) && pubSub.getConnectionState().equals(TMIConnectionState.CONNECTED)) &&
+//				(twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch));
+//	}
 
 	/**
 	 * Sending message to the joined channel
@@ -109,7 +108,7 @@ public class MessageInterface {
 	public void joinChannel(String channel) {
 		twitchChat.joinChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
-		pubSub.listenChannel(ch, true);
+//		pubSub.listenChannel(ch, true);
 	}
 
 	/**
@@ -119,6 +118,6 @@ public class MessageInterface {
 	public void partChannel(String channel) {
 		twitchChat.partChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
-		pubSub.unlistenChannel(ch);
+//		pubSub.unlistenChannel(ch);
 	}
 }
