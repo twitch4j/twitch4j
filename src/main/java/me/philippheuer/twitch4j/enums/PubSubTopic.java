@@ -38,4 +38,10 @@ public enum PubSubTopic {
     public boolean isRequiredScope(Set<String> scopes) {
         return scopes.size() != 1 || scopes.stream().map(scope -> scope.equals(this.scopes.get(0).getKey())).toArray().length > 0;
     }
+
+    public static PubSubTopic getTopicFromString(String topic) {
+    	PubSubTopic[] topics = (PubSubTopic[]) Arrays.stream(PubSubTopic.values())
+				.filter(psTopic -> psTopic.prefix.equals(topic.split(".")[0])).toArray();
+    	return topics[0];
+	}
 }

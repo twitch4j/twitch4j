@@ -1,8 +1,8 @@
 package me.philippheuer.twitch4j.message.pubsub.topics;
 
+import me.philippheuer.twitch4j.enums.PubSubTopic;
 import lombok.Getter;
 import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.enums.PubSubTopic;
 
 import java.util.Optional;
 

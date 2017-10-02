@@ -1,7 +1,7 @@
 package me.philippheuer.twitch4j.message.pubsub.topics;
 
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.PubSubTopic;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 
 import java.util.Optional;
 

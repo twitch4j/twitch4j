@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.message.pubsub;
+package me.philippheuer.twitch4j.exceptions;
 
 import me.philippheuer.twitch4j.message.pubsub.topics.PubSubTopics;
 

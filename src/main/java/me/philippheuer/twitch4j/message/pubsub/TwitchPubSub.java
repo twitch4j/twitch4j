@@ -120,7 +120,7 @@ public class TwitchPubSub {
     /**
      * Method: Check PubSub Socket Status
      *
-     * @return <b>TRUE</b>: The socket is connected.<br><b>FALSE</b>: There are problems with the PubSub endpoint.
+     * @return <b>TRUE</b>: The socket is connected. <br> <b>FALSE</b>: There are problems with the PubSub endpoint.
      */
     public boolean checkEndpointStatus() {
         return getConnectionState().equals(TMIConnectionState.CONNECTED);
