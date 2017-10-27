@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 @Data
-@Getter
 @EqualsAndHashCode(callSuper = false)
 public class AbstractChannelEvent extends Event {
 
