@@ -6,19 +6,14 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.AuthTokenExpiredEvent;
-import me.philippheuer.util.desktop.WebsiteUtils;
+import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.streamlabs.enums.StreamlabsScopes;
 import me.philippheuer.twitch4j.streamlabs.model.User;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import me.philippheuer.util.desktop.WebsiteUtils;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Getter

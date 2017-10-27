@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import net.jodah.typetools.TypeResolver;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -252,12 +251,9 @@ public class EventDispatcher {
 											}
 										} catch (IllegalAccessException ex) {
 											Logger.error(this, "Error dispatching event %s", event.getClass().getSimpleName());
-										} catch (InvocationTargetException ex) {
-											ex.printStackTrace();
-											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName()); // e.getCause()
 										} catch (Exception ex) {
 											ex.printStackTrace();
-											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName());
+											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName()); // e.getCause()
 										}
 									})));
 

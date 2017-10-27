@@ -2,7 +2,6 @@ package me.philippheuer.twitch4j.test.endpoints;
 
 import me.philippheuer.twitch4j.model.tmi.Chatter;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
-import me.philippheuer.util.annotation.Unofficial;
 import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

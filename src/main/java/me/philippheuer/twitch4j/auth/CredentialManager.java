@@ -8,14 +8,17 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
-import me.philippheuer.twitch4j.events.event.AuthTokenExpiredEvent;
+import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
 import java.io.File;
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**

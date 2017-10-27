@@ -74,9 +74,12 @@ and:
  - [x] StreamLabs
  
 #### Twitch REST Endpoints
+ - [ ] Bits
  - [ ] Channel Feed
  - [x] Channels
  - [ ] Chat
+ - [ ] Clips
+ - [ ] Collections
  - [x] Communities (Released: 10.02.2017)
  - [x] Games
  - [x] Ingests
@@ -87,12 +90,28 @@ and:
  - [x] Videos
 
 #### Twitch PubSub
- - [ ] Bits
- - [ ] Whispers
+ - [x] Bits
+ - [x] Whispers
+ - [x] Subscriptions
+ - [x] Stream Status - *Unofficial*
+ - [x] Moderation Action (from specified moderator in specified channel) - *Unofficial*
  
-#### Twitch IRC
+#### Twitch IRC (WebSocket)
  - [x] Subscriptions
  - [x] Cheers (Bits)
+ - [x] `/me` interactions chat
+ - [x] `/color` changer
+ - [x] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
+   - [x] Ban (with reason)
+   - [x] Timeout (with reason)
+   - [x] Slow mode
+   - [x] Sub mode
+   - [x] Follow mode
+   - [x] R9K mode
+   - [x] Emote Only mode
+ - [x] Channel Editor
+   - [x] Commercial
+   - [x] Host mode
 
 #### 3rd Party
 ##### [Streamlabs](https://streamlabs.com/)
@@ -120,12 +139,13 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 
 ### Client Builder (Twitch Standalone)
 ```java
-TwitchClient twitchClient = TwitchClient.builder()
-	.clientId("Twitch App ID")
-	.clientSecret("Twitch App SECRET")
-	.configurationAutoSave(true)
-	.configurationDirectory(new File("").getAbsolutePath())
-	.build();
+TwitchClient twitchClient = TwitchClientBuilder.builder()
+	.setClientId("Twitch App Id")
+	.setClientSecret("Twitch App Secret")
+	.setAutoSaveConfiguration(true)
+	.setConfigurationDirectory(new File("config"))
+	.setIrcCredential("ixsxu9123xzmlx798xooa3f91q1e9c") // Get your token at: https://twitchapps.com/tmi/
+	.connect();
 ```
 
 ### Get User Id from UserName

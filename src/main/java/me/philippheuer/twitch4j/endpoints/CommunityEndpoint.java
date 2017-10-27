@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.Community;
 import me.philippheuer.twitch4j.model.CommunityCreate;
 import me.philippheuer.twitch4j.model.CommunityList;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -17,8 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Getter
 @Setter
@@ -43,7 +43,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Community getCommunityByName(String name) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/communities", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameter
@@ -57,7 +57,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -73,7 +74,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Community getCommunityById(String id) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities/%s", getTwitchClient().getTwitchEndpoint(), id);
+		String requestUrl = String.format("%s/communities/%s", Endpoints.API.getURL(), id);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -84,7 +85,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -104,7 +106,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public String createCommunity(OAuthCredential credential, String name, String summary, String description, String rules) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/communities", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Post Data
@@ -122,7 +124,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -143,7 +146,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public void updateCommunity(OAuthCredential credential, String id, Optional<String> name, Optional<String> summary, Optional<String> description, Optional<String> rules, Optional<String> email) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities/%s", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/communities/%s", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Post Data
@@ -159,7 +162,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return;
@@ -176,7 +180,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public CommunityList getTopCommunities(Optional<Long> limit, Optional<String> cursor) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities/top", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/communities/top", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -191,7 +195,8 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -258,7 +263,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @return Whether the given name is a valid community name.
 	 */
 	private Boolean validateCommunityName(String name) {
-		String regex = "[A-Za-z\\-\\.\\_\\~]{3,25}";
+		String regex = "[A-Za-z\\x2D\\x2E\\x5F\\x7E]{3,25}"; // using ASCII characters
 
 		if(name.matches(regex)) {
 			return true;

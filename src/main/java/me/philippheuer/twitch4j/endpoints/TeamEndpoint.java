@@ -4,11 +4,13 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.RestError;
 import me.philippheuer.twitch4j.model.Team;
 import me.philippheuer.twitch4j.model.TeamList;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -38,7 +40,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Team> getTeams(Optional<Long> limit, Optional<Long> offset) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/teams", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -54,7 +56,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -70,7 +73,7 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Team> getTeam(String teamName) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams/%s", getTwitchClient().getTwitchEndpoint(), teamName);
+		String requestUrl = String.format("%s/teams/%s", Endpoints.API.getURL(), teamName);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -88,7 +91,8 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 				return Optional.empty();
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		throw new RuntimeException("Unhandled Exception!");

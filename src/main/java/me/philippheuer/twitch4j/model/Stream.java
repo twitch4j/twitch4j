@@ -8,7 +8,6 @@ import lombok.Data;
 
 import java.time.Duration;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Model representing a stream.

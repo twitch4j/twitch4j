@@ -44,20 +44,11 @@ dependencies {
 	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
 	// Spring (RestTemplate)
-	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.9.RELEASE'
+	compile group: 'org.springframework', 			name: 'spring-web', 			version: '5.0.0.RELEASE'
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
-	// WebSocket Client for Twitch PubSub
+	// WebSocket Client for Twitch PubSub and Twitch IRC
 	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.3'
-
-	// IRC Client [https://github.com/KittehOrg/KittehIRCClientLib]
-	compile group: 'org.kitteh.irc', 				name: 'client-lib', 			version: '3.2.0'
-	// - Transitive Dependency Conflict: Ratpack <-> Kitteh IRC Client
-	compile group: 'io.netty', 						name: 'netty-codec-http', 		version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-codec', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-handler', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-common', 			version: '4.1.13.Final'
-	compile group: 'io.netty', 						name: 'netty-transport-native-epoll', version: '4.1.13.Final'
 
 	// Apache Commons
 	// - Lang
@@ -66,7 +57,7 @@ dependencies {
 	compile group: 'commons-io',					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr4'
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.2'
 
 	// Bucket for rate-limiting
 	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'

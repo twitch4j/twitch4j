@@ -5,8 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Token;
+import me.philippheuer.twitch4j.model.TokenResponse;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Getter
@@ -33,7 +36,7 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Token getToken(OAuthCredential credential) {
 		// Endpoint
-		String requestUrl = String.format("%s", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// REST Request
@@ -44,7 +47,8 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		// Default Response: Invalid Token

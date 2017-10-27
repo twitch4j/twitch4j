@@ -5,9 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Video getVideo(String videoId) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/%s", getTwitchClient().getTwitchEndpoint(), videoId);
+		String requestUrl = String.format("%s/videos/%s", Endpoints.API.getURL(), videoId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -48,7 +50,8 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -65,7 +68,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Video> getTopVideos(Optional<Game> game, Optional<String> period, Optional<String> broadcast_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/top", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/videos/top", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -83,7 +86,8 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 			RestError restError = restException.getRestError();
 			Logger.error(this, "RestException: " + restError.toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		throw new RuntimeException("Unhandled Exception!");
@@ -100,7 +104,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Video> getFollowedVideos(OAuthCredential oAuthCredential, Optional<String> broadcast_type) {
 		// Endpoint
-		String requestUrl = String.format("%s/videos/followed", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/videos/followed", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(oAuthCredential);
 
 		// Parameters
@@ -115,7 +119,8 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

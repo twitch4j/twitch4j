@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Model representing a list of recommendations.

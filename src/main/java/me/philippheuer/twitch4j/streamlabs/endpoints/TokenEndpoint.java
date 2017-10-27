@@ -3,13 +3,9 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.streamlabs.Authorize;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import me.philippheuer.twitch4j.streamlabs.model.User;
-import me.philippheuer.twitch4j.streamlabs.model.UserResponse;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -35,7 +31,7 @@ public class TokenEndpoint extends AbstractStreamlabsEndpoint {
 	 * @param grant_type Valid values: authorization_code or refresh_token.
 	 * @param redirect_url Redirect url.
 	 * @param code authentication_code or refresh_token
-	 * @return
+	 * @return {@link Authorize} data on {@link Optional} container class
 	 */
 	public Optional<Authorize> getToken(String grant_type, String redirect_url, String code) {
 		// Endpoint

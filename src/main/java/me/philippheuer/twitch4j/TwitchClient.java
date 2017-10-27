@@ -1,24 +1,19 @@
 package me.philippheuer.twitch4j;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.chat.IrcClient;
-import me.philippheuer.twitch4j.chat.commands.CommandHandler;
 import me.philippheuer.twitch4j.endpoints.*;
 import me.philippheuer.twitch4j.events.EventDispatcher;
+import me.philippheuer.twitch4j.message.MessageInterface;
+import me.philippheuer.twitch4j.message.commands.CommandHandler;
+import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-import me.philippheuer.twitch4j.pubsub.TwitchPubSub;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import org.springframework.util.Assert;
 
 import java.io.File;
-
-import static me.philippheuer.twitch4j.auth.CredentialManager.CREDENTIAL_IRC;
 
 /**
  * TwitchClient is the core class for all api operations.
@@ -48,17 +43,12 @@ public class TwitchClient {
 	/**
 	 * RestClient to build the rest requests
 	 */
-	private RestClient restClient = new RestClient();
+	private final RestClient restClient = new RestClient();
 
 	/**
 	 * Twitch IRC Client
 	 */
-	private IrcClient ircClient;
-
-	/**
-	 * Twitch PubSub Client
-	 */
-	private TwitchPubSub pubSub;
+	private final MessageInterface messageInterface = new MessageInterface(this);
 
 	/**
 	 * Integration: Streamlabs Client
@@ -66,29 +56,9 @@ public class TwitchClient {
 	private StreamlabsClient streamLabsClient;
 
 	/**
-	 * Twitch API Endpoint
-	 */
-	public final String twitchEndpoint = "https://api.twitch.tv/kraken";
-
-	/**
 	 * Twitch API Version
 	 */
 	public final int twitchEndpointVersion = 5;
-
-	/**
-	 * Twitch TMI Endpoint
-	 */
-	public final String twitchMessagingInterfaceEndpoint = "http://tmi.twitch.tv";
-
-	/**
-	 * Twitch PubSub Endpoint
-	 */
-	public final String twitchPubSubEndpoint = "wss://pubsub-edge.twitch.tv";
-
-	/**
-	 * Twitch IRC Endpoint
-	 */
-	public final String twitchIrcEndpoint = "irc.chat.twitch.tv:443";
 
 	/**
 	 * Twitch Application - Client Id
@@ -124,77 +94,21 @@ public class TwitchClient {
 	 * @param clientSecret Twitch Application - Secret
 	 */
 	public TwitchClient(String clientId, String clientSecret) {
-		super();
-
-		setClientId(clientId);
-		setClientSecret(clientSecret);
+		this.clientId = clientId;
+		this.clientSecret = clientSecret;
 
 		// Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
 
 		// EventSubscribers
-		getDispatcher().registerListener(getCommandHandler());
-
+		// - Commands
+		dispatcher.registerListener(getCommandHandler());
+		// - IRC Event Listeners
+		dispatcher.registerListener(new IRCEventListener(this));
 		// Initialize REST Client
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Accept", String.format("application/vnd.twitchtv.v5+json", getTwitchEndpointVersion())));
-		getRestClient().putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
-	}
-
-	/**
-	 * Builder to get a TwitchClient Instance by provided varius options, to provide the user with a lot of customizable options.
-	 *
-	 * @param clientId Twitch Application - Id
-	 * @param clientSecret Twitch Application - Secret
-	 * @param configurationDirectory The directory the configuraton files should be stored in.
-	 * @param configurationAutoSave Whether the configuration should be saved automatically.
-	 * @param streamlabsClient The streamlabs client instance, to enable streamlabs related events and requests.
-	 * @param ircCredential The irc credential to use for chat messages. Should only be provided for bots.
-	 * @return A new twitch client instance, that will be initalized with the specified options.
-	 */
-	@Builder(builderMethodName = "builder")
-	public static TwitchClient twitchClientBuilder(String clientId, String clientSecret, String configurationDirectory, Boolean configurationAutoSave, StreamlabsClient streamlabsClient, OAuthCredential ircCredential) {
-		// Reqired Parameters
-		Assert.notNull(clientId, "You need to provide a client id!");
-		Assert.notNull(clientSecret, "You need to provide a client secret!");
-
-		// Initialize instance
-		final TwitchClient twitchClient = new TwitchClient(clientId, clientSecret);
-		twitchClient.getCredentialManager().provideTwitchClient(twitchClient);
-
-		// Optional Parameters
-		if (streamlabsClient != null) {
-			twitchClient.setStreamLabsClient(streamlabsClient);
-			twitchClient.getCredentialManager().provideStreamlabsClient(twitchClient.getStreamLabsClient());
-		}
-
-		if (configurationAutoSave != null) {
-			twitchClient.getCredentialManager().setSaveCredentials(configurationAutoSave);
-		} else {
-			twitchClient.getCredentialManager().setSaveCredentials(false);
-		}
-
-		if (configurationDirectory != null) {
-			twitchClient.setConfigurationDirectory(new File(configurationDirectory));
-
-			// Create ConfigurationDirectory, if it does not exist
-			twitchClient.getConfigurationDirectory().mkdirs();
-
-			// Initialize Managers dependening on the configuration
-			twitchClient.getCredentialManager().initializeConfiguration();
-			twitchClient.getCommandHandler().initializeConfiguration();
-		}
-
-		// Credentials
-		if (ircCredential != null) {
-			twitchClient.getCredentialManager().addTwitchCredential(CREDENTIAL_IRC, ircCredential);
-		}
-
-		// Connect to API Endpoints
-		twitchClient.connect();
-
-		// Return builded instance
-		return twitchClient;
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
+		restClient.putRestInterceptor(new HeaderRequestInterceptor("Client-ID", getClientId()));
 	}
 
 	/**
@@ -204,11 +118,7 @@ public class TwitchClient {
 	 * Connect needs to be called after initalizing the {@link CredentialManager}.
 	 */
 	public void connect() {
-		// Init IRC
-		setIrcClient(new IrcClient(this));
-
-		// Init PubSub API
-		setPubSub(new TwitchPubSub(this));
+		getMessageInterface().connect();
 	}
 
 	/**
@@ -217,8 +127,7 @@ public class TwitchClient {
 	 * This methods closes the connection to the twitch irc server and the pubsub endpoint.
 	 */
 	public void disconnect() {
-		getIrcClient().disconnect();
-		getPubSub().disconnect();
+		getMessageInterface().disconnect();
 	}
 
 	/**
@@ -227,8 +136,7 @@ public class TwitchClient {
 	 * This methods reconnects to the twitch irc server and the pubsub endpoint.
 	 */
 	public void reconnect() {
-		disconnect();
-		connect();
+		getMessageInterface().reconnect();
 	}
 
 	/**

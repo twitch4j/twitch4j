@@ -4,9 +4,11 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
 import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -36,7 +38,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Channel> getChannels(String query, Optional<Long> limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/channels", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/channels", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -51,7 +53,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -68,7 +71,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Game> getGames(String query, Optional<Boolean> live) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/games", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/games", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -83,7 +86,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -100,7 +104,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Stream> getStreams(String query, Optional<Long> limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/streams", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/search/streams", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -116,7 +120,8 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

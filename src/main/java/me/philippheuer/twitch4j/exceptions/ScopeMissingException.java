@@ -11,6 +11,6 @@ public class ScopeMissingException extends RuntimeException {
 
 	public ScopeMissingException(String scope) {
 		super(String.format("Access to Scope %s denied!", scope));
-		setScope(scope);
+		this.scope = scope;
 	}
 }

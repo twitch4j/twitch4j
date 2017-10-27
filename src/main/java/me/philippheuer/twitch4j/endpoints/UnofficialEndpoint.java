@@ -4,13 +4,10 @@ import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.model.TopGame;
-import me.philippheuer.twitch4j.model.TopGameList;
 import me.philippheuer.twitch4j.model.unofficial.AdvancedChannelInformation;
 import me.philippheuer.twitch4j.model.unofficial.Ember;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -28,6 +25,7 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets the primary team for a channel, which is displayed in the channel.
 	 *
+	 * @param userName Twitch username
 	 * @return todo
 	 */
 	public Ember getEmber(String userName) {
@@ -42,7 +40,8 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -51,6 +50,7 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets the steam profile id, if the streamer has linked his steam account.
 	 *
+	 * @param userName Twitch username
 	 * @return todo
 	 */
 	public String getConnectedSteamProfile(String userName) {
@@ -65,7 +65,8 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getSteamId();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

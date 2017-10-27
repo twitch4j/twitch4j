@@ -5,12 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.ChannelFeed;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
-import me.philippheuer.twitch4j.model.CommunityCreate;
 import me.philippheuer.twitch4j.model.Void;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +44,7 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<ChannelFeedPost> getFeedPosts(Long channelId, Optional<Long> limit, Optional<String> cursor, Optional<Long> commentLimit) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts", getTwitchClient().getTwitchEndpoint(), channelId);
+		String requestUrl = String.format("%s/feed/%s/posts", Endpoints.API.getURL(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -60,7 +61,8 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return new ArrayList<ChannelFeedPost>();
@@ -76,7 +78,7 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public ChannelFeedPost getFeedPost(Long channelId, String postId, Optional<Long> commentLimit) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts/%s", getTwitchClient().getTwitchEndpoint(), channelId, postId);
+		String requestUrl = String.format("%s/feed/%s/posts/%s", Endpoints.API.getURL(), channelId, postId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// Parameters
@@ -91,7 +93,8 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -103,11 +106,13 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 * Requires the Twitch *channel_feed_edit* Scope.
 	 *
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param channelId
+	 * @param channelId Channel ID
+	 * @param message message to feed
+	 * @param share Share to Twitter if is connected
 	 */
 	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
 		// Endpoint
-		String requestUrl = String.format("%s//feed/%s/posts", getTwitchClient().getTwitchEndpoint(), channelId);
+		String requestUrl = String.format("%s//feed/%s/posts", Endpoints.API.getURL(), channelId);
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
 
 		// Parameters
@@ -123,7 +128,8 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 		} catch (RestException restException) {
 			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 	}
 

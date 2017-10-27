@@ -1,13 +1,16 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.jcabi.log.Logger;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.model.TopGame;
+import me.philippheuer.twitch4j.model.TopGameList;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +34,7 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<TopGame> getTopGames() {
 		// Endpoint
-		String requestUrl = String.format("%s/games/top", getTwitchClient().getTwitchEndpoint());
+		String requestUrl = String.format("%s/games/top", Endpoints.API.getURL());
 		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
 
 		// REST Request
@@ -41,7 +44,8 @@ public class GameEndpoint extends AbstractTwitchEndpoint {
 
 			return responseObject.getTop();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			Logger.error(this, "Request failed: " + ex.getMessage());
+			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;

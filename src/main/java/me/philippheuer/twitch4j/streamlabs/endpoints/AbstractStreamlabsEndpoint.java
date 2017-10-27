@@ -3,8 +3,6 @@ package me.philippheuer.twitch4j.streamlabs.endpoints;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
