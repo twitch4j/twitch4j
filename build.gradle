@@ -44,7 +44,7 @@ dependencies {
 	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
 
 	// Spring (RestTemplate)
-	compile group: 'org.springframework', 			name: 'spring-web', 			version: '4.3.9.RELEASE'
+	compile group: 'org.springframework', 			name: 'spring-web', 			version: '5.0.0.RELEASE'
 	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
 
 	// WebSocket Client for Twitch PubSub and Twitch IRC
@@ -57,7 +57,7 @@ dependencies {
 	compile group: 'commons-io',					name: 'commons-io', 			version: '2.5'
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.0.pr4'
+	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.2'
 
 	// Bucket for rate-limiting
 	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'
