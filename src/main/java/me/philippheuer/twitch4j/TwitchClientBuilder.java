@@ -1,14 +1,15 @@
 package me.philippheuer.twitch4j;
 
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import lombok.*;
+import lombok.experimental.Wither;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
@@ -16,9 +17,10 @@ import java.io.File;
  * @version %I%, %G%
  * @since 1.0
  */
-@Setter
-@NoArgsConstructor
-@Accessors(chain = true, prefix = "with")
+@Getter
+@Wither
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchClientBuilder {
 
 	/**
@@ -53,6 +55,11 @@ public class TwitchClientBuilder {
 	private StreamlabsClient streamlabsClient = null;
 
 	/**
+	 * List of listeners
+	 */
+	private final Set<Object> listeners = new HashSet<>();
+
+	/**
 	 * Initializing builder
 	 * @return Client Builder
 	 */
@@ -82,8 +89,7 @@ public class TwitchClientBuilder {
 			client.getCommandHandler().initializeConfiguration();
 		}
 
-		if (credential != null)
-		{
+		if (credential != null) {
 			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC,
 					new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential));
 		}
@@ -94,7 +100,16 @@ public class TwitchClientBuilder {
 			client.getCredentialManager().provideStreamlabsClient(client.getStreamLabsClient());
 		}
 
+		if (listeners.size() > 0) {
+			listeners.forEach(client.getDispatcher()::registerListener);
+		}
+
 		return client;
+	}
+
+	public TwitchClientBuilder addListener(Object listener) {
+		listeners.add(listener);
+		return this;
 	}
 
 	/**
