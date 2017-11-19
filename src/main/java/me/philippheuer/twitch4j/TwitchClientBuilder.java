@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j;
 
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import me.philippheuer.twitch4j.auth.CredentialManager;
@@ -15,7 +15,8 @@ import java.io.File;
  * @author Damian Staszewski
  */
 @Setter
-@Accessors(chain = true)
+@NoArgsConstructor
+@Accessors(chain = true, prefix = "with")
 public class TwitchClientBuilder {
 
 	/**
@@ -26,12 +27,12 @@ public class TwitchClientBuilder {
 	/**
 	 * Client Secret
 	 */
-	private String clientSecret;
+	private String secret;
 
 	/**
 	 * IRC Credential
 	 */
-	private String ircCredential;
+	private String credential;
 
 	/**
 	 * Auto Saving Configuration
@@ -47,7 +48,6 @@ public class TwitchClientBuilder {
 	 * StreamLabs Client
 	 * TODO: Remove
 	 */
-	@Getter
 	private StreamlabsClient streamlabsClient = null;
 
 	/**
@@ -59,23 +59,15 @@ public class TwitchClientBuilder {
 	}
 
 	/**
-	 * Builder
-	 */
-	private TwitchClientBuilder()
-	{
-
-	}
-
-	/**
 	 * Initialize
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient build() {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
-		Assert.notNull(clientSecret, "You need to provide a client secret!");
+		Assert.notNull(secret, "You need to provide a client secret!");
 
-		final TwitchClient client = new TwitchClient(clientId, clientSecret);
+		final TwitchClient client = new TwitchClient(clientId, secret);
 		client.getCredentialManager().provideTwitchClient(client);
 		client.getCredentialManager().setSaveCredentials(autoSaveConfiguration);
 		if (configurationDirectory != null) {
@@ -88,14 +80,15 @@ public class TwitchClientBuilder {
 			client.getCommandHandler().initializeConfiguration();
 		}
 
-		if (ircCredential != null)
+		if (credential != null)
 		{
-			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, new OAuthCredential(ircCredential));
+			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC,
+					new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential));
 		}
 
 		// Streamlabs
-		if(getStreamlabsClient() != null) {
-			client.setStreamLabsClient(getStreamlabsClient());
+		if(streamlabsClient != null) {
+			client.setStreamLabsClient(streamlabsClient);
 			client.getCredentialManager().provideStreamlabsClient(client.getStreamLabsClient());
 		}
 
@@ -107,6 +100,7 @@ public class TwitchClientBuilder {
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient connect() {
+		Assert.notNull(credential, "You need provide a OAuth Credentials for Bot. Use: https://twitchapps.com/tmi/ to generate oauth key");
 		TwitchClient client = build();
 		client.connect();
 		return client;
