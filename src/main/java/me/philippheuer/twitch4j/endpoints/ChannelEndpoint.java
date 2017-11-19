@@ -333,19 +333,18 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Subscription> getSubscriptions(Optional<Long> limit, Optional<Long> offset, Optional<String> direction) {
 		// Check Scope
-		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
-		if (twitchCredential.isPresent()) {
+		if (getChannel().getTwitchCredential().isPresent()) {
 			Set<String> requiredScopes = new HashSet<String>();
 			requiredScopes.add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
 
-			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
+			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
 		} else {
 			throw new ChannelCredentialMissingException(getChannelId());
 		}
 
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions", Endpoints.API.getURL(), getChannelId());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get());
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
@@ -390,7 +389,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions/%d", Endpoints.API.getURL(), getChannelId(), user.getId());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get());
 
 		// REST Request
 		try {
@@ -501,7 +500,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/channels/%s/stream_key", Endpoints.API.getURL(), getChannelId());
-			getTwitchClient().getRestClient().getRestTemplate().delete(requestUrl);
+			getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get()).delete(requestUrl);
 
 			return true;
 		} catch (Exception ex) {
@@ -541,7 +540,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void timeout(String user, Duration duration) {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
 	}
-// TODO: moving to TMI
+	// TODO: moving to TMI
+
 	/**
 	 * IRC: Purge Chat of User
 	 * Clears all messages in a channel.
@@ -551,7 +551,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void purgeChat(String user) {
 		timeout(user, Duration.ofSeconds(1));
 	}
-// TODO: moving to TMI
+
+	// TODO: moving to TMI
 	/**
 	 * IRC: Purge Chat
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
