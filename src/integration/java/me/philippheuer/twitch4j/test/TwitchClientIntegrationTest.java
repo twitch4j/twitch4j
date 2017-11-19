@@ -44,8 +44,8 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 		// Initalize the Client a single time
 		if(twitchClient == null) {
 			twitchClient = TwitchClientBuilder.init()
-					.setClientId("jzkbprff40iqj646a697cyrvl0zt2m6")
-					.setClientSecret("**SECRET**")
+					.withClientId("jzkbprff40iqj646a697cyrvl0zt2m6")
+					.withSecret("**SECRET**")
 					.build();
 		}
 	}
