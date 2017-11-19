@@ -31,7 +31,7 @@ public class TwitchClientBuilder {
 	/**
 	 * Client Secret
 	 */
-	private String secret;
+	private String clientSecret;
 
 	/**
 	 * IRC Credential
@@ -74,9 +74,9 @@ public class TwitchClientBuilder {
 	public TwitchClient build() {
 		// Reqired Parameters
 		Assert.notNull(clientId, "You need to provide a client id!");
-		Assert.notNull(secret, "You need to provide a client secret!");
+		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
-		final TwitchClient client = new TwitchClient(clientId, secret);
+		final TwitchClient client = new TwitchClient(clientId, clientSecret);
 		client.getCredentialManager().provideTwitchClient(client);
 		client.getCredentialManager().setSaveCredentials(autoSaveConfiguration);
 		if (configurationDirectory != null) {
@@ -107,7 +107,7 @@ public class TwitchClientBuilder {
 		return client;
 	}
 
-	public TwitchClientBuilder addListener(Object listener) {
+	public TwitchClientBuilder withListener(Object listener) {
 		listeners.add(listener);
 		return this;
 	}
@@ -117,7 +117,7 @@ public class TwitchClientBuilder {
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient connect() {
-		Assert.notNull(credential, "You need provide a OAuth Credentials for Bot. Use: https://twitchapps.com/tmi/ to generate oauth key");
+		Assert.notNull(credential, "You need provide a OAuth Credentials for the Bot. Use: https://twitchapps.com/tmi/ to generate a oauth key.");
 		TwitchClient client = build();
 		client.connect();
 		return client;

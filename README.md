@@ -140,11 +140,11 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 ### Client Builder (Twitch Standalone)
 ```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
-	.setClientId("Twitch App Id")
-	.setClientSecret("Twitch App Secret")
-	.setAutoSaveConfiguration(true)
-	.setConfigurationDirectory(new File("config"))
-	.setIrcCredential("ixsxu9123xzmlx798xooa3f91q1e9c") // Get your token at: https://twitchapps.com/tmi/
+	.withClientId("Twitch App Id")
+	.withClientSecret("Twitch App Secret")
+	.withAutoSaveConfiguration(true)
+	.withConfigurationDirectory(new File("config"))
+	.withCredential("ixsxu9123xzmlx798xooa3f91q1e9c") // Get your token at: https://twitchapps.com/tmi/
 	.connect();
 ```
 
