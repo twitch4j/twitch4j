@@ -12,7 +12,9 @@ import java.io.File;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
- * @author Damian Staszewski
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
  */
 @Setter
 @NoArgsConstructor
