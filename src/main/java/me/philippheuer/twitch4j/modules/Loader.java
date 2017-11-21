@@ -81,7 +81,7 @@ public class Loader {
 	}
 
 	public boolean loadModule(IModule module) {
-		if (!loadedModules.contains(module)) {
+		if (loadedModules.contains(module)) {
 			return false;
 		}
 		Class<? extends IModule> clazz = module.getClass();
