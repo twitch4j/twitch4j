@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.modules;
 
 import com.jcabi.log.Logger;
+import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.event.system.modules.ModuleDisabledEvent;
 import me.philippheuer.twitch4j.events.event.system.modules.ModuleEnabledEvent;
@@ -26,11 +27,13 @@ import java.util.stream.Collectors;
 
 public class Loader {
 
-	public static final String MODULE_DIR = "modules";
+	@Getter
 	protected static final List<Class<? extends IModule>> modules = new CopyOnWriteArrayList<>();
+	public static final String MODULE_DIR = "modules";
 
-	private TwitchClient client;
+	@Getter
 	private List<IModule> loadedModules = new CopyOnWriteArrayList<>();
+	private TwitchClient client;
 
 	static {
 		if (Config.LOAD_EXTERNAL_MODULES) {
@@ -47,7 +50,7 @@ public class Loader {
 
 			File[] files = modulesDir.listFiles((FilenameFilter) FileFilterUtils.suffixFileFilter("jar"));
 			if (files != null && files.length > 0) {
-				Logger.info(Loader.class, "Attempting to load {} external module(s)...", files.length);
+				Logger.info(Loader.class, "Attempting to load %d external module(s)...", files.length);
 				loadExternalModules(Arrays.asList(files));
 			}
 		}
@@ -62,7 +65,7 @@ public class Loader {
 				Logger.info(this, "Loading module %s v%s by %s", module.getName(), module.getVersion(), module.getAuthor());
 				loadedModules.add(module);
 			} catch (InstantiationException | IllegalAccessException e) {
-				Logger.error(this, "Unable to load module %s! - %s", clazz.getName(), ExceptionUtils.getStackTrace(e));
+				Logger.error(this, "Unable to load module %s!", clazz.getName(), ExceptionUtils.getStackTrace(e));
 			}
 		}
 
@@ -75,14 +78,6 @@ public class Loader {
 				}
 			}
 		}
-	}
-
-	public List<IModule> getLoadedModules() {
-		return loadedModules;
-	}
-
-	public static List<Class<? extends IModule>> getModules() {
-		return modules;
 	}
 
 	public boolean loadModule(IModule module) {
@@ -135,6 +130,7 @@ public class Loader {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static synchronized void loadExternalModules(File file) { // A bit hacky, but oracle be dumb and encapsulates URLClassLoader#addUrl()
 		if (file.isFile() && file.getName().endsWith(".jar")) { // Can't be a directory and must be a jar
 			try (JarFile jar = new JarFile(file)) {
@@ -176,7 +172,7 @@ public class Loader {
 					}
 				}
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | ClassNotFoundException e) {
-				Logger.error(Loader.class, "Unable to load module %s! - %s", file.getName(), ExceptionUtils.getStackTrace(e));
+				Logger.error(Loader.class, "Unable to load module %s!", file.getName(), ExceptionUtils.getStackTrace(e));
 			}
 		}
 	}
