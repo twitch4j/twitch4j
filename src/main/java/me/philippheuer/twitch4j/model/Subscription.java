@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -22,19 +23,28 @@ import java.util.Date;
 public class Subscription {
 
 	@JsonProperty("_id")
-	private Long id;
+	private String id;
 
 	private Date createdAt;
 
-	private Integer streak;
+	private User user;
 
+	@JsonProperty("sub_plan")
+	private String sub_plan_code;
+
+	@JsonProperty("sub_plan_name")
+	private String sub_plan_name;
+
+	@JsonIgnore
 	private String message;
 
-	private User user;
+	@JsonIgnore
+	private Integer streak;
 
 	/**
 	 * Holds the subscription plan
 	 */
+	@JsonIgnore
 	private SubPlan subPlan;
 
 	/**
