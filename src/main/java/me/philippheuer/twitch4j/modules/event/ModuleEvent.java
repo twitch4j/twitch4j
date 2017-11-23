@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.events.event.system.modules;
+package me.philippheuer.twitch4j.modules.event;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

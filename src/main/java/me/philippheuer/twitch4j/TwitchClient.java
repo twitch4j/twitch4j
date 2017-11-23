@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
-import me.philippheuer.twitch4j.modules.Loader;
+import me.philippheuer.twitch4j.modules.ModuleLoader;
 import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
@@ -85,7 +85,7 @@ public class TwitchClient {
 	 */
 	private CommandHandler commandHandler = new CommandHandler(this);
 
-	private final Loader moduleLoader = new Loader(this);
+	private final ModuleLoader moduleLoader = new ModuleLoader(this);
 
 	/**
 	 * Class Constructor - Creates a new TwitchClient Instance for the provided app.
