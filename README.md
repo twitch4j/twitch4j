@@ -1,3 +1,5 @@
+![Twitch4J Logo](docs/static_files/logo.png?raw=true)
+
 # Java API for [Twitch](https://www.twitch.tv/) V5
 
 Project Information:
