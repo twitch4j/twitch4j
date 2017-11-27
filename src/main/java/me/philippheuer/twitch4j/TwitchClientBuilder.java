@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.Wither;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -49,12 +48,6 @@ public class TwitchClientBuilder {
 	private File configurationDirectory;
 
 	/**
-	 * StreamLabs Client
-	 * TODO: Remove
-	 */
-	private StreamlabsClient streamlabsClient = null;
-
-	/**
 	 * List of listeners
 	 */
 	private final Set<Object> listeners = new HashSet<>();
@@ -92,12 +85,6 @@ public class TwitchClientBuilder {
 		if (credential != null) {
 			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC,
 					new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential));
-		}
-
-		// Streamlabs
-		if(streamlabsClient != null) {
-			client.setStreamLabsClient(streamlabsClient);
-			client.getCredentialManager().provideStreamlabsClient(client.getStreamLabsClient());
 		}
 
 		if (listeners.size() > 0) {

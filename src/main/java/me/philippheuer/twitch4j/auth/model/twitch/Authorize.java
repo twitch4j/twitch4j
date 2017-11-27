@@ -16,6 +16,8 @@ public class Authorize {
 
 	private String refreshToken;
 
+	private Long expiresIn;
+
 	private List<String> scope;
 
 }

@@ -10,7 +10,6 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
-import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
@@ -46,11 +45,6 @@ public class CredentialManager {
 	private TwitchClient twitchClient;
 
 	/**
-	 * Holds the Twitch Instance
-	 */
-	private StreamlabsClient streamlabsClient;
-
-	/**
 	 * OAuth Response Listener
 	 */
 	private OAuthHandler oAuthHandler;
@@ -59,11 +53,6 @@ public class CredentialManager {
 	 * OAuth - Twitch
 	 */
 	private OAuthTwitch oAuthTwitch;
-
-	/**
-	 * OAuth - Streamlabs
-	 */
-	private OAuthStreamlabs oAuthStreamlabs;
 
 	/**
 	 * A map that stores all current requests.
@@ -147,19 +136,6 @@ public class CredentialManager {
 	}
 
 	/**
-	 * Provides the CredentialManager with the Streamlabs Context.
-	 *
-	 * @param streamlabsClient The Streamlabs Client.
-	 */
-	public void provideStreamlabsClient(StreamlabsClient streamlabsClient) {
-		setStreamlabsClient(streamlabsClient);
-		setOAuthStreamlabs(new OAuthStreamlabs(this));
-
-		// Register OAuthStreamlabs to get Events
-		getTwitchClient().getDispatcher().registerListener(getOAuthStreamlabs());
-	}
-
-	/**
 	 * Adds Twitch Credentials to the Credential Manager
 	 *
 	 * @param key        Key
@@ -172,7 +148,9 @@ public class CredentialManager {
 		credential.setUserId(token.getUserId());
 		credential.setUserName(token.getUserName());
 		credential.setDisplayName(token.getUserName());
-		credential.getOAuthScopes().addAll(token.getAuthorization().getScopes());
+		if(token.getAuthorization() != null)  {
+			credential.getOAuthScopes().addAll(token.getAuthorization().getScopes());
+		}
 
 		// OAuthCredential Prefix
 		addAnyCredential("TWITCH-" + key, credential);
