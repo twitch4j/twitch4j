@@ -85,6 +85,9 @@ public class TwitchClient {
 	 */
 	private CommandHandler commandHandler = new CommandHandler(this);
 
+	/**
+	 * NEW Feature: Modules.
+	 */
 	private final ModuleLoader moduleLoader = new ModuleLoader(this);
 
 	/**
