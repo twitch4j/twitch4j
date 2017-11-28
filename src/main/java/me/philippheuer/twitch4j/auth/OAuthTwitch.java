@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.auth;
 
+import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -7,6 +8,9 @@ import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.events.EventSubscriber;
+import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
+import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,6 +18,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -99,24 +105,20 @@ public class OAuthTwitch {
 	public OAuthCredential handleAuthenticationCodeResponseTwitch(String authenticationCode) {
 		try {
 			// Validate on Server
-			String requestUrl = String.format("%s/oauth2/token", Endpoints.API.getURL());
-			RestTemplate restTemplate = getCredentialManager().getTwitchClient().getRestClient().getRestTemplate();
-
-			// Prepare HTTP Post Data
-			MultiValueMap<String, Object> postObject = new LinkedMultiValueMap<String, Object>();
-			postObject.add("client_id", getCredentialManager().getTwitchClient().getClientId());
-			postObject.add("client_secret", getCredentialManager().getTwitchClient().getClientSecret());
-			postObject.add("grant_type", "authorization_code");
-			postObject.add("redirect_uri", getCredentialManager().getOAuthTwitch().getRedirectUri());
-			postObject.add("code", authenticationCode);
-
-			// Rest Request
-			Authorize responseObject = restTemplate.postForObject(requestUrl, postObject, Authorize.class);
+			Optional<Authorize> responseObject = getCredentialManager().getTwitchClient().getKrakenEndpoint().getOAuthToken("authorization_code", getRedirectUri(), authenticationCode);
+			if(!responseObject.isPresent()) {
+				throw new Exception("Invalid Code!");
+			}
 
 			// Credential
 			OAuthCredential credential = new OAuthCredential();
 			credential.setType("twitch");
-			credential.setToken(responseObject.getAccessToken());
+			credential.setToken(responseObject.get().getAccessToken());
+			credential.setRefreshToken(responseObject.get().getRefreshToken());
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.SECOND, 3600);
+			credential.setTokenExpiresAt(calendar);
 
 			// Get Token Status from Kraken Endpoint
 			Token token = getCredentialManager().getTwitchClient().getKrakenEndpoint().getToken(credential);
@@ -133,5 +135,43 @@ public class OAuthTwitch {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Event that gets triggered when a streamlabs token is expired.
+	 * <p>
+	 -
+	 * This events get triggered when a streamlabs auth token has expired, a new token
+	 * will be requested using the refresh token.
+	 *
+	 * @param event The Event, containing the credential and all other related information.
+	 */
+	@EventSubscriber
+	public void onTokenExpired(AuthTokenExpiredEvent event) {
+		// Filter to Streamlabs credentials
+		if(event.getCredential().getType().equals("twitch")) {
+			OAuthCredential credential = event.getCredential();
+			System.out.println("OLD: " + credential.toString());
+
+			// Rest Request to get refreshed token details
+			Authorize responseObject = getCredentialManager().getTwitchClient().getKrakenEndpoint().getOAuthToken(
+					"refresh_token",
+					getRedirectUri(),
+					credential.getRefreshToken()
+			).get();
+			System.out.println("NEW: " + responseObject.toString());
+
+			// Save Response
+			credential.setToken(responseObject.getAccessToken());
+			credential.setRefreshToken(responseObject.getRefreshToken());
+
+			// Set Token Expiry Date
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.SECOND, 3600);
+			credential.setTokenExpiresAt(calendar);
+
+			// Credential was modified.
+			getCredentialManager().onCredentialChanged();
+		}
 	}
 }

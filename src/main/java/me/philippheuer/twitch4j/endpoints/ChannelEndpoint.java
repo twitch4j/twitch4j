@@ -13,8 +13,6 @@ import me.philippheuer.twitch4j.events.event.channel.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
 import me.philippheuer.twitch4j.model.*;
-import me.philippheuer.twitch4j.streamlabs.endpoints.DonationEndpoint;
-import me.philippheuer.twitch4j.streamlabs.model.Donation;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -333,19 +331,18 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Subscription> getSubscriptions(Optional<Long> limit, Optional<Long> offset, Optional<String> direction) {
 		// Check Scope
-		Optional<OAuthCredential> twitchCredential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(getChannelId());
-		if (twitchCredential.isPresent()) {
+		if (getChannel().getTwitchCredential().isPresent()) {
 			Set<String> requiredScopes = new HashSet<String>();
 			requiredScopes.add(TwitchScopes.CHANNEL_SUBSCRIPTIONS.getKey());
 
-			checkScopePermission(twitchCredential.get().getOAuthScopes(), requiredScopes);
+			checkScopePermission(getChannel().getTwitchCredential().get().getOAuthScopes(), requiredScopes);
 		} else {
 			throw new ChannelCredentialMissingException(getChannelId());
 		}
 
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions", Endpoints.API.getURL(), getChannelId());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get());
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
@@ -390,7 +387,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Endpoint
 		String requestUrl = String.format("%s/channels/%s/subscriptions/%d", Endpoints.API.getURL(), getChannelId(), user.getId());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get());
 
 		// REST Request
 		try {
@@ -501,7 +498,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			String requestUrl = String.format("%s/channels/%s/stream_key", Endpoints.API.getURL(), getChannelId());
-			getTwitchClient().getRestClient().getRestTemplate().delete(requestUrl);
+			getTwitchClient().getRestClient().getPrivilegedRestTemplate(getChannel().getTwitchCredential().get()).delete(requestUrl);
 
 			return true;
 		} catch (Exception ex) {
@@ -541,7 +538,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void timeout(String user, Duration duration) {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".timeout %s %s", user, duration.getSeconds()));
 	}
-// TODO: moving to TMI
+	// TODO: moving to TMI
+
 	/**
 	 * IRC: Purge Chat of User
 	 * Clears all messages in a channel.
@@ -551,7 +549,8 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	public void purgeChat(String user) {
 		timeout(user, Duration.ofSeconds(1));
 	}
-// TODO: moving to TMI
+
+	// TODO: moving to TMI
 	/**
 	 * IRC: Purge Chat
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
@@ -595,14 +594,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		// Event Timer
 		// - Follows
 		startFollowListener(channel);
-
-		// - Donations
-		if (channel.getStreamlabsCredential().isPresent()) {
-			Logger.debug(this, "Sreamlabs: Credential found, starting to listen for Channel [%s]", channel.getDisplayName());
-			startDonationListener(channel);
-		} else {
-			Logger.info(this, "Sreamlabs: No Credentials for Channel [%s]", channel.getDisplayName());
-		}
 	}
 
 	private void startFollowListener(Channel channel) {
@@ -648,64 +639,6 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// Schedule Action
 		eventTriggerTimer.scheduleAtFixedRate(action, 0, 5 * 1000);
-	}
-
-	private void startDonationListener(Channel channel) {
-		// Define Action
-		TimerTask action = new TimerTask() {
-			public void run() {
-				try {
-					// Prepare
-					DonationEndpoint donationEndpoint = getTwitchClient().getStreamLabsClient().getDonationEndpoint(channel.getStreamlabsCredential().get());
-
-					// Followers
-					List<Calendar> creationDates = new ArrayList<Calendar>();
-					List<Donation> donationList = donationEndpoint.getDonations(
-							Optional.ofNullable(Currency.getInstance("EUR")),
-							Optional.ofNullable(10)
-					);
-
-					if (donationList.size() > 0) {
-						for (Donation donation : donationList) {
-							// dispatch event for new follows only
-							if (lastDonation != null && donation.getCreatedAt().after(lastDonation)) {
-								Optional<User> user = getTwitchClient().getUserEndpoint().getUserByUserName(donation.getName());
-								Event dispatchEvent = new DonationEvent(
-										channel,
-										user.orElse(null),
-										"streamlabs",
-										Currency.getInstance("EUR"),
-										donation.getAmount(),
-										donation.getMessage()
-								);
-								getTwitchClient().getDispatcher().dispatch(dispatchEvent);
-							}
-							creationDates.add(donation.getCreatedAt());
-						}
-
-						// Get newest date from all follows
-						Calendar lastDonationNew = creationDates.stream().max(Calendar::compareTo).get();
-						if (lastDonation == null || lastDonationNew.after(lastDonation)) {
-							lastDonation = lastDonationNew;
-						}
-					} else {
-						// No donations created yet!
-					}
-				} catch (Exception ex) {
-					Logger.error(this, "Failed to get Donations: " +ex.getMessage());
-
-					// Delay next execution
-					try {
-						Thread.sleep(1000);
-					} catch (Exception et) {
-						Logger.error(this, ExceptionUtils.getStackTrace(et));
-					}
-				}
-			}
-		};
-
-		// Schedule Action
-		eventTriggerTimer.scheduleAtFixedRate(action, 0, 2 * 1000);
 	}
 
 	/**

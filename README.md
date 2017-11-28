@@ -1,3 +1,5 @@
+![Twitch4J Logo](docs/static_files/logo.png?raw=true)
+
 # Java API for [Twitch](https://www.twitch.tv/) V5
 
 Project Information:
@@ -11,8 +13,7 @@ Project Information:
 
 Support:
 
-[![Discord](https://img.shields.io/badge/Join-Twitch4J-7289DA.svg?style=flat-square)](https://discord.gg/FQ5vgW3)
-[<img src="https://discordapp.com/api/guilds/143001431388061696/widget.png?style=shield">](https://discord.gg/FQ5vgW3)
+[![Discord Server](https://discordapp.com/api/guilds/143001431388061696/embed.png?style=banner2)](https://discord.gg/FQ5vgW3)
 
 Documentation:
 

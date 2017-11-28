@@ -106,47 +106,6 @@ public class OAuthHandler {
 										});
 									}
 							)
-							// Streamlabs
-							.get(OAuthStreamlabs.REDIRECT_KEY,
-									ctx -> {
-										// Parse Parameters
-										String responseCode = ctx.getRequest().getQueryParams().get("code");
-										String responseState = ctx.getRequest().getQueryParams().get("state");
-
-										// Get Request from Cache
-										if(!getCredentialManager().getOAuthRequestCache().containsKey(responseState)) {
-											ctx.render("Timeout! Please retry!");
-										}
-										OAuthRequest request = getCredentialManager().getOAuthRequestCache().get(responseState);
-
-										// Handle Response
-										OAuthCredential credential = credentialManager.getOAuthStreamlabs().handleAuthenticationCodeResponseStreamlabs(responseCode);
-
-										// Valid?
-										if (credential != null) {
-											// Add Scopes from Request
-											credential.getOAuthScopes().addAll(request.getOAuthScopes());
-
-											// Check for custom key, to store in credential manager
-											if (request.getType().length() > 0 && !request.getType().equals("CHANNEL")) {
-												// Custom Key
-												getCredentialManager().addStreamlabsCredential(request.getType(), credential);
-											} else {
-												// Channel Credentials
-												getCredentialManager().addStreamlabsCredential(credential.getUserId().toString(), credential);
-											}
-
-											ctx.render("Welcome " + credential.getDisplayName() + "!");
-										} else {
-											ctx.render("Authentication failed!");
-										}
-
-										// Response received, close listener
-										ctx.onClose(outcome -> {
-											new Thread(ctx.get(Stopper.class)::stop).start();
-										});
-									}
-							)
 					)
 			);
 
