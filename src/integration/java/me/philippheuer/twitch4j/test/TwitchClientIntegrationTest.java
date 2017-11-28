@@ -45,7 +45,7 @@ abstract public class TwitchClientIntegrationTest extends TestCase {
 		if(twitchClient == null) {
 			twitchClient = TwitchClientBuilder.init()
 					.withClientId("jzkbprff40iqj646a697cyrvl0zt2m6")
-					.withSecret("**SECRET**")
+					.withClientSecret("**SECRET**")
 					.build();
 		}
 	}
