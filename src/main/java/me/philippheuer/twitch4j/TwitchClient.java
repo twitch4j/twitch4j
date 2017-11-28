@@ -9,6 +9,7 @@ import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
+import me.philippheuer.twitch4j.modules.ModuleLoader;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
 
