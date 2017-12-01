@@ -9,7 +9,7 @@ Project Information:
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669)](https://www.codacy.com/app/PhilippHeuer/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PhilippHeuer/twitch4j&amp;utm_campaign=Badge_Grade)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Percentage of issues still open")
-[![](https://jitpack.io/v/PhilippHeuer/twitch4j.svg)](https://jitpack.io/#PhilippHeuer/twitch4j)
+[![Download](https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg) ](https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion)
 
 Support:
 
@@ -36,15 +36,15 @@ Add it to your build.gradle with:
 ```gradle
 allprojects {
     repositories {
-        maven { url "https://jitpack.io" }
+        jCenter()
     }
 }
 ```
-and:
+and: (latest, you should use the actual version here)
 
 ```gradle
 dependencies {
-    compile 'com.github.PhilippHeuer:twitch4j:master-SNAPSHOT'
+    compile 'com.github.twitch4j:twitch4j:+'
 }
 ```
 
@@ -53,18 +53,18 @@ Add it to your pom.xml with:
 ```xml
 <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
     </repository>
 </repositories>
 ```
-and:
+and: (latest, you should use the actual version here)
 
 ```xml
 <dependency>
-    <groupId>com.github.PhilippHeuer</groupId>
+    <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>master-SNAPSHOT</version>
+    <version>v0.10.0</version>
 </dependency>
 ```
 
