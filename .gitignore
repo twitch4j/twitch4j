@@ -52,3 +52,6 @@ client.log
 
 # Example Code
 /src/main/java/me/philippheuer/twitch4j/example/*
+
+# Modules
+/modules/
