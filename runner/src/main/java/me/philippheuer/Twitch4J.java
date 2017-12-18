@@ -50,8 +50,7 @@ public class Twitch4J implements ApplicationRunner {
 						Builder.Credential.init()
 						.withAccessToken(arguments.getBotToken())
 						.build()
-				)
-				.withAppContext(new DefaultServletAppContext(arguments.getPort()))
+				).withAppContext(new DefaultServletAppContext(arguments.getPort()))
 				.connect();
 	}
 }
