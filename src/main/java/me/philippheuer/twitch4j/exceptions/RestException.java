@@ -1,17 +1,15 @@
 package me.philippheuer.twitch4j.exceptions;
 
 import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.model.RestError;
+import me.philippheuer.twitch4j.models.IRestError;
 
 @Getter
-@Setter
 public class RestException extends RuntimeException {
 
-	private RestError restError;
+    private final IRestError error;
 
-	public RestException(RestError restError) {
-		super();
-		setRestError(restError);
-	}
+    public RestException(IRestError error) {
+        super(error.toString());
+        this.error = error;
+    }
 }
