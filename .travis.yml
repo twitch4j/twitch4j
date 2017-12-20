@@ -1,0 +1,21 @@
+#
+# Build configuration for Travis
+#
+sudo: false
+language: java
+jdk:
+  - oraclejdk8
+
+# Cache
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
+
+# Before Install
+before_install:
+  - mvn install
+
+# Build
+script:
+    - mvn test
