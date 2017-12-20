@@ -2,7 +2,9 @@ package me.philippheuer.twitch4j.impl;
 
 import lombok.Getter;
 import me.philippheuer.twitch4j.api.TwitchApi;
+import me.philippheuer.twitch4j.authorize.IManager;
 import me.philippheuer.twitch4j.connect.TwitchServiceProvider;
+import me.philippheuer.twitch4j.impl.authorize.CredentialManager;
 import me.philippheuer.twitch4j.models.IApplication;
 import me.philippheuer.twitch4j.IClient;
 import me.philippheuer.twitch4j.api.model.ICredential;
@@ -19,6 +21,7 @@ public class TwitchClient<T extends org.springframework.social.oauth2.AbstractOA
 
     private final IApplication application;
     private final TwitchServiceProvider provider;
+    private final IManager credentialManager = new CredentialManager(this);
 
     public TwitchClient(IApplication application) {
     	this.application = application;

@@ -1,4 +1,0 @@
-rootProject.name = 'twitch4j'
-
-include "runner"
-project(":runner").name = "twitch4j-runner"

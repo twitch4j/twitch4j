@@ -7,10 +7,16 @@ import me.philippheuer.twitch4j.connect.helix.TwitchHelixServiceProvider;
 import me.philippheuer.twitch4j.impl.Application;
 import me.philippheuer.twitch4j.impl.Authorization;
 import me.philippheuer.twitch4j.impl.TwitchClient;
+import me.philippheuer.twitch4j.security.TwitchAuthenticationService;
+import me.philippheuer.twitch4j.security.TwitchHelixAuthenticationService;
 import me.philippheuer.twitch4j.web.DefaultServletAppContext;
 import me.philippheuer.twitch4j.web.ServletAppContext;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
 import org.springframework.social.oauth2.OAuth2Version;
+import org.springframework.social.security.provider.OAuth2AuthenticationService;
 import org.springframework.util.Assert;
 
 public class Builder {
@@ -80,17 +86,17 @@ public class Builder {
 	public enum Provider {
         KRAKEN {
             @Override
-            public <T extends AbstractOAuth2ServiceProvider> T getProvider(String clientId, String clientSecret) {
-                return (T) new TwitchServiceProvider(clientId, clientSecret);
+            public <T extends OAuth2AuthenticationService> T getProvider(String clientId, String clientSecret) {
+                return (T) new TwitchAuthenticationService(clientId, clientSecret);
             }
         },
         HELIX {
             @Override
-            public <T extends AbstractOAuth2ServiceProvider> T getProvider(String clientId, String clientSecret) {
-                return (T) new TwitchHelixServiceProvider(clientId, clientSecret);
+            public <T extends OAuth2AuthenticationService> T getProvider(String clientId, String clientSecret) {
+                return (T) new TwitchHelixAuthenticationService(clientId, clientSecret);
             }
         };
 
-        public abstract <T extends AbstractOAuth2ServiceProvider> T getProvider(String clientId, String clientSecret);
+        public abstract <T extends OAuth2AuthenticationService> T getProvider(String clientId, String clientSecret);
     }
 }

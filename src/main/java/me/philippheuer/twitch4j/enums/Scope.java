@@ -16,10 +16,14 @@ import java.util.stream.Collectors;
  * @author Urgue - Github [https://raw.githubusercontent.com/urgrue/Java-Twitch-Api-Wrapper/master/src/main/java/com/mb3364/twitch/api/auth/Scopes.java]
  * @author Damian Staszewski
  * @version %I%, %G%
- * @since 1.0
+ * @since 0.10
  */
 @Getter
 public enum Scope {
+	/**
+	 * Manage a clip object.
+	 */
+	CLIPS_EDIT("clips:edit"),
     /**
      * Manage a user object.
      */
@@ -135,7 +139,7 @@ public enum Scope {
 
     public static String join(Collection<Scope> scopes) {
         if (scopes.size() == 0) return "";
-        return scopes.stream().map(Scope::getKey).collect(Collectors.joining("+"));
+        return scopes.stream().map(Scope::getKey).collect(Collectors.joining(","));
     }
 
     @Override
