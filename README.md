@@ -1,4 +1,4 @@
-![Twitch4J Logo](docs/static_files/logo.png?raw=true)
+![Twitch4J Logo](src/main/resources/banner.png?raw=true)
 
 # Java API for [Twitch](https://www.twitch.tv/) V5
 
