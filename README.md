@@ -33,16 +33,14 @@ This project is still in development, check out [Features](#features) and [Chang
 
 #### Gradle
 Add it to your build.gradle with:
-```gradle
-allprojects {
-    repositories {
-        jCenter()
-    }
+```groovy
+repositories {
+	jcenter()
 }
 ```
 and: (latest, you should use the actual version here)
 
-```gradle
+```groovy
 dependencies {
     compile 'com.github.twitch4j:twitch4j:+'
 }
