@@ -3,6 +3,7 @@ package me.philippheuer.twitch4j.events.event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.model.Channel;
@@ -10,6 +11,7 @@ import me.philippheuer.twitch4j.model.User;
 import org.springframework.util.Assert;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,14 +41,21 @@ public class AbstractChannelEvent extends Event {
 		this.channel = channel;
 	}
 
+	private User getBot() {
+		Optional<OAuthCredential> credentials = getClient().getCredentialManager().getTwitchCredentialsForIRC();
+		if (credentials.isPresent()) {
+			return getClient().getUserEndpoint().getUser(credentials.get()).orElse(null);
+		} else return null;
+	}
+
 	private boolean isBotModerator() {
-		User botUser = getClient().getUserEndpoint().getUser(getClient().getCredentialManager().getTwitchCredentialsForIRC().get()).get();
-		return getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getModerators().contains(botUser);
+		User botUser = getBot();
+		return (botUser != null) && getClient().getMessageInterface().getTwitchChat().getChannelCache().get(channel.getName()).getModerators().contains(botUser);
 	}
 
 	private boolean isBotChannelEditor() {
-		User botUser = getClient().getUserEndpoint().getUser(getClient().getCredentialManager().getTwitchCredentialsForIRC().get()).get();
-		return getClient().getChannelEndpoint(channel.getId()).getEditors().contains(botUser);
+		User botUser = getBot();
+		return (botUser != null) && getClient().getChannelEndpoint(channel.getId()).getEditors().contains(botUser);
 	}
 
 	/**
