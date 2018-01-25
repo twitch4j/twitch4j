@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
+import me.philippheuer.twitch4j.events.event.channel.HostOffEvent;
+import me.philippheuer.twitch4j.events.event.channel.HostOnEvent;
 import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
 import me.philippheuer.twitch4j.events.event.irc.*;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
@@ -233,6 +235,34 @@ public class IRCEventListener {
 			String message = event.getMessage().get();
 
 			event.getClient().getDispatcher().dispatch(new ChannelNoticeEvent(channel, messageId, message));
+		}
+	}
+
+	@EventSubscriber
+	public void onHostOnEvent(IRCMessageEvent event) {
+		if (event.getCommandType().equals("NOTICE")) {
+			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
+			String messageId = event.getTagValue("msg-id").get();
+
+			if(messageId.equals("host_on")) {
+				String message = event.getMessage().get();
+				String targetChannelName = message.substring(12, message.length() - 1);
+				Channel targetChannel = event.getClient().getChannelEndpoint(targetChannelName).getChannel();
+
+				event.getClient().getDispatcher().dispatch(new HostOnEvent(channel, targetChannel));
+			}
+		}
+	}
+
+	@EventSubscriber
+	public void onHostOffEvent(IRCMessageEvent event) {
+		if (event.getCommandType().equals("NOTICE")) {
+			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
+			String messageId = event.getTagValue("msg-id").get();
+
+			if(messageId.equals("host_off")) {
+				event.getClient().getDispatcher().dispatch(new HostOffEvent(channel));
+			}
 		}
 	}
 
