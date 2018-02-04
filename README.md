@@ -139,7 +139,7 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 
 ### Client Builder (Twitch Standalone)
 ```java
-TwitchClient twitchClient = TwitchClientBuilder.builder()
+TwitchClient twitchClient = TwitchClientBuilder.init()
 	.withClientId("Twitch App Id")
 	.withClientSecret("Twitch App Secret")
 	.withAutoSaveConfiguration(true)
