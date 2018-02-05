@@ -14,6 +14,7 @@ Project Information:
 Support:
 
 [![Discord Server](https://discordapp.com/api/guilds/143001431388061696/embed.png?style=banner2)](https://discord.gg/FQ5vgW3)
+
 [![Twitch API Server](https://discordapp.com/api/guilds/325552783787032576/embed.png?style=banner2)](https://discord.gg/8NXaEyV)
 
 Documentation:
@@ -90,11 +91,11 @@ and: (latest, you should use the actual version here)
  - [x] Videos
 
 #### Twitch PubSub
- - [x] Bits
- - [x] Whispers
- - [x] Subscriptions
- - [x] Stream Status - *Unofficial*
- - [x] Moderation Action (from specified moderator in specified channel) - *Unofficial*
+ - [ ] Bits
+ - [ ] Whispers
+ - [ ] Subscriptions
+ - [ ] Stream Status - *Unofficial*
+ - [ ] Moderation Action (from specified moderator in specified channel) - *Unofficial*
  
 #### Twitch IRC (WebSocket)
  - [x] Subscriptions
