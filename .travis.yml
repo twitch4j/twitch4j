@@ -24,3 +24,7 @@ before_install:
 script:
     - ./gradlew install
     - ./gradlew testIntegration
+
+after_success:
+	- [[ ! -z $TRAVIS_TAG && $TRAVIS_BRANCH == master ]] ./gradlew publish
+

@@ -4,7 +4,7 @@
 
 Project Information:
 
-[![Build Status](https://travis-ci.org/PhilippHeuer/twitch4j.svg?branch=master)](https://travis-ci.org/PhilippHeuer/twitch4j)
+[![Build Status](https://travis-ci.org/twitch4j/twitch4j.svg?branch=master)](https://travis-ci.org/twitch4j/twitch4j)
 [![Libraries.io for GitHub](https://img.shields.io/librariesio/github/twitch4j/twitch4j.svg?style=flat-square)]()
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669)](https://www.codacy.com/app/PhilippHeuer/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PhilippHeuer/twitch4j&amp;utm_campaign=Badge_Grade)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Average time to resolve an issue")
@@ -14,6 +14,7 @@ Project Information:
 Support:
 
 [![Discord Server](https://discordapp.com/api/guilds/143001431388061696/embed.png?style=banner2)](https://discord.gg/FQ5vgW3)
+
 [![Twitch API Server](https://discordapp.com/api/guilds/325552783787032576/embed.png?style=banner2)](https://discord.gg/8NXaEyV)
 
 Documentation:
@@ -90,11 +91,11 @@ and: (latest, you should use the actual version here)
  - [x] Videos
 
 #### Twitch PubSub
- - [x] Bits
- - [x] Whispers
- - [x] Subscriptions
- - [x] Stream Status - *Unofficial*
- - [x] Moderation Action (from specified moderator in specified channel) - *Unofficial*
+ - [ ] Bits
+ - [ ] Whispers
+ - [ ] Subscriptions
+ - [ ] Stream Status - *Unofficial*
+ - [ ] Moderation Action (from specified moderator in specified channel) - *Unofficial*
  
 #### Twitch IRC (WebSocket)
  - [x] Subscriptions
