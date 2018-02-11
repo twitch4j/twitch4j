@@ -26,5 +26,4 @@ script:
     - ./gradlew testIntegration
 
 after_success:
-	- [[ ! -z $TRAVIS_TAG && $TRAVIS_BRANCH == master ]] ./gradlew publish
-
+    - if [[ ! -z $TRAVIS_TAG && $TRAVIS_BRANCH == master ]]; then ./gradlew publish; fi
