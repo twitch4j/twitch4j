@@ -4,10 +4,10 @@ import lombok.*;
 import lombok.experimental.Wither;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.streamlabs.StreamlabsClient;
 import org.springframework.util.Assert;
 
 import java.io.File;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,11 +39,6 @@ public class TwitchClientBuilder {
 	private String credential;
 
 	/**
-	 * IRC Credential - Refresh Token
-	 */
-	private String credentialRefreshToken;
-
-	/**
 	 * Auto Saving Configuration
 	 */
 	private boolean autoSaveConfiguration = false;
@@ -52,6 +47,12 @@ public class TwitchClientBuilder {
 	 * Configuration Directory
 	 */
 	private File configurationDirectory;
+
+	/**
+	 * StreamLabs Client
+	 * TODO: Remove
+	 */
+	private StreamlabsClient streamlabsClient = null;
 
 	/**
 	 * List of listeners
@@ -89,15 +90,14 @@ public class TwitchClientBuilder {
 		}
 
 		if (credential != null) {
-			OAuthCredential oAuthCredential = new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential);
+			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC,
+					new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential));
+		}
 
-			// got a refresh token?
-			if(credentialRefreshToken != null) {
-				oAuthCredential.setRefreshToken(credentialRefreshToken);
-				oAuthCredential.setTokenExpiresAt(Calendar.getInstance());
-			}
-
-			client.getCredentialManager().addTwitchCredential(CredentialManager.CREDENTIAL_IRC, oAuthCredential);
+		// Streamlabs
+		if(streamlabsClient != null) {
+			client.setStreamLabsClient(streamlabsClient);
+			client.getCredentialManager().provideStreamlabsClient(client.getStreamLabsClient());
 		}
 
 		if (listeners.size() > 0) {
