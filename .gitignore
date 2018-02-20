@@ -38,6 +38,7 @@ local.properties
 #Gradle
 .gradletasknamecache
 .gradle/
+classes/
 gradle.properties
 
 # Exceptions

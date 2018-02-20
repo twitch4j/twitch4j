@@ -2,12 +2,12 @@
 
 <configuration scan="true">
 	<!-- Avoid logger Spam -->
-	<logger name="org.eclipse.jetty" level="INFO"/>
-	<logger name="io.netty" level="INFO"/>
-	<logger name="org.springframework.web.client.RestTemplate" level="INFO"/>
+	<logger name="org.eclipse.jetty" level="WARN"/>
+	<logger name="io.netty" level="WARN"/>
+	<logger name="org.springframework" level="WARN"/>
 
 	<!-- Configure Twitch4J logger level -->
-	<logger name="me.phlippheuer.twitch4j" level="INFO"/>
+	<logger name="me.phlippheuer" level="INFO"/>
 
 	<!-- Appender Configuration [Console] -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

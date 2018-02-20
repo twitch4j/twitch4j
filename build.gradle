@@ -1,206 +1,81 @@
-/*
- * Gradle Configuration
- */
-
-// Apply the java plugin to add support for Java
 plugins {
-	id 'java'
-	id 'idea'
-	id 'eclipse'
-	id 'application'
-	id 'maven-publish'
+	id "java"
+	id "idea"
+	id "eclipse"
+	id "application"
 	id "net.ltgt.apt" version "0.13"
-	id 'io.ratpack.ratpack-java' version '1.4.6'
 	id 'com.jfrog.bintray' version '1.7.3'
 	id "com.cinnober.gradle.semver-git" version "2.3.1"
 }
 
+ext.nextVersion = "0.11.0"
 ext.snapshotSuffix = "<count>.g<sha>-SNAPSHOT"
 ext.gitDescribeArgs = '--match v*[0-9].[0-9]*.[0-9]*'
+
+group = 'com.github.twitch4j'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = "me.philippheuer.Twitch4J"
 
 repositories {
 	mavenCentral()
 	jcenter()
-	maven { url "https://jitpack.io" }
+	maven { url 'https://jitpack.io' }
 }
 
-// Artifact Info
-group "com.github.twitch4j"
+javadoc {
+	exclude 'me/philippheuer/twitch4j/impl/*',
+			'me/philippheuer/twitch4j/utils/Util.java',
+			'me/philippheuer/Twitch4J.java',
+			'me/philippheuer/Arguments.java'
+	options {
+		overview = new File("${projectDir}/src/javadoc/overview.html")
+		title = "Twitch 4 Java (${project.version})"
+		windowTitle = "${project.name} (${project.version})"
+		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+		encoding = "UTF-8"
+	}
+}
 
-// Doesn't matter, only so that spring doesn't fail
-mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
-
-// Dependencies
 dependencies {
-	// Logging
-	compile "org.slf4j:slf4j-api:1.7.25"
-	compile "ch.qos.logback:logback-classic:1.2.3"
-	compile "com.jcabi:jcabi-log:0.17.2"
+	compile "com.auth0:java-jwt:+"
 
-	// Spring (RestTemplate)
-	compile "org.springframework:spring-web:5.0.0.RELEASE" 					// contains Tomcat
-	compile "org.springframework.social:spring-social-core:1.1.4.RELEASE"
+	compile "org.eclipse.jetty.websocket:websocket-client:+"
+	compile "org.eclipse.jetty.websocket:websocket-api:+"
+	compile "org.eclipse.jetty.websocket:websocket-servlet:+"
+	compile "org.eclipse.jetty.websocket:javax-websocket-client-impl:+"
 
-	// WebSocket Client for Twitch PubSub and Twitch IRC
-	// TODO: Change to Jetty WebSocket
-	compile "com.neovisionaries:nv-websocket-client:2.3"
+	compile "org.eclipse.jetty:jetty-server:+"
+	compile "org.eclipse.jetty:jetty-servlet:+"
+	compile "org.eclipse.jetty:jetty-util:+"
 
-	// Apache Commons
-	// - Lang
-	compile "org.apache.commons:commons-lang3:3.6"
-	// - IO
-	compile "commons-io:commons-io:2.5"
+	compile "com.squareup.retrofit2:retrofit:+"
+	compile "com.squareup.retrofit2:converter-jackson:+"
 
-	// JSON / YAML
-	compile "com.fasterxml.jackson.core:jackson-databind:2.9.2"
+	compile "org.jdbi:jdbi3-core:+"
 
-	// Bucket for rate-limiting
 	compile "org.isomorphism:token-bucket:1.7"
-
-	// Expiring Map
 	compile "net.jodah:expiringmap:0.5.8"
-
-	// TypeTools
 	compile "net.jodah:typetools:0.5.0"
 
-	// Args4J - CommandLineArgumentParser
-	compile "args4j:args4j:2.33"
+	compile "commons-io:commons-io:+"
+	compile "org.apache.commons:commons-lang3:+"
 
-	// Project Lombok for annotating processor
-	compile "org.projectlombok:lombok:+"
+	compile 'com.google.guava:guava:24.0-jre'
+
+	compile "com.beust:jcommander:1.72"
+
+	compile "ch.qos.logback:logback-classic:1.2.3"
+
+	compileOnly "org.projectlombok:lombok:+"	// Getters, Setters and more.
 	apt "org.projectlombok:lombok:+"
 
-	// Testing
-	testCompile "junit:junit:4.12"
+	testCompile "junit:junit:+"
 }
 
-/**
- * Define SourceSets
- */
-sourceSets {
-	main {
-		java.srcDir 'src/main/java'
-	}
-	test {
-		java.srcDir 'src/test/java'
-	}
-	integration {
-		java.srcDir 'src/integration/java'
-		resources.srcDir 'src/integration/resources'
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
-}
-
-// Configuration
-configurations {
-	// Integration compile task
-	integrationCompile.extendsFrom testCompile
-	integrationRuntime.extendsFrom testRuntime
-}
-
-configurations.all {
-	// Disable Gradle Caching
-	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-/**
- * Test Task `test` - Run Unit Tests
- */
-test {
-	useJUnit {
-		includeCategories 'me.philippheuer.util.test.UnitTestCategory'
-		excludeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
-	}
-}
-
-/**
- * Test Task `testIntegration` - Run Integration Tests
- */
-task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-	testClassesDir = sourceSets.integration.output.classesDir
-	classpath = sourceSets.integration.runtimeClasspath
-
-	useJUnit {
-		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
-		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
-	}
-}
-
-/**
- * Sources - build a jar with source files
- */
-task sourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
-	from sourceSets.main.java.srcDirs
-	classifier = 'sources'
-}
-
-/**
- * JavaDocs Generation
- */
-javadoc {
-	source = sourceSets.main.allJava
-	classpath = sourceSets.main.compileClasspath
-
-	// if not changed the destinationDir, the javadoc for production code is overridden.
-	destinationDir = file("${buildDir}/../docs/javadoc")
-}
-
-// build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
-}
-
-/**
- * Artifacts
- */
-artifacts {
-	archives sourcesJar
-	archives javadocJar
-}
-
-/**
- * Deployment
- */
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			if (plugins.hasPlugin('war')) {
-				from components.web
-			} else {
-				from components.java
-			}
-
-			// Additional Artifacts
-			artifact sourcesJar
-			artifact javadocJar
-		}
-	}
-}
-
-bintray {
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_API_KEY')
-	publications = ['mavenJava']
-	dryRun = false
-	publish = true
-	pkg {
-		repo = 'maven'
-		name = 'Twitch4J'
-		userOrg = 'twitch4j'
-		desc = 'This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)'
-		websiteUrl = "https://github.com/twitch4j/twitch4j"
-		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
-		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
-		licenses = ['MIT']
-		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
-		publicDownloadNumbers = true
-		version {
-			name = project.version
-			released = new Date()
-		}
-	}
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.5.1'
 }
 
 wrapper {
