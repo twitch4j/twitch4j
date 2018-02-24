@@ -24,6 +24,12 @@
 
 package io.twitch4j.irc.model;
 
+import io.twitch4j.IClient;
+import io.twitch4j.impl.irc.TwitchMessageInterface;
+import io.twitch4j.irc.IMessageInterface;
+import io.twitch4j.irc.event.IrcEvent;
+import io.twitch4j.irc.model.tags.Badge;
+import io.twitch4j.irc.model.tags.Badges;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -238,47 +244,84 @@ public class IrcMessage {
 		return new IrcMessage(command, parameters, message, hostmask, parseIrcTags(tags));
 	}
 
-	private static TagsV3 parseIrcTags(Map<String, String> tags) {
+	@SuppressWarnings({"unchecked","rawtypes"})
+	private static TagsV3<?> parseIrcTags(Map<String, String> tags) {
 		if (tags.isEmpty())
 			return null;
 
-		Map<String, Object> tagsParsed = new HashMap<>();
+		Map<String, Optional<?>> tagsParsed = new HashMap<>();
 
 		tags.forEach((key, value) -> {
-			if (key.equalsIgnoreCase("badges")) {
-				Map<String, Integer> badges = new HashMap<>();
-				Arrays.asList(value.split(",")).forEach(badge ->
-						badges.put(badge.split("/")[0], Integer.parseInt(badge.split("/")[1])));
-				if (badges.size() > 0) {
-					tagsParsed.put(key, Collections.unmodifiableMap(badges));
-				}
-			} else if (key.equalsIgnoreCase("emotes")) {
-				Map<Integer, List<Integer[]>> emotes = new HashMap<Integer, List<Integer[]>>();
-				Arrays.asList(value.split("/")).forEach(emote -> {
-					int k = Integer.parseInt(emote.split(":")[0]);
-					List<Integer[]> v = Arrays.stream(emote.split(":")[1].split(","))
-							.map(val -> {
-								String[] v2 = val.split("-");
-								return new Integer [] {Integer.parseInt(v2[0]), Integer.parseInt(v2[1])};
-							}).collect(Collectors.toList());
-					emotes.put(k, Collections.unmodifiableList(v));
-				});
-				if (emotes.size() > 0) {
-					tagsParsed.put(key, Collections.unmodifiableMap(emotes));
-				}
-			} else {
-				tagsParsed.put(formatKey(key), formatValue(value));
+			Optional<?> tagValue = Optional.empty();
+			switch (key.toLowerCase()) {
+				case "badges":
+					List<Badge> badges = Arrays.stream(value.split(","))
+							.map(badge -> new Badge(badge.split("/")[0], Integer.parseInt(badge.split("/")[1])))
+							.collect(Collectors.toList());
+					tagValue = Optional.of(new Badges(Collections.unmodifiableList(badges)));
+					break;
+				case "emotes":
+					// TODO: Emotes
+					break;
+				default:
+					tagValue = Optional.of(formatValue(value));
 			}
+			tagsParsed.put(key, tagValue);
 		});
 
 		return new TagsV3(tagsParsed);
 	}
 
-	private static String formatValue(String value) {
-		return value.replace("\\s", " ");
+	public static void parseAndDispatchEvent(IrcMessage message, IClient client) {
+
+		client.getDispatcher().dispatch(new IrcEvent(message));
+
+		switch (message.getCommand()) {
+			case JOIN:
+				client.getDispatcher().dispatch(new JoinChannelEvent());
+				break;
+			case PART:
+				client.getDispatcher().dispatch(new JoinChannelEvent());
+				break;
+			case PRIV_MSG:
+				client.getDispatcher().dispatch(new ChannelMessageEvent());
+				break;
+			case WHISPER:
+				client.getDispatcher().dispatch(new PrivateMessageEvent());
+				break;
+			case PONG:
+				client.getDispatcher().dispatch(new PongReceivedEvent());
+				break;
+			case PING:
+				client.getDispatcher().dispatch(new PingReceivedEvent());
+				break;
+			case USER_NOTICE:
+				client.getDispatcher().dispatch(new ChannelSubscriptionEvent());
+				break;
+			case NOTICE:
+				client.getDispatcher().dispatch(new ServerNoticeEvent());
+				break;
+			case HOST_TARGET:
+				client.getDispatcher().dispatch(new HostTargetEvent());
+				break;
+			case CLEAR_CHAT:
+				client.getDispatcher().dispatch(new ChannelClearEvent());
+				break;
+			case ROOM_STATE:
+				client.getDispatcher().dispatch(new ChannelStateEvent());
+				break;
+			case GLOBAL_USER_STATE:
+				client.getDispatcher().dispatch(new GlobalUserStateEvent());
+				break;
+			case USER_STATE:
+				client.getDispatcher().dispatch(new GlobalUserStateEvent());
+				break;
+			default:
+				break;
+		}
 	}
 
-	private static String formatKey(String key) {
-		return key.replace("-", "_");
+	private static String formatValue(String value) {
+		return value.replace("\\s", " ");
 	}
 }

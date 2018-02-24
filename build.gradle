@@ -7,16 +7,28 @@ plugins {
 	id 'com.jfrog.bintray' version '1.7.3'
 	id "com.cinnober.gradle.semver-git" version "2.3.1"
 }
-
-ext.nextVersion = "0.11.0"
-ext.snapshotSuffix = "<count>.g<sha>-SNAPSHOT"
-ext.gitDescribeArgs = '--match v*[0-9].[0-9]*.[0-9]*'
+ext {
+	nextVersion = "0.11.0"
+	snapshotSuffix = "<count>.g<sha>-SNAPSHOT"
+	gitDescribeArgs = '--match v*[0-9].[0-9]*.[0-9]*'
+	jacksonVersion = "2.9.4"
+	jwtVersion = "3.3.0"
+	jettyVersion = "9.4.8.v20171121"
+	okhttpVersion = "3.10.0"
+	guavaVersion = "24.0"
+	apacheCommonsIOVersion = "2.6"
+	apacheCommonsLang3Version = "3.6"
+	logbackVersion = "1.2.3"
+	slf4jVersion = "1.7.25"
+	lombokVersion = "1.16.20"
+	junitVersion = "4.12"
+}
 
 group = 'com.github.twitch4j'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "me.philippheuer.Twitch4J"
+mainClassName = "io.twitch4j.Twitch4J"
 
 repositories {
 	mavenCentral()
@@ -25,7 +37,7 @@ repositories {
 }
 
 javadoc {
-	exclude 'me/philippheuer/twitch4j/impl/*',
+	exclude 'me/philippheuer/twitch4j/impl/**',
 			'me/philippheuer/twitch4j/utils/Util.java',
 			'me/philippheuer/Twitch4J.java',
 			'me/philippheuer/Arguments.java'
@@ -39,45 +51,34 @@ javadoc {
 }
 
 dependencies {
-	compile "com.auth0:java-jwt:+"
+	compile "com.auth0:java-jwt:${jwtVersion}"
 
-	compile "org.eclipse.jetty.websocket:websocket-client:+"
-	compile "org.eclipse.jetty.websocket:websocket-api:+"
-	compile "org.eclipse.jetty.websocket:websocket-servlet:+"
-	compile "org.eclipse.jetty.websocket:javax-websocket-client-impl:+"
+	compile "org.eclipse.jetty.websocket:websocket-client:${jettyVersion}"
+	compile "org.eclipse.jetty.websocket:websocket-api:${jettyVersion}"
+	compile "org.eclipse.jetty.websocket:websocket-servlet:${jettyVersion}"
+	compile "org.eclipse.jetty.websocket:javax-websocket-client-impl:${jettyVersion}"
 
-	compile "org.eclipse.jetty:jetty-server:+"
-	compile "org.eclipse.jetty:jetty-servlet:+"
-	compile "org.eclipse.jetty:jetty-util:+"
+	compile "org.eclipse.jetty:jetty-server:${jettyVersion}"
+	compile "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
+	compile "org.eclipse.jetty:jetty-util:${jettyVersion}"
 
-	compile "com.squareup.retrofit2:retrofit:+"
-	compile "com.squareup.retrofit2:converter-jackson:+"
+	compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+	compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
 
-	compile "org.jdbi:jdbi3-core:+"
+	compile "commons-io:commons-io:${apacheCommonsIOVersion}"
+	compile "org.apache.commons:commons-lang3:${apacheCommonsLang3Version}"
 
-	compile "org.isomorphism:token-bucket:1.7"
-	compile "net.jodah:expiringmap:0.5.8"
-	compile "net.jodah:typetools:0.5.0"
+	compile "com.google.guava:guava:${guavaVersion}-jre"
 
-	compile "commons-io:commons-io:+"
-	compile "org.apache.commons:commons-lang3:+"
+	compile "ch.qos.logback:logback-classic:${logbackVersion}"
 
-	compile 'com.google.guava:guava:24.0-jre'
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"	// Getters, Setters and more.
+	apt "org.projectlombok:lombok:${lombokVersion}"
 
-	compile "com.beust:jcommander:1.72"
-
-	compile "ch.qos.logback:logback-classic:1.2.3"
-
-	compileOnly "org.projectlombok:lombok:+"	// Getters, Setters and more.
-	apt "org.projectlombok:lombok:+"
-
-	testCompile "junit:junit:+"
-}
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '4.5.1'
+	testCompile "junit:junit:${junitVersion}"
+	testCompile "com.squareup.okhttp3:mockwebserver:${okhttpVersion}"
 }
 
 wrapper {
-	gradleVersion = "4.5" // newer version
+	gradleVersion = "4.5.1" // newer version
 }

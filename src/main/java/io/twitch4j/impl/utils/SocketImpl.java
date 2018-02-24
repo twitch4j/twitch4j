@@ -24,6 +24,7 @@
 
 package io.twitch4j.impl.utils;
 
+import io.twitch4j.TwitchAPI;
 import io.twitch4j.utils.ISocket;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class SocketImpl<T extends TwitchListener> implements ISocket {
 	private final IClient client;
 	private final WebSocketClient wsClient = new WebSocketClient();
 	private final T listener;
-	private final String uri;
+	private final TwitchAPI uri;
 
 	public Optional<Session> getSession() {
 		return listener.getSession();
@@ -58,7 +59,7 @@ public class SocketImpl<T extends TwitchListener> implements ISocket {
 		if (!isConnected()) {
 			wsClient.start();
 			wsClient.setStopAtShutdown(true);
-			wsClient.connect(listener, new URI(uri), new ClientUpgradeRequest());
+			wsClient.connect(listener, new URI(uri.getUrl()), new ClientUpgradeRequest());
 		}
 	}
 

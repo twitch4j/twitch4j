@@ -24,6 +24,9 @@
 
 package io.twitch4j.impl.irc;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.twitch4j.impl.utils.TwitchListener;
 import io.twitch4j.irc.channel.IChannel;
 import io.twitch4j.irc.model.IrcMessage;
@@ -42,6 +45,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class MessageInterfaceListener extends TwitchListener {
@@ -50,31 +57,47 @@ public class MessageInterfaceListener extends TwitchListener {
 		super(client);
 	}
 	private final Map<String, IChannel> channels = new LinkedHashMap<>();
+	private final ConcurrentHashMap<String, IChannel> channelQueue = new ConcurrentHashMap<>();
 
 	public void addChannel(String channelName) {
 		IChannel channel = new ChannelEndpoint(this, channelName);
 		if (isConnected()) {
 			channel.join();
-		}
-		channels.put(channelName, channel);
+			channels.put(channelName, channel);
+		} else channelQueue.put(channelName, channel);
 	}
 
 	public void removeChannel(String channelName) {
-		IChannel channel = channels.remove(channelName);
 		if (isConnected()) {
-			channel.part();
-		}
+			channels.remove(channelName).part();
+		} else channelQueue.remove(channelName);
 	}
 
 	public IChannel getChannel(String channel) {
-		return channels.get(channel);
+		if (isConnected()) {
+			return channels.get(channel);
+		} else return channelQueue.get(channel);
 	}
 
 	@Override
 	public void onWebSocketText(String raw) {
 		IrcMessage message = IrcMessage.parseMessage(raw);
-		logger.debug(message.toString());
-		// TODO: handling message
+		switch (message.getCommand()) {
+			case PING:
+				sendPong();
+			default:
+				IrcMessage.parseAndDispatchEvent(message, getClient());
+		}
+	}
+
+	private void sendPong() {
+		getSession().ifPresent(session -> {
+			try {
+				session.getRemote().sendString("PONG :tmi.twitch.tv");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@Override
@@ -88,10 +111,6 @@ public class MessageInterfaceListener extends TwitchListener {
 		try {
 			((TwitchMessageInterface) getClient().getMessageInterface())
 					.initialize(session);
-			if (!channels.containsKey(getClient().getConfiguration().getBot().getUsername())) {
-				addChannel(getClient().getConfiguration().getBot().getUsername());
-			}
-			channels.forEach((name, channel) -> channel.join());
 		} catch (IOException e) {
 			logger.error("Connection error to Message Interface:", e);
 		}

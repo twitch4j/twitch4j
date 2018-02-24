@@ -28,4 +28,11 @@ import io.twitch4j.api.Model;
 import io.twitch4j.api.Model;
 
 public class Subscription extends Model {
+	public enum Type {
+		PRIME,
+		SUB_1000,
+		SUB_2000,
+		SUB_3000,
+		UNKNOWN;
+	}
 }

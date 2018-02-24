@@ -24,25 +24,12 @@
 
 package io.twitch4j.impl;
 
-import io.twitch4j.api.helix.IHelix;
-import io.twitch4j.api.kraken.IKraken;
-import io.twitch4j.event.IDispatcher;
-import io.twitch4j.impl.auth.Credential;
-import io.twitch4j.impl.event.EventDispatcher;
-import io.twitch4j.irc.IMessageInterface;
-import io.twitch4j.pubsub.IPubSub;
-import io.twitch4j.utils.LoggerType;
-import lombok.Getter;
-import lombok.Setter;
 import io.twitch4j.IClient;
 import io.twitch4j.IConfiguration;
-import io.twitch4j.api.helix.IHelix;
 import io.twitch4j.api.kraken.IKraken;
 import io.twitch4j.auth.IManager;
 import io.twitch4j.event.IDispatcher;
-import io.twitch4j.impl.api.helix.HelixApi;
 import io.twitch4j.impl.api.kraken.KrakenApi;
-import io.twitch4j.impl.auth.Credential;
 import io.twitch4j.impl.auth.CredentialManager;
 import io.twitch4j.impl.event.EventDispatcher;
 import io.twitch4j.impl.irc.TwitchMessageInterface;
@@ -50,6 +37,8 @@ import io.twitch4j.impl.pubsub.TwitchPubSub;
 import io.twitch4j.irc.IMessageInterface;
 import io.twitch4j.pubsub.IPubSub;
 import io.twitch4j.utils.LoggerType;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,18 +80,7 @@ public class TwitchClient implements IClient {
 	}
 
 	@Override
-	public IHelix getHelixApi() {
-		return new HelixApi(this);
-	}
-
-	@Override
 	public IKraken getKrakenApi() {
 		return new KrakenApi(this);
-	}
-
-	public static class BotCredential extends Credential implements IConfiguration.IBot {
-		public BotCredential(String accessToken, String refreshToken) {
-			super(accessToken, refreshToken);
-		}
 	}
 }

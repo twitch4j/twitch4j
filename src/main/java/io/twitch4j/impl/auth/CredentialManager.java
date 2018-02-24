@@ -24,6 +24,7 @@
 
 package io.twitch4j.impl.auth;
 
+import io.twitch4j.Builder;
 import io.twitch4j.utils.LoggerType;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,14 +58,14 @@ public class CredentialManager implements IManager {
 	}
 
 	@Override
-	public ICredential generateAccessToken(String code, String redirectUrl) {
+	public ICredential generateAccessToken(String code, String redirectUrl) throws Exception {
 		ICredential credential = authorization.buildAccessToken(code, redirectUrl);
 		credentialStorage.add(credential);
 		return credential;
 	}
 
 	@Override
-	public ICredential refreshToken(ICredential credential) {
+	public ICredential refreshToken(ICredential credential) throws Exception {
 		ICredential newCredential = authorization.refreshToken(credential);
 		credentialStorage.remove(credential);
 		credentialStorage.add(newCredential);
@@ -72,19 +73,24 @@ public class CredentialManager implements IManager {
 	}
 
 	@Override
-	public void revokeToken(ICredential credential) {
+	public void revokeToken(ICredential credential) throws Exception {
 		if (authorization.revokeToken(credential)) {
 			credentialStorage.remove(credential);
 		}
 	}
 
 	@Override
-	public void revokeToken(ICredential credential, boolean revokeOnly) {
+	public void revokeToken(ICredential credential, boolean revokeOnly) throws Exception {
 		authorization.revokeToken(credential);
 	}
 
 	@Override
-	public ICredential buildCredentialData(ICredential credential) {
-		return client.getKrakenApi().fetchUserInfo(credential);
+	public ICredential rebuildCredentialData(ICredential credential) throws Exception {
+		return null;
+	}
+
+	@Override
+	public ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception {
+		return authorization.buildCredentialData(credentialBuilder);
 	}
 }

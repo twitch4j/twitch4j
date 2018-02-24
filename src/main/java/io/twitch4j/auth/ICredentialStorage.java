@@ -29,17 +29,18 @@ import io.twitch4j.utils.ISocket;
 import io.twitch4j.api.kraken.models.User;
 import io.twitch4j.utils.ISocket;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-public interface ICredentialStorage extends ISocket {
-	Set<ICredential> getCredentials();
+public interface ICredentialStorage {
+	Collection<ICredential> getCredentials();
 
 	Optional<ICredential> getCredentialById(long userId);
 	Optional<ICredential> getCredentialName(String username);
 	Optional<ICredential> getCredential(User user);
 
-	void add(ICredential credential);
-	void remove(ICredential credential);
-	void remove(ICredential credential, boolean revoke);
+	void add(ICredential credential) throws Exception;
+	void remove(ICredential credential) throws Exception;
+	void remove(ICredential credential, boolean revoke) throws Exception;
 }

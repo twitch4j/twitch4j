@@ -25,14 +25,12 @@
 package io.twitch4j.impl.api;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
 
-@Data
 @AllArgsConstructor
 public class HeaderInterceptor implements Interceptor {
 	private final String key;
@@ -40,13 +38,10 @@ public class HeaderInterceptor implements Interceptor {
 
 	@Override
 	public Response intercept(Chain chain) throws IOException {
-		Request original = chain.request();
+		Request request = chain.request();
+		Request.Builder newRequest = request.newBuilder()
+				.header(key, value);
 
-		Request request = original.newBuilder()
-				.header(key, value)
-				.method(original.method(), original.body())
-				.build();
-
-		return chain.proceed(request);
+		return chain.proceed(newRequest.build());
 	}
 }

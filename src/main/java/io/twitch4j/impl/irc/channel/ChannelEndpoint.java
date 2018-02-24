@@ -35,15 +35,6 @@ import io.twitch4j.irc.exceptions.ChannelNotFoundException;
 import io.twitch4j.irc.exceptions.ModerationException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import io.twitch4j.api.kraken.models.Channel;
-import io.twitch4j.api.kraken.models.User;
-import io.twitch4j.impl.irc.MessageInterfaceListener;
-import io.twitch4j.irc.DefaultColor;
-import io.twitch4j.irc.channel.IChannel;
-import io.twitch4j.irc.channel.IModeration;
-import io.twitch4j.irc.chat.IChatRoom;
-import io.twitch4j.irc.exceptions.ChannelNotFoundException;
-import io.twitch4j.irc.exceptions.ModerationException;
 
 import java.awt.*;
 import java.io.IOException;
@@ -57,7 +48,7 @@ public class ChannelEndpoint implements IChannel {
 
 	@Override
 	public Channel getChannelInfo() {
-		return listener.getClient().getKrakenApi().channelOperation().getByName(channel).orElseThrow(() -> new ChannelNotFoundException(channel + " is not exists."));
+		return listener.getClient().getKrakenApi().channelsOperation().getByName(channel).orElseThrow(() -> new ChannelNotFoundException(channel + " is not exists."));
 	}
 
 	@Override
@@ -80,11 +71,6 @@ public class ChannelEndpoint implements IChannel {
 	@Override
 	public List<User> getChatUsers() {
 		return null;
-	}
-
-	@Override
-	public boolean isJoined() {
-		return getListener().getChannels().containsKey(channel);
 	}
 
 	@Override
@@ -116,7 +102,7 @@ public class ChannelEndpoint implements IChannel {
 	@Override
 	public void part() {
 		getListener().getSession().ifPresent(session -> {
-			if (isJoined()) {
+			if (getListener().getChannels().containsKey(channel)) {
 				try {
 					session.getRemote().sendString("PART #" + channel);
 					getListener().getChannels().remove(channel);
@@ -134,6 +120,9 @@ public class ChannelEndpoint implements IChannel {
 				try {
 					session.getRemote().sendString("JOIN #" + channel);
 					getListener().getChannels().put(channel, this);
+					if (getListener().getChannelQueue().contains(channel)) {
+						getListener().getChannelQueue().remove(channel);
+					}
 				} catch (IOException e) {
 					getListener().getLogger().error("Cannot join to channel: " + channel, e);
 				}

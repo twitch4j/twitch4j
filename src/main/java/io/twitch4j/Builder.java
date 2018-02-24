@@ -27,31 +27,25 @@ package io.twitch4j;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.twitch4j.api.kraken.models.Channel;
+import io.twitch4j.auth.AbstractCredentialStorage;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.auth.ICredentialStorage;
 import io.twitch4j.impl.Configuration;
 import io.twitch4j.impl.TwitchClient;
 import io.twitch4j.impl.auth.Credential;
-import io.twitch4j.impl.auth.DefaultCredentialStorage;
+import io.twitch4j.impl.auth.FileCredentialStorage;
 import io.twitch4j.impl.pubsub.TwitchPubSubTopic;
 import io.twitch4j.pubsub.ITopic;
 import io.twitch4j.pubsub.Topic;
+import io.twitch4j.utils.LoggerType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
-import io.twitch4j.api.kraken.models.Channel;
-import io.twitch4j.auth.ICredential;
-import io.twitch4j.auth.ICredentialStorage;
-import io.twitch4j.impl.Configuration;
-import io.twitch4j.impl.TwitchClient;
-import io.twitch4j.impl.auth.Credential;
-import io.twitch4j.impl.auth.DefaultCredentialStorage;
-import io.twitch4j.impl.pubsub.TwitchPubSubTopic;
-import io.twitch4j.pubsub.ITopic;
-import io.twitch4j.pubsub.Topic;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -89,7 +83,7 @@ public class Builder {
 		/**
 		 * Credential Storage
 		 */
-		private Function<IClient, ? extends ICredentialStorage> credentialStorage = DefaultCredentialStorage::new;
+		private Function<IClient, ? extends ICredentialStorage> credentialStorage = FileCredentialStorage::new;
 
 		@Wither(AccessLevel.NONE)
 		private Set<String> channels;
@@ -133,7 +127,7 @@ public class Builder {
 		 * Build Twitch Client
 		 * @return Twitch Client
 		 */
-		public IClient build() {
+		public IClient build() throws Exception {
 			boolean pubSub = topics != null && !topics.isEmpty();
 
 			Configuration configuration = new Configuration(
@@ -143,13 +137,12 @@ public class Builder {
 			);
 			TwitchClient client = new TwitchClient(configuration);
 
-			if (!Objects.isNull(this.botCredential)) {
-				((Configuration) client.getConfiguration())
-						.setBot((IConfiguration.IBot) this.botCredential.build(client, true));
-			}
-
 			client.getCredentialManager().setCredentialStorage(this.credentialStorage.apply(client));
 
+			if (!Objects.isNull(this.botCredential)) {
+				((Configuration) client.getConfiguration()).setBot((IConfiguration.IBot) client.getCredentialManager().buildCredentialData(this.botCredential));
+			}
+			
 			client.getPubSub().registerTopics(topics);
 			client.getMessageInterface().addChannels(channels);
 
@@ -185,14 +178,6 @@ public class Builder {
 		public Credentials withIdToken(DecodedJWT idToken) {
 			this.idToken = idToken;
 			return this;
-		}
-
-		public ICredential build(IClient client) {
-			return build(client, false);
-		}
-
-		public ICredential build(IClient client, boolean bot) {
-			return client.getCredentialManager().buildCredentialData((bot) ? new TwitchClient.BotCredential(accessToken, refreshToken) : new Credential(accessToken, refreshToken, idToken));
 		}
 	}
 

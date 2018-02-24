@@ -24,15 +24,26 @@
 
 package io.twitch4j.utils;
 
+import io.twitch4j.auth.ICredential;
+import io.twitch4j.auth.Scope;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
+import java.util.*;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Util {
 	private static Logger logger = LoggerFactory.getLogger("Util");
@@ -80,5 +91,43 @@ public class Util {
 		}
 
 		return sb.toString().toLowerCase();
+	}
+
+	public static <T> boolean checkEmptyAllFields(T object, String... fields) throws Exception {
+		Set<FieldCondition> fieldConditions = Arrays.stream(fields)
+				.map(field -> {
+					boolean condition = !field.startsWith("!");
+					String name = condition ? field.substring(1) : field;
+					return new FieldCondition(name, condition);
+				}).collect(Collectors.toSet());
+
+		return checkEmptyAllFields(object, fieldsList ->
+				fieldsList.stream().allMatch(field -> {
+					Optional<FieldCondition> condition = fieldConditions.stream()
+							.filter(fc -> fc.fieldName.equals(field.getName())).findFirst();
+					if (condition.isPresent()) {
+						try {
+							return condition.get().condition && !Objects.isNull(field.get(object));
+						} catch (IllegalAccessException ignored) {
+						}
+					}
+					return true;
+				})
+		);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> boolean checkEmptyAllFields(T object, Predicate<Collection<Field>> condition) throws Exception {
+		return condition.test(Arrays.asList(object.getClass().getDeclaredFields()));
+	}
+
+	public static <T> boolean hasCollectionDifference(Collection<T> target, Collection<T> source) {
+		return !source.stream().allMatch(target::contains) && !target.stream().allMatch(source::contains);
+	}
+
+	@AllArgsConstructor
+	private static class FieldCondition {
+		protected final String fieldName;
+		protected final boolean condition;
 	}
 }

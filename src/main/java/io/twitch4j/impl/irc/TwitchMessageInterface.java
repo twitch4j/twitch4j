@@ -76,6 +76,11 @@ public class TwitchMessageInterface extends SocketImpl<MessageInterfaceListener>
 	}
 
 	@Override
+	public boolean isJoined(String channelName) {
+		return getListener().getChannels().containsKey(channelName);
+	}
+
+	@Override
 	public void changeColorNames(DefaultColor color) {
 		getBotChannel().changeColorNames(color);
 	}
@@ -91,12 +96,16 @@ public class TwitchMessageInterface extends SocketImpl<MessageInterfaceListener>
 	}
 
 	protected void initialize(Session session) throws IOException {
+		if (!getListener().getChannels().containsKey(getClient().getConfiguration().getBot().getUsername())) {
+			addChannel(getClient().getConfiguration().getBot().getUsername());
+		}
+
 		session.getRemote().sendString("CAP REQ :twitch.tv/membership");
 		session.getRemote().sendString("CAP REQ :twitch.tv/tags");
 		session.getRemote().sendString("CAP REQ :twitch.tv/commands");
 
-		session.getRemote().sendString("CAP REQ :twitch.tv/commands");
 		session.getRemote().sendString("PASS " + getClient().getConfiguration().getBot().getPassword());
-		session.getRemote().sendString("NICK " + getClient().getConfiguration().getBot().getUsername().toLowerCase());
+		session.getRemote().sendString("NICK " + getClient().getConfiguration().getBot().getUsername());
+		getListener().getChannelQueue().forEach((name, channel) -> channel.join());
 	}
 }

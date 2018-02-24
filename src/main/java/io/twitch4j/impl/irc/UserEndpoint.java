@@ -49,7 +49,7 @@ public class UserEndpoint implements IUser {
 
 	@Override
 	public User getUserInfo() {
-		return listener.getClient().getKrakenApi().userOperation().getByName(userName).orElseThrow(() -> new UserNotFoundException(channel + " is not exists."));
+		return listener.getClient().getKrakenApi().usersOperation().getByName(userName).orElseThrow(() -> new UserNotFoundException(userName + " is not exists."));
 	}
 
 	@Override

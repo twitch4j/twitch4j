@@ -24,46 +24,65 @@
 
 package io.twitch4j.impl.api;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import io.twitch4j.IClient;
+import io.twitch4j.TwitchAPI;
 import io.twitch4j.api.IApi;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.api.Model;
+import io.twitch4j.api.RequestType;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import io.twitch4j.IClient;
-import io.twitch4j.api.IApi;
-import io.twitch4j.utils.LoggerType;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
+import okhttp3.*;
 
-@Slf4j(topic = LoggerType.API)
+import java.util.Map;
+
+@Getter
 public class Api implements IApi {
-	@Getter(AccessLevel.PROTECTED)
-	private final IClient client;
-	private final Retrofit retrofit;
-	@Getter
-	private final String baseAuth;
 
-	public Api(IClient client, String baseUrl, String baseAuth) {
-		OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
-				.addInterceptor(new HeaderInterceptor("Client-ID", client.getConfiguration().getClientId()))
-				.addInterceptor(new HeaderInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
-		if (baseUrl.contains("kraken")) {
-			httpClient.addInterceptor(new HeaderInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
-		}
+	private final IClient client;
+
+	private final OkHttpClient httpClient;
+
+	protected final ObjectMapper mapper;
+
+	@Getter(AccessLevel.NONE)
+	private TwitchAPI api;
+
+	protected Api(IClient client, TwitchAPI api) {
 		this.client = client;
-		this.baseAuth = baseAuth;
-		this.retrofit = new Retrofit.Builder()
-				.baseUrl(baseUrl)
-				.addCallAdapterFactory(new ExceptionConverter())
-				.addCallAdapterFactory(new TwitchCallAdapterFactory(client))
-				.addConverterFactory(new TwitchConverterFactory(baseAuth))
-				.client(httpClient.build())
+		this.api = (api.equals(TwitchAPI.HELIX) || api.equals(TwitchAPI.KRAKEN)) ? api : TwitchAPI.DEFAULT;
+		this.httpClient = new OkHttpClient.Builder()
+				.addInterceptor(new TwitchInterceptor(client, true))
 				.build();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy());
+		mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
+
+		this.mapper = mapper;
 	}
 
-
 	@Override
-	public <S> S createService(final Class<S> serviceClass) {
-		return retrofit.create(serviceClass);
+	public Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws Exception {
+		Request.Builder request = new Request.Builder();
+		request.url(url);
+		if (!headers.isEmpty()) {
+			request.headers(Headers.of(headers));
+		}
+		request.method(requestType.name(), body);
+		try (Response response = httpClient.newCall(request.build()).execute()) {
+			return response;
+		}
+	}
+
+	protected <T> T buildPOJO(Response response, Class<T> responseType) throws Exception {
+		T data = mapper.readValue(response.body().bytes(), responseType);
+
+		if (data instanceof Model) {
+			((Model) data).setClient(client);
+		}
+
+		return data;
 	}
 }

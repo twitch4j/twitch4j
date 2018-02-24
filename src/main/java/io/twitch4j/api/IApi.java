@@ -24,6 +24,51 @@
 
 package io.twitch4j.api;
 
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import java.util.Map;
+
 public interface IApi {
-	<S> S createService(Class<S> serviceClass);
+	default Response get(String url, Map<String, String> headers) throws Exception {
+		return request(RequestType.GET, url, headers);
+	}
+	default Response post(String url, RequestBody body, Map<String, String> headers) throws Exception {
+		return request(RequestType.POST, url, body, headers);
+	}
+	default Response put(String url, RequestBody body, Map<String, String> headers) throws Exception {
+		return request(RequestType.PUT, url, body, headers);
+	}
+	default Response patch(String url, RequestBody body, Map<String, String> headers) throws Exception {
+		return request(RequestType.PATCH, url, body, headers);
+	}
+	default Response delete(String url, Map<String, String> headers) throws Exception {
+		return request(RequestType.DELETE, url, headers);
+	}
+
+	default Response get(String url) throws Exception {
+		return get(url, null);
+	}
+	default Response post(String url, RequestBody body) throws Exception {
+		return post(url, body, null);
+	}
+	default Response put(String url, RequestBody body) throws Exception {
+		return put(url, body, null);
+	}
+	default Response patch(String url, RequestBody body) throws Exception {
+		return patch(url, body, null);
+	}
+	default Response delete(String url) throws Exception {
+		return delete(url, null);
+	}
+
+	default Response request(RequestType requestType, String url) throws Exception {
+		return request(requestType, url, null);
+	}
+
+	default Response request(RequestType requestType, String url, Map<String, String> headers) throws Exception {
+		return request(requestType, url, null, headers);
+	}
+
+	Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws Exception;
 }

@@ -40,8 +40,6 @@ public class Moderation implements IModeration {
 
 	private final ChannelEndpoint endpoint;
 
-
-
 	@Override
 	public void banUser(String user, String reason) {
 		endpoint.sendMessage(String.format("/ban %s%s", user, (StringUtils.isBlank(reason)) ? "" : " " + reason));

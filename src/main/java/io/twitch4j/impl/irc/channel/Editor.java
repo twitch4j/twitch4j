@@ -24,12 +24,10 @@
 
 package io.twitch4j.impl.irc.channel;
 
-import io.twitch4j.irc.CommercialType;
+import io.twitch4j.irc.channel.CommercialType;
 import io.twitch4j.irc.channel.IEditor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import io.twitch4j.irc.CommercialType;
-import io.twitch4j.irc.channel.IEditor;
 
 @Getter
 @RequiredArgsConstructor

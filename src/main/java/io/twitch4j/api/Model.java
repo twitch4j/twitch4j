@@ -24,17 +24,15 @@
 
 package io.twitch4j.api;
 
-import lombok.*;
 import io.twitch4j.IClient;
-import io.twitch4j.api.kraken.operations.KrakenOperation;
-import io.twitch4j.auth.ICredential;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+import java.util.Calendar;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Model {
 	private IClient client;
-	private Optional<ICredential> credential = Optional.empty();
+	private Calendar createdAt = Calendar.getInstance();
 }

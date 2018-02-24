@@ -26,7 +26,6 @@ package io.twitch4j.auth;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.twitch4j.api.kraken.models.User;
-import io.twitch4j.api.kraken.models.User;
 
 import java.util.Calendar;
 import java.util.Set;

@@ -24,29 +24,37 @@
 
 package io.twitch4j.impl.auth;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.auth0.jwt.JWT;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import io.twitch4j.Builder;
 import io.twitch4j.IClient;
 import io.twitch4j.TwitchAPI;
+import io.twitch4j.api.kraken.models.ErrorResponse;
+import io.twitch4j.api.kraken.models.Kraken;
+import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.auth.AuthorizationException;
 import io.twitch4j.auth.IAuthorization;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.auth.Scope;
+import io.twitch4j.utils.Util;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 import org.eclipse.jetty.util.UrlEncoded;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
 
 import java.nio.charset.Charset;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class Authorization implements IAuthorization {
-	@NonNull private final IClient client;
+
+	private final IClient client;
 
 	@Getter
 	@Setter
@@ -56,17 +64,21 @@ public class Authorization implements IAuthorization {
 	@Setter
 	private boolean openIdConnect = false;
 
-	private final Retrofit retrofit = new Retrofit.Builder()
-			.baseUrl((openIdConnect) ? TwitchAPI.DEFAULT : TwitchAPI.KRAKEN)
-			.addConverterFactory(JacksonConverterFactory.create())
-			.build();
+	private final OkHttpClient httpClient = new OkHttpClient();
+
+	private final ObjectMapper mapper = new ObjectMapper();
+
+	{
+		this.mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy());
+		this.mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
+	}
 
 	@Override
 	public String buildAuthorizationUrl(Set<Scope> scopes, String redirectUri, String state) {
 		// do not add openid scope if OIDC is false
 		openIdConnectScopeVerify(scopes);
 
-		return new StringBuilder(TwitchAPI.KRAKEN)
+		return new StringBuilder(TwitchAPI.KRAKEN.getUrl())
 				.append("oauth2/authorize")
 				.append("?response_type=code")
 				.append("&client_id=").append(client.getConfiguration().getClientId())
@@ -90,58 +102,125 @@ public class Authorization implements IAuthorization {
 		}
 	}
 
-	@Override
-	public ICredential buildAccessToken(String code, String redirectUri) {
-		OAuth2 oAuth2 = retrofit.create(OAuth2.class);
-		Credential credential = oAuth2.getToken(
-				client.getConfiguration().getClientId(),
-				client.getConfiguration().getClientSecret(),
-				redirectUri,
-				code
-		);
-
-		credential.setUser(client.getKrakenApi().userOperation().get(credential));
-
-		return credential;
+	private AccessToken buildAccessToken(Response response) throws Exception {
+		AccessToken accessToken = null;
+		if (response.isSuccessful()) {
+			accessToken = mapper.readValue(response.body().bytes(), AccessToken.class);
+		} else if (response.code() >= 400) {
+			throw new AuthorizationException(mapper.readValue(response.body().bytes(), ErrorResponse.class));
+		}
+		return accessToken;
 	}
 
 	@Override
-	public ICredential refreshToken(ICredential credential) {
-		// cast to Credential to change
-		Credential oldCredential = (Credential) credential;
-		OAuth2 oAuth2 = retrofit.create(OAuth2.class);
-		Credential newCredential = oAuth2.refreshToken(
-				client.getConfiguration().getClientId(),
-				client.getConfiguration().getClientSecret(),
-				oldCredential.getRefreshToken()
-		);
-		newCredential.setUser(oldCredential.getUser());
-		return newCredential;
+	public ICredential buildAccessToken(String code, String redirectUri) throws Exception {
+		String url = new StringBuilder((openIdConnect) ? TwitchAPI.DEFAULT.getUrl() : TwitchAPI.KRAKEN.getUrl())
+				.append("oauth2/token")
+				.append("?grant_type=authorization_code")
+				.append("&client_id=").append(client.getConfiguration().getClientId())
+				.append("&client_secret=").append(client.getConfiguration().getClientSecret())
+				.append("&code=").append(code)
+				.append("&redirect_uri=").append(UrlEncoded.encodeString(redirectUri, Charset.forName("UTF-8")))
+				.toString();
+
+		try (Response response = postResponse(url)) {
+			return buildCredential(buildAccessToken(response));
+		}
 	}
 
 	@Override
-	public boolean revokeToken(ICredential credential) {
-		return retrofit.create(OAuth2.class).revokeToken(client.getConfiguration().getClientId(), credential.getAccessToken()).isSuccessful();
+	public ICredential refreshToken(ICredential credential) throws Exception {
+		String url = new StringBuilder(TwitchAPI.KRAKEN.getUrl())
+				.append("oauth2/authorize")
+				.append("?grant_type=refresh_token")
+				.append("&refresh_token=").append(credential.getRefreshToken())
+				.append("&client_id=").append(client.getConfiguration().getClientId())
+				.append("&client_secret=").append(client.getConfiguration().getClientSecret())
+				.toString();
+
+		try (Response response = postResponse(url)) {
+			return buildCredential(buildAccessToken(response));
+		}
 	}
 
-	public interface OAuth2 {
-		@POST("/oauth2/token?grant_type=authorization_code")
-		Credential getToken(
-				@Query("client_id") String clientId,
-				@Query("client_secret") String clientSecret,
-				@Query("redirect_uri") String redirectUri,
-				@Query("code") String code
-		);
-		@POST("https://api.twitch.tv/kraken/oauth2/token?grant_type=refresh_token")
-		Credential refreshToken(
-				@Query("client_id") String clientId,
-				@Query("client_secret") String clientSecret,
-				@Query("refresh_token") String refreshToken
-		);
-		@POST("https://api.twitch.tv/kraken/oauth2/revoke")
-		Response revokeToken(
-				@Query("client_id") String clientId,
-				@Query("token") String accessToken
-		);
+	private ICredential buildCredential(AccessToken accessToken) throws Exception {
+		Kraken kraken = client.getKrakenApi().fetchUserInfo(accessToken.getAccessToken());
+		User user = client.getKrakenApi().usersOperation().getById(kraken.getUserId());
+		Map<String, ?> data = new LinkedHashMap<>();
+		Calendar expire = Calendar.getInstance();
+		expire.add(Calendar.SECOND, (int) accessToken.getExpiresIn());
+
+		Credential preCredential = Credential.newCredential()
+				.accessToken(accessToken.getAccessToken())
+				.refreshToken(accessToken.getRefreshToken())
+				.expiredAt(expire)
+				.idToken(JWT.decode(accessToken.getIdToken()))
+				.scopes(kraken.getAuthorization().getScopes())
+				.build();
+		preCredential.setUser(client.getKrakenApi().usersOperation().get(preCredential));
+
+		return preCredential;
+	}
+
+	private Response postResponse(String url) throws Exception {
+		Request request = new Request.Builder()
+				.url(url)
+				.post(null)
+				.build();
+		try (Response response = httpClient.newCall(request).execute()) {
+			return response;
+		}
+	}
+
+	@Override
+	public boolean revokeToken(ICredential credential) throws Exception {
+		String url = new StringBuilder(TwitchAPI.KRAKEN.getUrl())
+				.append("oauth2/revoke")
+				.append("?response_type=code")
+				.append("?client_id=").append(client.getConfiguration().getClientId())
+				.append("&token=").append(credential.getAccessToken())
+				.toString();
+
+		try (Response response = postResponse(url)) {
+			if (response.code() >= 400) {
+				throw new AuthorizationException(mapper.readValue(response.body().bytes(), ErrorResponse.class));
+			}
+			return response.isSuccessful();
+		}
+	}
+
+	@Override
+	public ICredential rebuildCredentialData(ICredential credential) throws Exception {
+		Credential preCredential = (Credential) credential;
+		Kraken kraken = client.getKrakenApi().fetchUserInfo(credential.getAccessToken());
+		if (!kraken.isValid()) {
+			return refreshToken(credential);
+		} else {
+			if (Objects.isNull(credential.getUser())) {
+				preCredential.setUser(client.getKrakenApi().usersOperation().get(credential));
+			}
+			if (Objects.isNull(credential.getScopes()) || credential.getScopes().size() != kraken.getAuthorization().getScopes().size() || Util.hasCollectionDifference(credential.getScopes(), kraken.getAuthorization().getScopes())) {
+				preCredential.setScopes(kraken.getAuthorization().getScopes());
+			}
+			return preCredential;
+		}
+	}
+
+	@Override
+	public ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception {
+		Kraken kraken = client.getKrakenApi().fetchUserInfo(credentialBuilder.getAccessToken());
+		Calendar expire = Calendar.getInstance();
+		expire.add(Calendar.DATE, 60);
+
+		Credential preCredential = Credential.newCredential()
+				.accessToken(credentialBuilder.getAccessToken())
+				.refreshToken(credentialBuilder.getRefreshToken())
+				.idToken(credentialBuilder.getIdToken())
+				.scopes(kraken.getAuthorization().getScopes())
+				.expiredAt(expire)
+				.build();
+		preCredential.setUser(client.getKrakenApi().usersOperation().get(preCredential));
+
+		return preCredential;
 	}
 }

@@ -29,10 +29,6 @@ import io.twitch4j.irc.DefaultColor;
 import io.twitch4j.irc.chat.IChatRoom;
 import io.twitch4j.irc.exceptions.ModerationException;
 import io.twitch4j.api.kraken.models.Channel;
-import io.twitch4j.api.kraken.models.User;
-import io.twitch4j.irc.DefaultColor;
-import io.twitch4j.irc.chat.IChatRoom;
-import io.twitch4j.irc.exceptions.ModerationException;
 
 import java.awt.*;
 import java.util.List;
@@ -43,7 +39,6 @@ public interface IChannel {
 	List<User> getModerators();
 	List<User> getSubscribers();
 	List<User> getChatUsers();
-	boolean isJoined();
 	boolean isBotModerator();
 	boolean isBotEditor();
 	void sendMessage(String message);

@@ -24,6 +24,8 @@
 
 package io.twitch4j.auth;
 
+import io.twitch4j.Builder;
+
 import java.util.Set;
 
 public interface IManager {
@@ -55,9 +57,10 @@ public interface IManager {
 	 * @param redirectUrl Your registered redirect URI. This must <i>exactly match</i> the redirect URI registered in the prior, <a href="https://dev.twitch.tv/docs/authentication#registration">Registration</a> step.
 	 * @return Access Token, Refresh Token and authorized user via {@link ICredential#getUser()}. {@link ICredential#getIdToken()} will be empty if on {@link IAuthorization#isOpenIdConnect()} will be <b>false</b>
 	 */
-	ICredential generateAccessToken(String code, String redirectUrl);
-	ICredential refreshToken(ICredential credential);
-	void revokeToken(ICredential credential);
-	void revokeToken(ICredential credential, boolean revokeOnly);
-	ICredential buildCredentialData(ICredential credential);
+	ICredential generateAccessToken(String code, String redirectUrl) throws Exception;
+	ICredential refreshToken(ICredential credential) throws Exception;
+	void revokeToken(ICredential credential) throws Exception;
+	void revokeToken(ICredential credential, boolean revokeOnly) throws Exception;
+	ICredential rebuildCredentialData(ICredential credential) throws Exception;
+	ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception;
 }

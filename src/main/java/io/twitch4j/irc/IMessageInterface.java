@@ -52,6 +52,9 @@ public interface IMessageInterface extends ISocket {
 	IChannel getChannel(String channelName);
 	IChannel getBotChannel();
 	IUser createPrivateMessage(String userName);
+
+	boolean isJoined(String channelName);
+
 	void changeColorNames(DefaultColor color);
 	void changeColorNames(Color color);
 	void changeColorNames(String hexColor);

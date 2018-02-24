@@ -24,6 +24,8 @@
 
 package io.twitch4j.auth;
 
+import io.twitch4j.Builder;
+
 import java.util.Set;
 
 public interface IAuthorization {
@@ -34,7 +36,9 @@ public interface IAuthorization {
 	void setOpenIdConnect(boolean openIdConnect);
 
 	String buildAuthorizationUrl(Set<Scope> scopes, String redirectUri, String state);
-	ICredential buildAccessToken(String code, String redirectUri);
-	ICredential refreshToken(ICredential credential);
-	boolean revokeToken(ICredential credential);
+	ICredential buildAccessToken(String code, String redirectUri) throws Exception;
+	ICredential refreshToken(ICredential credential) throws Exception;
+	boolean revokeToken(ICredential credential) throws Exception;
+	ICredential rebuildCredentialData(ICredential credential) throws Exception;
+	ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception;
 }

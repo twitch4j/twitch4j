@@ -26,19 +26,16 @@ package io.twitch4j.api.kraken.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.twitch4j.api.Model;
+import io.twitch4j.auth.ICredential;
 import lombok.*;
-import io.twitch4j.api.IApi;
-import io.twitch4j.api.Model;
-import io.twitch4j.api.OnField;
-import okhttp3.Response;
-import retrofit2.http.*;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 
 @Data
 @AllArgsConstructor
-@ToString(exclude = {"endpoint"})
+@ToString(exclude = {"credential"})
 @EqualsAndHashCode(callSuper = false)
 public class User extends Model {
 	@JsonProperty("_id")
@@ -54,36 +51,65 @@ public class User extends Model {
 	@Getter(AccessLevel.NONE)
 	private Calendar updatedAt;
 
-	private final UserEndpoints endpoint = ((IApi) getClient().getKrakenApi()).createService(UserEndpoints.class);
+	private Optional<ICredential> credential;
 
-	private interface UserEndpoints {
-		@GET("/users/{id}/emotes")
-		EmoteSet getEmoteSet(@Header("Authorization") String token, @Path("id") long userId);
+	public List<EmoteSet> getEmoteSets() {
+		return null;
+	}
 
-		@GET("/users/{id}/subscriptions/{channel_id}")
-		Optional<Subscription> getChannelSubscription(@Header("Authorization") String token, @Path("id") long userId, @Path("channel_id") long channelId);
+	public Optional<Subscription> getChannelSubscription(Channel channel) {
+		return getChannelSubscription(channel.getId());
+	}
 
-		@OnField("follows")
-		@GET("/users/{id}/follows/channels")
-		PaginatedList<Follow> getFollows(@Path("id") long userId);
+	public Optional<Subscription> getChannelSubscription(long channelId) {
+		return Optional.empty();
+	}
 
-		@GET("/users/{user_id}/follows/channels/{channel_id}")
-		Optional<Follow> getFollow(@Path("user_id") long userId, @Path("channel_id") long channelId);
+	public List<Follow> getFollows() {
+		return null;
+	}
 
-		@PUT("/users/{id}/follows/channels/{channel_id}")
-		Follow followChannel(@Header("Authorization") String token, @Path("id") long userId, @Path("channel_id") long channelId, @Query("notifications") boolean notifications);
+	public Optional<Follow> getFollowInfo(Channel channel) {
+		return getFollowInfo(channel.getId());
+	}
 
-		@DELETE("/users/{id}/follows/channels/{channel_id}")
-		Response unfollowChannel(@Header("Authorization") String token, @Path("id") long userId, @Path("channel_id") long channelId);
+	public Optional<Follow> getFollowInfo(long channelId) {
+		return Optional.empty();
+	}
 
-		@OnField("blocks")
-		@GET("/users/{id}/blocks")
-		PaginatedList<Blocked> getBlockedUser(@Header("Authorization") String token, @Path("id") long userId);
+	public Follow followChannel(Channel channel) {
+		return followChannel(channel.getId());
+	}
 
-		@PUT("/users/{credential.user.id}/blocks/{user_id}")
-		Blocked blockUser(@Header("Authorization") String token, @Path("id") long userId, @Path("blocked_id") long blockedUserId);
+	public Follow followChannel(long channelId) {
+		return null;
+	}
 
-		@DELETE("/users/{id}/blocks/{blocked_id}")
-		Response unblockUser(@Header("Authorization") String token, @Path("id") long userId, @Path("blocked_id") long blockedUserId);
+	public boolean unfollowChannel(Channel channel) {
+		return unfollowChannel(channel.getId());
+	}
+
+	public boolean unfollowChannel(long channelId) {
+		return false;
+	}
+
+	public List<Blocked> getBlockedUsers() {
+		return null;
+	}
+
+	public Blocked blockUser(User user) {
+		return blockUser(user.getId());
+	}
+
+	public Blocked blockUser(long userId) {
+		return null;
+	}
+
+	public boolean unblockUser(User user) {
+		return unblockUser(user.getId());
+	}
+
+	public boolean unblockUser(long userId) {
+		return false;
 	}
 }

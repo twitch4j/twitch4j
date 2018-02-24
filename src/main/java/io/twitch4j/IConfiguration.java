@@ -37,9 +37,11 @@ public interface IConfiguration {
 	IBot getBot();
 
 	interface IBot extends ICredential {
+
 		default String getUsername() {
-			return this.getUser().getUsername();
+			return getUser().getUsername().toLowerCase();
 		}
+
 		default String getPassword() {
 			return String.format("oauth:%s", this.getAccessToken());
 		}

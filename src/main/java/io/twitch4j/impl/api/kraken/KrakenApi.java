@@ -24,116 +24,147 @@
 
 package io.twitch4j.impl.api.kraken;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.twitch4j.api.NoScopeInfo;
-import io.twitch4j.api.kraken.IKraken;
-import io.twitch4j.api.kraken.operations.*;
-import io.twitch4j.impl.api.Api;
-import io.twitch4j.impl.auth.Credential;
-import io.twitch4j.utils.LoggerType;
 import io.twitch4j.IClient;
 import io.twitch4j.TwitchAPI;
-import io.twitch4j.api.NoScopeInfo;
+import io.twitch4j.api.ApiException;
 import io.twitch4j.api.kraken.IKraken;
+import io.twitch4j.api.kraken.models.ErrorResponse;
+import io.twitch4j.api.kraken.models.IngestServer;
+import io.twitch4j.api.kraken.models.Kraken;
 import io.twitch4j.api.kraken.operations.*;
-import io.twitch4j.auth.ICredential;
-import io.twitch4j.auth.Scope;
 import io.twitch4j.impl.api.Api;
-import io.twitch4j.impl.auth.Credential;
-import io.twitch4j.utils.LoggerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import retrofit2.Call;
-import retrofit2.http.Field;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
+import io.twitch4j.impl.api.kraken.operations.*;
+import io.twitch4j.utils.Unofficial;
+import okhttp3.Response;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 public class KrakenApi extends Api implements IKraken {
 
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.API);
+//	private final Bits bitsOperation;
+	private final Feeds feedsOpration;
+	private final Channels channelsOperation;
+	private final Chat chatOperation;
+	private final Clips clipsOpration;
+	private final Collections collectionsOperation;
+	private final Communities communitiesOperation;
+	private final Games gamesOperation;
+	private final Streams streamsOperation;
+	private final Teams teamsOperation;
+	@Unofficial
+	private final Undocumented undocumentedOperation;
+	private final Users usersOperation;
+	private final Videos videosOperation;
 
 	public KrakenApi(IClient client) {
-		super(client, TwitchAPI.KRAKEN, IKraken.PREFIX_AUTHORIZATION);
+		super(client, TwitchAPI.KRAKEN);
+
+//		this.bitsOperation = new BitsOperation(this);
+		this.feedsOpration = new FeedsOperation(this);
+		this.channelsOperation = new ChannelsOperation(this);
+		this.chatOperation = new ChatOperation(this);
+		this.clipsOpration = new ClipsOperation(this);
+		this.collectionsOperation = new CollectionsOperation(this);
+		this.communitiesOperation = new CommunitiesOperation(this);
+		this.gamesOperation = new GamesOperation(this);
+		this.streamsOperation = new StreamsOperation(this);
+		this.teamsOperation = new TeamsOperation(this);
+		this.undocumentedOperation = new UndocumentedOperation(this);
+		this.usersOperation = new UsersOperation(this);
+		this.videosOperation = new VideosOperation(this);
+	}
+
+//	@Override
+//	public Bits bitsOperation() {
+//		return bitsOperation;
+//	}
+
+	@Override
+	public Feeds feedsOpration() {
+		return feedsOpration;
 	}
 
 	@Override
-	public ChannelKrakenOperation channelOperation() {
-		return createService(ChannelKrakenOperation.class);
+	public Channels channelsOperation() {
+		return channelsOperation;
 	}
 
 	@Override
-	public ClipsKrakenOperation clipsOperation() {
-		return createService(ClipsKrakenOperation.class);
+	public Chat chatOperation() {
+		return chatOperation;
 	}
 
 	@Override
-	public GamesKrakenOperation gamesOperation() {
-		return createService(GamesKrakenOperation.class);
+	public Clips clipsOpration() {
+		return clipsOpration;
 	}
 
 	@Override
-	public StreamsKrakenOperation streamsOperation() {
-		return createService(StreamsKrakenOperation.class);
+	public Collections collectionsOperation() {
+		return collectionsOperation;
 	}
 
 	@Override
-	public UserKrakenOperation userOperation() {
-		return createService(UserKrakenOperation.class);
+	public Communities communitiesOperation() {
+		return communitiesOperation;
 	}
 
 	@Override
-	public VideosKrakenOperation videosOperation() {
-		return createService(VideosKrakenOperation.class);
+	public Games gamesOperation() {
+		return gamesOperation;
 	}
 
+
 	@Override
-	public ICredential fetchUserInfo(ICredential credential) {
-		Call<JsonNode> callNode = createService(CoreService.class).fetchUserInfo(credential);
-		JsonNode node = null;
-		if (!callNode.isExecuted()) {
-			try {
-				node = callNode.execute().body();
-			} catch (IOException e) {
-				logger.error("Cannot fetch user information");
-				return credential;
-			}
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public List<IngestServer> getServerList() throws Exception {
+		String url = String.format("%s/ingests", TwitchAPI.KRAKEN.getUrl().substring(0, TwitchAPI.KRAKEN.getUrl().length()-1));
+		try (Response response = get(url)) {
+			if (response.isSuccessful()) {
+				return Arrays.asList(buildPOJO(response, IngestServer[].class));
+			} else throw handleException(response);
 		}
-
-		if (node != null) {
-			if (!node.get("valid").asBoolean() || credential.expiredAt().getTime().before(new Date())) {
-				// Refresh token if session is not valid or expired
-				return fetchUserInfo(getClient().getCredentialManager().refreshToken(credential));
-			}
-
-			Credential cred = (Credential) credential;
-			JsonNode scopes = node.get("authorization").get("scopes");
-
-			if (scopes.isArray()) {
-				Set<Scope> scopeSet = new LinkedHashSet<>();
-				for (final JsonNode scope : scopes) {
-					Arrays.asList(Scope.values()).forEach(s -> {
-						if (s.toString().equals(scope.textValue())) {
-							scopeSet.add(s);
-						}
-					});
-				}
-				cred.setScopes(scopeSet);
-			}
-			cred.setUser(userOperation().getById(node.get("user_id").asLong()));
-			getClient().getCredentialManager().getCredentialStorage().add(cred);
-			return cred;
-		} else return credential;
 	}
 
-	private interface CoreService {
-		@GET("/")
-		@NoScopeInfo
-		Call<JsonNode> fetchUserInfo(@Header("Authorization") ICredential credential);
+	@Override
+	public Streams streamsOperation() {
+		return streamsOperation;
+	}
+
+	@Override
+	public Teams teamsOperation() {
+		return teamsOperation;
+	}
+
+	@Override
+	public @Unofficial Undocumented undocumentedOperation() {
+		return undocumentedOperation;
+	}
+
+	@Override
+	public Users usersOperation() {
+		return usersOperation;
+	}
+
+	@Override
+	public Videos videosOperation() {
+		return videosOperation;
+	}
+
+	public Kraken fetchUserInfo(String accessToken) throws Exception {
+		try (Response response = get(TwitchAPI.KRAKEN.getUrl(), java.util.Collections.singletonMap("Authorization", buildAuthorizationHeader(accessToken)))) {
+			if (response.isSuccessful()) {
+				return buildPOJO(response, Kraken.class);
+			} else throw handleException(response);
+		}
+	}
+
+	private ApiException handleException(Response response) throws Exception {
+		return new ApiException(buildPOJO(response, ErrorResponse.class));
+	}
+
+	private String buildAuthorizationHeader(String accessToken) {
+		return String.format("%s %s", IKraken.PREFIX_AUTHORIZATION, accessToken);
 	}
 }

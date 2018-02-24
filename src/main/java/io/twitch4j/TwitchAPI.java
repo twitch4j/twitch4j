@@ -24,15 +24,18 @@
 
 package io.twitch4j;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-public class TwitchAPI {
-	public static String DEFAULT = "https://api.twitch.tv/api/";
-	public static String KRAKEN = "https://api.twitch.tv/kraken/";
-	public static String HELIX = "https://api.twitch.tv/helix/";
-	public static String PUBSUB = "wss://pubsub-edge.twitch.tv";
-	public static String IRCWS = "wss://irc-ws.chat.twitch.tv";
+@RequiredArgsConstructor
+public enum  TwitchAPI {
+	DEFAULT("https://api.twitch.tv/api/"),
+	KRAKEN("https://api.twitch.tv/kraken/"),
+	HELIX("https://api.twitch.tv/helix/"),
+	PUBSUB("wss://pubsub-edge.twitch.tv"),
+	IRCWS("wss://irc-ws.chat.twitch.tv"),
+	CHATTERS("https://tmi.twitch.tv/group/user/%s/chatters");
+
+	private final String url;
 }

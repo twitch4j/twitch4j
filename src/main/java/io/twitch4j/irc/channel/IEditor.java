@@ -24,8 +24,6 @@
 
 package io.twitch4j.irc.channel;
 
-import io.twitch4j.irc.CommercialType;
-
 public interface IEditor {
 	void startCommercial(CommercialType commercial);
 	void hostChannel(String channelName);

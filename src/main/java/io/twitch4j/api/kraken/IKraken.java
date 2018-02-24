@@ -25,19 +25,31 @@
 package io.twitch4j.api.kraken;
 
 import io.twitch4j.api.IApi;
-import io.twitch4j.api.kraken.operations.*;
-import io.twitch4j.api.IApi;
+import io.twitch4j.api.kraken.models.IngestServer;
+import io.twitch4j.api.kraken.models.Kraken;
 import io.twitch4j.api.kraken.operations.*;
 import io.twitch4j.auth.ICredential;
+import io.twitch4j.utils.Unofficial;
+
+import java.util.List;
 
 public interface IKraken extends IApi {
 	String PREFIX_AUTHORIZATION = "OAuth";
 
-	ChannelKrakenOperation channelOperation();
-	ClipsKrakenOperation clipsOperation();
-	GamesKrakenOperation gamesOperation();
-	StreamsKrakenOperation streamsOperation();
-	UserKrakenOperation userOperation();
-	VideosKrakenOperation videosOperation();
-	ICredential fetchUserInfo(ICredential credential);
+//	Bits bitsOperation();
+	Feeds feedsOpration();
+	Channels channelsOperation();
+	Chat chatOperation();
+	Clips clipsOpration();
+	Collections collectionsOperation();
+	Communities communitiesOperation();
+	Games gamesOperation();
+	List<IngestServer> getServerList() throws Exception;
+	Streams streamsOperation();
+	Teams teamsOperation();
+	@Unofficial
+	Undocumented undocumentedOperation();
+	Users usersOperation();
+	Videos videosOperation();
+	Kraken fetchUserInfo(String accessToken) throws Exception;
 }

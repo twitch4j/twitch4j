@@ -25,47 +25,28 @@
 package io.twitch4j.impl.auth;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.twitch4j.api.kraken.models.User;
-import io.twitch4j.impl.auth.converters.ExpiredTimestamp;
-import io.twitch4j.impl.auth.converters.JWTSerialize;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import io.twitch4j.IConfiguration;
 import io.twitch4j.api.kraken.models.User;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.auth.Scope;
-import io.twitch4j.impl.auth.converters.ExpiredTimestamp;
-import io.twitch4j.impl.auth.converters.JWTSerialize;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Calendar;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class Credential implements ICredential {
-	private final String accessToken;
-	private final String refreshToken;
-	@JsonSerialize(converter = JWTSerialize.class)
+@Builder(builderMethodName = "newCredential", builderClassName = "Builder")
+public class Credential implements ICredential, IConfiguration.IBot {
+	private String accessToken;
+	private String refreshToken;
 	private DecodedJWT idToken;
-	@JsonSerialize(converter = ExpiredTimestamp.class)
+	@Accessors(fluent = true)
 	private Calendar expiredAt;
 	private Set<Scope> scopes;
 	private User user;
-
-	public Credential(String accessToken, String refreshToken, DecodedJWT idToken) {
-		this(accessToken, refreshToken);
-		this.idToken = idToken;
-	}
-
-	@Override
-	public Calendar expiredAt() {
-		return expiredAt;
-	}
 }

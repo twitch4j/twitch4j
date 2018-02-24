@@ -24,10 +24,7 @@
 
 package io.twitch4j.irc.model;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -36,90 +33,25 @@ import java.util.Set;
  * @version %I%, %G%
  * @since 1.0
  */
-public class TagsV3 implements Map<String, Object> {
+public class TagsV3<T> extends AbstractMap<String, Optional<T>> implements Map<String, Optional<T>> {
 
-	private final Map<String, Object> m;
+	private final Map<String, Optional<T>> m;
 
 	/**
 	 * Setting tags map are final
 	 * @param map {@link Map} parsed data
 	 */
-	TagsV3(Map<String, Object> map) {
+	TagsV3(Map<String, Optional<T>> map) {
 		this.m = Collections.unmodifiableMap(map);
 	}
 
 	@Override
-	public int size() {
-		return m.size();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return m.isEmpty();
-	}
-
-	@Override
-	public boolean containsKey(Object key) {
-		return m.containsKey(key);
-	}
-
-	@Override
-	public boolean containsValue(Object value) {
-		return m.containsValue(value);
-	}
-
-	@Override
-	public Object get(Object key) {
-		return m.get(key);
-	}
-
-	@Override
-	public Object put(String key, Object value) {
-		return m.put(key, value);
-	}
-
-	@Override
-	public Object remove(Object key) {
-		return m.remove(key);
-	}
-
-	@Override
-	public void putAll(Map<? extends String, ?> m) {
-		this.m.putAll(m);
-	}
-
-	@Override
-	public void clear() {
-		m.clear();
-	}
-
-	@Override
-	public Set<String> keySet() {
-		return m.keySet();
-	}
-
-	@Override
-	public Collection<Object> values() {
-		return m.values();
-	}
-
-	@Override
-	public Set<Entry<String, Object>> entrySet() {
+	public Set<Entry<String, Optional<T>>> entrySet() {
 		return m.entrySet();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return m.equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return m.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "(" + m.toString() + ")";
+	public Optional<T> put(String key, Optional<T> value) {
+		return m.put(key, value);
 	}
 }

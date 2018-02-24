@@ -41,7 +41,6 @@ import io.twitch4j.utils.ISocket;
 
 public interface IClient extends ISocket {
 	IConfiguration getConfiguration();
-	IHelix getHelixApi();
 	@Deprecated
 	IKraken getKrakenApi();
 	IManager getCredentialManager();
