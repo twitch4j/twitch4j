@@ -27,6 +27,7 @@ package io.twitch4j.auth;
 import io.twitch4j.Builder;
 import io.twitch4j.IClient;
 import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.irc.channel.IChannel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -35,10 +36,14 @@ import java.util.Calendar;
 import java.util.Optional;
 
 @Getter
-@RequiredArgsConstructor
 public abstract class AbstractCredentialStorage implements ICredentialStorage {
 	private final IClient client;
-	private final IManager credentialManager = client.getCredentialManager();
+	private final IManager credentialManager;
+
+	public AbstractCredentialStorage(IClient client) {
+		this.client = client;
+		this.credentialManager = client.getCredentialManager();
+	}
 
 	@Override
 	public Optional<ICredential> getCredentialById(long userId) {

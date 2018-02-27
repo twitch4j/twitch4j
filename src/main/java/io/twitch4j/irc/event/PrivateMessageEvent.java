@@ -22,10 +22,18 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.IUser;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Clips extends IOperation<Clip, String> {
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class PrivateMessageEvent extends Event {
+	private final IUser user;
+	private final String message;
 }

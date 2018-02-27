@@ -22,10 +22,30 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.impl.irc.channel;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannelUser;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
 
-public interface Clips extends IOperation<Clip, String> {
+@Data
+public class ChannelUserEndpoint implements IChannelUser {
+	private final IUser userEndpoint;
+	private final boolean moderator;
+	private final boolean subscriber;
+	@Getter(AccessLevel.NONE)
+	private final boolean turbo;
+
+	@Override
+	public User getUserInfo() {
+		return userEndpoint.getUserInfo();
+	}
+
+	@Override
+	public boolean hasTurbo() {
+		return turbo;
+	}
 }

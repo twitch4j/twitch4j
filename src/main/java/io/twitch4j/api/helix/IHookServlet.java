@@ -22,10 +22,7 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.api.helix;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
-
-public interface Clips extends IOperation<Clip, String> {
+public interface IHookServlet {
 }

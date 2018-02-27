@@ -22,10 +22,32 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import lombok.*;
 
-public interface Clips extends IOperation<Clip, String> {
+import java.awt.*;
+
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class GlobalUserStateEvent extends Event {
+	private final Color color;
+	private final String displayName;
+	@Getter(AccessLevel.NONE)
+	private final boolean turbo;
+	private final long userId;
+	private final String userType;
+
+	public boolean hasTurbo() {
+		return turbo;
+	}
+
+	public User getUser() {
+		return getClient().getKrakenApi().usersOperation().getById(userId);
+	}
 }

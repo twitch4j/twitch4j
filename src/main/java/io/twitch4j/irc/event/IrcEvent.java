@@ -27,10 +27,11 @@ package io.twitch4j.irc.event;
 import io.twitch4j.event.Event;
 import io.twitch4j.irc.model.IrcCommand;
 import io.twitch4j.irc.model.IrcMessage;
-import io.twitch4j.irc.model.TagsV3;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -40,7 +41,7 @@ public class IrcEvent extends Event {
 	private final String parameters;
 	private final String message;
 	private final String hostmask;
-	private final TagsV3 tags;
+	private final Map<String, String> tags;
 
 	public IrcEvent(IrcMessage message) {
 		this(message.getCommand(), message.getParameters(), message.getMessage(), message.getHostmask(), message.getTags());

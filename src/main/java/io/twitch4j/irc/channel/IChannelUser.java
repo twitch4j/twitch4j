@@ -22,10 +22,15 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.channel;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.irc.IUser;
 
-public interface Clips extends IOperation<Clip, String> {
+public interface IChannelUser {
+	User getUserInfo();
+	IUser getUserEndpoint();
+	boolean isModerator();
+	boolean isSubscriber();
+	boolean hasTurbo();
 }

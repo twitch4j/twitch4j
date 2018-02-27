@@ -24,25 +24,21 @@
 
 package io.twitch4j.impl.event;
 
-import io.twitch4j.event.Event;
-import io.twitch4j.event.EventSubscriber;
-import io.twitch4j.event.IDispatcher;
-import io.twitch4j.event.IListener;
-import io.twitch4j.utils.LoggerType;
-import lombok.RequiredArgsConstructor;
+import com.google.common.reflect.TypeResolver;
 import io.twitch4j.IClient;
 import io.twitch4j.event.Event;
 import io.twitch4j.event.EventSubscriber;
 import io.twitch4j.event.IDispatcher;
 import io.twitch4j.event.IListener;
 import io.twitch4j.utils.LoggerType;
-import net.jodah.typetools.TypeResolver;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -136,7 +132,7 @@ public class EventDispatcher implements IDispatcher {
 	 * @param isTemporary Whether the listener is temporary or not.
 	 */
 	private <EVENT extends Event> void registerListener(IListener<EVENT> listener, boolean isTemporary) {
-		Class<?> rawType = TypeResolver.resolveRawArgument(IListener.class, listener.getClass());
+		Class<EVENT> rawType = resolveArgumenType(listener);
 		if (Event.class.isAssignableFrom(rawType)) {
 			if (!classListeners.containsKey(rawType))
 				classListeners.put(rawType, new CopyOnWriteArrayList<>());
@@ -144,6 +140,11 @@ public class EventDispatcher implements IDispatcher {
 			logger.info("Registered IListener %s", listener.getClass().getSimpleName());
 			classListeners.get(rawType).add(new ListenerPair<>(isTemporary, listener));
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <EVENT extends Event> Class<EVENT> resolveArgumenType(IListener<EVENT> listener) {
+		return (Class<EVENT>) ((ParameterizedType) listener.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
 	/**
@@ -229,7 +230,7 @@ public class EventDispatcher implements IDispatcher {
 	 */
 	@SuppressWarnings("rawtypes")
 	public <EVENT extends Event> void unregisterListener(IListener<EVENT> listener) {
-		Class<?> rawType = TypeResolver.resolveRawArgument(IListener.class, listener.getClass());
+		Class<?> rawType = resolveArgumenType(listener);
 		if (Event.class.isAssignableFrom(rawType)) {
 			if (classListeners.containsKey(rawType)) {
 				classListeners.get(rawType).removeIf((ListenerPair pair) -> pair.listener == listener); //Yes, the == is intentional. We want the exact same instance.

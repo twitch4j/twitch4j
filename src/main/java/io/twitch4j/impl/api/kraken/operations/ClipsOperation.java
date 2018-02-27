@@ -24,8 +24,8 @@
 
 package io.twitch4j.impl.api.kraken.operations;
 
+import io.twitch4j.api.kraken.models.Clip;
 import io.twitch4j.impl.api.Api;
-import io.twitch4j.api.kraken.model.Clip;
 import io.twitch4j.api.kraken.operations.Clips;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.impl.api.Operation;

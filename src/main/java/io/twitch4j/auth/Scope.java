@@ -24,24 +24,18 @@
 
 package io.twitch4j.auth;
 
-import io.twitch4j.api.helix.Helix;
-import io.twitch4j.api.helix.Helix;
-
 public enum Scope {
 	/**
 	 * Manage a clip object.
 	 */
-	@Helix
 	CLIPS_EDIT("clips:edit"),
 	/**
 	 * Manage a user object.
 	 */
-	@Helix
 	USER_EDIT("user:edit"),
 	/**
 	 * Read authorized user's email address.
 	 */
-	@Helix
 	USER_READ_EMAIL("user:read:email"),
 	/**
 	 * Read whether a user is subscribed to your channel.

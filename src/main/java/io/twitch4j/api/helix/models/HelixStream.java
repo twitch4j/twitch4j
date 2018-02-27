@@ -34,8 +34,6 @@ import io.twitch4j.api.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import io.twitch4j.api.Model;
-import io.twitch4j.api.helix.StreamStatusSerializer;
 
 import java.util.Calendar;
 import java.util.List;
@@ -52,7 +50,6 @@ public class HelixStream extends Model {
 	private long gameId;
 	@JsonProperty("community_ids")
 	private List<String> communities;
-	@JsonEnumDefaultValue
 	private SteamStatus type;
 	private String title;
 	private long viewerCount;
@@ -60,7 +57,6 @@ public class HelixStream extends Model {
 	private Locale language;
 	private String thumbnailUrl;
 
-	@JsonDeserialize(using = StreamStatusSerializer.class)
 	public enum SteamStatus {
 		OFFLINE,
 		LIVE,

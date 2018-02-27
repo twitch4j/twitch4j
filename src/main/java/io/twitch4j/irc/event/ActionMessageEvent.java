@@ -22,10 +22,17 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.irc.model.tags.Badge;
 
-public interface Clips extends IOperation<Clip, String> {
+import java.awt.*;
+import java.util.List;
+
+public class ActionMessageEvent extends OrdinalMessageEvent {
+	public ActionMessageEvent(List<Badge> badges, Color color, boolean mod, boolean subscriber, boolean turbo, IUser user, IChannel channel, String message) {
+		super(badges, color, mod, subscriber, turbo, user, channel, message);
+	}
 }

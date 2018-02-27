@@ -22,10 +22,19 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Clips extends IOperation<Clip, String> {
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class JoinChannelEvent extends Event {
+	private final IChannel channel;
+	private final IUser user;
 }

@@ -33,21 +33,21 @@ import java.awt.*;
  * @since 1.0
  */
 public enum DefaultColor {
-	BLUE,
-	BLUEVIOLET,
-	CADETBLUE,
-	CHOCOLATE,
-	CORAL,
-	DODGERBLUE,
-	FIREBRICK,
-	GOLDENROD,
-	GREEN,
-	HOTPINK,
-	ORANGERED,
-	RED,
-	SEAGREEN,
-	SPRINGGREEN,
-	YELLOWGREEN;
+	Blue,
+	Coral,
+	DodgerBlue,
+	SpringGreen,
+	YellowGreen,
+	Green,
+	OrangeRed,
+	Red,
+	GoldenRod,
+	HotPink,
+	CadetBlue,
+	SeaGreen,
+	Chocolate,
+	BlueViolet,
+	Firebrick;
 
 	public static String colorToHex(Color color) {
 		String rgb = Integer.toHexString(color.getRGB());

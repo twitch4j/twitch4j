@@ -35,6 +35,7 @@ import java.util.List;
 
 public interface IChannel {
 	Channel getChannelInfo();
+	IRoomState getRoomState();
 	IModeration getModeration() throws ModerationException;
 	List<User> getModerators();
 	List<User> getSubscribers();

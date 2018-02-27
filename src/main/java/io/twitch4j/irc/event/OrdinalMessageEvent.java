@@ -22,10 +22,30 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.irc.model.tags.Badge;
+import lombok.*;
 
-public interface Clips extends IOperation<Clip, String> {
+import java.awt.Color;
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class OrdinalMessageEvent extends Event {
+	private final List<Badge> badges;
+	private final Color color;
+	private final boolean mod;
+	private final boolean subscriber;
+	@Getter(AccessLevel.NONE)
+	private final boolean turbo;
+	private final IUser user;
+	private final IChannel channel;
+	private final String message;
+
+	public boolean hasTurbo() { return turbo; }
 }

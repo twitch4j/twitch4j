@@ -22,10 +22,14 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.channel;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import java.util.Locale;
 
-public interface Clips extends IOperation<Clip, String> {
+public interface IRoomState {
+	Locale getBroadcastLanguage();
+	boolean isRobot9000();
+	boolean isSlowMode();
+	long getSlowTime();
+	boolean isSubscribersOnly();
 }

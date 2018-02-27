@@ -26,11 +26,21 @@ package io.twitch4j.impl.irc.channel;
 
 import io.twitch4j.api.kraken.models.Channel;
 import io.twitch4j.api.kraken.models.User;
+import io.twitch4j.event.Event;
+import io.twitch4j.event.IDispatcher;
+import io.twitch4j.event.IListener;
 import io.twitch4j.impl.irc.MessageInterfaceListener;
 import io.twitch4j.irc.DefaultColor;
+import io.twitch4j.irc.IUser;
 import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.irc.channel.IChannelUser;
 import io.twitch4j.irc.channel.IModeration;
+import io.twitch4j.irc.channel.IRoomState;
 import io.twitch4j.irc.chat.IChatRoom;
+import io.twitch4j.irc.event.JoinChannelEvent;
+import io.twitch4j.irc.event.MessageEvent;
+import io.twitch4j.irc.event.OrdinalMessageEvent;
+import io.twitch4j.irc.event.PartChannelEvent;
 import io.twitch4j.irc.exceptions.ChannelNotFoundException;
 import io.twitch4j.irc.exceptions.ModerationException;
 import lombok.Getter;
@@ -38,13 +48,38 @@ import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
-@RequiredArgsConstructor
 public class ChannelEndpoint implements IChannel {
 	private final MessageInterfaceListener listener;
 	private final String channel;
+	private final IRoomState roomState = new RoomState(this);
+
+	private final Set<IChannelUser> users = new LinkedHashSet<>();
+
+	public ChannelEndpoint(MessageInterfaceListener listener, String channel) {
+		this.listener = listener;
+		this.channel = channel;
+
+		IDispatcher dispatcher = listener.getClient().getDispatcher();
+
+		dispatcher.registerListener(new IListener<OrdinalMessageEvent>() {
+			@Override
+			public void handle(OrdinalMessageEvent event) {
+				ChannelEndpoint.this.users.add(new ChannelUserEndpoint(event.getUser(), event.isMod(), event.isSubscriber(), event.hasTurbo()));
+			}
+		});
+		dispatcher.registerListener(new IListener<PartChannelEvent>() {
+
+			@Override
+			public void handle(PartChannelEvent event) {
+				ChannelEndpoint.this.users.removeIf(user -> user.getUserEndpoint().equals(event.getUser()));
+			}
+		});
+	}
 
 	@Override
 	public Channel getChannelInfo() {
@@ -120,7 +155,7 @@ public class ChannelEndpoint implements IChannel {
 				try {
 					session.getRemote().sendString("JOIN #" + channel);
 					getListener().getChannels().put(channel, this);
-					if (getListener().getChannelQueue().contains(channel)) {
+					if (getListener().getChannelQueue().containsKey(channel)) {
 						getListener().getChannelQueue().remove(channel);
 					}
 				} catch (IOException e) {

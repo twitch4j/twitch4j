@@ -25,15 +25,20 @@
 package io.twitch4j.irc.model;
 
 import io.twitch4j.IClient;
-import io.twitch4j.impl.irc.TwitchMessageInterface;
+import io.twitch4j.api.kraken.models.Subscription;
+import io.twitch4j.event.Event;
 import io.twitch4j.irc.IMessageInterface;
-import io.twitch4j.irc.event.IrcEvent;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.irc.event.*;
 import io.twitch4j.irc.model.tags.Badge;
-import io.twitch4j.irc.model.tags.Badges;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +57,7 @@ public class IrcMessage {
 	 */
 	private final IrcCommand command;
 	/**
-	 * IRC Parameters
+	 * IRC Parameters e.g. <code>#&lt;channel&gt;</code>
 	 */
 	private final String parameters;
 	/**
@@ -60,14 +65,13 @@ public class IrcMessage {
 	 */
 	private final String message;
 	/**
-	 * IRC Host Mask which contains username.
+	 * IRC Host Mask which contains username. <code>&lt;username&gt;!&lt;username&gt;@&lt;hostname&gt;</code>
 	 */
 	private final String hostmask;
 	/**
 	 * IRC Tags V3
-	 * @see TagsV3
 	 */
-	private final TagsV3 tags;
+	private final Map<String, String> tags;
 
 	private enum ParserState {
 		STATE_NONE,
@@ -82,12 +86,14 @@ public class IrcMessage {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		if (!tags.isEmpty()) {
-			sb.append("@").append(tags).append(" ");
+			sb.append(tags).append(" ");
 		}
-		sb.append(hostmask).append(" ")
-				.append((command.name().startsWith("RPL_")) ? command.name().substring(4) : command.name()).append(" ")
-				.append(parameters);
-		if (message != null) {
+		sb.append(":").append(hostmask).append(" ")
+				.append(command.name().replace("RPL_", ""));
+		if (StringUtils.isNotBlank(parameters)) {
+			sb.append(" ").append(parameters);
+		}
+		if (StringUtils.isNotBlank(message)) {
 			sb.append(" :").append(message);
 		}
 		return sb.toString();
@@ -241,84 +247,215 @@ public class IrcMessage {
 		String parameters = rawMessage.substring(starts[ParserState.STATE_PARAM.ordinal()], lens[ParserState.STATE_PARAM.ordinal()]);
 		String message = rawMessage.substring(starts[ParserState.STATE_TRAILING.ordinal()], lens[ParserState.STATE_TRAILING.ordinal()]);
 		String hostmask = rawMessage.substring(starts[ParserState.STATE_PREFIX.ordinal()], lens[ParserState.STATE_PREFIX.ordinal()]);
-		return new IrcMessage(command, parameters, message, hostmask, parseIrcTags(tags));
+		return new IrcMessage(command, parameters, message, hostmask, Collections.unmodifiableMap(tags));
 	}
 
-	@SuppressWarnings({"unchecked","rawtypes"})
-	private static TagsV3<?> parseIrcTags(Map<String, String> tags) {
-		if (tags.isEmpty())
-			return null;
-
-		Map<String, Optional<?>> tagsParsed = new HashMap<>();
-
-		tags.forEach((key, value) -> {
-			Optional<?> tagValue = Optional.empty();
-			switch (key.toLowerCase()) {
-				case "badges":
-					List<Badge> badges = Arrays.stream(value.split(","))
-							.map(badge -> new Badge(badge.split("/")[0], Integer.parseInt(badge.split("/")[1])))
-							.collect(Collectors.toList());
-					tagValue = Optional.of(new Badges(Collections.unmodifiableList(badges)));
-					break;
-				case "emotes":
-					// TODO: Emotes
-					break;
-				default:
-					tagValue = Optional.of(formatValue(value));
-			}
-			tagsParsed.put(key, tagValue);
-		});
-
-		return new TagsV3(tagsParsed);
-	}
-
+	/**
+	 * Parsing message to event and dispatching them
+	 * @param message the IRC Message
+	 * @param client client
+	 */
 	public static void parseAndDispatchEvent(IrcMessage message, IClient client) {
 
 		client.getDispatcher().dispatch(new IrcEvent(message));
 
+		Event event = null;
+
+		IChannel channel = StringUtils.startsWith(message.getParameters(), "#") && !StringUtils.startsWith(message.getParameters(), "#chatrooms") ?
+				client.getMessageInterface().getChannel(message.getParameters().substring(1, message.getParameters().indexOf(" "))) : null;
+		boolean action = StringUtils.contains(message.getMessage(), "ACTION");
+		String msg = message.getMessage().replace( "\u0001", "").replace("ACTION ", "");
+		Map<String, String> tags = message.getTags();
+		String preUser = getUserFromHostmask(message.getHostmask());
+		IUser user = StringUtils.isNotBlank(preUser) ? client.getMessageInterface().createPrivateMessage(preUser) : null;
+
 		switch (message.getCommand()) {
 			case JOIN:
-				client.getDispatcher().dispatch(new JoinChannelEvent());
+				event = new JoinChannelEvent(channel, user);
 				break;
 			case PART:
-				client.getDispatcher().dispatch(new JoinChannelEvent());
+				event = new PartChannelEvent(channel, user);
 				break;
 			case PRIV_MSG:
-				client.getDispatcher().dispatch(new ChannelMessageEvent());
+				// dispatching message event to customize own message event
+				client.getDispatcher().dispatch(new MessageEvent(tags, user, channel, msg, action));
+				event = fetchMessageEvent(tags, user, channel, msg, action);
 				break;
 			case WHISPER:
-				client.getDispatcher().dispatch(new PrivateMessageEvent());
+				event = fetchPrivateMessageEvent(tags, user, msg);
 				break;
 			case PONG:
-				client.getDispatcher().dispatch(new PongReceivedEvent());
+				event = new PongReceivedEvent();
 				break;
 			case PING:
-				client.getDispatcher().dispatch(new PingReceivedEvent());
+				event = new PingReceivedEvent();
 				break;
 			case USER_NOTICE:
-				client.getDispatcher().dispatch(new ChannelSubscriptionEvent());
+				// dispatching user notice event to customize own user notice event
+				client.getDispatcher().dispatch(new UserNoticeEvent(tags, channel, msg));
+				event = fetchSubAndRaidEvent(tags, channel, msg, client.getMessageInterface());
 				break;
 			case NOTICE:
-				client.getDispatcher().dispatch(new ServerNoticeEvent());
+				event = new NoticeEvent(tags.get("msg_id"), channel, msg);
 				break;
 			case HOST_TARGET:
-				client.getDispatcher().dispatch(new HostTargetEvent());
+				boolean host = StringUtils.isBlank(msg);
+				String hostedChannel = message.getParameters().split(" ")[1];
+				long viewers = Long.parseLong(message.getParameters().split(" ")[2].replace("[", "").replace("]", ""));
+				if (host) {
+					event = new HostEvent(channel, viewers, hostedChannel);
+				} else {
+					event = new UnhostEvent(channel);
+				}
 				break;
 			case CLEAR_CHAT:
-				client.getDispatcher().dispatch(new ChannelClearEvent());
+				if (msg != null) {
+					String reason = null;
+					if (tags.containsKey("ban_reason")) {
+						reason = formatValue(tags.get("ban_reason"));
+					}
+					user = client.getMessageInterface().createPrivateMessage(msg);
+
+					if (tags.containsKey("ban_duration")) {
+						long seconds = Long.parseLong(tags.get("ban_duration"));
+						event = new TimeoutEvent(channel, user, seconds, reason);
+					} else {
+						event = new BanEvent(channel, user, reason);
+					}
+				} else event = new ClearChatEvent(channel);
 				break;
 			case ROOM_STATE:
-				client.getDispatcher().dispatch(new ChannelStateEvent());
+				if (tags.size() == 1) {
+					String key = (String) tags.keySet().toArray()[0];
+					String value = tags.get(key);
+					event = new RoomStateChangedEvent(key, value, channel);
+				} else {
+					Locale broadcastLang = StringUtils.isNotBlank(tags.get("broadcast_lang")) ? Locale.forLanguageTag(tags.get("broadcast_lang")) : null;
+					boolean r9k = tags.get("r9k").equals("1");
+					long slow = Long.parseLong(tags.get("slow"));
+					boolean sub = tags.get("subs-only").equals("1");
+					event = new RoomStateEvent(broadcastLang, r9k, slow, sub, channel);
+				}
 				break;
 			case GLOBAL_USER_STATE:
-				client.getDispatcher().dispatch(new GlobalUserStateEvent());
+				Color color = getColor(tags.get("color"));
+				String displayName = tags.get("display_name");
+				boolean turbo = tags.get("mod").equals("1");
+				String userType = tags.get("user_type");
+				long userId = Long.parseLong(tags.get("user_id"));
+				event = new GlobalUserStateEvent(color, displayName, turbo, userId, userType);
 				break;
 			case USER_STATE:
-				client.getDispatcher().dispatch(new GlobalUserStateEvent());
+				event = getUserState(tags, channel);
 				break;
 			default:
 				break;
 		}
+		// do not dispatch event if it is not defined or it is nullable
+		if (!Objects.isNull(event)) {
+			client.getDispatcher().dispatch(event);
+		}
+	}
+
+	private static UserStateEvent getUserState(Map<String, String> tags, IChannel channel) {
+		Color color = getColor(tags.get("color"));
+		String displayName = tags.get("display_name");
+		boolean mod = tags.get("mod").equals("1");
+		boolean subscriber = tags.get("mod").equals("1");
+		boolean turbo = tags.get("mod").equals("1");
+		String userType = tags.get("user_type");
+		return new UserStateEvent(color, displayName, mod, subscriber, turbo, userType, channel);
+	}
+
+	private static Event fetchSubAndRaidEvent(Map<String, String> tags, IChannel channel, String message, IMessageInterface tmi) {
+		List<Badge> badges = Arrays.stream(tags.get("badges").split(","))
+				.map(badge-> new Badge(badge.split("/")[0], Integer.parseInt(badge.split("/")[1])))
+				.collect(Collectors.toList());
+		Color color = getColor(tags.get("color"));
+		IUser user = tmi.createPrivateMessage(tags.get("login"));
+		boolean mod = tags.containsKey("mod") && tags.get("mod").equals("1");
+		String messageId = tags.get("msg_id");
+		Long channelId = Long.parseLong(tags.get("room_id"));
+		boolean subscriber = tags.containsKey("subscriber") && tags.get("subscriber").equals("1");
+		boolean turbo = tags.containsKey("turbo") && tags.get("turbo").equals("1");
+		String userType = tags.get("user_type");
+
+		Event event = null;
+
+		switch (messageId) {
+			case "raid":
+				long viewcount = Long.parseLong(tags.get("msg-param-viewerCount"));
+				event = new RaidEvent(viewcount, badges, color, user, mod, subscriber, turbo, channel, message);
+				break;
+			case "ritual":
+				if (tags.containsKey("msg-param-ritual-name") && tags.get("msg-param-ritual-name").equals("new_chatter")) {
+					event = new NewChatterEvent(badges, color, user, mod, subscriber, turbo, channel, message);
+				} else {
+					event = new RitualNotice(badges, color, user, mod, subscriber, turbo, channel, message);
+				}
+				break;
+			case "sub":
+			case "resub":
+				Subscription.Type subType;
+				int months = tags.containsKey("msg-param-months") ? Integer.parseInt(tags.get("msg-param-months")) : 1;
+				switch (tags.get("msg-param-sub-plan")) {
+					case "Prime":
+						subType = Subscription.Type.PRIME;
+						break;
+					case "1000":
+						subType = Subscription.Type.SUB_1000;
+						break;
+					case "2000":
+						subType = Subscription.Type.SUB_2000;
+						break;
+					case "3000":
+						subType = Subscription.Type.SUB_3000;
+						break;
+					default:
+						subType = Subscription.Type.UNKNOWN;
+				}
+				event = new SubscribeEvent(months, subType, badges, color, user, mod, subscriber, turbo, channel, message);
+		}
+		return event;
+	}
+
+	private static PrivateMessageEvent fetchPrivateMessageEvent(Map<String, String> tags, IUser user, String msg) {
+		return new PrivateMessageEvent(user, msg);
+	}
+
+	private static Event fetchMessageEvent(Map<String, String> tags, IUser user, IChannel channel, String message, boolean isAction) {
+		List<Badge> badges = Arrays.stream(tags.get("badges").split(","))
+				.map(badge-> new Badge(badge.split("/")[0], Integer.parseInt(badge.split("/")[1])))
+				.collect(Collectors.toList());
+		int bits = tags.containsKey("bits") ? Integer.parseInt(tags.get("bits")) : 0;
+		Color color = getColor(tags.get("color"));
+		String displayName = tags.get("display_name");
+		// TODO: Emotes
+		boolean mod = tags.containsKey("mod") && tags.get("mod").equals("1");
+		Long channelId = Long.parseLong(tags.get("room_id"));
+		boolean subscriber = tags.containsKey("subscriber") && tags.get("subscriber").equals("1");
+		boolean turbo = tags.containsKey("turbo") && tags.get("turbo").equals("1");
+		Long userId = Long.parseLong(tags.get("user_id"));
+		String userType = tags.get("user_type");
+		if (bits > 0) {
+			return new BitsMessageEvent(badges, bits, color, mod, subscriber, turbo, user, channel, message);
+		} else if (isAction) {
+			return new ActionMessageEvent(badges, color, mod, subscriber, turbo, user, channel, message);
+		} else {
+			return new OrdinalMessageEvent(badges, color, mod, subscriber, turbo, user, channel, message);
+		}
+	}
+
+	private static Color getColor(String color) {
+		if (StringUtils.isBlank(color)) return null;
+		if (color.startsWith("#")) color = "0x" + color.substring(1);
+		return Color.decode(color);
+	}
+
+	private static String getUserFromHostmask(String hostmask) {
+		if (hostmask.contains("!") && hostmask.contains("@")) {
+			return hostmask.substring(hostmask.indexOf("!") + 1 , hostmask.indexOf("@"));
+		} else return null;
 	}
 
 	private static String formatValue(String value) {

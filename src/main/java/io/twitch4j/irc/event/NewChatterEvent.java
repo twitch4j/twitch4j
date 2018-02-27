@@ -22,10 +22,21 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.IUser;
+import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.irc.model.tags.Badge;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Clips extends IOperation<Clip, String> {
+import java.awt.*;
+import java.util.List;
+
+public class NewChatterEvent extends RitualNotice {
+	public NewChatterEvent(List<Badge> badges, Color color, IUser user, boolean mod, boolean subscriber, boolean turbo, IChannel channel, String message) {
+		super(badges, color, user, mod, subscriber, turbo, channel, message);
+	}
 }

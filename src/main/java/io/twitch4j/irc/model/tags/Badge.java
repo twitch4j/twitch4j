@@ -27,9 +27,12 @@ package io.twitch4j.irc.model.tags;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Data
 @AllArgsConstructor
 public class Badge {
-	private String name;
-	private int version;
+	private final String name;
+	private final int version;
 }

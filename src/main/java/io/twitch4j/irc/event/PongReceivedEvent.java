@@ -22,10 +22,13 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Clips extends IOperation<Clip, String> {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class PongReceivedEvent extends Event {
 }

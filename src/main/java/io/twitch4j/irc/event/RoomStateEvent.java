@@ -22,10 +22,24 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.api.kraken.operations;
+package io.twitch4j.irc.event;
 
-import io.twitch4j.api.IOperation;
-import io.twitch4j.api.kraken.models.Clip;
+import io.twitch4j.event.Event;
+import io.twitch4j.irc.channel.IChannel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-public interface Clips extends IOperation<Clip, String> {
+import java.util.Locale;
+import java.util.Map;
+
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class RoomStateEvent extends Event {
+	private final Locale broadcastLang;
+	private final boolean r9k;
+	private final long slow;
+	private final boolean subscribers;
+	private final IChannel channel;
 }

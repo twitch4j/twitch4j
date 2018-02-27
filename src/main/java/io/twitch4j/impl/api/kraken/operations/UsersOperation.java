@@ -27,7 +27,7 @@ package io.twitch4j.impl.api.kraken.operations;
 import io.twitch4j.TwitchAPI;
 import io.twitch4j.impl.api.Api;
 import io.twitch4j.api.kraken.IKraken;
-import io.twitch4j.api.kraken.model.User;
+import io.twitch4j.api.kraken.models.User;
 import io.twitch4j.api.kraken.operations.Users;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.impl.api.Operation;
