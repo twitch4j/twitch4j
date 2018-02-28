@@ -28,8 +28,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import io.twitch4j.IClient;
-import io.twitch4j.TwitchAPI;
+import io.twitch4j.ITwitchClient;
+import io.twitch4j.enums.TwitchEndpoint;
 import io.twitch4j.api.IApi;
 import io.twitch4j.api.Model;
 import io.twitch4j.api.RequestType;
@@ -43,18 +43,18 @@ import java.util.Map;
 @Getter
 public class Api implements IApi {
 
-	private final IClient client;
+	private final ITwitchClient client;
 
 	private final OkHttpClient httpClient;
 
 	protected final ObjectMapper mapper;
 
 	@Getter(AccessLevel.NONE)
-	private TwitchAPI api;
+	private TwitchEndpoint api;
 
-	protected Api(IClient client, TwitchAPI api) {
+	protected Api(ITwitchClient client, TwitchEndpoint api) {
 		this.client = client;
-		this.api = (api.equals(TwitchAPI.HELIX) || api.equals(TwitchAPI.KRAKEN)) ? api : TwitchAPI.DEFAULT;
+		this.api = (api.equals(TwitchEndpoint.HELIX) || api.equals(TwitchEndpoint.KRAKEN)) ? api : TwitchEndpoint.DEFAULT;
 		this.httpClient = new OkHttpClient.Builder()
 				.addInterceptor(new TwitchInterceptor(client, true))
 				.build();

@@ -40,7 +40,7 @@ import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@Builder(builderMethodName = "newCredential", builderClassName = "Builder")
+@Builder(builderMethodName = "newCredential", builderClassName = "TwitchBuilder")
 public class Credential implements ICredential, IConfiguration.IBot {
 	private String accessToken;
 	private String refreshToken;

@@ -24,8 +24,8 @@
 
 package io.twitch4j.impl;
 
-import io.twitch4j.IClient;
 import io.twitch4j.IConfiguration;
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.api.kraken.IKraken;
 import io.twitch4j.auth.IManager;
 import io.twitch4j.event.IDispatcher;
@@ -36,7 +36,7 @@ import io.twitch4j.impl.irc.TwitchMessageInterface;
 import io.twitch4j.impl.pubsub.TwitchPubSub;
 import io.twitch4j.irc.IMessageInterface;
 import io.twitch4j.pubsub.IPubSub;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
-public class TwitchClient implements IClient {
+public class TwitchClient implements ITwitchClient {
 	private final IConfiguration configuration;
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.CORE);
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.CORE);
 	private final IManager credentialManager = new CredentialManager(this);
 	private final IMessageInterface messageInterface = new TwitchMessageInterface(this);
 	private final IPubSub pubSub = new TwitchPubSub(this);

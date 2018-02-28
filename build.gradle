@@ -32,9 +32,7 @@ targetCompatibility = 1.8
 mainClassName = "io.twitch4j.runner.Twitch4J"
 
 repositories {
-	mavenCentral()
 	jcenter()
-	maven { url 'https://jitpack.io' }
 }
 
 javadoc {

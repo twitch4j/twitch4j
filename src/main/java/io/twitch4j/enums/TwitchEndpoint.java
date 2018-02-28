@@ -22,13 +22,20 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.utils;
+package io.twitch4j.enums;
 
-public class LoggerType {
-	public static final String CORE = "Core";
-	public static final String CREDENTIAL_MANAGER = "Credential Manager";
-	public static final String TMI = "Message Interface";
-	public static final String PUBSUB = "PubSub";
-	public static final String API = "API";
-	public static final String DISPATCHER = "Event Dispatcher";
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum TwitchEndpoint {
+	DEFAULT("https://api.twitch.tv/api/"),
+	KRAKEN("https://api.twitch.tv/kraken/"),
+	HELIX("https://api.twitch.tv/helix/"),
+	PUBSUB("wss://pubsub-edge.twitch.tv"),
+	IRCWS("wss://irc-ws.chat.twitch.tv"),
+	CHATTERS("https://tmi.twitch.tv/group/user/%s/chatters");
+
+	private final String url;
 }

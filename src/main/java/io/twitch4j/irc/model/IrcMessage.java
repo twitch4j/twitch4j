@@ -24,7 +24,7 @@
 
 package io.twitch4j.irc.model;
 
-import io.twitch4j.IClient;
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.api.kraken.models.Subscription;
 import io.twitch4j.event.Event;
 import io.twitch4j.irc.IMessageInterface;
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 /**
  * IRC Parser.
+ *
  * @see <a href = "https://github.com/3ventic/TwitchChatSharp/blob/master/TwitchChatSharp/IrcMessage.cs#L201">https://github.com/3ventic/TwitchChatSharp/blob/master/TwitchChatSharp/IrcMessage.cs#L201</a>
  * @author Werner [https://github.com/3ventic]
  * @author Damian Staszewski [https://github.com/stachu540]
@@ -56,23 +57,30 @@ public class IrcMessage {
 	 * IRC Command
 	 */
 	private final IrcCommand command;
+
 	/**
 	 * IRC Parameters e.g. <code>#&lt;channel&gt;</code>
 	 */
 	private final String parameters;
+
 	/**
 	 * IRC Message
 	 */
 	private final String message;
+
 	/**
 	 * IRC Host Mask which contains username. <code>&lt;username&gt;!&lt;username&gt;@&lt;hostname&gt;</code>
 	 */
 	private final String hostmask;
+
 	/**
 	 * IRC Tags V3
 	 */
 	private final Map<String, String> tags;
 
+	/**
+	 * Parser States
+	 */
 	private enum ParserState {
 		STATE_NONE,
 		STATE_V3,
@@ -82,6 +90,9 @@ public class IrcMessage {
 		STATE_TRAILING
 	}
 
+	/**
+	 * Overwrite toString
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -251,11 +262,12 @@ public class IrcMessage {
 	}
 
 	/**
-	 * Parsing message to event and dispatching them
+	 * Parse the message and dispatch the corresponding event
+	 *
 	 * @param message the IRC Message
 	 * @param client client
 	 */
-	public static void parseAndDispatchEvent(IrcMessage message, IClient client) {
+	public static void parseAndDispatchEvent(IrcMessage message, ITwitchClient client) {
 
 		client.getDispatcher().dispatch(new IrcEvent(message));
 

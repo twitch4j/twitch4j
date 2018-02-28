@@ -31,17 +31,10 @@ import io.twitch4j.auth.ICredential;
 import io.twitch4j.pubsub.ITopic;
 import io.twitch4j.pubsub.PubSubException;
 import io.twitch4j.pubsub.Topic;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import io.twitch4j.utils.Util;
 import lombok.Getter;
 import io.twitch4j.IClient;
-import io.twitch4j.api.kraken.models.Channel;
-import io.twitch4j.auth.ICredential;
-import io.twitch4j.pubsub.ITopic;
-import io.twitch4j.pubsub.PubSubException;
-import io.twitch4j.pubsub.Topic;
-import io.twitch4j.utils.LoggerType;
-import io.twitch4j.utils.Util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -67,7 +60,7 @@ public class TwitchPubSubTopic implements ITopic {
 		this.credential = credential;
 		this.nonce = Util.generateNonce(toString());
 
-		this.logger = LoggerFactory.getLogger(String.format("%s @ %s", LoggerType.PUBSUB, topic.name().toLowerCase()));
+		this.logger = LoggerFactory.getLogger(String.format("%s @ %s", TwitchComponents.PUBSUB, topic.name().toLowerCase()));
 	}
 
 	@Override

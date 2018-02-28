@@ -24,22 +24,21 @@
 
 package io.twitch4j.impl.auth;
 
-import io.twitch4j.Builder;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.ITwitchClient;
+import io.twitch4j.TwitchBuilder;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.Getter;
 import lombok.Setter;
-import io.twitch4j.IClient;
 import io.twitch4j.auth.*;
-import io.twitch4j.utils.LoggerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 public class CredentialManager implements IManager {
-	private final IClient client;
+	private final ITwitchClient client;
 
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.CREDENTIAL_MANAGER);
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.CREDENTIAL_MANAGER);
 
 	@Getter
 	@Setter
@@ -47,7 +46,7 @@ public class CredentialManager implements IManager {
 
 	private final IAuthorization authorization;
 
-	public CredentialManager(IClient client) {
+	public CredentialManager(ITwitchClient client) {
 		this.client = client;
 		this.authorization = new Authorization(client);
 	}
@@ -90,7 +89,7 @@ public class CredentialManager implements IManager {
 	}
 
 	@Override
-	public ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception {
+	public ICredential buildCredentialData(TwitchBuilder.Credentials credentialBuilder) throws Exception {
 		return authorization.buildCredentialData(credentialBuilder);
 	}
 }

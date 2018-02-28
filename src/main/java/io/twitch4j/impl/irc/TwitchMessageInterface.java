@@ -24,20 +24,14 @@
 
 package io.twitch4j.impl.irc;
 
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.impl.irc.channel.ChannelEndpoint;
 import io.twitch4j.impl.utils.SocketImpl;
 import io.twitch4j.irc.DefaultColor;
 import io.twitch4j.irc.IMessageInterface;
 import io.twitch4j.irc.IUser;
 import io.twitch4j.irc.channel.IChannel;
-import io.twitch4j.IClient;
-import io.twitch4j.TwitchAPI;
-import io.twitch4j.impl.irc.channel.ChannelEndpoint;
-import io.twitch4j.impl.utils.SocketImpl;
-import io.twitch4j.irc.DefaultColor;
-import io.twitch4j.irc.IMessageInterface;
-import io.twitch4j.irc.IUser;
-import io.twitch4j.irc.channel.IChannel;
+import io.twitch4j.enums.TwitchEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.awt.*;
@@ -45,8 +39,8 @@ import java.io.IOException;
 
 public class TwitchMessageInterface extends SocketImpl<MessageInterfaceListener> implements IMessageInterface {
 
-	public TwitchMessageInterface(IClient client) {
-		super(client, new MessageInterfaceListener(client), TwitchAPI.IRCWS);
+	public TwitchMessageInterface(ITwitchClient client) {
+		super(client, new MessageInterfaceListener(client), TwitchEndpoint.IRCWS);
 	}
 
 	public IChannel getBotChannel() {

@@ -24,6 +24,7 @@
 
 package io.twitch4j.impl.utils;
 
+import io.twitch4j.ITwitchClient;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 public abstract class TwitchListener implements WebSocketListener {
-	private final IClient client;
+	private final ITwitchClient client;
 	@Setter(AccessLevel.PROTECTED)
 	private Optional<Session> session = Optional.empty();
 

@@ -28,9 +28,9 @@ import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import io.twitch4j.Builder;
-import io.twitch4j.IClient;
-import io.twitch4j.TwitchAPI;
+import io.twitch4j.ITwitchClient;
+import io.twitch4j.TwitchBuilder;
+import io.twitch4j.enums.TwitchEndpoint;
 import io.twitch4j.api.kraken.models.ErrorResponse;
 import io.twitch4j.api.kraken.models.Kraken;
 import io.twitch4j.api.kraken.models.User;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class Authorization implements IAuthorization {
 
-	private final IClient client;
+	private final ITwitchClient client;
 
 	@Getter
 	@Setter
@@ -78,7 +78,7 @@ public class Authorization implements IAuthorization {
 		// do not add openid scope if OIDC is false
 		openIdConnectScopeVerify(scopes);
 
-		return new StringBuilder(TwitchAPI.KRAKEN.getUrl())
+		return new StringBuilder(TwitchEndpoint.KRAKEN.getUrl())
 				.append("oauth2/authorize")
 				.append("?response_type=code")
 				.append("&client_id=").append(client.getConfiguration().getClientId())
@@ -114,7 +114,7 @@ public class Authorization implements IAuthorization {
 
 	@Override
 	public ICredential buildAccessToken(String code, String redirectUri) throws Exception {
-		String url = new StringBuilder((openIdConnect) ? TwitchAPI.DEFAULT.getUrl() : TwitchAPI.KRAKEN.getUrl())
+		String url = new StringBuilder((openIdConnect) ? TwitchEndpoint.DEFAULT.getUrl() : TwitchEndpoint.KRAKEN.getUrl())
 				.append("oauth2/token")
 				.append("?grant_type=authorization_code")
 				.append("&client_id=").append(client.getConfiguration().getClientId())
@@ -130,7 +130,7 @@ public class Authorization implements IAuthorization {
 
 	@Override
 	public ICredential refreshToken(ICredential credential) throws Exception {
-		String url = new StringBuilder(TwitchAPI.KRAKEN.getUrl())
+		String url = new StringBuilder(TwitchEndpoint.KRAKEN.getUrl())
 				.append("oauth2/authorize")
 				.append("?grant_type=refresh_token")
 				.append("&refresh_token=").append(credential.getRefreshToken())
@@ -174,7 +174,7 @@ public class Authorization implements IAuthorization {
 
 	@Override
 	public boolean revokeToken(ICredential credential) throws Exception {
-		String url = new StringBuilder(TwitchAPI.KRAKEN.getUrl())
+		String url = new StringBuilder(TwitchEndpoint.KRAKEN.getUrl())
 				.append("oauth2/revoke")
 				.append("?response_type=code")
 				.append("?client_id=").append(client.getConfiguration().getClientId())
@@ -207,7 +207,7 @@ public class Authorization implements IAuthorization {
 	}
 
 	@Override
-	public ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception {
+	public ICredential buildCredentialData(TwitchBuilder.Credentials credentialBuilder) throws Exception {
 		Kraken kraken = client.getKrakenApi().fetchUserInfo(credentialBuilder.getAccessToken());
 		Calendar expire = Calendar.getInstance();
 		expire.add(Calendar.DATE, 60);

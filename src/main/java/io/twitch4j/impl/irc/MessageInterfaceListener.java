@@ -24,20 +24,13 @@
 
 package io.twitch4j.impl.irc;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.impl.utils.TwitchListener;
 import io.twitch4j.irc.channel.IChannel;
 import io.twitch4j.irc.model.IrcMessage;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.Getter;
-import io.twitch4j.IClient;
 import io.twitch4j.impl.irc.channel.ChannelEndpoint;
-import io.twitch4j.impl.utils.TwitchListener;
-import io.twitch4j.irc.channel.IChannel;
-import io.twitch4j.irc.model.IrcMessage;
-import io.twitch4j.utils.LoggerType;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +39,11 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
 
 @Getter
 public class MessageInterfaceListener extends TwitchListener {
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.TMI);
-	public MessageInterfaceListener(IClient client) {
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.TMI);
+	public MessageInterfaceListener(ITwitchClient client) {
 		super(client);
 	}
 	private final Map<String, IChannel> channels = new LinkedHashMap<>();

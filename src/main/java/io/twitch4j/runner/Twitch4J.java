@@ -24,7 +24,8 @@
 
 package io.twitch4j.runner;
 
-import io.twitch4j.Builder;
+import io.twitch4j.ITwitchClient;
+import io.twitch4j.TwitchBuilder;
 import io.twitch4j.IClient;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -59,11 +60,11 @@ public class Twitch4J implements Runnable {
 		});
 
 		try {
-			IClient client = Builder.newClient()
+			ITwitchClient client = TwitchBuilder.newTwitchClient()
                     .withClientId(clientId)
                     .withClientSecret(clientSecret)
                     .withBotCredential(
-                            Builder.newCredential()
+                            TwitchBuilder.newCredential()
                             .withAccessToken(botAccessToken)
                             .withRefreshToken(botRefreshToken)
                     ).build();

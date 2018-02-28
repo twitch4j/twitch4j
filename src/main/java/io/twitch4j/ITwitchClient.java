@@ -22,23 +22,15 @@
  * SOFTWARE.
  */
 
-package io.twitch4j.auth;
+package io.twitch4j;
 
-import io.twitch4j.TwitchBuilder;
+import io.twitch4j.api.kraken.IKraken;
+import io.twitch4j.irc.IMessageInterface;
+import io.twitch4j.pubsub.IPubSub;
 
-import java.util.Set;
-
-public interface IAuthorization {
-	boolean isForceVerify();
-	void setForceVerify(boolean forceVerify);
-
-	boolean isOpenIdConnect();
-	void setOpenIdConnect(boolean openIdConnect);
-
-	String buildAuthorizationUrl(Set<Scope> scopes, String redirectUri, String state);
-	ICredential buildAccessToken(String code, String redirectUri) throws Exception;
-	ICredential refreshToken(ICredential credential) throws Exception;
-	boolean revokeToken(ICredential credential) throws Exception;
-	ICredential rebuildCredentialData(ICredential credential) throws Exception;
-	ICredential buildCredentialData(TwitchBuilder.Credentials credentialBuilder) throws Exception;
+public interface ITwitchClient extends IClient {
+	@Deprecated
+	IKraken getKrakenApi();
+	IPubSub getPubSub();
+	IMessageInterface getMessageInterface();
 }

@@ -24,7 +24,7 @@
 
 package io.twitch4j.auth;
 
-import io.twitch4j.Builder;
+import io.twitch4j.TwitchBuilder;
 
 import java.util.Set;
 
@@ -62,5 +62,5 @@ public interface IManager {
 	void revokeToken(ICredential credential) throws Exception;
 	void revokeToken(ICredential credential, boolean revokeOnly) throws Exception;
 	ICredential rebuildCredentialData(ICredential credential) throws Exception;
-	ICredential buildCredentialData(Builder.Credentials credentialBuilder) throws Exception;
+	ICredential buildCredentialData(TwitchBuilder.Credentials credentialBuilder) throws Exception;
 }

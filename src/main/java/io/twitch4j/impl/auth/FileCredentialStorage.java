@@ -32,7 +32,7 @@ import io.twitch4j.IClient;
 import io.twitch4j.auth.AbstractCredentialStorage;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.auth.ICredentialStorage;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
-@Slf4j(topic = LoggerType.CREDENTIAL_MANAGER)
+@Slf4j(topic = TwitchComponents.CREDENTIAL_MANAGER)
 public class FileCredentialStorage extends AbstractCredentialStorage implements ICredentialStorage {
 	private final Collection<ICredential> credentials = new FileCollection();
 	public FileCredentialStorage(IClient client) {

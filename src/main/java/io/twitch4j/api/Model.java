@@ -25,6 +25,7 @@
 package io.twitch4j.api;
 
 import io.twitch4j.IClient;
+import io.twitch4j.ITwitchClient;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,6 @@ import java.util.Calendar;
 @Data
 @NoArgsConstructor
 public class Model {
-	private IClient client;
+	private ITwitchClient client;
 	private Calendar createdAt = Calendar.getInstance();
 }

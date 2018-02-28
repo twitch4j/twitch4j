@@ -27,7 +27,6 @@ package io.twitch4j;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.twitch4j.api.kraken.models.Channel;
-import io.twitch4j.auth.AbstractCredentialStorage;
 import io.twitch4j.auth.ICredential;
 import io.twitch4j.auth.ICredentialStorage;
 import io.twitch4j.impl.Configuration;
@@ -37,23 +36,25 @@ import io.twitch4j.impl.auth.FileCredentialStorage;
 import io.twitch4j.impl.pubsub.TwitchPubSubTopic;
 import io.twitch4j.pubsub.ITopic;
 import io.twitch4j.pubsub.Topic;
-import io.twitch4j.utils.LoggerType;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Wither;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
 
-public class Builder {
+/**
+ * Builder that instantiates components of Twitch4J
+ */
+public class TwitchBuilder {
 
-	public static Client newClient() {
-		return new Client();
+	/**
+	 * Gets a builder to construct a new TwitchClient instance
+	 *
+	 * @return TwitchClientBuilder
+	 */
+	public static TwitchClientBuilder newTwitchClient() {
+		return new TwitchClientBuilder();
 	}
 
 	public static Credentials newCredential() {
@@ -62,24 +63,29 @@ public class Builder {
 
 	public static PubSubTopic newTopic() { return new PubSubTopic(); }
 
+
 	@Data
 	@Wither
+	@Setter(AccessLevel.NONE)
 	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
-	public static class Client {
+	public static class TwitchClientBuilder {
 		/**
-		 * [<b>REQUIRED</b>] Client ID
+		 * The client id of your twitch app
 		 */
 		private String clientId;
+
 		/**
-		 * [<b>REQUIRED</b>] Client Secret
+		 * The client secret of your twitch app
 		 */
 		private String clientSecret;
+
 		/**
 		 * Bot Credentials
 		 * @see Credential
 		 */
 		private Credentials botCredential;
+
 		/**
 		 * Credential Storage
 		 */
@@ -91,20 +97,20 @@ public class Builder {
 		@Wither(AccessLevel.NONE)
 		private Set<ITopic> topics;
 
-		public Client withTopics(ITopic... topics) {
+		public TwitchClientBuilder withTopics(ITopic... topics) {
 			return withTopics(Arrays.asList(topics));
 		}
 
-		public Client withTopics(Collection<ITopic> topics) {
+		public TwitchClientBuilder withTopics(Collection<ITopic> topics) {
 			this.topics = new LinkedHashSet<>(topics);
 			return this;
 		}
 
-		public Client withChannels(String... channels) {
+		public TwitchClientBuilder withChannels(String... channels) {
 			return withChannels(Arrays.asList(channels));
 		}
 
-		public Client withChannels(Collection<String> channels) {
+		public TwitchClientBuilder withChannels(Collection<String> channels) {
 			if (this.channels != null) {
 				this.channels.addAll(channels);
 			}
@@ -114,7 +120,7 @@ public class Builder {
 			return this;
 		}
 
-		public Client withChannel(String channel) {
+		public TwitchClientBuilder withChannel(String channel) {
 			if (this.channels == null) {
 				this.channels = new LinkedHashSet<>();
 			}
@@ -124,10 +130,11 @@ public class Builder {
 		}
 
 		/**
-		 * Build Twitch Client
-		 * @return Twitch Client
+		 * Build the Twitch Client instance
+		 *
+		 * @return IClient Twitch Client
 		 */
-		public IClient build() throws Exception {
+		public ITwitchClient build() throws Exception {
 			boolean pubSub = topics != null && !topics.isEmpty();
 
 			Configuration configuration = new Configuration(
@@ -142,7 +149,7 @@ public class Builder {
 			if (!Objects.isNull(this.botCredential)) {
 				((Configuration) client.getConfiguration()).setBot((IConfiguration.IBot) client.getCredentialManager().buildCredentialData(this.botCredential));
 			}
-			
+
 			client.getPubSub().registerTopics(topics);
 			client.getMessageInterface().addChannels(channels);
 

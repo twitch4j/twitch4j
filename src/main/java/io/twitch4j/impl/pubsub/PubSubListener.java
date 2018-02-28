@@ -26,18 +26,13 @@ package io.twitch4j.impl.pubsub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.impl.utils.TwitchListener;
 import io.twitch4j.pubsub.ITopic;
 import io.twitch4j.pubsub.PubSubException;
 import io.twitch4j.pubsub.event.PubSubBitsEvent;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.Getter;
-import io.twitch4j.IClient;
-import io.twitch4j.impl.utils.TwitchListener;
-import io.twitch4j.pubsub.ITopic;
-import io.twitch4j.pubsub.PubSubException;
-import io.twitch4j.pubsub.event.PubSubBitsEvent;
-import io.twitch4j.utils.LoggerType;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -49,12 +44,12 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class PubSubListener extends TwitchListener {
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.PUBSUB);
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.PUBSUB);
 
 	@Getter
 	private final Set<ITopic> topics = new LinkedHashSet<ITopic>();
 
-	public PubSubListener(IClient client) {
+	public PubSubListener(ITwitchClient client) {
 		super(client);
 	}
 

@@ -24,12 +24,11 @@
 
 package io.twitch4j.impl.utils;
 
-import io.twitch4j.TwitchAPI;
+import io.twitch4j.enums.TwitchEndpoint;
 import io.twitch4j.utils.ISocket;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import io.twitch4j.IClient;
-import io.twitch4j.utils.ISocket;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -43,7 +42,7 @@ public class SocketImpl<T extends TwitchListener> implements ISocket {
 	private final IClient client;
 	private final WebSocketClient wsClient = new WebSocketClient();
 	private final T listener;
-	private final TwitchAPI uri;
+	private final TwitchEndpoint uri;
 
 	public Optional<Session> getSession() {
 		return listener.getSession();

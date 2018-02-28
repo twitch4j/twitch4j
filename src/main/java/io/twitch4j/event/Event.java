@@ -24,10 +24,11 @@
 
 package io.twitch4j.event;
 
+import io.twitch4j.ITwitchClient;
 import lombok.Data;
 import io.twitch4j.IClient;
 
 @Data
 public abstract class Event {
-	private IClient client;
+	private ITwitchClient client;
 }

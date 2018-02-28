@@ -24,15 +24,12 @@
 
 package io.twitch4j.auth;
 
-import io.twitch4j.Builder;
+import io.twitch4j.TwitchBuilder;
 import io.twitch4j.IClient;
 import io.twitch4j.api.kraken.models.User;
-import io.twitch4j.irc.channel.IChannel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.Calendar;
 import java.util.Optional;
 
 @Getter
@@ -69,7 +66,7 @@ public abstract class AbstractCredentialStorage implements ICredentialStorage {
 		ICredential preCredential;
 		if (ObjectUtils.allNotNull(credential.expiredAt(), credential.getScopes(), credential.getUser())) {
 			preCredential = client.getCredentialManager().buildCredentialData(
-					Builder.newCredential()
+					TwitchBuilder.newCredential()
 						.withAccessToken(credential.getAccessToken())
 						.withRefreshToken(credential.getRefreshToken())
 						.withIdToken(credential.getIdToken())

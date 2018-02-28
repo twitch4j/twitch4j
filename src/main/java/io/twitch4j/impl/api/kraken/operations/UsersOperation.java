@@ -24,7 +24,7 @@
 
 package io.twitch4j.impl.api.kraken.operations;
 
-import io.twitch4j.TwitchAPI;
+import io.twitch4j.enums.TwitchEndpoint;
 import io.twitch4j.impl.api.Api;
 import io.twitch4j.api.kraken.IKraken;
 import io.twitch4j.api.kraken.models.User;
@@ -48,7 +48,7 @@ public class UsersOperation extends Operation implements Users {
 		if (!Objects.isNull(credential.getUser())) {
 			return credential.getUser();
 		}
-		String url = String.format("%suser", TwitchAPI.KRAKEN.getUrl());
+		String url = String.format("%suser", TwitchEndpoint.KRAKEN.getUrl());
 
 		try (Response response = getApi().get(url, Collections.singletonMap("Authorization", String.format("%s %s", IKraken.PREFIX_AUTHORIZATION, credential.getAccessToken())))) {
 			return getApi().buildPOJO(response, User.class);
@@ -60,7 +60,7 @@ public class UsersOperation extends Operation implements Users {
 
 	@Override
 	public User getById(Long id) {
-		String url = String.format("%susers/%d", TwitchAPI.KRAKEN.getUrl(), id);
+		String url = String.format("%susers/%d", TwitchEndpoint.KRAKEN.getUrl(), id);
 		try (Response response = getApi().get(url)) {
 			return getApi().buildPOJO(response, User.class);
 		} catch (IOException ignore) {
@@ -71,7 +71,7 @@ public class UsersOperation extends Operation implements Users {
 
 	@Override
 	public Optional<User> getByName(String name) {
-		String url = String.format("%susers?login=%s", TwitchAPI.KRAKEN.getUrl(), name);
+		String url = String.format("%susers?login=%s", TwitchEndpoint.KRAKEN.getUrl(), name);
 		try (Response response = getApi().get(url)) {
 			return Optional.of(getApi().buildPOJO(response, User.class));
 		} catch (IOException ignore) {

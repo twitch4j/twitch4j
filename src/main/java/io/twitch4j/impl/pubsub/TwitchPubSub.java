@@ -24,18 +24,13 @@
 
 package io.twitch4j.impl.pubsub;
 
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.impl.utils.SocketImpl;
 import io.twitch4j.pubsub.IPubSub;
 import io.twitch4j.pubsub.ITopic;
 import io.twitch4j.pubsub.PubSubException;
-import io.twitch4j.utils.LoggerType;
-import io.twitch4j.IClient;
-import io.twitch4j.TwitchAPI;
-import io.twitch4j.impl.utils.SocketImpl;
-import io.twitch4j.pubsub.IPubSub;
-import io.twitch4j.pubsub.ITopic;
-import io.twitch4j.pubsub.PubSubException;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
+import io.twitch4j.enums.TwitchEndpoint;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
@@ -45,11 +40,11 @@ import java.util.Collection;
 import java.util.Set;
 
 public class TwitchPubSub extends SocketImpl<PubSubListener> implements IPubSub {
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.PUBSUB);
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.PUBSUB);
 	private final WebSocketClient ws = new WebSocketClient();
 
-	public TwitchPubSub(IClient client) {
-		super(client, new PubSubListener(client), TwitchAPI.PUBSUB);
+	public TwitchPubSub(ITwitchClient client) {
+		super(client, new PubSubListener(client), TwitchEndpoint.PUBSUB);
 	}
 
 	private void sendRawMessage(String message) throws Exception {

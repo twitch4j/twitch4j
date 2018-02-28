@@ -24,13 +24,12 @@
 
 package io.twitch4j.impl.event;
 
-import com.google.common.reflect.TypeResolver;
-import io.twitch4j.IClient;
+import io.twitch4j.ITwitchClient;
 import io.twitch4j.event.Event;
 import io.twitch4j.event.EventSubscriber;
 import io.twitch4j.event.IDispatcher;
 import io.twitch4j.event.IListener;
-import io.twitch4j.utils.LoggerType;
+import io.twitch4j.enums.TwitchComponents;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -47,9 +46,9 @@ import java.util.concurrent.Executors;
 
 @RequiredArgsConstructor
 public class EventDispatcher implements IDispatcher {
-	private final Logger logger = LoggerFactory.getLogger(LoggerType.DISPATCHER);
+	private final Logger logger = LoggerFactory.getLogger(TwitchComponents.DISPATCHER);
 
-	private final IClient client;
+	private final ITwitchClient client;
 
 	private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<Method, CopyOnWriteArrayList<ListenerPair<Object>>>> methodListeners = new ConcurrentHashMap<>();
 	@SuppressWarnings("rawtypes")

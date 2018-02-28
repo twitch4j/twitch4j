@@ -24,8 +24,8 @@
 
 package io.twitch4j.impl.api.kraken;
 
-import io.twitch4j.IClient;
-import io.twitch4j.TwitchAPI;
+import io.twitch4j.ITwitchClient;
+import io.twitch4j.enums.TwitchEndpoint;
 import io.twitch4j.api.ApiException;
 import io.twitch4j.api.kraken.IKraken;
 import io.twitch4j.api.kraken.models.ErrorResponse;
@@ -57,8 +57,8 @@ public class KrakenApi extends Api implements IKraken {
 	private final Users usersOperation;
 	private final Videos videosOperation;
 
-	public KrakenApi(IClient client) {
-		super(client, TwitchAPI.KRAKEN);
+	public KrakenApi(ITwitchClient client) {
+		super(client, TwitchEndpoint.KRAKEN);
 
 //		this.bitsOperation = new BitsOperation(this);
 		this.feedsOpration = new FeedsOperation(this);
@@ -119,7 +119,7 @@ public class KrakenApi extends Api implements IKraken {
 	@Override
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public List<IngestServer> getServerList() throws Exception {
-		String url = String.format("%s/ingests", TwitchAPI.KRAKEN.getUrl().substring(0, TwitchAPI.KRAKEN.getUrl().length()-1));
+		String url = String.format("%s/ingests", TwitchEndpoint.KRAKEN.getUrl().substring(0, TwitchEndpoint.KRAKEN.getUrl().length()-1));
 		try (Response response = get(url)) {
 			if (response.isSuccessful()) {
 				return Arrays.asList(buildPOJO(response, IngestServer[].class));
@@ -153,7 +153,7 @@ public class KrakenApi extends Api implements IKraken {
 	}
 
 	public Kraken fetchUserInfo(String accessToken) throws Exception {
-		try (Response response = get(TwitchAPI.KRAKEN.getUrl(), java.util.Collections.singletonMap("Authorization", buildAuthorizationHeader(accessToken)))) {
+		try (Response response = get(TwitchEndpoint.KRAKEN.getUrl(), java.util.Collections.singletonMap("Authorization", buildAuthorizationHeader(accessToken)))) {
 			if (response.isSuccessful()) {
 				return buildPOJO(response, Kraken.class);
 			} else throw handleException(response);
