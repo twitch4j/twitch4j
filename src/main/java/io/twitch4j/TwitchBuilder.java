@@ -92,10 +92,10 @@ public class TwitchBuilder {
 		private Function<IClient, ? extends ICredentialStorage> credentialStorage = FileCredentialStorage::new;
 
 		@Wither(AccessLevel.NONE)
-		private Set<String> channels;
+		private Set<String> channels = new LinkedHashSet<>();
 
 		@Wither(AccessLevel.NONE)
-		private Set<ITopic> topics;
+		private Set<ITopic> topics = new LinkedHashSet<>();
 
 		public TwitchClientBuilder withTopics(ITopic... topics) {
 			return withTopics(Arrays.asList(topics));
@@ -150,8 +150,15 @@ public class TwitchBuilder {
 				((Configuration) client.getConfiguration()).setBot((IConfiguration.IBot) client.getCredentialManager().buildCredentialData(this.botCredential));
 			}
 
-			client.getPubSub().registerTopics(topics);
-			client.getMessageInterface().addChannels(channels);
+			// register provided pubsub topics
+			if (!topics.isEmpty()) {
+				client.getPubSub().registerTopics(topics);
+			}
+
+			// join provided channels
+			if (!channels.isEmpty()) {
+				client.getMessageInterface().addChannels(channels);
+			}
 
 			return client;
 		}
