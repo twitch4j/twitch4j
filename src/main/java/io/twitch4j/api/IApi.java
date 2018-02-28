@@ -24,51 +24,57 @@
 
 package io.twitch4j.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import io.twitch4j.api.kraken.models.Follow;
+import io.twitch4j.api.kraken.models.PaginatedList;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import java.io.IOException;
 import java.util.Map;
 
 public interface IApi {
-	default Response get(String url, Map<String, String> headers) throws Exception {
+	default Response get(String url, Map<String, String> headers) throws IOException {
 		return request(RequestType.GET, url, headers);
 	}
-	default Response post(String url, RequestBody body, Map<String, String> headers) throws Exception {
+	default Response post(String url, RequestBody body, Map<String, String> headers) throws IOException {
 		return request(RequestType.POST, url, body, headers);
 	}
-	default Response put(String url, RequestBody body, Map<String, String> headers) throws Exception {
+	default Response put(String url, RequestBody body, Map<String, String> headers) throws IOException {
 		return request(RequestType.PUT, url, body, headers);
 	}
-	default Response patch(String url, RequestBody body, Map<String, String> headers) throws Exception {
+	default Response patch(String url, RequestBody body, Map<String, String> headers) throws IOException {
 		return request(RequestType.PATCH, url, body, headers);
 	}
-	default Response delete(String url, Map<String, String> headers) throws Exception {
+	default Response delete(String url, Map<String, String> headers) throws IOException {
 		return request(RequestType.DELETE, url, headers);
 	}
 
-	default Response get(String url) throws Exception {
+	default Response get(String url) throws IOException {
 		return get(url, null);
 	}
-	default Response post(String url, RequestBody body) throws Exception {
+	default Response post(String url, RequestBody body) throws IOException {
 		return post(url, body, null);
 	}
-	default Response put(String url, RequestBody body) throws Exception {
+	default Response put(String url, RequestBody body) throws IOException {
 		return put(url, body, null);
 	}
-	default Response patch(String url, RequestBody body) throws Exception {
+	default Response patch(String url, RequestBody body) throws IOException {
 		return patch(url, body, null);
 	}
-	default Response delete(String url) throws Exception {
+	default Response delete(String url) throws IOException {
 		return delete(url, null);
 	}
 
-	default Response request(RequestType requestType, String url) throws Exception {
+	default Response request(RequestType requestType, String url) throws IOException {
 		return request(requestType, url, null);
 	}
 
-	default Response request(RequestType requestType, String url, Map<String, String> headers) throws Exception {
+	default Response request(RequestType requestType, String url, Map<String, String> headers) throws IOException {
 		return request(requestType, url, null, headers);
 	}
 
-	Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws Exception;
+	Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws IOException;
+	<T> T buildPOJO(Response response, Class<T> responseType) throws IOException;
+	<T> T buildPOJO(Response response, TypeReference<T> responseType) throws IOException;
 }

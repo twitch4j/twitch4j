@@ -24,8 +24,21 @@
 
 package io.twitch4j.api.kraken.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.twitch4j.api.Model;
 import io.twitch4j.api.Model;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.util.Calendar;
+
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Blocked extends Model {
+	@JsonProperty("_id")
+	private long id;
+	private Calendar updatedAt;
+	private User user;
 }

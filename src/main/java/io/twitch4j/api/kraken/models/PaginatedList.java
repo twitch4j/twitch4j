@@ -44,8 +44,7 @@ public class PaginatedList<E> extends Model {
 	@JsonProperty("_cursor")
 	private String cursor;
 	private int offset;
-	private InteractivePage<E> next;
-	private InteractivePage<E> previous;
+	private InteractivePage<E> interactivePage;
 
 	@JsonAlias({
 			"follows",
@@ -70,17 +69,11 @@ public class PaginatedList<E> extends Model {
 	private List<E> data;
 
 	public PaginatedList<E> next() {
-		if (StringUtils.isBlank(cursor)) {
-			return next.invoke(++offset);
-		} else return next.invoke(cursor);
+		return StringUtils.isBlank(cursor) ? interactivePage.invoke(++offset) : interactivePage.invoke(cursor);
 	}
 
 	public PaginatedList<E> previous() {
-		if (StringUtils.isBlank(cursor)) {
-			if (offset == 0)
-				return this;
-			else return previous.invoke(--offset);
-		} else return previous.invoke(cursor);
+		return StringUtils.isBlank(cursor) ? (offset == 0 ? this : interactivePage.invoke(--offset)) : interactivePage.invoke(cursor);
 	}
 
 	public interface InteractivePage<E> {

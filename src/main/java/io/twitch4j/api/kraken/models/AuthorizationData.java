@@ -24,17 +24,19 @@
 
 package io.twitch4j.api.kraken.models;
 
+import io.twitch4j.api.Model;
 import io.twitch4j.auth.Scope;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Calendar;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class AuthorizationData {
-	private Calendar createdAt;
+@EqualsAndHashCode(callSuper = false)
+public class AuthorizationData extends Model {
 	private Calendar updatedAt;
 	private Set<Scope> scopes;
 }

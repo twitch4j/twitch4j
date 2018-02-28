@@ -25,6 +25,7 @@
 package io.twitch4j.impl.api;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import io.twitch4j.IClient;
@@ -36,6 +37,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import okhttp3.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Getter
@@ -64,7 +66,7 @@ public class Api implements IApi {
 	}
 
 	@Override
-	public Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws Exception {
+	public Response request(RequestType requestType, String url, RequestBody body, Map<String, String> headers) throws IOException {
 		Request.Builder request = new Request.Builder();
 		request.url(url);
 		if (!headers.isEmpty()) {
@@ -76,7 +78,18 @@ public class Api implements IApi {
 		}
 	}
 
-	protected <T> T buildPOJO(Response response, Class<T> responseType) throws Exception {
+	public <T> T buildPOJO(Response response, Class<T> responseType) throws IOException {
+		T data = mapper.readValue(response.body().bytes(), responseType);
+
+		if (data instanceof Model) {
+			((Model) data).setClient(client);
+		}
+
+		return data;
+	}
+
+	@Override
+	public <T> T buildPOJO(Response response, TypeReference<T> responseType) throws IOException {
 		T data = mapper.readValue(response.body().bytes(), responseType);
 
 		if (data instanceof Model) {

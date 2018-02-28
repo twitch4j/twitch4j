@@ -97,14 +97,16 @@ public class FileCredentialStorage extends AbstractCredentialStorage implements 
 
 		private void load() {
 			try {
-				Collection<ICredential> credentials = Arrays.asList(mapper.readValue(file, Credential[].class));
-				credentials.forEach(credential -> {
-					try {
-						credentials.add(getClient().getCredentialManager().rebuildCredentialData(credential));
-					} catch (Exception e) {
-						FileCredentialStorage.log.error(ExceptionUtils.getMessage(e), e);
-					}
-				});
+				if (file.exists()) {
+					Collection<ICredential> credentials = Arrays.asList(mapper.readValue(file, Credential[].class));
+					credentials.forEach(credential -> {
+						try {
+							credentials.add(getClient().getCredentialManager().rebuildCredentialData(credential));
+						} catch (Exception e) {
+							FileCredentialStorage.log.error(ExceptionUtils.getMessage(e), e);
+						}
+					});
+				}
 			} catch (Exception e) {
 				FileCredentialStorage.log.error(ExceptionUtils.getMessage(e), e);
 			}
@@ -112,6 +114,10 @@ public class FileCredentialStorage extends AbstractCredentialStorage implements 
 
 		private void save() {
 			try {
+				if (!file.exists()) {
+					file.createNewFile();
+				}
+
 				TypeReference<Map<String, ?>> typeRef = new TypeReference<Map<String, ?>>() {};
 				Collection<Map<String, ?>> data = this.credentials.stream().map(credential -> {
 					Map<String, ?> value = mapper.convertValue(credential, typeRef);
