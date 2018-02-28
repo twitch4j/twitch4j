@@ -20,6 +20,7 @@ ext {
 	apacheCommonsLang3Version = "3.6"
 	logbackVersion = "1.2.3"
 	slf4jVersion = "1.7.25"
+	picocliVersion = "2.3.0"
 	lombokVersion = "1.16.20"
 	junitVersion = "4.12"
 }
@@ -28,7 +29,7 @@ group = 'com.github.twitch4j'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "io.twitch4j.Twitch4J"
+mainClassName = "io.twitch4j.runner.Twitch4J"
 
 repositories {
 	mavenCentral()
@@ -37,10 +38,9 @@ repositories {
 }
 
 javadoc {
-	exclude 'me/philippheuer/twitch4j/impl/**',
-			'me/philippheuer/twitch4j/utils/Util.java',
-			'me/philippheuer/Twitch4J.java',
-			'me/philippheuer/Arguments.java'
+	exclude 'io/twitch4j/impl/**',
+			'io/twitch4j/runner/**',
+			'io/twitch4j/utils/Util.java'
 	options {
 		overview = new File("${projectDir}/src/javadoc/overview.html")
 		title = "Twitch 4 Java (${project.version})"
@@ -71,6 +71,8 @@ dependencies {
 	compile "com.google.guava:guava:${guavaVersion}-jre"
 
 	compile "ch.qos.logback:logback-classic:${logbackVersion}"
+
+	compile "info.picocli:picocli:${picocliVersion}"
 
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"	// Getters, Setters and more.
 	apt "org.projectlombok:lombok:${lombokVersion}"
