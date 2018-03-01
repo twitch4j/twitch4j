@@ -136,7 +136,8 @@ and: (latest, you should use the actual version here)
 Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki) for more details.
 
 ### Sample Projects using Twitch4J
- - [Chatbot - Twitch4J](https://github.com/PhilippHeuer/twitch4j-chatbot)
+ - [CLI: Chatbot - Twitch4J](https://github.com/twitch4j/twitch4j-chatbot) by @twitch4j
+ - [GUI: Twitch Queue Bot](https://github.com/SirSkaro/twitch-queue-bot) by @SirSkaro
 
 ### Client Builder (Twitch Standalone)
 ```java
