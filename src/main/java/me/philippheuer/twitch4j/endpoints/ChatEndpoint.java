@@ -15,7 +15,7 @@ import java.util.Optional;
 public class ChatEndpoint extends AbstractTwitchEndpoint {
 
 	/**
-	 * AbstractTwitchEndpoint
+	 * ChatEndpoint
 	 *
 	 * @param twitchClient todo
 	 */
