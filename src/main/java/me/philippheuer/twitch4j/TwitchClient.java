@@ -310,4 +310,13 @@ public class TwitchClient {
 	public UnofficialEndpoint getUnofficialEndpoint() {
 		return new UnofficialEndpoint(this);
 	}
+
+	/**
+	 * Returns a new ChatEndpoint instance.
+	 *
+	 * @return a new instance of {@link ChatEndpoint}
+	 */
+	public ChatEndpoint getChatEndpoint() {
+		return new ChatEndpoint(this);
+	}
 }
