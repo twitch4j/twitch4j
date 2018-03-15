@@ -1,0 +1,20 @@
+plugins {
+    id "application"
+}
+
+dependencies {
+    compile project(":core")
+}
+
+
+mainClassName = "io.twitch4j.Twitch4J"
+
+dependencies {
+    compile project(":core")
+
+    compile "io.vertx:vertx-web:${vertxVersion}"
+
+    compile "info.picocli:picocli:${picocliVersion}"
+
+    compile "ch.qos.logback:logback-classic:${logbackVersion}"
+}

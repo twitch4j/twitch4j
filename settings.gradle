@@ -1,1 +1,3 @@
-rootProject.name = 'Twitch4J'
+rootProject.name = 'twitch4j'
+
+include "core", "launcher", "android"

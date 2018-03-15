@@ -1,0 +1,29 @@
+javadoc {
+    exclude 'io/twitch4j/impl/**'
+
+    options {
+        overview = new File("${projectDir}/src/javadoc/overview.html")
+        title = "Twitch 4 Java (${project.version})"
+        windowTitle = "${project.name} (${project.version})"
+        stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+        encoding = "UTF-8"
+    }
+}
+
+dependencies {
+    compile "com.auth0:java-jwt:${jwtVersion}"
+
+    compile "io.vertx:vertx-auth-oauth2:${vertxVersion}"
+    compile "io.vertx:vertx-web-client:${vertxVersion}"
+    compile "io.vertx:vertx-rx-java:${vertxVersion}"
+    compile "io.vertx:vertx-sync:${vertxVersion}"
+
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
+    compile "commons-io:commons-io:${apacheCommonsIOVersion}"
+    compile "org.apache.commons:commons-lang3:${apacheCommonsLang3Version}"
+
+    compile "com.google.guava:guava:${guavaVersion}-jre"
+
+    testCompile "com.squareup.okhttp3:mockwebserver:${okhttpVersion}"
+}
