@@ -11,7 +11,7 @@ plugins {
 	id 'maven-publish'
 	id "net.ltgt.apt" version "0.13"
 	id 'io.ratpack.ratpack-java' version '1.4.6'
-	id 'com.jfrog.bintray' version '1.7.3'
+	id 'com.jfrog.bintray' version '1.8.0'
 	id "com.cinnober.gradle.semver-git" version "2.3.1"
 }
 
