@@ -92,7 +92,7 @@ public class IRCMessageEvent extends Event {
 	 */
 	@SuppressWarnings("unchecked")
 	private void parseRawMessage() {
-		// Parse using Regex
+		// Parse Message
 		Pattern pattern = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
 		Matcher matcher = pattern.matcher(rawMessage);
 
@@ -108,6 +108,25 @@ public class IRCMessageEvent extends Event {
 			setChannelName(Optional.ofNullable(matcher.group("channel")));
 			setMessage(Optional.ofNullable(matcher.group("message")));
 			setPayload(Optional.ofNullable(matcher.group("payload")));
+			return;
+		}
+
+		// Parse Message - Whisper
+		Pattern patternPM = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
+		Matcher matcherPM = patternPM.matcher(rawMessage);
+
+		if(matcherPM.matches()) {
+			// Parse Tags
+			setTags(parseTags(matcherPM.group("tags")));
+			if(getTags().containsKey("badges")) {
+				setBadges(parseBadges(getTags().get("badges")));
+			}
+
+			setClientName(parseClientName(matcherPM.group("clientName")));
+			setCommandType(matcherPM.group("command"));
+			setChannelName(Optional.ofNullable(matcherPM.group("channel")));
+			setMessage(Optional.ofNullable(matcherPM.group("message")));
+			setPayload(Optional.ofNullable(matcherPM.group("payload")));
 		}
 	}
 
