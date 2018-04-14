@@ -10,7 +10,7 @@ before_script:
   # Make gradle wrapper executable
   - chmod +x gradlew
   - chmod +x gradle/wrapper/gradle-wrapper.jar
-  - apk add git
+  - apk --no-cache add git
 
 # Stages
 stages:
