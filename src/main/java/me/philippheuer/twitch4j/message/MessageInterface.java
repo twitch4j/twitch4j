@@ -115,9 +115,19 @@ public class MessageInterface {
 	/**
 	 * Leaving the channel
 	 * @param channel channel name
+	 * @deprecated See {@link #leaveChannel(String)}
 	 */
+	@Deprecated
 	public void partChannel(String channel) {
-		twitchChat.partChannel(channel);
+		leaveChannel(channel);
+	}
+
+	/**
+	 * Leaving the channel
+	 * @param channel channel name
+	 */
+	public void leaveChannel(String channel){
+		twitchChat.leaveChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		pubSub.unlistenChannel(ch);
 	}
