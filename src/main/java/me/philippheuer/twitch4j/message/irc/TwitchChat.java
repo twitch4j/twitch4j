@@ -367,8 +367,18 @@ public class TwitchChat {
 	/**
 	 * leaving the channel
 	 * @param channelName channel name
+	 * @deprecated Use {@link #leaveChannel(String)} instead
 	 */
+	@Deprecated
 	public void partChannel(String channelName) {
+		leaveChannel(channelName);
+	}
+
+	/**
+	 * leaving the channel
+	 * @param channelName channel name
+	 */
+	public void leaveChannel(String channelName) {
 		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
 		if (channelCache.containsKey(channelName)) {
 			sendCommand("part", "#" + channel.getName());
@@ -382,6 +392,7 @@ public class TwitchChat {
 			modMessageBucket.remove(channelName);
 		}
 	}
+
 
 	/**
 	 * Sending message to the joined channel
