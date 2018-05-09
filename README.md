@@ -1,15 +1,15 @@
-![Twitch4J Logo](docs/static_files/logo.png?raw=true)
+<p align="center"><img src=".github/logo.png?raw=true" width="150"></p>
 
-# Java API for [Twitch](https://www.twitch.tv/) V5
+<p align="center">
+<a href="https://travis-ci.org/twitch4j/twitch4j"><img src="https://travis-ci.org/twitch4j/twitch4j.svg?branch=master" alt="Build Status"></a>
+<img src="https://img.shields.io/librariesio/github/twitch4j/twitch4j.svg?style=flat-square" alt="Libraries.io for GitHub">
+<a href="https://www.codacy.com/app/twitch4j/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=twitch4j/twitch4j&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669" alt="Codacy Badge"></a>
+<a href="http://isitmaintained.com/project/twitch4j/twitch4j"><img src="http://isitmaintained.com/badge/resolution/twitch4j/twitch4j.svg" alt="Average time to resolve an issue"></a>
+<a href="http://isitmaintained.com/project/twitch4j/twitch4j"><img src="http://isitmaintained.com/badge/open/twitch4j/twitch4j.svg" alt="Percentage of issues still open"></a>
+<a href="https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion"><img src="https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg" alt="Download"></a>
+</p>
 
-Project Information:
-
-[![Build Status](https://travis-ci.org/twitch4j/twitch4j.svg?branch=master)](https://travis-ci.org/twitch4j/twitch4j)
-[![Libraries.io for GitHub](https://img.shields.io/librariesio/github/twitch4j/twitch4j.svg?style=flat-square)]()
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669)](https://www.codacy.com/app/PhilippHeuer/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PhilippHeuer/twitch4j&amp;utm_campaign=Badge_Grade)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/PhilippHeuer/twitch4j.svg)](http://isitmaintained.com/project/PhilippHeuer/twitch4j "Percentage of issues still open")
-[![Download](https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg) ](https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion)
+# Java API for [Twitch](https://www.twitch.tv/)
 
 Support:
 
