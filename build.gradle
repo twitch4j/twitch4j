@@ -9,23 +9,44 @@ plugins {
 	id 'eclipse'
 	id 'application'
 	id 'maven-publish'
-	id "net.ltgt.apt" version "0.13"
-	id 'io.ratpack.ratpack-java' version '1.4.6'
+	id "net.ltgt.apt" version "0.15"
 	id 'com.jfrog.bintray' version '1.8.0'
-	id "com.cinnober.gradle.semver-git" version "2.3.1"
+	id 'io.ratpack.ratpack-java' version '1.4.6'
 }
 
-ext.snapshotSuffix = "<count>.g<sha>-SNAPSHOT"
-ext.gitDescribeArgs = '--match v*[0-9].[0-9]*.[0-9]*'
+ext.pomConfig = {
+	licenses {
+		license {
+			name "MIT Licence"
+			url "https://github.com/twitch4j/twitch4j/blob/master/LICENSE"
+			distribution "repo"
+		}
+	}
+	developers {
+		developer {
+			id "PhilippHeuer"
+			name "Philipp Heuer"
+		}
+		developer {
+			id "stachu540"
+			name "Damian Staszewski"
+			email "damian@stachuofficial.pl"
+		}
+	}
+	scm {
+		url "https://github.com/twitch4j/twitch4j.git"
+	}
+}
 
 repositories {
-	mavenCentral()
 	jcenter()
 	maven { url "https://jitpack.io" }
 }
 
 // Artifact Info
-group "com.github.twitch4j"
+group = "com.github.twitch4j"
+description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
+version = "v0.10.3-SNAPSHOT"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -68,7 +89,7 @@ dependencies {
 
 	// Project Lombok for annotating processor
 	compile "org.projectlombok:lombok:+"
-	apt "org.projectlombok:lombok:+"
+	annotationProcessor "org.projectlombok:lombok:+"
 
 	// Testing
 	testCompile "junit:junit:4.12"
@@ -78,12 +99,6 @@ dependencies {
  * Define SourceSets
  */
 sourceSets {
-	main {
-		java.srcDir 'src/main/java'
-	}
-	test {
-		java.srcDir 'src/test/java'
-	}
 	integration {
 		java.srcDir 'src/integration/java'
 		resources.srcDir 'src/integration/resources'
@@ -118,9 +133,6 @@ test {
  * Test Task `testIntegration` - Run Integration Tests
  */
 task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-	testClassesDir = sourceSets.integration.output.classesDir
-	classpath = sourceSets.integration.runtimeClasspath
-
 	useJUnit {
 		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
 		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
@@ -130,20 +142,9 @@ task testIntegration(type: Test, description: 'Runs the integration tests.', gro
 /**
  * Sources - build a jar with source files
  */
-task sourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
-	from sourceSets.main.java.srcDirs
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
+	from sourceSets.main.allSource
 	classifier = 'sources'
-}
-
-/**
- * JavaDocs Generation
- */
-javadoc {
-	source = sourceSets.main.allJava
-	classpath = sourceSets.main.compileClasspath
-
-	// if not changed the destinationDir, the javadoc for production code is overridden.
-	destinationDir = file("${buildDir}/../docs/javadoc")
 }
 
 // build a jar with javadoc
@@ -165,16 +166,20 @@ artifacts {
  */
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			if (plugins.hasPlugin('war')) {
-				from components.web
-			} else {
-				from components.java
-			}
-
-			// Additional Artifacts
+		mainProject(MavenPublication) {
+			from project.components.java
+			groupId project.group
+			artifactId project.name
+			version project.version
 			artifact sourcesJar
 			artifact javadocJar
+			pom.withXml {
+				def root = asNode()
+				root.appendNode("description", project.description)
+				root.appendNode("name", project.name)
+				root.appendNode("url", "https://github.com/twitch4j/twitch4j")
+				root.children().last() + pomConf
+			}
 		}
 	}
 }
@@ -182,14 +187,14 @@ publishing {
 bintray {
 	user = System.getenv('BINTRAY_USER')
 	key = System.getenv('BINTRAY_API_KEY')
-	publications = ['mavenJava']
+	publications = ['mainProject']
 	dryRun = false
 	publish = true
 	pkg {
 		repo = 'maven'
 		name = 'Twitch4J'
 		userOrg = 'twitch4j'
-		desc = 'This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)'
+		desc = project.description
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
 		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
@@ -198,11 +203,11 @@ bintray {
 		publicDownloadNumbers = true
 		version {
 			name = project.version
-			released = new Date()
 		}
 	}
 }
 
 wrapper {
-	gradleVersion = "4.5" // newer version
+	gradleVersion = "4.7" // newer version
+	distributionType = Wrapper.DistributionType.ALL
 }
