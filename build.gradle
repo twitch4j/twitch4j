@@ -51,6 +51,19 @@ version = "v0.10.3-SNAPSHOT"
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
+/**
+ * Javadoc
+ */
+javadoc {
+	options {
+		overview = new File("${projectDir}/src/javadoc/overview.html")
+		title = "Twitch 4 Java (${project.version})"
+		windowTitle = "${project.name} (${project.version})"
+		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+		encoding = "UTF-8"
+	}
+}
+
 // Dependencies
 dependencies {
 	// Logging
