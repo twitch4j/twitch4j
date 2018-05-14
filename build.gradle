@@ -14,30 +14,6 @@ plugins {
 	id 'io.ratpack.ratpack-java' version '1.4.6'
 }
 
-ext.pomConfig = {
-	licenses {
-		license {
-			name "MIT Licence"
-			url "https://github.com/twitch4j/twitch4j/blob/master/LICENSE"
-			distribution "repo"
-		}
-	}
-	developers {
-		developer {
-			id "PhilippHeuer"
-			name "Philipp Heuer"
-		}
-		developer {
-			id "stachu540"
-			name "Damian Staszewski"
-			email "damian@stachuofficial.pl"
-		}
-	}
-	scm {
-		url "https://github.com/twitch4j/twitch4j.git"
-	}
-}
-
 repositories {
 	jcenter()
 	maven { url "https://jitpack.io" }
@@ -46,7 +22,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = "v0.10.3-SNAPSHOT"
+version = System.getenv('CI_COMMIT_REF_NAME')
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -181,22 +157,18 @@ publishing {
 	publications {
 		mainProject(MavenPublication) {
 			from project.components.java
+			artifact sourcesJar
+			artifact javadocJar
 			groupId project.group
 			artifactId project.name
 			version project.version
-			artifact sourcesJar
-			artifact javadocJar
-			pom.withXml {
-				def root = asNode()
-				root.appendNode("description", project.description)
-				root.appendNode("name", project.name)
-				root.appendNode("url", "https://github.com/twitch4j/twitch4j")
-				root.children().last() + pomConf
-			}
 		}
 	}
 }
 
+/**
+ * Bintray Upload
+ */
 bintray {
 	user = System.getenv('BINTRAY_USER')
 	key = System.getenv('BINTRAY_API_KEY')
@@ -204,9 +176,10 @@ bintray {
 	dryRun = false
 	publish = true
 	pkg {
+		// jcenter repository namespace and name
+		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
 		repo = 'maven'
-		name = 'Twitch4J'
-		userOrg = 'twitch4j'
+		name =  String.valueOf(project.name).toLowerCase()
 		desc = project.description
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
@@ -215,7 +188,9 @@ bintray {
 		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
 		publicDownloadNumbers = true
 		version {
-			name = project.version
+			name = String.valueOf(project.version).replace("v", "")
+			vcsTag = project.version
+			released = new Date()
 		}
 	}
 }
