@@ -1,0 +1,33 @@
+####
+# GitLab CI
+####
+
+# Image
+image: openjdk:8-jdk-alpine
+
+# Before Script
+before_script:
+  # Make gradle wrapper executable
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - apk --no-cache add git
+
+# Stages
+stages:
+  - build
+  - publish
+
+# Build
+Assemble:
+  stage: build
+  script:
+  - ./gradlew assemble
+
+# Publish
+#Publish:
+#  stage: publish
+#  script:
+#  - ./gradlew bintrayUpload
+#  only:
+#  - master
+#  - /^v[0-9]+\.[0-9]+\.[0-9]+$/

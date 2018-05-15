@@ -4,95 +4,90 @@
 
 // Apply the java plugin to add support for Java
 plugins {
+	id 'java'
+	id 'idea'
+	id 'eclipse'
+	id 'application'
+	id 'maven-publish'
+	id "net.ltgt.apt" version "0.15"
+	id 'com.jfrog.bintray' version '1.8.0'
 	id 'io.ratpack.ratpack-java' version '1.4.6'
-	id 'com.jfrog.bintray' version '1.7.3'
 }
 
-allprojects {
-	repositories {
-		jcenter()
-	}
-	apply plugin: 'maven'
-	apply plugin: 'maven-publish'
-	apply plugin: 'java'
-	apply plugin: 'idea'
-	apply plugin: 'eclipse'
+repositories {
+	jcenter()
+	maven { url "https://jitpack.io" }
 }
-
-// Method, that gets the total amount of commits in the repository (as build number)
-def gitVersion() {
-	def counter = 0
-	def process = "git rev-list dev --first-parent --count".execute()
-	counter = process.text.toInteger()
-	return counter
-}
-
-// Properties
-ext.project_name = 'Twitch4J'
-ext.project_group = 'com.github.twitch4j'
-ext.project_artifact = 'twitch4j'
-ext.project_version = 'v0.10.0'
-ext.github_group = 'twitch4j'
 
 // Artifact Info
-group project_group
-version project_version
+group = "com.github.twitch4j"
+description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
+version = System.getenv('TRAVIS_TAG')
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
+/**
+ * Javadoc
+ */
+javadoc {
+	options {
+		overview = new File("${projectDir}/src/javadoc/overview.html")
+		title = "Twitch 4 Java (${project.version})"
+		windowTitle = "${project.name} (${project.version})"
+		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+		encoding = "UTF-8"
+	}
+}
+
 // Dependencies
 dependencies {
 	// Logging
-	compile group: 'org.slf4j', 					name: 'slf4j-api', 				version: '1.7.25'
-	compile group: 'ch.qos.logback', 				name: 'logback-classic', 		version: '1.2.3'
-	compile group: 'com.jcabi', 					name: 'jcabi-log', 				version: '0.17.2'
+	compile "org.slf4j:slf4j-api:1.7.25"
+	compile "ch.qos.logback:logback-classic:1.2.3"
+	compile "com.jcabi:jcabi-log:0.17.2"
 
 	// Spring (RestTemplate)
-	compile group: 'org.springframework', 			name: 'spring-web', 			version: '5.0.0.RELEASE'
-	compile group: 'org.springframework.social', 	name: 'spring-social-core', 	version: '1.1.4.RELEASE'
+	compile "org.springframework:spring-web:5.0.0.RELEASE" 					// contains Tomcat
+	compile "org.springframework.social:spring-social-core:1.1.4.RELEASE"
 
 	// WebSocket Client for Twitch PubSub and Twitch IRC
-	compile group: 'com.neovisionaries', 			name: 'nv-websocket-client',	version: '2.3'
+	// TODO: Change to Jetty WebSocket
+	compile "com.neovisionaries:nv-websocket-client:2.3"
 
 	// Apache Commons
 	// - Lang
-	compile group: 'org.apache.commons',			name: 'commons-lang3', 			version: '3.6'
+	compile "org.apache.commons:commons-lang3:3.6"
 	// - IO
-	compile group: 'commons-io',					name: 'commons-io', 			version: '2.5'
+	compile "commons-io:commons-io:2.5"
 
 	// JSON / YAML
-	compile group: 'com.fasterxml.jackson.core', 	name: 'jackson-databind', 		version: '2.9.2'
+	compile "com.fasterxml.jackson.core:jackson-databind:2.9.2"
 
 	// Bucket for rate-limiting
-	compile group: 'org.isomorphism', 				name: 'token-bucket', 			version: '1.7'
+	compile "org.isomorphism:token-bucket:1.7"
 
 	// Expiring Map
-	compile group: 'net.jodah', 					name: 'expiringmap', 			version: '0.5.8'
+	compile "net.jodah:expiringmap:0.5.8"
 
 	// TypeTools
-	compile group: 'net.jodah', 					name: 'typetools', 				version: '0.5.0'
+	compile "net.jodah:typetools:0.5.0"
 
 	// Args4J - CommandLineArgumentParser
-	compile group: 'args4j', 						name: 'args4j', 				version: '2.33'
+	compile "args4j:args4j:2.33"
 
-	// Getter & Setter
-	compile group: 'org.projectlombok', 			name: 'lombok', 				version: '1.16.18'
+	// Project Lombok for annotating processor
+	compile "org.projectlombok:lombok:+"
+	annotationProcessor "org.projectlombok:lombok:+"
 
 	// Testing
-	testCompile group: 'junit', 					name: 'junit', 					version: '4.12'
+	testCompile "junit:junit:4.12"
 }
 
 /**
  * Define SourceSets
  */
 sourceSets {
-	main {
-		java.srcDir 'src/main/java'
-	}
-	test {
-		java.srcDir 'src/test/java'
-	}
 	integration {
 		java.srcDir 'src/integration/java'
 		resources.srcDir 'src/integration/resources'
@@ -127,9 +122,6 @@ test {
  * Test Task `testIntegration` - Run Integration Tests
  */
 task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-	testClassesDir = sourceSets.integration.output.classesDir
-	classpath = sourceSets.integration.runtimeClasspath
-
 	useJUnit {
 		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
 		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
@@ -139,20 +131,9 @@ task testIntegration(type: Test, description: 'Runs the integration tests.', gro
 /**
  * Sources - build a jar with source files
  */
-task sourcesJar(type: Jar, description: 'Builds the sourcesJar.', group: 'build') {
-	from sourceSets.main.java.srcDirs
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
+	from sourceSets.main.allSource
 	classifier = 'sources'
-}
-
-/**
- * JavaDocs Generation
- */
-javadoc {
-	source = sourceSets.main.allJava
-	classpath = sourceSets.main.compileClasspath
-
-	// if not changed the destinationDir, the javadoc for production code is overridden.
-	destinationDir = file("${buildDir}/../docs/javadoc")
 }
 
 // build a jar with javadoc
@@ -174,45 +155,47 @@ artifacts {
  */
 publishing {
 	publications {
-		MyPublication(MavenPublication) {
-			if (plugins.hasPlugin('war')) {
-				from components.web
-			} else {
-				from components.java
-			}
-
-			groupId project_group
-			artifactId project_artifact
-			version project_version
-
-			// Additional Artifacts
+		mainProject(MavenPublication) {
+			from project.components.java
 			artifact sourcesJar
 			artifact javadocJar
+			groupId project.group
+			artifactId project.name
+			version project.version
 		}
 	}
 }
 
+/**
+ * Bintray Upload
+ */
 bintray {
-	user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-	key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-	publications = ['MyPublication']
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_API_KEY')
+	publications = ['mainProject']
+	dryRun = false
+	publish = true
 	pkg {
+		// jcenter repository namespace and name
+		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
 		repo = 'maven'
-		name = project_name
-		userOrg = github_group
+		name =  String.valueOf(project.name).toLowerCase()
+		desc = project.description
+		websiteUrl = "https://github.com/twitch4j/twitch4j"
+		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
+		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
 		licenses = ['MIT']
+		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
 		publicDownloadNumbers = true
-		websiteUrl = "https://github.com/${github_group}/${project_name}"
-		issueTrackerUrl = "https://github.com/${github_group}/${project_name}/issues"
-		vcsUrl = "https://github.com/${github_group}/${project_name}.git"
-		githubRepo = "${github_group}/${project_name}"
 		version {
-			name = project_version
-			vcsTag = project_version
-			released  = new Date()
-			gpg {
-				sign = true
-			}
+			name = String.valueOf(project.version).replace("v", "")
+			vcsTag = project.version
+			released = new Date()
 		}
 	}
+}
+
+wrapper {
+	gradleVersion = "4.7" // newer version
+	distributionType = Wrapper.DistributionType.ALL
 }

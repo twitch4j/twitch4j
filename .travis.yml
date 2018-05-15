@@ -1,7 +1,3 @@
-#
-# Build configuration for Travis
-#
-sudo: false
 language: java
 jdk:
   - oraclejdk8
@@ -18,9 +14,15 @@ cache:
 # Before Install
 before_install:
   - chmod +x gradlew
-  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - ./gradlew install
 
 # Build
 script:
-    - ./gradlew install
     - ./gradlew testIntegration
+
+# Deploy (only if tags is there - default branch is master)
+deploy:
+  - provider: script
+    script: ./gradlew bintrayUpload
+    on:
+      condition: $TRAVIS_BRANCH == "master" || -n $TRAVIS_TAG
