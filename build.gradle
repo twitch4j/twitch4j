@@ -22,7 +22,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = System.getenv("TRAVIS_TAG") || "v0.10.2"
+version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
