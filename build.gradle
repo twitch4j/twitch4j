@@ -22,7 +22,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = System.getenv('TRAVIS_TAG')
+version = System.getenv("TRAVIS_TAG") || "v0.10.2"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -77,8 +77,8 @@ dependencies {
 	compile "args4j:args4j:2.33"
 
 	// Project Lombok for annotating processor
-	compile "org.projectlombok:lombok:+"
-	annotationProcessor "org.projectlombok:lombok:+"
+	compile "org.projectlombok:lombok:1.16.20"
+	annotationProcessor "org.projectlombok:lombok:1.16.20"
 
 	// Testing
 	testCompile "junit:junit:4.12"
@@ -133,12 +133,14 @@ task testIntegration(type: Test, description: 'Runs the integration tests.', gro
  */
 task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
 	from sourceSets.main.allSource
+	baseName = baseName.toLowerCase()
 	classifier = 'sources'
 }
 
 // build a jar with javadoc
 task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
 	classifier = 'javadoc'
+	baseName = baseName.toLowerCase()
 	from javadoc.destinationDir
 }
 
@@ -160,7 +162,7 @@ publishing {
 			artifact sourcesJar
 			artifact javadocJar
 			groupId project.group
-			artifactId project.name
+			artifactId project.name.toLowerCase()
 			version project.version
 		}
 	}
@@ -174,12 +176,11 @@ bintray {
 	key = System.getenv('BINTRAY_API_KEY')
 	publications = ['mainProject']
 	dryRun = false
-	publish = true
 	pkg {
 		// jcenter repository namespace and name
-		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
+		userOrg = 'twitch4j'
 		repo = 'maven'
-		name =  String.valueOf(project.name).toLowerCase()
+		name = "Twitch4J"
 		desc = project.description
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
