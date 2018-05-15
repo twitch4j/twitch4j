@@ -14,7 +14,6 @@ cache:
 # Before Install
 before_install:
   - chmod +x gradlew
-  - ./gradlew install
 
 # Build
 script:
@@ -24,8 +23,6 @@ script:
 deploy:
   - provider: script
     script: ./gradlew bintrayUpload
-    b: true
     on:
       tags: true
-      all_branches: true
-
+      branch: master
