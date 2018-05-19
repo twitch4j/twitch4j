@@ -1,0 +1,25 @@
+// main project version
+project.version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
+
+// dependencies version
+ext {
+	slf4j_version = "1.7.25"
+	jcabi_version = "0.18"
+
+	jackson_version = "2.9.5"
+	spring_platform = "Cairo-SR1"
+	spring_framework = "5.0.6.RELEASE"
+	websocket_version = "2.4"
+	commons_lang3_version = "3.7"
+	commons_io_version = "2.6"
+	tocketBucket_version = "1.7"
+	expriringMap_version = "0.5.8"
+	typeTools_version = "0.5.0"
+
+	args4j_version = "2.33"
+
+	lombok_version = "1.16.20"
+
+	logback_version = "1.2.3"
+	junit_version = "4.12"
+}

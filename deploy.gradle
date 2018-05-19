@@ -1,0 +1,80 @@
+/**
+ * Javadoc
+ */
+javadoc {
+	options {
+		overview = new File("${projectDir}/src/javadoc/overview.html")
+		title = "Twitch 4 Java (${project.version})"
+		windowTitle = "${project.name} (${project.version})"
+		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+		encoding = "UTF-8"
+	}
+}
+
+/**
+ * Sources - build a jar with source files
+ */
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
+	from sourceSets.main.allSource
+	baseName = baseName.toLowerCase()
+	classifier = 'sources'
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
+	classifier = 'javadoc'
+	baseName = baseName.toLowerCase()
+	from javadoc.destinationDir
+}
+
+/**
+ * Artifacts
+ */
+artifacts {
+	archives sourcesJar
+	archives javadocJar
+}
+
+/**
+ * Deployment
+ */
+publishing {
+	publications {
+		mainProject(MavenPublication) {
+			from project.components.java
+			artifact sourcesJar
+			artifact javadocJar
+			groupId project.group
+			artifactId project.name.toLowerCase()
+			version project.version
+		}
+	}
+}
+
+/**
+ * Bintray Upload
+ */
+bintray {
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_API_KEY')
+	publications = ['mainProject']
+	dryRun = false
+	pkg {
+		// jcenter repository namespace and name
+		userOrg = 'twitch4j'
+		repo = 'maven'
+		name = "Twitch4J"
+		desc = project.description
+		websiteUrl = "https://github.com/twitch4j/twitch4j"
+		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
+		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
+		licenses = ['MIT']
+		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
+		publicDownloadNumbers = true
+		version {
+			name = String.valueOf(project.version).replace("v", "")
+			vcsTag = project.version
+			released = new Date()
+		}
+	}
+}

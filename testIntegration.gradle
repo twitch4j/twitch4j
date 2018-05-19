@@ -1,0 +1,26 @@
+// Configuration
+configurations {
+	// Integration compile task
+	integrationCompile.extendsFrom testCompile
+	integrationRuntime.extendsFrom testRuntime
+}
+
+/**
+ * Test Task `test` - Run Unit Tests
+ */
+test {
+	useJUnit {
+		includeCategories 'me.philippheuer.util.test.UnitTestCategory'
+		excludeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
+	}
+}
+
+/**
+ * Test Task `testIntegration` - Run Integration Tests
+ */
+task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
+	useJUnit {
+		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
+		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
+	}
+}
