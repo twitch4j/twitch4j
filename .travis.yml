@@ -14,14 +14,15 @@ cache:
 # Before Install
 before_install:
   - chmod +x gradlew
-  - ./gradlew install
 
 # Build
 script:
     - ./gradlew testIntegration
 
+# Deploy (only if tags is there - default branch is master)
 deploy:
   - provider: script
     script: ./gradlew bintrayUpload
     on:
       tags: true
+      branch: master
