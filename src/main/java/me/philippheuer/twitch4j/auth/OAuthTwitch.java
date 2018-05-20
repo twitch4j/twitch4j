@@ -1,6 +1,5 @@
 package me.philippheuer.twitch4j.auth;
 
-import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -10,12 +9,8 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
-import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -151,7 +146,6 @@ public class OAuthTwitch {
 		// Filter to Streamlabs credentials
 		if(event.getCredential().getType().equals("twitch")) {
 			OAuthCredential credential = event.getCredential();
-			System.out.println("OLD: " + credential.toString());
 
 			// Rest Request to get refreshed token details
 			Authorize responseObject = getCredentialManager().getTwitchClient().getKrakenEndpoint().getOAuthToken(
@@ -159,7 +153,6 @@ public class OAuthTwitch {
 					getRedirectUri(),
 					credential.getRefreshToken()
 			).get();
-			System.out.println("NEW: " + responseObject.toString());
 
 			// Save Response
 			credential.setToken(responseObject.getAccessToken());
