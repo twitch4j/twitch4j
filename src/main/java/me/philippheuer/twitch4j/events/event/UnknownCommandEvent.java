@@ -17,7 +17,7 @@ import me.philippheuer.twitch4j.model.User;
 @Data
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class UnknownCommandEvent extends AbstractChannelEvent {
+public class UnknownCommandEvent extends ChannelBaseEvent {
 
 	/**
 	 * User
@@ -32,8 +32,8 @@ public class UnknownCommandEvent extends AbstractChannelEvent {
 	/**
 	 * Event Constructor
 	 *
-	 * @param channel The channel that this event originates from.
-	 * @param user	The user that invoked this event.
+	 * @param channel      The channel that this event originates from.
+	 * @param user         The user that invoked this event.
 	 * @param messageEvent The originating event.
 	 */
 	public UnknownCommandEvent(Channel channel, User user, ChannelMessageEvent messageEvent) {

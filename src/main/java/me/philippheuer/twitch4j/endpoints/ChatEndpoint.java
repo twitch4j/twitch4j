@@ -26,12 +26,12 @@ public class ChatEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get a channel's chat rooms based from the authenticated channel's perspective. We need the authenticated channel
 	 * ID here because the API needs to know with what respect to return a channel's chat rooms from.
-	 *
+	 * <p>
 	 * For example, if you own the channel, you'll get all the chat rooms (subscriber only, mod only, etc.).
 	 * However, if you're only a viewer of that channel, you'll only get the rooms that you can see (not sub only, etc.).
 	 *
 	 * @param authenticatedChannelId The channel ID that you're authenticated under.
-	 * @param channelIdToQuery The channel ID that you're trying to get the chat rooms for.
+	 * @param channelIdToQuery       The channel ID that you're trying to get the chat rooms for.
 	 * @return
 	 */
 	public Optional<ChatRoomList> getChatRoomsByChannel(Long authenticatedChannelId, Long channelIdToQuery) {

@@ -9,9 +9,9 @@ import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.*;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;

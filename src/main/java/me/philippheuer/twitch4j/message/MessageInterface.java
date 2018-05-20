@@ -71,14 +71,17 @@ public class MessageInterface {
 
 	/**
 	 * Checking join channel status
+	 *
 	 * @param channel Channel name
 	 * @return bot has been joined to this channel
 	 */
 	public boolean isJoined(String channel) {
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		// syncing channels
-		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
-		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
+		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch))
+			pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
+		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch))
+			twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
 
 		return (twitchChat.getConnectionState().equals(TMIConnectionState.CONNECTED) && pubSub.getConnectionState().equals(TMIConnectionState.CONNECTED)) &&
 				(twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch));
@@ -86,6 +89,7 @@ public class MessageInterface {
 
 	/**
 	 * Sending message to the joined channel
+	 *
 	 * @param channel channel name
 	 * @param message message
 	 */
@@ -95,8 +99,9 @@ public class MessageInterface {
 
 	/**
 	 * sending private message
+	 *
 	 * @param username username
-	 * @param message message
+	 * @param message  message
 	 */
 	public void sendPrivateMessage(String username, String message) {
 		twitchChat.sendPrivateMessage(username, message);
@@ -104,6 +109,7 @@ public class MessageInterface {
 
 	/**
 	 * Joining the channel
+	 *
 	 * @param channel channel name
 	 */
 	public void joinChannel(String channel) {
@@ -114,6 +120,7 @@ public class MessageInterface {
 
 	/**
 	 * Leaving the channel
+	 *
 	 * @param channel channel name
 	 * @deprecated See {@link #leaveChannel(String)}
 	 */
@@ -124,9 +131,10 @@ public class MessageInterface {
 
 	/**
 	 * Leaving the channel
+	 *
 	 * @param channel channel name
 	 */
-	public void leaveChannel(String channel){
+	public void leaveChannel(String channel) {
 		twitchChat.leaveChannel(channel);
 		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
 		pubSub.unlistenChannel(ch);

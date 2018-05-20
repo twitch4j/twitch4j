@@ -12,8 +12,8 @@ import java.util.List;
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%
- * @since 1.0
  * @see Ingest
+ * @since 1.0
  */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)

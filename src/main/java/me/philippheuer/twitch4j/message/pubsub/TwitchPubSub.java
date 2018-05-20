@@ -155,8 +155,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Setting topic
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param topics list of {@link PubSubTopics}
+	 * @param topics  list of {@link PubSubTopics}
 	 */
 	private void setTopic(Channel channel, PubSubTopics... topics) {
 		List<PubSubTopics> topicList;
@@ -173,8 +174,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Releasing topic
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param topics list of {@link PubSubTopics}
+	 * @param topics  list of {@link PubSubTopics}
 	 */
 	private void releaseTopic(Channel channel, PubSubTopics... topics) {
 		List<PubSubTopics> topicList;
@@ -189,8 +191,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Checking topic existence
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param topic {@link PubSubTopics} enum
+	 * @param topic   {@link PubSubTopics} enum
 	 * @return topic exists
 	 */
 	private boolean hasTopic(Channel channel, PubSubTopics topic) {
@@ -252,6 +255,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Disconnect from PubSub
+	 *
 	 * @param forceDisconnect forcing disconnection - if it false will reconnecting automatically
 	 */
 	public void disconnect(boolean forceDisconnect) {
@@ -298,7 +302,8 @@ public class TwitchPubSub {
 
 	/**
 	 * Executing data to Twitch PubSub
-	 * @param type data type ("LISTEN" or "UNLISTEN")
+	 *
+	 * @param type   data type ("LISTEN" or "UNLISTEN")
 	 * @param topics string {@link List} of topics
 	 */
 	private void execType(String type, List<String> topics) {
@@ -322,8 +327,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Listening channel
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param getAll force all {@link PubSubTopics}. To using specified topics use {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
+	 * @param getAll  force all {@link PubSubTopics}. To using specified topics use {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
 	 */
 	public void listenChannel(Channel channel, boolean getAll) {
 		List<String> topicList = new ArrayList<String>();
@@ -334,8 +340,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Listening specified topics channel
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param topics list of {@link PubSubTopics}
+	 * @param topics  list of {@link PubSubTopics}
 	 */
 	public void listenChannel(Channel channel, PubSubTopics... topics) {
 		List<String> topicList = new ArrayList<String>();
@@ -345,7 +352,8 @@ public class TwitchPubSub {
 		}
 		if (channelCredential != null) {
 			for (PubSubTopics topic : topics) {
-				if (topic.isInRequiredScope((TwitchScopes[]) channelCredential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
+				if (topic.isInRequiredScope((TwitchScopes[]) channelCredential.getOAuthScopes().toArray()))
+					topicList.add(topic.getTopic(channel));
 			}
 			if (topicList.size() > 0) {
 				execType("LISTEN", topicList);
@@ -356,8 +364,9 @@ public class TwitchPubSub {
 
 	/**
 	 * Un-Listening specified topics channel
+	 *
 	 * @param channel {@link Channel} user model
-	 * @param topics list of {@link PubSubTopics}
+	 * @param topics  list of {@link PubSubTopics}
 	 */
 	public void unlistenChannel(Channel channel, PubSubTopics... topics) {
 		List<String> topicList = new ArrayList<String>();
@@ -372,6 +381,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Un-Listening channel
+	 *
 	 * @param channel {@link Channel} user model
 	 */
 	public void unlistenChannel(Channel channel) {

@@ -33,7 +33,7 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 	/**
 	 * Class Constructor
 	 *
-	 * @param name Name of the query parameter to add.
+	 * @param name  Name of the query parameter to add.
 	 * @param value Value of the query parameter to add.
 	 */
 	public QueryRequestInterceptor(String name, String value) {
@@ -45,7 +45,7 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestDecorator httpRequest = new HttpRequestDecorator(request);
 
-		if(name != null && value != null) {
+		if (name != null && value != null) {
 			httpRequest.addParameter(name, value);
 		}
 

@@ -3,7 +3,6 @@ package me.philippheuer.twitch4j.message.irc;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
@@ -59,7 +58,7 @@ public class ChannelCache {
 	/**
 	 * Channel Cache
 	 *
-	 * @param chat TwitchChat Instance
+	 * @param chat    TwitchChat Instance
 	 * @param channel The channel this cache is for
 	 */
 	public ChannelCache(TwitchChat chat, String channel) {
@@ -67,18 +66,17 @@ public class ChannelCache {
 		this.channel = channel;
 
 		// Register for Events from the EventDispatcher
-		chat.getTwitchClient().getDispatcher().registerListener(this);
+		chat.getTwitchClient().getEventManager().registerListener(this);
 	}
 
 	/**
 	 * Mod Grant/Removed (also caching mods after join channel)
 	 */
-	@EventSubscriber
 	public void onChannelModStatusChange(ChannelModEvent event) {
-		if(event.getChannel().getName().equals(getChannel())) {
+		if (event.getChannel().getName().equals(getChannel())) {
 			// Add or remove moderator from cache
-			if(event.isMod()) {
-				if(!getModerators().contains(event.getUser())) {
+			if (event.isMod()) {
+				if (!getModerators().contains(event.getUser())) {
 					getModerators().add(event.getUser());
 				}
 			} else {
@@ -90,11 +88,10 @@ public class ChannelCache {
 	/**
 	 * Timeout
 	 */
-	@EventSubscriber
 	public void onChannelTimeout(UserTimeoutEvent event) {
 		// Remove expired Events
 		for (UserTimeoutEvent timeout : getTimeoutEvents()) {
-			if (timeout.getCreatedAt().getTimeInMillis() + timeout.getDuration() * 1000 < Calendar.getInstance().getTimeInMillis()) {
+			if (timeout.getFiredAt().getTimeInMillis() + timeout.getDuration() * 1000 < Calendar.getInstance().getTimeInMillis()) {
 				// Expired
 				synchronized (timeoutEvents) {
 					getTimeoutEvents().remove(timeout);
@@ -103,7 +100,7 @@ public class ChannelCache {
 		}
 
 		// Add to Cache
-		if(!isTimeoutCached(event)) {
+		if (!isTimeoutCached(event)) {
 			synchronized (timeoutEvents) {
 				getTimeoutEvents().add(event);
 			}
@@ -113,10 +110,9 @@ public class ChannelCache {
 	/**
 	 * Ban
 	 */
-	@EventSubscriber
 	public void onChannelBan(UserBanEvent event) {
 		// Add to Cache
-		if(!isBanCached(event)) {
+		if (!isBanCached(event)) {
 			getBanEvents().add(event);
 		}
 	}
@@ -124,7 +120,6 @@ public class ChannelCache {
 	/**
 	 * Channel State
 	 */
-	@EventSubscriber
 	public void onChannelState(ChannelStateEvent event) {
 		if (event.getStates().size() > 1) {
 			channelState.putAll(event.getStates());
@@ -134,22 +129,22 @@ public class ChannelCache {
 					channelState.replace(k, v); // replacing
 					switch (k) { // and emit event
 						case BROADCAST_LANG:
-							chat.getTwitchClient().getDispatcher().dispatch(new BroadcasterLanguageEvent(event.getChannel(), (Locale) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new BroadcasterLanguageEvent(event.getChannel(), (Locale) v));
 							break;
 						case R9K:
-							chat.getTwitchClient().getDispatcher().dispatch(new Robot9000Event(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new Robot9000Event(event.getChannel(), (Boolean) v));
 							break;
 						case SLOW:
-							chat.getTwitchClient().getDispatcher().dispatch(new SlowModeEvent(event.getChannel(), (Long) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new SlowModeEvent(event.getChannel(), (Long) v));
 							break;
 						case EMOTE:
-							chat.getTwitchClient().getDispatcher().dispatch(new EmoteOnlyEvent(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new EmoteOnlyEvent(event.getChannel(), (Boolean) v));
 							break;
 						case FOLLOWERS:
-							chat.getTwitchClient().getDispatcher().dispatch(new FollowersOnlyEvent(event.getChannel(), (Long) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new FollowersOnlyEvent(event.getChannel(), (Long) v));
 							break;
 						case SUBSCRIBERS:
-							chat.getTwitchClient().getDispatcher().dispatch(new SubscribersOnlyEvent(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new SubscribersOnlyEvent(event.getChannel(), (Boolean) v));
 							break;
 						default:
 							break;
@@ -167,8 +162,8 @@ public class ChannelCache {
 	 */
 	public Boolean isTimeoutCached(UserTimeoutEvent event) {
 		//return timeoutEvents.contains(event); // You can use it
-		for(UserTimeoutEvent timeout : getTimeoutEvents()) {
-			if(timeout.getUser().getId().equals(event.getUser().getId())) {
+		for (UserTimeoutEvent timeout : getTimeoutEvents()) {
+			if (timeout.getUser().getId().equals(event.getUser().getId())) {
 				return true;
 			}
 		}
@@ -184,8 +179,8 @@ public class ChannelCache {
 	 */
 	public Boolean isBanCached(UserBanEvent event) {
 		//return banEvents.contains(event); // You can use it
-		for(UserBanEvent ban : getBanEvents()) {
-			if(ban.getUser().getId().equals(event.getUser().getId())) {
+		for (UserBanEvent ban : getBanEvents()) {
+			if (ban.getUser().getId().equals(event.getUser().getId())) {
 				return true;
 			}
 		}

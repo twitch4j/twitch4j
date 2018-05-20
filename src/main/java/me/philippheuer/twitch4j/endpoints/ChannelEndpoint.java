@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import com.github.philippheuer.events4j.domain.Event;
 import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,8 +8,6 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
-import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.event.channel.DonationEvent;
 import me.philippheuer.twitch4j.events.event.channel.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
@@ -244,7 +243,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
 			// Provide the Follow with info about the channel
-			for(Follow f : responseObject.getFollows()) {
+			for (Follow f : responseObject.getFollows()) {
 				f.setChannel(getChannel());
 			}
 
@@ -443,6 +442,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 // TODO: moving to TMI
 // NOTE: using `/commercial (time)` in the chat
+
 	/**
 	 * Endpoint: Start Channel Commercial
 	 * Starts a commercial (advertisement) on a specified channel. This is valid only for channels that are Twitch partners.
@@ -506,6 +506,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 	}
 // TODO: moving to TMI
+
 	/**
 	 * IRC: Ban User
 	 * This command will allow you to permanently ban a user from the chat room.
@@ -516,6 +517,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".ban %s", user));
 	}
 // TODO: moving to TMI
+
 	/**
 	 * IRC: Unban User
 	 * This command will allow you to lift a permanent ban on a user from the chat room. You can also use this command to end a ban early; this also applies to timeouts.
@@ -526,13 +528,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		getTwitchClient().getMessageInterface().sendMessage(getChannel().getName(), String.format(".unban %s", user));
 	}
 // TODO: moving to TMI
+
 	/**
 	 * IRC: Timeout User
 	 * This command allows you to temporarily ban someone from the chat room for 10 minutes by default.
 	 * This will be indicated to yourself and the temporarily banned subject in chat on a successful temporary ban.
 	 * A new timeout command will overwrite an old one.
 	 *
-	 * @param user Username.
+	 * @param user     Username.
 	 * @param duration {@link Duration} in seconds
 	 */
 	public void timeout(String user, Duration duration) {
@@ -544,13 +547,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * IRC: Purge Chat of User
 	 * Clears all messages in a channel.
 	 *
-	 * @param user          User.
+	 * @param user User.
 	 */
 	public void purgeChat(String user) {
 		timeout(user, Duration.ofSeconds(1));
 	}
 
 	// TODO: moving to TMI
+
 	/**
 	 * IRC: Purge Chat
 	 * This command will allow the Broadcaster and chat moderators to completely wipe the previous chat history.
@@ -613,7 +617,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 							// dispatch event for new follows only
 							if (lastFollow != null && follow.getCreatedAt().after(lastFollow)) {
 								Event dispatchEvent = new FollowEvent(channel, follow.getUser());
-								getTwitchClient().getDispatcher().dispatch(dispatchEvent);
+								getTwitchClient().getEventManager().dispatchEvent(dispatchEvent);
 							}
 							creationDates.add(follow.getCreatedAt());
 						}

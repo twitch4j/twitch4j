@@ -21,5 +21,5 @@ public class RestError {
 
 	private Integer status;
 
-    private String message;
+	private String message;
 }

@@ -35,7 +35,7 @@ public class RestErrorHandler implements ResponseErrorHandler {
 			String content = IOUtils.toString(clienthttpresponse.getBody(), "UTF-8");
 
 			// The server has successfully fulfilled the request and that there is no additional content to send in the response payload body.
-			if(clienthttpresponse.getStatusCode() == HttpStatus.NO_CONTENT) {
+			if (clienthttpresponse.getStatusCode() == HttpStatus.NO_CONTENT) {
 				return false;
 			}
 
@@ -51,7 +51,7 @@ public class RestErrorHandler implements ResponseErrorHandler {
 				}
 
 				throw new RestException(restError);
-				
+
 			} catch (RestException restException) {
 				// Rethrow
 				throw restException;

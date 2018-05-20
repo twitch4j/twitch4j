@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.irc;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
+import me.philippheuer.twitch4j.events.event.ChannelBaseEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -20,7 +20,7 @@ import java.util.Set;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class ChannelMessageEvent extends AbstractChannelEvent {
+public class ChannelMessageEvent extends ChannelBaseEvent {
 
 	/**
 	 * User

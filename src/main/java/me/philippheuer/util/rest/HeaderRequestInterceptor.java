@@ -33,7 +33,7 @@ public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor {
 	/**
 	 * Class Constructor
 	 *
-	 * @param name Name of the header key to add.
+	 * @param name  Name of the header key to add.
 	 * @param value Value of the header key to add.
 	 */
 	public HeaderRequestInterceptor(String name, String value) {
@@ -45,7 +45,7 @@ public class HeaderRequestInterceptor implements ClientHttpRequestInterceptor {
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestWrapper wrapper = new HttpRequestWrapper(request);
 
-		if(name != null && value != null) {
+		if (name != null && value != null) {
 			wrapper.getHeaders().set(name, value);
 		}
 

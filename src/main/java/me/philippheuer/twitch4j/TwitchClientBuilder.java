@@ -1,6 +1,9 @@
 package me.philippheuer.twitch4j;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import me.philippheuer.twitch4j.auth.CredentialManager;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -13,6 +16,7 @@ import java.util.Set;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
+ *
  * @author Damian Staszewski [https://github.com/stachu540]
  * @version %I%, %G%
  * @since 1.0
@@ -60,6 +64,7 @@ public class TwitchClientBuilder {
 
 	/**
 	 * Initializing builder
+	 *
 	 * @return Client Builder
 	 */
 	public static TwitchClientBuilder init() {
@@ -68,6 +73,7 @@ public class TwitchClientBuilder {
 
 	/**
 	 * Initialize
+	 *
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient build() {
@@ -92,7 +98,7 @@ public class TwitchClientBuilder {
 			OAuthCredential oAuthCredential = new OAuthCredential((credential.toLowerCase().startsWith("oauth:")) ? credential.substring(6) : credential);
 
 			// got a refresh token?
-			if(credentialRefreshToken != null) {
+			if (credentialRefreshToken != null) {
 				oAuthCredential.setRefreshToken(credentialRefreshToken);
 				oAuthCredential.setTokenExpiresAt(Calendar.getInstance());
 			}
@@ -101,7 +107,7 @@ public class TwitchClientBuilder {
 		}
 
 		if (listeners.size() > 0) {
-			listeners.forEach(client.getDispatcher()::registerListener);
+			listeners.forEach(client.getEventManager()::registerListener);
 		}
 
 		return client;
@@ -114,6 +120,7 @@ public class TwitchClientBuilder {
 
 	/**
 	 * Initialize and connect to twitch
+	 *
 	 * @return {@link TwitchClient} initialized class
 	 */
 	public TwitchClient connect() {

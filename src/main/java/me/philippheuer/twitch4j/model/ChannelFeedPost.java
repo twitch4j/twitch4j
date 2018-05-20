@@ -12,9 +12,9 @@ import java.util.Calendar;
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%
- * @since 1.0
  * @see User
  * @see ReactionList
+ * @since 1.0
  */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class FollowersOnlyEvent extends ChannelStatesEvent{
+public class FollowersOnlyEvent extends ChannelStatesBaseEvent {
 
 	private final long time;
 

@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.irc;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
+import me.philippheuer.twitch4j.events.event.ChannelBaseEvent;
 import me.philippheuer.twitch4j.model.Channel;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.Map;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class ChannelStateEvent extends AbstractChannelEvent {
+public class ChannelStateEvent extends ChannelBaseEvent {
 	public enum ChannelState {
 		BROADCAST_LANG,
 		EMOTE,
@@ -36,6 +36,7 @@ public class ChannelStateEvent extends AbstractChannelEvent {
 		states.put(state, value);
 		this.states = Collections.unmodifiableMap(states);
 	}
+
 	public ChannelStateEvent(Channel channel, Map<ChannelState, Object> state) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();

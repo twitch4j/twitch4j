@@ -17,7 +17,7 @@ import java.util.Locale;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class BroadcasterLanguageEvent extends ChannelStatesEvent{
+public class BroadcasterLanguageEvent extends ChannelStatesBaseEvent {
 
 	private final Locale language;
 

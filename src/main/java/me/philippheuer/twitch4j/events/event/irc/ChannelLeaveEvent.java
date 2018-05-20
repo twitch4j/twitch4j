@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.irc;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
+import me.philippheuer.twitch4j.events.event.ChannelBaseEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -17,7 +17,7 @@ import me.philippheuer.twitch4j.model.User;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class ChannelLeaveEvent extends AbstractChannelEvent {
+public class ChannelLeaveEvent extends ChannelBaseEvent {
 
 	/**
 	 * User
@@ -27,8 +27,8 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	/**
 	 * Event Constructor
 	 *
-	 * @param channel     The channel that this event originates from.
-	 * @param user        The user triggering the event.
+	 * @param channel The channel that this event originates from.
+	 * @param user    The user triggering the event.
 	 */
 	public ChannelLeaveEvent(Channel channel, User user) {
 		super(channel);

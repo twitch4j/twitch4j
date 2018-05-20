@@ -9,14 +9,13 @@ plugins {
 	id 'eclipse'
 	id 'application'
 	id 'maven-publish'
-	id "net.ltgt.apt" version "0.15"
 	id 'com.jfrog.bintray' version '1.8.0'
 	id 'io.ratpack.ratpack-java' version '1.4.6'
 }
 
 repositories {
 	jcenter()
-	maven { url "https://jitpack.io" }
+	maven { url "https://dl.bintray.com/philippheuer/maven" }
 }
 
 // Artifact Info
@@ -64,6 +63,9 @@ dependencies {
 	// JSON / YAML
 	compile "com.fasterxml.jackson.core:jackson-databind:2.9.2"
 
+	// Events4J
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.2.0'
+
 	// Bucket for rate-limiting
 	compile "org.isomorphism:token-bucket:1.7"
 
@@ -78,7 +80,6 @@ dependencies {
 
 	// Project Lombok for annotating processor
 	compile "org.projectlombok:lombok:+"
-	annotationProcessor "org.projectlombok:lombok:+"
 
 	// Testing
 	testCompile "junit:junit:4.12"

@@ -207,25 +207,25 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Calling the getTopCommunities with parameters to get up to limit communities.
 	 * Requires Scope: none
 	 *
-	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
+	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: none.
 	 * @return The top communities.
 	 */
 	public List<Community> getTopCommunities(Optional<Long> limit) {
-		if(limit.isPresent()) {
-			if(limit.get() > 100) {
+		if (limit.isPresent()) {
+			if (limit.get() > 100) {
 				List<Community> resultList = new ArrayList<Community>();
 
 				Long recordsToFetch = limit.get();
 				String cursor = "";
 
-				while(recordsToFetch > 0) {
+				while (recordsToFetch > 0) {
 					CommunityList communityList = getTopCommunities(Optional.ofNullable(recordsToFetch > 100 ? 100 : recordsToFetch), Optional.empty());
 					cursor = communityList.getCursor();
 					Integer results = communityList.getCommunities().size();
 					resultList.addAll(communityList.getCommunities());
 					recordsToFetch -= results;
 
-					if(results == 0) {
+					if (results == 0) {
 						break;
 					}
 				}
@@ -265,7 +265,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	private Boolean validateCommunityName(String name) {
 		String regex = "[A-Za-z\\x2D\\x2E\\x5F\\x7E]{3,25}"; // using ASCII characters
 
-		if(name.matches(regex)) {
+		if (name.matches(regex)) {
 			return true;
 		}
 

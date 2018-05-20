@@ -1,7 +1,7 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
 import lombok.*;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.TwitchBaseEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
-public class IRCMessageEvent extends Event {
+public class IRCMessageEvent extends TwitchBaseEvent {
 
 	/**
 	 * Tags
@@ -70,7 +70,7 @@ public class IRCMessageEvent extends Event {
 	/**
 	 * Event Constructor
 	 *
-	 * @param rawMessage      The raw message.
+	 * @param rawMessage The raw message.
 	 */
 	public IRCMessageEvent(String rawMessage) {
 		this.rawMessage = rawMessage;
@@ -81,6 +81,7 @@ public class IRCMessageEvent extends Event {
 
 	/**
 	 * Checks if the Event was parsed correctly.
+	 *
 	 * @return Is the Event valid?
 	 */
 	public Boolean isValid() {
@@ -96,10 +97,10 @@ public class IRCMessageEvent extends Event {
 		Pattern pattern = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
 		Matcher matcher = pattern.matcher(rawMessage);
 
-		if(matcher.matches()) {
+		if (matcher.matches()) {
 			// Parse Tags
 			setTags(parseTags(matcher.group("tags")));
-			if(getTags().containsKey("badges")) {
+			if (getTags().containsKey("badges")) {
 				setBadges(parseBadges(getTags().get("badges")));
 			}
 
@@ -115,10 +116,10 @@ public class IRCMessageEvent extends Event {
 		Pattern patternPM = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
 		Matcher matcherPM = patternPM.matcher(rawMessage);
 
-		if(matcherPM.matches()) {
+		if (matcherPM.matches()) {
 			// Parse Tags
 			setTags(parseTags(matcherPM.group("tags")));
-			if(getTags().containsKey("badges")) {
+			if (getTags().containsKey("badges")) {
 				setBadges(parseBadges(getTags().get("badges")));
 			}
 
@@ -138,9 +139,9 @@ public class IRCMessageEvent extends Event {
 	 */
 	public Map parseTags(String raw) {
 		Map<String, String> map = new HashMap<>();
-		if(StringUtils.isBlank(raw)) return map;
+		if (StringUtils.isBlank(raw)) return map;
 
-		for (String tag: raw.split(";")) {
+		for (String tag : raw.split(";")) {
 			String[] val = tag.split("=");
 			final String key = val[0];
 			String value = (val.length > 1) ? val[1] : null;
@@ -158,12 +159,12 @@ public class IRCMessageEvent extends Event {
 	 */
 	public Map parseBadges(String raw) {
 		Map<String, String> map = new HashMap<>();
-		if(StringUtils.isBlank(raw)) return map;
+		if (StringUtils.isBlank(raw)) return map;
 
 		// Fix Whitespaces
 		raw = raw.replace("\\s", " ");
 
-		for (String tag: raw.split(",")) {
+		for (String tag : raw.split(",")) {
 			String[] val = tag.split("/");
 			final String key = val[0];
 			String value = (val.length > 1) ? val[1] : null;
@@ -180,13 +181,13 @@ public class IRCMessageEvent extends Event {
 	 * @return Client name, or empty.
 	 */
 	public Optional<String> parseClientName(String raw) {
-		if(raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
+		if (raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
 			return Optional.empty();
 		}
 
 		Pattern pattern = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
 		Matcher matcher = pattern.matcher(raw);
-		if(matcher.matches()) {
+		if (matcher.matches()) {
 			return Optional.ofNullable(matcher.group(1));
 		}
 
@@ -235,7 +236,7 @@ public class IRCMessageEvent extends Event {
 	 * Gets the Channel Id (from Tags)
 	 */
 	public Long getChannelId() {
-		if(getTags().containsKey("room-id")) {
+		if (getTags().containsKey("room-id")) {
 			return Long.parseLong(getTags().get("room-id"));
 		}
 
@@ -246,7 +247,7 @@ public class IRCMessageEvent extends Event {
 	 * Gets the User Id (from Tags)
 	 */
 	public Long getUserId() {
-		if(getTags().containsKey("user-id")) {
+		if (getTags().containsKey("user-id")) {
 			return Long.parseLong(getTags().get("user-id"));
 		}
 
@@ -257,9 +258,9 @@ public class IRCMessageEvent extends Event {
 	 * Gets a optional tag from the irc message
 	 */
 	public Optional<String> getTagValue(String tagName) {
-		if(getTags().containsKey(tagName)) {
+		if (getTags().containsKey(tagName)) {
 			String value = getTags().get(tagName);
-			if(StringUtils.isBlank(value)) return Optional.empty();
+			if (StringUtils.isBlank(value)) return Optional.empty();
 
 			value = value.replaceAll("\\\\s", " ");
 			return Optional.ofNullable(value);

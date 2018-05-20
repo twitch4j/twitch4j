@@ -15,7 +15,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class SlowModeEvent extends ChannelStatesEvent{
+public class SlowModeEvent extends ChannelStatesBaseEvent {
 	/**
 	 * time in seconds
 	 */

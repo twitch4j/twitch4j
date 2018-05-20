@@ -2,12 +2,11 @@ package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.philippheuer.events4j.domain.Event;
 import com.jcabi.log.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.UnknownCommandEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
 
@@ -161,12 +160,11 @@ public class CommandHandler {
 	 *
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
-	@EventSubscriber
 	public void processCommand(ChannelMessageEvent messageEvent) {
 		String cmdTrigger = messageEvent.getMessage().substring(0, getCommandTrigger().length());
 		String cmdName = null;
 
-		if(messageEvent.getMessage().startsWith(getCommandTrigger())) {
+		if (messageEvent.getMessage().startsWith(getCommandTrigger())) {
 			// Get real command name from alias - With Trigger
 			if (messageEvent.getMessage().contains(" ")) {
 				cmdName = getCommandAliasToPrimaryMap().get(messageEvent.getMessage().substring(getCommandTrigger().length(), messageEvent.getMessage().indexOf(" ")));
@@ -190,20 +188,20 @@ public class CommandHandler {
 			// Enabled?
 			if (cmd.get().getEnabled()) {
 				// Check for Command Trigger
-				if(cmd.get().getRequiresCommandTrigger()) {
-					if(!cmdTrigger.equals(getCommandTrigger())) {
+				if (cmd.get().getRequiresCommandTrigger()) {
+					if (!cmdTrigger.equals(getCommandTrigger())) {
 						// Invalid CommandTrigger
 						return;
 					}
 				} else {
-					if(!cmdTrigger.equals(getCommandTrigger()) && !cmdTrigger.equals("")) {
+					if (!cmdTrigger.equals(getCommandTrigger()) && !cmdTrigger.equals("")) {
 						// Only accepting the right or no CommandTrigger
 						return;
 					}
 				}
 
 				// Check for custom defined permissions
-				if(customPermissions.containsKey(messageEvent.getUser().getId())) {
+				if (customPermissions.containsKey(messageEvent.getUser().getId())) {
 					List<CommandPermission> userCustomPermissions = customPermissions.get(messageEvent.getUser().getId());
 
 					messageEvent.getPermissions().addAll(userCustomPermissions);
@@ -221,10 +219,10 @@ public class CommandHandler {
 				Logger.info(this, "Access to command [%s] denied for user [%s].! (Command Disabled)", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
 			}
 		} else {
-			if(cmdTrigger.equals(getCommandTrigger())) {
+			if (cmdTrigger.equals(getCommandTrigger())) {
 				// Dispatch UnknownCommandEvent
 				Event event = new UnknownCommandEvent(messageEvent.getChannel(), messageEvent.getUser(), messageEvent);
-				getTwitchClient().getDispatcher().dispatch(event);
+				getTwitchClient().getEventManager().dispatchEvent(event);
 			}
 		}
 	}
@@ -326,11 +324,11 @@ public class CommandHandler {
 	/**
 	 * Method to grant custom permissions (Owner,Broadcaster,...)
 	 *
-	 * @param userId Twitch User Id
+	 * @param userId     Twitch User Id
 	 * @param permission Permission
 	 */
 	public void grantCustomPermission(Long userId, CommandPermission permission) {
-		if(customPermissions.containsKey(userId)) {
+		if (customPermissions.containsKey(userId)) {
 			customPermissions.get(userId).add(permission);
 		} else {
 			List<CommandPermission> permissions = new ArrayList<CommandPermission>();

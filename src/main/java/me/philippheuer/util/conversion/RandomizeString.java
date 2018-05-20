@@ -21,7 +21,7 @@ public class RandomizeString {
 			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
 			boolean toLower = new Random().nextBoolean();
 			char c = SALTCHARS.charAt(index);
-			salt.append((Pattern.matches("[0-9]", String.valueOf(c)) ? c : (toLower) ? String.valueOf(c).toLowerCase() : c ));
+			salt.append((Pattern.matches("[0-9]", String.valueOf(c)) ? c : (toLower) ? String.valueOf(c).toLowerCase() : c));
 		}
 		saltStr = salt.toString();
 	}

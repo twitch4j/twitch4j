@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
+import me.philippheuer.twitch4j.events.event.ChannelBaseEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -17,7 +17,7 @@ import me.philippheuer.twitch4j.model.User;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class CheerEvent extends AbstractChannelEvent {
+public class CheerEvent extends ChannelBaseEvent {
 
 	/**
 	 * Event Target User
@@ -38,9 +38,9 @@ public class CheerEvent extends AbstractChannelEvent {
 	 * Event Constructor
 	 *
 	 * @param channel The channel that this event originates from.
-	 * @param user The donating user.
+	 * @param user    The donating user.
 	 * @param message The donation message.
-	 * @param bits The amount of bits.
+	 * @param bits    The amount of bits.
 	 */
 	public CheerEvent(Channel channel, User user, String message, Integer bits) {
 		super(channel);

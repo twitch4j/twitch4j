@@ -49,16 +49,17 @@ public class Subscription {
 
 	/**
 	 * Sets the subplan using the string
+	 *
 	 * @param code sub plan by code
 	 */
 	public void setSubPlanByCode(String code) {
-		if(code.equals("Prime")) {
+		if (code.equals("Prime")) {
 			setSubPlan(SubPlan.PRIME);
-		} else if(code.equals("1000")) {
+		} else if (code.equals("1000")) {
 			setSubPlan(SubPlan.TIER_1);
-		} else if(code.equals("2000")) {
+		} else if (code.equals("2000")) {
 			setSubPlan(SubPlan.TIER_2);
-		} else if(code.equals("3000")) {
+		} else if (code.equals("3000")) {
 			setSubPlan(SubPlan.TIER_3);
 		} else {
 			setSubPlan(SubPlan.UNKNOWN);

@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
+import me.philippheuer.twitch4j.events.event.ChannelBaseEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 
@@ -17,7 +17,7 @@ import me.philippheuer.twitch4j.model.User;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class FollowEvent extends AbstractChannelEvent {
+public class FollowEvent extends ChannelBaseEvent {
 
 	/**
 	 * User

@@ -61,8 +61,9 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * Endpoint: Get Top Videos
 	 * Gets the top videos based on viewcount, optionally filtered by game or time period.
 	 * Requires Scope: none
-	 * @param game Constrains videos by game. A game name can be retrieved using the Search Games endpoint.
-	 * @param period Specifies the window of time to search. Valid values: week, month, all. Default: week
+	 *
+	 * @param game           Constrains videos by game. A game name can be retrieved using the Search Games endpoint.
+	 * @param period         Specifies the window of time to search. Valid values: week, month, all. Default: week
 	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight. (comma-separated list)
 	 * @return Returns all top videos matching the query parameters.
 	 */
@@ -99,7 +100,7 @@ public class VideoEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: user_read
 	 *
 	 * @param oAuthCredential The user.
-	 * @param broadcast_type Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight. (comma-separated list)
+	 * @param broadcast_type  Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight. (comma-separated list)
 	 * @return Gets the videos from channels the user is following based on the OAuth token provided.
 	 */
 	public List<Video> getFollowedVideos(OAuthCredential oAuthCredential, Optional<String> broadcast_type) {

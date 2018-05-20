@@ -15,7 +15,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class SubscribersOnlyEvent extends ChannelStatesEvent{
+public class SubscribersOnlyEvent extends ChannelStatesBaseEvent {
 	public SubscribersOnlyEvent(Channel channel, boolean active) {
 		super(channel, active);
 	}

@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.auth;
 
-import com.jcabi.log.Logger;
+import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -8,14 +8,9 @@ import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
-import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -70,7 +65,7 @@ public class OAuthTwitch {
 	 * Returns the authentication URL that you can redirect the user to in order
 	 * to authorize your application to retrieve an access token.
 	 *
-	 * @param state   What are the credentials requested for? (CHANNEL/IRC)
+	 * @param state  What are the credentials requested for? (CHANNEL/IRC)
 	 * @param scopes TwitchScopes to request access for
 	 * @return String    OAuth2 Uri
 	 */
@@ -106,7 +101,7 @@ public class OAuthTwitch {
 		try {
 			// Validate on Server
 			Optional<Authorize> responseObject = getCredentialManager().getTwitchClient().getKrakenEndpoint().getOAuthToken("authorization_code", getRedirectUri(), authenticationCode);
-			if(!responseObject.isPresent()) {
+			if (!responseObject.isPresent()) {
 				throw new Exception("Invalid Code!");
 			}
 
@@ -122,7 +117,7 @@ public class OAuthTwitch {
 
 			// Get Token Status from Kraken Endpoint
 			Token token = getCredentialManager().getTwitchClient().getKrakenEndpoint().getToken(credential);
-			if(token.getValid()) {
+			if (token.getValid()) {
 				credential.setUserId(token.getUserId());
 				credential.setUserName(token.getUserName());
 				credential.setDisplayName(token.getUserName());
@@ -140,7 +135,7 @@ public class OAuthTwitch {
 	/**
 	 * Event that gets triggered when a streamlabs token is expired.
 	 * <p>
-	 -
+	 * -
 	 * This events get triggered when a streamlabs auth token has expired, a new token
 	 * will be requested using the refresh token.
 	 *
@@ -148,8 +143,8 @@ public class OAuthTwitch {
 	 */
 	@EventSubscriber
 	public void onTokenExpired(AuthTokenExpiredEvent event) {
-		// Filter to Streamlabs credentials
-		if(event.getCredential().getType().equals("twitch")) {
+		// Filter to Twitch Credentials
+		if (event.getCredential().getType().equals("twitch")) {
 			OAuthCredential credential = event.getCredential();
 			System.out.println("OLD: " + credential.toString());
 

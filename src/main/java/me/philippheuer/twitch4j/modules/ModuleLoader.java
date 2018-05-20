@@ -3,7 +3,8 @@ package me.philippheuer.twitch4j.modules;
 import com.jcabi.log.Logger;
 import lombok.*;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.modules.event.*;
+import me.philippheuer.twitch4j.modules.event.ModuleDisabledEvent;
+import me.philippheuer.twitch4j.modules.event.ModuleEnabledEvent;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -78,9 +79,12 @@ public class ModuleLoader {
 	private void addModule(IModule module, boolean active) {
 		ModulePair pair = new ModulePair(module, active);
 		String moduleName = module.getClass().getSimpleName();
-		if (!modules.containsKey(moduleName))
-			if (active) client.getDispatcher().dispatch(new ModuleEnabledEvent(module));
+		if (!modules.containsKey(moduleName)) {
+			if (active) {
+				client.getEventManager().dispatchEvent(new ModuleEnabledEvent(module));
+			}
 			modules.put(moduleName, pair);
+		}
 	}
 
 	public void enableModule(IModule module) {
@@ -95,7 +99,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (!pair.active) {
-				client.getDispatcher().dispatch(new ModuleEnabledEvent(pair.module));
+				client.getEventManager().dispatchEvent(new ModuleEnabledEvent(pair.module));
 				pair.module.enable(client);
 				pair.active = true;
 			}
@@ -106,7 +110,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (pair.active) {
-				client.getDispatcher().dispatch(new ModuleDisabledEvent(pair.module));
+				client.getEventManager().dispatchEvent(new ModuleDisabledEvent(pair.module));
 				pair.module.disable();
 				pair.active = false;
 			}
@@ -171,7 +175,8 @@ public class ModuleLoader {
 							if (IModule.class.isAssignableFrom(classInstance) && !classInstance.equals(IModule.class)) {
 								addModuleClass(classInstance);
 							}
-						} catch (NoClassDefFoundError ignored) {}
+						} catch (NoClassDefFoundError ignored) {
+						}
 					}
 				} else {
 					for (String moduleClass : moduleClasses) {

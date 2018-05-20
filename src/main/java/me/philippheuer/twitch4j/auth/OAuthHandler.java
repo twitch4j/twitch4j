@@ -69,7 +69,7 @@ public class OAuthHandler {
 										String responseState = ctx.getRequest().getQueryParams().get("state");
 
 										// Get Request from Cache
-										if(!getCredentialManager().getOAuthRequestCache().containsKey(responseState)) {
+										if (!getCredentialManager().getOAuthRequestCache().containsKey(responseState)) {
 											ctx.render("Timeout! Please retry!");
 										}
 										OAuthRequest request = getCredentialManager().getOAuthRequestCache().get(responseState);
@@ -126,7 +126,7 @@ public class OAuthHandler {
 					public void run() {
 						// RatpackServer: Stop
 						try {
-							if(ratpackServer.isRunning()) {
+							if (ratpackServer.isRunning()) {
 								ratpackServer.stop();
 							}
 						} catch (Exception ex) {

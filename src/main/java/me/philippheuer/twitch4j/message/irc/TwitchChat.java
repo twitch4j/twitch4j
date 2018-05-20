@@ -1,7 +1,10 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
-import com.neovisionaries.ws.client.*;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -92,6 +95,7 @@ public class TwitchChat {
 
 	/**
 	 * IRC WebSocket
+	 *
 	 * @param client TwitchClient.
 	 */
 	public TwitchChat(TwitchClient client) {
@@ -150,21 +154,20 @@ public class TwitchChat {
 								if (!message.equals("")) {
 									// Handle messages
 									// - Ping
-									if(message.contains("PING :tmi.twitch.tv")) {
+									if (message.contains("PING :tmi.twitch.tv")) {
 										sendPong(":tmi.twitch.tv");
 									}
 									// - Login failed.
-									else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+									else if (message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
 										Logger.error(this, "Invalid IRC Credentials. Login failed!");
 									}
 									// - Parse IRC Message
-									else
-									{
+									else {
 										try {
 											IRCMessageEvent event = new IRCMessageEvent(message);
 
-											if(event.isValid()) {
-												getTwitchClient().getDispatcher().dispatch(event);
+											if (event.isValid()) {
+												getTwitchClient().getEventManager().dispatchEvent(event);
 											} else {
 												Logger.trace(this, "Can't parse " + event.getRawMessage());
 											}
@@ -175,6 +178,7 @@ public class TwitchChat {
 								}
 							});
 				}
+
 				public void onDisconnected(WebSocket websocket,
 										   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
 										   boolean closedByServer) {
@@ -195,8 +199,10 @@ public class TwitchChat {
 			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
 		}
 	}
+
 	/**
 	 * Increased Token Bucket, when <b>isKnownBot</b> is <b>true</b>
+	 *
 	 * @return increased token bucket
 	 */
 	private TokenBucket setIncreasedMessageBucket() {
@@ -208,6 +214,7 @@ public class TwitchChat {
 
 	/**
 	 * Default Token Bucket, when <b>isKnownBot</b> is <b>false</b>
+	 *
 	 * @return default token bucket
 	 */
 	private TokenBucket setDefaultMessageBucket() {
@@ -302,8 +309,9 @@ public class TwitchChat {
 
 	/**
 	 * Send IRC Command
+	 *
 	 * @param command IRC Command
-	 * @param args command arguments
+	 * @param args    command arguments
 	 */
 	private void sendCommand(String command, String... args) {
 		// will send command if connection has been established
@@ -334,9 +342,9 @@ public class TwitchChat {
 	public boolean isModerator(String channel) {
 		Optional<User> botUser = getTwitchClient().getUserEndpoint().getUser(credential.get().getUserId());
 		// Get Credential from CredentialManager
-		if(getChannelCache().containsKey(channel) && botUser.isPresent()) {
-			for(User mod : getChannelCache().get(channel).getModerators()) {
-				if(mod.getId().equals(botUser.get().getId())) {
+		if (getChannelCache().containsKey(channel) && botUser.isPresent()) {
+			for (User mod : getChannelCache().get(channel).getModerators()) {
+				if (mod.getId().equals(botUser.get().getId())) {
 					return true;
 				}
 			}
@@ -347,6 +355,7 @@ public class TwitchChat {
 
 	/**
 	 * Joining the channel
+	 *
 	 * @param channel channel name
 	 */
 	public void joinChannel(String channel) {
@@ -366,6 +375,7 @@ public class TwitchChat {
 
 	/**
 	 * leaving the channel
+	 *
 	 * @param channelName channel name
 	 * @deprecated Use {@link #leaveChannel(String)} instead
 	 */
@@ -376,6 +386,7 @@ public class TwitchChat {
 
 	/**
 	 * leaving the channel
+	 *
 	 * @param channelName channel name
 	 */
 	public void leaveChannel(String channelName) {
@@ -396,6 +407,7 @@ public class TwitchChat {
 
 	/**
 	 * Sending message to the joined channel
+	 *
 	 * @param channel channel name
 	 * @param message message
 	 */
@@ -432,8 +444,9 @@ public class TwitchChat {
 
 	/**
 	 * sending private message
+	 *
 	 * @param username username
-	 * @param message message
+	 * @param message  message
 	 */
 	public void sendPrivateMessage(String username, String message) {
 		Optional<User> twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
@@ -449,10 +462,10 @@ public class TwitchChat {
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
 		// Check
 		OAuthCredential credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
-		if(credential == null) {
+		if (credential == null) {
 			return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials not present!");
 		} else {
-			if(!credential.getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
+			if (!credential.getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
 				return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
 			}
 		}

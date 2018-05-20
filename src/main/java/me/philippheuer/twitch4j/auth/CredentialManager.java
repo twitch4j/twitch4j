@@ -92,20 +92,20 @@ public class CredentialManager {
 		Thread tokenRefreshTask = new Thread(new Runnable() {
 			public void run() {
 				// Keep running
-				while(true) {
+				while (true) {
 					try {
 						// For each Credential
-						for(OAuthCredential credential : getOAuthCredentials().values()) {
+						for (OAuthCredential credential : getOAuthCredentials().values()) {
 							// Check for expiry date
-							if(credential.getTokenExpiresAt() == null) {
+							if (credential.getTokenExpiresAt() == null) {
 								continue;
 							}
 
 							// Is the token expired?
-							if(credential.getTokenExpiresAt().before(Calendar.getInstance())) {
+							if (credential.getTokenExpiresAt().before(Calendar.getInstance())) {
 								// Dispatch token expired event
 								AuthTokenExpiredEvent event = new AuthTokenExpiredEvent(credential);
-								getTwitchClient().getDispatcher().dispatch(event);
+								getTwitchClient().getEventManager().dispatchEvent(event);
 
 								Logger.info(this, "Token Expired, triggering Refresh Event! [%s]", event.toString());
 							}
@@ -132,7 +132,8 @@ public class CredentialManager {
 		setOAuthTwitch(new OAuthTwitch(this));
 
 		// Register OAuthTwitch to get Events
-		getTwitchClient().getDispatcher().registerListener(getOAuthTwitch());
+		getTwitchClient().getEventManager().registerListener(getOAuthTwitch());
+
 	}
 
 	/**
@@ -148,7 +149,7 @@ public class CredentialManager {
 		credential.setUserId(token.getUserId());
 		credential.setUserName(token.getUserName());
 		credential.setDisplayName(token.getUserName());
-		if(token.getAuthorization() != null)  {
+		if (token.getAuthorization() != null) {
 			credential.getOAuthScopes().addAll(token.getAuthorization().getScopes());
 		}
 

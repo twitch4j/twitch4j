@@ -15,7 +15,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class Robot9000Event extends ChannelStatesEvent{
+public class Robot9000Event extends ChannelStatesBaseEvent {
 	public Robot9000Event(Channel channel, boolean active) {
 		super(channel, active);
 	}

@@ -15,7 +15,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class EmoteOnlyEvent extends ChannelStatesEvent{
+public class EmoteOnlyEvent extends ChannelStatesBaseEvent {
 
 	public EmoteOnlyEvent(Channel channel, boolean active) {
 		super(channel, active);

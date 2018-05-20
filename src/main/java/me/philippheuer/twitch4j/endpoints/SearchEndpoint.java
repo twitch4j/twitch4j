@@ -66,7 +66,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param query search query
-	 * @param live Whether only games that are live should be returned. This argument is optional.
+	 * @param live  Whether only games that are live should be returned. This argument is optional.
 	 * @return A list of games matching the query.
 	 */
 	public List<Game> getGames(String query, Optional<Boolean> live) {

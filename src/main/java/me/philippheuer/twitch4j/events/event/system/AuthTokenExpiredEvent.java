@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.TwitchBaseEvent;
 
 /**
  * This event gets called an oauth token expires.
@@ -16,7 +16,7 @@ import me.philippheuer.twitch4j.events.Event;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class AuthTokenExpiredEvent extends Event {
+public class AuthTokenExpiredEvent extends TwitchBaseEvent {
 
 	/**
 	 * Event Credential

@@ -63,9 +63,9 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets/refreshes the token
 	 *
-	 * @param grant_type Valid values: authorization_code or refresh_token.
+	 * @param grant_type   Valid values: authorization_code or refresh_token.
 	 * @param redirect_url Redirect url.
-	 * @param code authentication_code or refresh_token
+	 * @param code         authentication_code or refresh_token
 	 * @return {@link Authorize} data on {@link Optional} container class
 	 */
 	public Optional<Authorize> getOAuthToken(String grant_type, String redirect_url, String code) {
@@ -79,9 +79,9 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 		postParameters.add("client_id", getTwitchClient().getClientId());
 		postParameters.add("client_secret", getTwitchClient().getClientSecret());
 		postParameters.add("redirect_uri", redirect_url);
-		if(grant_type.equals("authorization_code")) {
+		if (grant_type.equals("authorization_code")) {
 			postParameters.add("code", code);
-		} else if(grant_type.equals("refresh_token")) {
+		} else if (grant_type.equals("refresh_token")) {
 			postParameters.add("refresh_token", code);
 		}
 

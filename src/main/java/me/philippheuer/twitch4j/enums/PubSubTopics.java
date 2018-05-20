@@ -21,6 +21,7 @@ public enum PubSubTopics {
 
 	/**
 	 * Getting name topics for the channel
+	 *
 	 * @param channel {@link Channel} model
 	 * @return The topic that the message pertains to.
 	 */

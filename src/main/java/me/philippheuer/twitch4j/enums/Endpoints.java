@@ -4,6 +4,7 @@ import lombok.Getter;
 
 /**
  * This enums data contains endpoints to Twitch Services
+ *
  * @author Damian Staszewski
  */
 @Getter

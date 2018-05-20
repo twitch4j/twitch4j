@@ -10,7 +10,9 @@ public abstract class IModule {
 	private final String name;
 	private final String author;
 	private final String version;
+
 	public abstract void enable(TwitchClient client);
+
 	public abstract void disable();
 	// String getMinimumTwitch4JVersion(); TODO: version implementing?
 
