@@ -37,7 +37,7 @@ public class RestClient {
 	/**
 	 * Adds a interceptor to the Rest Template.
 	 *
-	 * @param interceptor Interceptor, that will be executed prior to the rest request.
+	 * @param interceptor Interceptor, that will be executed prior to the http request.
 	 * @see HeaderRequestInterceptor
 	 * @see QueryRequestInterceptor
 	 */
@@ -48,7 +48,7 @@ public class RestClient {
 	/**
 	 * Gets a Rest Template.
 	 *
-	 * @return A RestTemplate for rest requests.
+	 * @return A RestTemplate for http requests.
 	 */
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();
@@ -66,8 +66,8 @@ public class RestClient {
 	/**
 	 * Gets a Rest Template with authorization.
 	 *
-	 * @param OAuthCredential Credential, to add authentication headers to the rest template.
-	 * @return A RestTemplate for rest requests.
+	 * @param OAuthCredential Credential, to add authentication headers to the http template.
+	 * @return A RestTemplate for http requests.
 	 */
 	public RestTemplate getPrivilegedRestTemplate(OAuthCredential OAuthCredential) {
 		// Get Rest Template
@@ -82,7 +82,7 @@ public class RestClient {
 	/**
 	 * Gets a Rest Template without any interceptors.
 	 *
-	 * @return A RestTemplate for rest requests.
+	 * @return A RestTemplate for http requests.
 	 */
 	public RestTemplate getPlainRestTemplate() {
 		RestTemplate restTemplate = new RestTemplate();

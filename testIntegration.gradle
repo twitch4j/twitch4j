@@ -1,9 +1,9 @@
-// Configuration
-configurations {
-	// Integration compile task
-	integrationCompile.extendsFrom testCompile
-	integrationRuntime.extendsFrom testRuntime
-}
+//// Configuration
+//configurations {
+//	// Integration compile task
+//	integrationCompile.extendsFrom testCompile
+//	integrationRuntime.extendsFrom testRuntime
+//}
 
 /**
  * Test Task `test` - Run Unit Tests

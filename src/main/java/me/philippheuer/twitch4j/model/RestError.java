@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 /**
- * Model representing an error within the rest api.
+ * Model representing an error within the http api.
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%

@@ -1,0 +1,5 @@
+dependencies {
+	compile project(":api")
+	compile project(":irc")
+	compile project(":pubsub")
+}

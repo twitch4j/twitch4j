@@ -264,7 +264,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 			// Provide User to Follow Object
 			for (Follow follow : followList) {
-				// The user id exists for sure, or the rest request would fail, so we can directly get the user
+				// The user id exists for sure, or the http request would fail, so we can directly get the user
 				follow.setUser(getUser(userId).get());
 			}
 

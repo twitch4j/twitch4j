@@ -1,104 +1,63 @@
-/*
- * Gradle Configuration
- */
-
 // Apply the java plugin to add support for Java
 plugins {
-	id 'java'
 	id 'idea'
 	id 'eclipse'
-	id 'application'
-	id 'maven-publish'
 	id "net.ltgt.apt" version "0.15"
 	id 'com.jfrog.bintray' version '1.8.0'
-	id 'io.ratpack.ratpack-java' version '1.4.6'
+	id 'io.ratpack.ratpack-java' version '1.5.4'
 	id "io.spring.dependency-management" version "1.0.5.RELEASE"
 }
 
 apply from: "version.gradle"
-apply from: "deploy.gradle"
 apply from: "testIntegration.gradle"
 
-repositories {
-	jcenter()
-	maven { url "https://jitpack.io" }
-}
+allprojects {
+	apply plugin: "java"
+	apply plugin: "net.ltgt.apt"
+	apply plugin: "io.spring.dependency-management"
 
-dependencyManagement {
-	imports {
-		mavenBom "com.fasterxml.jackson:jackson-bom:$jackson_version"
-		mavenBom "io.spring.platform:platform-bom:$spring_platform"
-		mavenBom "org.springframework:spring-framework-bom:$spring_framework"
+	dependencyManagement {
+		imports {
+			mavenBom "com.fasterxml.jackson:jackson-bom:$jackson_version"
+		}
 	}
-}
 
-// Artifact Info
-group = "com.github.twitch4j"
-description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
+	repositories {
+		jcenter()
+		maven { url "https://jitpack.io" }
+	}
+
+	// Artifact Info
+	group = "com.github.twitch4j"
+	description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
+	version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
 
 // Doesn't matter, only so that spring doesn't fail
-mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
+//	mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
-
-// Dependencies
-dependencies {
-	// Logging
-	compile "org.slf4j:slf4j-api"
-	compile "ch.qos.logback:logback-classic"
-	compile "com.jcabi:jcabi-log:$jcabi_version"
-
-	// Spring (RestTemplate)
-	compile "org.springframework:spring-web"
-	compile "org.springframework.social:spring-social-core"
-
-	// WebSocket Client for Twitch PubSub and Twitch IRC
-	compile "com.neovisionaries:nv-websocket-client:$websocket_version"
-
-	// Apache Commons
-	// - Lang
-	compile "org.apache.commons:commons-lang3"
-	// - IO
-	compile "commons-io:commons-io"
-
-	// JSON / YAML
-	compile "com.fasterxml.jackson.core:jackson-databind"
-
-	// Bucket for rate-limiting
-	compile "org.isomorphism:token-bucket:$tocketBucket_version"
-
-	// Expiring Map
-	compile "net.jodah:expiringmap:$expriringMap_version"
-
-	// TypeTools
-	compile "net.jodah:typetools:$typeTools_version"
-
-	// Args4J - CommandLineArgumentParser
-	compile "args4j:args4j:$args4j_version"
-
-	// Project Lombok for annotating processor
-	compileOnly "org.projectlombok:lombok"
-	annotationProcessor "org.projectlombok:lombok"
-
-	// Testing
-	testCompile "junit:junit"
-}
-
-/**
- * Define SourceSets
- */
-sourceSets {
-	integration {
-		java.srcDir 'src/integration/java'
-		resources.srcDir 'src/integration/resources'
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
+	configurations.all {
+		// Disable Gradle Caching
+		resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 	}
 }
 
-configurations.all {
-	// Disable Gradle Caching
-	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+subprojects {
+	apply from: "${rootDir}/deploy.gradle"
+// Dependencies
+	dependencies {
+		// Logging
+		compile "org.slf4j:slf4j-api:$slf4j_version"
+		// JSON / YAML
+		compile "com.fasterxml.jackson.core:jackson-databind"
+		// Project Lombok for annotating processor
+		compileOnly "org.projectlombok:lombok:$lombok_version"
+		annotationProcessor "org.projectlombok:lombok:$lombok_version"
+
+		// Testing
+		testCompile "org.mockito:mockito-core:$mockito_version"
+		testCompile "junit:junit:$junit_version"
+		compile "ch.qos.logback:logback-classic:$logback_version"
+	}
 }
 
 wrapper {

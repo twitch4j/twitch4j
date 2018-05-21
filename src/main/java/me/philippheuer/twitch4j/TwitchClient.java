@@ -19,7 +19,7 @@ import java.io.File;
  * TwitchClient is the core class for all api operations.
  * <p>
  * The TwitchClient class is the central component, that grants access
- * to the various rest endpoints, the twitch chat interface and the
+ * to the various http endpoints, the twitch chat interface and the
  * client related services. (CredentialManager/CommandHandler/...)
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
@@ -41,7 +41,7 @@ public class TwitchClient {
 	private final CredentialManager credentialManager = new CredentialManager();
 
 	/**
-	 * RestClient to build the rest requests
+	 * RestClient to build the http requests
 	 */
 	private final RestClient restClient = new RestClient();
 
@@ -87,8 +87,8 @@ public class TwitchClient {
 	/**
 	 * Class Constructor - Creates a new TwitchClient Instance for the provided app.
 	 * <p>
-	 * This will also initialize the rest interceptors, that provide oauth tokens/get/post parameters
-	 * on the fly to easily build the rest requests.
+	 * This will also initialize the http interceptors, that provide oauth tokens/get/post parameters
+	 * on the fly to easily build the http requests.
 	 *
 	 * @param clientId     Twitch Application - Id
 	 * @param clientSecret Twitch Application - Secret
