@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public abstract class Event<T extends Event<T>> {
+public abstract class Event {
 	private Instant createdAt = Instant.now();
 	private String eventId = UUID.randomUUID().toString();
 }

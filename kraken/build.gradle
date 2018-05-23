@@ -1,0 +1,9 @@
+dependencies {
+	compile project(":common")
+	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
+	compile "org.springframework:spring-web:$spring_framework"
+
+	compile "net.jodah:expiringmap:$expriringMap_version"// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	compile "org.apache.commons:commons-lang3:$commons_lang3_version"
+
+}

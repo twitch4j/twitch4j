@@ -1,3 +1,6 @@
 dependencies {
-	compile project(":core")
+	compile project(":core"), {
+		exclude module: 'api-kraken'
+	}
+	compile "org.springframework.boot:spring-boot-starter-webflux:2.0.2.RELEASE"
 }

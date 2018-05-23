@@ -33,11 +33,21 @@ public class TwitchPubSub extends WebSocketClient {
 
 	private final Timer timer = new Timer();
 
-	public TwitchPubSub(EventManager eventManager, ObjectMapper mapper, Collection<PubSubTopic> listeners) {
+	public TwitchPubSub(EventManager eventManager, ObjectMapper mapper) {
 		super(URI.create("wss://pubsub-edge.twitch.tv:443"), new Draft_6455());
-		listeners.forEach(this::register);
 		this.eventManager = eventManager;
 		this.mapper = mapper;
+	}
+
+	public boolean ready() {
+		return !PRE_LISTEN.isEmpty();
+	}
+
+	@Override
+	public void connect() {
+		if (ready()) {
+			super.connect();
+		}
 	}
 
 	@Override

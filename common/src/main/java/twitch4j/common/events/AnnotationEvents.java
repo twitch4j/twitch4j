@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AnnotationEvents<E extends Event<E>> {
+public class AnnotationEvents<E extends Event> {
 	private final EventManager manager;
 
 	/**

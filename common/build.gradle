@@ -5,6 +5,8 @@ dependencies {
 	// Reactive dependency
 	compile "io.projectreactor:reactor-core"
 
+	compileOnly "io.projectreactor.ipc:reactor-netty"
+	compileOnly "io.projectreactor.addons:reactor-extra"
 	compile "com.google.code.findbugs:jsr305:$jsr305_version"
 //	compile "org.java-websocket:Java-WebSocket:$websocket_version"
 }

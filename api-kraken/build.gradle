@@ -1,7 +1,0 @@
-dependencies {
-	compile project(":common")
-	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
-	compile "org.springframework:spring-web:$spring_framework"
-
-
-}

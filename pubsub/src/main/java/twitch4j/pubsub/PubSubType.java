@@ -60,7 +60,6 @@ public enum PubSubType {
 	 */
 	VIDEO_PLAYBACK("video-playback");
 
-
 	private final String topic;
 
 	public String subject(String... subject) {

@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
-import twitch4j.common.TwitchBotConfig;
+import twitch4j.Configuration;
 import twitch4j.common.events.EventManager;
 
 import javax.annotation.Nullable;
@@ -12,20 +12,22 @@ import java.net.URI;
 
 public class TwitchMessageInterface extends WebSocketClient {
 	@Nullable
-	private final TwitchBotConfig botConfig;
+	private final Configuration configuration;
 	private final MessageParser parser;
 
-	@Getter
-	private boolean connected;
-
-	public TwitchMessageInterface(TwitchBotConfig botConfig, EventManager eventManager) {
+	public TwitchMessageInterface(Configuration configuration, EventManager eventManager) {
 		super(URI.create("wss://irc-ws.chat.twitch.tv:443/"), new Draft_6455());
-		this.botConfig = botConfig;
-		this.parser = new MessageParser(eventManager);
+		this.configuration = configuration;
+		this.parser = new MessageParser(this, eventManager);
 	}
 
 	public boolean ready() {
-		return botConfig != null;
+		return configuration.getBotCredentials() != null;
+	}
+
+	@Override
+	public void connect() {
+		if (ready()) super.connect();
 	}
 
 	@Override
@@ -35,7 +37,7 @@ public class TwitchMessageInterface extends WebSocketClient {
 
 	@Override
 	public void onMessage(String message) {
-
+		parser.handleMessage(message);
 	}
 
 	@Override

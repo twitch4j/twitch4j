@@ -1,4 +1,4 @@
 package twitch4j.pubsub.event;
 
-public class CommerceEvent extends PubSubEvent<CommerceEvent> {
+public class CommerceEvent extends PubSubEvent {
 }

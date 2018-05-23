@@ -10,7 +10,7 @@ package twitch4j.common.events;
  * @since 1.0
  */
 @FunctionalInterface
-public interface IListener<E extends Event<E>> {
+public interface IListener<E extends Event> {
 
 	/**
 	 * Called when the event is sent.

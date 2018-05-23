@@ -15,10 +15,10 @@ ext {
 
 //	spring_platform = "Cairo-SR1"
 	spring_framework = "5.0.6.RELEASE"
-//	commons_lang3_version = "3.7"
+	commons_lang3_version = "3.7"
 //	commons_io_version = "2.6"
 //	tocketBucket_version = "1.7"
-//	expriringMap_version = "0.5.8"
+	expriringMap_version = "0.5.8"
 //	typeTools_version = "0.5.0"
 
 //	args4j_version = "2.33"

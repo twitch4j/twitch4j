@@ -12,6 +12,6 @@ public class PubSubListeningException extends RuntimeException {
 
 	@Override
 	public String toString() {
-		return message + " - " + topic.getTopics();
+		return message + " - " + topic.getTopics().get(0);
 	}
 }

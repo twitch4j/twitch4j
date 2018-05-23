@@ -11,8 +11,6 @@ public interface ICredential {
 	String username();
 	Long userId();
 
-	boolean chatBot();
-
 	static Builder builder() {
 		return new CredentialBuilder();
 	}
@@ -20,8 +18,6 @@ public interface ICredential {
 	interface Builder {
 		Builder accessToken(String accessToken);
 		Builder refreshToken(String refreshToken);
-		Builder credentialManager(Manager.Builder credentialManager);
-		Builder chatBot(boolean chatBot);
 
 		ICredential build(AuthService service);
 	}

@@ -9,6 +9,6 @@ import twitch4j.pubsub.TwitchPubSub;
 @Data
 @ToString(exclude = {"pubSub"})
 @EqualsAndHashCode(callSuper = true)
-public abstract class PubSubEvent<E extends PubSubEvent<E>> extends Event<E> {
+public abstract class PubSubEvent extends Event {
 	private TwitchPubSub pubSub;
 }

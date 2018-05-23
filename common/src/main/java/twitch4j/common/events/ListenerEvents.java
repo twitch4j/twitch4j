@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ListenerEvents<E extends Event<E>> {
+public class ListenerEvents<E extends Event> {
 	private final EventManager manager;
 
 	private final ConcurrentHashMap<Class<E>, Set<IListener<E>>> listeners = new ConcurrentHashMap<>();

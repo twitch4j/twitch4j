@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @Getter
-public class EventManager<E extends Event<E>> {
+public class EventManager<E extends Event> {
 
 	private final Scheduler scheduler;
 	private final FluxProcessor<E, E> processor;

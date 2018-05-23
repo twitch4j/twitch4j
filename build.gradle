@@ -4,17 +4,12 @@ plugins {
 	id 'eclipse'
 	id "net.ltgt.apt" version "0.15"
 	id 'com.jfrog.bintray' version '1.8.0'
-	id 'io.ratpack.ratpack-java' version '1.5.4'
 	id "io.spring.dependency-management" version "1.0.5.RELEASE"
 }
 
-apply from: "version.gradle"
-apply from: "testIntegration.gradle"
-
 allprojects {
-	apply plugin: "java"
-	apply plugin: "net.ltgt.apt"
 	apply plugin: "io.spring.dependency-management"
+	apply from: "${rootDir}/version.gradle"
 
 	dependencyManagement {
 		imports {
@@ -43,6 +38,9 @@ allprojects {
 }
 
 subprojects {
+	apply plugin: "java"
+	apply plugin: "net.ltgt.apt"
+	apply from: "${rootDir}/test.gradle"
 	apply from: "${rootDir}/deploy.gradle"
 // Dependencies
 	dependencies {
