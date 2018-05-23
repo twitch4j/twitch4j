@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.enums;
 
-import me.philippheuer.twitch4j.model.Channel;
+import twitch4j.api.kraken.json.Channel;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -21,7 +21,7 @@ public enum PubSubTopics {
 
 	/**
 	 * Getting name topics for the channel
-	 * @param channel {@link Channel} model
+	 * @param channel {@link Channel} json
 	 * @return The topic that the message pertains to.
 	 */
 	public String getTopic(Channel channel) {

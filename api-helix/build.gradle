@@ -1,0 +1,6 @@
+dependencies {
+	compile project(":common")
+	compile "io.projectreactor.ipc:reactor-netty"
+	compile "io.projectreactor.addons:reactor-extra"
+
+}

@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
-import me.philippheuer.twitch4j.model.Token;
+import twitch4j.api.kraken.json.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
 
 import java.util.Arrays;

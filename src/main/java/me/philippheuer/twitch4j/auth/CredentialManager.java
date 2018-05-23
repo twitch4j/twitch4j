@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
-import me.philippheuer.twitch4j.model.Token;
+import twitch4j.api.kraken.json.Token;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 

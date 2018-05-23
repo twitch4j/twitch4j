@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import me.philippheuer.twitch4j.model.ChannelFeedPost;
+import twitch4j.api.kraken.json.ChannelFeedPost;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
 import me.philippheuer.twitch4j.test.model.AssertEntity;
 import me.philippheuer.util.test.IntegrationTestCategory;

@@ -1,5 +1,6 @@
 dependencies {
-	compile project(":api")
+	compile project(":api-kraken")
+	compile project(":api-helix")
 	compile project(":irc")
 	compile project(":pubsub")
 }

@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.irc.roomstates;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.model.Channel;
+import twitch4j.api.kraken.json.Channel;
 
 import java.util.Locale;
 

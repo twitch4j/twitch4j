@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import me.philippheuer.twitch4j.model.tmi.Chatter;
+import twitch4j.api.kraken.json.tmi.Chatter;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
 import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;

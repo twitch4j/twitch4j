@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
-import me.philippheuer.twitch4j.model.Follow;
+import twitch4j.api.kraken.json.Follow;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
 import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;

@@ -19,6 +19,7 @@ allprojects {
 	dependencyManagement {
 		imports {
 			mavenBom "com.fasterxml.jackson:jackson-bom:$jackson_version"
+			mavenBom "io.projectreactor:reactor-bom:$reactor_bom"
 		}
 	}
 
@@ -45,18 +46,23 @@ subprojects {
 	apply from: "${rootDir}/deploy.gradle"
 // Dependencies
 	dependencies {
+
 		// Logging
 		compile "org.slf4j:slf4j-api:$slf4j_version"
-		// JSON / YAML
+
+		// Jackson
 		compile "com.fasterxml.jackson.core:jackson-databind"
+		compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+
 		// Project Lombok for annotating processor
 		compileOnly "org.projectlombok:lombok:$lombok_version"
 		annotationProcessor "org.projectlombok:lombok:$lombok_version"
 
 		// Testing
-		testCompile "org.mockito:mockito-core:$mockito_version"
 		testCompile "junit:junit:$junit_version"
-		compile "ch.qos.logback:logback-classic:$logback_version"
+		testCompile "io.projectreactor:reactor-test"
+		testCompile "org.mockito:mockito-core:$mockito_version"
+		testCompile "ch.qos.logback:logback-classic:$logback_version"
 	}
 }
 

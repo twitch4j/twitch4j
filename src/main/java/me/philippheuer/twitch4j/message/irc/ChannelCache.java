@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserTimeoutEvent;
 import me.philippheuer.twitch4j.events.event.irc.roomstates.*;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.User;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;

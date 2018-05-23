@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.User;
 import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;

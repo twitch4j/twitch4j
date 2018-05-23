@@ -6,8 +6,8 @@ import lombok.Getter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.User;
 import org.springframework.util.Assert;
 
 import java.util.Map;

@@ -1,6 +1,10 @@
 dependencies {
-	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
-	compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+//	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
+//	compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+
+	// Reactive dependency
+	compile "io.projectreactor:reactor-core"
+
 	compile "com.google.code.findbugs:jsr305:$jsr305_version"
-	compile "org.java-websocket:Java-WebSocket:$websocket_version"
+//	compile "org.java-websocket:Java-WebSocket:$websocket_version"
 }

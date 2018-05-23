@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.User;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.endpoints;
+package twitch4j.api.kraken.endpoints;
 
 import com.jcabi.log.Logger;
 import me.philippheuer.twitch4j.TwitchClient;
@@ -7,8 +7,8 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.model.*;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
+import twitch4j.api.kraken.json.*;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;

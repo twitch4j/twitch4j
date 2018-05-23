@@ -4,9 +4,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.Subscription;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.Subscription;
+import twitch4j.api.kraken.json.User;
 
 /**
  * This event gets called when a user gets a new subscriber or a user resubscribes.

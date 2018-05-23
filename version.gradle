@@ -6,14 +6,15 @@ ext {
 	slf4j_version = "1.7.25"
 	jackson_version = "2.9.5"
 	okhttp_version = "3.10.0"
-	rxjava_version = "2.1.13"
+//	rxjava_version = "2.1.13"
 	jsr305_version = "3.0.2"
 	websocket_version = "1.3.8"
 
+	reactor_bom = "Bismuth-SR9"
 //	jcabi_version = "0.18"
 
 //	spring_platform = "Cairo-SR1"
-//	spring_framework = "5.0.6.RELEASE"
+	spring_framework = "5.0.6.RELEASE"
 //	commons_lang3_version = "3.7"
 //	commons_io_version = "2.6"
 //	tocketBucket_version = "1.7"

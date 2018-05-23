@@ -9,7 +9,7 @@ import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.message.irc.TwitchChat;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
-import me.philippheuer.twitch4j.model.Channel;
+import twitch4j.api.kraken.json.Channel;
 
 import java.util.ArrayList;
 

@@ -9,9 +9,9 @@ import me.philippheuer.twitch4j.events.event.channel.HostOnEvent;
 import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
 import me.philippheuer.twitch4j.events.event.irc.*;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
-import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.twitch4j.model.Subscription;
-import me.philippheuer.twitch4j.model.User;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.Subscription;
+import twitch4j.api.kraken.json.User;
 
 import java.util.*;
 

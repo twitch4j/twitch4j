@@ -17,7 +17,7 @@ import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.PubSubTopics;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
-import me.philippheuer.twitch4j.model.Channel;
+import twitch4j.api.kraken.json.Channel;
 import me.philippheuer.util.conversion.RandomizeString;
 
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Setting topic
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param topics list of {@link PubSubTopics}
 	 */
 	private void setTopic(Channel channel, PubSubTopics... topics) {
@@ -173,7 +173,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Releasing topic
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param topics list of {@link PubSubTopics}
 	 */
 	private void releaseTopic(Channel channel, PubSubTopics... topics) {
@@ -189,7 +189,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Checking topic existence
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param topic {@link PubSubTopics} enum
 	 * @return topic exists
 	 */
@@ -322,7 +322,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Listening channel
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param getAll force all {@link PubSubTopics}. To using specified topics use {@link TwitchPubSub#listenChannel(Channel, PubSubTopics...)}
 	 */
 	public void listenChannel(Channel channel, boolean getAll) {
@@ -334,7 +334,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Listening specified topics channel
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param topics list of {@link PubSubTopics}
 	 */
 	public void listenChannel(Channel channel, PubSubTopics... topics) {
@@ -356,7 +356,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Un-Listening specified topics channel
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 * @param topics list of {@link PubSubTopics}
 	 */
 	public void unlistenChannel(Channel channel, PubSubTopics... topics) {
@@ -372,7 +372,7 @@ public class TwitchPubSub {
 
 	/**
 	 * Un-Listening channel
-	 * @param channel {@link Channel} user model
+	 * @param channel {@link Channel} user json
 	 */
 	public void unlistenChannel(Channel channel) {
 		unlistenChannel(channel, (PubSubTopics[]) channelList.get(channel).toArray());

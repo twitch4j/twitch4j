@@ -1,4 +1,4 @@
-package me.philippheuer.twitch4j.endpoints;
+package twitch4j.api.kraken.endpoints;
 
 import com.jcabi.log.Logger;
 import lombok.Getter;
@@ -8,13 +8,12 @@ import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.event.channel.DonationEvent;
 import me.philippheuer.twitch4j.events.event.channel.FollowEvent;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ChannelDoesNotExistException;
-import me.philippheuer.twitch4j.model.*;
-import me.philippheuer.util.rest.HeaderRequestInterceptor;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
+import twitch4j.api.kraken.json.*;
+import twitch4j.api.util.rest.HeaderRequestInterceptor;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;

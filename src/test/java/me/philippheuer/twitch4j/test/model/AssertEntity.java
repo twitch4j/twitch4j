@@ -1,12 +1,12 @@
 package me.philippheuer.twitch4j.test.model;
 
-import me.philippheuer.twitch4j.model.ChannelFeedPost;
+import twitch4j.api.kraken.json.ChannelFeedPost;
 import org.springframework.util.Assert;
 
 public class AssertEntity {
 
 	/**
-	 * Checks the provided model type.
+	 * Checks the provided json type.
 	 *
 	 * @param entity ChannelFeedPost
 	 */

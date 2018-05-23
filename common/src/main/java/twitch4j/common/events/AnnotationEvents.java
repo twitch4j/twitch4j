@@ -1,8 +1,8 @@
 package twitch4j.common.events;
 
-import io.reactivex.exceptions.Exceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.Exceptions;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -11,13 +11,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AnnotationEvents {
-	private final Manager manager;
+public class AnnotationEvents<E extends Event<E>> {
+	private final EventManager manager;
 
 	/**
 	 * Annotation based method listeners
 	 */
-	private final ConcurrentHashMap<Class<Event<?>>,
+	private final ConcurrentHashMap<Class<E>,
 			ConcurrentHashMap<Method, CopyOnWriteArrayList<Object>>> methodListeners = new ConcurrentHashMap<>();
 
 	/**
@@ -47,14 +47,14 @@ public class AnnotationEvents {
 					method.setAccessible(true);
 
 					// get event class the listener expects
-					Class<?> eventClass = method.getParameterTypes()[0];
+					Class<E> eventClass = (Class<E>) method.getParameterTypes()[0];
 
 					// check if the event class extends the base event class
 					if (Event.class.isAssignableFrom(eventClass)) {
 
 						// add class to methodListeners
 						if (!methodListeners.containsKey(eventClass))
-							methodListeners.put((Class<Event<?>>) eventClass, new ConcurrentHashMap<>());
+							methodListeners.put(eventClass, new ConcurrentHashMap<>());
 
 						// add method to methodListeners
 						if (!methodListeners.get(eventClass).containsKey(method))
@@ -76,26 +76,27 @@ public class AnnotationEvents {
 	 *
 	 * @param event The event that will be dispatched to the annotation based method listeners.
 	 */
-	public synchronized <E extends Event<E>> void dispatch(E event) {
+	public synchronized void dispatch(E event) {
 		// Call Method Listeners
 		methodListeners.entrySet().stream()
 				.filter(e -> e.getKey().isAssignableFrom(event.getClass()))
 				.map(Map.Entry::getValue)
-				.forEach(eventClass -> {
-					eventClass.forEach((k, v) -> {
-						v.forEach(object -> {
-							try {
-								// Invoke Event
-								k.invoke(object, event);
-							} catch (IllegalAccessException ex) {
-								log.error("Error dispatching event {}.", event.getClass().getSimpleName());
-							} catch (Exception ex) {
-								Exceptions.propagate(ex);
-								log.error("Unhandled exception caught dispatching event {}.", event.getClass().getSimpleName());
-							}
-						});
-					});
-				});
+				.forEach(eventClass ->
+						eventClass.forEach((k, v) ->
+								v.forEach(object -> {
+									try {
+										// Invoke Event
+										k.invoke(object, event);
+									} catch (IllegalAccessException ex) {
+										log.error("Error dispatching event {}.", event.getClass().getSimpleName());
+										throw Exceptions.propagate(ex);
+									} catch (Exception ex) {
+										log.error("Unhandled exception caught dispatching event {}.", event.getClass().getSimpleName());
+										throw Exceptions.propagate(ex);
+									}
+								})
+						)
+				);
 	}
 
 }
