@@ -16,9 +16,7 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper=true)
 public class BlockList extends AbstractResultList {
 
 	/**

@@ -15,8 +15,6 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameList {
 	/**
 	 * Data

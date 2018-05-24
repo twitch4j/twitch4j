@@ -1,19 +1,17 @@
 package twitch4j.api.kraken.endpoints;
 
-import lombok.Getter;
-import lombok.Setter;
-import twitch4j.api.kraken.json.RestError;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.json.Team;
 import twitch4j.api.kraken.json.TeamList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-@Getter
-@Setter
+@Slf4j
 public class TeamEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -34,29 +32,27 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * @param offset Object offset for pagination. Default is 0.
 	 * @return todo
 	 */
-	public List<Team> getTeams(Optional<Long> limit, Optional<Long> offset) {
+	public List<Team> getTeams(@Nullable Integer limit, @Nullable Integer offset) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+		}
+		if (offset != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", Integer.toString((offset < 0) ? 0 : offset)));
+		}
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			TeamList responseObject = restTemplate.getForObject(requestUrl, TeamList.class);
-
-			return responseObject.getTeams();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/teams", TeamList.class).getTeams();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -67,31 +63,19 @@ public class TeamEndpoint extends AbstractTwitchEndpoint {
 	 * @param teamName Name of the Team.
 	 * @return Optional of type Team, is only present - if the team exists.
 	 */
-	public Optional<Team> getTeam(String teamName) {
+	public Team getTeam(String teamName) {
 		// Endpoint
-		String requestUrl = String.format("%s/teams/%s", Endpoints.API.getURL(), teamName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/teams/%s", teamName);
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			Team responseObject = restTemplate.getForObject(requestUrl, Team.class);
-
-			return Optional.ofNullable(responseObject);
-		} catch (RestException restException) {
-			RestError restError = restException.getRestError();
-			Logger.error(this, "RestException: " + restError.toString());
-
-			// Handle: Team does not exist
-			if (restError.getStatus().equals(404) && restError.getMessage().equals("Team does not exist")) {
-				return Optional.empty();
-			}
+			return restTemplate.getForObject(requestUrl, Team.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		throw new RuntimeException("Unhandled Exception!");
+			return null;
+		}
 	}
 
 }

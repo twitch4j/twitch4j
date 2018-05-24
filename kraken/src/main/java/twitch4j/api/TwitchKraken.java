@@ -1,16 +1,9 @@
 package twitch4j.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.endpoints.*;
-import twitch4j.api.kraken.exceptions.ChannelDoesNotExistException;
-import twitch4j.api.kraken.exceptions.UserIsNotExistsException;
-
-import java.io.Serializable;
-import java.util.function.Function;
 
 @Getter
 @Deprecated
@@ -27,8 +20,7 @@ public class TwitchKraken {
 	private final UserEndpoint userEndpoint;
 	private final StreamEndpoint streamEndpoint;
 	private final GameEndpoint gameEndpoint;
-	@Getter(AccessLevel.NONE)
-	private final Function<Long, ChannelEndpoint> channelEndpoint;
+	private final ChannelEndpoint channelEndpoint;
 	private final KrakenEndpoint krakenEndpoint;
 
 	public TwitchKraken(RestTemplate restTemplate) {
@@ -43,15 +35,7 @@ public class TwitchKraken {
 		this.userEndpoint = new UserEndpoint(restTemplate);
 		this.streamEndpoint = new StreamEndpoint(restTemplate);
 		this.gameEndpoint = new GameEndpoint(restTemplate);
-		this.channelEndpoint = (channelId) -> new ChannelEndpoint(restTemplate, channelId);
+		this.channelEndpoint = new ChannelEndpoint(restTemplate);
 		this.krakenEndpoint = new KrakenEndpoint(restTemplate);
-	}
-
-	public ChannelEndpoint channelEndpoint(Long channelId) {
-		return channelEndpoint.apply(channelId);
-	}
-
-	public ChannelEndpoint channelEndpoint(String username) {
-		return channelEndpoint.apply(userEndpoint.getUserIdByUserName(username).orElseThrow(() -> new UserIsNotExistsException(username)));
 	}
 }

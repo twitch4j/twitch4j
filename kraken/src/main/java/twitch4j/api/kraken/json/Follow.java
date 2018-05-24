@@ -15,8 +15,6 @@ import java.util.Date;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Follow {
 
 	private Date createdAt;

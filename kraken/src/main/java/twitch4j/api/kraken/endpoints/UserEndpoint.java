@@ -1,12 +1,20 @@
 package twitch4j.api.kraken.endpoints;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.User;
-import twitch4j.api.kraken.json.UserList;
-import twitch4j.api.util.rest.RestException;
+import twitch4j.api.kraken.enums.SortBy;
+import twitch4j.api.kraken.exceptions.ChannelCredentialMissingException;
+import twitch4j.api.kraken.exceptions.ScopeMissingException;
+import twitch4j.api.kraken.json.*;
+import twitch4j.api.util.rest.HeaderRequestInterceptor;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
+import twitch4j.common.auth.ICredential;
+import twitch4j.common.auth.Scope;
+import twitch4j.common.enums.Sort;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -30,35 +38,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param userName todo
 	 * @return todo
 	 */
-	public Optional<Long> getUserIdByUserName(String userName) {
-		// Validate Arguments
-		Assert.hasLength(userName, "Please provide a Username!");
-
-		// REST Request
-		String requestUrl = String.format("%s/users?login=%s", Endpoints.API.getURL(), userName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// REST Request
-		if (!restObjectCache.containsKey(requestUrl)) {
-			try {
-				UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
-				restObjectCache.put(requestUrl, responseObject, 15, TimeUnit.MINUTES);
-			} catch (RestException restException) {
-				log.error("RestException: " + restException.toString());
-			} catch (Exception ex) {
-				log.error("Request failed: " + ex.getMessage(), ex);
-				return Optional.empty();
-			}
-		}
-
-		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();
-
-		// User found?
-		if (userList.size() == 1) {
-			return Optional.ofNullable(userList.get(0).getId());
-		} else {
-			return Optional.empty();
-		}
+	public Long getUserIdByUserName(String userName) {
+		return getUserByUserName(userName).getId();
 	}
 
 	/**
@@ -67,16 +48,26 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param userName todo
 	 * @return todo
 	 */
-	public Optional<User> getUserByUserName(String userName) {
+	public User getUserByUserName(String userName) {
 		// Validate Arguments
 		Assert.hasLength(userName, "Please provide a Username!");
 
-		Optional<Long> userId = getUserIdByUserName(userName);
-		if (userId.isPresent()) {
-			return getUser(userId.get());
+
+		String requestUrl = String.format("/users?login=%s", userName);
+
+
+		// REST Request
+		if (!restObjectCache.containsKey(requestUrl)) {
+			try {
+				UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
+				restObjectCache.put(requestUrl, responseObject, 15, TimeUnit.MINUTES);
+			} catch (Exception ex) {
+				log.error("Request failed: " + ex.getMessage());
+				log.trace(ExceptionUtils.getStackTrace(ex));
+			}
 		}
 
-		return Optional.empty();
+		return ((UserList) restObjectCache.get(requestUrl)).getUsers().get(0);
 	}
 
 	/**
@@ -85,28 +76,24 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param credential todo
 	 * @return todo
 	 */
-	public Optional<User> getUser(OAuthCredential credential) {
+	public User getUser(ICredential credential) {
 		// Validate Arguments
 		Assert.notNull(credential, "Please provide Twitch Credentials!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/user", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+		RestTemplate restTemplate = this.restTemplate;
+
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			User responseObject = restTemplate.getForObject(requestUrl, User.class);
-
-			return Optional.ofNullable(responseObject);
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/user", User.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return Optional.empty();
+			return null;
+		}
 	}
 
 	/**
@@ -115,31 +102,25 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param userId todo
 	 * @return todo
 	 */
-	public Optional<User> getUser(Long userId) {
+	public User getUser(Long userId) {
 		// Validate Arguments
 		Assert.notNull(userId, "Please provide a User ID!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/users/%d", Endpoints.API.getURL(), userId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("%s/users/%d", userId);
 
 		// REST Request
 		try {
 			if (!restObjectCache.containsKey(requestUrl)) {
-				Logger.trace(this, "Rest Request to [%s]", requestUrl);
-				User responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(requestUrl, User.class);
+				User responseObject = this.restTemplate.getForObject(requestUrl, User.class);
 				restObjectCache.put(requestUrl, responseObject);
 			}
-
-			return Optional.ofNullable((User) restObjectCache.get(requestUrl));
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
-		return Optional.empty();
+		return (User) restObjectCache.get(requestUrl);
 	}
 
 	/**
@@ -148,45 +129,34 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * available ones and the channel-specific ones (which can be accessed by any user subscribed to the channel).
 	 * Requires Scope: user_subscriptions
 	 *
-	 * @param userId UserId of the user.
+	 * @param credential UserId of the user.
 	 * @return todo
 	 */
-	public List<Emote> getUserEmotes(Long userId) {
-		// Check Scope
-		Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(userId);
-		if (credential.isPresent()) {
-			Set<String> requiredScopes = new HashSet<String>();
-			requiredScopes.add(TwitchScopes.USER_SUBSCRIPTIONS.getKey());
-
-			checkScopePermission(credential.get().getOAuthScopes(), requiredScopes);
-		} else {
-			throw new ChannelCredentialMissingException(userId);
-		}
-
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/emotes", Endpoints.API.getURL(), userId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential.get());
-
-		// REST Request
+	public List<Emote> getUserEmotes(ICredential credential) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_SUBSCRIPTIONS));
+			// Endpoint
+			String requestUrl = String.format("/users/%s/emotes", credential.userId());
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
 			EmoteSets responseObject = restTemplate.getForObject(requestUrl, EmoteSets.class);
 
 			List<Emote> emoteList = new ArrayList<>();
-
 			for (List<Emote> emotes : responseObject.getEmoticonSets().values()) {
 				emoteList.addAll(emotes);
 			}
 
 			return emoteList;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return new ArrayList<Emote>();
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -194,34 +164,30 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Checks if a specified user is subscribed to a specified channel.
 	 * Requires Scope: user_subscriptions
 	 *
-	 * @param userId    UserId of the user.
+	 * @param credential    UserId of the user.
 	 * @param channelId ChannelId of the channel you are checking against.
 	 * @return Optional of Type UserSubscriptionCheck. Is only present, when the user is subscribed.
 	 */
-	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(Long userId, Long channelId) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/subscriptions/%s", Endpoints.API.getURL(), userId, channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// REST Request
+	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(ICredential credential, Long channelId) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_SUBSCRIPTIONS));
+			// Endpoint
+			String requestUrl = String.format("/users/%s/subscriptions/%s", credential.userId(), channelId);
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
 			UserSubscriptionCheck responseObject = restTemplate.getForObject(requestUrl, UserSubscriptionCheck.class);
 
 			return Optional.ofNullable(responseObject);
-		} catch (RestException restException) {
-			if (restException.getRestError().getStatus().equals(422)) {
-				// Channel has no subscription program.
-				Logger.info(this, "Channel %s has no subscription programm.", channelId);
-			} else {
-				Logger.error(this, "RestException: " + restException.getRestError().toString());
-			}
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return Optional.empty();
+			return Optional.empty();
+		}
 	}
 
 	/**
@@ -236,20 +202,26 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param sortBy    Sorting key. Valid values: created_at, last_broadcast, login. Default: created_at.
 	 * @return List of Type Follow. A list of all Follows
 	 */
-	public List<Follow> getUserFollows(Long userId, Optional<Long> limit, Optional<Long> offset, Optional<String> direction, Optional<String> sortBy) {
+	public List<Follow> getUserFollows(Long userId, @Nullable Integer limit, @Nullable Integer offset, @Nullable Sort direction, SortBy sortBy) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels", Endpoints.API.getURL(), userId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/users/%s/follows/channels", userId);
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.orElse("desc")));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("sortby", sortBy.orElse("created_at")));
-
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+		}
+		if (offset != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", Integer.toString((offset < 0) ? 0 : offset)));
+		}
+		if (direction != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("direction", direction.name().toLowerCase()));
+		}
+		if (sortBy != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("sortby", sortBy.name().toLowerCase()));
+		}
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
 			// Prepare List
@@ -259,18 +231,16 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			// Provide User to Follow Object
 			for (Follow follow : followList) {
 				// The user id exists for sure, or the rest request would fail, so we can directly get the user
-				follow.setUser(getUser(userId).get());
+				follow.setUser(getUser(userId));
 			}
 
 			return followList;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return new ArrayList<Follow>();
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -284,28 +254,20 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Optional<Follow> checkUserFollowByChannel(Long userId, Long channelId) {
 		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), userId, channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/users/%s/follows/channels/%s", userId, channelId);
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
 			Follow responseObject = restTemplate.getForObject(requestUrl, Follow.class);
 
 			return Optional.ofNullable(responseObject);
-		} catch (RestException restException) {
-			if (restException.getRestError().getStatus().equals(404)) {
-				// User does not follow channel
-				return Optional.empty();
-			} else {
-				Logger.error(this, "RestException: " + restException.getRestError().toString());
-			}
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return Optional.empty();
 		}
 
-		return Optional.empty();
 	}
 
 	/**
@@ -318,25 +280,27 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param notifications Send's email notifications on true.
 	 * @return Optional Follow, if user is following.
 	 */
-	public Boolean followChannel(OAuthCredential credential, Long channelId, Optional<Boolean> notifications) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), credential.getUserId(), channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// REST Request
+	public Boolean followChannel(ICredential credential, Long channelId, @Nullable Boolean notifications) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_FOLLOWS_EDIT));
+			// Endpoint
+			String requestUrl = String.format("/users/%s/follows/channels/%s", credential.userId(), channelId);
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
+			// REST Request
 			restTemplate.put(requestUrl, Follow.class, new HashMap<String, String>());
 
 			return true;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return false;
+			return false;
+		}
 	}
 
 	/**
@@ -348,25 +312,26 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param channelId  Channel to follow
 	 * @return Optional Follow, if user is following.
 	 */
-	public Boolean unfollowChannel(OAuthCredential credential, Long channelId) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/follows/channels/%s", Endpoints.API.getURL(), credential.getUserId(), channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// REST Request
+	public Boolean unfollowChannel(ICredential credential, Long channelId) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_FOLLOWS_EDIT));
+			// Endpoint
+			String requestUrl = String.format("/users/%s/follows/channels/%s", credential.userId(), channelId);
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
 			restTemplate.delete(requestUrl);
 
 			return true;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return false;
+			return false;
+		}
 	}
 
 	/**
@@ -379,29 +344,36 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * @param offset     Tells the server where to start fetching the next set of results, in a multi-page response.
 	 * @return todo
 	 */
-	public List<Block> getUserBlockList(OAuthCredential credential, Optional<Long> limit, Optional<Long> offset) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks", Endpoints.API.getURL(), credential.getUserId());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", offset.orElse(0l).toString()));
-
-		// REST Request
+	public List<Block> getUserBlockList(ICredential credential, @Nullable Integer limit, @Nullable Integer offset) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_READ));
+
+			// Endpoint
+			String requestUrl = String.format("/users/%s/blocks", credential.userId());
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
+			// Parameters
+			if (limit != null) {
+				restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+			}
+			if (offset != null) {
+				restTemplate.getInterceptors().add(new QueryRequestInterceptor("offset", Integer.toString((offset < 0) ? 0 : offset)));
+			}
+
+			// REST Request
 			BlockList responseObject = restTemplate.getForObject(requestUrl, BlockList.class);
 
 			return responseObject.getBlocks();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return new ArrayList<Block>();
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -409,29 +381,31 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Blocks a user; that is, adds a specified target user to the blocks list of a specified source user.
 	 * Requires Scope: user_blocks_edit
 	 *
-	 * @param credential   Credential
-	 * @param targetUserId UserID of the Target
+	 * @param credential   	Credential
+	 * @param user 			Target user
 	 * @return todo
 	 */
-	public Boolean addBlock(OAuthCredential credential, Long targetUserId) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks/%s", Endpoints.API.getURL(), credential.getUserId(), targetUserId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// REST Request
+	public Boolean blockUser(ICredential credential, User user) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			restTemplate.put(requestUrl, Follow.class, new HashMap<String, String>());
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_EDIT));
 
+			// Endpoint
+			String requestUrl = String.format("/users/%s/blocks/%s", credential.userId(), user.getId());
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
+			// REST Request
+			restTemplate.put(requestUrl, null, Collections.emptyMap());
 			return true;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return false;
+			return false;
+		}
 	}
 
 	/**
@@ -440,60 +414,55 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: user_blocks_edit
 	 *
 	 * @param credential   Credential
-	 * @param targetUserId UserID of the Target
+	 * @param user 			Target user
 	 * @return todo
 	 */
-	public Boolean deleteBlock(OAuthCredential credential, Long targetUserId) {
-		// Endpoint
-		String requestUrl = String.format("%s/users/%s/blocks/%s", Endpoints.API.getURL(), credential.getUserId(), targetUserId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// REST Request
+	public Boolean unblockUser(ICredential credential, User user) {
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_EDIT));
+
+			// Endpoint
+			String requestUrl = String.format("/users/%s/blocks/%s", credential.userId(), user.getId());
+			RestTemplate restTemplate = this.restTemplate;
+
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", "OAuth " + credential.accessToken()));
+
+			// REST Request
 			restTemplate.delete(requestUrl);
-
 			return true;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return false;
 		}
-
-		return false;
 	}
 
-	public Optional<UserChat> getUserChatByUserName(String username) {
-		Optional<Long> user = getUserIdByUserName(username);
-		return getUserChat(user.get());
+	public UserChat getUserChatByUserName(String username) {
+		Long id = getUserIdByUserName(username);
+		return getUserChat(id);
 	}
 
-	public Optional<UserChat> getUserChat(Long userId) {
+	public UserChat getUserChat(Long userId) {
 		// Validate Arguments
 		Assert.notNull(userId, "Please provide a User ID!");
 
 		// Endpoint
-		String reqUrl = String.format("%s/users/%s/chat", Endpoints.API.getURL(), userId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String reqUrl = String.format("/users/%s/chat", userId);
 
 		// REST Request
 		try {
 			if (!restObjectCache.containsKey(reqUrl)) {
-				Logger.trace(this, "Rest Request to [%s]", reqUrl);
-				UserChat responseObject = getTwitchClient().getRestClient().getRestTemplate().getForObject(reqUrl, UserChat.class);
+				UserChat responseObject = this.restTemplate.getForObject(reqUrl, UserChat.class);
 				restObjectCache.put(reqUrl, responseObject);
 			}
-
-			return Optional.ofNullable((UserChat) restObjectCache.get(reqUrl));
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
-		return Optional.empty();
+		return (UserChat) restObjectCache.get(reqUrl);
 	}
-
 }

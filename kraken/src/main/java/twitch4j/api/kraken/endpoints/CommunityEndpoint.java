@@ -1,27 +1,24 @@
 package twitch4j.api.kraken.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
-import twitch4j.api.kraken.json.Community;
-import twitch4j.api.kraken.json.CommunityCreate;
-import twitch4j.api.kraken.json.CommunityList;
-import twitch4j.api.util.rest.QueryRequestInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
+import twitch4j.api.kraken.exceptions.ChannelCredentialMissingException;
+import twitch4j.api.kraken.exceptions.ScopeMissingException;
+import twitch4j.api.kraken.json.BannedCommunityUsers;
+import twitch4j.api.kraken.json.Community;
+import twitch4j.api.kraken.json.CommunityList;
+import twitch4j.api.kraken.json.User;
+import twitch4j.api.util.rest.HeaderRequestInterceptor;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
+import twitch4j.common.auth.ICredential;
+import twitch4j.common.auth.Scope;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.annotation.Nullable;
+import java.util.*;
 
-@Getter
-@Setter
+@Slf4j
 public class CommunityEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -42,23 +39,22 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @return todo
 	 */
 	public Community getCommunityByName(String name) {
-		// Endpoint
-		String requestUrl = String.format("%s/communities", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// Parameter
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("name", name));
 
 		// REST Request
 		try {
-			Community responseObject = restTemplate.getForObject(requestUrl, Community.class);
+			Objects.requireNonNull(name, "Provide community name!");
+			Assert.isTrue(validateCommunityName(name), "Invalid community name!");
 
-			return responseObject;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			// Endpoint
+			String requestUrl = "/communities";
+			RestTemplate restTemplate = this.restTemplate;
+
+			// Parameter
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("name", name));
+			return restTemplate.getForObject(requestUrl, Community.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -73,62 +69,19 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @return The community.
 	 */
 	public Community getCommunityById(String id) {
-		// Endpoint
-		String requestUrl = String.format("%s/communities/%s", Endpoints.API.getURL(), id);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// REST Request
 		try {
-			Community responseObject = restTemplate.getForObject(requestUrl, Community.class);
+			Objects.requireNonNull(id, "Provide community ID!");
+			// Endpoint
+			String requestUrl = String.format("/communities/%s", id);
 
-			return responseObject;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			// REST Request
+			return restTemplate.getForObject(requestUrl, Community.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return null;
 		}
-
-		return null;
-	}
-
-	/**
-	 * Endpoint: Create Community
-	 * Creates a community.
-	 * Requires Scope: none
-	 *
-	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
-	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
-	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
-	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
-	 * @return ID (String) of the created community
-	 */
-	public String createCommunity(OAuthCredential credential, String name, String summary, String description, String rules) {
-		// Endpoint
-		String requestUrl = String.format("%s/communities", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// Post Data
-		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
-		postBody.add("name", name);
-		postBody.add("summary", summary);
-		postBody.add("description", description);
-		postBody.add("rules", rules);
-
-		// REST Request
-		try {
-			CommunityCreate responseObject = restTemplate.postForObject(requestUrl, postBody, CommunityCreate.class);
-
-			return responseObject.getId();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
-		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
-
-		return null;
 	}
 
 	/**
@@ -138,35 +91,44 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 *
 	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
 	 * @param id          Id of the community, which will be updated.
-	 * @param name        Community name. 3-25 characters, which can be alphanumerics, dashes (-), periods (.), underscores (_), and tildes (~). Cannot contain spaces.
 	 * @param summary     Short description of the community, shown in search results. Maximum: 160 characters.
 	 * @param description Long description of the community, shown in the *about this community* box. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB).
 	 * @param rules       Rules displayed when viewing a community page or searching for a community from the broadcaster dashboard. Markdown syntax allowed. Maximum 1,572,864 characters (1.5 MB)
 	 * @param email       Email address of the community owner.
 	 */
-	public void updateCommunity(OAuthCredential credential, String id, Optional<String> name, Optional<String> summary, Optional<String> description, Optional<String> rules, Optional<String> email) {
+	public Boolean updateCommunity(ICredential credential, String id, @Nullable String summary, @Nullable String description, @Nullable String rules, @Nullable String email) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities/%s", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/communities/%s", id);
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Post Data
-		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
-		postBody.add("summary", summary.orElse(""));
-		postBody.add("description", description.orElse(""));
-		postBody.add("rules", rules.orElse(""));
-		postBody.add("email", email.orElse(""));
+		Map<String, Object> postBody = new LinkedHashMap<>();
+		if (summary != null) {
+			postBody.put("summary", summary);
+		}
+		if (description != null) {
+			postBody.put("description", description);
+		}
+		if (rules != null) {
+			postBody.put("rules", rules);
+		}
+		if (email != null) {
+			postBody.put("email", email);
+		}
 
 		// REST Request
 		try {
-			restTemplate.postForObject(requestUrl, postBody, CommunityCreate.class);
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
-		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			if (postBody.isEmpty()) {
+				throw new NullPointerException("Must be contain some data!");
+			}
 
-		return;
+			restTemplate.put(requestUrl, postBody);
+			return true;
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+			return false;
+		}
 	}
 
 	/**
@@ -178,28 +140,28 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param cursor Tells the server where to start fetching the next set of results in a multi-page response.
 	 * @return The top communities.
 	 */
-	public CommunityList getTopCommunities(Optional<Long> limit, Optional<String> cursor) {
+	public CommunityList getTopCommunities(@Nullable Integer limit, @Nullable String cursor) {
 		// Endpoint
-		String requestUrl = String.format("%s/communities/top", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = "/communities/top";
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+		}
+		if (cursor != null && cursor.equals("")) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor));
+		}
 
 		// REST Request
 		try {
-			CommunityList responseObject = restTemplate.getForObject(requestUrl, CommunityList.class);
-
-			return responseObject;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject(requestUrl, CommunityList.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return null;
+		}
 	}
 
 	/**
@@ -210,39 +172,11 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
 	 * @return The top communities.
 	 */
-	public List<Community> getTopCommunities(Optional<Long> limit) {
-		if(limit.isPresent()) {
-			if(limit.get() > 100) {
-				List<Community> resultList = new ArrayList<Community>();
-
-				Long recordsToFetch = limit.get();
-				String cursor = "";
-
-				while(recordsToFetch > 0) {
-					CommunityList communityList = getTopCommunities(Optional.ofNullable(recordsToFetch > 100 ? 100 : recordsToFetch), Optional.empty());
-					cursor = communityList.getCursor();
-					Integer results = communityList.getCommunities().size();
-					resultList.addAll(communityList.getCommunities());
-					recordsToFetch -= results;
-
-					if(results == 0) {
-						break;
-					}
-				}
-
-				return resultList;
-			} else {
-				return getTopCommunities(limit, Optional.empty()).getCommunities();
-			}
-		} else {
-			return getTopCommunities(Optional.empty(), Optional.empty()).getCommunities();
-		}
+	public List<Community> getTopCommunities(@Nullable Integer limit) {
+		return getTopCommunities(limit, null).getCommunities();
 	}
 
 	// TODO
-	// Get Community Banned Users
-	// Ban Community User
-	// Un-Ban Community User
 	// Create Community Avatar Image
 	// Delete Community Avatar Image
 	// Create Community Cover Image
@@ -256,6 +190,83 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	// Add Community Timed-Out User
 	// Delete Community Timed-Out User
 
+	public BannedCommunityUsers getCommunityBannedUsers(ICredential credential, String id, @Nullable Integer limit, @Nullable String cursor) {
+		try {
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+
+			// Endpoint
+			String requestUrl = String.format("/communities/%s/bans", id);
+			RestTemplate restTemplate = this.restTemplate;
+
+			// Query Parameters
+			if (limit != null) {
+				restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+			}
+			if (cursor != null && cursor.equals("")) {
+				restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor));
+			}
+
+			// Header Parameters
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
+
+			return restTemplate.getForObject(requestUrl, BannedCommunityUsers.class);
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return null;
+		}
+	}
+
+	public Boolean banCommunityUser(ICredential credential, String id, Long userId) {
+		try {
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+
+			// Endpoint
+			String requestUrl = String.format("/communities/%s/bans/%s", id, userId);
+			RestTemplate restTemplate = this.restTemplate;
+
+			// Parameters
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
+
+			restTemplate.put(requestUrl, null);
+
+			return true;
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return false;
+		}
+	}
+
+	public Boolean unbanCommunityUser(ICredential credential, String id, Long userId) {
+		try {
+			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+
+			// Endpoint
+			String requestUrl = String.format("/communities/%s/bans/%s", id, userId);
+			RestTemplate restTemplate = this.restTemplate;
+
+			// Parameters
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
+
+			restTemplate.delete(requestUrl);
+
+			return true;
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.userId(), ex);
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+
+			return false;
+		}
+	}
 	/**
 	 * Validates community names against the twitch name limitations.
 	 *
@@ -263,12 +274,6 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * @return Whether the given name is a valid community name.
 	 */
 	private Boolean validateCommunityName(String name) {
-		String regex = "[A-Za-z\\x2D\\x2E\\x5F\\x7E]{3,25}"; // using ASCII characters
-
-		if(name.matches(regex)) {
-			return true;
-		}
-
-		return false;
+		return name.matches("^[A-Za-z\\-\\_\\.\\~]{3,25}$");
 	}
 }

@@ -16,10 +16,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EmoteSets {
-
 	private Map<String, List<Emote>> emoticonSets;
 
 }

@@ -1,14 +1,10 @@
 package twitch4j.api.kraken.json;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
-import me.philippheuer.twitch4j.enums.SubPlan;
+import twitch4j.common.enums.SubscriptionPlan;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Model representing a subscription.
@@ -23,43 +19,13 @@ public class Subscription {
 	@JsonProperty("_id")
 	private String id;
 
-	private Date createdAt;
+	private Instant createdAt;
 
 	private User user;
 
 	@JsonProperty("sub_plan")
-	private String sub_plan_code;
+	private SubscriptionPlan subscriptionPlan;
 
 	@JsonProperty("sub_plan_name")
-	private String sub_plan_name;
-
-	@JsonIgnore
-	private String message;
-
-	@JsonIgnore
-	private Integer streak;
-
-	/**
-	 * Holds the subscription plan
-	 */
-	@JsonIgnore
-	private SubPlan subPlan;
-
-	/**
-	 * Sets the subplan using the string
-	 * @param code sub plan by code
-	 */
-	public void setSubPlanByCode(String code) {
-		if(code.equals("Prime")) {
-			setSubPlan(SubPlan.PRIME);
-		} else if(code.equals("1000")) {
-			setSubPlan(SubPlan.TIER_1);
-		} else if(code.equals("2000")) {
-			setSubPlan(SubPlan.TIER_2);
-		} else if(code.equals("3000")) {
-			setSubPlan(SubPlan.TIER_3);
-		} else {
-			setSubPlan(SubPlan.UNKNOWN);
-		}
-	}
+	private String subscriptionName;
 }

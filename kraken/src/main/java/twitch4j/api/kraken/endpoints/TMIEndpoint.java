@@ -1,16 +1,15 @@
 package twitch4j.api.kraken.endpoints;
 
-import com.jcabi.log.Logger;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import twitch4j.api.kraken.json.Channel;
 import twitch4j.api.kraken.json.User;
 import twitch4j.api.kraken.json.tmi.Chatter;
 import twitch4j.api.kraken.json.tmi.ChatterResult;
-import net.jodah.expiringmap.ExpirationPolicy;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Twitch Messaging Interface (TMI)
  * This Endpoint can be changed at any time. (Unofficial)
  */
+@Slf4j
 public class TMIEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -26,7 +26,10 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	 * @param restTemplate {@link RestTemplate}
 	 */
 	public TMIEndpoint(RestTemplate restTemplate) {
-		super(restTemplate);
+		super(new RestTemplate(new OkHttp3ClientHttpRequestFactory()));
+		this.restTemplate.setInterceptors(restTemplate.getInterceptors());
+		this.restTemplate.setMessageConverters(restTemplate.getMessageConverters());
+		this.restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("http://tmi.twitch.tv"));
 	}
 
 	/**
@@ -37,24 +40,20 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Chatter getChatters(String channelName) {
 		// Endpoint
-		String requestUrl = String.format("%s/group/user/%s/chatters", Endpoints.TMI.getURL(), channelName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/group/user/%s/chatters", channelName);
 
 		// REST Request
 		try {
 			if (!restObjectCache.containsKey(requestUrl)) {
-				Logger.trace(this, "Rest Request to [%s]", requestUrl);
 				ChatterResult responseObject = restTemplate.getForObject(requestUrl, ChatterResult.class);
 				restObjectCache.put(requestUrl, responseObject, ExpirationPolicy.CREATED, 60, TimeUnit.SECONDS);
 			}
 
 			return ((ChatterResult) restObjectCache.get(requestUrl)).getChatters();
 
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
 		// OnError: Return empty result

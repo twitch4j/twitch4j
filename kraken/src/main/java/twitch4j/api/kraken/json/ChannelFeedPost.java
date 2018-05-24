@@ -17,8 +17,6 @@ import java.util.Calendar;
  * @see ReactionList
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChannelFeedPost {
 
 	/**

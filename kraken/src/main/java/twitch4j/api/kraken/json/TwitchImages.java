@@ -13,8 +13,6 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TwitchImages {
 
 	private String small;

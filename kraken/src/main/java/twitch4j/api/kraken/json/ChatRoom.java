@@ -10,8 +10,6 @@ import lombok.Data;
  * Model representing a chat room.
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatRoom {
 
 	@JsonProperty("_id")

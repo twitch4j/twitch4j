@@ -11,8 +11,6 @@ import java.util.List;
  * Model representing a list of chat rooms.
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatRoomList {
 
 	/**

@@ -1,17 +1,17 @@
 package twitch4j.api.kraken.endpoints;
 
-import com.jcabi.log.Logger;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
-import twitch4j.api.kraken.json.ChatRoomList;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
+import twitch4j.api.kraken.json.*;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 public class ChatEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -30,42 +30,53 @@ public class ChatEndpoint extends AbstractTwitchEndpoint {
 	 * For example, if you own the channel, you'll get all the chat rooms (subscriber only, mod only, etc.).
 	 * However, if you're only a viewer of that channel, you'll only get the rooms that you can see (not sub only, etc.).
 	 *
-	 * @param authenticatedChannelId The channel ID that you're authenticated under.
-	 * @param channelIdToQuery The channel ID that you're trying to get the chat rooms for.
+	 * @param channelId The channel ID that you're trying to get the chat rooms for.
 	 * @return
 	 */
-	public Optional<ChatRoomList> getChatRoomsByChannel(Long authenticatedChannelId, Long channelIdToQuery) {
+	public List<ChatRoom> getChatRooms(Long channelId) {
 		// Validate Arguments
-		Assert.notNull(authenticatedChannelId, "Please provide a channel ID that you're authenticated for!");
-		Assert.notNull(channelIdToQuery, "Please provide a channel ID to query its chat rooms for!");
+		Objects.requireNonNull(channelId, "Please provide a channel ID to query its chat rooms for!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/chat/%s/rooms", Endpoints.API.getURL(), channelIdToQuery);
+		String requestUrl = String.format("/chat/%s/rooms", channelId);
 
 		// REST Request
 		try {
-			Optional<OAuthCredential> credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForChannel(authenticatedChannelId);
-			if (!credential.isPresent()) {
-				throw new IllegalArgumentException("Can't get credential for channel. Did you authenticate under this channel ID with Twitch?");
-			}
-
-			RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential.get());
-			if (!restObjectCache.containsKey(requestUrl)) {
-				Logger.trace(this, "Rest Request to [%s]", requestUrl);
-				ChatRoomList responseObject = restTemplate.getForObject(requestUrl, ChatRoomList.class);
-				restObjectCache.put(requestUrl, responseObject);
-			}
-
-			return Optional.ofNullable((ChatRoomList) restObjectCache.get(requestUrl));
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
-			restException.printStackTrace();
+			return restTemplate.getForObject(requestUrl, ChatRoomList.class).getRooms();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-			ex.printStackTrace();
+			log.error("Request failed: " + ex.getMessage());
+			log.trace( ExceptionUtils.getStackTrace(ex));
+			return Collections.emptyList();
 		}
+	}
 
-		return Optional.empty();
+	public List<Emote> getEmoteSets(Long emoteSets) {
+		// Validate Arguments
+		Assert.notNull(emoteSets, "Please provide a emote sets!");
+		String requestUri = "/chat/emoticon_images";
+		RestTemplate restTemplate = this.restTemplate;
+
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("emotesets", emoteSets.toString()));
+
+		try {
+			return restTemplate.getForObject(requestUri, EmoteSets.class).getEmoticonSets().get(emoteSets.toString());
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+			return Collections.emptyList();
+		}
+	}
+
+	public List<Emoticon> getEmotes() {
+		// Validate Arguments
+		String requestUri = "/chat/emoticon_images";
+
+		try {
+			return restTemplate.getForObject(requestUri, EmoticonList.class).getEmoticons();
+		} catch (Exception ex) {
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
+			return Collections.emptyList();
+		}
 	}
 }

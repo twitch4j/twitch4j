@@ -9,8 +9,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserChat {
 
 	@JsonProperty("_id")

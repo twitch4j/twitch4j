@@ -15,6 +15,7 @@ ext {
 
 //	spring_platform = "Cairo-SR1"
 	spring_framework = "5.0.6.RELEASE"
+	spring_social = "1.1.6.RELEASE"
 	commons_lang3_version = "3.7"
 //	commons_io_version = "2.6"
 //	tocketBucket_version = "1.7"
@@ -28,5 +29,4 @@ ext {
 	junit_version = "4.12"
 	logback_version = "1.2.3"
 	mockito_version = "2.18.3"
-
 }

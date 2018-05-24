@@ -1,24 +1,16 @@
 package twitch4j.api.kraken.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.json.Token;
 import twitch4j.api.kraken.json.TokenResponse;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import twitch4j.api.util.rest.HeaderRequestInterceptor;
+import twitch4j.common.auth.ICredential;
 
 import java.util.Optional;
 
-@Getter
-@Setter
+@Slf4j
 public class KrakenEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -39,25 +31,22 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	 * @return Information about the user, that issued the token - also provides info about scopes/valid/etc.
 	 * @see Token
 	 */
-	public Token getToken(OAuthCredential credential) {
-		// Endpoint
-		String requestUrl = String.format("%s", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
+	public Token getToken(ICredential credential) {
+		RestTemplate restTemplate = this.restTemplate;
+
+		// Parameters
+		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
 
 		// REST Request
 		try {
-			TokenResponse responseObject = restTemplate.getForObject(requestUrl, TokenResponse.class);
-
-			return responseObject.getToken();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/", TokenResponse.class).getToken();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		// Default Response: Invalid Token
-		return new Token();
+			// Default Response: Invalid Token
+			return new Token();
+		}
 	}
 
 	/**
@@ -66,36 +55,11 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	 * @param grant_type Valid values: authorization_code or refresh_token.
 	 * @param redirect_url Redirect url.
 	 * @param code authentication_code or refresh_token
-	 * @return {@link Authorize} data on {@link Optional} container class
+	 * @return {@link ICredential} data on {@link Optional} container class
+	 * @deprecated use {@link twitch4j.common.auth.CredentialManager#authorize(String)} and put only authorization code
 	 */
-	public Optional<Authorize> getOAuthToken(String grant_type, String redirect_url, String code) {
-		// Endpoint
-		String requestUrl = String.format("%s/oauth2/token", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
-		// Post Data
-		MultiValueMap<String, Object> postParameters = new LinkedMultiValueMap<String, Object>();
-		postParameters.add("grant_type", grant_type);
-		postParameters.add("client_id", getTwitchClient().getClientId());
-		postParameters.add("client_secret", getTwitchClient().getClientSecret());
-		postParameters.add("redirect_uri", redirect_url);
-		if(grant_type.equals("authorization_code")) {
-			postParameters.add("code", code);
-		} else if(grant_type.equals("refresh_token")) {
-			postParameters.add("refresh_token", code);
-		}
-
-		// REST Request
-		try {
-			Authorize responseObject = restTemplate.postForObject(requestUrl, postParameters, Authorize.class);
-
-			return Optional.ofNullable(responseObject);
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
+	@Deprecated
+	public Optional<ICredential> getOAuthToken(String grant_type, String redirect_url, String code) {
 		return Optional.empty();
 	}
 

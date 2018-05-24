@@ -16,8 +16,6 @@ import java.util.List;
  * @see Ingest
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class IngestList {
 	/**
 	 * Data

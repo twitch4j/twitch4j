@@ -52,7 +52,7 @@ public class RestClient {
 	 * @return A RestTemplate for http requests.
 	 */
 	public RestTemplate getRestTemplate(ObjectMapper mapper) {
-		RestTemplate restTemplate = getPlainRestTemplate();
+		RestTemplate restTemplate = getPlainRestTemplate(mapper);
 
 		// Request Interceptors
 		restTemplate.setInterceptors(restInterceptors);

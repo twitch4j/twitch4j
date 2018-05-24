@@ -24,8 +24,8 @@ public class RestErrorHandler implements ResponseErrorHandler {
 
 		ErrorResponse content = mapper.readValue(response.getBody(), ErrorResponse.class);
 
-		if (content.getMessage() == null) {
-			content.setMessage(response.getStatusCode().getReasonPhrase());
+		if (content.getError() == null) {
+			content.setError(response.getStatusCode().getReasonPhrase());
 		}
 
 		if (content.getStatus() == null) {

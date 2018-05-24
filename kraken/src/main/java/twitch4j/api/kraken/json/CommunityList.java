@@ -16,8 +16,6 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper=false)
 public class CommunityList extends AbstractResultList {
 	/**

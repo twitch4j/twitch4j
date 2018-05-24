@@ -19,8 +19,6 @@ import java.util.Calendar;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
 
 	@JsonProperty("_id")
