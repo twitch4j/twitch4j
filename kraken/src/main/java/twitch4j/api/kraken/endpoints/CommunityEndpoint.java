@@ -1,5 +1,10 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
@@ -9,14 +14,10 @@ import twitch4j.api.kraken.exceptions.ScopeMissingException;
 import twitch4j.api.kraken.json.BannedCommunityUsers;
 import twitch4j.api.kraken.json.Community;
 import twitch4j.api.kraken.json.CommunityList;
-import twitch4j.api.kraken.json.User;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
-
-import javax.annotation.Nullable;
-import java.util.*;
 
 @Slf4j
 public class CommunityEndpoint extends AbstractTwitchEndpoint {
@@ -169,7 +170,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 	 * Calling the getTopCommunities with parameters to get up to limit communities.
 	 * Requires Scope: none
 	 *
-	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: none.
+	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: none.
 	 * @return The top communities.
 	 */
 	public List<Community> getTopCommunities(@Nullable Integer limit) {
@@ -192,7 +193,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 
 	public BannedCommunityUsers getCommunityBannedUsers(ICredential credential, String id, @Nullable Integer limit, @Nullable String cursor) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+			checkScopePermission(credential.scopes(), Scope.COMMUNITIES_MODERATE);
 
 			// Endpoint
 			String requestUrl = String.format("/communities/%s/bans", id);
@@ -222,7 +223,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 
 	public Boolean banCommunityUser(ICredential credential, String id, Long userId) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+			checkScopePermission(credential.scopes(), Scope.COMMUNITIES_MODERATE);
 
 			// Endpoint
 			String requestUrl = String.format("/communities/%s/bans/%s", id, userId);
@@ -246,7 +247,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 
 	public Boolean unbanCommunityUser(ICredential credential, String id, Long userId) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.COMMUNITIES_MODERATE));
+			checkScopePermission(credential.scopes(), Scope.COMMUNITIES_MODERATE);
 
 			// Endpoint
 			String requestUrl = String.format("/communities/%s/bans/%s", id, userId);
@@ -267,6 +268,7 @@ public class CommunityEndpoint extends AbstractTwitchEndpoint {
 			return false;
 		}
 	}
+
 	/**
 	 * Validates community names against the twitch name limitations.
 	 *

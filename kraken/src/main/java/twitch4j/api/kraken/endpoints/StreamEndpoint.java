@@ -1,21 +1,34 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.enums.StreamType;
 import twitch4j.api.kraken.exceptions.ChannelCredentialMissingException;
 import twitch4j.api.kraken.exceptions.ScopeMissingException;
-import twitch4j.api.kraken.json.*;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.Game;
+import twitch4j.api.kraken.json.Recommendation;
+import twitch4j.api.kraken.json.RecommendationList;
+import twitch4j.api.kraken.json.Stream;
+import twitch4j.api.kraken.json.StreamFeatured;
+import twitch4j.api.kraken.json.StreamFeaturedList;
+import twitch4j.api.kraken.json.StreamList;
+import twitch4j.api.kraken.json.StreamSingle;
+import twitch4j.api.kraken.json.StreamSummary;
+import twitch4j.api.kraken.json.User;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.utils.Unofficial;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * All api methods related to a stream.
@@ -90,12 +103,12 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	 * Gets the list of all live streams.
 	 * Requires Scope: none
 	 *
-	 * @param limit       Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
-	 * @param offset      Object offset for pagination of results. Default: 0.
-	 * @param language    Restricts the returned streams to the specified language. Permitted values are locale ID strings, e.g. en, fi, es-mx.
-	 * @param game        Restricts the returned streams to the specified game.
-	 * @param channels    Receives the streams from a list of channels.
-	 * @param streamType  Restricts the returned streams to a certain stream type. Valid values: live, playlist, all. Playlists are offline streams of VODs (Video on Demand) that appear live. Default: live.
+	 * @param limit      Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param offset     Object offset for pagination of results. Default: 0.
+	 * @param language   Restricts the returned streams to the specified language. Permitted values are locale ID strings, e.g. en, fi, es-mx.
+	 * @param game       Restricts the returned streams to the specified game.
+	 * @param channels   Receives the streams from a list of channels.
+	 * @param streamType Restricts the returned streams to a certain stream type. Valid values: live, playlist, all. Playlists are offline streams of VODs (Video on Demand) that appear live. Default: live.
 	 * @return Returns all streams that match with the provided filtering.
 	 */
 	public List<Stream> getLiveStreams(@Nullable List<Channel> channels, @Nullable Game game, @Nullable List<Locale> language, StreamType streamType, Integer limit, Integer offset) {
@@ -145,7 +158,7 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	public List<Stream> getFollowed(ICredential credential) {
 
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_READ));
+			checkScopePermission(credential.scopes(), Scope.USER_READ);
 
 			// Endpoint
 			RestTemplate restTemplate = this.restTemplate;
@@ -257,60 +270,60 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get the streams on the frontpage for a specific region (UnofficialEndpoint)
 	 * <table summary="Valid Regions:">
-	 *     <tr><th>Code</th><th>Region</th></tr>
-	 *     <tr><td>AT</td><td>Austria</td></tr>
-	 *     <tr><td>BE</td><td>Belgium</td></tr>
-	 *     <tr><td>BG</td><td>Bulgaria</td></tr>
-	 *     <tr><td>CY</td><td>Cyprus</td></tr>
-	 *     <tr><td>CZ</td><td>Czech Republic</td></tr>
-	 *     <tr><td>DE</td><td>Germany</td></tr>
-	 *     <tr><td>DK</td><td>Denmark</td></tr>
-	 *     <tr><td>EE</td><td>Estonia</td></tr>
-	 *     <tr><td>FI</td><td>Finland</td></tr>
-	 *     <tr><td>FR</td><td>France</td></tr>
-	 *     <tr><td>GR</td><td>Greece</td></tr>
-	 *     <tr><td>GL</td><td>Greenland</td></tr>
-	 *     <tr><td>HU</td><td>Hungary</td></tr>
-	 *     <tr><td>IS</td><td>Iceland</td></tr>
-	 *     <tr><td>IT</td><td>Italy</td></tr>
-	 *     <tr><td>LT</td><td>Lithuania</td></tr>
-	 *     <tr><td>LU</td><td>Luxembourg</td></tr>
-	 *     <tr><td>NL</td><td>Netherlands</td></tr>
-	 *     <tr><td>NO</td><td>Norway</td></tr>
-	 *     <tr><td>PL</td><td>Poland</td></tr>
-	 *     <tr><td>PT</td><td>Portugal</td></tr>
-	 *     <tr><td>RO</td><td>Romania</td></tr>
-	 *     <tr><td>RU</td><td>Russia</td></tr>
-	 *     <tr><td>SK</td><td>Slovakia</td></tr>
-	 *     <tr><td>SI</td><td>Slovenia</td></tr>
-	 *     <tr><td>ES</td><td>Spain</td></tr>
-	 *     <tr><td>SE</td><td>Sweden</td></tr>
-	 *     <tr><td>CH</td><td>Switzerland</td></tr>
-	 *     <tr><td>TR</td><td>Turkey</td></tr>
-	 *     <tr><td>LV</td><td>Latvia</td></tr>
-	 *     <tr><td>MT</td><td>Malta</td></tr>
-	 *     <tr><td>RS</td><td>Serbia</td></tr>
-	 *     <tr><td>AL</td><td>Albania</td></tr>
-	 *     <tr><td>AD</td><td>Andorra</td></tr>
-	 *     <tr><td>AM</td><td>Armenia</td></tr>
-	 *     <tr><td>AZ</td><td>Azerbaijan</td></tr>
-	 *     <tr><td>BY</td><td>Belarus</td></tr>
-	 *     <tr><td>BA</td><td>Bosnia and Herzegovina</td></tr>
-	 *     <tr><td>HR</td><td>Croatia</td></tr>
-	 *     <tr><td>GE</td><td>Georgia</td></tr>
-	 *     <tr><td>IL</td><td>Israel</td></tr>
-	 *     <tr><td>LI</td><td>Liechtenstein</td></tr>
-	 *     <tr><td>MK</td><td>Macedonia</td></tr>
-	 *     <tr><td>MD</td><td>Moldova</td></tr>
-	 *     <tr><td>MC</td><td>Monaco</td></tr>
-	 *     <tr><td>ME</td><td>Montenegro</td></tr>
-	 *     <tr><td>QA</td><td>Qatar</td></tr>
-	 *     <tr><td>SM</td><td>San Marino</td></tr>
-	 *     <tr><td>UA</td><td>Ukraine</td></tr>
-	 *     <tr><td>UK</td><td>United Kingdom</td></tr>
-	 *     <tr><td>GB</td><td>Great Britain</td></tr>
-	 *     <tr><td>IE</td><td>Ireland</td></tr>
-	 *     <tr><td>US</td><td>USA</td></tr>
+	 * <tr><th>Code</th><th>Region</th></tr>
+	 * <tr><td>AT</td><td>Austria</td></tr>
+	 * <tr><td>BE</td><td>Belgium</td></tr>
+	 * <tr><td>BG</td><td>Bulgaria</td></tr>
+	 * <tr><td>CY</td><td>Cyprus</td></tr>
+	 * <tr><td>CZ</td><td>Czech Republic</td></tr>
+	 * <tr><td>DE</td><td>Germany</td></tr>
+	 * <tr><td>DK</td><td>Denmark</td></tr>
+	 * <tr><td>EE</td><td>Estonia</td></tr>
+	 * <tr><td>FI</td><td>Finland</td></tr>
+	 * <tr><td>FR</td><td>France</td></tr>
+	 * <tr><td>GR</td><td>Greece</td></tr>
+	 * <tr><td>GL</td><td>Greenland</td></tr>
+	 * <tr><td>HU</td><td>Hungary</td></tr>
+	 * <tr><td>IS</td><td>Iceland</td></tr>
+	 * <tr><td>IT</td><td>Italy</td></tr>
+	 * <tr><td>LT</td><td>Lithuania</td></tr>
+	 * <tr><td>LU</td><td>Luxembourg</td></tr>
+	 * <tr><td>NL</td><td>Netherlands</td></tr>
+	 * <tr><td>NO</td><td>Norway</td></tr>
+	 * <tr><td>PL</td><td>Poland</td></tr>
+	 * <tr><td>PT</td><td>Portugal</td></tr>
+	 * <tr><td>RO</td><td>Romania</td></tr>
+	 * <tr><td>RU</td><td>Russia</td></tr>
+	 * <tr><td>SK</td><td>Slovakia</td></tr>
+	 * <tr><td>SI</td><td>Slovenia</td></tr>
+	 * <tr><td>ES</td><td>Spain</td></tr>
+	 * <tr><td>SE</td><td>Sweden</td></tr>
+	 * <tr><td>CH</td><td>Switzerland</td></tr>
+	 * <tr><td>TR</td><td>Turkey</td></tr>
+	 * <tr><td>LV</td><td>Latvia</td></tr>
+	 * <tr><td>MT</td><td>Malta</td></tr>
+	 * <tr><td>RS</td><td>Serbia</td></tr>
+	 * <tr><td>AL</td><td>Albania</td></tr>
+	 * <tr><td>AD</td><td>Andorra</td></tr>
+	 * <tr><td>AM</td><td>Armenia</td></tr>
+	 * <tr><td>AZ</td><td>Azerbaijan</td></tr>
+	 * <tr><td>BY</td><td>Belarus</td></tr>
+	 * <tr><td>BA</td><td>Bosnia and Herzegovina</td></tr>
+	 * <tr><td>HR</td><td>Croatia</td></tr>
+	 * <tr><td>GE</td><td>Georgia</td></tr>
+	 * <tr><td>IL</td><td>Israel</td></tr>
+	 * <tr><td>LI</td><td>Liechtenstein</td></tr>
+	 * <tr><td>MK</td><td>Macedonia</td></tr>
+	 * <tr><td>MD</td><td>Moldova</td></tr>
+	 * <tr><td>MC</td><td>Monaco</td></tr>
+	 * <tr><td>ME</td><td>Montenegro</td></tr>
+	 * <tr><td>QA</td><td>Qatar</td></tr>
+	 * <tr><td>SM</td><td>San Marino</td></tr>
+	 * <tr><td>UA</td><td>Ukraine</td></tr>
+	 * <tr><td>UK</td><td>United Kingdom</td></tr>
+	 * <tr><td>GB</td><td>Great Britain</td></tr>
+	 * <tr><td>IE</td><td>Ireland</td></tr>
+	 * <tr><td>US</td><td>USA</td></tr>
 	 * </table>
 	 *
 	 * @param locale using {@link Optional} Valid Code Regions below
@@ -378,7 +391,6 @@ public class StreamEndpoint extends AbstractTwitchEndpoint {
 	@Unofficial
 	public Boolean isStreamOnFrontpage(Stream stream) {
 		List<String> regions = Arrays.asList("", "");
-
 
 
 		return false;

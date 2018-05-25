@@ -12,6 +12,6 @@ import lombok.Data;
 @Data
 public class Emoticon {
 	private Long id;
- 	private Long emoticonSet;
+	private Long emoticonSet;
 	private String code;
 }

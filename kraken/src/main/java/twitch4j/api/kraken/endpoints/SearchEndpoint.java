@@ -1,15 +1,19 @@
 package twitch4j.api.kraken.endpoints;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.*;
-import twitch4j.api.util.rest.QueryRequestInterceptor;
-
-import javax.annotation.Nullable;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.ChannelList;
+import twitch4j.api.kraken.json.Game;
+import twitch4j.api.kraken.json.GameList;
+import twitch4j.api.kraken.json.Stream;
+import twitch4j.api.kraken.json.StreamList;
+import twitch4j.api.util.rest.QueryRequestInterceptor;
 
 @Slf4j
 public class SearchEndpoint extends AbstractTwitchEndpoint {
@@ -59,7 +63,7 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param query search query
-	 * @param live Whether only games that are live should be returned. This argument is optional.
+	 * @param live  Whether only games that are live should be returned. This argument is optional.
 	 * @return A list of games matching the query.
 	 */
 	public List<Game> getGames(String query, @Nullable Boolean live) {

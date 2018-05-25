@@ -1,11 +1,10 @@
 package twitch4j.common.auth.storage;
 
-import twitch4j.common.auth.ICredential;
-
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import twitch4j.common.auth.ICredential;
 
 public class DefaultAuthStorage implements AuthStorage {
 	private final Map<Long, ICredential> credentials = new LinkedHashMap<>();

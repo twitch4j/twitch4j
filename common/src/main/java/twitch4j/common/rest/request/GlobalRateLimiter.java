@@ -16,13 +16,12 @@
  */
 package twitch4j.common.rest.request;
 
+import java.time.Duration;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * Used to prevent requests from being sent while the bot is
@@ -34,33 +33,33 @@ import java.time.Duration;
  */
 public class GlobalRateLimiter implements Publisher<Void> {
 
-    private static final Object PERMIT = new Object();
+	private static final Object PERMIT = new Object();
 
-    private final EmitterProcessor<Object> resetNotifier = EmitterProcessor.create(false);
-    private volatile boolean isRateLimited;
-    private final Flux<Void> flux = Flux.create(sink -> sink.onRequest(l -> {
-        if (isRateLimited) {
-            resetNotifier.next().subscribe(o -> sink.complete());
-        } else {
-            sink.complete();
-        }
-    }));
+	private final EmitterProcessor<Object> resetNotifier = EmitterProcessor.create(false);
+	private volatile boolean isRateLimited;
+	private final Flux<Void> flux = Flux.create(sink -> sink.onRequest(l -> {
+		if (isRateLimited) {
+			resetNotifier.next().subscribe(o -> sink.complete());
+		} else {
+			sink.complete();
+		}
+	}));
 
-    /**
-     * Prevents the rate limiter from completing subscriptions for the given duration.
-     *
-     * @param duration The duration to prevent completions for.
-     */
-    void rateLimitFor(Duration duration) {
-        isRateLimited = true;
-        Mono.delay(duration).subscribe(l -> {
-            isRateLimited = false;
-            resetNotifier.onNext(PERMIT);
-        });
-    }
+	/**
+	 * Prevents the rate limiter from completing subscriptions for the given duration.
+	 *
+	 * @param duration The duration to prevent completions for.
+	 */
+	void rateLimitFor(Duration duration) {
+		isRateLimited = true;
+		Mono.delay(duration).subscribe(l -> {
+			isRateLimited = false;
+			resetNotifier.onNext(PERMIT);
+		});
+	}
 
-    @Override
-    public void subscribe(Subscriber<? super Void> s) {
-        flux.subscribe(s);
-    }
+	@Override
+	public void subscribe(Subscriber<? super Void> s) {
+		flux.subscribe(s);
+	}
 }

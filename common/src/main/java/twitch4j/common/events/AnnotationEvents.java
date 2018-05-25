@@ -1,13 +1,12 @@
 package twitch4j.common.events;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.Exceptions;
-
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.Exceptions;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,9 +32,9 @@ public class AnnotationEvents<E extends Event> {
 	 * Registers a single event listener.
 	 *
 	 * @param eventListenerClass The class of the listener.
-	 * @param eventListener The class instance of the listener.
+	 * @param eventListener      The class instance of the listener.
 	 */
-	@SuppressWarnings({"unchecked","rawtypes"})
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void registerListener(Class<?> eventListenerClass, Object eventListener) {
 		// for each method on the event listener class
 		for (Method method : eventListenerClass.getMethods()) {

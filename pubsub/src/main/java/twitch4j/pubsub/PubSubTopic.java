@@ -1,10 +1,13 @@
 package twitch4j.pubsub;
 
-import lombok.*;
-import lombok.experimental.Accessors;
-
 import java.util.Collections;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

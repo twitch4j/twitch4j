@@ -1,8 +1,7 @@
 package twitch4j.api.kraken.json;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class Communities {

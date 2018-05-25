@@ -1,6 +1,6 @@
 dependencies {
-	compile project(":core"), {
-		exclude module: 'api-kraken'
-	}
+	compile project(":core")
 	compile "org.springframework.boot:spring-boot-starter-webflux:2.0.2.RELEASE"
+	compile "ch.qos.logback:logback-classic:$logback_version"
+	compile "com.beust:jcommander:1.72"
 }

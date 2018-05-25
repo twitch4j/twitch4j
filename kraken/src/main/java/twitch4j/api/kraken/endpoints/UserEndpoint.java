@@ -1,5 +1,12 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
@@ -7,16 +14,20 @@ import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.enums.SortBy;
 import twitch4j.api.kraken.exceptions.ChannelCredentialMissingException;
 import twitch4j.api.kraken.exceptions.ScopeMissingException;
-import twitch4j.api.kraken.json.*;
+import twitch4j.api.kraken.json.Block;
+import twitch4j.api.kraken.json.BlockList;
+import twitch4j.api.kraken.json.Emote;
+import twitch4j.api.kraken.json.EmoteSets;
+import twitch4j.api.kraken.json.Follow;
+import twitch4j.api.kraken.json.FollowList;
+import twitch4j.api.kraken.json.User;
+import twitch4j.api.kraken.json.UserList;
+import twitch4j.api.kraken.json.UserSubscriptionCheck;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.enums.Sort;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class UserEndpoint extends AbstractTwitchEndpoint {
@@ -134,7 +145,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Emote> getUserEmotes(ICredential credential) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_SUBSCRIPTIONS));
+			checkScopePermission(credential.scopes(), Scope.USER_SUBSCRIPTIONS);
 			// Endpoint
 			String requestUrl = String.format("/users/%s/emotes", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -164,13 +175,13 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Checks if a specified user is subscribed to a specified channel.
 	 * Requires Scope: user_subscriptions
 	 *
-	 * @param credential    UserId of the user.
-	 * @param channelId ChannelId of the channel you are checking against.
+	 * @param credential UserId of the user.
+	 * @param channelId  ChannelId of the channel you are checking against.
 	 * @return Optional of Type UserSubscriptionCheck. Is only present, when the user is subscribed.
 	 */
 	public Optional<UserSubscriptionCheck> getUserSubcriptionCheck(ICredential credential, Long channelId) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_SUBSCRIPTIONS));
+			checkScopePermission(credential.scopes(), Scope.USER_SUBSCRIPTIONS);
 			// Endpoint
 			String requestUrl = String.format("/users/%s/subscriptions/%s", credential.userId(), channelId);
 			RestTemplate restTemplate = this.restTemplate;
@@ -282,7 +293,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean followChannel(ICredential credential, Long channelId, @Nullable Boolean notifications) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_FOLLOWS_EDIT));
+			checkScopePermission(credential.scopes(), Scope.USER_FOLLOWS_EDIT);
 			// Endpoint
 			String requestUrl = String.format("/users/%s/follows/channels/%s", credential.userId(), channelId);
 			RestTemplate restTemplate = this.restTemplate;
@@ -314,7 +325,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean unfollowChannel(ICredential credential, Long channelId) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_FOLLOWS_EDIT));
+			checkScopePermission(credential.scopes(), Scope.USER_FOLLOWS_EDIT);
 			// Endpoint
 			String requestUrl = String.format("/users/%s/follows/channels/%s", credential.userId(), channelId);
 			RestTemplate restTemplate = this.restTemplate;
@@ -346,7 +357,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Block> getUserBlockList(ICredential credential, @Nullable Integer limit, @Nullable Integer offset) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_READ));
+			checkScopePermission(credential.scopes(), Scope.USER_BLOCKS_READ);
 
 			// Endpoint
 			String requestUrl = String.format("/users/%s/blocks", credential.userId());
@@ -381,13 +392,13 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Blocks a user; that is, adds a specified target user to the blocks list of a specified source user.
 	 * Requires Scope: user_blocks_edit
 	 *
-	 * @param credential   	Credential
-	 * @param user 			Target user
+	 * @param credential Credential
+	 * @param user       Target user
 	 * @return todo
 	 */
 	public Boolean blockUser(ICredential credential, User user) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_EDIT));
+			checkScopePermission(credential.scopes(), Scope.USER_BLOCKS_EDIT);
 
 			// Endpoint
 			String requestUrl = String.format("/users/%s/blocks/%s", credential.userId(), user.getId());
@@ -413,13 +424,13 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 	 * Unblocks a user; that is, deletes a specified target user from the blocks list of a specified source user.
 	 * Requires Scope: user_blocks_edit
 	 *
-	 * @param credential   Credential
-	 * @param user 			Target user
+	 * @param credential Credential
+	 * @param user       Target user
 	 * @return todo
 	 */
 	public Boolean unblockUser(ICredential credential, User user) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.USER_BLOCKS_EDIT));
+			checkScopePermission(credential.scopes(), Scope.USER_BLOCKS_EDIT);
 
 			// Endpoint
 			String requestUrl = String.format("/users/%s/blocks/%s", credential.userId(), user.getId());
@@ -438,31 +449,5 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 
 			return false;
 		}
-	}
-
-	public UserChat getUserChatByUserName(String username) {
-		Long id = getUserIdByUserName(username);
-		return getUserChat(id);
-	}
-
-	public UserChat getUserChat(Long userId) {
-		// Validate Arguments
-		Assert.notNull(userId, "Please provide a User ID!");
-
-		// Endpoint
-		String reqUrl = String.format("/users/%s/chat", userId);
-
-		// REST Request
-		try {
-			if (!restObjectCache.containsKey(reqUrl)) {
-				UserChat responseObject = this.restTemplate.getForObject(reqUrl, UserChat.class);
-				restObjectCache.put(reqUrl, responseObject);
-			}
-		} catch (Exception ex) {
-			log.error("Request failed: " + ex.getMessage());
-			log.trace(ExceptionUtils.getStackTrace(ex));
-		}
-
-		return (UserChat) restObjectCache.get(reqUrl);
 	}
 }

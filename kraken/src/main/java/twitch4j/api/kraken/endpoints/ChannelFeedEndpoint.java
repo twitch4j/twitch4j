@@ -1,5 +1,8 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,10 +15,6 @@ import twitch4j.api.kraken.json.ChannelFeedPost;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
@@ -33,10 +32,10 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets posts from a specified channel feed.
 	 *
-	 * @param channelId    The channel id, which the posts should be retrieved from.
-	 * @param limit        Maximum number of most-recent objects to return. Default: 10. Maximum: 100.
-	 * @param cursor       Tells the server where to start fetching the next set of results in a multi-page response.
-	 * @param comments Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
+	 * @param channelId The channel id, which the posts should be retrieved from.
+	 * @param limit     Maximum number of most-recent objects to return. Default: 10. Maximum: 100.
+	 * @param cursor    Tells the server where to start fetching the next set of results in a multi-page response.
+	 * @param comments  Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
 	 * @return posts from a specified channel feed.
 	 */
 	public List<ChannelFeedPost> getFeedPosts(Long channelId, @Nullable Integer limit, @Nullable String cursor, @Nullable Integer comments) {
@@ -69,9 +68,9 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets a specified post from a specified channel feed.
 	 *
-	 * @param channelId		The channel id, which the posts should be retrieved from.
-	 * @param postId		The post id.
-	 * @param limit			Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
+	 * @param channelId The channel id, which the posts should be retrieved from.
+	 * @param postId    The post id.
+	 * @param limit     Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
 	 * @return a specified post from a specified channel feed.
 	 */
 	public ChannelFeedPost getFeedPost(Long channelId, String postId, Integer limit) {
@@ -100,13 +99,13 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 * <p>
 	 * Requires the Twitch *channel_feed_edit* Scope.
 	 *
-	 * @param credential  	OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param message 		message to feed
-	 * @param share 		Share to Twitter if is connected
+	 * @param credential OAuth token for a Twitch user (that as 2fa enabled)
+	 * @param message    message to feed
+	 * @param share      Share to Twitter if is connected
 	 */
 	public void createFeedPost(ICredential credential, String message, Boolean share) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_FEED_EDIT));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_FEED_EDIT);
 
 			// Endpoint
 			String requestUrl = String.format("/feed/%s/posts", credential.userId());

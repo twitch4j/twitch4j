@@ -1,21 +1,37 @@
 package twitch4j.common.auth;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
 import twitch4j.Configuration;
 import twitch4j.common.json.auth.AccessToken;
 import twitch4j.common.json.auth.ValidAccess;
-import twitch4j.common.rest.http.client.SimpleHttpClient;
 import twitch4j.common.rest.request.Router;
 import twitch4j.common.rest.route.Route;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 @AllArgsConstructor
 public class AuthService {
-	private final Router router = new Router(SimpleHttpClient.builder().baseUrl("https://id.twitch.tv/oauth2").build());
 	private final Configuration configuration;
+	private final Router router;
+
+	public Mono<String> createRedirectUri(String redirectUri, @Nullable List<Scope> scopes) {
+		Objects.requireNonNull(redirectUri, "redirect_uri");
+
+		return Mono.fromSupplier(() -> {
+			StringBuilder sb = new StringBuilder(router.getHttpClient().getBaseUrl())
+					.append("/authorize")
+					.append("?client_id=").append(configuration.getClientId())
+					.append("&redirect_uri=").append(redirectUri)
+					.append("&response_type=code")
+					.append("&scope=").append(Scope.join((scopes == null || scopes.isEmpty()) ? configuration.getDefaultScopes() : scopes));
+
+			return sb.toString();
+		});
+	}
 
 	Mono<ValidAccess> validate(String accessToken) {
 		return Route.get("/validate", ValidAccess.class)

@@ -12,6 +12,8 @@ public abstract class IModule {
 	private final Version minimalVersion;
 
 	public abstract boolean init();
+
 	public abstract boolean stop();
+
 	public abstract boolean reload();
 }

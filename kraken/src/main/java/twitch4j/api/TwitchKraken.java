@@ -3,7 +3,18 @@ package twitch4j.api;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.endpoints.*;
+import twitch4j.api.kraken.endpoints.ChannelEndpoint;
+import twitch4j.api.kraken.endpoints.ChatEndpoint;
+import twitch4j.api.kraken.endpoints.CommunityEndpoint;
+import twitch4j.api.kraken.endpoints.GameEndpoint;
+import twitch4j.api.kraken.endpoints.IngestEndpoint;
+import twitch4j.api.kraken.endpoints.KrakenEndpoint;
+import twitch4j.api.kraken.endpoints.SearchEndpoint;
+import twitch4j.api.kraken.endpoints.StreamEndpoint;
+import twitch4j.api.kraken.endpoints.TeamEndpoint;
+import twitch4j.api.kraken.endpoints.UnofficialEndpoint;
+import twitch4j.api.kraken.endpoints.UserEndpoint;
+import twitch4j.api.kraken.endpoints.VideoEndpoint;
 
 @Getter
 @Deprecated
@@ -11,7 +22,6 @@ import twitch4j.api.kraken.endpoints.*;
 public class TwitchKraken {
 	private final ChatEndpoint chatEndpoint;
 	private final UnofficialEndpoint unofficialEndpoint;
-	private final TMIEndpoint tmiEndpoint;
 	private final VideoEndpoint videoEndpoint;
 	private final TeamEndpoint teamEndpoint;
 	private final SearchEndpoint searchEndpoint;
@@ -26,7 +36,6 @@ public class TwitchKraken {
 	public TwitchKraken(RestTemplate restTemplate) {
 		this.chatEndpoint = new ChatEndpoint(restTemplate);
 		this.unofficialEndpoint = new UnofficialEndpoint(restTemplate);
-		this.tmiEndpoint = new TMIEndpoint(restTemplate);
 		this.videoEndpoint = new VideoEndpoint(restTemplate);
 		this.teamEndpoint = new TeamEndpoint(restTemplate);
 		this.searchEndpoint = new SearchEndpoint(restTemplate);

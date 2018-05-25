@@ -1,13 +1,12 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.json.Ingest;
 import twitch4j.api.kraken.json.IngestList;
-
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class IngestEndpoint extends AbstractTwitchEndpoint {

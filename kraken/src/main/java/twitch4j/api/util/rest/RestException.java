@@ -1,10 +1,9 @@
 package twitch4j.api.util.rest;
 
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import twitch4j.common.json.ErrorResponse;
-
-import java.io.IOException;
 
 @Getter
 @AllArgsConstructor

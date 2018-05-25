@@ -13,5 +13,5 @@ import lombok.Data;
 public class ErrorResponse {
 	private String error;
 	private Integer status;
-    private String message;
+	private String message;
 }

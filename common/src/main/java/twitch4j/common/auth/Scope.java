@@ -1,9 +1,10 @@
 package twitch4j.common.auth;
 
-import lombok.RequiredArgsConstructor;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify
@@ -116,6 +117,7 @@ public enum Scope {
 
 	/**
 	 * Get the identifier that oauth will recognize.
+	 *
 	 * @return A <code>{@link String}</code> identifier of the scope.
 	 */
 	private final String name;
@@ -127,11 +129,16 @@ public enum Scope {
 	/**
 	 * Combine <code>TwitchScopes</code> into a '+' separated <code>{@link String}</code>.
 	 * This is the required input format for twitch.tv
+	 *
 	 * @param scopes <code>{@link Scope}</code> to combine.
 	 * @return <code>{@link String}</code> representing '+' separated list of <code>{@link Scope}</code>
 	 */
 	public static String join(Scope... scopes) {
-		if (scopes.length > 0) return Stream.of(scopes).map(Scope::name)
+		return join(Arrays.asList(scopes));
+	}
+
+	public static String join(Collection<Scope> scopes) {
+		if (scopes.size() > 0) return scopes.stream().map(Scope::name)
 				.collect(Collectors.joining("+"));
 		else return "";
 	}

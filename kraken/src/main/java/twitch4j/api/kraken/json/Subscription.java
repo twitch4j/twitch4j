@@ -1,10 +1,9 @@
 package twitch4j.api.kraken.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import lombok.Data;
 import twitch4j.common.enums.SubscriptionPlan;
-
-import java.time.Instant;
 
 /**
  * Model representing a subscription.

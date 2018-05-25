@@ -1,4 +1,10 @@
 dependencies {
 	compile project(":common")
 	compile "org.java-websocket:Java-WebSocket:$websocket_version"
+//	compile "org.apache.commons:commons-lang3:$commons_lang3_version"
+	compile 'com.google.guava:guava:25.1-jre'
+
+	// Immutables
+//	compileOnly "org.immutables:value:$immutables_version"
+//	annotationProcessor "org.immutables:value:$immutables_version"
 }

@@ -1,5 +1,6 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -7,8 +8,6 @@ import twitch4j.api.kraken.json.Token;
 import twitch4j.api.kraken.json.TokenResponse;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.common.auth.ICredential;
-
-import java.util.Optional;
 
 @Slf4j
 public class KrakenEndpoint extends AbstractTwitchEndpoint {
@@ -52,9 +51,9 @@ public class KrakenEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Gets/refreshes the token
 	 *
-	 * @param grant_type Valid values: authorization_code or refresh_token.
+	 * @param grant_type   Valid values: authorization_code or refresh_token.
 	 * @param redirect_url Redirect url.
-	 * @param code authentication_code or refresh_token
+	 * @param code         authentication_code or refresh_token
 	 * @return {@link ICredential} data on {@link Optional} container class
 	 * @deprecated use {@link twitch4j.common.auth.CredentialManager#authorize(String)} and put only authorization code
 	 */

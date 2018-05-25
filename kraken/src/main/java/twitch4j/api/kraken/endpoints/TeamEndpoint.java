@@ -1,15 +1,14 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.json.Team;
 import twitch4j.api.kraken.json.TeamList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class TeamEndpoint extends AbstractTwitchEndpoint {

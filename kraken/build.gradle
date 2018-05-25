@@ -4,6 +4,7 @@ dependencies {
 	compile "org.springframework:spring-web:$spring_framework"
 	compile "org.springframework.social:spring-social-core:$spring_social"
 
-	compile "net.jodah:expiringmap:$expriringMap_version"// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	compile "net.jodah:expiringmap:$expriringMap_version"
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	compile "org.apache.commons:commons-lang3:$commons_lang3_version"
 }

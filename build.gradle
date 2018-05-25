@@ -40,9 +40,19 @@ allprojects {
 subprojects {
 	apply plugin: "java"
 	apply plugin: "net.ltgt.apt"
+
 	apply from: "${rootDir}/test.gradle"
 	apply from: "${rootDir}/deploy.gradle"
-// Dependencies
+
+	sourceSets {
+		main {
+			java {
+				srcDirs = ['build/generated/source/apt/main', 'src/main/java']
+			}
+		}
+	}
+
+	// Dependencies
 	dependencies {
 
 		// Logging

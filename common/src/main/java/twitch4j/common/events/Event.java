@@ -1,11 +1,12 @@
 package twitch4j.common.events;
 
-import lombok.Data;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class Event {
 	private Instant createdAt = Instant.now();
 	private String eventId = UUID.randomUUID().toString();

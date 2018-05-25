@@ -1,9 +1,8 @@
 package twitch4j.common.json.auth;
 
+import java.util.Set;
 import lombok.Data;
 import twitch4j.common.auth.Scope;
-
-import java.util.Set;
 
 @Data
 public class AccessToken {

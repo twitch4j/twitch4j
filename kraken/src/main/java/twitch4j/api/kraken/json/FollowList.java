@@ -1,12 +1,8 @@
 package twitch4j.api.kraken.json;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * Model representing a list of followers.
@@ -16,7 +12,7 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class FollowList extends AbstractResultList {
 	/**
 	 * Data

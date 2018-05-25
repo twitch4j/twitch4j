@@ -3,22 +3,28 @@ package twitch4j.pubsub;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.channels.NotYetConnectedException;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
 import twitch4j.common.events.EventManager;
-import twitch4j.pubsub.event.*;
+import twitch4j.pubsub.event.Reconnect;
+import twitch4j.pubsub.event.TopicListen;
 import twitch4j.pubsub.exceptions.PubSubListeningException;
 import twitch4j.pubsub.json.PubSubMessage;
-
-import java.io.IOException;
-import java.net.URI;
-import java.nio.channels.NotYetConnectedException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class TwitchPubSub extends WebSocketClient {
@@ -62,7 +68,8 @@ public class TwitchPubSub extends WebSocketClient {
 	@SuppressWarnings("unchecked")
 	public void onMessage(String message) {
 		try {
-			Map<String, String> response = mapper.readValue(message, new TypeReference<Map<String, String>>() {});
+			Map<String, String> response = mapper.readValue(message, new TypeReference<Map<String, String>>() {
+			});
 			if (response.containsKey("type")) {
 				switch (response.get("type")) {
 					case "RECONNECT":

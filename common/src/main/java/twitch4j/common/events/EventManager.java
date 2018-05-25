@@ -1,5 +1,9 @@
 package twitch4j.common.events;
 
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.EmitterProcessor;
@@ -8,12 +12,6 @@ import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @Getter

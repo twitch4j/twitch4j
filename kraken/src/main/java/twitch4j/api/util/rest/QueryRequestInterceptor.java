@@ -1,12 +1,11 @@
 package twitch4j.api.util.rest;
 
+import java.io.IOException;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.social.support.HttpRequestDecorator;
-
-import java.io.IOException;
 
 /**
  * Spring Rest: Query Request Interceptor
@@ -33,7 +32,7 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 	/**
 	 * Class Constructor
 	 *
-	 * @param key Name of the query parameter to add.
+	 * @param key   Name of the query parameter to add.
 	 * @param value Value of the query parameter to add.
 	 */
 	public QueryRequestInterceptor(String key, String value) {
@@ -45,7 +44,7 @@ public class QueryRequestInterceptor implements ClientHttpRequestInterceptor {
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 		HttpRequestDecorator httpRequest = new HttpRequestDecorator(request);
 
-		if(key != null && value != null) {
+		if (key != null && value != null) {
 			httpRequest.addParameter(key, value);
 		}
 

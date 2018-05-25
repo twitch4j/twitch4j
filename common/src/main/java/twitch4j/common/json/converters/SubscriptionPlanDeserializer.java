@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import twitch4j.common.enums.SubscriptionPlan;
-
 import java.io.IOException;
+import twitch4j.common.enums.SubscriptionPlan;
 
 public class SubscriptionPlanDeserializer extends JsonDeserializer<SubscriptionPlan> {
 	@Override

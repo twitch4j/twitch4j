@@ -1,14 +1,12 @@
 package twitch4j.common.events;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class ListenerEvents<E extends Event> {
 
 	@SuppressWarnings("unchecked")
 	private <X extends IListener<E>> Class<E> getSubtype(Class<X> listenerClass) {
-		return (Class<E>) ((ParameterizedType) listenerClass.getGenericInterfaces()[0]).getActualTypeArguments()[0];
+		return (Class<E>) ((Class<IListener<E>>) listenerClass).getMethods()[0].getParameterTypes()[0];
 	}
 
 	public synchronized void dispatch(E event) {

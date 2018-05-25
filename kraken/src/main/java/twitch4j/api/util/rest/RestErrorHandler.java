@@ -3,11 +3,10 @@ package twitch4j.api.util.rest;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import twitch4j.common.json.ErrorResponse;
-
-import java.io.IOException;
 
 /**
  * Rest Error Handler

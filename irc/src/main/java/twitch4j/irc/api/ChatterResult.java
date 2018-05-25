@@ -1,4 +1,4 @@
-package twitch4j.api.kraken.json.tmi;
+package twitch4j.irc.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

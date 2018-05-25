@@ -2,7 +2,7 @@
 * [Philipp Heuer](https://github.com/PhilippHeuer)
 
 ## Contributors
-* [Damian Staszewski](http://github.com/stachu540) - Twitch Message Interface
+* [Damian Staszewski](http://github.com/stachu540)
 
 ## Credits
 * @urgrue - The twitch data models from [Java Twitch Api Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper)

@@ -1,15 +1,19 @@
 package twitch4j.api.kraken.endpoints;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.*;
+import twitch4j.api.kraken.json.ChatRoom;
+import twitch4j.api.kraken.json.ChatRoomList;
+import twitch4j.api.kraken.json.Emote;
+import twitch4j.api.kraken.json.EmoteSets;
+import twitch4j.api.kraken.json.Emoticon;
+import twitch4j.api.kraken.json.EmoticonList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 public class ChatEndpoint extends AbstractTwitchEndpoint {
@@ -26,7 +30,7 @@ public class ChatEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Get a channel's chat rooms based from the authenticated channel's perspective. We need the authenticated channel
 	 * ID here because the API needs to know with what respect to return a channel's chat rooms from.
-	 *
+	 * <p>
 	 * For example, if you own the channel, you'll get all the chat rooms (subscriber only, mod only, etc.).
 	 * However, if you're only a viewer of that channel, you'll only get the rooms that you can see (not sub only, etc.).
 	 *
@@ -45,7 +49,7 @@ public class ChatEndpoint extends AbstractTwitchEndpoint {
 			return restTemplate.getForObject(requestUrl, ChatRoomList.class).getRooms();
 		} catch (Exception ex) {
 			log.error("Request failed: " + ex.getMessage());
-			log.trace( ExceptionUtils.getStackTrace(ex));
+			log.trace(ExceptionUtils.getStackTrace(ex));
 			return Collections.emptyList();
 		}
 	}

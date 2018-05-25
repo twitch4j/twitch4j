@@ -1,14 +1,12 @@
 package twitch4j.common.auth;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashSet;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import reactor.core.publisher.Mono;
 import twitch4j.common.json.auth.ValidAccess;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.LinkedHashSet;
 
 @Setter
 @Accessors(fluent = true, chain = true)

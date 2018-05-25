@@ -1,17 +1,13 @@
 package twitch4j.api.kraken.endpoints;
 
-import lombok.Getter;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.exceptions.ScopeMissingException;
 import twitch4j.common.auth.Scope;
-
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 abstract class AbstractTwitchEndpoint {
@@ -34,14 +30,12 @@ abstract class AbstractTwitchEndpoint {
 	/**
 	 * Check that the api has the required scopes before making a request
 	 *
-	 * @param scopes         Scopes, we have access to.
-	 * @param requiredScopes Scopes, we want to access.
+	 * @param scopes        Scopes, we have access to.
+	 * @param requiredScope Scope, we want to access.
 	 */
-	protected void checkScopePermission(Collection<Scope> scopes, Collection<Scope> requiredScopes) throws ScopeMissingException {
-		for (Scope requiredScope : requiredScopes) {
-			if (!scopes.contains(requiredScope)) {
-				throw new ScopeMissingException(requiredScope);
-			}
+	protected void checkScopePermission(Collection<Scope> scopes, Scope requiredScope) throws ScopeMissingException {
+		if (!scopes.contains(requiredScope)) {
+			throw new ScopeMissingException(requiredScope);
 		}
 	}
 

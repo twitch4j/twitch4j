@@ -1,34 +1,44 @@
 package twitch4j.api.kraken.endpoints;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import twitch4j.api.kraken.enums.BroadcastType;
 import twitch4j.api.kraken.enums.VideoSort;
 import twitch4j.api.kraken.exceptions.ChannelCredentialMissingException;
 import twitch4j.api.kraken.exceptions.ScopeMissingException;
-import twitch4j.api.kraken.json.*;
+import twitch4j.api.kraken.json.Channel;
+import twitch4j.api.kraken.json.Commercial;
+import twitch4j.api.kraken.json.Communities;
+import twitch4j.api.kraken.json.Community;
+import twitch4j.api.kraken.json.Follow;
+import twitch4j.api.kraken.json.FollowList;
+import twitch4j.api.kraken.json.Subscription;
+import twitch4j.api.kraken.json.SubscriptionList;
+import twitch4j.api.kraken.json.Team;
+import twitch4j.api.kraken.json.TeamList;
+import twitch4j.api.kraken.json.User;
+import twitch4j.api.kraken.json.UserList;
+import twitch4j.api.kraken.json.Video;
+import twitch4j.api.kraken.json.VideoList;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
+import twitch4j.common.enums.CommercialType;
 import twitch4j.common.enums.Sort;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class ChannelEndpoint extends AbstractTwitchEndpoint {
-
-	/**
-	 * Commercial Lengths
-	 */
-	private final List<Integer> validCommercialLengths = Arrays.asList(30, 60, 90, 120, 150, 180);
 
 	/**
 	 * Channel Endpoint
@@ -73,7 +83,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Channel getChannel(ICredential credential) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_READ));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_READ);
 
 			// Endpoint
 			String requestUrl = "/channel";
@@ -107,15 +117,16 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<User> getEditors(ICredential credential) {
 		// Endpoint
-		Channel channel = getChannel(credential);
-		String requestUrl = "/channels/" + channel.getId() + "/editors";
-		RestTemplate restTemplate = this.restTemplate;
+		try {
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_EDITOR);
+			Channel channel = getChannel(credential);
+			String requestUrl = "/channels/" + channel.getId() + "/editors";
+			RestTemplate restTemplate = this.restTemplate;
 
-		// Parameters
-		restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
+			// Parameters
+			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
 
 		// REST Request
-		try {
 			UserList responseObject = restTemplate.getForObject(requestUrl, UserList.class);
 
 			return responseObject.getUsers();
@@ -138,7 +149,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public List<Follow> getFollowers(Long channelId, @Nullable Integer limit, @Nullable String cursor, @Nullable Sort direction) {
 		// Endpoint
-		String requestUrl = String.format("/channels/%s/follows",  channelId);
+		String requestUrl = String.format("/channels/%s/follows", channelId);
 
 		// parameters
 		List<String> query = new ArrayList<>();
@@ -162,7 +173,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			FollowList responseObject = restTemplate.getForObject(requestUrl, FollowList.class);
 
 			// Provide the Follow with info about the channel
-			for(Follow f : responseObject.getFollows()) f.setChannel(getChannel(channelId));
+			for (Follow f : responseObject.getFollows()) f.setChannel(getChannel(channelId));
 
 			return responseObject.getFollows();
 		} catch (Exception ex) {
@@ -214,14 +225,14 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * This is not related to the user messages, subscriptions are visible immediately.
 	 * Requires Scope: channel_subscriptions
 	 *
-	 * @param limit     Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
-	 * @param offset    Object offset for pagination of results. Default: 0.
-	 * @param order		Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: asc.
+	 * @param limit  Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param offset Object offset for pagination of results. Default: 0.
+	 * @param order  Direction of sorting. Valid values: asc (oldest first), desc (newest first). Default: asc.
 	 * @return todo
 	 */
 	public List<Subscription> getSubscriptions(ICredential credential, @Nullable Integer limit, @Nullable Integer offset, @Nullable Sort order) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_SUBSCRIPTIONS));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_SUBSCRIPTIONS);
 			// Endpoint
 			String requestUrl = String.format("/channels/%s/subscriptions", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -266,7 +277,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		Objects.requireNonNull(user, "Please provide a User!");
 
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_SUBSCRIPTIONS));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_SUBSCRIPTIONS);
 			// Endpoint
 			String requestUrl = String.format("/channels/%s/subscriptions/%s", credential.userId(), user.getId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -289,15 +300,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Gets a list of videos from a specified channel.
 	 * Requires Scope: none
 	 *
-	 * @param limit          Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
-	 * @param offset         Object offset for pagination of results. Default: 0.
+	 * @param limit         Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
+	 * @param offset        Object offset for pagination of results. Default: 0.
 	 * @param sort          Sorting order of the returned objects. Valid values: views, time. Default: time (most recent first).
-	 * @param language       Constrains the language of the videos that are returned; for example, *en,es.* Default: all languages.
+	 * @param language      Constrains the language of the videos that are returned; for example, *en,es.* Default: all languages.
 	 * @param broadcastType Constrains the type of videos returned. Valid values: (any combination of) archive, highlight, upload, Default: highlight.
 	 * @return todo
 	 */
-	// TODO: broadcast_type - Enumeric
-	// TODO: language - Locale
 	public List<Video> getVideos(Long channelId, @Nullable Integer limit, @Nullable Integer offset, @Nullable VideoSort sort, @Nullable List<Locale> language, @Nullable BroadcastType broadcastType) {
 		// Endpoint
 		String requestUrl = String.format("/channels/%s/videos", channelId);
@@ -322,9 +331,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 		// REST Request
 		try {
-			VideoList responseObject = restTemplate.getForObject(requestUrl, VideoList.class);
-
-			return responseObject.getVideos();
+			return restTemplate.getForObject(requestUrl, VideoList.class).getVideos();
 		} catch (Exception ex) {
 			log.error("Request failed: " + ex.getMessage());
 			log.trace(ExceptionUtils.getStackTrace(ex));
@@ -334,6 +341,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 // TODO: moving to TMI
 // NOTE: using `/commercial (time)` in the chat
+
 	/**
 	 * Endpoint: Start Channel Commercial
 	 * Starts a commercial (advertisement) on a specified channel. This is valid only for channels that are Twitch partners.
@@ -342,14 +350,13 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 * Valid values are 30, 60, 90, 120, 150, and 180.
 	 * Requires Scope: channel_commercial
 	 *
-	 * @param length todo
+	 * @param commercialType todo
 	 * @return todo
 	 */
-	public Commercial startCommercial(ICredential credential, Integer length) {
-		Assert.isTrue(validCommercialLengths.contains(length), "Please provide a valid length! Valid: " + validCommercialLengths.toString());
+	public Commercial startCommercial(ICredential credential, CommercialType commercialType) {
 
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_COMMERCIAL));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_COMMERCIAL);
 
 			String requestUrl = String.format("/channels/%s/commercial", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -357,7 +364,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 			// Header Parameters
 			restTemplate.getInterceptors().add(new HeaderRequestInterceptor("Authorization", String.format("OAuth %s", credential.accessToken())));
 
-			return restTemplate.postForObject(requestUrl, Collections.singletonMap("length", length), Commercial.class);
+			return restTemplate.postForObject(requestUrl, Collections.singletonMap("length", commercialType.getSeconds()), Commercial.class);
 
 		} catch (ScopeMissingException ex) {
 			throw new ChannelCredentialMissingException(credential.userId(), ex);
@@ -380,7 +387,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 	 */
 	public Boolean deleteStreamKey(ICredential credential) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_STREAM));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_STREAM);
 
 			String requestUrl = String.format("/channels/%s/stream_key", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -414,7 +421,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	public Boolean addCommunity(ICredential credential, List<Community> communities) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_EDITOR));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_EDITOR);
 
 			String requestUrl = String.format("/channels/%s/communities", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;
@@ -437,7 +444,7 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 
 	public Boolean purgeCommunities(ICredential credential) {
 		try {
-			checkScopePermission(credential.scopes(), Collections.singleton(Scope.CHANNEL_EDITOR));
+			checkScopePermission(credential.scopes(), Scope.CHANNEL_EDITOR);
 
 			String requestUrl = String.format("/channels/%s/communities", credential.userId());
 			RestTemplate restTemplate = this.restTemplate;

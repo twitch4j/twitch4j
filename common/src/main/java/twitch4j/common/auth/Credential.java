@@ -1,12 +1,10 @@
 package twitch4j.common.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
 import java.time.Instant;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
@@ -27,7 +25,7 @@ class Credential implements ICredential {
 				.append("expired_at=").append(expiredAt.toString()).append(", ")
 				.append("scopes=").append(scopes.toString()).append(", ")
 				.append("user_id=").append(userId.toString()).append(", ")
-				.append("user_name=\"").append((accessToken != null) ? "\"" + username +"\"" : "null").append("\"")
+				.append("user_name=\"").append((accessToken != null) ? "\"" + username + "\"" : "null").append("\"")
 				.append("]").toString();
 	}
 }

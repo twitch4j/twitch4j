@@ -6,10 +6,10 @@ apply plugin: "com.jfrog.bintray"
  */
 javadoc {
 	options {
-		overview = new File("${rootProject}/src/javadoc/overview.html")
+		overview = new File("${rootDir}/src/javadoc/overview.html")
 		title = "Twitch 4 Java - ${project.name} (${project.version})"
 		windowTitle = "${project.name} (${project.version})"
-		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
+		stylesheetFile = new File("${rootDir}/src/javadoc/css/style.css")
 		encoding = "UTF-8"
 	}
 }

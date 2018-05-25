@@ -1,6 +1,8 @@
 package twitch4j.common.utils;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * The Unofficial Annotation marks unofficial api endpoints.
@@ -12,4 +14,7 @@ import java.lang.annotation.Documented;
  * @since 1.0
  */
 @Documented
-public @interface Unofficial {}
+@Retention(RetentionPolicy.SOURCE)
+public @interface Unofficial {
+	String source() default "https://dev.twitch.tv/";
+}
