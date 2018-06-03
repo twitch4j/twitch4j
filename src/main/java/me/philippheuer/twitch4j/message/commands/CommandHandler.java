@@ -280,7 +280,11 @@ public class CommandHandler {
 
 			// Save List to File
 			ObjectMapper mapper = new ObjectMapper();
-			mapper.writeValue(getCommandSaveFile(), commandList);
+
+			File commandSaveFile = getCommandSaveFile();
+			if (commandSaveFile != null) {
+				mapper.writeValue(commandSaveFile, commandList);
+			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
