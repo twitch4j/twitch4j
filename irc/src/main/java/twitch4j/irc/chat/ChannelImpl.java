@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import twitch4j.common.auth.Scope;
 import twitch4j.irc.TwitchMessageInterface;
 import twitch4j.irc.chat.moderations.EditorImpl;
 import twitch4j.irc.chat.moderations.IEditor;

@@ -6,7 +6,6 @@ import reactor.core.publisher.Mono;
 import twitch4j.Configuration;
 import twitch4j.common.rest.request.Router;
 import twitch4j.common.rest.route.Route;
-import twitch4j.irc.api.Chatter;
 import twitch4j.irc.api.ChatterResult;
 import twitch4j.irc.api.UserChat;
 
@@ -30,7 +29,7 @@ public class MessageInterfaceAPI {
 		// Validate Arguments
 		Objects.requireNonNull(userId, "Please provide a User ID!");
 
-		Route<UserChat> route =  Route.get(String.format("/users/%s/chat", userId), UserChat.class);
+		Route<UserChat> route = Route.get(String.format("/users/%s/chat", userId), UserChat.class);
 
 		return route.newRequest()
 				.header("Client-ID", configuration.getClientId())

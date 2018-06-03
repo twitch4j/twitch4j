@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
 import twitch4j.common.IBotCredential;
-import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.enums.SubscriptionPlan;
 import twitch4j.common.json.converters.InstantClockDeserializer;

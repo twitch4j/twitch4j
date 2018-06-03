@@ -45,7 +45,7 @@ public class Runner {
 								response.status(HttpResponseStatus.FORBIDDEN)
 										.sendString(Mono.just(query.parameters().get("error").get(0))).then();
 							} else if (query.parameters().isEmpty()) {
-								client.getCredentialManager().getService().createRedirectUri(query.uri(),null);
+								client.getCredentialManager().getService().createRedirectUri(query.uri(), null);
 							}
 							Mono<ICredential> credential = client.getCredentialManager().authorize(query.parameters().get("code").get(0));
 							Mono<String> msg = credential.map(cred -> "Welcome " + cred.username());

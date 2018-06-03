@@ -7,8 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import twitch4j.irc.api.UserChat;
 import twitch4j.irc.TwitchMessageInterface;
 import twitch4j.irc.exceptions.ChannelNotFoundException;
 import twitch4j.irc.exceptions.UserNotFoundException;
@@ -36,7 +34,7 @@ public class ChannelCache {
 		this.tmi.getApi().getChatters(channelName.toLowerCase())
 				.subscribe(result -> {
 					channel.setRateLimiter(RateLimiter.channelLimit(result.getChatters()
-							.getModerators().contains(tmi.getConfiguration().getBotCredentials().username()),
+									.getModerators().contains(tmi.getConfiguration().getBotCredentials().username()),
 							tmi.getConfiguration().getBotCredentials().isKnownBot(),
 							this.tmi.getConfiguration().getBotCredentials().isVerified()));
 					if (!channelExist(channel)) {

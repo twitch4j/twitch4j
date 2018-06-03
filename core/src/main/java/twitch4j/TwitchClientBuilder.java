@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import twitch4j.api.TwitchKraken;
 import twitch4j.common.BotCredentialImpl;
 import twitch4j.common.auth.AuthService;
 import twitch4j.common.auth.ICredential;
@@ -17,7 +16,6 @@ import twitch4j.common.events.EventManager;
 import twitch4j.common.events.EventSubscriber;
 import twitch4j.common.events.IListener;
 import twitch4j.irc.MessageInterfaceAPI;
-import twitch4j.irc.api.UserChat;
 import twitch4j.pubsub.PubSubTopic;
 
 @Setter

@@ -3,7 +3,6 @@ package twitch4j.common;
 import java.time.Instant;
 import java.util.Set;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
@@ -23,6 +22,7 @@ public class BotCredentialImpl implements IBotCredential {
 	private final boolean knownBot;
 	@Accessors(fluent = false)
 	private final boolean verified;
+
 	public BotCredentialImpl(ICredential credential, boolean knownBot, boolean verified) {
 		this.accessToken = credential.accessToken();
 		this.refreshToken = credential.refreshToken();
