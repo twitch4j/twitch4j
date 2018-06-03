@@ -34,7 +34,7 @@ public abstract class Command {
 	/**
 	 * Get aliases of command
 	 */
-	protected String[] commandAliases;
+	protected String[] commandAliases = new String[] {};
 
 	/**
 	 * Category of the Command
