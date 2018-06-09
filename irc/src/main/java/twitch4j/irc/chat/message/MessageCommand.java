@@ -1,0 +1,32 @@
+package twitch4j.irc.chat.message;
+
+public enum MessageCommand {
+	UNKNOWN,
+	PRIV_MSG,
+	NOTICE,
+	PING,
+	PONG,
+	JOIN,
+	PART,
+	HOST_TARGET,
+	CLEAR_CHAT,
+	USER_STATE,
+	GLOBAL_USER_STATE,
+	NICK,
+	PASS,
+	CAP,
+	RPL_001,
+	RPL_002,
+	RPL_003,
+	RPL_004,
+	RPL_353,
+	RPL_366,
+	RPL_372,
+	RPL_375,
+	RPL_376,
+	WHISPER,
+	ROOM_STATE,
+	RECONNECT,
+	SERVER_CHANGE,
+	USER_NOTICE
+}

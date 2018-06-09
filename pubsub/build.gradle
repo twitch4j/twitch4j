@@ -1,0 +1,4 @@
+dependencies {
+	compile project(":common")
+	compile "org.java-websocket:Java-WebSocket:$websocket_version"
+}

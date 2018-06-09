@@ -63,7 +63,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>v0.10.0</version>
+    <version>RELEASE</version>
 </dependency>
 ```
 
@@ -76,9 +76,9 @@ and: (latest, you should use the actual version here)
  
 #### Twitch REST Endpoints
  - [ ] Bits
- - [ ] Channel Feed
+ - [x] Channel Feed
  - [x] Channels
- - [ ] Chat
+ - [x] Chat
  - [ ] Clips
  - [ ] Collections
  - [x] Communities (Released: 10.02.2017)
@@ -91,28 +91,34 @@ and: (latest, you should use the actual version here)
  - [x] Videos
 
 #### Twitch PubSub
- - [ ] Bits
- - [ ] Whispers
- - [ ] Subscriptions
- - [ ] Stream Status - *Unofficial*
- - [ ] Moderation Action (from specified moderator in specified channel) - *Unofficial*
+ - [x] Bits
+ - [x] Commerce
+ - [x] Whispers
+ - [x] Subscriptions
+ - [x] Follows - *Unofficial*
+ - [x] Extension Broadcast System - *Unofficial*
+ - [x] Stream Status (Video Playback) - *Unofficial*
+ - [x] Moderation Action (from specified moderator in specified channel) - *Unofficial*
  
 #### Twitch IRC (WebSocket)
- - [x] Subscriptions
- - [x] Cheers (Bits)
- - [x] `/me` interactions chat
- - [x] `/color` changer
- - [x] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
-   - [x] Ban (with reason)
-   - [x] Timeout (with reason)
-   - [x] Slow mode
-   - [x] Sub mode
-   - [x] Follow mode
-   - [x] R9K mode
-   - [x] Emote Only mode
- - [x] Channel Editor
-   - [x] Commercial
-   - [x] Host mode
+ - [ ] Raids
+ - [ ] Rituals
+ - [ ] Chat Rooms
+ - [ ] Subscriptions
+ - [ ] Cheers (Bits)
+ - [ ] `/me` interactions chat
+ - [ ] `/color` changer
+ - [ ] [Moderation](https://help.twitch.tv/customer/portal/articles/659095-chat-moderation-commands)
+   - [ ] Ban (with reason)
+   - [ ] Timeout (with reason)
+   - [ ] Slow mode
+   - [ ] Sub mode
+   - [ ] Follow mode
+   - [ ] R9K mode
+   - [ ] Emote Only mode
+ - [ ] Channel Editor
+   - [ ] Commercial
+   - [ ] Host mode
 
 #### 3rd Party
 ##### [Streamlabs](https://streamlabs.com/)
@@ -141,13 +147,14 @@ Just some simple examples, visit the [WIKI](https://github.com/PhilippHeuer/twit
 
 ### Client Builder (Twitch Standalone)
 ```java
-TwitchClient twitchClient = TwitchClientBuilder.init()
-	.withClientId("Twitch App Id")
-	.withClientSecret("Twitch App Secret")
-	.withAutoSaveConfiguration(true)
-	.withConfigurationDirectory(new File("config"))
-	.withCredential("ixsxu9123xzmlx798xooa3f91q1e9c") // Get your token at: https://twitchapps.com/tmi/
-	.connect();
+TwitchClient twitchClient = TwitchClient.builder()
+	.clientId("<Client ID>")
+	.clientSecret("<Client Secret>")
+	.botCredentials(ICredentials.builder() // Get your access & refresh token at: https://twitchtokengenerator.com/
+		.accessToken("<Bot Access Token>")
+		.refreshToken("<Bot Refresh Token>"))
+	.redirectUri("https://localhost:8080") // use your own redirection and implement it into your servlet application. 
+	.connect(); // or .build()
 ```
 
 ### Get User Id from UserName
@@ -191,13 +198,13 @@ try {
 ```
 
 ### WIKI
-For more advanced features, check out the [WIKI](https://github.com/PhilippHeuer/twitch4j/wiki).
+For more advanced features, check out the [WIKI](https://github.com/twitch4j/twitch4j/wiki).
 
 ## Problems
 
 If you have problems using the *Twitch Java API*, then you are welcome to join the [discord server](https://discord.gg/FQ5vgW3) to talk about it.
 
-If you discover any issues/have feature requests, then please [open an issue here](https://github.com/PhilippHeuer/twitch4j/issues/new).
+If you discover any issues/have feature requests, then please [open an issue here](https://github.com/twitch4j/twitch4j/issues/new).
 
 ## License
 
