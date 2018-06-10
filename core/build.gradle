@@ -1,6 +1,17 @@
 dependencies {
+	/**
+	 * Rest API
+	 */
 	compile project(":kraken")
 	compile project(":helix")
+
+	/**
+	 * Messaging
+	 */
 	compile project(":irc")
+
+	/**
+	 * PubSub
+	 */
 	compile project(":pubsub")
 }

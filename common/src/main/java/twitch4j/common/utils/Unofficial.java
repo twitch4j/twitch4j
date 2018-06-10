@@ -16,5 +16,9 @@ import java.lang.annotation.RetentionPolicy;
 @Documented
 @Retention(RetentionPolicy.SOURCE)
 public @interface Unofficial {
+
+	/**
+	 * Source of the unofficial endpoint
+	 */
 	String source() default "https://dev.twitch.tv/";
 }

@@ -1,10 +1,14 @@
 dependencies {
+	// Common Dependencies
 	compile project(":common")
-	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
-	compile "org.springframework:spring-web:$spring_framework"
-	compile "org.springframework.social:spring-social-core:$spring_social"
 
-	compile "net.jodah:expiringmap:$expriringMap_version"
-// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compile "org.apache.commons:commons-lang3:$commons_lang3_version"
+	// Spring REST
+	compile group: 'org.springframework', name: 'spring-web'
+	compile group: 'org.springframework.social', name: 'spring-social-core'
+
+	// OkHttp
+	compile group: 'com.squareup.okhttp3', name: 'okhttp'
+
+	// Caching
+	compile group: 'net.jodah', name: 'expiringmap'
 }

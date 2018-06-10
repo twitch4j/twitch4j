@@ -1,6 +1,13 @@
 dependencies {
+	// Twitch4J Core
 	compile project(":core")
-	compile "org.springframework.boot:spring-boot-starter-webflux:2.0.2.RELEASE"
-	compile "ch.qos.logback:logback-classic:$logback_version"
-	compile "com.beust:jcommander:1.72"
+
+	// Spring WebFlux
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+
+	// Logging
+	compile group: 'ch.qos.logback', name: 'logback-classic'
+
+	// jCommander
+	compile group: 'com.beust', name: 'jcommander', version: '1.72'
 }

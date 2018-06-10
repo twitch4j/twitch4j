@@ -1,4 +1,7 @@
 dependencies {
+	// Common Dependencies
 	compile project(":common")
-	compile "org.java-websocket:Java-WebSocket:$websocket_version"
+
+	// WebSocket
+	compile group: 'org.java-websocket', name: 'Java-WebSocket'
 }

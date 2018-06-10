@@ -1,5 +1,10 @@
-apply plugin: "maven-publish"
-apply plugin: "com.jfrog.bintray"
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+/**
+ * Set project version on deployment
+ */
+project.version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "1.0.0-SNAPSHOT"
 
 /**
  * Javadoc
@@ -72,7 +77,7 @@ bintray {
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
 		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
 		licenses = ['MIT']
-		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
+		labels = ['twitch', 'kraken', 'helix', 'twitch-pubsub', 'twitch-irc' ]
 		publicDownloadNumbers = true
 		version {
 			name = String.valueOf(project.version).replace("v", "")

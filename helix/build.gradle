@@ -1,5 +1,12 @@
 dependencies {
+	/**
+	 * Common Dependencies
+	 */
 	compile project(":common")
+
+	/**
+	 * HTTP Client
+	 */
 	compile "io.projectreactor.ipc:reactor-netty"
 	compile "io.projectreactor.addons:reactor-extra"
 }

@@ -1,12 +1,18 @@
 dependencies {
-//	compile "com.squareup.okhttp3:okhttp:$okhttp_version"
-//	compile "io.reactivex.rxjava2:rxjava:$rxjava_version"
+	/**
+	 * Project Reactor
+	 */
+	compile group: 'io.projectreactor', name: 'reactor-core'
+	compileOnly group: 'io.projectreactor.ipc', name: 'reactor-netty'
+	compileOnly group: 'io.projectreactor.addons', name: 'reactor-extra'
 
-	// Reactive dependency
-	compile "io.projectreactor:reactor-core"
+	/**
+	 * Event Processing
+	 */
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.2.0'
 
-	compileOnly "io.projectreactor.ipc:reactor-netty"
-	compileOnly "io.projectreactor.addons:reactor-extra"
-	compile "com.google.code.findbugs:jsr305:$jsr305_version"
-//	compile "org.java-websocket:Java-WebSocket:$websocket_version"
+	/**
+	 * Apache Commons
+	 */
+	compile group: 'org.apache.commons', name: 'commons-lang3'
 }
