@@ -1,3 +1,7 @@
+apply plugin: "application"
+
+mainClassName = "twitch4j.Runner"
+
 dependencies {
 	// Twitch4J Core
 	compile project(":core")

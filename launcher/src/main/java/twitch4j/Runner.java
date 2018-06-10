@@ -3,6 +3,7 @@ package twitch4j;
 import com.beust.jcommander.JCommander;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import java.io.File;
 import java.time.Duration;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.server.HttpServer;
@@ -16,6 +17,10 @@ public class Runner {
 				.addObject(arguments)
 				.build()
 				.parse(args);
+		if (arguments.getConfigFile().exists() && !arguments.isEmptyRequiredParameters()) {
+			PropertyArgumentConverter.toArguments(arguments);
+		}
+
 		if (arguments.isHelp()) {
 			System.exit(0);
 		}
@@ -36,7 +41,7 @@ public class Runner {
 						.refreshToken(arguments.getBotRefreshToken())
 				).connect();
 
-		HttpServer.create(arguments.getPort()).startRouterAndAwait(
+		HttpServer.create(arguments.getServerPort()).startRouterAndAwait(
 				routesBuilder -> routesBuilder
 						.get("/**", (request, response) -> response.status(HttpResponseStatus.NOT_FOUND).send())
 						.get("/login", (request, response) -> {
@@ -55,6 +60,9 @@ public class Runner {
 					blockingNettyContext.installShutdownHook();
 					blockingNettyContext.setLifecycleTimeout(Duration.ofDays(30));
 				});
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> client.getMessageInterface().close()));
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			client.getMessageInterface().close();
+			PropertyArgumentConverter.toProperties(arguments, true);
+		}));
 	}
 }
