@@ -3,6 +3,8 @@ package twitch4j;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
+
+import com.github.philippheuer.events4j.EventManager;
 import lombok.Getter;
 import twitch4j.api.TwitchHelix;
 import twitch4j.api.TwitchKraken;
@@ -12,7 +14,6 @@ import twitch4j.common.auth.AuthService;
 import twitch4j.common.auth.CredentialManager;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.storage.AuthStorage;
-import twitch4j.common.events.EventManager;
 import twitch4j.irc.MessageInterfaceAPI;
 import twitch4j.irc.TwitchMessageInterface;
 import twitch4j.pubsub.PubSubTopic;

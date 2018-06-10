@@ -25,7 +25,6 @@ public class EditorImpl implements IEditor {
 
 	/**
 	 * @param channel
-	 * @return
 	 * @see <a href="https://help.twitch.tv/customer/portal/articles/2877820">Raids</a>
 	 */
 	@Override
@@ -34,7 +33,6 @@ public class EditorImpl implements IEditor {
 	}
 
 	/**
-	 * @return
 	 * @see <a href="https://help.twitch.tv/customer/portal/articles/2877820">Raids</a>
 	 */
 	@Override

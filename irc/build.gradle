@@ -4,4 +4,11 @@ dependencies {
 
 	// WebSocket
 	compile group: 'org.java-websocket', name: 'Java-WebSocket'
+
+	// Guava - Immutable Multimap
+	compile group: 'com.google.guava', name: 'guava', version: '25.1-jre'
+
+	// Immutables
+	compileOnly group: 'org.immutables', name: 'value'
+	annotationProcessor group: 'org.immutables', name: 'value'
 }

@@ -1,18 +1,12 @@
 dependencies {
-	/**
-	 * Project Reactor
-	 */
+	// Project Reactor
 	compile group: 'io.projectreactor', name: 'reactor-core'
 	compileOnly group: 'io.projectreactor.ipc', name: 'reactor-netty'
 	compileOnly group: 'io.projectreactor.addons', name: 'reactor-extra'
 
-	/**
-	 * Event Processing
-	 */
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.2.0'
+	// EventManager
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
-	/**
-	 * Apache Commons
-	 */
+	// Apache Commons
 	compile group: 'org.apache.commons', name: 'commons-lang3'
 }

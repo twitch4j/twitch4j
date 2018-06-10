@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import twitch4j.common.BotCredentialImpl;
@@ -12,9 +15,6 @@ import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.auth.storage.AuthStorage;
 import twitch4j.common.auth.storage.DefaultAuthStorage;
-import twitch4j.common.events.EventManager;
-import twitch4j.common.events.EventSubscriber;
-import twitch4j.common.events.IListener;
 import twitch4j.irc.MessageInterfaceAPI;
 import twitch4j.pubsub.PubSubTopic;
 
@@ -35,9 +35,7 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 
 	@Override
 	public TwitchClient.Builder addListener(Object listener) {
-		if (hasEventSubscriber(listener) || IListener.class.isAssignableFrom(listener.getClass())) {
-			listeners.add(listener);
-		}
+		listeners.add(listener);
 		return this;
 	}
 
@@ -67,8 +65,7 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 		}
 
 		EventManager eventManager = new EventManager();
-		eventManager.registerListeners(listeners);
-
+		listeners.forEach(listener -> eventManager.registerListener(listener));
 		return new TwitchClient(configuration, service, authenticationStorage, tmiApi, eventManager);
 	}
 
@@ -86,10 +83,5 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 			channels.forEach(client.getMessageInterface()::join);
 		}
 		return client;
-	}
-
-	private boolean hasEventSubscriber(Object listener) {
-		return Arrays.stream(listener.getClass().getMethods())
-				.anyMatch(m -> m.isAnnotationPresent(EventSubscriber.class));
 	}
 }

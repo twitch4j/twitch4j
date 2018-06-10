@@ -15,12 +15,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.github.philippheuer.events4j.EventManager;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
-import twitch4j.common.events.EventManager;
 import twitch4j.pubsub.event.Reconnect;
 import twitch4j.pubsub.event.TopicListen;
 import twitch4j.pubsub.exceptions.PubSubListeningException;
@@ -81,7 +82,7 @@ public class TwitchPubSub extends WebSocketClient {
 						});
 						Reconnect reconnect = new Reconnect();
 						reconnect.setPubSub(this);
-						eventManager.dispatch(reconnect);
+						eventManager.dispatchEvent(reconnect);
 						reconnect();
 						break;
 					case "RESPONSE":
@@ -95,7 +96,7 @@ public class TwitchPubSub extends WebSocketClient {
 							topicListen.setPubSub(this);
 							topicListen.setTopic(topic);
 
-							eventManager.dispatch(topicListen);
+							eventManager.dispatchEvent(topicListen);
 						}
 						break;
 					case "MESSAGE":

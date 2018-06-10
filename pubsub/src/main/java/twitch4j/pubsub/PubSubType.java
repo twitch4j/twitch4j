@@ -1,6 +1,7 @@
 package twitch4j.pubsub;
 
 import lombok.AllArgsConstructor;
+import twitch4j.common.utils.Unofficial;
 
 @AllArgsConstructor
 public enum PubSubType {

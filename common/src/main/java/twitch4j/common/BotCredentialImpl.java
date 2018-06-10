@@ -7,7 +7,6 @@ import lombok.experimental.Accessors;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 
-
 @Data
 @Accessors(fluent = true)
 public class BotCredentialImpl implements IBotCredential {
@@ -16,10 +15,11 @@ public class BotCredentialImpl implements IBotCredential {
 	private final Instant expiredAt;
 	private final Set<Scope> scopes;
 	private final String username;
-	private final long userId;
+	private final Long userId;
 
 	@Accessors(fluent = false)
 	private final boolean knownBot;
+
 	@Accessors(fluent = false)
 	private final boolean verified;
 

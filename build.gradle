@@ -24,9 +24,6 @@ allprojects {
 			// Apache Commons
 			dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 
-			// Lombok
-			dependency group: 'org.projectlombok', name: 'lombok', version: '1.16.22'
-
 			// Spring
 			// - WebFlux
 			dependency group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '2.0.2.RELEASE'
@@ -41,9 +38,19 @@ allprojects {
 			// WebSockets
 			dependency group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.3.8'
 
+			// Annotations
+			// - Nullable
+			dependency group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+			// - Getter & Setter
+			dependency group: 'org.projectlombok', name: 'lombok', version: '1.16.22'
+
 			// Utilities
+			// - EventManager
+			dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.2.0'
 			// - Expiring Map
 			dependency group: 'net.jodah', name: 'expiringmap', version: '0.5.8'
+			// - Immutables
+			dependency group: 'org.immutables', name: 'value', version: '2.6.1'
 
 			// Testing
 			dependency group: 'junit', name: 'junit', version: '4.12'
@@ -52,14 +59,17 @@ allprojects {
 		}
 	}
 
+	/**
+	 * Repositories
+	 */
 	repositories {
 		jcenter()
 		maven { url "https://dl.bintray.com/philippheuer/maven" }
 	}
 
 	// Artifact Info
-	group = "com.github.twitch4j"
-	description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
+	group = 'com.github.twitch4j'
+	description = 'This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)'
 	version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
 
 	configurations.all {
@@ -87,13 +97,16 @@ subprojects {
 		// Logging
 		compile group: 'org.slf4j', name: 'slf4j-api'
 
+		// Annotations
+		// - Nullable
+		compile group: 'com.google.code.findbugs', name: 'jsr305'
+		// - Getter & Setter
+		compileOnly group: 'org.projectlombok', name: 'lombok'
+		annotationProcessor group: 'org.projectlombok', name: 'lombok'
+
 		// Jackson
 		compile "com.fasterxml.jackson.core:jackson-databind"
 		compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
-
-		// Project Lombok for annotating processor
-		compileOnly group: 'org.projectlombok', name: 'lombok'
-		annotationProcessor group: 'org.projectlombok', name: 'lombok'
 
 		// Testing
 		testCompile group: 'junit', name: 'junit'
