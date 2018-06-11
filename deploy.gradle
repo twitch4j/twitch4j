@@ -53,7 +53,7 @@ publishing {
 			artifact sourcesJar
 			artifact javadocJar
 			groupId project.group
-			artifactId project.name.toLowerCase()
+			artifactId jar.baseName.toLowerCase()
 			version project.version
 		}
 	}

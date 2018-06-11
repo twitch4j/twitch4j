@@ -2,7 +2,10 @@
 plugins {
 	id 'idea'
 	id 'eclipse'
-	id 'com.jfrog.bintray' version '1.8.0'
+	id 'net.ltgt.apt' version '0.15'
+	id 'net.ltgt.apt-idea' version '0.15'
+	id 'com.jfrog.bintray' version '1.8.1'
+	id 'net.ltgt.apt-eclipse' version '0.15'
 	id 'io.spring.dependency-management' version '1.0.5.RELEASE'
 }
 
@@ -13,7 +16,7 @@ allprojects {
 		// BOMs
 		imports {
 			mavenBom 'com.fasterxml.jackson:jackson-bom:2.9.5'
-			mavenBom 'io.projectreactor:reactor-bom:Bismuth-SR9'
+			mavenBom 'io.projectreactor:reactor-bom:Bismuth-SR10'
 			mavenBom 'org.springframework:spring-framework-bom:5.0.6.RELEASE'
 		}
 		// Twitch4J
@@ -42,7 +45,7 @@ allprojects {
 			// - Nullable
 			dependency group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 			// - Getter & Setter
-			dependency group: 'org.projectlombok', name: 'lombok', version: '1.16.22'
+			dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.0'
 
 			// Utilities
 			// - EventManager
@@ -117,6 +120,6 @@ subprojects {
 }
 
 wrapper {
-	gradleVersion = "5.0" // newer version
-	distributionType = Wrapper.DistributionType.ALL
+	gradleVersion = "4.8" // newer version
+	distributionType = Wrapper.DistributionType.ALL // distribution type ALL
 }

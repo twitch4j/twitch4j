@@ -1,3 +1,5 @@
 rootProject.name = 'Twitch4J'
 
 include 'core', 'helix', 'kraken', 'pubsub', 'irc', 'launcher', 'common'
+
+enableFeaturePreview('STABLE_PUBLISHING')
