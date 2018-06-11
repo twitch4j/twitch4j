@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -16,13 +17,13 @@ import twitch4j.common.enums.SubscriptionPlan;
 import twitch4j.common.json.converters.InstantClockDeserializer;
 import twitch4j.common.json.converters.ScopeDeserializer;
 import twitch4j.common.json.converters.SubscriptionPlanDeserializer;
-import twitch4j.common.rest.http.EmptyReaderStrategy;
-import twitch4j.common.rest.http.EmptyWriterStrategy;
-import twitch4j.common.rest.http.FallbackReaderStrategy;
-import twitch4j.common.rest.http.JacksonReaderStrategy;
-import twitch4j.common.rest.http.JacksonWriterStrategy;
-import twitch4j.common.rest.http.client.SimpleHttpClient;
-import twitch4j.common.rest.request.Router;
+import twitch4j.stream.rest.http.EmptyReaderStrategy;
+import twitch4j.stream.rest.http.EmptyWriterStrategy;
+import twitch4j.stream.rest.http.FallbackReaderStrategy;
+import twitch4j.stream.rest.http.JacksonReaderStrategy;
+import twitch4j.stream.rest.http.JacksonWriterStrategy;
+import twitch4j.stream.rest.http.client.SimpleHttpClient;
+import twitch4j.stream.rest.request.Router;
 
 @Data
 @Setter(AccessLevel.PACKAGE)
@@ -36,19 +37,20 @@ public class Configuration {
 	@Nullable
 	private IBotCredential botCredentials;
 
-	public static Router buildRouter(String baseUrl) {
+	public static Router buildRouter(String baseUrl, Map<String, String> headers) {
 		ObjectMapper mapper = getMapper();
 
-		SimpleHttpClient httpClient = SimpleHttpClient.builder()
+		SimpleHttpClient.Builder httpClient = SimpleHttpClient.builder()
 				.baseUrl(baseUrl)
 				.readerStrategy(new JacksonReaderStrategy<>(mapper))
 				.readerStrategy(new FallbackReaderStrategy())
 				.readerStrategy(new EmptyReaderStrategy())
 				.writerStrategy(new JacksonWriterStrategy(mapper))
-				.writerStrategy(new EmptyWriterStrategy())
-				.build();
+				.writerStrategy(new EmptyWriterStrategy());
 
-		return new Router(httpClient);
+		headers.forEach(httpClient::defaultHeader);
+
+		return new Router(httpClient.build());
 	}
 
 	public static ObjectMapper getMapper() {

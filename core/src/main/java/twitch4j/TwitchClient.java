@@ -2,6 +2,8 @@ package twitch4j;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import com.github.philippheuer.events4j.EventManager;
@@ -41,7 +43,9 @@ public class TwitchClient {
 	}
 
 	private TwitchHelix buildHelixEndpoint(Configuration configuration) {
-		return new TwitchHelix(Configuration.buildRouter("https://api.twitch.tv/helix"), configuration);
+		Map<String, String> headers = new LinkedHashMap<>();
+		headers.put("User-Agent", configuration.getUserAgent());
+		return new TwitchHelix(Configuration.buildRouter("https://api.twitch.tv/helix", headers), configuration);
 	}
 
 	private TwitchKraken buildKrakenEndpoint(Configuration configuration) {

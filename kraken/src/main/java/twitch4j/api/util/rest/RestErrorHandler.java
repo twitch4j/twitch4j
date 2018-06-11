@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import java.io.IOException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import twitch4j.common.json.ErrorResponse;
+import twitch4j.stream.json.Error;
 
 /**
  * Rest Error Handler
@@ -21,7 +21,7 @@ public class RestErrorHandler implements ResponseErrorHandler {
 	public void handleError(ClientHttpResponse response) throws IOException {
 		ObjectMapper mapper = createDefaultObjectMapper();
 
-		ErrorResponse content = mapper.readValue(response.getBody(), ErrorResponse.class);
+		Error content = mapper.readValue(response.getBody(), Error.class);
 
 		if (content.getError() == null) {
 			content.setError(response.getStatusCode().getReasonPhrase());
