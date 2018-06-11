@@ -49,7 +49,7 @@ allprojects {
 
 			// Utilities
 			// - EventManager
-			dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.2.0'
+			dependency group: 'com.github.PhilippHeuer', name: 'events4j', version: 'v0.2.0'
 			// - Expiring Map
 			dependency group: 'net.jodah', name: 'expiringmap', version: '0.5.8'
 			// - Immutables
@@ -59,6 +59,8 @@ allprojects {
 			dependency group: 'junit', name: 'junit', version: '4.12'
 			dependency group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
 			dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+			dependency 'com.github.twitch4j:stream4j:master-SNAPSHOT'
 		}
 	}
 
@@ -67,7 +69,7 @@ allprojects {
 	 */
 	repositories {
 		jcenter()
-		maven { url "https://dl.bintray.com/philippheuer/maven" }
+		maven { url "https://jitpack.io" }
 	}
 
 	// Artifact Info

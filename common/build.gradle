@@ -4,8 +4,10 @@ dependencies {
 	compileOnly group: 'io.projectreactor.ipc', name: 'reactor-netty'
 	compileOnly group: 'io.projectreactor.addons', name: 'reactor-extra'
 
+	compile 'com.github.twitch4j:stream4j'
+
 	// EventManager
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
+	compile group: 'com.github.PhilippHeuer', name: 'events4j'
 
 	// Apache Commons
 	compile group: 'org.apache.commons', name: 'commons-lang3'
