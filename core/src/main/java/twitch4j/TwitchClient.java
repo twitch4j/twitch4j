@@ -45,7 +45,8 @@ public class TwitchClient {
 	private TwitchHelix buildHelixEndpoint(Configuration configuration) {
 		Map<String, String> headers = new LinkedHashMap<>();
 		headers.put("User-Agent", configuration.getUserAgent());
-		return new TwitchHelix(Configuration.buildRouter("https://api.twitch.tv/helix", headers), configuration);
+		headers.put("Client-ID", configuration.getClientId());
+		return new TwitchHelix(Configuration.buildRouter("https://api.twitch.tv/helix", headers));
 	}
 
 	private TwitchKraken buildKrakenEndpoint(Configuration configuration) {

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -13,10 +15,8 @@ import lombok.Data;
 import lombok.Setter;
 import twitch4j.common.IBotCredential;
 import twitch4j.common.auth.Scope;
-import twitch4j.common.enums.SubscriptionPlan;
-import twitch4j.common.json.converters.InstantClockDeserializer;
-import twitch4j.common.json.converters.ScopeDeserializer;
-import twitch4j.common.json.converters.SubscriptionPlanDeserializer;
+import twitch4j.common.enums.*;
+import twitch4j.common.json.converters.*;
 import twitch4j.stream.rest.http.EmptyReaderStrategy;
 import twitch4j.stream.rest.http.EmptyWriterStrategy;
 import twitch4j.stream.rest.http.FallbackReaderStrategy;
@@ -59,9 +59,15 @@ public class Configuration {
 		SimpleModule simpleModule = new SimpleModule();
 
 		// Register serialization / deserialization using Simple Module
-		simpleModule.addDeserializer(Scope.class, new ScopeDeserializer());
-		simpleModule.addDeserializer(Instant.class, new InstantClockDeserializer());
-		simpleModule.addDeserializer(SubscriptionPlan.class, new SubscriptionPlanDeserializer());
+		simpleModule.addDeserializer(BroadcasterType.class, new BroadcasterTypeDeserializer())
+				.addDeserializer(Duration.class, new DurationDeserializer())
+				.addDeserializer(Instant.class, new InstantClockDeserializer())
+				.addDeserializer(Scope.class, new ScopeDeserializer())
+				.addDeserializer(StreamType.class, new StreamTypeDeserializer())
+				.addDeserializer(SubscriptionPlan.class, new SubscriptionPlanDeserializer())
+				.addDeserializer(UserType.class, new UserTypeDeserializer())
+				.addDeserializer(VideoAccess.class, new VideoAccessDeserializer())
+				.addDeserializer(VideoType.class, new VideoTypeDeserializer());
 
 		mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
 		mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
