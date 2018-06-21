@@ -60,13 +60,12 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 
 		if (botCredential != null) {
 			ICredential botCredential = this.botCredential.build(service);
-			tmiApi.getUserChat(botCredential.userId()).subscribe(bot -> {
-				configuration.setBotCredentials(new BotCredentialImpl(botCredential, bot.isKnownBot(), bot.isVerifiedBot()));
-			});
+			tmiApi.getUserChat(botCredential.userId()).subscribe(bot ->
+					configuration.setBotCredentials(new BotCredentialImpl(botCredential, bot.isKnownBot(), bot.isVerifiedBot())));
 		}
 
 		EventManager eventManager = new EventManager();
-		listeners.forEach(listener -> eventManager.registerListener(listener));
+		listeners.forEach(eventManager::registerListener);
 		return new TwitchClient(configuration, service, authenticationStorage, tmiApi, eventManager);
 	}
 
