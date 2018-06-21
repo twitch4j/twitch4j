@@ -10,8 +10,8 @@ import reactor.core.publisher.Mono;
 import twitch4j.Configuration;
 import twitch4j.common.json.auth.AccessToken;
 import twitch4j.common.json.auth.ValidAccess;
-import twitch4j.common.rest.request.Router;
-import twitch4j.common.rest.route.Route;
+import twitch4j.stream.rest.request.Router;
+import twitch4j.stream.rest.route.Route;
 
 @AllArgsConstructor
 public class AuthService {
