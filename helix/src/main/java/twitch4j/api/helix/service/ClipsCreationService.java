@@ -1,12 +1,7 @@
 package twitch4j.api.helix.service;
 
-import jdk.nashorn.internal.objects.annotations.Getter;
-import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import twitch4j.api.helix.json.BitsLeadeboardData;
-import twitch4j.api.helix.json.ClipCreate;
-import twitch4j.api.helix.json.ClipCreated;
+import twitch4j.api.helix.model.ClipCreated;
 import twitch4j.common.auth.ICredential;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.request.TwitchRequest;

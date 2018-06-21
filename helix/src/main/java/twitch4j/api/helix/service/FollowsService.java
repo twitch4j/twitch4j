@@ -1,8 +1,8 @@
 package twitch4j.api.helix.service;
 
 import reactor.core.publisher.Mono;
-import twitch4j.api.helix.json.Follows;
-import twitch4j.api.helix.json.User;
+import twitch4j.api.helix.model.Follows;
+import twitch4j.api.helix.model.User;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.route.Route;
 

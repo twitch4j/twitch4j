@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.Channel;
-import twitch4j.api.kraken.json.ChannelList;
-import twitch4j.api.kraken.json.Game;
-import twitch4j.api.kraken.json.GameList;
-import twitch4j.api.kraken.json.Stream;
-import twitch4j.api.kraken.json.StreamList;
+import twitch4j.api.kraken.model.Channel;
+import twitch4j.api.kraken.model.ChannelList;
+import twitch4j.api.kraken.model.Game;
+import twitch4j.api.kraken.model.GameList;
+import twitch4j.api.kraken.model.Stream;
+import twitch4j.api.kraken.model.StreamList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 
 @Slf4j

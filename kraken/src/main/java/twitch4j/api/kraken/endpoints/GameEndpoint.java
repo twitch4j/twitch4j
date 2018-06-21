@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.TopGame;
-import twitch4j.api.kraken.json.TopGameList;
+import twitch4j.api.kraken.model.TopGame;
+import twitch4j.api.kraken.model.TopGameList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 
 @Slf4j

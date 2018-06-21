@@ -52,7 +52,7 @@ public class TwitchClient {
 	private TwitchKraken buildKrakenEndpoint(Configuration configuration) {
 		RestClient restClient = new RestClient("https://api.twitch.tv/kraken");
 		restClient.addInterceptor(new HeaderRequestInterceptor("Client-ID", configuration.getClientId()));
-		restClient.addInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
+		restClient.addInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+model"));
 		restClient.addInterceptor(new HeaderRequestInterceptor("User-Agent", configuration.getUserAgent()));
 
 		return new TwitchKraken(restClient.getRestTemplate(Configuration.getMapper()));

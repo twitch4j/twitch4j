@@ -9,7 +9,7 @@ import lombok.Data;
 /**
  * Model representing the chatters of a channel.
  * <p>
- * The json contains a list of moderators, staff, admins, global moderators and viewers.
+ * The model contains a list of moderators, staff, admins, global moderators and viewers.
  *
  * @author Philipp Heuer [https://github.com/PhilippHeuer]
  * @version %I%, %G%

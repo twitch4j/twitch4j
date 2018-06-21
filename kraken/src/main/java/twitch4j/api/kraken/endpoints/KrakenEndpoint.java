@@ -4,8 +4,8 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.Token;
-import twitch4j.api.kraken.json.TokenResponse;
+import twitch4j.api.kraken.model.Token;
+import twitch4j.api.kraken.model.TokenResponse;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.common.auth.ICredential;
 

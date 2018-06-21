@@ -7,12 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import twitch4j.api.kraken.json.ChatRoom;
-import twitch4j.api.kraken.json.ChatRoomList;
-import twitch4j.api.kraken.json.Emote;
-import twitch4j.api.kraken.json.EmoteSets;
-import twitch4j.api.kraken.json.Emoticon;
-import twitch4j.api.kraken.json.EmoticonList;
+import twitch4j.api.kraken.model.ChatRoom;
+import twitch4j.api.kraken.model.ChatRoomList;
+import twitch4j.api.kraken.model.Emote;
+import twitch4j.api.kraken.model.EmoteSets;
+import twitch4j.api.kraken.model.Emoticon;
+import twitch4j.api.kraken.model.EmoticonList;
 import twitch4j.api.util.rest.QueryRequestInterceptor;
 
 @Slf4j

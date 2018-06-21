@@ -2,7 +2,7 @@ package twitch4j.api.helix.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import twitch4j.api.helix.json.*;
+import twitch4j.api.helix.model.*;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.request.TwitchRequest;
 import twitch4j.stream.rest.route.Route;
@@ -10,7 +10,6 @@ import twitch4j.stream.rest.route.Route;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClipsService extends AbstractService<ClipsData> {

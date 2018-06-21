@@ -2,10 +2,8 @@ package twitch4j.api.helix.service;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import twitch4j.api.helix.json.Clip;
-import twitch4j.api.helix.json.ClipsData;
-import twitch4j.api.helix.json.Stream;
-import twitch4j.api.helix.json.StreamData;
+import twitch4j.api.helix.model.Stream;
+import twitch4j.api.helix.model.StreamData;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.request.TwitchRequest;
 import twitch4j.stream.rest.route.Route;

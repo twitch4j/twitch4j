@@ -1,13 +1,12 @@
 package twitch4j.api.helix.service;
 
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import twitch4j.api.helix.exceptions.ScopeIsMissingException;
-import twitch4j.api.helix.json.Stream;
-import twitch4j.api.helix.json.User;
-import twitch4j.api.helix.json.UserList;
+import twitch4j.api.helix.model.Stream;
+import twitch4j.api.helix.model.User;
+import twitch4j.api.helix.model.UserList;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.stream.rest.request.Router;

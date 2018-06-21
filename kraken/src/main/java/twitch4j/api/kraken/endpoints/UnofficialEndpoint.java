@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import twitch4j.api.kraken.json.unofficial.AdvancedChannelInformation;
-import twitch4j.api.kraken.json.unofficial.Ember;
+import twitch4j.api.kraken.model.unofficial.AdvancedChannelInformation;
+import twitch4j.api.kraken.model.unofficial.Ember;
 import twitch4j.common.utils.Unofficial;
 
 @Slf4j
