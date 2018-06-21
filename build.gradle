@@ -110,8 +110,8 @@ subprojects {
 		annotationProcessor group: 'org.projectlombok', name: 'lombok'
 
 		// Jackson
-		compile "com.fasterxml.jackson.core:jackson-databind"
-		compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
+		compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+		compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
 
 		// Testing
 		testCompile group: 'junit', name: 'junit'
