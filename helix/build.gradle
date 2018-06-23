@@ -7,6 +7,6 @@ dependencies {
 	/**
 	 * HTTP Client
 	 */
-	compile "io.projectreactor.ipc:reactor-netty"
-	compile "io.projectreactor.addons:reactor-extra"
+	compile group: 'io.projectreactor.ipc', name: 'reactor-netty'
+	compile group: 'io.projectreactor.addons', name: 'reactor-extra'
 }

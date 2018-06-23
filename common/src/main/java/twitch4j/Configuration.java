@@ -10,9 +10,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+
+import lombok.*;
 import twitch4j.common.IBotCredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.enums.*;
@@ -26,6 +25,7 @@ import twitch4j.stream.rest.http.client.SimpleHttpClient;
 import twitch4j.stream.rest.request.Router;
 
 @Data
+@AllArgsConstructor
 @Setter(AccessLevel.PACKAGE)
 public class Configuration {
 	private final String clientId;
@@ -34,6 +34,7 @@ public class Configuration {
 	private final String redirectUri;
 	private final Set<Scope> defaultScopes;
 	private final boolean forceVerify;
+
 	@Nullable
 	private IBotCredential botCredentials;
 

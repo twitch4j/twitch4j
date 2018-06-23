@@ -3,6 +3,7 @@ package twitch4j.api;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.springframework.web.client.RestTemplate;
+import twitch4j.Configuration;
 import twitch4j.api.kraken.endpoints.ChannelEndpoint;
 import twitch4j.api.kraken.endpoints.ChatEndpoint;
 import twitch4j.api.kraken.endpoints.CommunityEndpoint;
@@ -15,6 +16,8 @@ import twitch4j.api.kraken.endpoints.TeamEndpoint;
 import twitch4j.api.kraken.endpoints.UnofficialEndpoint;
 import twitch4j.api.kraken.endpoints.UserEndpoint;
 import twitch4j.api.kraken.endpoints.VideoEndpoint;
+import twitch4j.api.util.rest.HeaderRequestInterceptor;
+import twitch4j.api.util.rest.RestClient;
 
 @Getter
 @Deprecated
@@ -33,7 +36,15 @@ public class TwitchKraken {
 	private final ChannelEndpoint channelEndpoint;
 	private final KrakenEndpoint krakenEndpoint;
 
-	public TwitchKraken(RestTemplate restTemplate) {
+	public TwitchKraken(Configuration configuration) {
+		// prepare rest template
+		RestClient restClient = new RestClient("https://api.twitch.tv/kraken");
+		restClient.addInterceptor(new HeaderRequestInterceptor("Client-ID", configuration.getClientId()));
+		restClient.addInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+model"));
+		restClient.addInterceptor(new HeaderRequestInterceptor("User-Agent", configuration.getUserAgent()));
+		RestTemplate restTemplate = restClient.getRestTemplate(Configuration.getMapper());
+
+		// initialize endpoints
 		this.chatEndpoint = new ChatEndpoint(restTemplate);
 		this.unofficialEndpoint = new UnofficialEndpoint(restTemplate);
 		this.videoEndpoint = new VideoEndpoint(restTemplate);

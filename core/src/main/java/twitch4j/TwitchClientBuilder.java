@@ -1,13 +1,11 @@
 package twitch4j;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.github.philippheuer.events4j.EventManager;
-import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import twitch4j.common.BotCredentialImpl;
@@ -54,7 +52,7 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 
 	@Override
 	public TwitchClient build() {
-		Configuration configuration = new Configuration(clientId, clientSecret, userAgent, redirectUri.get(), defaultScopes, forceVerify);
+		Configuration configuration = new Configuration(clientId, clientSecret, userAgent, redirectUri.get(), defaultScopes, forceVerify, null);
 		AuthService service = new AuthService(configuration, Configuration.buildRouter("https://id.twitch.tv/oauth2", Collections.emptyMap()));
 		MessageInterfaceAPI tmiApi = new MessageInterfaceAPI(configuration);
 

@@ -2,16 +2,12 @@ package twitch4j;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import com.github.philippheuer.events4j.EventManager;
 import lombok.Getter;
 import twitch4j.api.TwitchHelix;
 import twitch4j.api.TwitchKraken;
-import twitch4j.api.util.rest.HeaderRequestInterceptor;
-import twitch4j.api.util.rest.RestClient;
 import twitch4j.common.auth.AuthService;
 import twitch4j.common.auth.CredentialManager;
 import twitch4j.common.auth.ICredential;
@@ -31,8 +27,8 @@ public class TwitchClient {
 	private final TwitchPubSub pubSub;
 
 	TwitchClient(Configuration configuration, AuthService service, AuthStorage storage, MessageInterfaceAPI tmiApi, EventManager eventManager) {
-		krakenEndpoint = buildKrakenEndpoint(configuration);
-		helixEndpoint = buildHelixEndpoint(configuration);
+		krakenEndpoint = new TwitchKraken(configuration);
+		helixEndpoint = new TwitchHelix(configuration);
 		credentialManager = new CredentialManager(service, storage);
 		messageInterface = new TwitchMessageInterface(configuration, eventManager, tmiApi);
 		pubSub = new TwitchPubSub(eventManager, Configuration.getMapper());
@@ -40,22 +36,6 @@ public class TwitchClient {
 
 	public static Builder builder() {
 		return new TwitchClientBuilder();
-	}
-
-	private TwitchHelix buildHelixEndpoint(Configuration configuration) {
-		Map<String, String> headers = new LinkedHashMap<>();
-		headers.put("User-Agent", configuration.getUserAgent());
-		headers.put("Client-ID", configuration.getClientId());
-		return new TwitchHelix(Configuration.buildRouter("https://api.twitch.tv/helix", headers));
-	}
-
-	private TwitchKraken buildKrakenEndpoint(Configuration configuration) {
-		RestClient restClient = new RestClient("https://api.twitch.tv/kraken");
-		restClient.addInterceptor(new HeaderRequestInterceptor("Client-ID", configuration.getClientId()));
-		restClient.addInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+model"));
-		restClient.addInterceptor(new HeaderRequestInterceptor("User-Agent", configuration.getUserAgent()));
-
-		return new TwitchKraken(restClient.getRestTemplate(Configuration.getMapper()));
 	}
 
 	public interface Builder {
