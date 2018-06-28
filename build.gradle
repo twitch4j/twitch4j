@@ -15,7 +15,7 @@ allprojects {
 	dependencyManagement {
 		// BOMs
 		imports {
-			mavenBom 'com.fasterxml.jackson:jackson-bom:2.9.5'
+			mavenBom 'com.fasterxml.jackson:jackson-bom:2.9.6'
 			mavenBom 'io.projectreactor:reactor-bom:Bismuth-SR10'
 			mavenBom 'org.springframework:spring-framework-bom:5.0.6.RELEASE'
 		}
