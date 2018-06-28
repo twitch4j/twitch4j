@@ -1,5 +1,6 @@
 package twitch4j.api.helix.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.route.Route;
@@ -11,7 +12,7 @@ import twitch4j.stream.rest.route.Route;
  * @version %I%, %G%
  * @since 1.0
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public abstract class AbstractService<T> {
 	protected final Route<T> route;
 	protected final Router router;

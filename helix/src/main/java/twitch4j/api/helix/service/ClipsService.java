@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version %I%, %G%
  * @since 1.0
  */
-public class ClipsService extends AbstractService<ClipsData> {
+public class ClipsService extends AbstractSizedService<ClipsData> {
 
 	private volatile AtomicInteger size = new AtomicInteger(20);
 
@@ -60,16 +60,5 @@ public class ClipsService extends AbstractService<ClipsData> {
 				.query(key, value);
 
 		return request.exchange(router).flatMapMany(clipsData -> Flux.fromIterable(clipsData.getData()));
-	}
-
-	public ClipsService size(int size) {
-		if (size > 100) {
-			this.size.set(100);
-		} else if (size < 1) {
-			this.size.set(20);
-		} else {
-			this.size.set(size);
-		}
-		return this;
 	}
 }

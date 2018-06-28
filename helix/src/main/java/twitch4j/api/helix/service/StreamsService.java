@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 1.0
  */
 @Slf4j
-public class StreamsService extends AbstractService<StreamData> {
+public class StreamsService extends AbstractSizedService<StreamData> {
 	private AtomicInteger size = new AtomicInteger(20);
 	private Set<String> communityIds = new HashSet<>();
 	private Set<Long> gameIds = new LinkedHashSet<>();
@@ -32,23 +32,6 @@ public class StreamsService extends AbstractService<StreamData> {
 
 	public StreamsService(Router router) {
 		super(Route.get("/streams", StreamData.class), router);
-	}
-
-	/**
-	 * Limit data for pagination.
-	 * @param size <b>Max:</b> 100,<br> <b>Default:</b> 20
-	 * @return
-	 */
-	public StreamsService size(int size) {
-		if (size > 100) {
-			this.size.set(100);
-		} else if (size < 1) {
-			this.size.set(20);
-		} else {
-			this.size.set(size);
-		}
-
-		return this;
 	}
 
 	/**

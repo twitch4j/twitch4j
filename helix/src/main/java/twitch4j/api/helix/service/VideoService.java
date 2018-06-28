@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version %I%, %G%
  * @since 1.0
  */
-public class VideoService extends AbstractService<VideoList> {
+public class VideoService extends AbstractSizedService<VideoList> {
 
 	private final AtomicInteger size = new AtomicInteger(20);
 	private final AtomicReference<Period> period = new AtomicReference<>();
@@ -75,17 +75,6 @@ public class VideoService extends AbstractService<VideoList> {
 
 	public VideoService type(VideoType type) {
 		this.type.set(type);
-		return this;
-	}
-
-	public VideoService size(int size) {
-		if (size > 100) {
-			this.size.set(100);
-		} else if (size < 1) {
-			this.size.set(20);
-		} else {
-			this.size.set(size);
-		}
 		return this;
 	}
 
