@@ -12,6 +12,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Provides Clips Service for getting data from streamers and game specific clip.
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 public class ClipsService extends AbstractService<ClipsData> {
 
 	private volatile AtomicInteger size = new AtomicInteger(20);
@@ -21,14 +27,14 @@ public class ClipsService extends AbstractService<ClipsData> {
 	}
 
 	public Mono<Clip> getClip(String clipId) {
-		return getAllClips(clipId).next();
+		return getAllClips(clipId).flatMap(p -> p.get().next());
 	}
 
-	public Flux<Clip> getAllClips(String... clipIds) {
+	public Mono<Pagination<Clip, ClipsData>> getAllClips(String... clipIds) {
 		return getAllClips(Arrays.asList(clipIds));
 	}
 
-	public Flux<Clip> getAllClips(Collection<String> clipIds) {
+	public Mono<Pagination<Clip, ClipsData>> getAllClips(Collection<String> clipIds) {
 		if (clipIds.size() > 100) {
 			clipIds = new ArrayList<>(clipIds).subList(0, 99);
 		}
@@ -37,7 +43,7 @@ public class ClipsService extends AbstractService<ClipsData> {
 		clipIds.forEach(clip -> request.query("id", clip));
 
 		return request.exchange(router)
-				.flatMapMany(data -> Flux.fromIterable(data.getData()));
+				.flatMap(data -> Mono.just(new Pagination<>(router, data, request)));
 	}
 
 	public Flux<Clip> getByGame(Game game) {

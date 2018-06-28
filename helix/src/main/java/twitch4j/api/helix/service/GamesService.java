@@ -1,6 +1,7 @@
 package twitch4j.api.helix.service;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import twitch4j.api.helix.model.*;
 import twitch4j.stream.rest.request.Router;
 import twitch4j.stream.rest.request.TwitchRequest;
@@ -10,6 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * Provides Games Service. Searching {@link #getByNames(String...) by name}, {@link #getByIds(Long...) by game ID}
+ * and getting {@link #getTopGames() top games} on the Twitch.
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 public class GamesService extends AbstractService<GamesData> {
 	/**
 	 * Routes
@@ -83,9 +91,9 @@ public class GamesService extends AbstractService<GamesData> {
 	 *
 	 * @return The the list of games ordered by current viewers
 	 */
-	public Flux<Game> getTopGames() {
+	public Mono<Pagination<Game, TopGames>> getTopGames() {
 		return topGamesRoute.newRequest()
 				.exchange(router)
-				.flatMapMany(top -> Flux.fromIterable(top.getData()));
+				.flatMap(t -> Mono.just(new Pagination<>(router, t, topGamesRoute.newRequest())));
 	}
 }

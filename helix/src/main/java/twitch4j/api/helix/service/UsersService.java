@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import twitch4j.api.helix.exceptions.ScopeIsMissingException;
-import twitch4j.api.helix.model.Stream;
 import twitch4j.api.helix.model.User;
 import twitch4j.api.helix.model.UserList;
 import twitch4j.common.auth.ICredential;
@@ -19,19 +18,31 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Provides User Service. <br>
+ * <b>Optional: </b> {@link twitch4j.common.auth.Scope#USER_EDIT user:edit}
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @Slf4j
 public class UsersService extends AbstractService<UserList> {
 
 	private final Optional<ICredential> credential;
 
 	private final Set<Long> userIds = new LinkedHashSet<>();
-	private final Set<String> usernames = new LinkedHashSet<>();
+	private final Set<String> userLogins = new LinkedHashSet<>();
 
 	public UsersService(Router router, Optional<ICredential> credential) {
 		super(Route.get("/users", UserList.class), router);
 		this.credential = credential;
 	}
 
+	/**
+	 * Adding user Id
+	 * @param userId user ID
+	 * @return
+	 */
 	public UsersService userId(Long userId) {
 		if (userIds.size() == 100) {
 			SizeLimitExceededException ex = new SizeLimitExceededException("Limit of user_id's is exceeded. Max 100.");
@@ -41,16 +52,26 @@ public class UsersService extends AbstractService<UserList> {
 		}
 		return this;
 	}
+
+	/**
+	 * Adding username/login
+	 * @param username username or login (not display name)
+	 * @return
+	 */
 	public UsersService username(String username) {
-		if (usernames.size() == 100) {
+		if (userLogins.size() == 100) {
 			SizeLimitExceededException ex = new SizeLimitExceededException("Limit of login's is exceeded. Max 100.");
 			log.error(ex.getMessage(), ex);
 		} else  {
-			this.usernames.add(username);
+			this.userLogins.add(username);
 		}
 		return this;
 	}
 
+	/**
+	 * Fetching all users
+	 * @return
+	 */
 	public Flux<User> exchange() {
 		TwitchRequest<UserList> request = route.newRequest();
 		credential.ifPresent(cred -> {
@@ -62,15 +83,19 @@ public class UsersService extends AbstractService<UserList> {
 		if (!userIds.isEmpty()) {
 			userIds.forEach(id -> request.query("user_id", id.toString()));
 		}
-		if (!usernames.isEmpty()) {
-			usernames.forEach(username -> request.query("user_login", username));
+		if (!userLogins.isEmpty()) {
+			userLogins.forEach(username -> request.query("user_login", username));
 		}
 
 		return request.exchange(router).flatMapMany(data -> Flux.fromIterable(data.getData()));
 	}
 
-	public Mono<User> updateUser(Stream description) {
-
+	/**
+	 * Update authorized user
+	 * @param description Description your channel
+	 * @return
+	 */
+	public Mono<User> updateUser(String description) {
 		if (!credential.isPresent()) {
 			return Mono.error(new CredentialNotFoundException("Required credentials to update your description."));
 		} else {

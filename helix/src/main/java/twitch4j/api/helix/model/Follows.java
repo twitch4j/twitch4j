@@ -5,6 +5,6 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Follows extends PaginationList<Follow> {
+public class Follows extends ListData<Follow> {
 	private Long total;
 }

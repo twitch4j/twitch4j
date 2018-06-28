@@ -19,6 +19,10 @@ import twitch4j.api.kraken.endpoints.VideoEndpoint;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.RestClient;
 
+
+/**
+ * Twitch API (Kraken)
+ */
 @Getter
 @Deprecated
 @Accessors(fluent = true)

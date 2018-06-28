@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 @EqualsAndHashCode(callSuper = true)
 public class PaginationList<T> extends ListData<T> {
 
-	@Nullable
 	private Pagination pagination;
 
 	@Data

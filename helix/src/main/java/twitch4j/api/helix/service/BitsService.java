@@ -17,6 +17,13 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 
+/**
+ * Provides Bits Service Leaderboard. <br>
+ * <b>Required: </b> {@link twitch4j.common.auth.Scope#BITS_READ bits:read}
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 public class BitsService extends AbstractService<BitsLeadeboardData> {
 
 	private final ICredential credential;

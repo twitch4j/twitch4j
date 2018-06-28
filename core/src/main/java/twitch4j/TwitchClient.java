@@ -19,7 +19,6 @@ import twitch4j.pubsub.TwitchPubSub;
 
 @Getter
 public class TwitchClient {
-
 	private final TwitchKraken krakenEndpoint;
 	private final TwitchHelix helixEndpoint;
 	private final CredentialManager credentialManager;
@@ -81,7 +80,6 @@ public class TwitchClient {
 		default Builder addChannels(String... channels) {
 			return addChannels(Arrays.asList(channels));
 		}
-
 
 		TwitchClient build();
 

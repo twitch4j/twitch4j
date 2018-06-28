@@ -1,6 +1,5 @@
 package twitch4j.api;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import twitch4j.Configuration;
 import twitch4j.api.helix.exceptions.ScopeIsMissingException;
@@ -9,10 +8,20 @@ import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.stream.rest.request.Router;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+
+/**
+ * The <b>NEW</b> Twitch API (Helix) provides tools for developing integrations with Twitch.
+ * Using {@link twitch4j.stream.rest.request.Router Router} to provides reactive non=blocking response
+ * components using <a href="https://projectreactor.io/">Project Reactor</a>.
+ * @author Damian Staszewski [https://github.com/stachu540]
+ * @version %I%, %G%
+ * @since 1.0
+ */
 @RequiredArgsConstructor
 public class TwitchHelix {
 	/**
@@ -35,7 +44,7 @@ public class TwitchHelix {
 		headers.put("Client-ID", configuration.getClientId());
 
 		// create router instance
-		router = configuration.buildRouter("https://api.twitch.tv/helix", headers);
+		router = Configuration.buildRouter("https://api.twitch.tv/helix", headers);
 	}
 
 	/**
@@ -106,7 +115,7 @@ public class TwitchHelix {
 	 * @return A new instance of the UsersService
 	 */
 	public UsersService getUsersService() {
-		return new UsersService(router, Optional.empty());
+		return getUsersService(null);
 	}
 
 	/**
@@ -115,8 +124,8 @@ public class TwitchHelix {
 	 * Required Permissions: {@link twitch4j.common.auth.Scope#USER_READ}
 	 * @return A new instance of the UsersService
 	 */
-	public UsersService getUsersService(ICredential credential) {
-		if (!credential.scopes().contains(Scope.USER_READ)) {
+	public UsersService getUsersService(@Nullable ICredential credential) {
+		if (credential != null && !credential.scopes().contains(Scope.USER_READ)) {
 			throw new ScopeIsMissingException(Scope.USER_READ);
 		}
 		return new UsersService(router, Optional.ofNullable(credential));
