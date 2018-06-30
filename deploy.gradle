@@ -11,10 +11,10 @@ project.version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("T
  */
 javadoc {
 	options {
-		overview = new File("${rootDir}/common/src/javadoc/overview.html")
+		overview = new File("${rootDir}/src/javadoc/overview.html")
 		title = "Twitch 4 Java - ${project.name} (${project.version})"
 		windowTitle = "${project.name} (${project.version})"
-		stylesheetFile = new File("${rootDir}/common/src/javadoc/css/style.css")
+		stylesheetFile = new File("${rootDir}/src/javadoc/css/style.css")
 		encoding = "UTF-8"
 	}
 }
