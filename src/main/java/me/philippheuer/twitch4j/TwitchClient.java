@@ -166,26 +166,11 @@ public class TwitchClient {
 	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
 	 * therefore you need to provide information to identify a unique channel.
 	 *
-	 * @param channelId ID of the twitch channel
 	 * @return a new instance of {@link ChannelEndpoint}
 	 * @see me.philippheuer.twitch4j.model.Channel
 	 */
-	public ChannelEndpoint getChannelEndpoint(Long channelId) {
-		return new ChannelEndpoint(this, channelId);
-	}
-
-	/**
-	 * Returns an a new ChannelEndpoint instance - identifying the channel by the channel name.
-	 * <p>
-	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
-	 * therefore you need to provide information to identify a unique channel.
-	 *
-	 * @param channelName Name of the twitch channel
-	 * @return a new instance of {@link ChannelEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Channel
-	 */
-	public ChannelEndpoint getChannelEndpoint(String channelName) {
-		return new ChannelEndpoint(this, channelName);
+	public ChannelEndpoint getChannelEndpoint() {
+		return new ChannelEndpoint(this);
 	}
 
 	/**

@@ -15,8 +15,8 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.PubSubTopics;
+import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
-import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.util.conversion.RandomizeString;
 
@@ -345,7 +345,7 @@ public class TwitchPubSub {
 		}
 		if (channelCredential != null) {
 			for (PubSubTopics topic : topics) {
-				if (topic.isInRequiredScope((TwitchScopes[]) channelCredential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
+				if (topic.isInRequiredScope((Scope[]) channelCredential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
 			}
 			if (topicList.size() > 0) {
 				execType("LISTEN", topicList);

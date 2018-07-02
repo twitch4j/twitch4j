@@ -9,8 +9,9 @@ public class ChannelCredentialMissingException extends RuntimeException {
 
 	private Long channelId;
 
-	public ChannelCredentialMissingException(Long channelId) {
+	public ChannelCredentialMissingException(Long channelId, Throwable ex) {
 		super();
 		setChannelId(channelId);
+		initCause(ex);
 	}
 }

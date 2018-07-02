@@ -77,6 +77,9 @@ dependencies {
 	// Args4J - CommandLineArgumentParser
 	compile "args4j:args4j:2.33"
 
+	// Nullable Annotation
+	compile "com.google.code.findbugs:jsr305:3.0.2"
+
 	// Project Lombok for annotating processor
 	compile "org.projectlombok:lombok:1.18.0"
 	annotationProcessor "org.projectlombok:lombok:1.18.0"

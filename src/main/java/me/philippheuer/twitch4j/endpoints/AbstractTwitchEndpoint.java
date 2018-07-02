@@ -1,18 +1,18 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-@Getter
-@Setter
-public class AbstractTwitchEndpoint {
+@RequiredArgsConstructor
+abstract class AbstractTwitchEndpoint {
 
 	/**
 	 * Cache - Objects
@@ -23,32 +23,22 @@ public class AbstractTwitchEndpoint {
 			.variableExpiration()
 			.build();
 
-	/**
-	 * Holds the API Instance
-	 */
-	private TwitchClient twitchClient;
+	protected final TwitchClient client;
 
 	/**
-	 * AbstractTwitchEndpoint
-	 *
-	 * @param twitchClient todo
+	 * Holds the {@link RestTemplate} instance
 	 */
-	public AbstractTwitchEndpoint(TwitchClient twitchClient) {
-		// Properties
-		setTwitchClient(twitchClient);
-	}
+	protected final RestTemplate restTemplate;
 
 	/**
 	 * Check that the api has the required scopes before making a request
 	 *
-	 * @param scopes         Scopes, we have access to.
-	 * @param requiredScopes Scopes, we want to access.
+	 * @param scopes        Scopes, we have access to.
+	 * @param requiredScope Scope, we want to access.
 	 */
-	protected void checkScopePermission(Set<String> scopes, Set<String> requiredScopes) {
-		for (String requiredScope : requiredScopes) {
-			if (!scopes.contains(requiredScope)) {
-				throw new ScopeMissingException(requiredScope);
-			}
+	protected void checkScopePermission(Collection<Scope> scopes, Scope requiredScope) throws ScopeMissingException {
+		if (!scopes.contains(requiredScope)) {
+			throw new ScopeMissingException(requiredScope);
 		}
 	}
 

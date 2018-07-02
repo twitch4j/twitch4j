@@ -23,10 +23,10 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	/**
 	 * Twitch Messaging Interface (TMI)
 	 *
-	 * @param client todo
+	 * @param client The Twitch Client.
 	 */
 	public TMIEndpoint(TwitchClient client) {
-		super(client);
+		super(client, client.getRestClient().getRestTemplate());
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 	public Chatter getChatters(String channelName) {
 		// Endpoint
 		String requestUrl = String.format("%s/group/user/%s/chatters", Endpoints.TMI.getURL(), channelName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = client.getRestClient().getRestTemplate();
 
 		// REST Request
 		try {

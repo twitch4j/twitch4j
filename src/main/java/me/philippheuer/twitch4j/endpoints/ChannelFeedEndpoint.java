@@ -1,100 +1,96 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
+import me.philippheuer.twitch4j.enums.Scope;
+import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
+import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
 import me.philippheuer.twitch4j.model.ChannelFeed;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
-import me.philippheuer.twitch4j.model.Void;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-@Getter
-@Setter
+@Slf4j
 public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * The Channel Feed Endpoint
 	 *
-	 * @param twitchClient The Twitch Client.
+	 * @param client The Twitch Client.
 	 */
-	public ChannelFeedEndpoint(TwitchClient twitchClient) {
-		super(twitchClient);
+
+	public ChannelFeedEndpoint(TwitchClient client) {
+		super(client, client.getRestClient().getRestTemplate());
 	}
 
 	/**
 	 * Gets posts from a specified channel feed.
 	 *
-	 * @param channelId    The channel id, which the posts should be retrieved from.
-	 * @param limit        Maximum number of most-recent objects to return. Default: 10. Maximum: 100.
-	 * @param cursor       Tells the server where to start fetching the next set of results in a multi-page response.
-	 * @param commentLimit Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
+	 * @param channelId The channel id, which the posts should be retrieved from.
+	 * @param limit     Maximum number of most-recent objects to return. Default: 10. Maximum: 100.
+	 * @param cursor    Tells the server where to start fetching the next set of results in a multi-page response.
+	 * @param comments  Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
 	 * @return posts from a specified channel feed.
 	 */
-	public List<ChannelFeedPost> getFeedPosts(Long channelId, Optional<Long> limit, Optional<String> cursor, Optional<Long> commentLimit) {
+	public List<ChannelFeedPost> getFeedPosts(Long channelId, @Nullable Integer limit, @Nullable String cursor, @Nullable Integer comments) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts", Endpoints.API.getURL(), channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/feed/%s/posts", channelId);
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(10l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor.orElse("")));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("comments", commentLimit.orElse(5l).toString()));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.toString()));
+		}
+		if (cursor != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("cursor", cursor));
+		}
+		if (comments != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("comments", comments.toString()));
+		}
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			ChannelFeed responseObject = restTemplate.getForObject(requestUrl, ChannelFeed.class);
-
-			return responseObject.getPosts();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject(requestUrl, ChannelFeed.class).getPosts();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
-		return new ArrayList<ChannelFeedPost>();
+		return Collections.emptyList();
 	}
 
 	/**
 	 * Gets a specified post from a specified channel feed.
 	 *
-	 * @param channelId    The channel id, which the posts should be retrieved from.
-	 * @param postId       The post id.
-	 * @param commentLimit Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
+	 * @param channelId The channel id, which the posts should be retrieved from.
+	 * @param postId    The post id.
+	 * @param limit     Specifies the number of most-recent comments on posts that are included in the response. Default: 5. Maximum: 5.
 	 * @return a specified post from a specified channel feed.
 	 */
-	public ChannelFeedPost getFeedPost(Long channelId, String postId, Optional<Long> commentLimit) {
+	public ChannelFeedPost getFeedPost(Long channelId, String postId, Integer limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/feed/%s/posts/%s", Endpoints.API.getURL(), channelId, postId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/feed/%s/posts/%s", channelId, postId);
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("comments", commentLimit.orElse(5l).toString()));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("comments", limit.toString()));
+		}
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			ChannelFeedPost responseObject = restTemplate.getForObject(requestUrl, ChannelFeedPost.class);
-
-			return responseObject;
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject(requestUrl, ChannelFeedPost.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 
 		return null;
@@ -105,35 +101,33 @@ public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {
 	 * <p>
 	 * Requires the Twitch *channel_feed_edit* Scope.
 	 *
-	 * @param credential  OAuth token for a Twitch user (that as 2fa enabled)
-	 * @param channelId Channel ID
-	 * @param message message to feed
-	 * @param share Share to Twitter if is connected
+	 * @param credential OAuth token for a Twitch user (that as 2fa enabled)
+	 * @param message    message to feed
+	 * @param share      Share to Twitter if is connected
 	 */
-	public void createFeedPost(OAuthCredential credential, Long channelId, String message, Optional<Boolean> share) {
-		// Endpoint
-		String requestUrl = String.format("%s//feed/%s/posts", Endpoints.API.getURL(), channelId);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getPrivilegedRestTemplate(credential);
-
-		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("share", share.orElse(false).toString()));
-
-		// Post Data
-		MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
-		postBody.add("content", message);
-
-		// REST Request
+	public void createFeedPost(OAuthCredential credential, String message, Boolean share) {
 		try {
+			checkScopePermission(credential.getOAuthScopes(), Scope.CHANNEL_FEED_EDIT);
+
+			// Endpoint
+			String requestUrl = String.format("/feed/%s/posts", credential.getUserId());
+			RestTemplate restTemplate = this.restTemplate;
+
+			// Parameters
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("share", share.toString()));
+
+			// Post Data
+			MultiValueMap<String, Object> postBody = new LinkedMultiValueMap<String, Object>();
+			postBody.add("content", message);
+
 			restTemplate.postForObject(requestUrl, postBody, Void.class);
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+
+		} catch (ScopeMissingException ex) {
+			throw new ChannelCredentialMissingException(credential.getUserId(), ex);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 		}
 	}
-
-	// Requires channel_feed_edit
-
 
 }

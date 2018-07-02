@@ -1,9 +1,10 @@
 package me.philippheuer.twitch4j.enums;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
  * @author Urgue - Github [https://raw.githubusercontent.com/urgrue/Java-Twitch-Api-Wrapper/master/src/main/java/com/mb3364/twitch/api/auth/Scopes.java]
  */
 @RequiredArgsConstructor
-public enum TwitchScopes {
+public enum Scope {
 	/**
 	 * View analytics data for your games.
 	 */
@@ -121,23 +122,23 @@ public enum TwitchScopes {
 	 */
 	private final String name;
 
-	TwitchScopes() {
+	Scope() {
 		this.name = name();
 	}
 
 	/**
-	 * Combine <code>TwitchScopes</code> into a '+' separated <code>{@link String}</code>.
+	 * Combine <code>Scope</code> into a '+' separated <code>{@link String}</code>.
 	 * This is the required input format for twitch.tv
 	 *
-	 * @param scopes <code>{@link TwitchScopes}</code> to combine.
-	 * @return <code>{@link String}</code> representing '+' separated list of <code>{@link TwitchScopes}</code>
+	 * @param scopes <code>{@link Scope}</code> to combine.
+	 * @return <code>{@link String}</code> representing '+' separated list of <code>{@link Scope}</code>
 	 */
-	public static String join(TwitchScopes... scopes) {
+	public static String join(Scope... scopes) {
 		return join(Arrays.asList(scopes));
 	}
 
-	public static String join(Collection<TwitchScopes> scopes) {
-		if (scopes.size() > 0) return scopes.stream().map(TwitchScopes::name)
+	public static String join(Collection<Scope> scopes) {
+		if (scopes.size() > 0) return scopes.stream().map(Scope::name)
 				.collect(Collectors.joining("+"));
 		else return "";
 	}
@@ -148,12 +149,12 @@ public enum TwitchScopes {
 	 * @param text Text representation of Enum value
 	 * @return Enum value that the text represents
 	 */
-	public static TwitchScopes fromString(String text) {
+	public static Scope fromString(String text) {
 		if (text == null) {
 			return null;
 		}
 
-		for (TwitchScopes b : TwitchScopes.values()) {
+		for (Scope b : Scope.values()) {
 			if (text.equalsIgnoreCase(b.name)) {
 				return b;
 			}

@@ -2,14 +2,17 @@ package me.philippheuer.twitch4j.auth.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.philippheuer.twitch4j.enums.Scope;
+import me.philippheuer.util.conversion.ScopeDeserializer;
 
 import java.util.Calendar;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -28,7 +31,8 @@ public class OAuthCredential {
 
 	private String refreshToken;
 
-	private final Set<String> oAuthScopes = new HashSet<String>();
+	@JsonDeserialize(as = ScopeDeserializer.class)
+	private final Set<Scope> oAuthScopes = new LinkedHashSet<>();
 
 	private Long userId;
 

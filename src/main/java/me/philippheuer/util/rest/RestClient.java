@@ -51,14 +51,10 @@ public class RestClient {
 	 * @return A RestTemplate for rest requests.
 	 */
 	public RestTemplate getRestTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = getPlainRestTemplate();
 
 		// Request Interceptors
-		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
-		restTemplate.getInterceptors().addAll(getRestInterceptors());
-
-		// Default Error Handler
-		restTemplate.setErrorHandler(new RestErrorHandler());
+		restTemplate.setInterceptors(restInterceptors);
 
 		return restTemplate;
 	}

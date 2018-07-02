@@ -1,7 +1,10 @@
 package me.philippheuer.twitch4j.message.irc;
 
 import com.jcabi.log.Logger;
-import com.neovisionaries.ws.client.*;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -9,8 +12,8 @@ import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
+import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
-import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.events.event.irc.IRCMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -452,7 +455,7 @@ public class TwitchChat {
 		if(credential == null) {
 			return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials not present!");
 		} else {
-			if(!credential.getOAuthScopes().contains(TwitchScopes.CHAT_LOGIN.getKey())) {
+			if(!credential.getOAuthScopes().contains(Scope.CHAT_LOGIN.getKey())) {
 				return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
 			}
 		}
