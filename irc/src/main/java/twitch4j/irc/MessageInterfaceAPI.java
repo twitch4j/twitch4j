@@ -5,6 +5,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import twitch4j.Configuration;
+import twitch4j.common.utils.CommonUtils;
 import twitch4j.irc.api.ChatterResult;
 import twitch4j.irc.api.UserChat;
 import twitch4j.stream.rest.request.Router;
@@ -14,8 +15,8 @@ import twitch4j.stream.rest.route.Route;
 public class MessageInterfaceAPI {
 	private final Configuration configuration;
 
-	private final Router krakenRoute = Configuration.buildRouter("https://api.twitch.tv/kraken", Collections.emptyMap());
-	private final Router tmiRoute = Configuration.buildRouter("http://tmi.twitch.tv", Collections.emptyMap());
+	private final Router krakenRoute = CommonUtils.buildRouter("https://api.twitch.tv/kraken", Collections.emptyMap());
+	private final Router tmiRoute = CommonUtils.buildRouter("http://tmi.twitch.tv", Collections.emptyMap());
 
 	public Mono<ChatterResult> getChatters(String channelName) {
 		// Validate Arguments

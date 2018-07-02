@@ -14,6 +14,7 @@ import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
 import twitch4j.common.auth.storage.AuthStorage;
 import twitch4j.common.auth.storage.DefaultAuthStorage;
+import twitch4j.common.utils.CommonUtils;
 import twitch4j.irc.MessageInterfaceAPI;
 import twitch4j.pubsub.PubSubTopic;
 
@@ -53,7 +54,7 @@ class TwitchClientBuilder implements TwitchClient.Builder {
 	@Override
 	public TwitchClient build() {
 		Configuration configuration = new Configuration(clientId, clientSecret, userAgent, redirectUri.get(), defaultScopes, forceVerify, null);
-		AuthService service = new AuthService(configuration, Configuration.buildRouter("https://id.twitch.tv/oauth2", Collections.emptyMap()));
+		AuthService service = new AuthService(configuration, CommonUtils.buildRouter("https://id.twitch.tv/oauth2", Collections.emptyMap()));
 		MessageInterfaceAPI tmiApi = new MessageInterfaceAPI(configuration);
 
 		if (botCredential != null) {

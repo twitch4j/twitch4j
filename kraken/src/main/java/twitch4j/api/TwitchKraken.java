@@ -18,6 +18,7 @@ import twitch4j.api.kraken.endpoints.UserEndpoint;
 import twitch4j.api.kraken.endpoints.VideoEndpoint;
 import twitch4j.api.util.rest.HeaderRequestInterceptor;
 import twitch4j.api.util.rest.RestClient;
+import twitch4j.common.utils.CommonUtils;
 
 
 /**
@@ -46,7 +47,7 @@ public class TwitchKraken {
 		restClient.addInterceptor(new HeaderRequestInterceptor("Client-ID", configuration.getClientId()));
 		restClient.addInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+model"));
 		restClient.addInterceptor(new HeaderRequestInterceptor("User-Agent", configuration.getUserAgent()));
-		RestTemplate restTemplate = restClient.getRestTemplate(Configuration.getMapper());
+		RestTemplate restTemplate = restClient.getRestTemplate(CommonUtils.getMapper());
 
 		// initialize endpoints
 		this.chatEndpoint = new ChatEndpoint(restTemplate);

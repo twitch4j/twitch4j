@@ -6,6 +6,7 @@ import twitch4j.api.helix.exceptions.ScopeIsMissingException;
 import twitch4j.api.helix.service.*;
 import twitch4j.common.auth.ICredential;
 import twitch4j.common.auth.Scope;
+import twitch4j.common.utils.CommonUtils;
 import twitch4j.stream.rest.request.Router;
 
 import javax.annotation.Nullable;
@@ -44,7 +45,7 @@ public class TwitchHelix {
 		headers.put("Client-ID", configuration.getClientId());
 
 		// create router instance
-		router = Configuration.buildRouter("https://api.twitch.tv/helix", headers);
+		router = CommonUtils.buildRouter("https://api.twitch.tv/helix", headers);
 	}
 
 	/**
