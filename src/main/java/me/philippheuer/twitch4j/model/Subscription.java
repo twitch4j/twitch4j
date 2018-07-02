@@ -2,7 +2,7 @@ package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import twitch4j.common.enums.SubscriptionPlan;
+import me.philippheuer.twitch4j.enums.SubscriptionPlan;
 
 import java.time.Instant;
 
