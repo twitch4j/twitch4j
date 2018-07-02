@@ -9,9 +9,11 @@ plugins {
 	id 'eclipse'
 	id 'application'
 	id 'maven-publish'
-	id "net.ltgt.apt" version "0.15"
-	id 'com.jfrog.bintray' version '1.8.0'
-	id 'io.ratpack.ratpack-java' version '1.4.6'
+	id "net.ltgt.apt" version "0.17"
+	id "net.ltgt.apt-idea" version "0.17"
+	id "net.ltgt.apt-eclipse" version "0.17"
+	id 'com.jfrog.bintray' version '1.8.3'
+	id 'io.ratpack.ratpack-java' version '1.5.4'
 }
 
 repositories {
@@ -44,25 +46,24 @@ javadoc {
 dependencies {
 	// Logging
 	compile "org.slf4j:slf4j-api:1.7.25"
-	compile "ch.qos.logback:logback-classic:1.2.3"
-	compile "com.jcabi:jcabi-log:0.17.2"
+	compile "com.jcabi:jcabi-log:0.18"
 
 	// Spring (RestTemplate)
-	compile "org.springframework:spring-web:5.0.0.RELEASE" 					// contains Tomcat
-	compile "org.springframework.social:spring-social-core:1.1.4.RELEASE"
+	compile "org.springframework:spring-web:5.0.7.RELEASE" 					// contains Tomcat
+	compile "org.springframework.social:spring-social-core:1.1.6.RELEASE"
 
 	// WebSocket Client for Twitch PubSub and Twitch IRC
 	// TODO: Change to Jetty WebSocket
-	compile "com.neovisionaries:nv-websocket-client:2.3"
+	compile "com.neovisionaries:nv-websocket-client:2.5"
 
 	// Apache Commons
 	// - Lang
-	compile "org.apache.commons:commons-lang3:3.6"
+	compile "org.apache.commons:commons-lang3:3.7"
 	// - IO
-	compile "commons-io:commons-io:2.5"
+	compile "commons-io:commons-io:2.6"
 
 	// JSON / YAML
-	compile "com.fasterxml.jackson.core:jackson-databind:2.9.2"
+	compile "com.fasterxml.jackson.core:jackson-databind:2.9.6"
 
 	// Bucket for rate-limiting
 	compile "org.isomorphism:token-bucket:1.7"
@@ -77,11 +78,12 @@ dependencies {
 	compile "args4j:args4j:2.33"
 
 	// Project Lombok for annotating processor
-	compile "org.projectlombok:lombok:1.16.20"
-	annotationProcessor "org.projectlombok:lombok:1.16.20"
+	compile "org.projectlombok:lombok:1.18.0"
+	annotationProcessor "org.projectlombok:lombok:1.18.0"
 
 	// Testing
 	testCompile "junit:junit:4.12"
+	testCompile "ch.qos.logback:logback-classic:1.2.3"
 }
 
 /**
@@ -197,6 +199,6 @@ bintray {
 }
 
 wrapper {
-	gradleVersion = "4.7" // newer version
+	gradleVersion = "4.8.1" // newer version
 	distributionType = Wrapper.DistributionType.ALL
 }
