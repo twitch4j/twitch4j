@@ -1,10 +1,11 @@
+import java.text.SimpleDateFormat
+import java.time.Instant
+
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-/**
- * Set project version on deployment
- */
-project.version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "1.0.0-SNAPSHOT"
+apply from: "${rootDir}/versioning.gradle"
+
 
 /**
  * Javadoc
@@ -16,6 +17,25 @@ javadoc {
 		windowTitle = "${project.name} (${project.version})"
 		stylesheetFile = new File("${rootDir}/src/javadoc/css/style.css")
 		encoding = "UTF-8"
+	}
+}
+
+private def static timestamp() {
+	SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm:ss zzz")
+	sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+	return sdf.format(new Date())
+}
+
+jar {
+	manifest {
+		attributes([
+				'Manifest-Version': '1.0',
+				'Created-By': "Gradle ${gradle.gradleVersion} - JDK ${System.getProperty("java.specification.version")} (${System.getProperty("java.version")})",
+				'Implementation-Title': project.group,
+				'Implementation-Vendor': rootProject.name,
+		        'Implementation-Version': project.version,
+				'Implementation-Date': timestamp()
+		])
 	}
 }
 
@@ -73,16 +93,16 @@ bintray {
 		repo = 'maven'
 		name = "Twitch4J"
 		desc = project.description
-		websiteUrl = "https://github.com/twitch4j/twitch4j"
-		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
-		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
+		websiteUrl = url
+		issueTrackerUrl = "${projectUrl}/issues"
+		vcsUrl = gitUrl
 		licenses = ['MIT']
 		labels = ['twitch', 'kraken', 'helix', 'twitch-pubsub', 'twitch-irc' ]
 		publicDownloadNumbers = true
 		version {
-			name = String.valueOf(project.version).replace("v", "")
-			vcsTag = project.version
-			released = new Date()
+			name = project.version
+			vcsTag = System.getenv("TRAVIS_TAG") ?: project.version
+			released = Calendar.getInstance(TimeZone.getTimeZone("GMT")).time
 		}
 	}
 }

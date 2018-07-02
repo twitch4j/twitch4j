@@ -6,11 +6,19 @@ plugins {
 	id 'net.ltgt.apt-idea' version '0.15'
 	id 'com.jfrog.bintray' version '1.8.1'
 	id 'net.ltgt.apt-eclipse' version '0.15'
+	id 'pl.allegro.tech.build.axion-release' version '1.9.2'
+	id "com.gorylenko.gradle-git-properties" version '1.5.1'
 	id 'io.spring.dependency-management' version '1.0.5.RELEASE'
 }
 
 allprojects {
 	apply plugin: 'io.spring.dependency-management'
+
+	ext {
+		projectUrl = 'https://github.com/twitch4j/twitch4j'
+		gitUrl = 'https://github.com/twitch4j/twitch4j.git'
+		url = projectUrl
+	}
 
 	dependencyManagement {
 		// BOMs
@@ -72,10 +80,21 @@ allprojects {
 		maven { url "https://jitpack.io" }
 	}
 
+	scmVersion {
+		useHighestVersion = true
+		tag {
+			prefix = 'v'
+			versionSeparator = ''
+		}
+		createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
+		releaseCommitMessage { version, position -> "chore(RELEASE): Release ${version}" } // custom commit message if commits are created
+	}
+
 	// Artifact Info
 	group = 'com.github.twitch4j'
 	description = 'This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)'
-	version = (System.getenv().containsKey("TRAVIS_TAG")) ? System.getenv("TRAVIS_TAG") : "v0.11.0-SNAPSHOT"
+	// Acquire for deploying using Travis CI
+	project.version = scmVersion.version
 
 	configurations.all {
 		// Disable Gradle Caching

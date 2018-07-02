@@ -1,0 +1,42 @@
+apply plugin: 'com.gorylenko.gradle-git-properties'
+apply plugin: 'pl.allegro.tech.build.axion-release'
+
+gitProperties {
+	keys = [
+			'git.commit.id',
+			'git.commit.id.abbrev',
+			'git.closest.tag.name',
+			'git.closest.tag.commit.count',
+			'git.commit.id.describe'
+	]
+	dateFormatTimeZone = 'GMT'
+	customProperty 'application.name', rootProject.name
+	customProperty 'application.version', project.version
+	customProperty 'application.description', project.description
+	customProperty 'application.url', url
+}
+
+scmVersion {
+	ignoreUncommittedChanges = true
+	useHighestVersion = true
+	tag {
+		prefix = 'v'
+		versionSeparator = ''
+	}
+	versionIncrementer 'incrementMajor'
+	nextVersion {
+		suffix = 'alpha'
+		separator = '-'
+	}
+	hooks {
+		pre 'fileUpdate', [file: 'README.md', pattern: { v, c -> /compile '${rootProject.group}:twitch4j-core:(.+)'/}, replacement: {v, c -> "compile '${rootProject.group}:twitch4j-core:${v.substring(c)}'"}]
+		pre 'fileUpdate', [file: 'README.md', pattern: { v, c -> /<version>(.+)<\/version>/}, replacement: {v, c -> "<version>${v.substring(c)}</version>"}]
+		pre 'commit', { v, p -> "RELEASE(${v.substring(p)}): Release ${v}" }
+		post 'push'
+	}
+	checks {
+		uncommittedChanges = true
+		aheadOfRemote = true
+		snapshotDependencies = true
+	}
+}
