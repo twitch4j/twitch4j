@@ -102,6 +102,9 @@ public enum TwitchScopes {
 		for (TwitchScopes scope : scopes) {
 			sb.append(scope.getKey()).append("+");
 		}
+		if (sb.length() > 0 && sb.charAt(sb.length() - 1) == '+') {
+			sb.setLength(sb.length() - 1);
+		}
 		return sb.toString();
 	}
 
