@@ -120,7 +120,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		Assert.notNull(userId, "Please provide a User ID!");
 
 		// Endpoint
-		String requestUrl = String.format("%s/users/%d", userId);
+		String requestUrl = String.format("/users/%d", userId);
 
 		// REST Request
 		try {

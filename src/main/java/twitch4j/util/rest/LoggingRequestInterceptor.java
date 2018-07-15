@@ -26,15 +26,17 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 		ClientHttpResponse response = execution.execute(request, body);
 
-		log(request, body, response);
+		log(request, body);
 
 		return response;
 	}
 
-	private void log(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
+	private void log(HttpRequest request, byte[] body) {
 		// do logging
 		log.info("Request: [{}] {}", request.getMethod(), request.getURI());
-		log.info("\tHeaders: {}{}", request.getMethod(), request.getURI());
-		log.info("\tBody: {}", Arrays.toString(body));
+		log.info("Headers: {}", request.getHeaders());
+		if (body.length > 0) {
+			log.info("Body: {}", Arrays.toString(body));
+		}
 	}
 }

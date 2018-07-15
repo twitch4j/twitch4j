@@ -3,7 +3,8 @@ package twitch4j.util.rest;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import twitch4j.auth.model.OAuthCredential;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
@@ -15,23 +16,15 @@ import org.springframework.web.client.RestTemplate;
  * @version %I%, %G%
  * @since 1.0
  */
+
 @Getter
-@Setter
+@NoArgsConstructor
 public class RestClient {
 
 	/**
 	 * REST Request Interceptors (adding header-values/query parameters/... to requests)
 	 */
-	private List<ClientHttpRequestInterceptor> restInterceptors;
-
-	/**
-	 * Class Constructor
-	 */
-	public RestClient() {
-		super();
-
-		setRestInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
-	}
+	private final List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 
 	/**
 	 * Adds a interceptor to the Rest Template.
@@ -55,6 +48,7 @@ public class RestClient {
 		putRestInterceptor(new LoggingRequestInterceptor());
 
 		restTemplate.setInterceptors(restInterceptors);
+		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("https://api.twitch.tv/kraken"));
 
 		return restTemplate;
 	}
