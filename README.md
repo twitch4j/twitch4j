@@ -39,7 +39,7 @@ and: (latest, you should use the actual version here)
 
 ```groovy
 dependencies {
-    compile 'com.github.twitch4j:twitch4j:0.11.0'
+    compile 'com.github.twitch4j:twitch4j:v0.11.0'
 }
 ```
 
@@ -59,7 +59,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>0.11.0</version>
+    <version>v0.11.0</version>
 </dependency>
 ```
 
@@ -72,7 +72,7 @@ and: (latest, you should use the actual version here)
  
 #### Twitch REST Endpoints
  - [ ] Bits
- - [ ] Channel Feed
+ - [x] ~~Channel Feed~~ #50
  - [x] Channels
  - [ ] Chat
  - [ ] Clips
