@@ -178,18 +178,11 @@ public abstract class Command {
 	public List<User> getCommandArgumentTargetUsers() {
 		Pattern patternMention = Pattern.compile("@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
 
-		List<User> targetUserList = new ArrayList<User>();
 		List<String> targetUserNameList = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
-
-		for (String userName : targetUserNameList) {
-			Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUserByUserName(userName);
-
-			// Username Valid?
-			// Add to Targets
-			targetUser.ifPresent(targetUserList::add);
+		if (targetUserNameList.isEmpty()) {
+			return Collections.emptyList();
 		}
-
-		return targetUserList;
+		return targetUserNameList.stream().map(getTwitchClient().getUserEndpoint()::getUserByUserName).collect(Collectors.toList());
 	}
 
 	/**

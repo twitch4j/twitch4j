@@ -8,6 +8,8 @@ import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
 
+import java.util.Optional;
+
 /**
  * This event gets called when a user gets a new subscriber or a user resubscribes.
  * <p>
@@ -34,15 +36,27 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	private Subscription subscription;
 
 	/**
+	 * Subscription Message
+	 */
+	private Optional<String> message;
+
+	/**
+	 *
+	 */
+	private Integer months;
+
+	/**
 	 * Event Constructor
 	 *
 	 * @param channel      The channel that this event originates from.
 	 * @param subscription The subscription, containing all relevant information.
 	 */
-	public SubscriptionEvent(Channel channel, Subscription subscription) {
+	public SubscriptionEvent(Channel channel, Subscription subscription, Optional<String> message, Integer months) {
 		super(channel);
 		this.user = subscription.getUser();
 		this.subscription = subscription;
+		this.message = message;
+		this.months = months;
 	}
 
 }

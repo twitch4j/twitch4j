@@ -1,13 +1,5 @@
 package me.philippheuer.twitch4j.modules;
 
-import com.jcabi.log.Logger;
-import lombok.*;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.modules.event.ModuleDisabledEvent;
-import me.philippheuer.twitch4j.modules.event.ModuleEnabledEvent;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -16,12 +8,28 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.modules.event.ModuleDisabledEvent;
+import me.philippheuer.twitch4j.modules.event.ModuleEnabledEvent;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
+@Slf4j
 public class ModuleLoader {
 
 	public static final String MODULE_DIR = "modules";
@@ -62,12 +70,12 @@ public class ModuleLoader {
 			try {
 				IModule module = clazz.newInstance();
 				ModulePair modulePair = new ModulePair(module, false);
-				Logger.info(this, "Loading module $s", module.getName(), module.getVersion(), module.getAuthor());
+				log.info("Loading module {}", module.getName(), module.getVersion(), module.getAuthor());
 				if (Configuration.AUTOMATICALLY_ENABLE_MODULES) {
 					enableModule(module);
 				} else addModule(module);
 			} catch (InstantiationException | IllegalAccessException e) {
-				Logger.error(this, "Unable to load module " + clazz.getName() + "!", ExceptionUtils.getStackTrace(e));
+				log.error("Unable to load module " + clazz.getName() + "!", e);
 			}
 		});
 	}
@@ -134,7 +142,7 @@ public class ModuleLoader {
 	private static void loadModulesFromDirectory(File modulesDir) {
 		File[] files = modulesDir.listFiles((FilenameFilter) FileFilterUtils.suffixFileFilter("jar"));
 		if (files != null && files.length > 0) {
-			Logger.info(ModuleLoader.class, "Attempting to load %s external module(s)...", files.length);
+			log.info("Attempting to load {} external module(s)...", files.length);
 			loadExternalModules(Arrays.asList(files));
 		}
 	}
@@ -176,14 +184,14 @@ public class ModuleLoader {
 					}
 				} else {
 					for (String moduleClass : moduleClasses) {
-						Logger.info(ModuleLoader.class, "Loading Class from Manifest Attribute: %s", moduleClass);
+						log.info("Loading Class from Manifest Attribute: {}", moduleClass);
 						Class classInstance = loadClass(moduleClass);
 						if (IModule.class.isAssignableFrom(classInstance))
 							addModuleClass(classInstance);
 					}
 				}
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | ClassNotFoundException e) {
-				Logger.error(ModuleLoader.class, "Unable to load module " + file.getName() + "!", ExceptionUtils.getStackTrace(e));
+				log.error("Unable to load module " + file.getName() + "!", e);
 			}
 		}
 	}

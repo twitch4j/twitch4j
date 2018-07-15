@@ -18,7 +18,7 @@ public class ChannelEndpointIntegrationTest extends TwitchClientIntegrationTest 
 	 */
 	@Test
 	public void testGetFollowers() {
-		List<Follow> followList = twitchClient.getChannelEndpoint(CHANNEL_ID).getFollowers(Optional.ofNullable(100l), Optional.empty());
+		List<Follow> followList = twitchClient.getChannelEndpoint().getFollowers(CHANNEL_ID, 100, null);
 
 		// Result
 		assertNotNull(followList);

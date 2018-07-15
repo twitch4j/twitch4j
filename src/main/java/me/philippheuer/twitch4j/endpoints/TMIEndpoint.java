@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.endpoints;
 
 import com.jcabi.log.Logger;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.exceptions.RestException;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * Twitch Messaging Interface (TMI)
  * This Endpoint can be changed at any time. (Unofficial)
  */
+@Slf4j
 public class TMIEndpoint extends AbstractTwitchEndpoint {
 
 	/**
@@ -43,7 +45,7 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 		// REST Request
 		try {
 			if (!restObjectCache.containsKey(requestUrl)) {
-				Logger.trace(this, "Rest Request to [%s]", requestUrl);
+				log.trace("Rest Request to [{}]", requestUrl);
 				ChatterResult responseObject = restTemplate.getForObject(requestUrl, ChatterResult.class);
 				restObjectCache.put(requestUrl, responseObject, ExpirationPolicy.CREATED, 60, TimeUnit.SECONDS);
 			}
@@ -51,10 +53,9 @@ public class TMIEndpoint extends AbstractTwitchEndpoint {
 			return ((ChatterResult) restObjectCache.get(requestUrl)).getChatters();
 
 		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			log.error("RestException: {}", restException.getRestError().toString());
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error("Request failed: " + ex.getMessage(), ex);
 		}
 
 		// OnError: Return empty result

@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Data
+@Slf4j
 public class TwitchChat {
 
 	/**
@@ -118,13 +120,13 @@ public class TwitchChat {
 
 				@Override
 				public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
-					Logger.info(this, "Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
+					log.info("Connecting to Twitch IRC [%s]", Endpoints.IRC.getURL());
 
 					sendCommand("cap req", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands");
 
 					// if credentials is null, it will automatically disconnect
 					if (!credential.isPresent()) {
-						Logger.error(this, "The Twitch IRC Client needs valid Credentials from the CredentialManager.");
+						log.error("The Twitch IRC Client needs valid Credentials from the CredentialManager.");
 						disconnect();
 						return; // do not continue script
 					}
@@ -158,7 +160,7 @@ public class TwitchChat {
 									}
 									// - Login failed.
 									else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
-										Logger.error(this, "Invalid IRC Credentials. Login failed!");
+										log.error("Invalid IRC Credentials. Login failed!");
 									}
 									// - Parse IRC Message
 									else
@@ -169,10 +171,10 @@ public class TwitchChat {
 											if(event.isValid()) {
 												getTwitchClient().getDispatcher().dispatch(event);
 											} else {
-												Logger.trace(this, "Can't parse " + event.getRawMessage());
+												log.trace("Can't parse {}", event.getRawMessage());
 											}
 										} catch (Exception ex) {
-											Logger.error(this, ExceptionUtils.getStackTrace(ex));
+											log.error(ex.getMessage(), ex);
 										}
 									}
 								}
@@ -182,20 +184,19 @@ public class TwitchChat {
 										   WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
 										   boolean closedByServer) {
 					if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
-						Logger.info(this, "Connection to Twitch IRC lost (WebSocket)! Retrying ...");
+						log.info("Connection to Twitch IRC lost (WebSocket)! Retrying ...");
 
 						// connection lost - reconnecting
 						reconnect();
 					} else {
 						setConnectionState(TMIConnectionState.DISCONNECTED);
-						Logger.info(this, "Disconnected from Twitch IRC (WebSocket)!");
+						log.info("Disconnected from Twitch IRC (WebSocket)!");
 					}
 				}
 			});
 
 		} catch (Exception ex) {
-			Logger.error(this, ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
+			log.error(ex.getMessage(), ex);
 		}
 	}
 	/**
@@ -246,12 +247,12 @@ public class TwitchChat {
 				// Message Bucket
 				updateMessageBucket();
 			} catch (Exception ex) {
-				Logger.error(this, "Connection to Twitch IRC failed: %s - Retrying ...", ex.getMessage());
+				log.error("Connection to Twitch IRC failed: {} - Retrying ...", ex.getMessage());
 
 				try {
 					Thread.sleep(1000);
 				} catch (Exception et) {
-					et.printStackTrace();
+					log.error(et.getMessage(), et);
 				}
 
 				wsLock.unlock();
@@ -296,8 +297,8 @@ public class TwitchChat {
 	 */
 	public void updateMessageBucket() {
 		if (credential.isPresent()) {
-			Optional<UserChat> userChat = twitchClient.getUserEndpoint().getUserChat(credential.get().getUserId());
-			messageBucket = (userChat.isPresent() && userChat.get().getIsKnownBot()) ? setIncreasedMessageBucket() : setDefaultMessageBucket();
+			UserChat userChat = twitchClient.getUserEndpoint().getUserChat(credential.get().getUserId());
+			messageBucket = (userChat.getIsKnownBot()) ? setIncreasedMessageBucket() : setDefaultMessageBucket();
 		} else {
 			messageBucket = setDefaultMessageBucket();
 		}
@@ -314,7 +315,7 @@ public class TwitchChat {
 			// command will be uppercase.
 			this.ws.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
 		} else {
-			Logger.warn(this, String.format("Can't send IRC-WS Command [%s %s]", command.toUpperCase(), String.join(" ", args)));
+			log.warn("Can't send IRC-WS Command [{} {}]", command.toUpperCase(), String.join(" ", args));
 		}
 	}
 
@@ -335,11 +336,11 @@ public class TwitchChat {
 	 * @return Moderator (true) or User (false)
 	 */
 	public boolean isModerator(String channel) {
-		Optional<User> botUser = getTwitchClient().getUserEndpoint().getUser(credential.get().getUserId());
+		User botUser = getTwitchClient().getUserEndpoint().getUser(credential.get().getUserId());
 		// Get Credential from CredentialManager
-		if(getChannelCache().containsKey(channel) && botUser.isPresent()) {
+		if(getChannelCache().containsKey(channel)) {
 			for(User mod : getChannelCache().get(channel).getModerators()) {
-				if(mod.getId().equals(botUser.get().getId())) {
+				if (mod.getId().equals(botUser.getId())) {
 					return true;
 				}
 			}
@@ -357,7 +358,7 @@ public class TwitchChat {
 			sendCommand("join", "#" + channel);
 			channelCache.put(channel, new ChannelCache(this, channel));
 
-			Logger.debug(this, "Joining Channel [%s].", channel);
+			log.debug("Joining Channel [{}].", channel);
 
 			TokenBucket modBucket = TokenBuckets.builder()
 					.withCapacity(100)
@@ -382,18 +383,16 @@ public class TwitchChat {
 	 * @param channelName channel name
 	 */
 	public void leaveChannel(String channelName) {
-		Channel channel = twitchClient.getChannelEndpoint(channelName).getChannel();
+		Channel channel = twitchClient.getChannelEndpoint().getChannel(channelName);
 		if (channelCache.containsKey(channelName)) {
 			sendCommand("part", "#" + channel.getName());
 			channelCache.remove(channelName);
 
-			Logger.debug(this, "Leaving Channel [%s].", channelName);
+			log.debug("Leaving Channel [{}].", channelName);
 		}
 
 		// Remove message bucket
-		if (modMessageBucket.containsKey(channelName)) {
-			modMessageBucket.remove(channelName);
-		}
+		modMessageBucket.remove(channelName);
 	}
 
 
@@ -403,7 +402,7 @@ public class TwitchChat {
 	 * @param message message
 	 */
 	public void sendMessage(String channel, String message) {
-		Logger.debug(this, "Sending message to channel [%s] with content [%s].!", channel, message);
+		log.debug("Sending message to channel [{}] with content [{}].", channel, message);
 		new Thread(() -> {
 			// Consume 1 Token (wait's in case the limit has been exceeded)
 			if (isModerator(channel)) {
@@ -417,7 +416,7 @@ public class TwitchChat {
 			sendCommand("privmsg", "#" + channel, ":" + message);
 
 			// Logging
-			Logger.debug(this, "Message send to Channel [%s] with content [%s].", channel, message);
+			log.debug("Message send to Channel [{}] with content [{}].", channel, message);
 		}).start();
 	}
 
@@ -439,23 +438,25 @@ public class TwitchChat {
 	 * @param message message
 	 */
 	public void sendPrivateMessage(String username, String message) {
-		Optional<User> twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
-		OAuthCredential credential = twitchClient.getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
-		twitchUser.ifPresent(user -> sendCommand("privmsg", "#" + credential.getUserName(), "/w", user.getName(), message));
+		User twitchUser = twitchClient.getUserEndpoint().getUserByUserName(username);
+		twitchClient.getCredentialManager().getTwitchCredentialsForIRC().ifPresent( credential ->
+				sendCommand("privmsg", "#" + credential.getUserName(), "/w", twitchUser.getName(), message));
 	}
 
 	/**
 	 * Gets the status of the IRC Client.
 	 *
 	 * @return Whether the service or operating normally or not.
+	 * @deprecated
 	 */
+	@Deprecated
 	public Map.Entry<Boolean, String> checkEndpointStatus() {
 		// Check
 		OAuthCredential credential = getTwitchClient().getCredentialManager().getTwitchCredentialsForIRC().orElse(null);
 		if(credential == null) {
 			return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials not present!");
 		} else {
-			if(!credential.getOAuthScopes().contains(Scope.CHAT_LOGIN.getKey())) {
+			if(!credential.getOAuthScopes().contains(Scope.CHAT_LOGIN)) {
 				return new AbstractMap.SimpleEntry<>(false, "Twitch IRC Credentials are missing the CHAT_LOGIN Scope! Please fix the permissions in your oauth request!");
 			}
 		}

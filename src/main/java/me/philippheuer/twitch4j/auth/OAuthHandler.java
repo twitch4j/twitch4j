@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
+import me.philippheuer.twitch4j.enums.Scope;
 import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
 
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -81,9 +83,9 @@ public class OAuthHandler {
 										if (credential != null) {
 											// Add requested Scopes to credential (separated by space when more than one is requested)
 											if (responseScope.contains(" ")) {
-												credential.getOAuthScopes().addAll(Arrays.asList(responseScope.split("\\s")));
+												credential.getOAuthScopes().addAll(Arrays.stream(responseScope.split("\\s")).map(Scope::fromString).collect(Collectors.toList()));
 											} else {
-												credential.getOAuthScopes().add(responseScope);
+												credential.getOAuthScopes().add(Scope.fromString(responseScope));
 											}
 
 											// Check for custom key, to store in credential manager

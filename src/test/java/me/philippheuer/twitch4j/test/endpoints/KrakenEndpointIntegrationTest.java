@@ -21,7 +21,7 @@ public class KrakenEndpointIntegrationTest extends TwitchClientIntegrationTest {
 		Token token = twitchClient.getKrakenEndpoint().getToken(credential);
 
 		// Result
-		assertTrue(token.getValid() == false);
+		assertTrue(!token.getValid());
 	}
 
 	/**

@@ -16,7 +16,7 @@ public class GameEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	 */
 	@Test
 	public void testGetTopGames() {
-		List<TopGame> gameList = twitchClient.getGameEndpoint().getTopGames();
+		List<TopGame> gameList = twitchClient.getGameEndpoint().getTopGames(null, null);
 
 		// Result
 		assertNotNull(gameList);

@@ -1,6 +1,7 @@
 package me.philippheuer.util.rest;
 
-import com.jcabi.log.Logger;
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -18,6 +19,7 @@ import java.io.IOException;
  * @version %I%, %G%
  * @since 1.0
  */
+@Slf4j
 public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 	@Override
@@ -32,6 +34,8 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 	private void log(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
 		// do logging
-		Logger.info(this, "Request: [ %s ][ %s ][ %s ][ %s ]", request.getURI(), request.getMethod(), request.getHeaders(), body.toString());
+		log.info("Request: [{}] {}", request.getMethod(), request.getURI());
+		log.info("\tHeaders: {}{}", request.getMethod(), request.getURI());
+		log.info("\tBody: {}", Arrays.toString(body));
 	}
 }

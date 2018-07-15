@@ -440,4 +440,8 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			return false;
 		}
 	}
+
+	public UserChat getUserChat(Long userId) {
+		return this.restTemplate.getForObject(String.format("/users/%s/chat", userId), UserChat.class);
+	}
 }

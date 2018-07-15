@@ -1,10 +1,9 @@
 package me.philippheuer.util.desktop;
 
-import com.jcabi.log.Logger;
-import org.apache.commons.lang3.SystemUtils;
-
-import java.awt.*;
+import java.awt.Desktop;
 import java.net.URI;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 
 /**
  * Website Utils
@@ -13,6 +12,7 @@ import java.net.URI;
  * @version %I%, %G%
  * @since 1.0
  */
+@Slf4j
 public class WebsiteUtils {
 
 	/**
@@ -29,7 +29,7 @@ public class WebsiteUtils {
 				throw new UnsupportedOperationException("Desktop class can't open browser, trying open from Runtime.");
 			}
 		} catch (Exception e) {
-			Logger.warn(WebsiteUtils.class, e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			openRuntime(uri);
 		}
 	}
@@ -42,12 +42,12 @@ public class WebsiteUtils {
 			} else if (SystemUtils.IS_OS_MAC) {
 				runtime.exec("open " + uri);
 			} else if (SystemUtils.IS_OS_LINUX) {
-				runtime.exec("xdg-open "+ uri);
+				runtime.exec("xdg-open " + uri);
 			} else {
 				throw new RuntimeException("Cannot open url: " + uri, new UnsupportedOperationException("You OS is unsupported"));
 			}
 		} catch (Exception ex) {
-			Logger.error(WebsiteUtils.class, ex.getMessage(), ex);
+			log.error(ex.getMessage(), ex);
 		}
 	}
 

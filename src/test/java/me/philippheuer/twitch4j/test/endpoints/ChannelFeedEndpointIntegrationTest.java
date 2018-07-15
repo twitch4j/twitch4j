@@ -19,7 +19,7 @@ public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationT
 	 */
 	@Test
 	public void testGetFeedPosts() {
-		List<ChannelFeedPost> channelFeedPosts = twitchClient.getChannelFeedEndpoint().getFeedPosts(CHANNEL_ID, Optional.empty(), Optional.empty(), Optional.empty());
+		List<ChannelFeedPost> channelFeedPosts = twitchClient.getChannelFeedEndpoint().getFeedPosts(CHANNEL_ID, null, null, null);
 
 		// Result
 		Assert.isTrue(channelFeedPosts != null && channelFeedPosts.size() > 0, "No posts found!");
@@ -36,7 +36,7 @@ public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationT
 	public void testGetFeedPost() {
 		String postId = "c5527e8a-7cb5-40ca-b434-160ef0bd0b1b";
 
-		ChannelFeedPost post = twitchClient.getChannelFeedEndpoint().getFeedPost(CHANNEL_ID, postId, Optional.empty());
+		ChannelFeedPost post = twitchClient.getChannelFeedEndpoint().getFeedPost(CHANNEL_ID, postId, null);
 		// System.out.println(post);
 
 		AssertEntity.assertChannelFeedPost(post);

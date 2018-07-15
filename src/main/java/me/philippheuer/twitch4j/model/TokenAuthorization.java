@@ -1,6 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import me.philippheuer.twitch4j.enums.Scope;
+import me.philippheuer.util.conversion.ScopeDeserializer;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +18,8 @@ import java.util.List;
 @Data
 public class TokenAuthorization {
 
-	private List<String> scopes;
+	@JsonDeserialize(as = ScopeDeserializer.class)
+	private List<Scope> scopes;
 
 	private Date createdAt;
 

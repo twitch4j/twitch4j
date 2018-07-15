@@ -55,6 +55,17 @@ public class ChannelEndpoint extends AbstractTwitchEndpoint {
 		}
 	}
 
+
+	/**
+	 * Endpoint: Get Channel
+	 * Gets a specified channel object.
+	 *
+	 * @return todo
+	 */
+	public Channel getChannel(String channelName) {
+		return getChannel(client.getUserEndpoint().getUserIdByUserName(channelName));
+	}
+
 	/**
 	 * Endpoint: Get Channel
 	 * Get Channel returns more data than Get Channel by ID because Get Channel is privileged.

@@ -28,4 +28,8 @@ public class Subscription {
 
 	@JsonProperty("sub_plan_name")
 	private String subscriptionName;
+
+	public void setSubPlanByCode(String subPlan) {
+		this.subscriptionPlan = SubscriptionPlan.fromString(subPlan);
+	}
 }

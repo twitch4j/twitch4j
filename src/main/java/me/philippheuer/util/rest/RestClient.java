@@ -53,7 +53,8 @@ public class RestClient {
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = getPlainRestTemplate();
 
-		// Request Interceptors
+		putRestInterceptor(new LoggingRequestInterceptor());
+
 		restTemplate.setInterceptors(restInterceptors);
 
 		return restTemplate;
