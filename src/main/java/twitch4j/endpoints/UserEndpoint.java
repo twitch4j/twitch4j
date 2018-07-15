@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.enums.Scope;
@@ -27,9 +30,6 @@ import twitch4j.model.UserList;
 import twitch4j.model.UserSubscriptionCheck;
 import twitch4j.util.rest.HeaderRequestInterceptor;
 import twitch4j.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.Assert;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class UserEndpoint extends AbstractTwitchEndpoint {

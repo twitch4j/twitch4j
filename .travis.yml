@@ -25,4 +25,3 @@ deploy:
     script: ./gradlew bintrayUpload
     on:
       tags: true
-      branch: master

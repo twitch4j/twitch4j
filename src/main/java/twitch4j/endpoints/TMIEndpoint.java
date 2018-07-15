@@ -2,6 +2,8 @@ package twitch4j.endpoints;
 
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.enums.Endpoints;
 import twitch4j.exceptions.RestException;
@@ -9,8 +11,6 @@ import twitch4j.model.Channel;
 import twitch4j.model.User;
 import twitch4j.model.tmi.Chatter;
 import twitch4j.model.tmi.ChatterResult;
-import net.jodah.expiringmap.ExpirationPolicy;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Twitch Messaging Interface (TMI)

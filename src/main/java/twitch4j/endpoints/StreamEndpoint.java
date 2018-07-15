@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.enums.Scope;
@@ -28,8 +30,6 @@ import twitch4j.model.User;
 import twitch4j.util.annotation.Unofficial;
 import twitch4j.util.rest.HeaderRequestInterceptor;
 import twitch4j.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * All api methods related to a stream.

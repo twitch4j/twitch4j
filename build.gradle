@@ -24,7 +24,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = "0.11.0"
+version = "v0.11.0"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'twitch4j.TwitchClient'

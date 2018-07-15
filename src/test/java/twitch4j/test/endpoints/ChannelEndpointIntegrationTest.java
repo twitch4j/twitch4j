@@ -1,12 +1,12 @@
 package twitch4j.test.endpoints;
 
 import java.util.List;
-import twitch4j.model.Follow;
-import twitch4j.test.TwitchClientIntegrationTest;
-import twitch4j.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.util.Assert;
+import twitch4j.model.Follow;
+import twitch4j.test.TwitchClientIntegrationTest;
+import twitch4j.util.test.IntegrationTestCategory;
 
 @Category(IntegrationTestCategory.class)
 public class ChannelEndpointIntegrationTest extends TwitchClientIntegrationTest {

@@ -13,9 +13,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import twitch4j.events.Event;
 import twitch4j.message.commands.CommandPermission;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This event gets called when we receive a raw irc message.

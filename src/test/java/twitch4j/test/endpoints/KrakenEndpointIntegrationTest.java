@@ -1,11 +1,11 @@
 package twitch4j.test.endpoints;
 
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.model.Token;
 import twitch4j.test.TwitchClientIntegrationTest;
 import twitch4j.util.test.IntegrationTestCategory;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTestCategory.class)
 public class KrakenEndpointIntegrationTest extends TwitchClientIntegrationTest {

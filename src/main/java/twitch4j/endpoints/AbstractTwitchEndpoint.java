@@ -3,12 +3,12 @@ package twitch4j.endpoints;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import twitch4j.TwitchClient;
-import twitch4j.enums.Scope;
-import twitch4j.exceptions.ScopeMissingException;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.springframework.web.client.RestTemplate;
+import twitch4j.TwitchClient;
+import twitch4j.enums.Scope;
+import twitch4j.exceptions.ScopeMissingException;
 
 @RequiredArgsConstructor
 abstract class AbstractTwitchEndpoint {

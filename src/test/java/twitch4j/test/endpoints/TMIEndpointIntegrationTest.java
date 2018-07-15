@@ -1,10 +1,10 @@
 package twitch4j.test.endpoints;
 
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import twitch4j.model.tmi.Chatter;
 import twitch4j.test.TwitchClientIntegrationTest;
 import twitch4j.util.test.IntegrationTestCategory;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 /**
  * These tests check the unofficial tmi endpoints.

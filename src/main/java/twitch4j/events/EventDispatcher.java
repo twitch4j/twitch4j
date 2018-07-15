@@ -10,8 +10,8 @@ import java.util.concurrent.Executors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import twitch4j.TwitchClient;
 import net.jodah.typetools.TypeResolver;
+import twitch4j.TwitchClient;
 
 /**
  * Manages event listeners and event logic.

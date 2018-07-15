@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.model.ChatRoom;
 import twitch4j.model.ChatRoomList;
@@ -12,9 +15,6 @@ import twitch4j.model.EmoteSets;
 import twitch4j.model.Emoticon;
 import twitch4j.model.EmoticonList;
 import twitch4j.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.Assert;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class ChatEndpoint extends AbstractTwitchEndpoint {

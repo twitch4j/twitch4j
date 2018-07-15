@@ -17,6 +17,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.isomorphism.util.TokenBucket;
+import org.isomorphism.util.TokenBuckets;
+import org.springframework.util.Assert;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.enums.Endpoints;
@@ -26,9 +29,6 @@ import twitch4j.events.event.irc.IRCMessageEvent;
 import twitch4j.model.Channel;
 import twitch4j.model.User;
 import twitch4j.model.UserChat;
-import org.isomorphism.util.TokenBucket;
-import org.isomorphism.util.TokenBuckets;
-import org.springframework.util.Assert;
 
 @Data
 @Slf4j

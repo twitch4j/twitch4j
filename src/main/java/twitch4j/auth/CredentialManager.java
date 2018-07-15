@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.auth.model.OAuthRequest;
 import twitch4j.events.event.system.AuthTokenExpiredEvent;
 import twitch4j.model.Token;
-import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
 
 /**
  * This class managed all oauth credentials for the verious services.

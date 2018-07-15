@@ -21,10 +21,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import twitch4j.TwitchClient;
 import twitch4j.enums.Endpoints;
 import twitch4j.enums.TMIConnectionState;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @Slf4j
 public class PubSub {

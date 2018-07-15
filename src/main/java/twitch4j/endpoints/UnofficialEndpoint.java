@@ -1,12 +1,12 @@
 package twitch4j.endpoints;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import twitch4j.TwitchClient;
 import twitch4j.model.unofficial.AdvancedChannelInformation;
 import twitch4j.model.unofficial.Ember;
 import twitch4j.util.annotation.Unofficial;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Slf4j
 @Unofficial

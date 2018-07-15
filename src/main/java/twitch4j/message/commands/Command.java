@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import twitch4j.TwitchClient;
 import twitch4j.events.event.irc.ChannelMessageEvent;
 import twitch4j.model.User;
 import twitch4j.util.conversion.TypeConvert;
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 
 @Getter
 @Setter

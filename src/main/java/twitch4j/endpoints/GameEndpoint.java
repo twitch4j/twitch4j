@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.model.TopGame;
 import twitch4j.model.TopGameList;
 import twitch4j.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class GameEndpoint extends AbstractTwitchEndpoint {

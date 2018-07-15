@@ -23,10 +23,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import twitch4j.TwitchClient;
 import twitch4j.modules.event.ModuleDisabledEvent;
 import twitch4j.modules.event.ModuleEnabledEvent;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 
 @Slf4j
 public class ModuleLoader {

@@ -6,11 +6,11 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import ratpack.server.RatpackServer;
+import ratpack.server.Stopper;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.auth.model.OAuthRequest;
 import twitch4j.enums.Scope;
-import ratpack.server.RatpackServer;
-import ratpack.server.Stopper;
 
 @Getter
 @Setter

@@ -6,12 +6,12 @@ import java.util.concurrent.TimeUnit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.util.Assert;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.events.Event;
 import twitch4j.events.event.irc.ChannelStateEvent;
 import twitch4j.model.Channel;
 import twitch4j.model.User;
-import org.springframework.util.Assert;
 
 /**
  * This event is a base for events that originate from a channel.

@@ -9,9 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
+import org.springframework.util.Assert;
 import twitch4j.auth.CredentialManager;
 import twitch4j.auth.model.OAuthCredential;
-import org.springframework.util.Assert;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.

@@ -6,6 +6,8 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.enums.BroadcastType;
@@ -18,8 +20,6 @@ import twitch4j.model.VideoList;
 import twitch4j.model.VideoTopList;
 import twitch4j.util.rest.HeaderRequestInterceptor;
 import twitch4j.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class VideoEndpoint extends AbstractTwitchEndpoint {

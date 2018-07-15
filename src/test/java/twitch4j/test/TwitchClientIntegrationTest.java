@@ -1,10 +1,10 @@
 package twitch4j.test;
 
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
 import twitch4j.TwitchClient;
 import twitch4j.TwitchClientBuilder;
 import twitch4j.util.test.IntegrationTestCategory;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTestCategory.class)
 abstract public class TwitchClientIntegrationTest extends TestCase {

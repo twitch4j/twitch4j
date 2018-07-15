@@ -1,10 +1,10 @@
 package twitch4j.test.endpoints;
 
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import twitch4j.model.User;
 import twitch4j.test.TwitchClientIntegrationTest;
 import twitch4j.util.test.IntegrationTestCategory;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTestCategory.class)
 public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {

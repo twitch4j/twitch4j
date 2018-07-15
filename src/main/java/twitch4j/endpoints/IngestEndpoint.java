@@ -3,10 +3,10 @@ package twitch4j.endpoints;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import twitch4j.TwitchClient;
 import twitch4j.model.Ingest;
 import twitch4j.model.IngestList;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @Slf4j
 public class IngestEndpoint extends AbstractTwitchEndpoint {

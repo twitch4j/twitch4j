@@ -2,6 +2,10 @@ package twitch4j.endpoints;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import twitch4j.TwitchClient;
 import twitch4j.auth.model.OAuthCredential;
 import twitch4j.auth.model.twitch.Authorize;
@@ -10,10 +14,6 @@ import twitch4j.exceptions.RestException;
 import twitch4j.model.Token;
 import twitch4j.model.TokenResponse;
 import twitch4j.util.rest.HeaderRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class KrakenEndpoint extends AbstractTwitchEndpoint {

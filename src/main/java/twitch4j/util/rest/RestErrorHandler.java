@@ -3,12 +3,12 @@ package twitch4j.util.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import twitch4j.exceptions.RestException;
-import twitch4j.model.RestError;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
+import twitch4j.exceptions.RestException;
+import twitch4j.model.RestError;
 
 /**
  * Rest Error Handler
