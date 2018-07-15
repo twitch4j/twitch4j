@@ -167,9 +167,11 @@ public class TwitchClient {
 	 * Returns an a new ChannelFeedEndpoint instance.
 	 *
 	 * @return a new instance of {@link ChannelFeedEndpoint}
+	 * @deprecated Twitch removes Channel Feeds and Pulse. More info <a href="https://discuss.dev.twitch.tv/t/how-the-removal-of-channel-feed-and-pulse-affects-the-twitch-api-v5/16540">here</a>.
 	 */
+	@Deprecated
 	public ChannelFeedEndpoint getChannelFeedEndpoint() {
-		return new ChannelFeedEndpoint(this);
+		throw new UnsupportedOperationException("The endpoint has been Deprecated");
 	}
 
 	/**

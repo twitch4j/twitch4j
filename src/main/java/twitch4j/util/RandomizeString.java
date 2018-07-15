@@ -1,4 +1,4 @@
-package twitch4j.util.conversion;
+package twitch4j.util;
 
 import java.util.Random;
 import java.util.regex.Pattern;

@@ -1,5 +1,6 @@
 package twitch4j.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ import lombok.Data;
 @Data
 public class TopGameList {
 
+	@JsonProperty("_total")
 	private int total;
 
 	private List<TopGame> top;

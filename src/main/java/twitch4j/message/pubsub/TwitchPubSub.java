@@ -24,7 +24,7 @@ import twitch4j.enums.PubSubTopics;
 import twitch4j.enums.Scope;
 import twitch4j.enums.TMIConnectionState;
 import twitch4j.model.Channel;
-import twitch4j.util.conversion.RandomizeString;
+import twitch4j.util.RandomizeString;
 
 @Getter
 @Setter

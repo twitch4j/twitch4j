@@ -1,5 +1,6 @@
 package twitch4j.model.unofficial;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Data;
  * @since 1.0
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Ember {
 
 	/**
