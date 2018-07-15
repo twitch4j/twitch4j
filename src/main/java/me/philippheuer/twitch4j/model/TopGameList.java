@@ -1,11 +1,8 @@
 package me.philippheuer.twitch4j.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import lombok.Data;
 
 /**
  * Model representing a popular games on twitch.
@@ -15,10 +12,9 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TopGameList {
 
+	@JsonProperty("_total")
 	private int total;
 
 	private List<TopGame> top;

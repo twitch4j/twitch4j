@@ -1,15 +1,14 @@
 package me.philippheuer.util.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcabi.log.Logger;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.RestError;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-
-import java.io.IOException;
 
 /**
  * Rest Error Handler
@@ -18,12 +17,13 @@ import java.io.IOException;
  * @version %I%, %G%
  * @since 1.0
  */
+@Slf4j
 public class RestErrorHandler implements ResponseErrorHandler {
 
 	@Override
 	public void handleError(ClientHttpResponse clienthttpresponse) throws IOException {
 		if (clienthttpresponse.getStatusCode() == HttpStatus.FORBIDDEN) {
-			Logger.debug(this, HttpStatus.FORBIDDEN + " response. Throwing authentication exception");
+			log.debug(HttpStatus.FORBIDDEN + " response. Throwing authentication exception");
 			// throw new AuthenticationException();
 		}
 	}
@@ -51,22 +51,22 @@ public class RestErrorHandler implements ResponseErrorHandler {
 				}
 
 				throw new RestException(restError);
-				
+
 			} catch (RestException restException) {
 				// Rethrow
 				throw restException;
 			} catch (Exception ex) {
 
 				// No REST Error
-				Logger.trace(this, "Status code: " + clienthttpresponse.getStatusCode());
-				Logger.trace(this, "Response" + clienthttpresponse.getStatusText());
-				Logger.trace(this, "Content: " + content);
+				log.trace("Status code: " + clienthttpresponse.getStatusCode());
+				log.trace("Response" + clienthttpresponse.getStatusText());
+				log.trace("Content: " + content);
 
 				if (clienthttpresponse.getStatusCode() == HttpStatus.FORBIDDEN) {
 					if (content.contains("used Cloudflare to restrict access")) {
-						Logger.warn(this, "Your current ip is banned by cloudflare, so you can't reach the target.");
+						log.warn("Your current ip is banned by cloudflare, so you can't reach the target.");
 					} else {
-						Logger.debug(this, "Call returned a error 403 forbidden resposne ");
+						log.debug("Call returned a error 403 forbidden resposne ");
 					}
 
 					return true;

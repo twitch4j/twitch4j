@@ -6,8 +6,6 @@ import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Optional;
-
 @Category(IntegrationTestCategory.class)
 public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 
@@ -16,10 +14,10 @@ public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	 */
 	@Test
 	public void testGetUserIdByName() {
-		Optional<Long> userId = twitchClient.getUserEndpoint().getUserIdByUserName("twitch4j");
+		Long userId = twitchClient.getUserEndpoint().getUserIdByUserName("twitch4j");
 
-		assertTrue(userId.isPresent());
-		assertEquals(149223493l, (long) userId.get());
+		assertNotNull(userId);
+		assertEquals(149223493L, (long) userId);
 	}
 
 	/**
@@ -27,12 +25,12 @@ public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 	 */
 	@Test
 	public void testGetUser() {
-		Optional<User> user = twitchClient.getUserEndpoint().getUser(149223493l);
+		User user = twitchClient.getUserEndpoint().getUser(149223493L);
 
-		assertTrue(user.isPresent());
-		assertNotNull(user.get().getId());
-		assertNotNull(user.get().getName());
-		assertNotNull(user.get().getDisplayName());
+		assertNotNull(user);
+		assertNotNull(user.getId());
+		assertNotNull(user.getName());
+		assertNotNull(user.getDisplayName());
 	}
 
 }

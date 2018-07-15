@@ -1,4 +1,4 @@
-package me.philippheuer.util.conversion;
+package me.philippheuer.util;
 
 import java.util.Random;
 import java.util.regex.Pattern;

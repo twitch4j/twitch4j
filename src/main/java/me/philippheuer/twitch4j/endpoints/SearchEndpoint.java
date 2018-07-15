@@ -1,30 +1,31 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.ChannelList;
+import me.philippheuer.twitch4j.model.Game;
+import me.philippheuer.twitch4j.model.GameList;
+import me.philippheuer.twitch4j.model.Stream;
+import me.philippheuer.twitch4j.model.StreamList;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Optional;
-
-@Getter
-@Setter
+@Slf4j
 public class SearchEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Search Endpoint
 	 *
-	 * @param twitchClient The TwitchClient.
+	 * @param client The Twitch Client.
 	 */
-	public SearchEndpoint(TwitchClient twitchClient) {
-		super(twitchClient);
+	public SearchEndpoint(TwitchClient client) {
+		super(client, client.getRestClient().getRestTemplate());
 	}
 
 	/**
@@ -36,28 +37,25 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @return A list of Channels matching the query.
 	 */
-	public List<Channel> getChannels(String query, Optional<Long> limit) {
+	public List<Channel> getChannels(String query, @Nullable Integer limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/channels", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", query));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+		}
+		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", URLEncoder.encode(query)));
 
 		// REST Request
 		try {
-			ChannelList responseObject = restTemplate.getForObject(requestUrl, ChannelList.class);
-
-			return responseObject.getChannels();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/search/channels", ChannelList.class).getChannels();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -66,31 +64,28 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * Requires Scope: none
 	 *
 	 * @param query search query
-	 * @param live Whether only games that are live should be returned. This argument is optional.
+	 * @param live  Whether only games that are live should be returned. This argument is optional.
 	 * @return A list of games matching the query.
 	 */
-	public List<Game> getGames(String query, Optional<Boolean> live) {
+	public List<Game> getGames(String query, @Nullable Boolean live) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/games", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", query));
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("live", live.orElse(false).toString()));
+		if (live != null && live) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("live", live.toString()));
+		}
 
 		// REST Request
 		try {
-			GameList responseObject = restTemplate.getForObject(requestUrl, GameList.class);
-
-			return responseObject.getGames();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/search/games", GameList.class).getGames();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return Collections.emptyList();
+		}
 	}
 
 	/**
@@ -102,28 +97,24 @@ public class SearchEndpoint extends AbstractTwitchEndpoint {
 	 * @param limit Maximum number of most-recent objects to return. Default: 25. Maximum: 100.
 	 * @return A list of Streams matching the query.
 	 */
-	public List<Stream> getStreams(String query, Optional<Long> limit) {
+	public List<Stream> getStreams(String query, @Nullable Integer limit) {
 		// Endpoint
-		String requestUrl = String.format("%s/search/streams", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		RestTemplate restTemplate = this.restTemplate;
 
 		// Parameters
-		restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", limit.orElse(25l).toString()));
+		if (limit != null) {
+			restTemplate.getInterceptors().add(new QueryRequestInterceptor("limit", Integer.toString((limit > 100) ? 100 : (limit < 1) ? 25 : limit)));
+		}
 		restTemplate.getInterceptors().add(new QueryRequestInterceptor("query", query));
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			StreamList responseObject = restTemplate.getForObject(requestUrl, StreamList.class);
-
-			return responseObject.getStreams();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/search/streams", StreamList.class).getStreams();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return Collections.emptyList();
+		}
 	}
 }

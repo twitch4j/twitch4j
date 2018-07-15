@@ -1,5 +1,9 @@
 package me.philippheuer.twitch4j.message.irc.listener;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.EventSubscriber;
@@ -7,13 +11,22 @@ import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
 import me.philippheuer.twitch4j.events.event.channel.HostOffEvent;
 import me.philippheuer.twitch4j.events.event.channel.HostOnEvent;
 import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
-import me.philippheuer.twitch4j.events.event.irc.*;
+import me.philippheuer.twitch4j.events.event.irc.ChannelJoinEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelLeaveEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageActionEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelNoticeEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
+import me.philippheuer.twitch4j.events.event.irc.ClearChatEvent;
+import me.philippheuer.twitch4j.events.event.irc.IRCMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.PrivateMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
+import me.philippheuer.twitch4j.events.event.irc.UserTimeoutEvent;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
-
-import java.util.*;
 
 /**
  * IRC Event Listener
@@ -46,19 +59,15 @@ public class IRCEventListener {
 		if(event.getCommandType().equals("PRIVMSG")) {
 			if(!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
 				// Load Info
-				Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
-				Optional<User> user = event.getClient().getUserEndpoint().getUser(event.getUserId());
-
-				if(user.isPresent())
-				{
-					// Dispatch Event
-					if(event.getMessage().get().startsWith("\u0001ACTION ")) {
-						// Action
-						event.getClient().getDispatcher().dispatch(new ChannelMessageActionEvent(channel, user.get(), event.getMessage().get().substring(8), event.getClientPermissions()));
-					} else {
-						// Regular Message
-						event.getClient().getDispatcher().dispatch(new ChannelMessageEvent(channel, user.get(), event.getMessage().get(), event.getClientPermissions()));
-					}
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelId());
+				User user = event.getClient().getUserEndpoint().getUser(event.getUserId());
+				// Dispatch Event
+				if(event.getMessage().get().startsWith("\u0001ACTION ")) {
+					// Action
+					event.getClient().getDispatcher().dispatch(new ChannelMessageActionEvent(channel, user, event.getMessage().get().substring(8), event.getClientPermissions()));
+				} else {
+					// Regular Message
+					event.getClient().getDispatcher().dispatch(new ChannelMessageEvent(channel, user, event.getMessage().get(), event.getClientPermissions()));
 				}
 			}
 		}
@@ -72,7 +81,7 @@ public class IRCEventListener {
 	public void onWhisper(IRCMessageEvent event) {
 		if(event.getCommandType().equals("WHISPER")) {
 			// Load Info
-			User user = event.getClient().getUserEndpoint().getUser(event.getUserId()).get();
+			User user = event.getClient().getUserEndpoint().getUser(event.getUserId());
 
 			// Dispatch Event
 			event.getClient().getDispatcher().dispatch(new PrivateMessageEvent(user, event.getMessage().get(), event.getClientPermissions()));
@@ -88,8 +97,8 @@ public class IRCEventListener {
 		if(event.getCommandType().equals("PRIVMSG")) {
 			if(event.getTags().containsKey("bits")) {
 				// Load Info
-				Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
-				User user = event.getClient().getUserEndpoint().getUser(event.getUserId()).get();
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelId());
+				User user = event.getClient().getUserEndpoint().getUser(event.getUserId());
 				String message = event.getMessage().orElse("");
 				Integer bits = Integer.parseInt(event.getTags().get("bits"));
 
@@ -108,11 +117,11 @@ public class IRCEventListener {
 		if(event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id")) {
 			if(event.getTags().get("msg-id").equalsIgnoreCase("sub") || event.getTags().get("msg-id").equalsIgnoreCase("resub")) {
 				// Load Info
-				Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
-				User user = event.getClient().getUserEndpoint().getUserByUserName(event.getTagValue("login").get()).get();
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+				User user = event.getClient().getUserEndpoint().getUserByUserName(event.getTagValue("login").get());
 				String subPlan = event.getTagValue("msg-param-sub-plan").get();
-				boolean isResub = event.getTags().get("msg-id").toString().equalsIgnoreCase("resub");
-				Integer subStreak = Integer.parseInt(event.getTags().get("msg-param-months"));
+				boolean isResub = event.getTags().get("msg-id").equalsIgnoreCase("resub");
+				Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
 
 				// Twitch sometimes returns 0 months for new subs
 				if(subStreak == 0) {
@@ -121,14 +130,12 @@ public class IRCEventListener {
 
 				// Build Subscription Entity
 				Subscription entity = new Subscription();
-				entity.setCreatedAt(new Date());
-				entity.setMessage(event.getMessage().orElse("")); // no message for sub time subs
-				entity.setStreak(subStreak);
+				entity.setCreatedAt(Instant.now());
 				entity.setUser(user);
 				entity.setSubPlanByCode(subPlan);
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity));
+				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak));
 			}
 		}
 	}
@@ -140,11 +147,11 @@ public class IRCEventListener {
 	@EventSubscriber
 	public void onClearChat(IRCMessageEvent event) {
 		if (event.getCommandType().equals("CLEARCHAT")) {
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelId());
 			if (event.getTags().containsKey("target-user-id")) { // ban or timeout
 				if (event.getTags().containsKey("ban-duration")) { // timeout
 					// Load Info
-					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id"))).get();
+					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTags().get("target-user-id")));
 					Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
 					String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
 					banReason = banReason.replaceAll("\\\\s", " ");
@@ -158,7 +165,7 @@ public class IRCEventListener {
 					event.getClient().getDispatcher().dispatch(timeoutEvent);
 				} else { // ban
 					// Load Info
-					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get())).get();
+					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get()));
 					String banReason = event.getTagValue("ban-reason").orElse("");
 					banReason = banReason.replaceAll("\\\\s", " ");
 					UserBanEvent banEvent = new UserBanEvent(channel, user, banReason);
@@ -184,8 +191,8 @@ public class IRCEventListener {
 	public void onChannnelClientJoinEvent(IRCMessageEvent event) {
 		if(event.getCommandType().equals("JOIN") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
 			// Load Info
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
-			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get()).get();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get());
 
 			// Dispatch Event
 			event.getClient().getDispatcher().dispatch(new ChannelJoinEvent(channel, user));
@@ -200,8 +207,8 @@ public class IRCEventListener {
 	public void onChannnelClientLeaveEvent(IRCMessageEvent event) {
 		if(event.getCommandType().equals("PART") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
 			// Load Info
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
-			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get()).get();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get());
 
 			// Dispatch Event
 			event.getClient().getDispatcher().dispatch(new ChannelLeaveEvent(channel, user));
@@ -218,8 +225,8 @@ public class IRCEventListener {
 			// Recieving Mod Status
 			if(event.getPayload().get().substring(1).startsWith("o")) {
 				// Load Info
-				Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
-				User user = event.getClient().getUserEndpoint().getUserByUserName(event.getPayload().get().substring(3)).get();
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+				User user = event.getClient().getUserEndpoint().getUserByUserName(event.getPayload().get().substring(3));
 
 				// Dispatch Event
 				event.getClient().getDispatcher().dispatch(new ChannelModEvent(channel, user, event.getPayload().get().startsWith("+")));
@@ -230,7 +237,7 @@ public class IRCEventListener {
 	@EventSubscriber
 	public void onNoticeEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
 			String messageId = event.getTagValue("msg-id").get();
 			String message = event.getMessage().get();
 
@@ -241,13 +248,13 @@ public class IRCEventListener {
 	@EventSubscriber
 	public void onHostOnEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
 			String messageId = event.getTagValue("msg-id").get();
 
 			if(messageId.equals("host_on")) {
 				String message = event.getMessage().get();
 				String targetChannelName = message.substring(12, message.length() - 1);
-				Channel targetChannel = event.getClient().getChannelEndpoint(targetChannelName).getChannel();
+				Channel targetChannel = event.getClient().getChannelEndpoint().getChannel(targetChannelName);
 
 				event.getClient().getDispatcher().dispatch(new HostOnEvent(channel, targetChannel));
 			}
@@ -257,7 +264,7 @@ public class IRCEventListener {
 	@EventSubscriber
 	public void onHostOffEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelName().get()).getChannel();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
 			String messageId = event.getTagValue("msg-id").get();
 
 			if(messageId.equals("host_off")) {
@@ -270,7 +277,7 @@ public class IRCEventListener {
 	public void onChannelState(IRCMessageEvent event) {
 		if(event.getCommandType().equals("ROOMSTATE")) {
 			// getting Status on channel
-			Channel channel = event.getClient().getChannelEndpoint(event.getChannelId()).getChannel();
+			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelId());
 			Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<ChannelStateEvent.ChannelState, Object>();
 			if (event.getTags().size() > 2) {
 				event.getTags().forEach((k, v) -> {

@@ -4,27 +4,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jcabi.log.Logger;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.PubSubTopics;
+import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
-import me.philippheuer.twitch4j.enums.TwitchScopes;
 import me.philippheuer.twitch4j.model.Channel;
-import me.philippheuer.util.conversion.RandomizeString;
-
-import java.io.IOException;
-import java.util.*;
+import me.philippheuer.util.RandomizeString;
 
 @Getter
 @Setter
+@Slf4j
 public class TwitchPubSub {
 
 	/**
@@ -41,7 +45,6 @@ public class TwitchPubSub {
 	 * WebSocketFactory
 	 */
 	private WebSocket webSocket;
-
 
 	/**
 	 * The connection state
@@ -87,7 +90,7 @@ public class TwitchPubSub {
 
 			@Override
 			public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-				Logger.info(this, "Connection to Twitch PubSub Closed by Server [%s]", Endpoints.PUBSUB.getURL());
+				log.info("Connection to Twitch PubSub Closed by Server [{}]", Endpoints.PUBSUB.getURL());
 
 				if (!getConnectionState().equals(TMIConnectionState.DISCONNECTING)) {
 					reconnect();
@@ -109,7 +112,7 @@ public class TwitchPubSub {
 							 *  If a client does not receive a PONG message within 10 seconds
 							 *  of issuing a PING command, it should reconnect to the server.
 							 */
-							Logger.debug(this, "Recieved PONG Response from Twitch PubSub.");
+							log.debug("Recieved PONG Response from Twitch PubSub.");
 							break;
 						case "reconnect":
 							/*
@@ -120,11 +123,11 @@ public class TwitchPubSub {
 							 *  During this time, we recommend that clients reconnect to the server.
 							 *  Otherwise, the client will be forcibly disconnected.
 							 */
-							Logger.debug(this, "Twitch PubSub is asking us to reconnect ...");
+							log.debug("Twitch PubSub is asking us to reconnect ...");
 							reconnect();
 							break;
 						case "message":
-							Logger.debug(this, "Recieved a message from Twitch PubSub: [%s]", text);
+							log.debug("Recieved a message from Twitch PubSub: [{}]", text);
 							// TODO: parse Messages (I'm on it [D.S.])
 						default:
 							return;
@@ -134,16 +137,16 @@ public class TwitchPubSub {
 				if (jsonNode.has("error") && jsonNode.get("error") != null & !jsonNode.get("error").textValue().isEmpty()) {
 					switch (jsonNode.get("error").textValue().toUpperCase()) {
 						case "ERR_BADMESSAGE":
-							Logger.error(this, "Twitch PubSub encountered an error: %s", "Wrong message format.");
+							log.error("Twitch PubSub encountered an error: {}", "Wrong message format.");
 							break;
 						case "ERR_BADAUTH":
-							Logger.error(this, "Twitch PubSub encountered an error: %s", "Bad OAuth key or OAuth key doesn't have authorized scope to specify topic.");
+							log.error("Twitch PubSub encountered an error: {}", "Bad OAuth key or OAuth key doesn't have authorized scope to specify topic.");
 							break;
 						case "ERR_SERVER":
-							Logger.error(this, "Twitch PubSub encountered an error: %s", "Server Error.");
+							log.error("Twitch PubSub encountered an error: {}", "Server Error.");
 							break;
 						case "ERR_BADTOPIC":
-							Logger.error(this, "Twitch PubSub encountered an error: %s", "Some topics is unknown.");
+							log.error("Twitch PubSub encountered an error: {}", "Some topics is unknown.");
 							break;
 						default:
 							return;
@@ -208,10 +211,10 @@ public class TwitchPubSub {
 			} catch (Exception ex) {
 				setConnectionState(TMIConnectionState.DISCONNECTED);
 
-				Logger.error(this, "Connection to Twitch PubSub failed: [%s]", ex.getMessage());
+				log.error("Connection to Twitch PubSub failed: [{}]", ex.getMessage());
 			}
 		} else {
-			Logger.warn(this, "Cannot connecting to Twitch PubSub: is already [%s].", getConnectionState().name().toUpperCase());
+			log.warn("Cannot connecting to Twitch PubSub: is already [{}].", getConnectionState().name().toUpperCase());
 		}
 	}
 
@@ -240,9 +243,9 @@ public class TwitchPubSub {
 
 					webSocket.sendText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode));
 
-					Logger.debug(this, "Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
+					log.debug("Send Ping to Twitch PubSub. (Keep-Connection-Alive)");
 				} catch (Exception ex) {
-					Logger.error(this, "Failed to Ping Twitch PubSub. (%s)", ex.getMessage());
+					log.error("Failed to Ping Twitch PubSub. ({})", ex.getMessage());
 					reconnect();
 				}
 
@@ -316,7 +319,7 @@ public class TwitchPubSub {
 		node.putObject("data")
 				.put("auth_token", "") // TODO: OAuth if exist.
 				.putArray("topics").addAll(topicList);
-		Logger.debug(this, "Sending to PubSub - type: %s, topics: [ %s ]", type.toUpperCase(), String.join(", ", topics));
+		log.debug("Sending to PubSub - type: {}, topics: [ {} ]", type.toUpperCase(), String.join(", ", topics));
 		webSocket.sendText(node.toString());
 	}
 
@@ -339,19 +342,15 @@ public class TwitchPubSub {
 	 */
 	public void listenChannel(Channel channel, PubSubTopics... topics) {
 		List<String> topicList = new ArrayList<String>();
-		OAuthCredential channelCredential = null;
-		if (channel.getTwitchCredential().isPresent()) {
-			channelCredential = channel.getTwitchCredential().get();
-		}
-		if (channelCredential != null) {
+		twitchClient.getCredentialManager().getTwitchCredentialsForChannel(channel.getId()).ifPresent(credential -> {
 			for (PubSubTopics topic : topics) {
-				if (topic.isInRequiredScope((TwitchScopes[]) channelCredential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
+				if (topic.isInRequiredScope((Scope[]) credential.getOAuthScopes().toArray())) topicList.add(topic.getTopic(channel));
 			}
 			if (topicList.size() > 0) {
 				execType("LISTEN", topicList);
 				setTopic(channel, (PubSubTopics[]) topicList.toArray());
 			}
-		}
+		});
 	}
 
 	/**

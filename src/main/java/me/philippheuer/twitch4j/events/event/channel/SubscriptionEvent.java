@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.events.event.channel;
 
+import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
@@ -34,15 +35,27 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	private Subscription subscription;
 
 	/**
+	 * Subscription Message
+	 */
+	private Optional<String> message;
+
+	/**
+	 *
+	 */
+	private Integer months;
+
+	/**
 	 * Event Constructor
 	 *
 	 * @param channel      The channel that this event originates from.
 	 * @param subscription The subscription, containing all relevant information.
 	 */
-	public SubscriptionEvent(Channel channel, Subscription subscription) {
+	public SubscriptionEvent(Channel channel, Subscription subscription, Optional<String> message, Integer months) {
 		super(channel);
 		this.user = subscription.getUser();
 		this.subscription = subscription;
+		this.message = message;
+		this.months = months;
 	}
 
 }

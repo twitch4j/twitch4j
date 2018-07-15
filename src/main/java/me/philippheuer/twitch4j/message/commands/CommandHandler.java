@@ -2,21 +2,26 @@ package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcabi.log.Logger;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.UnknownCommandEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
 
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Getter
 @Setter
+@Slf4j
 public class CommandHandler {
 
 	/**
@@ -67,7 +72,7 @@ public class CommandHandler {
 	public void registerCommand(Class<? extends Command> commandClass) {
 		// Check if the user provided an Interface instead of a class
 		if (commandClass.isInterface()) {
-			Logger.error(this, "Can't register an Interface as Command! [%s]!", commandClass.getSimpleName());
+			log.error("Can't register an Interface as Command! [{}]!", commandClass.getSimpleName());
 			return;
 		}
 
@@ -78,7 +83,7 @@ public class CommandHandler {
 
 			// Check, if the command already was registered
 			if (getCommandMap().containsKey(command.getCommand())) {
-				Logger.error(this, "Can't register an Command! [%s]! Error: Command was already registered!", commandClass.getSimpleName());
+				log.error("Can't register an Command! [{}]! Error: Command was already registered!", commandClass.getSimpleName());
 				return;
 			}
 
@@ -94,12 +99,12 @@ public class CommandHandler {
 				}
 			}
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
-			Logger.error(this, "Can't register an Command! [%s]! Error: %s", commandClass.getSimpleName(), ex.getMessage());
+			log.error("Can't register an Command! [{}]! Error: {}", commandClass.getSimpleName(), ex.getMessage());
 			ex.printStackTrace();
 			return;
 		}
 
-		Logger.info(this, "Registered new Command [%s]!", commandClass.getSimpleName());
+		log.info("Registered new Command [{}]!", commandClass.getSimpleName());
 	}
 
 	/**
@@ -113,7 +118,7 @@ public class CommandHandler {
 
 		// Check, if the command already was registered
 		if (getCommandMap().containsKey(command.getCommand())) {
-			Logger.error(this, "Can't register Command! [%s]! Error: Command was already registered!", command.getCommand());
+			log.error("Can't register Command! [{}]! Error: Command was already registered!", command.getCommand());
 			return;
 		}
 
@@ -133,7 +138,7 @@ public class CommandHandler {
 		}
 
 
-		Logger.info(this, "Registered new Command [%s]!", command.getCommand());
+		log.info("Registered new Command [{}]!", command.getCommand());
 	}
 
 	/**
@@ -211,14 +216,14 @@ public class CommandHandler {
 
 				// Check Command Permissions
 				if (cmd.get().hasPermissions(messageEvent)) {
-					Logger.info(this, "Recieved command [%s] from user [%s].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
+					log.info("Recieved command [{}] from user [{}].!", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
 
 					cmd.get().executeCommand(messageEvent);
 				} else {
-					Logger.info(this, "Access to command [%s] denied for user [%s]! (Missing Permissions)", cmdName, messageEvent.getUser().getDisplayName());
+					log.info("Access to command [{}] denied for user [{}]! (Missing Permissions)", cmdName, messageEvent.getUser().getDisplayName());
 				}
 			} else {
-				Logger.info(this, "Access to command [%s] denied for user [%s].! (Command Disabled)", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
+				log.info("Access to command [{}] denied for user [{}].! (Command Disabled)", messageEvent.getMessage(), messageEvent.getUser().getDisplayName());
 			}
 		} else {
 			if(cmdTrigger.equals(getCommandTrigger())) {
@@ -280,7 +285,11 @@ public class CommandHandler {
 
 			// Save List to File
 			ObjectMapper mapper = new ObjectMapper();
-			mapper.writeValue(getCommandSaveFile(), commandList);
+
+			File commandSaveFile = getCommandSaveFile();
+			if (commandSaveFile != null) {
+				mapper.writeValue(commandSaveFile, commandList);
+			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();

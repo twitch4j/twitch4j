@@ -1,13 +1,12 @@
 package me.philippheuer.twitch4j.events.event.channel;
 
+import java.util.Currency;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
-
-import java.util.Currency;
 
 /**
  * This event gets called when a user receives a donation from any source.

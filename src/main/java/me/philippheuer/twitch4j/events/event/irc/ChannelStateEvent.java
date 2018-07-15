@@ -1,14 +1,13 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.model.Channel;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Value
 @Getter

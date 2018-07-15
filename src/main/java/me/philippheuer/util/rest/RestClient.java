@@ -1,13 +1,39 @@
 package me.philippheuer.util.rest;
 
-import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.web.client.RestTemplate;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import me.philippheuer.twitch4j.enums.BroadcasterType;
+import me.philippheuer.twitch4j.enums.Scope;
+import me.philippheuer.twitch4j.enums.StreamType;
+import me.philippheuer.twitch4j.enums.SubscriptionPlan;
+import me.philippheuer.twitch4j.enums.UserType;
+import me.philippheuer.twitch4j.enums.VideoAccess;
+import me.philippheuer.twitch4j.enums.VideoType;
+import me.philippheuer.util.conversion.BroadcasterTypeDeserializer;
+import me.philippheuer.util.conversion.DurationDeserializer;
+import me.philippheuer.util.conversion.InstantClockDeserializer;
+import me.philippheuer.util.conversion.ScopeDeserializer;
+import me.philippheuer.util.conversion.StreamTypeDeserializer;
+import me.philippheuer.util.conversion.SubscriptionPlanDeserializer;
+import me.philippheuer.util.conversion.UnixTimestampDeserializer;
+import me.philippheuer.util.conversion.UserTypeDeserializer;
+import me.philippheuer.util.conversion.VideoAccessDeserializer;
+import me.philippheuer.util.conversion.VideoTypeDeserializer;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 /**
  * Rest Client Wrapper
@@ -16,23 +42,15 @@ import java.util.List;
  * @version %I%, %G%
  * @since 1.0
  */
+
 @Getter
-@Setter
+@NoArgsConstructor
 public class RestClient {
 
 	/**
 	 * REST Request Interceptors (adding header-values/query parameters/... to requests)
 	 */
-	private List<ClientHttpRequestInterceptor> restInterceptors;
-
-	/**
-	 * Class Constructor
-	 */
-	public RestClient() {
-		super();
-
-		setRestInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
-	}
+	private final List<ClientHttpRequestInterceptor> restInterceptors = new ArrayList<ClientHttpRequestInterceptor>();
 
 	/**
 	 * Adds a interceptor to the Rest Template.
@@ -51,14 +69,12 @@ public class RestClient {
 	 * @return A RestTemplate for rest requests.
 	 */
 	public RestTemplate getRestTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = getPlainRestTemplate();
 
-		// Request Interceptors
-		restTemplate.setInterceptors(new ArrayList<ClientHttpRequestInterceptor>());
-		restTemplate.getInterceptors().addAll(getRestInterceptors());
+		putRestInterceptor(new LoggingRequestInterceptor());
 
-		// Default Error Handler
-		restTemplate.setErrorHandler(new RestErrorHandler());
+		restTemplate.setInterceptors(restInterceptors);
+		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("https://api.twitch.tv/kraken"));
 
 		return restTemplate;
 	}
@@ -85,9 +101,30 @@ public class RestClient {
 	 * @return A RestTemplate for rest requests.
 	 */
 	public RestTemplate getPlainRestTemplate() {
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(getObjectMapper())));
 		restTemplate.setErrorHandler(new RestErrorHandler());
 
+
 		return restTemplate;
+	}
+
+	private ObjectMapper getObjectMapper() {
+		SimpleModule simpleModule = new SimpleModule()
+				.addDeserializer(Calendar.class, new UnixTimestampDeserializer())
+				.addDeserializer(Scope.class, new ScopeDeserializer())
+				.addDeserializer(BroadcasterType.class, new BroadcasterTypeDeserializer())
+				.addDeserializer(Duration.class, new DurationDeserializer())
+				.addDeserializer(Instant.class, new InstantClockDeserializer())
+				.addDeserializer(Scope.class, new ScopeDeserializer())
+				.addDeserializer(StreamType.class, new StreamTypeDeserializer())
+				.addDeserializer(SubscriptionPlan.class, new SubscriptionPlanDeserializer())
+				.addDeserializer(UserType.class, new UserTypeDeserializer())
+				.addDeserializer(VideoAccess.class, new VideoAccessDeserializer())
+				.addDeserializer(VideoType.class, new VideoTypeDeserializer());
+
+		return new ObjectMapper()
+				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // Ignoring unknown properties
+				.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+				.registerModule(simpleModule);
 	}
 }

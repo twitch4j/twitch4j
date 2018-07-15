@@ -1,15 +1,17 @@
 package me.philippheuer.twitch4j;
 
-import lombok.*;
-import lombok.experimental.Wither;
-import me.philippheuer.twitch4j.auth.CredentialManager;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import org.springframework.util.Assert;
-
 import java.io.File;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
+import me.philippheuer.twitch4j.auth.CredentialManager;
+import me.philippheuer.twitch4j.auth.model.OAuthCredential;
+import org.springframework.util.Assert;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.

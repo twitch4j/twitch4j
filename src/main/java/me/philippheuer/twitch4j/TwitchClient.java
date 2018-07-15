@@ -1,19 +1,39 @@
 package me.philippheuer.twitch4j;
 
+import java.io.File;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
-import me.philippheuer.twitch4j.endpoints.*;
+import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
+import me.philippheuer.twitch4j.endpoints.ChannelFeedEndpoint;
+import me.philippheuer.twitch4j.endpoints.ChatEndpoint;
+import me.philippheuer.twitch4j.endpoints.CommunityEndpoint;
+import me.philippheuer.twitch4j.endpoints.GameEndpoint;
+import me.philippheuer.twitch4j.endpoints.IngestEndpoint;
+import me.philippheuer.twitch4j.endpoints.KrakenEndpoint;
+import me.philippheuer.twitch4j.endpoints.SearchEndpoint;
+import me.philippheuer.twitch4j.endpoints.StreamEndpoint;
+import me.philippheuer.twitch4j.endpoints.TMIEndpoint;
+import me.philippheuer.twitch4j.endpoints.TeamEndpoint;
+import me.philippheuer.twitch4j.endpoints.UnofficialEndpoint;
+import me.philippheuer.twitch4j.endpoints.UserEndpoint;
+import me.philippheuer.twitch4j.endpoints.VideoEndpoint;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.Community;
+import me.philippheuer.twitch4j.model.Game;
+import me.philippheuer.twitch4j.model.Ingest;
+import me.philippheuer.twitch4j.model.Stream;
+import me.philippheuer.twitch4j.model.Team;
+import me.philippheuer.twitch4j.model.User;
+import me.philippheuer.twitch4j.model.Video;
 import me.philippheuer.twitch4j.modules.ModuleLoader;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-
-import java.io.File;
 
 /**
  * TwitchClient is the core class for all api operations.
@@ -155,9 +175,11 @@ public class TwitchClient {
 	 * Returns an a new ChannelFeedEndpoint instance.
 	 *
 	 * @return a new instance of {@link ChannelFeedEndpoint}
+	 * @deprecated Twitch removes Channel Feeds and Pulse. More info <a href="https://discuss.dev.twitch.tv/t/how-the-removal-of-channel-feed-and-pulse-affects-the-twitch-api-v5/16540">here</a>.
 	 */
+	@Deprecated
 	public ChannelFeedEndpoint getChannelFeedEndpoint() {
-		return new ChannelFeedEndpoint(this);
+		throw new UnsupportedOperationException("The endpoint has been Deprecated");
 	}
 
 	/**
@@ -166,26 +188,11 @@ public class TwitchClient {
 	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
 	 * therefore you need to provide information to identify a unique channel.
 	 *
-	 * @param channelId ID of the twitch channel
 	 * @return a new instance of {@link ChannelEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Channel
+	 * @see Channel
 	 */
-	public ChannelEndpoint getChannelEndpoint(Long channelId) {
-		return new ChannelEndpoint(this, channelId);
-	}
-
-	/**
-	 * Returns an a new ChannelEndpoint instance - identifying the channel by the channel name.
-	 * <p>
-	 * The Channel Endpoint instances allow you the query or set data for a specific channel,
-	 * therefore you need to provide information to identify a unique channel.
-	 *
-	 * @param channelName Name of the twitch channel
-	 * @return a new instance of {@link ChannelEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Channel
-	 */
-	public ChannelEndpoint getChannelEndpoint(String channelName) {
-		return new ChannelEndpoint(this, channelName);
+	public ChannelEndpoint getChannelEndpoint() {
+		return new ChannelEndpoint(this);
 	}
 
 	/**
@@ -194,7 +201,7 @@ public class TwitchClient {
 	 * The Game Endpoint instance allows you to access information about the all available games on twitch.
 	 *
 	 * @return a new instance of {@link GameEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Game
+	 * @see Game
 	 */
 	public GameEndpoint getGameEndpoint() {
 		return new GameEndpoint(this);
@@ -204,10 +211,10 @@ public class TwitchClient {
 	 * Returns an a new StreamEndpoint instance.
 	 * <p>
 	 * The Stream Endpoint provides information about all current live streams and related metadata.
-	 * For more information about the data, check out the {@link me.philippheuer.twitch4j.model.Stream} model.
+	 * For more information about the data, check out the {@link Stream} model.
 	 *
 	 * @return a new instance of {@link StreamEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Stream
+	 * @see Stream
 	 */
 	public StreamEndpoint getStreamEndpoint() {
 		return new StreamEndpoint(this);
@@ -220,7 +227,7 @@ public class TwitchClient {
 	 * For more information about the available methods, check out the {@link UserEndpoint}.
 	 *
 	 * @return a new instance of {@link UserEndpoint}
-	 * @see me.philippheuer.twitch4j.model.User
+	 * @see User
 	 */
 	public UserEndpoint getUserEndpoint() {
 		return new UserEndpoint(this);
@@ -230,10 +237,10 @@ public class TwitchClient {
 	 * Returns an a new CommunityEndpoint instance.
 	 * <p>
 	 * The Community Endpoint allows you to fetch information or manage your communities using the api.
-	 * The community methods usually return a {@link me.philippheuer.twitch4j.model.Community} model.
+	 * The community methods usually return a {@link Community} model.
 	 *
 	 * @return a new instance of {@link CommunityEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Community
+	 * @see Community
 	 */
 	public CommunityEndpoint getCommunityEndpoint() {
 		return new CommunityEndpoint(this);
@@ -245,7 +252,7 @@ public class TwitchClient {
 	 * The Ingest Endpoint allows you to fetch a list of the twitch ingest servers.
 	 *
 	 * @return a new instance of {@link IngestEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Ingest
+	 * @see Ingest
 	 */
 	public IngestEndpoint getIngestEndpoint() {
 		return new IngestEndpoint(this);
@@ -254,13 +261,13 @@ public class TwitchClient {
 	/**
 	 * Returns an a new SearchEndpoint instance.
 	 * <p>
-	 * The Search Endpoint allows you to search for {@link me.philippheuer.twitch4j.model.Channel}s,
-	 * {@link me.philippheuer.twitch4j.model.Game}s or {@link me.philippheuer.twitch4j.model.Stream}s.
+	 * The Search Endpoint allows you to search for {@link Channel}s,
+	 * {@link Game}s or {@link Stream}s.
 	 *
 	 * @return a new instance of {@link SearchEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Stream
-	 * @see me.philippheuer.twitch4j.model.Game
-	 * @see me.philippheuer.twitch4j.model.Channel
+	 * @see Stream
+	 * @see Game
+	 * @see Channel
 	 */
 	public SearchEndpoint getSearchEndpoint() {
 		return new SearchEndpoint(this);
@@ -272,7 +279,7 @@ public class TwitchClient {
 	 * The Team Endpoint provides a list of all teams and detailed information about single teams.
 	 *
 	 * @return a new instance of {@link TeamEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Team
+	 * @see Team
 	 */
 	public TeamEndpoint getTeamEndpoint() {
 		return new TeamEndpoint(this);
@@ -284,7 +291,7 @@ public class TwitchClient {
 	 * The Video Endpoint provides access to videos that twitch users recoded.
 	 *
 	 * @return a new instance of {@link VideoEndpoint}
-	 * @see me.philippheuer.twitch4j.model.Video
+	 * @see Video
 	 */
 	public VideoEndpoint getVideoEndpoint() {
 		return new VideoEndpoint(this);

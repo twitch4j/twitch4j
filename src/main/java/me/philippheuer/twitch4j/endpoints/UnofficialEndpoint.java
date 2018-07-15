@@ -1,25 +1,25 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.unofficial.AdvancedChannelInformation;
 import me.philippheuer.twitch4j.model.unofficial.Ember;
+import me.philippheuer.util.annotation.Unofficial;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
-@Getter
-@Setter
+@Slf4j
+@Unofficial
 public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Endpoint for all unofficial api endpoints
 	 *
-	 * @param twitchClient The Twitch Client.
+	 * @param client The Twitch Clien
 	 */
-	public UnofficialEndpoint(TwitchClient twitchClient) {
-		super(twitchClient);
+	public UnofficialEndpoint(TwitchClient client) {
+		super(client, client.getRestClient().getRestTemplate());
+		this.restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("https://api.twitch.tv/api"));
 	}
 
 	/**
@@ -28,23 +28,20 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	 * @param userName Twitch username
 	 * @return todo
 	 */
+	@Unofficial
 	public Ember getEmber(String userName) {
 		// Endpoint
-		String requestUrl = String.format("https://api.twitch.tv/api/channels/%s/ember", userName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/channels/%s/ember", userName);
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			Ember responseObject = restTemplate.getForObject(requestUrl, Ember.class);
-
-			return responseObject;
+			return restTemplate.getForObject(requestUrl, Ember.class);
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return null;
+		}
 	}
 
 	/**
@@ -53,22 +50,19 @@ public class UnofficialEndpoint extends AbstractTwitchEndpoint {
 	 * @param userName Twitch username
 	 * @return todo
 	 */
+	@Unofficial
 	public String getConnectedSteamProfile(String userName) {
 		// Endpoint
-		String requestUrl = String.format("https://api.twitch.tv/api/channels/%s", userName);
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
+		String requestUrl = String.format("/channels/%s", userName);
 
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			AdvancedChannelInformation responseObject = restTemplate.getForObject(requestUrl, AdvancedChannelInformation.class);
-
-			return responseObject.getSteamId();
+			return restTemplate.getForObject(requestUrl, AdvancedChannelInformation.class).getSteamId();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return null;
+		}
 	}
 }

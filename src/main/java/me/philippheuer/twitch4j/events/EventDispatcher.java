@@ -1,11 +1,5 @@
 package me.philippheuer.twitch4j.events;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
-import me.philippheuer.twitch4j.TwitchClient;
-import net.jodah.typetools.TypeResolver;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -13,6 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import me.philippheuer.twitch4j.TwitchClient;
+import net.jodah.typetools.TypeResolver;
 
 /**
  * Manages event listeners and event logic.
@@ -23,6 +22,7 @@ import java.util.concurrent.Executors;
  */
 @Getter
 @Setter
+@Slf4j
 public class EventDispatcher {
 
 	private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<Method, CopyOnWriteArrayList<ListenerPair<Object>>>> methodListeners = new ConcurrentHashMap<>();
@@ -87,7 +87,7 @@ public class EventDispatcher {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void registerListener(Class<?> listenerClass, Object listener, boolean isTemporary) {
 		if (IListener.class.isAssignableFrom(listenerClass)) {
-			Logger.warn(this, "IListener was attempted to be registered as an annotation listener. The listener in question will now be registered as an IListener.");
+			log.warn("IListener was attempted to be registered as an annotation listener. The listener in question will now be registered as an IListener.");
 			registerListener((IListener) listener, isTemporary);
 			return;
 		}
@@ -106,7 +106,7 @@ public class EventDispatcher {
 							methodListeners.get(eventClass).put(method, new CopyOnWriteArrayList<>());
 
 						methodListeners.get(eventClass).get(method).add(new ListenerPair<>(isTemporary, listener));
-						Logger.info(this, "Registered method listener %s#%s", listenerClass.getSimpleName(), method.getName());
+						log.info("Registered method listener {}#{}", listenerClass.getSimpleName(), method.getName());
 					}
 				}
 			}
@@ -125,7 +125,7 @@ public class EventDispatcher {
 			if (!classListeners.containsKey(rawType))
 				classListeners.put(rawType, new CopyOnWriteArrayList<>());
 
-			Logger.info(this, "Registered IListener %s", listener.getClass().getSimpleName());
+			log.info("Registered IListener {}", listener.getClass().getSimpleName());
 			classListeners.get(rawType).add(new ListenerPair<>(isTemporary, listener));
 		}
 	}
@@ -176,7 +176,7 @@ public class EventDispatcher {
 						if (methodListeners.get(eventClass).containsKey(method)) {
 							methodListeners.get(eventClass).get(method).removeIf((ListenerPair pair) -> pair.listener == listener); //Yes, the == is intentional. We want the exact same instance.
 
-							Logger.debug(this, "Unregistered method listener %s#%s", listener.getClass().getSimpleName(), method.toString());
+							log.debug("Unregistered method listener {}#{}", listener.getClass().getSimpleName(), method.toString());
 						}
 					}
 				}
@@ -199,7 +199,7 @@ public class EventDispatcher {
 						if (methodListeners.get(eventClass).containsKey(method)) {
 							methodListeners.get(eventClass).get(method).removeIf((ListenerPair pair) -> pair.listener == null); // null for static listener
 
-							Logger.debug(this, "Unregistered class method listener %s#%s", clazz.getSimpleName(), method.toString());
+							log.debug("Unregistered class method listener {}#{}", clazz.getSimpleName(), method.toString());
 						}
 				}
 			}
@@ -218,7 +218,7 @@ public class EventDispatcher {
 			if (classListeners.containsKey(rawType)) {
 				classListeners.get(rawType).removeIf((ListenerPair pair) -> pair.listener == listener); //Yes, the == is intentional. We want the exact same instance.
 
-				Logger.debug(this, "Unregistered IListener %s", listener.getClass().getSimpleName());
+				log.debug("Unregistered IListener {}", listener.getClass().getSimpleName());
 			}
 		}
 	}
@@ -231,7 +231,7 @@ public class EventDispatcher {
 	@SuppressWarnings("unchecked")
 	public synchronized void dispatch(Event event) {
 		eventExecutor.submit(() -> {
-			Logger.trace(this, "Dispatching Event of Type [%s]", event.getClass().getSimpleName());
+			log.trace("Dispatching Event of Type [{}]", event.getClass().getSimpleName());
 			event.setClient(client);
 
 			// Method Listener
@@ -250,10 +250,10 @@ public class EventDispatcher {
 												unregisterListener(o.listener);
 											}
 										} catch (IllegalAccessException ex) {
-											Logger.error(this, "Error dispatching event %s", event.getClass().getSimpleName());
+											log.error("Error dispatching event {}", event.getClass().getSimpleName());
 										} catch (Exception ex) {
 											ex.printStackTrace();
-											Logger.error(this, "Unhandled exception caught dispatching event %s", event.getClass().getSimpleName()); // e.getCause()
+											log.error("Unhandled exception caught dispatching event {}", event.getClass().getSimpleName()); // e.getCause()
 										}
 									})));
 
@@ -273,7 +273,7 @@ public class EventDispatcher {
 							// FIXME: This occurs when a lambda expression is used to create an IListener leading it to be registered under the type 'Event'.
 							// FIXME: This is due to a bug in TypeTools: https://github.com/jhalterman/typetools/issues/14
 						} catch (Exception ex) {
-							Logger.error(this, "Unhandled exception caught dispatching event %s [%s]", event.getClass().getSimpleName(), ex.getMessage());
+							log.error("Unhandled exception caught dispatching event {} [{}]", event.getClass().getSimpleName(), ex.getMessage());
 						}
 					}));
 		});

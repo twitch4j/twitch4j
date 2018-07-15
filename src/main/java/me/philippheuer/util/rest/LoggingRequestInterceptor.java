@@ -1,12 +1,12 @@
 package me.philippheuer.util.rest;
 
-import com.jcabi.log.Logger;
+import java.io.IOException;
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-
-import java.io.IOException;
 
 /**
  * Spring Rest: Logging Request Interceptor
@@ -18,6 +18,7 @@ import java.io.IOException;
  * @version %I%, %G%
  * @since 1.0
  */
+@Slf4j
 public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 	@Override
@@ -25,13 +26,17 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
 		ClientHttpResponse response = execution.execute(request, body);
 
-		log(request, body, response);
+		log(request, body);
 
 		return response;
 	}
 
-	private void log(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
+	private void log(HttpRequest request, byte[] body) {
 		// do logging
-		Logger.info(this, "Request: [ %s ][ %s ][ %s ][ %s ]", request.getURI(), request.getMethod(), request.getHeaders(), body.toString());
+		log.info("Request: [{}] {}", request.getMethod(), request.getURI());
+		log.info("Headers: {}", request.getHeaders());
+		if (body.length > 0) {
+			log.info("Body: {}", Arrays.toString(body));
+		}
 	}
 }

@@ -1,5 +1,12 @@
 package me.philippheuer.twitch4j.message.irc;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,11 +15,13 @@ import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserTimeoutEvent;
-import me.philippheuer.twitch4j.events.event.irc.roomstates.*;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.BroadcasterLanguageEvent;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.EmoteOnlyEvent;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.FollowersOnlyEvent;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.Robot9000Event;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.SlowModeEvent;
+import me.philippheuer.twitch4j.events.event.irc.roomstates.SubscribersOnlyEvent;
 import me.philippheuer.twitch4j.model.User;
-
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Setter(AccessLevel.PROTECTED)
 @Getter(AccessLevel.PUBLIC)

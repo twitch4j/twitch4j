@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.message;
 
 
+import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
@@ -10,8 +11,6 @@ import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.message.irc.TwitchChat;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.model.Channel;
-
-import java.util.ArrayList;
 
 @Getter
 @Setter
@@ -75,7 +74,7 @@ public class MessageInterface {
 	 * @return bot has been joined to this channel
 	 */
 	public boolean isJoined(String channel) {
-		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		Channel ch = twitchClient.getChannelEndpoint().getChannel(channel);
 		// syncing channels
 		if (twitchChat.getChannelCache().containsKey(channel) && !pubSub.getChannelList().containsKey(ch)) pubSub.getChannelList().put(ch, new ArrayList<PubSubTopics>());
 		if (!twitchChat.getChannelCache().containsKey(channel) && pubSub.getChannelList().containsKey(ch)) twitchChat.getChannelCache().put(channel, new ChannelCache(twitchChat, channel));
@@ -108,7 +107,7 @@ public class MessageInterface {
 	 */
 	public void joinChannel(String channel) {
 		twitchChat.joinChannel(channel);
-		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		Channel ch = twitchClient.getChannelEndpoint().getChannel(channel);
 		pubSub.listenChannel(ch, true);
 	}
 
@@ -128,7 +127,7 @@ public class MessageInterface {
 	 */
 	public void leaveChannel(String channel){
 		twitchChat.leaveChannel(channel);
-		Channel ch = twitchClient.getChannelEndpoint(channel).getChannel();
+		Channel ch = twitchClient.getChannelEndpoint().getChannel(channel);
 		pubSub.unlistenChannel(ch);
 	}
 }

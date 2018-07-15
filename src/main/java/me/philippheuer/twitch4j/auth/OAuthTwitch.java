@@ -1,26 +1,19 @@
 package me.philippheuer.twitch4j.auth;
 
-import com.jcabi.log.Logger;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.enums.TwitchScopes;
+import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
-import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -47,16 +40,16 @@ public class OAuthTwitch {
 
 	/**
 	 * @param type         Type for Permission for the CredentialManager (IRC/CHANNEL)
-	 * @param twitchScopes TwitchScopes to request.
+	 * @param twitchScopes Scope to request.
 	 */
-	public void requestPermissionsFor(String type, TwitchScopes... twitchScopes) {
+	public void requestPermissionsFor(String type, Scope... twitchScopes) {
 		// Ensures that the listener runs, if permissions are requested
 		getCredentialManager().getOAuthHandler().onRequestPermission();
 
 		// Store Request Information / Generate Token
 		OAuthRequest request = new OAuthRequest();
 		request.setType(type);
-		request.getOAuthScopes().addAll(Arrays.stream(twitchScopes).map(e -> e.toString()).collect(Collectors.toList()));
+		request.getOAuthScopes().addAll(Arrays.asList(twitchScopes));
 		getCredentialManager().getOAuthRequestCache().put(request.getTokenId(), request);
 
 		// Get OAuthTwitch URI
@@ -71,15 +64,15 @@ public class OAuthTwitch {
 	 * to authorize your application to retrieve an access token.
 	 *
 	 * @param state   What are the credentials requested for? (CHANNEL/IRC)
-	 * @param scopes TwitchScopes to request access for
+	 * @param scopes Scope to request access for
 	 * @return String    OAuth2 Uri
 	 */
-	private String getAuthenticationUrl(String state, TwitchScopes... scopes) {
+	private String getAuthenticationUrl(String state, Scope... scopes) {
 		return String.format("%s/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&force_verify=true",
 				Endpoints.API.getURL(),
 				getCredentialManager().getTwitchClient().getClientId(),
 				getRedirectUri(),
-				TwitchScopes.join(scopes),
+				Scope.join(scopes),
 				state
 		);
 	}
@@ -151,7 +144,6 @@ public class OAuthTwitch {
 		// Filter to Streamlabs credentials
 		if(event.getCredential().getType().equals("twitch")) {
 			OAuthCredential credential = event.getCredential();
-			System.out.println("OLD: " + credential.toString());
 
 			// Rest Request to get refreshed token details
 			Authorize responseObject = getCredentialManager().getTwitchClient().getKrakenEndpoint().getOAuthToken(
@@ -159,7 +151,6 @@ public class OAuthTwitch {
 					getRedirectUri(),
 					credential.getRefreshToken()
 			).get();
-			System.out.println("NEW: " + responseObject.toString());
 
 			// Save Response
 			credential.setToken(responseObject.getAccessToken());

@@ -1,6 +1,13 @@
 package me.philippheuer.twitch4j.message.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,10 +18,6 @@ import me.philippheuer.util.conversion.TypeConvert;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -34,7 +37,7 @@ public abstract class Command {
 	/**
 	 * Get aliases of command
 	 */
-	protected String[] commandAliases;
+	protected String[] commandAliases = new String[] {};
 
 	/**
 	 * Category of the Command
@@ -178,18 +181,11 @@ public abstract class Command {
 	public List<User> getCommandArgumentTargetUsers() {
 		Pattern patternMention = Pattern.compile("@[a-zA-Z0-9_]{4,25}"); // @[a-zA-Z0-9_]{4,25}
 
-		List<User> targetUserList = new ArrayList<User>();
 		List<String> targetUserNameList = getParsedArguments().stream().filter(patternMention.asPredicate()).map(map -> map.replace("@", "")).collect(Collectors.toList());
-
-		for (String userName : targetUserNameList) {
-			Optional<User> targetUser = getTwitchClient().getUserEndpoint().getUserByUserName(userName);
-
-			// Username Valid?
-			// Add to Targets
-			targetUser.ifPresent(targetUserList::add);
+		if (targetUserNameList.isEmpty()) {
+			return Collections.emptyList();
 		}
-
-		return targetUserList;
+		return targetUserNameList.stream().map(getTwitchClient().getUserEndpoint()::getUserByUserName).collect(Collectors.toList());
 	}
 
 	/**

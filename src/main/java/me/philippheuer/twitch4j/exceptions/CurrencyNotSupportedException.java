@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.exceptions;
 
+import java.util.Currency;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Currency;
 
 @Getter
 @Setter

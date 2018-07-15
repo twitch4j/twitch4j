@@ -1,29 +1,23 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Collections;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.enums.Endpoints;
-import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.Ingest;
 import me.philippheuer.twitch4j.model.IngestList;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
-@Getter
-@Setter
+@Slf4j
 public class IngestEndpoint extends AbstractTwitchEndpoint {
 
 	/**
 	 * Get User by UserId
 	 *
-	 * @param client todo
+	 * @param client The Twitch Client.
 	 */
 	public IngestEndpoint(TwitchClient client) {
-		super(client);
+		super(client, client.getRestClient().getRestTemplate());
 	}
 
 	/**
@@ -36,23 +30,14 @@ public class IngestEndpoint extends AbstractTwitchEndpoint {
 	 * @return todo
 	 */
 	public List<Ingest> getIngestServer() {
-		// Endpoint
-		String requestUrl = String.format("%s/ingests", Endpoints.API.getURL());
-		RestTemplate restTemplate = getTwitchClient().getRestClient().getRestTemplate();
-
 		// REST Request
 		try {
-			Logger.trace(this, "Rest Request to [%s]", requestUrl);
-			IngestList responseObject = restTemplate.getForObject(requestUrl, IngestList.class);
-
-			return responseObject.getIngests();
-		} catch (RestException restException) {
-			Logger.error(this, "RestException: " + restException.getRestError().toString());
+			return restTemplate.getForObject("/ingests", IngestList.class).getIngests();
 		} catch (Exception ex) {
-			Logger.error(this, "Request failed: " + ex.getMessage());
-			Logger.trace(this, ExceptionUtils.getStackTrace(ex));
-		}
+			log.error("Request failed: " + ex.getMessage());
+			log.trace(ExceptionUtils.getStackTrace(ex));
 
-		return null;
+			return Collections.emptyList();
+		}
 	}
 }

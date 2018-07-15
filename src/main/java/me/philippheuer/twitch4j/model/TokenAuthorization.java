@@ -1,12 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
-
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
+import me.philippheuer.twitch4j.enums.Scope;
 
 /**
  * Model representing a token authorization.
@@ -16,11 +13,8 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenAuthorization {
-
-	private List<String> scopes;
+	private List<Scope> scopes;
 
 	private Date createdAt;
 

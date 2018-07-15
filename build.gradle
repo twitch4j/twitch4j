@@ -9,9 +9,11 @@ plugins {
 	id 'eclipse'
 	id 'application'
 	id 'maven-publish'
-	id "net.ltgt.apt" version "0.15"
-	id 'com.jfrog.bintray' version '1.8.0'
-	id 'io.ratpack.ratpack-java' version '1.4.6'
+	id "net.ltgt.apt" version "0.17"
+	id "net.ltgt.apt-idea" version "0.17"
+	id 'com.jfrog.bintray' version '1.8.4'
+	id "net.ltgt.apt-eclipse" version "0.17"
+	id 'io.ratpack.ratpack-java' version '1.5.4'
 }
 
 repositories {
@@ -22,7 +24,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = System.getenv('TRAVIS_TAG')
+version = "v0.11.0"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -44,25 +46,23 @@ javadoc {
 dependencies {
 	// Logging
 	compile "org.slf4j:slf4j-api:1.7.25"
-	compile "ch.qos.logback:logback-classic:1.2.3"
-	compile "com.jcabi:jcabi-log:0.17.2"
 
 	// Spring (RestTemplate)
-	compile "org.springframework:spring-web:5.0.0.RELEASE" 					// contains Tomcat
-	compile "org.springframework.social:spring-social-core:1.1.4.RELEASE"
+	compile "org.springframework:spring-web:5.0.7.RELEASE" 					// contains Tomcat
+	compile "org.springframework.social:spring-social-core:1.1.6.RELEASE"
 
 	// WebSocket Client for Twitch PubSub and Twitch IRC
 	// TODO: Change to Jetty WebSocket
-	compile "com.neovisionaries:nv-websocket-client:2.3"
+	compile "com.neovisionaries:nv-websocket-client:2.5"
 
 	// Apache Commons
 	// - Lang
-	compile "org.apache.commons:commons-lang3:3.6"
+	compile "org.apache.commons:commons-lang3:3.7"
 	// - IO
-	compile "commons-io:commons-io:2.5"
+	compile "commons-io:commons-io:2.6"
 
 	// JSON / YAML
-	compile "com.fasterxml.jackson.core:jackson-databind:2.9.2"
+	compile "com.fasterxml.jackson.core:jackson-databind:2.9.6"
 
 	// Bucket for rate-limiting
 	compile "org.isomorphism:token-bucket:1.7"
@@ -76,12 +76,16 @@ dependencies {
 	// Args4J - CommandLineArgumentParser
 	compile "args4j:args4j:2.33"
 
+	// Nullable Annotation
+	compile "com.google.code.findbugs:jsr305:3.0.2"
+
 	// Project Lombok for annotating processor
-	compile "org.projectlombok:lombok:+"
-	annotationProcessor "org.projectlombok:lombok:+"
+	compile "org.projectlombok:lombok:1.18.0"
+	annotationProcessor "org.projectlombok:lombok:1.18.0"
 
 	// Testing
 	testCompile "junit:junit:4.12"
+	testCompile "ch.qos.logback:logback-classic:1.2.3"
 }
 
 /**
@@ -133,12 +137,14 @@ task testIntegration(type: Test, description: 'Runs the integration tests.', gro
  */
 task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
 	from sourceSets.main.allSource
+	baseName = baseName.toLowerCase()
 	classifier = 'sources'
 }
 
 // build a jar with javadoc
 task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
 	classifier = 'javadoc'
+	baseName = baseName.toLowerCase()
 	from javadoc.destinationDir
 }
 
@@ -160,7 +166,7 @@ publishing {
 			artifact sourcesJar
 			artifact javadocJar
 			groupId project.group
-			artifactId project.name
+			artifactId project.name.toLowerCase()
 			version project.version
 		}
 	}
@@ -174,12 +180,11 @@ bintray {
 	key = System.getenv('BINTRAY_API_KEY')
 	publications = ['mainProject']
 	dryRun = false
-	publish = true
 	pkg {
 		// jcenter repository namespace and name
-		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
+		userOrg = 'twitch4j'
 		repo = 'maven'
-		name =  String.valueOf(project.name).toLowerCase()
+		name = "Twitch4J"
 		desc = project.description
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
@@ -196,6 +201,6 @@ bintray {
 }
 
 wrapper {
-	gradleVersion = "4.7" // newer version
+	gradleVersion = "4.8.1" // newer version
 	distributionType = Wrapper.DistributionType.ALL
 }

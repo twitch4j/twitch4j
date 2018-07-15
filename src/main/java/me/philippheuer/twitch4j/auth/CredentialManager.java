@@ -2,9 +2,15 @@ package me.philippheuer.twitch4j.auth;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcabi.log.Logger;
+import java.io.File;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.auth.model.OAuthRequest;
@@ -12,13 +18,6 @@ import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
-
-import java.io.File;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class managed all oauth credentials for the verious services.
@@ -32,6 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 @Setter
+@Slf4j
 public class CredentialManager {
 
 	/**
@@ -107,7 +107,7 @@ public class CredentialManager {
 								AuthTokenExpiredEvent event = new AuthTokenExpiredEvent(credential);
 								getTwitchClient().getDispatcher().dispatch(event);
 
-								Logger.info(this, "Token Expired, triggering Refresh Event! [%s]", event.toString());
+								log.info("Token Expired, triggering Refresh Event! [{}]", event.toString());
 							}
 						}
 
@@ -177,12 +177,12 @@ public class CredentialManager {
 	private void addAnyCredential(String key, OAuthCredential credential) {
 		// Remove value if it exists
 		if (getOAuthCredentials().containsKey(key)) {
-			Logger.debug(this, "Credentials with key [%s] already present in CredentialManager.", key);
+			log.debug("Credentials with key [{}] already present in CredentialManager.", key);
 			getOAuthCredentials().remove(key);
 		}
 
 		// Add value
-		Logger.debug(this, "Added Credentials with key [%s] and data [%s]", key, credential.toString());
+		log.debug("Added Credentials with key [{}] and data [{}]", key, credential.toString());
 
 		getOAuthCredentials().put(key, credential);
 
@@ -286,7 +286,7 @@ public class CredentialManager {
 
 				mapper.writeValue(getCredentialFile(), oAuthCredentials);
 
-				Logger.debug(this, "Saved %d Credentials using the CredentialManager.", oAuthCredentials.size());
+				log.debug("Saved {} Credentials using the CredentialManager.", oAuthCredentials.size());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -305,7 +305,7 @@ public class CredentialManager {
 				});
 				getOAuthCredentials().putAll(loadedCredentials);
 
-				Logger.debug(this, "Loaded %d Credentials using the CredentialManager.", oAuthCredentials.size());
+				log.debug("Loaded {} Credentials using the CredentialManager.", oAuthCredentials.size());
 
 			} catch (Exception ex) {
 				ex.printStackTrace();
