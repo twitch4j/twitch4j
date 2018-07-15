@@ -1,5 +1,9 @@
 package me.philippheuer.twitch4j.message.irc.listener;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.EventSubscriber;
@@ -7,14 +11,22 @@ import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
 import me.philippheuer.twitch4j.events.event.channel.HostOffEvent;
 import me.philippheuer.twitch4j.events.event.channel.HostOnEvent;
 import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
-import me.philippheuer.twitch4j.events.event.irc.*;
+import me.philippheuer.twitch4j.events.event.irc.ChannelJoinEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelLeaveEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageActionEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelNoticeEvent;
+import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
+import me.philippheuer.twitch4j.events.event.irc.ClearChatEvent;
+import me.philippheuer.twitch4j.events.event.irc.IRCMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.PrivateMessageEvent;
+import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
+import me.philippheuer.twitch4j.events.event.irc.UserTimeoutEvent;
 import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.Subscription;
 import me.philippheuer.twitch4j.model.User;
-
-import java.time.Instant;
-import java.util.*;
 
 /**
  * IRC Event Listener

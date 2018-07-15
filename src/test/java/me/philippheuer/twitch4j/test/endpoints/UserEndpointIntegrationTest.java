@@ -6,8 +6,6 @@ import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Optional;
-
 @Category(IntegrationTestCategory.class)
 public class UserEndpointIntegrationTest extends TwitchClientIntegrationTest {
 

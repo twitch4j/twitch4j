@@ -1,6 +1,7 @@
 package me.philippheuer.twitch4j.message;
 
 
+import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
@@ -10,8 +11,6 @@ import me.philippheuer.twitch4j.message.irc.ChannelCache;
 import me.philippheuer.twitch4j.message.irc.TwitchChat;
 import me.philippheuer.twitch4j.message.pubsub.TwitchPubSub;
 import me.philippheuer.twitch4j.model.Channel;
-
-import java.util.ArrayList;
 
 @Getter
 @Setter

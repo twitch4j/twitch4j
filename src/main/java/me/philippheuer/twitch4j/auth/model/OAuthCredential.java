@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Calendar;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.util.conversion.ScopeDeserializer;
-
-import java.util.Calendar;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Data
 @Getter

@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.time.Duration;
 import java.util.Calendar;
+import lombok.Data;
 
 /**
  * Model representing a stream.

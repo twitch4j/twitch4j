@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.test.endpoints;
 
+import java.util.List;
 import me.philippheuer.twitch4j.model.ChannelFeedPost;
 import me.philippheuer.twitch4j.test.TwitchClientIntegrationTest;
 import me.philippheuer.twitch4j.test.model.AssertEntity;
@@ -7,9 +8,6 @@ import me.philippheuer.util.test.IntegrationTestCategory;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.util.Assert;
-
-import java.util.List;
-import java.util.Optional;
 
 @Category(IntegrationTestCategory.class)
 public class ChannelFeedEndpointIntegrationTest extends TwitchClientIntegrationTest {

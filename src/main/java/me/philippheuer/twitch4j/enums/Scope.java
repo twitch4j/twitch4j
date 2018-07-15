@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.enums;
 
-import lombok.RequiredArgsConstructor;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify

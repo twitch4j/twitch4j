@@ -1,5 +1,10 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -15,12 +20,6 @@ import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class VideoEndpoint extends AbstractTwitchEndpoint {

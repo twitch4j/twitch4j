@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import me.philippheuer.twitch4j.enums.Scope;
-
 import java.io.IOException;
+import me.philippheuer.twitch4j.enums.Scope;
 
 public class ScopeDeserializer extends JsonDeserializer<Scope> {
 	@Override

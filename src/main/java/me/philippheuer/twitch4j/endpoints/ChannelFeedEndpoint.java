@@ -1,5 +1,8 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -13,10 +16,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class ChannelFeedEndpoint extends AbstractTwitchEndpoint {

@@ -1,5 +1,9 @@
 package me.philippheuer.twitch4j.auth;
 
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -7,11 +11,6 @@ import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.enums.Scope;
 import ratpack.server.RatpackServer;
 import ratpack.server.Stopper;
-
-import java.util.Arrays;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

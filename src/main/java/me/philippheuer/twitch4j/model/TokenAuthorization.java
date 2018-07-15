@@ -1,12 +1,11 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Date;
+import java.util.List;
 import lombok.Data;
 import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.util.conversion.ScopeDeserializer;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * Model representing a token authorization.

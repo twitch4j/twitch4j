@@ -1,5 +1,12 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -8,16 +15,21 @@ import me.philippheuer.twitch4j.enums.Sort;
 import me.philippheuer.twitch4j.enums.SortBy;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Block;
+import me.philippheuer.twitch4j.model.BlockList;
+import me.philippheuer.twitch4j.model.Emote;
+import me.philippheuer.twitch4j.model.EmoteSets;
+import me.philippheuer.twitch4j.model.Follow;
+import me.philippheuer.twitch4j.model.FollowList;
+import me.philippheuer.twitch4j.model.User;
+import me.philippheuer.twitch4j.model.UserChat;
+import me.philippheuer.twitch4j.model.UserList;
+import me.philippheuer.twitch4j.model.UserSubscriptionCheck;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class UserEndpoint extends AbstractTwitchEndpoint {

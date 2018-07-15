@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.model;
 
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 /**
  * Model representing a list of followers.

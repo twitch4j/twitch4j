@@ -3,14 +3,13 @@ package me.philippheuer.twitch4j.auth.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.enums.Scope;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Getter

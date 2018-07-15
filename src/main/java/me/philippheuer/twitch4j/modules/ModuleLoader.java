@@ -27,7 +27,6 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.modules.event.ModuleDisabledEvent;
 import me.philippheuer.twitch4j.modules.event.ModuleEnabledEvent;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 @Slf4j
 public class ModuleLoader {

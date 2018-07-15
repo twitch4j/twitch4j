@@ -4,8 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jcabi.log.Logger;
-import com.neovisionaries.ws.client.*;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketException;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +25,6 @@ import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class PubSub {

@@ -1,11 +1,10 @@
 package me.philippheuer.twitch4j.events;
 
+import java.util.Calendar;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.TwitchClient;
-
-import java.util.Calendar;
 
 /**
  * Used to represent an event.

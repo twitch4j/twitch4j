@@ -1,5 +1,10 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -14,12 +19,6 @@ import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 public class CommunityEndpoint extends AbstractTwitchEndpoint {

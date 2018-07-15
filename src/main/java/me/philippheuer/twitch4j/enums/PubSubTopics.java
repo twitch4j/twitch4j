@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.enums;
 
-import me.philippheuer.twitch4j.model.Channel;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import me.philippheuer.twitch4j.model.Channel;
 
 public enum PubSubTopics {
 	BITS("channel-bits-events-v1", Scope.values()),

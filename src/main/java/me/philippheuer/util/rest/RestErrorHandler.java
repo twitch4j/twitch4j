@@ -1,7 +1,7 @@
 package me.philippheuer.util.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcabi.log.Logger;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.exceptions.RestException;
 import me.philippheuer.twitch4j.model.RestError;
@@ -9,8 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-
-import java.io.IOException;
 
 /**
  * Rest Error Handler

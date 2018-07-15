@@ -1,12 +1,11 @@
 package me.philippheuer.util.rest;
 
+import java.io.IOException;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.support.HttpRequestWrapper;
-
-import java.io.IOException;
 
 /**
  * Spring Rest: Header Request Interceptor

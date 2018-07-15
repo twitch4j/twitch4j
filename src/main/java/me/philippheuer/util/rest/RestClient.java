@@ -1,13 +1,12 @@
 package me.philippheuer.util.rest;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Rest Client Wrapper

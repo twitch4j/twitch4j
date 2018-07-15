@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
@@ -7,8 +8,6 @@ import me.philippheuer.twitch4j.events.event.AbstractChannelEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
-
-import java.util.Set;
 
 /**
  * This event gets called when a message is received in a channel.

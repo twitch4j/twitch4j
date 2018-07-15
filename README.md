@@ -2,8 +2,6 @@
 
 <p align="center">
 <a href="https://travis-ci.org/twitch4j/twitch4j"><img src="https://travis-ci.org/twitch4j/twitch4j.svg?branch=master" alt="Build Status"></a>
-<img src="https://img.shields.io/librariesio/github/twitch4j/twitch4j.svg?style=flat-square" alt="Libraries.io for GitHub">
-<a href="https://www.codacy.com/app/twitch4j/twitch4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=twitch4j/twitch4j&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4d9f9562de194b7f8699f9adfd0c4669" alt="Codacy Badge"></a>
 <a href="http://isitmaintained.com/project/twitch4j/twitch4j"><img src="http://isitmaintained.com/badge/resolution/twitch4j/twitch4j.svg" alt="Average time to resolve an issue"></a>
 <a href="http://isitmaintained.com/project/twitch4j/twitch4j"><img src="http://isitmaintained.com/badge/open/twitch4j/twitch4j.svg" alt="Percentage of issues still open"></a>
 <a href="https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion"><img src="https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg" alt="Download"></a>
@@ -19,8 +17,7 @@ Support:
 
 Documentation:
 
-[![JavaDoc: Master](https://img.shields.io/badge/JavaDoc-Master-006400.svg?style=flat-square)](https://jitpack.io/com/github/PhilippHeuer/twitch4j/master-SNAPSHOT/javadoc/index.html)
-[![JavaDoc: Develop](https://img.shields.io/badge/JavaDoc-Develop-006400.svg?style=flat-square)](https://jitpack.io/com/github/PhilippHeuer/twitch4j/develop-SNAPSHOT/javadoc/index.html)
+[![Javadocs](http://javadoc.io/badge/com.github.twitch4j/twitch4j.svg)](http://javadoc.io/doc/com.github.twitch4j/twitch4j)
 [![Wiki](https://img.shields.io/badge/Wiki-Github-D3D3D3.svg?style=flat-square)](https://github.com/PhilippHeuer/twitch4j/wiki)
 
 --------
@@ -29,7 +26,6 @@ Documentation:
 This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Futhermore twitch related services like Streamlabs are integrated.
 
 This project is still in development, check out [Features](#features) and [Changelog](#changelog) to follow progress.
-
 ## Quick Start
 
 #### Gradle
@@ -43,7 +39,7 @@ and: (latest, you should use the actual version here)
 
 ```groovy
 dependencies {
-    compile 'com.github.twitch4j:twitch4j:+'
+    compile 'com.github.twitch4j:twitch4j:0.11.0'
 }
 ```
 
@@ -63,7 +59,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>v0.10.0</version>
+    <version>0.11.0</version>
 </dependency>
 ```
 

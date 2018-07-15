@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * Model representing a user.

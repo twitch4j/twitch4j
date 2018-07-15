@@ -1,11 +1,10 @@
 package me.philippheuer.twitch4j.events.event.irc.roomstates;
 
+import java.util.concurrent.TimeUnit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.model.Channel;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * R9K mode event.

@@ -1,13 +1,12 @@
 package me.philippheuer.twitch4j.events.event.irc;
 
+import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.User;
-
-import java.util.Set;
 
 /**
  * This event gets called when the bot gets a private message.

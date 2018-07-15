@@ -4,25 +4,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jcabi.log.Logger;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.auth.model.OAuthCredential;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.PubSubTopics;
 import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.enums.TMIConnectionState;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.util.conversion.RandomizeString;
-
-import java.io.IOException;
-import java.util.*;
 
 @Getter
 @Setter

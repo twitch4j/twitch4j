@@ -1,6 +1,6 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import com.jcabi.log.Logger;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.enums.Endpoints;
@@ -10,10 +10,7 @@ import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.twitch4j.model.tmi.Chatter;
 import me.philippheuer.twitch4j.model.tmi.ChatterResult;
 import net.jodah.expiringmap.ExpirationPolicy;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Twitch Messaging Interface (TMI)

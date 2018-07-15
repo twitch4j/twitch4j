@@ -1,10 +1,24 @@
 package me.philippheuer.twitch4j;
 
+import java.io.File;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
 import me.philippheuer.twitch4j.auth.CredentialManager;
-import me.philippheuer.twitch4j.endpoints.*;
+import me.philippheuer.twitch4j.endpoints.ChannelEndpoint;
+import me.philippheuer.twitch4j.endpoints.ChannelFeedEndpoint;
+import me.philippheuer.twitch4j.endpoints.ChatEndpoint;
+import me.philippheuer.twitch4j.endpoints.CommunityEndpoint;
+import me.philippheuer.twitch4j.endpoints.GameEndpoint;
+import me.philippheuer.twitch4j.endpoints.IngestEndpoint;
+import me.philippheuer.twitch4j.endpoints.KrakenEndpoint;
+import me.philippheuer.twitch4j.endpoints.SearchEndpoint;
+import me.philippheuer.twitch4j.endpoints.StreamEndpoint;
+import me.philippheuer.twitch4j.endpoints.TMIEndpoint;
+import me.philippheuer.twitch4j.endpoints.TeamEndpoint;
+import me.philippheuer.twitch4j.endpoints.UnofficialEndpoint;
+import me.philippheuer.twitch4j.endpoints.UserEndpoint;
+import me.philippheuer.twitch4j.endpoints.VideoEndpoint;
 import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
@@ -12,8 +26,6 @@ import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
 import me.philippheuer.twitch4j.modules.ModuleLoader;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.RestClient;
-
-import java.io.File;
 
 /**
  * TwitchClient is the core class for all api operations.

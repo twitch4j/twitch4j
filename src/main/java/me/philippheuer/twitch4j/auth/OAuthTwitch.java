@@ -1,5 +1,8 @@
 package me.philippheuer.twitch4j.auth;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -11,10 +14,6 @@ import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Optional;
 
 @Getter
 @Setter

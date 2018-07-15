@@ -1,13 +1,5 @@
 package me.philippheuer.twitch4j.events;
 
-import com.jcabi.log.Logger;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.java.Log;
-import lombok.extern.slf4j.Slf4j;
-import me.philippheuer.twitch4j.TwitchClient;
-import net.jodah.typetools.TypeResolver;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -15,6 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import me.philippheuer.twitch4j.TwitchClient;
+import net.jodah.typetools.TypeResolver;
 
 /**
  * Manages event listeners and event logic.

@@ -1,13 +1,12 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.model.Ingest;
 import me.philippheuer.twitch4j.model.IngestList;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 public class IngestEndpoint extends AbstractTwitchEndpoint {

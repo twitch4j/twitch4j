@@ -1,13 +1,12 @@
 package me.philippheuer.util.rest;
 
+import java.io.IOException;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-
-import java.io.IOException;
 
 /**
  * Spring Rest: Logging Request Interceptor

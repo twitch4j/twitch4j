@@ -1,10 +1,9 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import lombok.Data;
 import me.philippheuer.twitch4j.enums.SubscriptionPlan;
-
-import java.time.Instant;
 
 /**
  * Model representing a subscription.

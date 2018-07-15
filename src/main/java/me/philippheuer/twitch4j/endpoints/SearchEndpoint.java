@@ -1,16 +1,20 @@
 package me.philippheuer.twitch4j.endpoints;
 
-import lombok.extern.slf4j.Slf4j;
-import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.model.*;
-import me.philippheuer.util.rest.QueryRequestInterceptor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
+import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.ChannelList;
+import me.philippheuer.twitch4j.model.Game;
+import me.philippheuer.twitch4j.model.GameList;
+import me.philippheuer.twitch4j.model.Stream;
+import me.philippheuer.twitch4j.model.StreamList;
+import me.philippheuer.util.rest.QueryRequestInterceptor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class SearchEndpoint extends AbstractTwitchEndpoint {

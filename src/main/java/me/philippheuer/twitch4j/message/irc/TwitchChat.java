@@ -1,10 +1,17 @@
 package me.philippheuer.twitch4j.message.irc;
 
-import com.jcabi.log.Logger;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -19,14 +26,9 @@ import me.philippheuer.twitch4j.events.event.irc.IRCMessageEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.twitch4j.model.UserChat;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.isomorphism.util.TokenBucket;
 import org.isomorphism.util.TokenBuckets;
 import org.springframework.util.Assert;
-
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Data
 @Slf4j

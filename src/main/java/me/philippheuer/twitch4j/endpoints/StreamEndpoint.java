@@ -1,5 +1,12 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -7,16 +14,22 @@ import me.philippheuer.twitch4j.enums.Scope;
 import me.philippheuer.twitch4j.enums.StreamType;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.Game;
+import me.philippheuer.twitch4j.model.Recommendation;
+import me.philippheuer.twitch4j.model.RecommendationList;
+import me.philippheuer.twitch4j.model.Stream;
+import me.philippheuer.twitch4j.model.StreamFeatured;
+import me.philippheuer.twitch4j.model.StreamFeaturedList;
+import me.philippheuer.twitch4j.model.StreamList;
+import me.philippheuer.twitch4j.model.StreamSingle;
+import me.philippheuer.twitch4j.model.StreamSummary;
+import me.philippheuer.twitch4j.model.User;
 import me.philippheuer.util.annotation.Unofficial;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * All api methods related to a stream.

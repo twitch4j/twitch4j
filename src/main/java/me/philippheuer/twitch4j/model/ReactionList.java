@@ -1,8 +1,7 @@
 package me.philippheuer.twitch4j.model;
 
-import lombok.Data;
-
 import java.util.Map;
+import lombok.Data;
 
 /**
  * Model representing a list of games.

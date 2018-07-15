@@ -1,5 +1,6 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -13,8 +14,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Optional;
 
 @Slf4j
 public class KrakenEndpoint extends AbstractTwitchEndpoint {

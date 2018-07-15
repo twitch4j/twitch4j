@@ -1,9 +1,8 @@
 package me.philippheuer.twitch4j.model;
 
-import lombok.Data;
-
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 
 /**
  * Model representing a sets of twitch emotes.

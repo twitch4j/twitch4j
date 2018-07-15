@@ -1,22 +1,42 @@
 package me.philippheuer.twitch4j.endpoints;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.enums.*;
+import me.philippheuer.twitch4j.enums.BroadcastType;
+import me.philippheuer.twitch4j.enums.CommercialType;
+import me.philippheuer.twitch4j.enums.Scope;
+import me.philippheuer.twitch4j.enums.Sort;
+import me.philippheuer.twitch4j.enums.VideoSort;
 import me.philippheuer.twitch4j.exceptions.ChannelCredentialMissingException;
 import me.philippheuer.twitch4j.exceptions.ScopeMissingException;
-import me.philippheuer.twitch4j.model.*;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.Commercial;
+import me.philippheuer.twitch4j.model.Communities;
+import me.philippheuer.twitch4j.model.Community;
+import me.philippheuer.twitch4j.model.Follow;
+import me.philippheuer.twitch4j.model.FollowList;
+import me.philippheuer.twitch4j.model.Subscription;
+import me.philippheuer.twitch4j.model.SubscriptionList;
+import me.philippheuer.twitch4j.model.Team;
+import me.philippheuer.twitch4j.model.TeamList;
+import me.philippheuer.twitch4j.model.User;
+import me.philippheuer.twitch4j.model.UserList;
+import me.philippheuer.twitch4j.model.Video;
+import me.philippheuer.twitch4j.model.VideoList;
 import me.philippheuer.util.rest.HeaderRequestInterceptor;
 import me.philippheuer.util.rest.QueryRequestInterceptor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.lang.Void;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class ChannelEndpoint extends AbstractTwitchEndpoint {
