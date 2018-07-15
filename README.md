@@ -72,7 +72,7 @@ and: (latest, you should use the actual version here)
  
 #### Twitch REST Endpoints
  - [ ] Bits
- - [x] ~~Channel Feed~~ #50
+ - [x] ~~Channel Feed~~ [#50](https://github.com/twitch4j/twitch4j/issues/50)
  - [x] Channels
  - [ ] Chat
  - [ ] Clips
