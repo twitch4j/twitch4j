@@ -27,7 +27,7 @@ description = "This is a api client for the Twitch API V5/IRC/PubSub. (And relat
 version = "v0.11.0"
 
 // Doesn't matter, only so that spring doesn't fail
-mainClassName = 'twitch4j.TwitchClient'
+mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
 
 /**
  * Javadoc
@@ -117,8 +117,8 @@ configurations.all {
  */
 test {
 	useJUnit {
-		includeCategories 'twitch4j.util.test.UnitTestCategory'
-		excludeCategories 'twitch4j.util.test.IntegrationTestCategory'
+		includeCategories 'me.philippheuer.util.test.UnitTestCategory'
+		excludeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
 	}
 }
 
@@ -127,8 +127,8 @@ test {
  */
 task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
 	useJUnit {
-		includeCategories 'twitch4j.util.test.IntegrationTestCategory'
-		excludeCategories 'twitch4j.util.test.UnitTestCategory'
+		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
+		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
 	}
 }
 
