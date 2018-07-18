@@ -138,7 +138,7 @@ public enum Scope {
 
 	public static String join(Collection<Scope> scopes) {
 		if (scopes.size() > 0) return scopes.stream().map(Scope::name)
-				.collect(Collectors.joining("+"));
+				.collect(Collectors.joining("+")).toLowerCase();
 		else return "";
 	}
 
