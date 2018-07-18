@@ -24,7 +24,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = "v0.11.0"
+version = "v0.11.1"
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -176,8 +176,8 @@ publishing {
  * Bintray Upload
  */
 bintray {
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_API_KEY')
+	user = findProperty("bintrayUser").toString() ?: System.getenv("BINTRAY_USER")
+	key = findProperty("bintrayApiKey").toString() ?: System.getenv("BINTRAY_API_KEY")
 	publications = ['mainProject']
 	dryRun = false
 	pkg {
@@ -201,6 +201,6 @@ bintray {
 }
 
 wrapper {
-	gradleVersion = "4.8.1" // newer version
+	gradleVersion = "4.9" // newer version
 	distributionType = Wrapper.DistributionType.ALL
 }
