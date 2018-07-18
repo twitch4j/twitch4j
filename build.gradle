@@ -201,6 +201,6 @@ bintray {
 }
 
 wrapper {
-	gradleVersion = "4.9" // newer version
+	gradleVersion = "4.8.1" // newer version
 	distributionType = Wrapper.DistributionType.ALL
 }
