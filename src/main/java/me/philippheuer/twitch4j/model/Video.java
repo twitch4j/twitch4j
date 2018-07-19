@@ -1,9 +1,11 @@
 package me.philippheuer.twitch4j.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 import java.util.Map;
 import lombok.Data;
+import me.philippheuer.util.conversion.VideoIdDeserializer;
 
 /**
  * Model representing a video.
@@ -16,6 +18,7 @@ import lombok.Data;
 public class Video {
 
 	@JsonProperty("_id")
+	@JsonDeserialize(using = VideoIdDeserializer.class)
 	private long id;
 
 	private String title;
