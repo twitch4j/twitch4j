@@ -17,6 +17,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Scope {
 	/**
+	 * View analytics data for your extensions.
+	 */
+	ANALYTICS_READ_EXTENSION("analytics:read:extensions"),
+	/**
 	 * View analytics data for your games.
 	 */
 	ANALYTICS_READ_GAMES("analytics:read:games"),
@@ -33,14 +37,21 @@ public enum Scope {
 	 */
 	USER_EDIT("user:edit"),
 	/**
+	 * Edit your channel’s broadcast configuration, including extension configuration. (This scope implies <code>{@link Scope#USER_READ_BROADCAST user:read:broadcast}</code> capability.)
+	 */
+	USER_EDIT_BROADCAST("user:edit:broadcast"),
+	/**
+	 * View your broadcasting configuration, including extension configurations.
+	 */
+	USER_READ_BROADCAST("user:read:broadcast"),
+	/**
 	 * Read authorized user’s email address.
 	 */
 	USER_READ_EMAIL("user:read:email"),
-
 	/**
 	 * Read whether a user is subscribed to your channel.
 	 */
-	channel_check_subscription,
+	CHANNEL_CHECK_SUBSCRIPTION,
 	/**
 	 * Trigger commercials on channel.
 	 */
@@ -51,11 +62,15 @@ public enum Scope {
 	CHANNEL_EDITOR,
 	/**
 	 * Add posts and reactions to a channel feed.
+	 * @deprecated <a href="https://discuss.dev.twitch.tv/t/how-the-removal-of-channel-feed-and-pulse-affects-the-twitch-api-v5/16540">Twitch removes Channel Feed and Pulse.</a>
 	 */
+	@Deprecated
 	CHANNEL_FEED_EDIT,
 	/**
 	 * View a channel feed.
+	 * @deprecated <a href="https://discuss.dev.twitch.tv/t/how-the-removal-of-channel-feed-and-pulse-affects-the-twitch-api-v5/16540">Twitch removes Channel Feed and Pulse.</a>
 	 */
+	@Deprecated
 	CHANNEL_FEED_READ,
 	/**
 	 * Read nonpublic channel information, including email address and stream key.
@@ -122,7 +137,7 @@ public enum Scope {
 	private final String name;
 
 	Scope() {
-		this.name = name();
+		this.name = name().toLowerCase();
 	}
 
 	/**
