@@ -1,3 +1,9 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+
+---
+
 <!--
 	Thanks to using Twitch4J
  	Before you submit pull request/issue read Contributing guidelines.
@@ -31,7 +37,7 @@
 2. [Second step]
 -->
 
-...
+---
 
 **Expected behavior:** 
 <!-- What was supposed to happen -->
