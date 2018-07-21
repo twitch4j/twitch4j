@@ -110,14 +110,14 @@ public class RestClient {
 
 	private ObjectMapper getObjectMapper() {
 		SimpleModule simpleModule = new SimpleModule()
-				.addDeserializer(Calendar.class, new UnixTimestampDeserializer())
-				.addDeserializer(Scope.class, new ScopeDeserializer())
 				.addDeserializer(BroadcasterType.class, new BroadcasterTypeDeserializer())
 				.addDeserializer(Duration.class, new DurationDeserializer())
 				.addDeserializer(Instant.class, new InstantClockDeserializer())
 				.addDeserializer(Scope.class, new ScopeDeserializer())
 				.addDeserializer(StreamType.class, new StreamTypeDeserializer())
 				.addDeserializer(SubscriptionPlan.class, new SubscriptionPlanDeserializer())
+				.addDeserializer(UserType.class, new UserTypeDeserializer())
+				.addDeserializer(Calendar.class, new UnixTimestampDeserializer())
 				.addDeserializer(UserType.class, new UserTypeDeserializer())
 				.addDeserializer(VideoAccess.class, new VideoAccessDeserializer())
 				.addDeserializer(VideoType.class, new VideoTypeDeserializer());

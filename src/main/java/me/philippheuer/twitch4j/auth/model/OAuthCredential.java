@@ -30,7 +30,6 @@ public class OAuthCredential {
 
 	private String refreshToken;
 
-	@JsonDeserialize(as = ScopeDeserializer.class)
 	private final Set<Scope> oAuthScopes = new LinkedHashSet<>();
 
 	private Long userId;
