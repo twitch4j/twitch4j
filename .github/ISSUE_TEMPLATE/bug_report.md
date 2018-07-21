@@ -1,3 +1,9 @@
+---
+name: Bug report
+about: Create a report to help us improve
+
+---
+
 <!--
 	Thanks to using Twitch4J
  	Before you submit pull request/issue read Contributing guidelines.
