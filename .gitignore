@@ -55,3 +55,6 @@ src/*/java/twitch4j/example/*
 
 # Modules
 /modules/
+
+# Visual Studio Code
+.vscode/
