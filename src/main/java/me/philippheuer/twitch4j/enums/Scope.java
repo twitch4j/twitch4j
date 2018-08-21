@@ -152,7 +152,7 @@ public enum Scope {
 	}
 
 	public static String join(Collection<Scope> scopes) {
-		if (scopes.size() > 0) return scopes.stream().map(Scope::name)
+		if (scopes.size() > 0) return scopes.stream().map(scope -> scope.name().toLowerCase())
 				.collect(Collectors.joining("+"));
 		else return "";
 	}
