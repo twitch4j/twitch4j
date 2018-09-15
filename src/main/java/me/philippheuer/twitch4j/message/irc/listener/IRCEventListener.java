@@ -6,11 +6,9 @@ import java.util.Locale;
 import java.util.Map;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
+import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.EventSubscriber;
-import me.philippheuer.twitch4j.events.event.channel.CheerEvent;
-import me.philippheuer.twitch4j.events.event.channel.HostOffEvent;
-import me.philippheuer.twitch4j.events.event.channel.HostOnEvent;
-import me.philippheuer.twitch4j.events.event.channel.SubscriptionEvent;
+import me.philippheuer.twitch4j.events.event.channel.*;
 import me.philippheuer.twitch4j.events.event.irc.ChannelJoinEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelLeaveEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelMessageActionEvent;
@@ -114,7 +112,8 @@ public class IRCEventListener {
 	 */
 	@EventSubscriber
 	public void onChannelSubscription(IRCMessageEvent event) {
-		if(event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id")) {
+		if (event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id")) {
+			// Sub
 			if(event.getTags().get("msg-id").equalsIgnoreCase("sub") || event.getTags().get("msg-id").equalsIgnoreCase("resub")) {
 				// Load Info
 				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
@@ -123,7 +122,7 @@ public class IRCEventListener {
 				boolean isResub = event.getTags().get("msg-id").equalsIgnoreCase("resub");
 				Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
 
-				// Twitch sometimes returns 0 months for new subs
+				// twitch sometimes returns 0 months for new subs
 				if(subStreak == 0) {
 					subStreak = 1;
 				}
@@ -135,7 +134,43 @@ public class IRCEventListener {
 				entity.setSubPlanByCode(subPlan);
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak));
+				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, false, null));
+			}
+			// Receive Gifted Sub
+			else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {
+				// Load Info
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+				User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("msg-param-recipient-id").get()));
+				User giftedBy = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("user-id").get()));
+				String subPlan = event.getTagValue("msg-param-sub-plan").get();
+				boolean isResub = event.getTags().get("msg-id").equalsIgnoreCase("resub");
+				Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
+
+				// twitch sometimes returns 0 months for new subs
+				if(subStreak == 0) {
+					subStreak = 1;
+				}
+
+				// Build Subscription Entity
+				Subscription entity = new Subscription();
+				entity.setCreatedAt(Instant.now());
+				entity.setUser(user);
+				entity.setSubPlanByCode(subPlan);
+
+				// Dispatch Event
+				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, true, giftedBy));
+			}
+			// Gift X Subs
+			else if(event.getTags().get("msg-id").equalsIgnoreCase("submysterygift")) {
+				// Load Info
+				Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelName().get());
+				User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("user-id").get()));
+				String subPlan = event.getTagValue("msg-param-sub-plan").get();
+				Integer subsGifted = (event.getTags().containsKey("msg-param-mass-gift-count")) ? Integer.parseInt(event.getTags().get("msg-param-mass-gift-count")) : 0;
+				Integer subsGiftedTotal = (event.getTags().containsKey("msg-param-sender-count")) ? Integer.parseInt(event.getTags().get("msg-param-sender-count")) : 0;
+
+				// Dispatch Event
+				event.getClient().getDispatcher().dispatch(new GiftSubscriptionsEvent(channel, user, subPlan, subsGifted, subsGiftedTotal));
 			}
 		}
 	}
@@ -195,7 +230,9 @@ public class IRCEventListener {
 			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get());
 
 			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new ChannelJoinEvent(channel, user));
+			if (channel != null && user != null) {
+				event.getClient().getDispatcher().dispatch(new ChannelJoinEvent(channel, user));
+			}
 		}
 	}
 
@@ -211,7 +248,9 @@ public class IRCEventListener {
 			User user = event.getClient().getUserEndpoint().getUserByUserName(event.getClientName().get());
 
 			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new ChannelLeaveEvent(channel, user));
+			if (channel != null && user != null) {
+				event.getClient().getDispatcher().dispatch(new ChannelLeaveEvent(channel, user));
+			}
 		}
 	}
 

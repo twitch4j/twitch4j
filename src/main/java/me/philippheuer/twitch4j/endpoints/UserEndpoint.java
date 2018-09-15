@@ -65,9 +65,7 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 		// Validate Arguments
 		Assert.hasLength(userName, "Please provide a Username!");
 
-
 		String requestUrl = String.format("/users?login=%s", userName);
-
 
 		// REST Request
 		if (!restObjectCache.containsKey(requestUrl)) {
@@ -80,7 +78,9 @@ public class UserEndpoint extends AbstractTwitchEndpoint {
 			}
 		}
 
-		return ((UserList) restObjectCache.get(requestUrl)).getUsers().get(0);
+		List<User> userList = ((UserList) restObjectCache.get(requestUrl)).getUsers();
+
+		return userList.size() > 0 ? userList.get(0) : null;
 	}
 
 	/**

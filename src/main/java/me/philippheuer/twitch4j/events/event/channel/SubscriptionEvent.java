@@ -40,9 +40,19 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	private Optional<String> message;
 
 	/**
-	 *
+	 * X Months subscription streak
 	 */
 	private Integer months;
+
+	/**
+	 * Was this sub gifted?
+	 */
+	private Boolean gifted;
+
+	/**
+	 * User that gifted the sub
+	 */
+	private User giftedBy;
 
 	/**
 	 * Event Constructor
@@ -50,12 +60,14 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	 * @param channel      The channel that this event originates from.
 	 * @param subscription The subscription, containing all relevant information.
 	 */
-	public SubscriptionEvent(Channel channel, Subscription subscription, Optional<String> message, Integer months) {
+	public SubscriptionEvent(Channel channel, Subscription subscription, Optional<String> message, Integer months, Boolean gifted, User giftedBy) {
 		super(channel);
 		this.user = subscription.getUser();
 		this.subscription = subscription;
 		this.message = message;
 		this.months = months;
+		this.gifted = gifted;
+		this.giftedBy = giftedBy;
 	}
 
 }

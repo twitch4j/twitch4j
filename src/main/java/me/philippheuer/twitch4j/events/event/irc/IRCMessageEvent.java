@@ -235,6 +235,10 @@ public class IRCMessageEvent extends Event {
 		if (getTags().containsKey("subscriber") && getTags().get("subscriber").equals("1")) {
 			getClientPermissions().add(CommandPermission.SUBSCRIBER);
 		}
+		// Sub Gifter
+		if (getTags().containsKey("sub-gifter") && getTags().get("sub-gifter").equals("1")) {
+			getClientPermissions().add(CommandPermission.SUBGIFTER);
+		}
 		// Everyone
 		getClientPermissions().add(CommandPermission.EVERYONE);
 	}

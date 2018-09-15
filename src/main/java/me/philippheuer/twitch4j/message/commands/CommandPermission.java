@@ -22,6 +22,11 @@ public enum CommandPermission {
 	SUBSCRIBER,
 
 	/**
+	 * Gifted a sub
+	 */
+	SUBGIFTER,
+
+	/**
 	 * Channel Moderator
 	 */
 	MODERATOR,

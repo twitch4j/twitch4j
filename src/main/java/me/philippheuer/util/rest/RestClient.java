@@ -71,8 +71,6 @@ public class RestClient {
 	public RestTemplate getRestTemplate() {
 		RestTemplate restTemplate = getPlainRestTemplate();
 
-		putRestInterceptor(new LoggingRequestInterceptor());
-
 		restTemplate.setInterceptors(restInterceptors);
 		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("https://api.twitch.tv/kraken"));
 
