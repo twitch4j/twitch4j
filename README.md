@@ -44,7 +44,7 @@ dependencies {
 ```
 
 #### Maven
-Add it to your pom.xml with:
+Add the repository to your pom.xml with:
 ```xml
 <repositories>
     <repository>

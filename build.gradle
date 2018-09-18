@@ -22,8 +22,8 @@ repositories {
 
 // Artifact Info
 group = "com.github.twitch4j"
-description = "This is a api client for the Twitch API V5/IRC/PubSub. (And related services: Streamlabs, ...)"
-version = "v0.11.2"
+description = "This is a api client for the Twitch API V5/IRC/PubSub."
+version = System.getenv("CI_COMMIT_REF_NAME")
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -165,7 +165,7 @@ publishing {
 			artifact sourcesJar
 			artifact javadocJar
 			groupId project.group
-			artifactId project.name.toLowerCase()
+			artifactId project.name
 			version project.version
 		}
 	}
@@ -175,20 +175,20 @@ publishing {
  * Bintray Upload
  */
 bintray {
-	user = findProperty("bintrayUser").toString() ?: System.getenv("BINTRAY_USER")
-	key = findProperty("bintrayApiKey").toString() ?: System.getenv("BINTRAY_API_KEY")
+	user = System.getenv("BINTRAY_USER")
+	key = System.getenv("BINTRAY_API_KEY")
 	publications = ['mainProject']
 	dryRun = false
 	pkg {
 		// jcenter repository namespace and name
-		userOrg = 'twitch4j'
+		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
 		repo = 'maven'
-		name = "Twitch4J"
+		name =  String.valueOf(project.name)
 		desc = project.description
+		licenses = ['MIT']
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
 		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
 		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
-		licenses = ['MIT']
 		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
 		publicDownloadNumbers = true
 		version {
