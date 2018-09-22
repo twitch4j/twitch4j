@@ -16,6 +16,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.events.event.TwitchEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
+import me.philippheuer.twitch4j.model.Channel;
+import me.philippheuer.twitch4j.model.User;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -267,6 +269,17 @@ public class IRCMessageEvent extends TwitchEvent {
 	}
 
 	/**
+	 * Gets the User Name (from Tags)
+	 */
+	public String getUserName() {
+		if(getTags().containsKey("login")) {
+			return getTags().get("login");
+		}
+
+		return getClientName().orElse(null);
+	}
+
+	/**
 	 * Gets a optional tag from the irc message
 	 */
 	public Optional<String> getTagValue(String tagName) {
@@ -279,6 +292,28 @@ public class IRCMessageEvent extends TwitchEvent {
 		}
 
 		return Optional.empty();
+	}
+
+	/**
+	 * Get User
+	 */
+	public User getUser() {
+		User user = new User();
+		user.setId(getUserId());
+		user.setName(getUserName());
+		user.setDisplayName(getUserName());
+		return user;
+	}
+
+	/**
+	 * Get Channel
+	 */
+	public Channel getChannel() {
+		Channel channel = new Channel();
+		channel.setId(getChannelId());
+		channel.setName(getChannelName().get());
+		channel.setDisplayName(getChannelName().get());
+		return channel;
 	}
 
 }
