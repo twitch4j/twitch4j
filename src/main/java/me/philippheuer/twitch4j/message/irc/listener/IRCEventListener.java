@@ -6,8 +6,6 @@ import java.util.Locale;
 import java.util.Map;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.channel.*;
 import me.philippheuer.twitch4j.events.event.irc.ChannelJoinEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelLeaveEvent;
@@ -62,10 +60,10 @@ public class IRCEventListener {
 				// Dispatch Event
 				if(event.getMessage().get().startsWith("\u0001ACTION ")) {
 					// Action
-					event.getClient().getDispatcher().dispatch(new ChannelMessageActionEvent(channel, user, event.getMessage().get().substring(8), event.getClientPermissions()));
+					event.getClient().getEventManager().dispatchEvent(new ChannelMessageActionEvent(channel, user, event.getMessage().get().substring(8), event.getClientPermissions()));
 				} else {
 					// Regular Message
-					event.getClient().getDispatcher().dispatch(new ChannelMessageEvent(channel, user, event.getMessage().get(), event.getClientPermissions()));
+					event.getClient().getEventManager().dispatchEvent(new ChannelMessageEvent(channel, user, event.getMessage().get(), event.getClientPermissions()));
 				}
 			}
 		}
@@ -82,7 +80,7 @@ public class IRCEventListener {
 			User user = event.getClient().getUserEndpoint().getUser(event.getUserId());
 
 			// Dispatch Event
-			event.getClient().getDispatcher().dispatch(new PrivateMessageEvent(user, event.getMessage().get(), event.getClientPermissions()));
+			event.getClient().getEventManager().dispatchEvent(new PrivateMessageEvent(user, event.getMessage().get(), event.getClientPermissions()));
 		}
 	}
 
@@ -101,7 +99,7 @@ public class IRCEventListener {
 				Integer bits = Integer.parseInt(event.getTags().get("bits"));
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new CheerEvent(channel, user, message, bits));
+				event.getClient().getEventManager().dispatchEvent(new CheerEvent(channel, user, message, bits));
 			}
 		}
 	}
@@ -134,7 +132,7 @@ public class IRCEventListener {
 				entity.setSubPlanByCode(subPlan);
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, false, null));
+				event.getClient().getEventManager().dispatchEvent(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, false, null));
 			}
 			// Receive Gifted Sub
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {
@@ -158,7 +156,7 @@ public class IRCEventListener {
 				entity.setSubPlanByCode(subPlan);
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, true, giftedBy));
+				event.getClient().getEventManager().dispatchEvent(new SubscriptionEvent(channel, entity, event.getMessage(), subStreak, true, giftedBy));
 			}
 			// Gift X Subs
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("submysterygift")) {
@@ -170,7 +168,7 @@ public class IRCEventListener {
 				Integer subsGiftedTotal = (event.getTags().containsKey("msg-param-sender-count")) ? Integer.parseInt(event.getTags().get("msg-param-sender-count")) : 0;
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new GiftSubscriptionsEvent(channel, user, subPlan, subsGifted, subsGiftedTotal));
+				event.getClient().getEventManager().dispatchEvent(new GiftSubscriptionsEvent(channel, user, subPlan, subsGifted, subsGiftedTotal));
 			}
 		}
 	}
@@ -197,7 +195,7 @@ public class IRCEventListener {
 					if(cache != null && cache.isTimeoutCached(timeoutEvent)) return;
 
 					// Dispatch Event
-					event.getClient().getDispatcher().dispatch(timeoutEvent);
+					event.getClient().getEventManager().dispatchEvent(timeoutEvent);
 				} else { // ban
 					// Load Info
 					User user = event.getClient().getUserEndpoint().getUser(Long.parseLong(event.getTagValue("target-user-id").get()));
@@ -210,10 +208,10 @@ public class IRCEventListener {
 					if(cache != null && cache.isBanCached(banEvent)) return;
 
 					// Dispatch Event
-					event.getClient().getDispatcher().dispatch(banEvent);
+					event.getClient().getEventManager().dispatchEvent(banEvent);
 				}
 			} else { // Clear chat event
-				event.getClient().getDispatcher().dispatch(new ClearChatEvent(channel));
+				event.getClient().getEventManager().dispatchEvent(new ClearChatEvent(channel));
 			}
 		}
 	}
@@ -231,7 +229,7 @@ public class IRCEventListener {
 
 			// Dispatch Event
 			if (channel != null && user != null) {
-				event.getClient().getDispatcher().dispatch(new ChannelJoinEvent(channel, user));
+				event.getClient().getEventManager().dispatchEvent(new ChannelJoinEvent(channel, user));
 			}
 		}
 	}
@@ -249,7 +247,7 @@ public class IRCEventListener {
 
 			// Dispatch Event
 			if (channel != null && user != null) {
-				event.getClient().getDispatcher().dispatch(new ChannelLeaveEvent(channel, user));
+				event.getClient().getEventManager().dispatchEvent(new ChannelLeaveEvent(channel, user));
 			}
 		}
 	}
@@ -268,7 +266,7 @@ public class IRCEventListener {
 				User user = event.getClient().getUserEndpoint().getUserByUserName(event.getPayload().get().substring(3));
 
 				// Dispatch Event
-				event.getClient().getDispatcher().dispatch(new ChannelModEvent(channel, user, event.getPayload().get().startsWith("+")));
+				event.getClient().getEventManager().dispatchEvent(new ChannelModEvent(channel, user, event.getPayload().get().startsWith("+")));
 			}
 		}
 	}
@@ -280,7 +278,7 @@ public class IRCEventListener {
 			String messageId = event.getTagValue("msg-id").get();
 			String message = event.getMessage().get();
 
-			event.getClient().getDispatcher().dispatch(new ChannelNoticeEvent(channel, messageId, message));
+			event.getClient().getEventManager().dispatchEvent(new ChannelNoticeEvent(channel, messageId, message));
 		}
 	}
 
@@ -295,7 +293,7 @@ public class IRCEventListener {
 				String targetChannelName = message.substring(12, message.length() - 1);
 				Channel targetChannel = event.getClient().getChannelEndpoint().getChannel(targetChannelName);
 
-				event.getClient().getDispatcher().dispatch(new HostOnEvent(channel, targetChannel));
+				event.getClient().getEventManager().dispatchEvent(new HostOnEvent(channel, targetChannel));
 			}
 		}
 	}
@@ -307,7 +305,7 @@ public class IRCEventListener {
 			String messageId = event.getTagValue("msg-id").get();
 
 			if(messageId.equals("host_off")) {
-				event.getClient().getDispatcher().dispatch(new HostOffEvent(channel));
+				event.getClient().getEventManager().dispatchEvent(new HostOffEvent(channel));
 			}
 		}
 	}
@@ -344,7 +342,7 @@ public class IRCEventListener {
 					}
 				});
 			}
-			event.getClient().getDispatcher().dispatch(new ChannelStateEvent(channel, states));
+			event.getClient().getEventManager().dispatchEvent(new ChannelStateEvent(channel, states));
 		}
 	}
 }

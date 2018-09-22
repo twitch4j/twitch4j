@@ -171,7 +171,7 @@ public class TwitchChat {
 											IRCMessageEvent event = new IRCMessageEvent(message);
 
 											if(event.isValid()) {
-												getTwitchClient().getDispatcher().dispatch(event);
+												getTwitchClient().getEventManager().dispatchEvent(event);
 											} else {
 												log.trace("Can't parse {}", event.getRawMessage());
 											}

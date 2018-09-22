@@ -4,7 +4,7 @@ import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.TwitchEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import me.philippheuer.twitch4j.model.User;
 
@@ -18,7 +18,7 @@ import me.philippheuer.twitch4j.model.User;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class PrivateMessageEvent extends Event {
+public class PrivateMessageEvent extends TwitchEvent {
 
 	/**
 	 * User

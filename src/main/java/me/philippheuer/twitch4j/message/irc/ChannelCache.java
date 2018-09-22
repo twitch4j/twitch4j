@@ -7,10 +7,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.irc.ChannelModEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.events.event.irc.UserBanEvent;
@@ -76,7 +77,7 @@ public class ChannelCache {
 		this.channel = channel;
 
 		// Register for Events from the EventDispatcher
-		chat.getTwitchClient().getDispatcher().registerListener(this);
+		chat.getTwitchClient().getEventManager().registerListener(this);
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class ChannelCache {
 	public void onChannelTimeout(UserTimeoutEvent event) {
 		// Remove expired Events
 		for (UserTimeoutEvent timeout : getTimeoutEvents()) {
-			if (timeout.getCreatedAt().getTimeInMillis() + timeout.getDuration() * 1000 < Calendar.getInstance().getTimeInMillis()) {
+			if (timeout.getFiredAt().getTimeInMillis() + timeout.getDuration() * 1000 < Calendar.getInstance().getTimeInMillis()) {
 				// Expired
 				synchronized (timeoutEvents) {
 					getTimeoutEvents().remove(timeout);
@@ -143,22 +144,22 @@ public class ChannelCache {
 					channelState.replace(k, v); // replacing
 					switch (k) { // and emit event
 						case BROADCAST_LANG:
-							chat.getTwitchClient().getDispatcher().dispatch(new BroadcasterLanguageEvent(event.getChannel(), (Locale) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new BroadcasterLanguageEvent(event.getChannel(), (Locale) v));
 							break;
 						case R9K:
-							chat.getTwitchClient().getDispatcher().dispatch(new Robot9000Event(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new Robot9000Event(event.getChannel(), (Boolean) v));
 							break;
 						case SLOW:
-							chat.getTwitchClient().getDispatcher().dispatch(new SlowModeEvent(event.getChannel(), (Long) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new SlowModeEvent(event.getChannel(), (Long) v));
 							break;
 						case EMOTE:
-							chat.getTwitchClient().getDispatcher().dispatch(new EmoteOnlyEvent(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new EmoteOnlyEvent(event.getChannel(), (Boolean) v));
 							break;
 						case FOLLOWERS:
-							chat.getTwitchClient().getDispatcher().dispatch(new FollowersOnlyEvent(event.getChannel(), (Long) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new FollowersOnlyEvent(event.getChannel(), (Long) v));
 							break;
 						case SUBSCRIBERS:
-							chat.getTwitchClient().getDispatcher().dispatch(new SubscribersOnlyEvent(event.getChannel(), (Boolean) v));
+							chat.getTwitchClient().getEventManager().dispatchEvent(new SubscribersOnlyEvent(event.getChannel(), (Boolean) v));
 							break;
 						default:
 							break;

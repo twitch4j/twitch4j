@@ -105,7 +105,7 @@ public class CredentialManager {
 							if(credential.getTokenExpiresAt().before(Calendar.getInstance())) {
 								// Dispatch token expired event
 								AuthTokenExpiredEvent event = new AuthTokenExpiredEvent(credential);
-								getTwitchClient().getDispatcher().dispatch(event);
+								getTwitchClient().getEventManager().dispatchEvent(event);
 
 								log.info("Token Expired, triggering Refresh Event! [{}]", event.toString());
 							}
@@ -132,7 +132,7 @@ public class CredentialManager {
 		setOAuthTwitch(new OAuthTwitch(this));
 
 		// Register OAuthTwitch to get Events
-		getTwitchClient().getDispatcher().registerListener(getOAuthTwitch());
+		getTwitchClient().getEventManager().registerListener(getOAuthTwitch());
 	}
 
 	/**

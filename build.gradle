@@ -54,6 +54,9 @@ dependencies {
 	// TODO: Change to Jetty WebSocket
 	compile "com.neovisionaries:nv-websocket-client:2.5"
 
+	// Event Dispatcher
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.3.0'
+
 	// Apache Commons
 	// - Lang
 	compile "org.apache.commons:commons-lang3:3.7"
@@ -199,6 +202,9 @@ bintray {
 	}
 }
 
+/**
+ * Gradle Wrapper
+ */
 wrapper {
 	gradleVersion = "4.8.1" // newer version
 	distributionType = Wrapper.DistributionType.ALL

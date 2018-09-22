@@ -3,11 +3,11 @@ package me.philippheuer.twitch4j.events.event;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
-import me.philippheuer.twitch4j.events.Event;
 import me.philippheuer.twitch4j.events.event.irc.ChannelStateEvent;
 import me.philippheuer.twitch4j.model.Channel;
 import me.philippheuer.twitch4j.model.User;
@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 @Data
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class AbstractChannelEvent extends Event {
+public class AbstractChannelEvent extends TwitchEvent {
 
 	/**
 	 * Event Channel

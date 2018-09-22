@@ -8,12 +8,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.TwitchEvent;
 import me.philippheuer.twitch4j.message.commands.CommandPermission;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
-public class IRCMessageEvent extends Event {
+public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Tags

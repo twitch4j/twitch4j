@@ -77,7 +77,7 @@ public class TwitchClientBuilder {
 		Assert.notNull(clientId, "You need to provide a client id!");
 		Assert.notNull(clientSecret, "You need to provide a client secret!");
 
-		final TwitchClient client = new TwitchClient(clientId, clientSecret);
+		final TwitchClient client = new TwitchClient(clientId, clientSecret, null);
 		client.getCredentialManager().provideTwitchClient(client);
 		client.getCredentialManager().setSaveCredentials(autoSaveConfiguration);
 		if (configurationDirectory != null) {
@@ -103,7 +103,7 @@ public class TwitchClientBuilder {
 		}
 
 		if (listeners.size() > 0) {
-			listeners.forEach(client.getDispatcher()::registerListener);
+			listeners.forEach(client.getEventManager()::registerListener);
 		}
 
 		return client;

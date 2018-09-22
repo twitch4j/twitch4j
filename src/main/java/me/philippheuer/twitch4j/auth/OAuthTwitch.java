@@ -3,6 +3,8 @@ package me.philippheuer.twitch4j.auth;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Optional;
+
+import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -10,7 +12,6 @@ import me.philippheuer.twitch4j.auth.model.OAuthRequest;
 import me.philippheuer.twitch4j.auth.model.twitch.Authorize;
 import me.philippheuer.twitch4j.enums.Endpoints;
 import me.philippheuer.twitch4j.enums.Scope;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.system.AuthTokenExpiredEvent;
 import me.philippheuer.twitch4j.model.Token;
 import me.philippheuer.util.desktop.WebsiteUtils;

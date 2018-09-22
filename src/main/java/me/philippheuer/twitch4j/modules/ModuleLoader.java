@@ -87,7 +87,7 @@ public class ModuleLoader {
 		ModulePair pair = new ModulePair(module, active);
 		String moduleName = module.getClass().getSimpleName();
 		if (!modules.containsKey(moduleName))
-			if (active) client.getDispatcher().dispatch(new ModuleEnabledEvent(module));
+			if (active) client.getEventManager().dispatchEvent((new ModuleEnabledEvent(module)));
 			modules.put(moduleName, pair);
 	}
 
@@ -103,7 +103,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (!pair.active) {
-				client.getDispatcher().dispatch(new ModuleEnabledEvent(pair.module));
+				client.getEventManager().dispatchEvent((new ModuleEnabledEvent(pair.module)));
 				pair.module.enable(client);
 				pair.active = true;
 			}
@@ -114,7 +114,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (pair.active) {
-				client.getDispatcher().dispatch(new ModuleDisabledEvent(pair.module));
+				client.getEventManager().dispatchEvent((new ModuleDisabledEvent(pair.module)));
 				pair.module.disable();
 				pair.active = false;
 			}

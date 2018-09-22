@@ -3,7 +3,7 @@ package me.philippheuer.twitch4j.events.event.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import me.philippheuer.twitch4j.events.Event;
+import me.philippheuer.twitch4j.events.event.TwitchEvent;
 import me.philippheuer.twitch4j.model.Channel;
 
 /**
@@ -16,7 +16,7 @@ import me.philippheuer.twitch4j.model.Channel;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class HostOffEvent extends Event {
+public class HostOffEvent extends TwitchEvent {
 
 	/**
 	 * Event Channel

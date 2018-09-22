@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.github.philippheuer.events4j.domain.Event;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import me.philippheuer.twitch4j.TwitchClient;
-import me.philippheuer.twitch4j.events.Event;
-import me.philippheuer.twitch4j.events.EventSubscriber;
 import me.philippheuer.twitch4j.events.event.UnknownCommandEvent;
 import me.philippheuer.twitch4j.events.event.irc.ChannelMessageEvent;
 
@@ -166,7 +166,6 @@ public class CommandHandler {
 	 *
 	 * @param messageEvent The message event. Can infer channel, user, etc.
 	 */
-	@EventSubscriber
 	public void processCommand(ChannelMessageEvent messageEvent) {
 		String cmdTrigger = messageEvent.getMessage().substring(0, getCommandTrigger().length());
 		String cmdName = null;
@@ -229,7 +228,7 @@ public class CommandHandler {
 			if(cmdTrigger.equals(getCommandTrigger())) {
 				// Dispatch UnknownCommandEvent
 				Event event = new UnknownCommandEvent(messageEvent.getChannel(), messageEvent.getUser(), messageEvent);
-				getTwitchClient().getDispatcher().dispatch(event);
+				getTwitchClient().getEventManager().dispatchEvent(event);
 			}
 		}
 	}

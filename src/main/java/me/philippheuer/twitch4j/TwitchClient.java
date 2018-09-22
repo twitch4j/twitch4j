@@ -1,6 +1,8 @@
 package me.philippheuer.twitch4j;
 
 import java.io.File;
+
+import com.github.philippheuer.events4j.EventManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
@@ -19,7 +21,6 @@ import me.philippheuer.twitch4j.endpoints.TeamEndpoint;
 import me.philippheuer.twitch4j.endpoints.UnofficialEndpoint;
 import me.philippheuer.twitch4j.endpoints.UserEndpoint;
 import me.philippheuer.twitch4j.endpoints.VideoEndpoint;
-import me.philippheuer.twitch4j.events.EventDispatcher;
 import me.philippheuer.twitch4j.message.MessageInterface;
 import me.philippheuer.twitch4j.message.commands.CommandHandler;
 import me.philippheuer.twitch4j.message.irc.listener.IRCEventListener;
@@ -53,7 +54,7 @@ public class TwitchClient {
 	/**
 	 * Service to dispatch Events
 	 */
-	private final EventDispatcher dispatcher = new EventDispatcher(this);
+	private final EventManager eventManager;
 
 	/**
 	 * Services to store/request credentials
@@ -113,18 +114,27 @@ public class TwitchClient {
 	 * @param clientId     Twitch Application - Id
 	 * @param clientSecret Twitch Application - Secret
 	 */
-	public TwitchClient(String clientId, String clientSecret) {
+	public TwitchClient(String clientId, String clientSecret, EventManager eventManager) {
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 
 		// Provide Instance of TwitchClient to CredentialManager
 		credentialManager.setTwitchClient(this);
 
-		// EventSubscribers
-		// - Commands
-		dispatcher.registerListener(getCommandHandler());
-		// - IRC Event Listeners
-		dispatcher.registerListener(new IRCEventListener(this));
+		// EventManager
+		if (eventManager == null) {
+			this.eventManager = new EventManager();
+			eventManager = this.eventManager;
+		} else {
+			this.eventManager = eventManager;
+		}
+		// - register service
+		eventManager.getServiceMediator().addService("twitch4j", this);
+		// - register command listener
+		eventManager.registerListener(getCommandHandler());
+		// - register irc listener
+		eventManager.registerListener(new IRCEventListener(this));
+
 		// Initialize REST Client
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"));
 		restClient.putRestInterceptor(new HeaderRequestInterceptor("Accept", "application/vnd.twitchtv.v5+json"));
