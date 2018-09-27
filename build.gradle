@@ -14,6 +14,7 @@ plugins {
 	id 'com.jfrog.bintray' version '1.8.4'
 	id "net.ltgt.apt-eclipse" version "0.17"
 	id 'io.ratpack.ratpack-java' version '1.5.4'
+	id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
 repositories {
@@ -81,13 +82,16 @@ dependencies {
 	// Nullable Annotation
 	compile "com.google.code.findbugs:jsr305:3.0.2"
 
-	// Project Lombok for annotating processor
-	compile "org.projectlombok:lombok:1.18.0"
-	annotationProcessor "org.projectlombok:lombok:1.18.0"
-
 	// Testing
 	testCompile "junit:junit:4.12"
 	testCompile "ch.qos.logback:logback-classic:1.2.3"
+}
+
+/**
+ * Lombok
+ */
+lombok {
+	sha256 = "" // skip verifyLombok task
 }
 
 /**
