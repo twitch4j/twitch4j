@@ -23,7 +23,7 @@ repositories {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "This is a api client for the Twitch API V5/IRC/PubSub."
-version = System.getenv("CI_COMMIT_REF_NAME")
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
 
 // Doesn't matter, only so that spring doesn't fail
 mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
@@ -186,7 +186,7 @@ bintray {
 		// jcenter repository namespace and name
 		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
 		repo = 'maven'
-		name =  String.valueOf(project.name)
+		name =  String.valueOf(project.name).toLowerCase()
 		desc = project.description
 		licenses = ['MIT']
 		websiteUrl = "https://github.com/twitch4j/twitch4j"
@@ -195,17 +195,9 @@ bintray {
 		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
 		publicDownloadNumbers = true
 		version {
-			name = String.valueOf(project.version).replace("v", "")
+			name = String.valueOf(project.version).toLowerCase()
 			vcsTag = project.version
 			released = new Date()
 		}
 	}
-}
-
-/**
- * Gradle Wrapper
- */
-wrapper {
-	gradleVersion = "4.8.1" // newer version
-	distributionType = Wrapper.DistributionType.ALL
 }
