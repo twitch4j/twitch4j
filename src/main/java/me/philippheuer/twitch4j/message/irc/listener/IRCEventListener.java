@@ -4,9 +4,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
-import com.github.philippheuer.events4j.annotation.EventSubscriber;
+import com.github.philippheuer.events4j.EventManager;
 import lombok.Getter;
 import me.philippheuer.twitch4j.TwitchClient;
 import me.philippheuer.twitch4j.events.event.channel.*;
@@ -41,19 +40,38 @@ public class IRCEventListener {
 	private final TwitchClient twitchClient;
 
 	/**
+	 * Event Manager
+	 */
+	private final EventManager eventManager;
+
+	/**
 	 * Constructor
 	 *
 	 * @param twitchClient The Twitch Client instance.
 	 */
 	public IRCEventListener(TwitchClient twitchClient) {
 		this.twitchClient = twitchClient;
+		this.eventManager = twitchClient.getEventManager();
+
+		// event consumers
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelMessage(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onWhisper(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelCheer(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelSubscription(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onClearChat(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientJoinEvent(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientLeaveEvent(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelModChange(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onNoticeEvent(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onHostOnEvent(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onHostOffEvent(event));
+		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelState(event));
 	}
 
 	/**
 	 * Channel Message Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannelMessage(IRCMessageEvent event) {
 		if(event.getCommandType().equals("PRIVMSG")) {
 			if(!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
@@ -77,7 +95,6 @@ public class IRCEventListener {
 	 * Whisper Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onWhisper(IRCMessageEvent event) {
 		if(event.getCommandType().equals("WHISPER")) {
 			// Load Info
@@ -92,7 +109,6 @@ public class IRCEventListener {
 	 * Channel Cheer (Bits) Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannelCheer(IRCMessageEvent event) {
 		if(event.getCommandType().equals("PRIVMSG")) {
 			if(event.getTags().containsKey("bits")) {
@@ -112,7 +128,6 @@ public class IRCEventListener {
 	 * Channel Subscription Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannelSubscription(IRCMessageEvent event) {
 		if (event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id")) {
 			// Sub
@@ -181,7 +196,6 @@ public class IRCEventListener {
 	 * Channel clearing chat, timeouting or banning user Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onClearChat(IRCMessageEvent event) {
 		if (event.getCommandType().equals("CLEARCHAT")) {
 			Channel channel = event.getClient().getChannelEndpoint().getChannel(event.getChannelId());
@@ -224,7 +238,6 @@ public class IRCEventListener {
 	 * User Joins Channel Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannnelClientJoinEvent(IRCMessageEvent event) {
 		if(event.getCommandType().equals("JOIN") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
 			// Load Info
@@ -242,7 +255,6 @@ public class IRCEventListener {
 	 * User Leaves Channel Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannnelClientLeaveEvent(IRCMessageEvent event) {
 		if(event.getCommandType().equals("PART") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
 			// Load Info
@@ -260,7 +272,6 @@ public class IRCEventListener {
 	 * Mod Status Change Event
 	 * @param event IRCMessageEvent
 	 */
-	@EventSubscriber
 	public void onChannelModChange(IRCMessageEvent event) {
 		if(event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
 			// Recieving Mod Status
@@ -278,7 +289,6 @@ public class IRCEventListener {
 		}
 	}
 
-	@EventSubscriber
 	public void onNoticeEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
 			Channel channel = event.getChannel();
@@ -289,7 +299,6 @@ public class IRCEventListener {
 		}
 	}
 
-	@EventSubscriber
 	public void onHostOnEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
 			Channel channel = event.getChannel();
@@ -305,7 +314,6 @@ public class IRCEventListener {
 		}
 	}
 
-	@EventSubscriber
 	public void onHostOffEvent(IRCMessageEvent event) {
 		if (event.getCommandType().equals("NOTICE")) {
 			Channel channel = event.getChannel();
@@ -317,7 +325,6 @@ public class IRCEventListener {
 		}
 	}
 
-	@EventSubscriber
 	public void onChannelState(IRCMessageEvent event) {
 		if(event.getCommandType().equals("ROOMSTATE")) {
 			// getting Status on channel

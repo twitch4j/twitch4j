@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Optional;
 
-import com.github.philippheuer.events4j.annotation.EventSubscriber;
 import lombok.Getter;
 import lombok.Setter;
 import me.philippheuer.twitch4j.auth.model.OAuthCredential;
@@ -37,6 +36,9 @@ public class OAuthTwitch {
 	 */
 	protected OAuthTwitch(CredentialManager credentialManager) {
 		setCredentialManager(credentialManager);
+
+		// event consumers
+		getCredentialManager().getTwitchClient().getEventManager().onEvent(AuthTokenExpiredEvent.class).subscribe(event -> onTokenExpired(event));
 	}
 
 	/**
@@ -140,7 +142,6 @@ public class OAuthTwitch {
 	 *
 	 * @param event The Event, containing the credential and all other related information.
 	 */
-	@EventSubscriber
 	public void onTokenExpired(AuthTokenExpiredEvent event) {
 		// Filter to Streamlabs credentials
 		if(event.getCredential().getType().equals("twitch")) {

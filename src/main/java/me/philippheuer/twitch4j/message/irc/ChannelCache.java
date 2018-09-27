@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.github.philippheuer.events4j.annotation.EventSubscriber;
+import com.github.philippheuer.events4j.EventManager;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +31,11 @@ public class ChannelCache {
 	 * Twitch Chat
 	 */
 	private final TwitchChat chat;
+
+	/**
+	 * Event Manager
+	 */
+	private final EventManager eventManager;
 
 	/**
 	 * The channel this cache instance is for
@@ -75,15 +80,18 @@ public class ChannelCache {
 	public ChannelCache(TwitchChat chat, String channel) {
 		this.chat = chat;
 		this.channel = channel;
+		this.eventManager = chat.getTwitchClient().getEventManager();
 
-		// Register for Events from the EventDispatcher
-		chat.getTwitchClient().getEventManager().registerListener(this);
+		// event consumers
+		getEventManager().onEvent(ChannelModEvent.class).subscribe(event -> onChannelModStatusChange(event));
+		getEventManager().onEvent(UserTimeoutEvent.class).subscribe(event -> onChannelTimeout(event));
+		getEventManager().onEvent(UserBanEvent.class).subscribe(event -> onChannelBan(event));
+		getEventManager().onEvent(ChannelStateEvent.class).subscribe(event -> onChannelState(event));
 	}
 
 	/**
 	 * Mod Grant/Removed (also caching mods after join channel)
 	 */
-	@EventSubscriber
 	public void onChannelModStatusChange(ChannelModEvent event) {
 		if(event.getChannel().getName().equals(getChannel())) {
 			// Add or remove moderator from cache
@@ -100,7 +108,6 @@ public class ChannelCache {
 	/**
 	 * Timeout
 	 */
-	@EventSubscriber
 	public void onChannelTimeout(UserTimeoutEvent event) {
 		// Remove expired Events
 		for (UserTimeoutEvent timeout : getTimeoutEvents()) {
@@ -123,7 +130,6 @@ public class ChannelCache {
 	/**
 	 * Ban
 	 */
-	@EventSubscriber
 	public void onChannelBan(UserBanEvent event) {
 		// Add to Cache
 		if(!isBanCached(event)) {
@@ -134,7 +140,6 @@ public class ChannelCache {
 	/**
 	 * Channel State
 	 */
-	@EventSubscriber
 	public void onChannelState(ChannelStateEvent event) {
 		if (event.getStates().size() > 1) {
 			channelState.putAll(event.getStates());
