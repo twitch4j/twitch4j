@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
+import twitch4j.chat.TwitchChat;
 import twitch4j.helix.TwitchHelix;
 import twitch4j.helix.TwitchHelixBuilder;
 
@@ -36,6 +37,12 @@ public class TwitchClientBuilder {
      */
     @Wither
     private Boolean enableHelix;
+
+    /**
+     * Enabled: Chat
+     */
+    @Wither
+    private Boolean enableChat;
 
     /**
      * EventManager
@@ -75,8 +82,14 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: Chat
+        TwitchChat chat = null;
+        if (this.enableChat) {
+
+        }
+
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix);
+        final TwitchClient client = new TwitchClient(eventManager, helix, chat);
 
         // Return new Client Instance
         return client;
