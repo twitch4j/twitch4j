@@ -22,6 +22,7 @@ public class TwitchClientTest {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
+            .withEnableHelix(true)
             .build();
     }
 

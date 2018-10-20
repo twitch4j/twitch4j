@@ -32,6 +32,12 @@ public class TwitchClientBuilder {
     private String clientSecret;
 
     /**
+     * Enabled: Helix
+     */
+    @Wither
+    private Boolean enableHelix;
+
+    /**
      * EventManager
      */
     @Wither
@@ -60,11 +66,14 @@ public class TwitchClientBuilder {
         }
 
         // Module: Helix
-        TwitchHelix helix = TwitchHelixBuilder.builder()
-            .withClientId(this.clientId)
-            .withClientSecret(this.clientSecret)
-            .withEventManager(eventManager)
-            .build();
+        TwitchHelix helix = null;
+        if (this.enableHelix) {
+            helix = TwitchHelixBuilder.builder()
+                .withClientId(this.clientId)
+                .withClientSecret(this.clientSecret)
+                .withEventManager(eventManager)
+                .build();
+        }
 
         // Module: Client
         final TwitchClient client = new TwitchClient(eventManager, helix);
