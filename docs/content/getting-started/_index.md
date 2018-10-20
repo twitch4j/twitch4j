@@ -3,45 +3,14 @@ title="Getting started"
 weight = 1
 +++
 
-# Installation
+# Twitch4J
 
-We recommend using a dependency management tool to manage twitch4j and sub dependencies. As a fallback method you can also download a fatJar.
+Welcome and thanks for using Twitch4J!
 
-## Gradle
-Add it to your build.gradle with:
-```groovy
-repositories {
-	jcenter()
-}
-```
-and: (latest, you should use the actual version here)
+Please check out the [Installation](./installation) page to install the Twitch4J dependency.
 
-```groovy
-dependencies {
-    compile 'com.github.twitch4j:twitch4j:v0.13.0'
-}
-```
+After that the [Client-Builder](./client-builder) will show you how to create a Twitch4J Instance.
 
-## Maven
-Add it to your pom.xml with:
-```xml
-<repositories>
-    <repository>
-      <id>jcenter</id>
-      <url>https://jcenter.bintray.com/</url>
-    </repository>
-</repositories>
-```
-and: (latest, you should use the actual version here)
+Now you'r ready to check out a few example projects:
 
-```xml
-<dependency>
-    <groupId>com.github.twitch4j</groupId>
-    <artifactId>twitch4j</artifactId>
-    <version>v0.13.0</version>
-</dependency>
-```
-
-## fatJar
-
-[Download](http://localhost)
+* [Twitch4J Chatbot](https://github.com/twitch4j/twitch4j-chatbot)

@@ -8,7 +8,7 @@ weight = 5
 ## All Features
 Initialize the Twitch4J Client and specify which modules you want to use:
 
-```
+```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
             .withEnableHelix(true)
@@ -19,7 +19,7 @@ TwitchClient twitchClient = TwitchClientBuilder.builder()
 
 You can overwrite the native EventManager with a commonly used one to share events between Twitch4J and other 3rd party libraries.
 
-```
+```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
             .build();

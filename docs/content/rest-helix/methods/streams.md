@@ -32,3 +32,9 @@ game_id 	string 	Returns streams broadcasting a specified game ID. You can speci
 language 	string 	Stream language. You can specify up to 100 languages.
 user_id 	string 	Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
 user_login 	string 	Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
+
+## Code-Snippet
+
+```java
+
+```

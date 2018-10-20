@@ -1,3 +1,8 @@
++++
+title="API - Helix"
+weight = 5
++++
+
 # Twitch API - Helix
 
 To make an application that uses the Twitch API, you first need to register your application on the Twitch developer site. When creating this app, enter your redirect URI, which is where your users are redirected after being authorized.
@@ -17,7 +22,7 @@ You can create new application on the [Twitch Developer Console](https://glass.t
 
 To use Helix you need to enable the Helix API when building the Twitch4J Instance, as shown below:
 
-```
+```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
             ...
             .withEnableHelix(true)
