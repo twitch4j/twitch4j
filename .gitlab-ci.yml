@@ -1,0 +1,46 @@
+####
+# GitLab CI
+####
+
+# Image
+image: openjdk:8-jdk-alpine
+
+# Variables
+variables:
+  # Submodule Support (Hugo)
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# Stages
+stages:
+#  - build
+#  - publish
+  - docs
+
+###
+# Test Documentation
+###
+test:
+  image: registry.gitlab.com/pages/hugo:latest
+  stage: docs
+  script:
+  - cd docs
+  - hugo
+  except:
+  - master
+
+###
+# Build & Publish on GitLab Pages
+###
+pages:
+  image: registry.gitlab.com/pages/hugo:latest
+  stage: docs
+  script:
+  - cd docs
+  - hugo --baseUrl https://${CI_PROJECT_NAMESPACE}.gitlab.io/${CI_PROJECT_NAME}/
+  - cp -R public ../
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+  - feature/work-in-progress
