@@ -1,0 +1,32 @@
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // Logging
+    compile group: 'org.slf4j', name: 'slf4j-api'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic'
+
+    // Event Dispatcher
+    compile group: 'com.github.philippheuer.events4j', name: 'events4j'
+
+    // Apache Commons
+    compile group: 'org.apache.commons', name: 'commons-lang3'
+    compile group: 'commons-io', name: 'commons-io'
+
+    // Jackson (JSON)
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+
+    // Test
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+
+    // Getter & Setter
+    compileOnly group: 'org.projectlombok', name: 'lombok'
+    testCompile group: 'org.projectlombok', name: 'lombok'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok'
+}
+
+// Artifact Info
+group = "com.github.twitch4j"
+description = "IRC Client"
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+
+// Deployment Script
+apply from: '../deployment.gradle'

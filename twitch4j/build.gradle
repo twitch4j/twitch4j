@@ -1,0 +1,14 @@
+// In this section you declare the dependencies for your production and test code
+dependencies {
+	// Twitch4J Modules
+	compile project(':' + rootProject.name + '-irc')
+	compile project(':' + rootProject.name + '-rest-helix')
+}
+
+// Artifact Info
+group = "com.github.twitch4j"
+description = "IRC Client"
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+
+// Deployment Script
+apply from: '../deployment.gradle'

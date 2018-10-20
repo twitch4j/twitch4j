@@ -1,0 +1,78 @@
+/**
+ * Javadoc
+ */
+javadoc {
+    options {
+        title = "${project.name} (${project.version})"
+        windowTitle = "${project.name} (${project.version})"
+        encoding = "UTF-8"
+    }
+}
+
+/**
+ * Sources - build a jar with source files
+ */
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
+    from sourceSets.main.allSource
+    baseName = baseName.toLowerCase()
+    classifier = 'sources'
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
+    classifier = 'javadoc'
+    baseName = baseName.toLowerCase()
+    from javadoc.destinationDir
+}
+
+/**
+ * Artifacts
+ */
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+/**
+ * Deployment
+ */
+publishing {
+    publications {
+        mainProject(MavenPublication) {
+            from project.components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId project.group
+            artifactId project.name
+            version project.version
+        }
+    }
+}
+
+/**
+ * Bintray Upload
+ */
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
+    publications = ['mainProject']
+    dryRun = false
+    pkg {
+        // jcenter repository namespace and name
+        userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
+        repo = 'maven'
+        name =  String.valueOf(project.name).toLowerCase()
+        desc = project.description
+        licenses = ['MIT']
+        websiteUrl = "https://github.com/twitch4j/twitch4j"
+        issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
+        vcsUrl = "https://github.com/twitch4j/twitch4j.git"
+        labels = ['twitch', 'twitch-api-v5', 'twitch4j.helix', 'twitch-pubsub', 'twitch-irc', 'helix']
+        publicDownloadNumbers = true
+        version {
+            name = String.valueOf(project.version).toLowerCase()
+            vcsTag = project.version
+            released = new Date()
+        }
+    }
+}

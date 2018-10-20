@@ -1,207 +1,81 @@
-/*
- * Gradle Configuration
- */
-
-// Apply the java plugin to add support for Java
+// Plugins
 plugins {
-	id 'java'
-	id 'idea'
-	id 'eclipse'
-	id 'application'
-	id 'maven-publish'
-	id "net.ltgt.apt" version "0.17"
-	id "net.ltgt.apt-idea" version "0.17"
-	id 'com.jfrog.bintray' version '1.8.4'
-	id "net.ltgt.apt-eclipse" version "0.17"
-	id 'io.ratpack.ratpack-java' version '1.5.4'
-	id 'io.franzbecker.gradle-lombok' version '1.14'
+    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+    id 'com.jfrog.bintray' version '1.8.4'
 }
 
-repositories {
-	jcenter()
-}
+// Subprojects
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'maven-publish'
+    apply plugin: 'io.spring.dependency-management'
 
-// Artifact Info
-group = "com.github.twitch4j"
-description = "This is a api client for the Twitch API V5/IRC/PubSub."
-version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+    // Source Compatiblity
+    sourceCompatibility = 1.8
 
-// Doesn't matter, only so that spring doesn't fail
-mainClassName = 'me.philippheuer.twitch4j.TwitchClient'
+    // Repositories
+    repositories {
+        jcenter()
+    }
 
-/**
- * Javadoc
- */
-javadoc {
-	options {
-		overview = new File("${projectDir}/src/javadoc/overview.html")
-		title = "Twitch 4 Java (${project.version})"
-		windowTitle = "${project.name} (${project.version})"
-		stylesheetFile = new File("${projectDir}/src/javadoc/css/style.css")
-		encoding = "UTF-8"
-	}
-}
+    // Dependency Management for Subprojects
+    dependencyManagement {
+        dependencies {
+            // Logging
+            dependency group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+            dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
-// Dependencies
-dependencies {
-	// Logging
-	compile "org.slf4j:slf4j-api:1.7.25"
+            // Apache Commons
+            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+            dependency group: 'commons-io', name: 'commons-io', version: '2.6'
 
-	// Spring (RestTemplate)
-	compile "org.springframework:spring-web:5.0.7.RELEASE" 					// contains Tomcat
-	compile "org.springframework.social:spring-social-core:1.1.6.RELEASE"
+            //
+            dependency group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
-	// WebSocket Client for Twitch PubSub and Twitch IRC
-	// TODO: Change to Jetty WebSocket
-	compile "com.neovisionaries:nv-websocket-client:2.5"
+            // Event Dispatcher
+            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.3.0'
 
-	// Event Dispatcher
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.3.0'
+            // HTTP Client
+            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.3.1'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '9.3.1'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '9.3.1'
+            dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.12'
 
-	// Apache Commons
-	// - Lang
-	compile "org.apache.commons:commons-lang3:3.7"
-	// - IO
-	compile "commons-io:commons-io:2.6"
+            // Jackson (JSON)
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
-	// JSON / YAML
-	compile "com.fasterxml.jackson.core:jackson-databind:2.9.6"
+            // Testing
+            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 
-	// Bucket for rate-limiting
-	compile "org.isomorphism:token-bucket:1.7"
+            // Lombok
+            dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
+        }
+    }
 
-	// Expiring Map
-	compile "net.jodah:expiringmap:0.5.8"
+	// Common Dependencies
+	plugins.withType(JavaPlugin) {
+		dependencies {
+			// Logging
+			compile group: 'org.slf4j', name: 'slf4j-api'
+			testCompile group: 'ch.qos.logback', name: 'logback-classic'
 
-	// TypeTools
-	compile "net.jodah:typetools:0.5.0"
+			// Event Dispatcher
+			compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
-	// Args4J - CommandLineArgumentParser
-	compile "args4j:args4j:2.33"
+			// Apache Commons
+			compile group: 'org.apache.commons', name: 'commons-lang3'
+			compile group: 'commons-io', name: 'commons-io'
 
-	// Nullable Annotation
-	compile "com.google.code.findbugs:jsr305:3.0.2"
+			// Test
+			testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api'
 
-	// Testing
-	testCompile "junit:junit:4.12"
-	testCompile "ch.qos.logback:logback-classic:1.2.3"
-}
-
-/**
- * Lombok
- */
-lombok {
-	sha256 = "" // skip verifyLombok task
-}
-
-/**
- * Define SourceSets
- */
-sourceSets {
-	integration {
-		java.srcDir 'src/integration/java'
-		resources.srcDir 'src/integration/resources'
-		compileClasspath += main.output + test.output
-		runtimeClasspath += main.output + test.output
-	}
-}
-
-// Configuration
-configurations {
-	// Integration compile task
-	integrationCompile.extendsFrom testCompile
-	integrationRuntime.extendsFrom testRuntime
-}
-
-configurations.all {
-	// Disable Gradle Caching
-	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-/**
- * Test Task `test` - Run Unit Tests
- */
-test {
-	useJUnit {
-		includeCategories 'me.philippheuer.util.test.UnitTestCategory'
-		excludeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
-	}
-}
-
-/**
- * Test Task `testIntegration` - Run Integration Tests
- */
-task testIntegration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
-	useJUnit {
-		includeCategories 'me.philippheuer.util.test.IntegrationTestCategory'
-		excludeCategories 'me.philippheuer.util.test.UnitTestCategory'
-	}
-}
-
-/**
- * Sources - build a jar with source files
- */
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
-	from sourceSets.main.allSource
-	baseName = baseName.toLowerCase()
-	classifier = 'sources'
-}
-
-// build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
-	classifier = 'javadoc'
-	baseName = baseName.toLowerCase()
-	from javadoc.destinationDir
-}
-
-/**
- * Artifacts
- */
-artifacts {
-	archives sourcesJar
-	archives javadocJar
-}
-
-/**
- * Deployment
- */
-publishing {
-	publications {
-		mainProject(MavenPublication) {
-			from project.components.java
-			artifact sourcesJar
-			artifact javadocJar
-			groupId project.group
-			artifactId project.name
-			version project.version
-		}
-	}
-}
-
-/**
- * Bintray Upload
- */
-bintray {
-	user = System.getenv("BINTRAY_USER")
-	key = System.getenv("BINTRAY_API_KEY")
-	publications = ['mainProject']
-	dryRun = false
-	pkg {
-		// jcenter repository namespace and name
-		userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
-		repo = 'maven'
-		name =  String.valueOf(project.name).toLowerCase()
-		desc = project.description
-		licenses = ['MIT']
-		websiteUrl = "https://github.com/twitch4j/twitch4j"
-		issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
-		vcsUrl = "https://github.com/twitch4j/twitch4j.git"
-		labels = ['twitch', 'twitch-api-v5', 'kraken', 'twitch-pubsub', 'twitch-irc', 'helix']
-		publicDownloadNumbers = true
-		version {
-			name = String.valueOf(project.version).toLowerCase()
-			vcsTag = project.version
-			released = new Date()
+			// Getter & Setter
+			compileOnly group: 'org.projectlombok', name: 'lombok'
+			testCompile group: 'org.projectlombok', name: 'lombok'
+			annotationProcessor group: 'org.projectlombok', name: 'lombok'
 		}
 	}
 }
