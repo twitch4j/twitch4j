@@ -3,7 +3,6 @@ package twitch4j;
 import com.github.philippheuer.events4j.EventManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import twitch4j.helix.TwitchHelixBuilder;
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
  */
 @Slf4j
-@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchClientBuilder {

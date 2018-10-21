@@ -1,24 +1,45 @@
-# Camunda Project Template
+<p align="center"><img src=".github/logo.png?raw=true" width="150"></p>
 
-This is a tempate for camunda projects.
+<p align="center">
+<a href="https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion"><img src="https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg" alt="Download"></a>
+</p>
 
-## Details
+# Java API for [Twitch](https://www.twitch.tv/)
 
-The project contains 4 subprojects:
+Support:
 
-- Process Application (Your Process)
-- Package WAR (builds the tomcat war deployment)
-- Package Boot (Spring Boot embedded process engine)
-- Package Boot AllInOne (Spring Boot embedded process engine, with WebApp and REST-API)
+[![Discord Server](https://discordapp.com/api/guilds/143001431388061696/embed.png?style=banner2)](https://discord.gg/FQ5vgW3)
 
-## Deployment
+[![Twitch API Server](https://discordapp.com/api/guilds/325552783787032576/embed.png?style=banner2)](https://discord.gg/8NXaEyV)
 
-Supports the following deployment methods from the same code base:
+Documentation:
 
-- deployment into a shared engine (tomcat-war)
-- spring boot standalone
-- spring boot standalone with webapps and rest api
+[![Wiki](https://img.shields.io/badge/Docs-Official-D3D3D3.svg?style=flat-square)](https://twitch4j.gitlab.io/twitch4j/)
+
+--------
+
+## A quick note:
+
+This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Furthermore there are integrations with 3rd-party services like Streamlabs.
+
+## Quick Start
+
+Check out the [Documentation](https://twitch4j.gitlab.io/twitch4j/)!
+
+--------
+
+## Modules
+
+* Auth
+* API - Helix
+* Chat
+
+## Problems
+
+If you have problems using the *Twitch Java API*, then you are welcome to join the [discord server](https://discord.gg/FQ5vgW3) to talk about it.
+
+If you discover any issues/have feature requests, then please [open an issue here](https://github.com/twitch4j/twitch4j/issues/new).
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [MIT license](./LICENSE).

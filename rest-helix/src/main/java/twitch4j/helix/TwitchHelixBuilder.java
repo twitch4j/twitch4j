@@ -8,7 +8,6 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import twitch4j.helix.interceptors.CommonHeaderInterceptor;
  * Documentation: https://dev.twitch.tv/docs/v5/
  */
 @Slf4j
-@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchHelixBuilder {

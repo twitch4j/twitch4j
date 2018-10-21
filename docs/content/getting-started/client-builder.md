@@ -10,7 +10,6 @@ Initialize the Twitch4J Client and specify which modules you want to use:
 
 ```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
-            .withEventManager(eventManager)
             .withEnableHelix(true)
             .build();
 ```

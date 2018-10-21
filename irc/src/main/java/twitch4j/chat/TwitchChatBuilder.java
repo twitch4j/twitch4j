@@ -1,5 +1,7 @@
 package twitch4j.chat;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.events4j.EventManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +25,13 @@ public class TwitchChatBuilder {
      * Event Manager
      */
     @Wither
-    private EventManager eventManager;
+    private EventManager eventManager = new EventManager();
+
+    /**
+     * Credential Manager
+     */
+    @Wither
+    private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
      * BaseUrl
@@ -43,6 +51,7 @@ public class TwitchChatBuilder {
      * @return TwitchHelix
      */
     public TwitchChat build() {
-        return null;
+        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager);
+        return twitchChat;
     }
 }

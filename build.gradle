@@ -2,6 +2,16 @@
 plugins {
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'com.jfrog.bintray' version '1.8.4'
+	id 'de.lukaskoerfer.gradle.delombok' version '0.2'
+}
+
+// All-Projects
+allprojects {
+	// Repositories
+	repositories {
+		jcenter()
+		maven { url "https://dl.bintray.com/philippheuer/maven" }
+	}
 }
 
 // Subprojects
@@ -11,14 +21,10 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'de.lukaskoerfer.gradle.delombok'
 
     // Source Compatiblity
     sourceCompatibility = 1.8
-
-    // Repositories
-    repositories {
-        jcenter()
-    }
 
     // Dependency Management for Subprojects
     dependencyManagement {
@@ -35,9 +41,12 @@ subprojects {
             dependency group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
             // Event Dispatcher
-            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: 'v0.3.0'
+            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
 
-            // HTTP Client
+			// Credential Manager
+			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.4'
+
+			// HTTP Client
             dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'
             dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.3.1'
             dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '9.3.1'

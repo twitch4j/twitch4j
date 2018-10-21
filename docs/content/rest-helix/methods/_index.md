@@ -1,5 +1,4 @@
 +++
-title="Helix - Methods"
+title="Components"
 weight = 5
 +++
-

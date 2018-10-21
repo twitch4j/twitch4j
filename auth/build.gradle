@@ -3,16 +3,13 @@ dependencies {
 	// Event Manager
 	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
-	// Args4J
-	compile group: 'args4j', name: 'args4j', version: '2.33'
-
-	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-auth')
+	// Credential Manager
+	compile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
 }
 
 // Artifact Info
 group = "com.github.twitch4j"
-description = "IRC Client"
+description = "Auth Module"
 version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
 
 // Deployment Script
