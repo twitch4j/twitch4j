@@ -1,9 +1,5 @@
 <p align="center"><img src=".github/logo.png?raw=true" width="150"></p>
 
-<p align="center">
-<a href="https://bintray.com/twitch4j/maven/Twitch4J/_latestVersion"><img src="https://api.bintray.com/packages/twitch4j/maven/Twitch4J/images/download.svg" alt="Download"></a>
-</p>
-
 # Java API for [Twitch](https://www.twitch.tv/)
 
 Support:
@@ -12,9 +8,12 @@ Support:
 
 [![Twitch API Server](https://discordapp.com/api/guilds/325552783787032576/embed.png?style=banner2)](https://discord.gg/8NXaEyV)
 
-Documentation:
+Badges:
 
-[![Wiki](https://img.shields.io/badge/Docs-Official-D3D3D3.svg?style=flat-square)](https://twitch4j.gitlab.io/twitch4j/)
+![Stable](https://img.shields.io/github/release/twitch4j/twitch4j.svg?style=flat-square&label=stable)
+![Alpha](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flat-square&label=alpha)
+[![pipeline status](https://gitlab.com/twitch4j/twitch4j/badges/master/pipeline.svg)](https://gitlab.com/twitch4j/twitch4j/commits/master)
+[![Docs](https://img.shields.io/badge/WIKI-Latest-green.svg?style=flat-square)](https://twitch4j.gitlab.io/twitch4j/)
 
 --------
 

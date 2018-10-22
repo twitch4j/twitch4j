@@ -1,12 +1,20 @@
 package twitch4j.chat.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Channel {
 
-    private Long id;
+    /**
+     * Channel Id
+     */
+    private final Long id;
 
-    private String name;
+    /**
+     * Channel Name
+     */
+    private final String name;
 
 }

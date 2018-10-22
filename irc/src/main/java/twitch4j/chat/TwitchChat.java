@@ -13,6 +13,7 @@ import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import twitch4j.chat.enums.TMIConnectionState;
+import twitch4j.chat.events.IRCEventHandler;
 import twitch4j.chat.events.channel.IRCMessageEvent;
 
 import java.util.*;
@@ -24,11 +25,13 @@ public class TwitchChat {
     /**
      * EventManager
      */
+    @Getter
     private final EventManager eventManager;
 
     /**
      * CredentialManager
      */
+    @Getter
     private final CredentialManager credentialManager;
 
     /**
@@ -77,6 +80,9 @@ public class TwitchChat {
 
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-chat", this);
+
+        // register event listeners
+        IRCEventHandler ircEventHandler = new IRCEventHandler(this);
 
         // connect to irc
         this.connect();

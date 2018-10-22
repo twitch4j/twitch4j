@@ -266,6 +266,17 @@ public class IRCMessageEvent extends TwitchEvent {
 		return getClientName().orElse(null);
 	}
 
+    /**
+     * Gets the Target User Id (from Tags)
+     */
+    public Long getTargetUserId() {
+        if(getTags().containsKey("target-user-id")) {
+            return Long.parseLong(getTags().get("target-user-id"));
+        }
+
+        return null;
+    }
+
 	/**
 	 * Gets a optional tag from the irc message
 	 */
@@ -285,20 +296,22 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * Get User
 	 */
 	public User getUser() {
-		User user = new User();
-		user.setId(getUserId());
-		user.setName(getUserName());
-		return user;
+		return new User(getUserId(), getUserName());
 	}
+
+    /**
+     * Get Target User
+     */
+    public User getTargetUser() {
+        return new User(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
+    }
+
 
 	/**
 	 * Get Channel
 	 */
 	public Channel getChannel() {
-		Channel channel = new Channel();
-		channel.setId(getChannelId());
-		channel.setName(getChannelName().get());
-		return channel;
+		return new Channel(getChannelId(), getChannelName().get());
 	}
 
 }

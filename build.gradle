@@ -44,7 +44,7 @@ subprojects {
             dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
 
 			// Credential Manager
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.4'
+			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.5'
 
 			// HTTP Client
             dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'

@@ -1,12 +1,20 @@
 package twitch4j.chat.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class User {
 
-    private Long id;
+    /**
+     * User Id
+     */
+    private final Long id;
 
-    private String name;
+    /**
+     * User Name
+     */
+    private final String name;
 
 }

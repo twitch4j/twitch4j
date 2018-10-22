@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Value;
 import twitch4j.chat.domain.Channel;
 import twitch4j.chat.domain.User;
+import twitch4j.chat.enums.SubscriptionPlan;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 import java.util.Optional;
@@ -29,11 +30,6 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	 * Subscription Plan
 	 */
     private String subscriptionPlan;
-
-    /**
-     * Subscription Plan Name
-     */
-    private String subscriptionPlanName;
 
 	/**
 	 * Subscription Message
@@ -61,21 +57,27 @@ public class SubscriptionEvent extends AbstractChannelEvent {
      * @param channel Channel the user subscribed to
      * @param user User that subscribed
      * @param subPlan Sub Plan
-     * @param subPlanName Sub Plan Name
      * @param message Sub Message
      * @param months Months
      * @param gifted Is gifted?
      * @param giftedBy User that gifted the sub
      */
-	public SubscriptionEvent(Channel channel, User user, String subPlan, String subPlanName, Optional<String> message, Integer months, Boolean gifted, User giftedBy) {
+	public SubscriptionEvent(Channel channel, User user, String subPlan, Optional<String> message, Integer months, Boolean gifted, User giftedBy) {
 		super(channel);
 		this.user = user;
 		this.subscriptionPlan = subPlan;
-		this.subscriptionPlanName = subPlanName;
 		this.message = message;
 		this.months = months;
 		this.gifted = gifted;
 		this.giftedBy = giftedBy;
 	}
+
+    /**
+     * Gets the Subscription Plan
+     * @return SubscriptionPlan
+     */
+	public SubscriptionPlan getSubscriptionPlanName() {
+        return SubscriptionPlan.fromString(this.subscriptionPlan);
+    }
 
 }
