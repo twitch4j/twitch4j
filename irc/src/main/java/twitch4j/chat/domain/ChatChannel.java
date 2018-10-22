@@ -5,15 +5,15 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class User {
+public class ChatChannel {
 
     /**
-     * User Id
+     * Channel Id
      */
     private final Long id;
 
     /**
-     * User Name
+     * Channel Name
      */
     private final String name;
 

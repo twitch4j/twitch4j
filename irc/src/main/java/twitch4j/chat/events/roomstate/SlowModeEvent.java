@@ -3,7 +3,7 @@ package twitch4j.chat.events.roomstate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 
 /**
  * Slow Mode State Event
@@ -20,10 +20,10 @@ public class SlowModeEvent extends ChannelStatesEvent {
     /**
      * Constructor
      *
-     * @param channel Channel
+     * @param channel ChatChannel
      * @param time seconds
      */
-	public SlowModeEvent(Channel channel, long time) {
+	public SlowModeEvent(ChatChannel channel, long time) {
 		super(channel, time > 0);
 		this.time = time;
 	}

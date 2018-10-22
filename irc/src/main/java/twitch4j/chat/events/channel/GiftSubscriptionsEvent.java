@@ -4,8 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -23,7 +23,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * The Subscription
@@ -46,7 +46,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent {
 	 * @param channel          The channel that this event originates from.
 	 * @param subscriptionPlan The subscription plan
 	 */
-	public GiftSubscriptionsEvent(Channel channel, User user, String subscriptionPlan, Integer count, Integer totalCount) {
+	public GiftSubscriptionsEvent(ChatChannel channel, ChatUser user, String subscriptionPlan, Integer count, Integer totalCount) {
 		super(channel);
 		this.user = user;
 		this.subscriptionPlan = subscriptionPlan;

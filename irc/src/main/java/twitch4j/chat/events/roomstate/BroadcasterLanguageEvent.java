@@ -3,7 +3,7 @@ package twitch4j.chat.events.roomstate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 
 import java.util.Locale;
 
@@ -23,10 +23,10 @@ public class BroadcasterLanguageEvent extends ChannelStatesEvent {
     /**
      * Constructor
      *
-     * @param channel Channel
+     * @param channel ChatChannel
      * @param language Locale
      */
-	public BroadcasterLanguageEvent(Channel channel, Locale language) {
+	public BroadcasterLanguageEvent(ChatChannel channel, Locale language) {
 		super(channel, language != null);
 		this.language = language;
 	}

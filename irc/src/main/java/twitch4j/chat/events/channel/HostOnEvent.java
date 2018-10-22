@@ -3,7 +3,7 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -15,9 +15,9 @@ import twitch4j.chat.events.AbstractChannelEvent;
 public class HostOnEvent extends AbstractChannelEvent {
 
 	/**
-	 * Event Target Channel
+	 * Event Target ChatChannel
 	 */
-	private Channel targetChannel;
+	private ChatChannel targetChannel;
 
 	/**
 	 * Event Constructor
@@ -25,7 +25,7 @@ public class HostOnEvent extends AbstractChannelEvent {
 	 * @param channel       The channel that this event originates from.
 	 * @param targetChannel The channel that was hosted.
 	 */
-	public HostOnEvent(Channel channel, Channel targetChannel) {
+	public HostOnEvent(ChatChannel channel, ChatChannel targetChannel) {
 		super(channel);
 		this.targetChannel = targetChannel;
 	}

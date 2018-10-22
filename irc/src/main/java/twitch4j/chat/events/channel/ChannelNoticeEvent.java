@@ -3,11 +3,11 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
- * Channel Notice Event
+ * ChatChannel Notice Event
  */
 @Value
 @Getter
@@ -27,11 +27,11 @@ public class ChannelNoticeEvent extends AbstractChannelEvent {
     /**
      * Channel Notice Event
      *
-     * @param channel Channel
+     * @param channel ChatChannel
      * @param msgId Message Id
      * @param message message Content
      */
-	public ChannelNoticeEvent(Channel channel, String msgId, String message) {
+	public ChannelNoticeEvent(ChatChannel channel, String msgId, String message) {
 		super(channel);
 		this.msgId = msgId;
 		this.message = message;

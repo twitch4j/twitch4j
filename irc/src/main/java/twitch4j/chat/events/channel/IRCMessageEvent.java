@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import twitch4j.chat.commands.CommandPermission;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.TwitchEvent;
 
 import java.util.*;
@@ -295,23 +295,23 @@ public class IRCMessageEvent extends TwitchEvent {
 	/**
 	 * Get User
 	 */
-	public User getUser() {
-		return new User(getUserId(), getUserName());
+	public ChatUser getUser() {
+		return new ChatUser(getUserId(), getUserName());
 	}
 
     /**
      * Get Target User
      */
-    public User getTargetUser() {
-        return new User(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
+    public ChatUser getTargetUser() {
+        return new ChatUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
     }
 
 
 	/**
-	 * Get Channel
+	 * Get ChatChannel
 	 */
-	public Channel getChannel() {
-		return new Channel(getChannelId(), getChannelName().get());
+	public ChatChannel getChannel() {
+		return new ChatChannel(getChannelId(), getChannelName().get());
 	}
 
 }

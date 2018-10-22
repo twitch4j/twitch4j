@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 import java.util.Currency;
@@ -20,7 +20,7 @@ public class DonationEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Donation Source
@@ -52,7 +52,7 @@ public class DonationEvent extends AbstractChannelEvent {
 	 * @param amount   The donated amount.
 	 * @param message  The plain text of the message.
 	 */
-	public DonationEvent(Channel channel, User user, String source, Currency currency, Double amount, String message) {
+	public DonationEvent(ChatChannel channel, ChatUser user, String source, Currency currency, Double amount, String message) {
 		super(channel);
 		this.user = user;
 		this.source = source;

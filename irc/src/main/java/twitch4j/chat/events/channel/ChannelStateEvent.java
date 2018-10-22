@@ -3,7 +3,7 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 import java.util.Collections;
@@ -30,13 +30,13 @@ public class ChannelStateEvent extends AbstractChannelEvent {
 	 *
 	 * @param channel The channel that this event originates from.
 	 */
-	public ChannelStateEvent(Channel channel, ChannelState state, Object value) {
+	public ChannelStateEvent(ChatChannel channel, ChannelState state, Object value) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();
 		states.put(state, value);
 		this.states = Collections.unmodifiableMap(states);
 	}
-	public ChannelStateEvent(Channel channel, Map<ChannelState, Object> state) {
+	public ChannelStateEvent(ChatChannel channel, Map<ChannelState, Object> state) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();
 		states.putAll(state);

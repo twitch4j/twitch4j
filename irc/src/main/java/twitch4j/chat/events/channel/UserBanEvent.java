@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -18,7 +18,7 @@ public class UserBanEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Reason for Punishment
@@ -32,7 +32,7 @@ public class UserBanEvent extends AbstractChannelEvent {
 	 * @param user    The user who triggered the event.
 	 * @param reason  Reason for Ban.
 	 */
-	public UserBanEvent(Channel channel, User user, String reason) {
+	public UserBanEvent(ChatChannel channel, ChatUser user, String reason) {
 		super(channel);
 		this.user = user;
 		this.reason = reason;

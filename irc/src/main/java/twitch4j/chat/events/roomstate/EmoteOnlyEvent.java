@@ -3,7 +3,7 @@ package twitch4j.chat.events.roomstate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
+import twitch4j.chat.domain.ChatChannel;
 
 /**
  * Emote Only State Event
@@ -16,10 +16,10 @@ public class EmoteOnlyEvent extends ChannelStatesEvent{
     /**
      * Constructor
      *
-     * @param channel Channel
+     * @param channel ChatChannel
      * @param active State active?
      */
-	public EmoteOnlyEvent(Channel channel, boolean active) {
+	public EmoteOnlyEvent(ChatChannel channel, boolean active) {
 		super(channel, active);
 	}
 }

@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -18,7 +18,7 @@ public class UserTimeoutEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Duration in Minutes
@@ -38,7 +38,7 @@ public class UserTimeoutEvent extends AbstractChannelEvent {
 	 * @param duration Timeout Duration in Minutes.
 	 * @param reason   Reason for Ban.
 	 */
-	public UserTimeoutEvent(Channel channel, User user, Integer duration, String reason) {
+	public UserTimeoutEvent(ChatChannel channel, ChatUser user, Integer duration, String reason) {
 		super(channel);
 		this.user = user;
 		this.duration = duration;

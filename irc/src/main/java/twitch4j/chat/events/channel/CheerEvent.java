@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -18,7 +18,7 @@ public class CheerEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Message
@@ -38,7 +38,7 @@ public class CheerEvent extends AbstractChannelEvent {
 	 * @param message The donation message.
 	 * @param bits The amount of bits.
 	 */
-	public CheerEvent(Channel channel, User user, String message, Integer bits) {
+	public CheerEvent(ChatChannel channel, ChatUser user, String message, Integer bits) {
 		super(channel);
 		this.user = user;
 		this.message = message;

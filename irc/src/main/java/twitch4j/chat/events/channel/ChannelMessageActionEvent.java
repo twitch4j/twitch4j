@@ -4,8 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 import twitch4j.chat.commands.CommandPermission;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 import java.util.Set;
@@ -21,7 +21,7 @@ public class ChannelMessageActionEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Message
@@ -41,7 +41,7 @@ public class ChannelMessageActionEvent extends AbstractChannelEvent {
 	 * @param message     The plain text of the message.
 	 * @param permissions The permissions of the triggering user.
 	 */
-	public ChannelMessageActionEvent(Channel channel, User user, String message, Set<CommandPermission> permissions) {
+	public ChannelMessageActionEvent(ChatChannel channel, ChatUser user, String message, Set<CommandPermission> permissions) {
 		super(channel);
 		this.user = user;
 		this.message = message;

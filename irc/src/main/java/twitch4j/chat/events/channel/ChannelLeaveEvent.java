@@ -3,8 +3,8 @@ package twitch4j.chat.events.channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import twitch4j.chat.domain.Channel;
-import twitch4j.chat.domain.User;
+import twitch4j.chat.domain.ChatChannel;
+import twitch4j.chat.domain.ChatUser;
 import twitch4j.chat.events.AbstractChannelEvent;
 
 /**
@@ -18,7 +18,7 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private User user;
+	private ChatUser user;
 
 	/**
 	 * Event Constructor
@@ -26,7 +26,7 @@ public class ChannelLeaveEvent extends AbstractChannelEvent {
 	 * @param channel     The channel that this event originates from.
 	 * @param user        The user triggering the event.
 	 */
-	public ChannelLeaveEvent(Channel channel, User user) {
+	public ChannelLeaveEvent(ChatChannel channel, ChatUser user) {
 		super(channel);
 		this.user = user;
 	}
