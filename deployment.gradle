@@ -1,4 +1,11 @@
 /**
+ * Testing
+ */
+test {
+	useJUnitPlatform()
+}
+
+/**
  * Javadoc
  */
 javadoc {

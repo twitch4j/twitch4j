@@ -9,16 +9,16 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Stream List
+ * Bits Leaderboard
  */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StreamList {
+public class BitsLeaderboard {
 	/**
 	 * Data
 	 */
 	@JsonProperty("data")
-	private List<Stream> streams;
+	private List<BitsLeaderboardEntry> entries;
 
 }

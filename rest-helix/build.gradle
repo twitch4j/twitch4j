@@ -9,6 +9,9 @@ dependencies {
 
     // Jackson (JSON)
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+
+	// Twitch4J Modules
+	compile project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info

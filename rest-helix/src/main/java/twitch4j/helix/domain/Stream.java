@@ -12,9 +12,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * Model representing a stream.
- * <p>
- * A stream is a channel, that is currently streaming live.
+ * Stream (LiveStream)
  */
 @Data
 @Setter(AccessLevel.PRIVATE)

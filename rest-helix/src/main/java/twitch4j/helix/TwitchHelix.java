@@ -3,6 +3,7 @@ package twitch4j.helix;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import twitch4j.helix.domain.BitsLeaderboard;
 import twitch4j.helix.domain.StreamList;
 import twitch4j.helix.domain.StreamMarkersList;
 import twitch4j.helix.domain.StreamMetadataList;
@@ -11,6 +12,26 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TwitchHelix {
+
+    /**
+     * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
+     *
+     * @param authToken User Auth Token
+     * @param count     Number of results to be returned. Maximum: 100. Default: 10.
+     * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
+     * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".
+     * @param userId    ID of the user whose results are returned; i.e., the person who paid for the Bits.
+     * @return StreamList
+     */
+    @RequestLine("GET /bits/leaderboard?count={count}&period={period}&started_at={started_at}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    BitsLeaderboard getBitsLeaderboard(
+        @Param("token") String authToken,
+        @Param("count") String count,
+        @Param("period") String period,
+        @Param("started_at") String startedAt,
+        @Param("user_id") String userId
+    );
 
     /**
      * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
