@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+	<!-- Event Manager -->
+	<logger name="com.github.philippheuer.events4j" level="INFO" />
+
+	<!-- Configure Twitch4J logger level -->
+	<logger name="twitch4j" level="TRACE"/>
+
+	<!-- Appender Configuration [Console] -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %highlight([%-5level]) %logger{25} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Appender Configuration [File] -->
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+		<file>client.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>client.%i.log</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<!-- Appender Output Configuration -->
+	<root level="trace">
+		<appender-ref ref="CONSOLE"/>
+	</root>
+</configuration>

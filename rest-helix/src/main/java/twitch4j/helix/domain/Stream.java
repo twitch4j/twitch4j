@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * Model representing a stream.
@@ -67,7 +68,7 @@ public class Stream {
 	 * @return The stream uptime.
 	 */
 	public Duration getUptime() {
-		Duration uptime = Duration.between(getStartedAt().toInstant(), Calendar.getInstance().toInstant());
+		Duration uptime = Duration.between(startedAt.toInstant(), Calendar.getInstance().toInstant());
 		return uptime;
 	}
 
@@ -75,6 +76,6 @@ public class Stream {
 	 * Gets the thumbnail url for specific dimensions
 	 */
 	public String getThumbnailUrl(Integer width, Integer height) {
-		return getThumbnailUrl().replaceAll("{width}", width.toString()).replaceAll("{height}", height.toString());
+		return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
 	}
 }

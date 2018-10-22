@@ -1,5 +1,8 @@
 package twitch4j;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 import twitch4j.chat.TwitchChat;
+import twitch4j.chat.TwitchChatBuilder;
 import twitch4j.helix.TwitchHelix;
 import twitch4j.helix.TwitchHelixBuilder;
 
@@ -43,10 +47,28 @@ public class TwitchClientBuilder {
     private Boolean enableChat;
 
     /**
+     * Chat Account
+     */
+    @Wither
+    private OAuth2Credential chatAccount;
+
+    /**
+     * Channel Cache
+     */
+    @Wither
+    private Boolean enableChannelCache = false;
+
+    /**
      * EventManager
      */
     @Wither
     private EventManager eventManager = new EventManager();
+
+    /**
+     * EventManager
+     */
+    @Wither
+    private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
      * Initialize the builder
@@ -83,7 +105,12 @@ public class TwitchClientBuilder {
         // Module: Chat
         TwitchChat chat = null;
         if (this.enableChat) {
-
+            chat = TwitchChatBuilder.builder()
+                .withEventManager(eventManager)
+                .withCredentialManager(credentialManager)
+                .withChatAccount(chatAccount)
+                .withEnableChannelCache(enableChannelCache)
+                .build();
         }
 
         // Module: Client

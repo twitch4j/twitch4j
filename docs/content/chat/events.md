@@ -9,3 +9,9 @@ Twitch Chat can trigger verious events you can handle, here is a list of all eve
 
 ## Event Catalogue
 
+### Index
+
+* [IRCMessageEvent](###Event A)
+
+### IRCMessageEvent
+

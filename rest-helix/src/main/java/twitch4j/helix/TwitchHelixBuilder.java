@@ -8,6 +8,7 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import twitch4j.helix.interceptors.CommonHeaderInterceptor;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class TwitchHelixBuilder {
 
     /**
@@ -70,6 +72,7 @@ public class TwitchHelixBuilder {
      * @return TwitchHelix
      */
     public TwitchHelix build() {
+        log.debug("Helix: Initializing Module ...");
         TwitchHelix client = Feign.builder()
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())

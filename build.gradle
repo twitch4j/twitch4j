@@ -56,6 +56,9 @@ subprojects {
             // Jackson (JSON)
             dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
+			// WebSocket
+			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.6'
+
             // Testing
             dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
 

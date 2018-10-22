@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class TwitchClientTest {
 
     /**
-     * Get Streams
+     * Twitch Client Test
      */
     @Test
     @DisplayName("Tests the TwitchClientBuilder")

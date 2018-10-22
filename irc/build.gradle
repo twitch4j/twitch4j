@@ -3,6 +3,9 @@ dependencies {
 	// Event Manager
 	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
+	// IRC
+	compile group: 'com.neovisionaries', name: 'nv-websocket-client'
+
 	// Args4J
 	compile group: 'args4j', name: 'args4j', version: '2.33'
 
