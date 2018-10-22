@@ -1,5 +1,5 @@
 +++
-title="Channel - MessageEvent"
+title="IRC Message"
 weight = 200
 +++
 
@@ -7,7 +7,7 @@ weight = 200
 
 ## Description
 
-The low level irc message received before it gets parsed.
+The irc message received before it gets parsed and the real event gets dispatched.
 
 ## Dependencies
 

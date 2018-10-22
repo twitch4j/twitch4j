@@ -1,6 +1,6 @@
 +++
 title="Channel - MessageEvent"
-weight = 200
+weight = 210
 +++
 
 # ChannelMessageEvent

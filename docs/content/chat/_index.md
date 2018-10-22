@@ -32,6 +32,9 @@ TwitchClient twitchClient = TwitchClientBuilder.builder()
             .build();
 ```
 
+The first value of new OAuth2Credential is the identity provider, and in the case of twitch4j always `twitch`.
+You can pass in your oauth token as 2nd value, if you don't have one you can generate one [here](https://twitchtokengenerator.com/).
+
 ## Standalone
 
 Initialize the Chat Feature as Standalone Module:

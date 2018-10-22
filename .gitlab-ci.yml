@@ -12,9 +12,26 @@ variables:
 
 # Stages
 stages:
-#  - build
+  - build
+  - test
 #  - publish
   - docs
+
+# Build
+Assemble:
+  stage: build
+  script:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - ./gradlew assemble
+
+# Test
+Run Tests:
+  stage: test
+  script:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - ./gradlew test
 
 ###
 # Test Documentation
