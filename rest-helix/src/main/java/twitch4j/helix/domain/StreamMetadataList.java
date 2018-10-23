@@ -19,10 +19,10 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamMetadataList {
-	/**
-	 * Data
-	 */
-	@JsonProperty("data")
-	private List<StreamMetadata> streams;
+    /**
+     * Data
+     */
+    @JsonProperty("data")
+    private List<StreamMetadata> streams;
 
 }

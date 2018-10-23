@@ -91,7 +91,7 @@ public class StreamsEndpointTest extends AbtractEndpointTest {
     @Disabled
     public void getStreamMarkers() {
         // TestCase
-        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, "217359661l","137512364l");
+        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, "217359661l", "137512364l");
 
         // Test
         assertTrue(resultList.getStreamMarkers().size() > 0, "Should at least find one result from the streams metadata method!");

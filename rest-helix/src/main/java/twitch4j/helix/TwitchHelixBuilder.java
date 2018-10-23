@@ -17,7 +17,7 @@ import twitch4j.helix.interceptors.CommonHeaderInterceptor;
 
 /**
  * Twitch API v5
- *
+ * <p>
  * Documentation: https://dev.twitch.tv/docs/v5/
  */
 @Slf4j
@@ -27,16 +27,14 @@ import twitch4j.helix.interceptors.CommonHeaderInterceptor;
 public class TwitchHelixBuilder {
 
     /**
+     * Http Client
+     */
+    private final OkHttpClient okHttpClient = new OkHttpClient();
+    /**
      * Event Manager
      */
     @Wither
     private EventManager eventManager;
-
-    /**
-     * Http Client
-     */
-    private final OkHttpClient okHttpClient = new OkHttpClient();
-
     /**
      * Client Id
      */
@@ -61,6 +59,7 @@ public class TwitchHelixBuilder {
 
     /**
      * Initialize the builder
+     *
      * @return Twitch Helix Builder
      */
     public static TwitchHelixBuilder builder() {
@@ -69,19 +68,20 @@ public class TwitchHelixBuilder {
 
     /**
      * Twitch API Client (Helix)
+     *
      * @return TwitchHelix
      */
     public TwitchHelix build() {
         log.debug("Helix: Initializing Module ...");
         TwitchHelix client = Feign.builder()
-                .encoder(new JacksonEncoder())
-                .decoder(new JacksonDecoder())
-                .logger(new Logger.ErrorLogger())
-                .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
-                .logLevel(Logger.Level.BASIC)
-                .requestInterceptor(new CommonHeaderInterceptor(this))
-                .retryer(new Retryer.Default(1, 100, 3))
-                .target(TwitchHelix.class, baseUrl);
+            .encoder(new JacksonEncoder())
+            .decoder(new JacksonDecoder())
+            .logger(new Logger.ErrorLogger())
+            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
+            .logLevel(Logger.Level.BASIC)
+            .requestInterceptor(new CommonHeaderInterceptor(this))
+            .retryer(new Retryer.Default(1, 100, 3))
+            .target(TwitchHelix.class, baseUrl);
         return client;
     }
 }

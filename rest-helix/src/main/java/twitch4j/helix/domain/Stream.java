@@ -21,59 +21,59 @@ import java.util.regex.Pattern;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
 
-	// Stream ID.
+    // Stream ID.
     @NonNull
-	private Long id;
+    private Long id;
 
-	// ID of the user who is streaming.
+    // ID of the user who is streaming.
     @NonNull
-	private Long userId;
+    private Long userId;
 
-	// ID of the game being played on the stream.
-	private Long gameId;
+    // ID of the game being played on the stream.
+    private Long gameId;
 
-	// Array of community IDs.
+    // Array of community IDs.
     @NonNull
-	private List<UUID> communityIds;
+    private List<UUID> communityIds;
 
-	// Stream type: "live" or "" (in case of error).
+    // Stream type: "live" or "" (in case of error).
     @NonNull
-	private String type;
+    private String type;
 
-	// Stream title.
+    // Stream title.
     @NonNull
-	private String title;
+    private String title;
 
-	// Number of viewers watching the stream at the time of the query.
+    // Number of viewers watching the stream at the time of the query.
     @NonNull
-	private Integer viewerCount;
+    private Integer viewerCount;
 
-	// UTC timestamp on when the stream started
+    // UTC timestamp on when the stream started
     @NonNull
-	private Calendar startedAt;
+    private Calendar startedAt;
 
-	// Stream language.
+    // Stream language.
     @NonNull
-	private String language;
+    private String language;
 
-	// Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image
+    // Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image
     @NonNull
     private String thumbnailUrl;
 
-	/**
-	 * Gets the stream uptime based on the start date.
-	 *
-	 * @return The stream uptime.
-	 */
-	public Duration getUptime() {
-		Duration uptime = Duration.between(startedAt.toInstant(), Calendar.getInstance().toInstant());
-		return uptime;
-	}
+    /**
+     * Gets the stream uptime based on the start date.
+     *
+     * @return The stream uptime.
+     */
+    public Duration getUptime() {
+        Duration uptime = Duration.between(startedAt.toInstant(), Calendar.getInstance().toInstant());
+        return uptime;
+    }
 
-	/**
-	 * Gets the thumbnail url for specific dimensions
-	 */
-	public String getThumbnailUrl(Integer width, Integer height) {
-		return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
-	}
+    /**
+     * Gets the thumbnail url for specific dimensions
+     */
+    public String getThumbnailUrl(Integer width, Integer height) {
+        return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
+    }
 }

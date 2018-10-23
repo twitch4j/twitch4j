@@ -15,10 +15,10 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BitsLeaderboard {
-	/**
-	 * Data
-	 */
-	@JsonProperty("data")
-	private List<BitsLeaderboardEntry> entries;
+    /**
+     * Data
+     */
+    @JsonProperty("data")
+    private List<BitsLeaderboardEntry> entries;
 
 }

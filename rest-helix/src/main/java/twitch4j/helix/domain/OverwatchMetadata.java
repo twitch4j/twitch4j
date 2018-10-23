@@ -15,9 +15,9 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OverwatchMetadata {
 
-	// The Broadcaster
+    // The Broadcaster
     @NonNull
-	private OverwatchPlayer broadcaster;
+    private OverwatchPlayer broadcaster;
 
     /**
      * Overwatch Player

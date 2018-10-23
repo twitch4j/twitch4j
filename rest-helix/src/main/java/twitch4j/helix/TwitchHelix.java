@@ -3,10 +3,7 @@ package twitch4j.helix;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import twitch4j.helix.domain.BitsLeaderboard;
-import twitch4j.helix.domain.StreamList;
-import twitch4j.helix.domain.StreamMarkersList;
-import twitch4j.helix.domain.StreamMetadataList;
+import twitch4j.helix.domain.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +11,59 @@ import java.util.UUID;
 public interface TwitchHelix {
 
     /**
+     * Gets a URL that extension developers can use to download analytics reports (CSV files) for their extensions. The URL is valid for 5 minutes.
+     * For detail about analytics and the fields returned, see the Insights & Analytics guide.
+     *
+     * @param authToken   Auth Token
+     * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param extensionId Client ID value assigned to the extension when it is created. If this is specified, the returned URL points to an analytics report for just the specified extension.
+     * @param type        Type of analytics report that is returned. If this is specified, the response includes one URL, for the specified report type. If this is not specified, the response includes multiple URLs (paginated), one for each report type available for the authenticated user’s Extensions. Limit: 1. Valid values: "overview_v1", "overview_v2".
+     * @param startedAt   Starting date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     * @param endedAt     Ending date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     * @return ExtensionAnalyticsList
+     */
+    @RequestLine("GET /analytics/extensions?after={after}&ended_at={ended_at}&first={first}&extension_id={extension_id}&started_at={started_at}&type={type}")
+    @Headers("Authorization: Bearer {token}")
+    ExtensionAnalyticsList getExtensionAnalyticUrl(
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit,
+        @Param("extension_id") String extensionId,
+        @Param("type") String type,
+        @Param("started_at") String startedAt,
+        @Param("ended_at") String endedAt
+    );
+
+    /**
+     * Gets a URL that game developers can use to download analytics reports (CSV files) for their games. The URL is valid for 5 minutes.
+     * For detail about analytics and the fields returned, see the Insights & Analytics guide.
+     *
+     * @param authToken Auth Token
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param gameId    Game ID. If this is specified, the returned URL points to an analytics report for just the specified game.
+     * @param type      Type of analytics report that is returned. If this is specified, the response includes one URL, for the specified report type. If this is not specified, the response includes multiple URLs (paginated), one for each report type available for the authenticated user’s Extensions. Limit: 1. Valid values: "overview_v1", "overview_v2".
+     * @param startedAt Starting date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     * @param endedAt   Ending date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     * @return GameAnalyticsList
+     */
+    @RequestLine("GET /analytics/games?after={after}&ended_at={ended_at}&first={first}&game_id={game_id}&started_at={started_at}&type={type}")
+    @Headers("Authorization: Bearer {token}")
+    GameAnalyticsList getGameAnalyticUrl(
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit,
+        @Param("game_id") String gameId,
+        @Param("type") String type,
+        @Param("started_at") String startedAt,
+        @Param("ended_at") String endedAt
+    );
+
+    /**
      * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
      *
-     * @param authToken User Auth Token
+     * @param authToken Auth Token
      * @param count     Number of results to be returned. Maximum: 100. Default: 10.
      * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
      * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".

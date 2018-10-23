@@ -16,9 +16,9 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HearthstoneMetadata {
 
-	// The Broadcaster
+    // The Broadcaster
     @NonNull
-	private HearthstonePlayer broadcaster;
+    private HearthstonePlayer broadcaster;
 
     // The Opponent
     @NonNull

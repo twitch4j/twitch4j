@@ -48,19 +48,17 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
 
             if (response.status() == 401) {
                 throw new UnauthorizedException()
-                        .addContextValue("requestUrl", response.request().url())
-                        .addContextValue("requestMethod", response.request().method())
-                        .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
-                        .addContextValue("responseBody", responseBody);
-            }
-            else if (response.status() == 404) {
+                    .addContextValue("requestUrl", response.request().url())
+                    .addContextValue("requestMethod", response.request().method())
+                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
+                    .addContextValue("responseBody", responseBody);
+            } else if (response.status() == 404) {
                 throw new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().method())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
-            }
-            else if (response.status() == 503) {
+            } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.

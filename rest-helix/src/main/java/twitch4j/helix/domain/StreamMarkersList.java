@@ -20,7 +20,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamMarkersList {
 
-	// Markers
+    // Markers
     @NonNull
     @JsonProperty("data")
     private List<StreamMarkers> streamMarkers;

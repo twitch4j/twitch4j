@@ -9,16 +9,16 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Stream List
+ * Extension Analytics List
  */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StreamList {
+public class ExtensionAnalyticsList {
     /**
      * Data
      */
     @JsonProperty("data")
-    private List<Stream> streams;
+    private List<ExtensionAnalytics> extensionAnalytics;
 
 }
