@@ -5,6 +5,7 @@ import feign.Param;
 import feign.RequestLine;
 import twitch4j.helix.domain.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,6 +82,59 @@ public interface TwitchHelix {
     );
 
     /**
+     * Creates a clip programmatically. This returns both an ID and an edit URL for the new clip.
+     *
+     * @param authToken     Auth Token
+     * @param broadcasterId ID of the stream from which the clip will be made.
+     * @param hasDelay      If false, the clip is captured from the live stream when the API is called; otherwise, a delay is added before the clip is captured (to account for the brief delay between the broadcaster’s stream and the viewer’s experience of that stream). Default: false.
+     * @return CreateClip
+     */
+    @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&has_delay={has_delay}")
+    @Headers("Authorization: Bearer {token}")
+    CreateClip createClip(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("has_delay") Boolean hasDelay
+    );
+
+    /**
+     * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
+     *
+     * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
+     * @param gameId ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
+     * @param id ID of the clip being queried. Limit: 100.
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param before Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param startedAt Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+     * @param endedAt Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+     * @return ClipList Clip List
+     */
+    @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
+    ClipList getClips(
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("game_id") String gameId,
+        @Param("id") String id,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit,
+        @Param("started_at") Date startedAt,
+        @Param("ended_at") Date endedAt
+    );
+
+    /**
+     * TODO: Create Entitlement Grants Upload URL
+     */
+
+    /**
+     * TODO: Get Games
+     */
+
+    /**
+     * TODO: Get Top Games
+     */
+
+    /**
      * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      *
      * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
@@ -131,6 +185,10 @@ public interface TwitchHelix {
     );
 
     /**
+     * TODO: Create Stream Marker
+     */
+
+    /**
      * Gets a list of markers for either a specified user’s most recent stream or a specified VOD/video (stream), ordered by recency. A marker is an arbitrary point in a stream that the broadcaster wants to mark; e.g., to easily return to later. The only markers returned are those created by the user identified by the Bearer token.
      *
      * @param authToken User Auth Token
@@ -151,5 +209,37 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("video_id") String videoId
     );
+
+    /**
+     * TODO: Get Users
+     */
+
+    /**
+     * TODO: Get Users Follows
+     */
+
+    /**
+     * TODO: Update User
+     */
+
+    /**
+     * TODO: Get User Extensions
+     */
+
+    /**
+     * TODO: Get User Active Extensions
+     */
+
+    /**
+     * TODO: Update User Extensions
+     */
+
+    /**
+     * TODO: Get Videos
+     */
+
+    /**
+     * TODO: Get Webhook Subscriptions
+     */
 
 }
