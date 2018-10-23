@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import twitch4j.helix.domain.StreamList;
 import twitch4j.helix.domain.StreamMarkersList;
+import twitch4j.helix.domain.StreamMetadata;
 import twitch4j.helix.domain.StreamMetadataList;
 
 import java.util.Arrays;
@@ -49,13 +50,17 @@ public class StreamsEndpointTest extends AbtractEndpointTest {
     @DisplayName("Fetch meta-information (hearthstone) about live streams")
     public void getStreamMetadataForHearthstone() {
         // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 1, Arrays.asList(hearthstoneGameId), null, null, null);
+        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 5, Arrays.asList(hearthstoneGameId), null, null, null);
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
-        resultList.getStreams().forEach(stream -> {
-            assertNotNull(stream.getHearthstone(), "Hearthstone Metadata should be provided!");
-        });
+        int foundMetadata = 0;
+        for (StreamMetadata stream : resultList.getStreams()) {
+            if (stream.getHearthstone() != null) {
+                foundMetadata++;
+            }
+        }
+        assertTrue(foundMetadata > 0, "Hearthstone Metadata should be provided!");
     }
 
     /**
@@ -65,13 +70,17 @@ public class StreamsEndpointTest extends AbtractEndpointTest {
     @DisplayName("Fetch meta-information (overwatch) about live streams")
     public void getStreamMetadataForOverwatch() {
         // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 1, Arrays.asList(overwatchGameId), null, null, null);
+        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 5, Arrays.asList(overwatchGameId), null, null, null);
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
-        resultList.getStreams().forEach(stream -> {
-            assertNotNull(stream.getOverwatch(), "Overwatch Metadata should be provided!");
-        });
+        int foundMetadata = 0;
+        for (StreamMetadata stream : resultList.getStreams()) {
+            if (stream.getOverwatch() != null) {
+                foundMetadata++;
+            }
+        }
+        assertTrue(foundMetadata > 0, "Overwatch Metadata should be provided!");
     }
 
     /**

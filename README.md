@@ -19,7 +19,7 @@ Badges:
 
 ## A quick note:
 
-This API aims to retrieve all twitch relation information from the Twitch REST API V5, Twitch PubSub and the Twitch IRC Server. Furthermore there are integrations with 3rd-party services like Streamlabs.
+This project provides multiple standalone modules you can use to interact with twitch and related services.
 
 ## Quick Start
 
@@ -29,6 +29,11 @@ Check out the [Documentation](https://twitch4j.gitlab.io/twitch4j/)!
 
 ## Modules
 
+Shared
+* [Event4J](https://github.com/PhilippHeuer/events4j)
+* [Credential Manager](https://github.com/PhilippHeuer/credential-manager)
+
+Project
 * Auth
 * API - Helix
 * Chat
