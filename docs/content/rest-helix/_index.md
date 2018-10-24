@@ -40,3 +40,41 @@ TwitchHelix client = TwitchHelixBuilder.builder()
             .withClientSecret("clientSecret")
             .build();
 ```
+
+## API Methods
+
+Analytics
+* [Analytics -> Extension Analytics Url](./clips-create.md)
+* [Analytics -> Game Analytics Url](./clips-create.md)
+
+Bits
+* [Bits -> Get Leaderboard](./bits-leaderboard.md)
+
+Clips
+* [Clips -> Create Clip](./clips-create.md)
+* [Clips -> Get Clips](./clips-get.md)
+
+Entitlements
+* Create Entitlement Grants Upload URL
+
+Games
+* Get Games
+* Get Top Games
+
+Streams
+* [Streams -> Get](./streams-get.md)
+* [Streams -> Get Metadata](./streams-getMetadata.md)
+* Create Stream Marker
+* Get Stream Markers
+
+Users
+* Get Users
+* Get Users Follows
+* Update User
+* Get User Extensions
+* Get User Active Extensions
+* Update User Extensions
+
+Videos
+* Get Videos
+* Get Webhook Subscriptions
