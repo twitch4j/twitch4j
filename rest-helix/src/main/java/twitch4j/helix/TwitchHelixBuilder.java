@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.EventManager;
 import feign.Feign;
 import feign.Logger;
 import feign.Retryer;
+import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import lombok.AccessLevel;
@@ -73,7 +74,7 @@ public class TwitchHelixBuilder {
      */
     public TwitchHelix build() {
         log.debug("Helix: Initializing Module ...");
-        TwitchHelix client = Feign.builder()
+        TwitchHelix client = HystrixFeign.builder()
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())

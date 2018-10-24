@@ -7,8 +7,7 @@ dependencies {
     compile group: 'io.github.openfeign', name: 'feign-okhttp'
     compile group: 'io.github.openfeign', name: 'feign-jackson'
     compile group: 'io.github.openfeign', name: 'feign-slf4j'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp'
-    compile group: 'com.netflix.hystrix', name: 'hystrix-core'
+	compile group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.0.1'
 
     // Jackson (JSON)
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'

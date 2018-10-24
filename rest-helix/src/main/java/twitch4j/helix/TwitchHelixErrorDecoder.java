@@ -1,6 +1,7 @@
 package twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
 import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
@@ -62,7 +63,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.
-                return new RetryableException("getting service unavailable, retrying ...", null);
+                return new RetryableException("getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
             }
 
             TwitchHelixError helixError = objectMapper.readValue(responseBody, TwitchHelixError.class);

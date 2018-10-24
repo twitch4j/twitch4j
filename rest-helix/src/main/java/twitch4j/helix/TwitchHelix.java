@@ -1,5 +1,6 @@
 package twitch4j.helix;
 
+import com.netflix.hystrix.HystrixCommand;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -26,7 +27,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /analytics/extensions?after={after}&ended_at={ended_at}&first={first}&extension_id={extension_id}&started_at={started_at}&type={type}")
     @Headers("Authorization: Bearer {token}")
-    ExtensionAnalyticsList getExtensionAnalyticUrl(
+    HystrixCommand<ExtensionAnalyticsList> getExtensionAnalyticUrl(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit,
@@ -51,7 +52,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /analytics/games?after={after}&ended_at={ended_at}&first={first}&game_id={game_id}&started_at={started_at}&type={type}")
     @Headers("Authorization: Bearer {token}")
-    GameAnalyticsList getGameAnalyticUrl(
+    HystrixCommand<GameAnalyticsList> getGameAnalyticUrl(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit,
@@ -73,7 +74,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /bits/leaderboard?count={count}&period={period}&started_at={started_at}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    BitsLeaderboard getBitsLeaderboard(
+    HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
         @Param("token") String authToken,
         @Param("count") String count,
         @Param("period") String period,
@@ -91,7 +92,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&has_delay={has_delay}")
     @Headers("Authorization: Bearer {token}")
-    CreateClip createClip(
+    HystrixCommand<CreateClip> createClip(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("has_delay") Boolean hasDelay
@@ -111,7 +112,7 @@ public interface TwitchHelix {
      * @return ClipList Clip List
      */
     @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
-    ClipList getClips(
+    HystrixCommand<ClipList> getClips(
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
         @Param("id") String id,
@@ -148,7 +149,7 @@ public interface TwitchHelix {
      * @return StreamList
      */
     @RequestLine("GET /streams?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
-    StreamList getStreams(
+    HystrixCommand<StreamList> getStreams(
         @Param("after") String after,
         @Param("before") String before,
         @Param("community_id") List<UUID> communityId,
@@ -173,7 +174,7 @@ public interface TwitchHelix {
      * @return StreamMetadataList
      */
     @RequestLine("GET /streams/metadata?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
-    StreamMetadataList getStreamsMetadata(
+    HystrixCommand<StreamMetadataList> getStreamsMetadata(
         @Param("after") String after,
         @Param("before") String before,
         @Param("community_id") List<UUID> communityId,
@@ -201,7 +202,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams/markers?after={after}&before={before}&first={first}&user_id={user_id}&video_id={video_id}")
     @Headers("Authorization: Bearer {token}")
-    StreamMarkersList getStreamMarkers(
+    HystrixCommand<StreamMarkersList> getStreamMarkers(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,

@@ -26,7 +26,7 @@ public class ClipsTest extends AbtractEndpointTest {
     @Disabled
     public void createClipTest() {
         // TestCase
-        CreateClip clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAuthToken(), null, null);
+        CreateClip clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAuthToken(), null, null).execute();
 
         // Validate
     }
@@ -38,7 +38,7 @@ public class ClipsTest extends AbtractEndpointTest {
     @DisplayName("Get Clips")
     public void getClips() {
         // TestCase
-        ClipList clipList = testUtils.getTwitchHelixClient().getClips(null, "488552", null, null, null, null, null, null);
+        ClipList clipList = testUtils.getTwitchHelixClient().getClips(null, "488552", null, null, null, null, null, null).execute();
 
         // Validate
         clipList.getData().forEach(clip -> {

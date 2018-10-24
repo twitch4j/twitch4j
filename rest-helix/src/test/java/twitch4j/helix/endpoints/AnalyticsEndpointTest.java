@@ -24,7 +24,7 @@ public class AnalyticsEndpointTest extends AbtractEndpointTest {
     public void getExtensionAnalytics() {
         // TestCase
         try {
-            ExtensionAnalyticsList resultList = testUtils.getTwitchHelixClient().getExtensionAnalyticUrl(testUtils.getCredential().getAuthToken(),null,10, null, null, null, null);
+            ExtensionAnalyticsList resultList = testUtils.getTwitchHelixClient().getExtensionAnalyticUrl(testUtils.getCredential().getAuthToken(),null,10, null, null, null, null).execute();
         } catch (ContextedRuntimeException ex) {
             String responseBody = (String) ex.getFirstContextValue("responseBody");
             assertTrue(responseBody.contains("User Does Not Have Extensions"), "Test Account does not have extensions!");
@@ -40,7 +40,7 @@ public class AnalyticsEndpointTest extends AbtractEndpointTest {
     public void getGameAnalytics() {
         // TestCase
         try {
-            GameAnalyticsList resultList = testUtils.getTwitchHelixClient().getGameAnalyticUrl(testUtils.getCredential().getAuthToken(),null,10, null, null, null, null);
+            GameAnalyticsList resultList = testUtils.getTwitchHelixClient().getGameAnalyticUrl(testUtils.getCredential().getAuthToken(),null,10, null, null, null, null).execute();
         } catch (ContextedRuntimeException ex) {
             String responseBody = (String) ex.getFirstContextValue("responseBody");
             System.out.println(responseBody);

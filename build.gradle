@@ -49,12 +49,14 @@ subprojects {
 
 			// HTTP Client
             dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.3.1'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '9.3.1'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '9.3.1'
-            dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.12'
 
-            // Jackson (JSON)
+			// Http Client
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.0.1'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.0.1'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.0.1'
+			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.0.1'
+
+			// Jackson (JSON)
             dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 
 			// WebSocket
