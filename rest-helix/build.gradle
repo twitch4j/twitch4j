@@ -1,25 +1,31 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    // Event Manager
+	// Event Manager
 	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
-    // HTTP Client
-    compile group: 'io.github.openfeign', name: 'feign-okhttp'
-    compile group: 'io.github.openfeign', name: 'feign-jackson'
-    compile group: 'io.github.openfeign', name: 'feign-slf4j'
+	// HTTP Client
+	compile group: 'io.github.openfeign', name: 'feign-okhttp'
+	compile group: 'io.github.openfeign', name: 'feign-jackson'
+	compile group: 'io.github.openfeign', name: 'feign-slf4j'
 	compile group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.0.1'
 
-    // Jackson (JSON)
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+	// Jackson (JSON)
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info
-group = "com.github.twitch4j"
-description = "REST API CLient - Helix"
-version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
+project.ext {
+	groupId = 'com.github.twitch4j'
+	artifactName = 'Twitch4J-Helix'
+	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
+	artifactDescription = 'Twitch4J API - Helix Module'
+	websiteUrl = 'https://github.com/twitch4j/twitch4j'
+	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
+	vcsUrl = 'https://github.com/twitch4j/twitch4j.git'
+}
 
 // Deployment Script
 apply from: '../deployment.gradle'

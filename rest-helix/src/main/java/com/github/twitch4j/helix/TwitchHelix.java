@@ -5,7 +5,6 @@ import com.netflix.hystrix.HystrixCommand;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import twitch4j.helix.domain.*;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +14,8 @@ public interface TwitchHelix {
 
     /**
      * Gets a URL that extension developers can use to download analytics reports (CSV files) for their extensions. The URL is valid for 5 minutes.
-     * For detail about analytics and the fields returned, see the Insights & Analytics guide.
+     * <p>
+     * For detail about analytics and the fields returned, see the Insights and Analytics guide.
      *
      * @param authToken   Auth Token
      * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
@@ -40,7 +40,8 @@ public interface TwitchHelix {
 
     /**
      * Gets a URL that game developers can use to download analytics reports (CSV files) for their games. The URL is valid for 5 minutes.
-     * For detail about analytics and the fields returned, see the Insights & Analytics guide.
+     * <p>
+     * For detail about analytics and the fields returned, see the Insights and Analytics guide.
      *
      * @param authToken Auth Token
      * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
@@ -103,13 +104,13 @@ public interface TwitchHelix {
      * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
      *
      * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
-     * @param gameId ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
-     * @param id ID of the clip being queried. Limit: 100.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param before Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param startedAt Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
-     * @param endedAt Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+     * @param gameId        ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
+     * @param id            ID of the clip being queried. Limit: 100.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param before        Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param startedAt     Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
+     * @param endedAt       Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
      * @return ClipList Clip List
      */
     @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
@@ -131,6 +132,7 @@ public interface TwitchHelix {
     /**
      * TODO: Get Games
      */
+
 
     /**
      * TODO: Get Top Games

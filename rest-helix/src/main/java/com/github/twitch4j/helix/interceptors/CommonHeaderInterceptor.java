@@ -1,8 +1,8 @@
 package com.github.twitch4j.helix.interceptors;
 
+import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import com.github.twitch4j.helix.TwitchHelixBuilder;
 
 /**
  * Injects ClientId Header, the User Agent and other common headers into each API Request

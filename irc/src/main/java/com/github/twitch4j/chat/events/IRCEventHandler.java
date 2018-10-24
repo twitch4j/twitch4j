@@ -7,7 +7,6 @@ import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.user.PrivateMessageEvent;
 import lombok.Getter;
 import com.github.twitch4j.chat.TwitchChat;
-import twitch4j.chat.events.channel.*;
 
 import java.util.HashMap;
 import java.util.Locale;

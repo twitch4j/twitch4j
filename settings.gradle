@@ -2,7 +2,5 @@ include 'rest-helix', 'irc', 'auth', 'twitch4j'
 
 rootProject.name = 'twitch4j'
 rootProject.children.each {
-    if (it.name != "twitch4j") {
-        it.name = rootProject.name + "-" + it.name
-    }
+	it.name = rootProject.name + "-" + it.name
 }

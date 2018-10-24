@@ -72,6 +72,10 @@ public class Stream {
 
     /**
      * Gets the thumbnail url for specific dimensions
+     *
+     * @param width  thumbnail width
+     * @param height thumbnail height
+     * @return String
      */
     public String getThumbnailUrl(Integer width, Integer height) {
         return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());

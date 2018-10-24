@@ -38,9 +38,9 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     /**
      * Overwrite the Decode Method to handle custom error cases
      *
-     * @param methodKey
-     * @param response
-     * @return
+     * @param methodKey Method Key
+     * @param response Response
+     * @return Exception
      */
     @Override
     public Exception decode(String methodKey, Response response) {
@@ -50,13 +50,13 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
             if (response.status() == 401) {
                 throw new UnauthorizedException()
                     .addContextValue("requestUrl", response.request().url())
-                    .addContextValue("requestMethod", response.request().method())
+                    .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 404) {
                 throw new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
-                    .addContextValue("requestMethod", response.request().method())
+                    .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 503) {
@@ -69,7 +69,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
             TwitchHelixError helixError = objectMapper.readValue(responseBody, TwitchHelixError.class);
             return new ContextedRuntimeException("Helix API Error")
                 .addContextValue("requestUrl", response.request().url())
-                .addContextValue("requestMethod", response.request().method())
+                .addContextValue("requestMethod", response.request().httpMethod())
                 .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                 .addContextValue("responseBody", responseBody)
                 .addContextValue("errorType", helixError.getError())

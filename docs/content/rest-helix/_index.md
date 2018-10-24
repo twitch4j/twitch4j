@@ -18,7 +18,7 @@ Warning: Client IDs should be unique for each application: do not re-use client 
 
 You can create new application on the [Twitch Developer Console](https://glass.twitch.tv/console/apps/create)
 
-## Twitch4J
+## As Module: Twitch4J
 
 To use Helix you need to enable the Helix API when building the Twitch4J Instance, as shown below:
 

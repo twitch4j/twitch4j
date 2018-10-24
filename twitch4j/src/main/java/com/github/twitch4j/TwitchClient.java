@@ -23,6 +23,10 @@ public class TwitchClient {
 
     /**
      * Constructor
+     *
+     * @param eventManager EventManager
+     * @param helix TwitchHelix
+     * @param chat TwitchChat
      */
     public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchChat chat) {
         this.eventManager = eventManager;
@@ -32,6 +36,8 @@ public class TwitchClient {
 
     /**
      * Get Helix
+     *
+     * @return TwitchHelix
      */
     public TwitchHelix getHelix() {
         if (this.helix == null) {
@@ -43,6 +49,8 @@ public class TwitchClient {
 
     /**
      * Get Chat
+     *
+     * @return TwitchChat
      */
     public TwitchChat getChat() {
         if (this.chat == null) {

@@ -1,8 +1,18 @@
 /**
+ * Artifact
+ */
+group = project.groupId
+description = project.artifactDescription
+version = project.artifactVersion
+
+/**
  * Testing
  */
 test {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		includeTags 'unittest'
+		excludeTags 'integration'
+	}
 }
 
 /**
@@ -10,8 +20,8 @@ test {
  */
 javadoc {
     options {
-        title = "${project.name} (${project.version})"
-        windowTitle = "${project.name} (${project.version})"
+        title = "${project.artifactName} (v${project.version})"
+        windowTitle = "${project.artifactName} (v${project.version})"
         encoding = "UTF-8"
     }
 }
@@ -43,6 +53,26 @@ artifacts {
 /**
  * Deployment
  */
+def pomConfig = {
+	licenses {
+		license {
+			name "MIT License"
+			url "https://opensource.org/licenses/MIT"
+			distribution "repo"
+		}
+	}
+	developers {
+		developer {
+			id "PhilippHeuer"
+			name "Philipp Heuer"
+			email "git@philippheuer.me"
+		}
+	}
+
+	scm {
+		url project.vcsUrl
+	}
+}
 publishing {
     publications {
         mainProject(MavenPublication) {
@@ -50,8 +80,15 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
             groupId project.group
-            artifactId project.name
+            artifactId String.valueOf(project.artifactName).toLowerCase()
             version project.version
+			pom.withXml {
+				def root = asNode()
+				root.appendNode('description', project.artifactDescription)
+				root.appendNode('name', String.valueOf(project.artifactName))
+				root.appendNode('url', String.valueOf(project.websiteUrl))
+				root.children().last() + pomConfig
+			}
         }
     }
 }
@@ -73,7 +110,7 @@ artifactory {
             publishPom = true
             properties = [
                     'build.number': System.getenv("CI_PIPELINE_IID"),
-                    'build.name'  : String.valueOf(project.name).toLowerCase()
+                    'build.name'  : String.valueOf(project.artifactName).toLowerCase()
             ]
         }
     }
@@ -96,16 +133,16 @@ bintray {
         // jcenter repository namespace and name
         userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
         repo = 'maven'
-        name =  String.valueOf(project.name).toLowerCase()
+        name = String.valueOf(project.artifactName).toLowerCase()
         desc = project.description
         licenses = ['MIT']
-        websiteUrl = "https://github.com/twitch4j/twitch4j"
-        issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
-        vcsUrl = "https://github.com/twitch4j/twitch4j.git"
-        labels = ['twitch', 'twitch-api-v5', 'twitch4j.helix', 'twitch-pubsub', 'twitch-irc', 'helix']
+        websiteUrl = project.websiteUrl
+        issueTrackerUrl = project.issueTrackerUrl
+        vcsUrl = project.vcsUrl
+        labels = []
         publicDownloadNumbers = true
         version {
-            name = String.valueOf(project.version).toLowerCase()
+            name = project.version
             vcsTag = project.version
             released = new Date()
         }
