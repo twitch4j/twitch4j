@@ -14,8 +14,9 @@ variables:
 stages:
   - build
   - test
-#  - publish
   - docs
+  - publishStage
+  - publishStable
 
 # Build
 Assemble:
@@ -61,3 +62,29 @@ pages:
   only:
   - master
   - feature/work-in-progress
+
+###
+# Pre-Release
+###
+Publish Prerelease:
+  stage: publishStage
+  script:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - ./gradlew artifactoryPublish -Dsnapshot=true
+  only:
+  - /^v[0-9]+\.[0-9]+\.[0-9]+\-alpha\.[0-9]+$/
+  - /^v[0-9]+\.[0-9]+\.[0-9]+\-beta\.[0-9]+$/
+  - /^v[0-9]+\.[0-9]+\.[0-9]+\-rc\.[0-9]+$/
+
+###
+# Stable Release
+###
+Publish Release:
+  stage: publishStable
+  script:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - ./gradlew bintrayUpload
+  only:
+  - /^v[0-9]+\.[0-9]+\.[0-9]+$/

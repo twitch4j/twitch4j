@@ -10,7 +10,7 @@ dependencies {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "Auth Module"
-version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
 
 // Deployment Script
 apply from: '../deployment.gradle'

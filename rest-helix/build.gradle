@@ -1,5 +1,8 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
+    // Event Manager
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
+
     // HTTP Client
     compile group: 'io.github.openfeign', name: 'feign-okhttp'
     compile group: 'io.github.openfeign', name: 'feign-jackson'
@@ -17,7 +20,7 @@ dependencies {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "REST API CLient - Helix"
-version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
 
 // Deployment Script
 apply from: '../deployment.gradle'

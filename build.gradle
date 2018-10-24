@@ -2,6 +2,7 @@
 plugins {
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.jfrog.artifactory' version '4.8.1'
 	id 'de.lukaskoerfer.gradle.delombok' version '0.2'
 }
 
@@ -74,9 +75,6 @@ subprojects {
 			// Logging
 			compile group: 'org.slf4j', name: 'slf4j-api'
 			testCompile group: 'ch.qos.logback', name: 'logback-classic'
-
-			// Event Dispatcher
-			compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
 			// Apache Commons
 			compile group: 'org.apache.commons', name: 'commons-lang3'

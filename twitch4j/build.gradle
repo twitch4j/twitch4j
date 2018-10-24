@@ -1,5 +1,8 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
+	// Event Manager
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
+
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-irc')
 	compile project(':' + rootProject.name + '-rest-helix')
@@ -8,7 +11,7 @@ dependencies {
 // Artifact Info
 group = "com.github.twitch4j"
 description = "IRC Client"
-version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+version = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
 
 // Deployment Script
 apply from: '../deployment.gradle'
