@@ -9,6 +9,7 @@ plugins {
 // Artifact Info
 project.ext {
 	groupId = 'com.github.twitch4j'
+	artifactNamespace = 'twitch4j'
 	artifactName = 'Twitch4J'
 	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
 	artifactDescription = 'Twitch4J'
@@ -33,6 +34,8 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'com.jfrog.bintray'
+	apply plugin: 'com.jfrog.artifactory'
 	apply plugin: 'de.lukaskoerfer.gradle.delombok'
 
     // Source Compatiblity

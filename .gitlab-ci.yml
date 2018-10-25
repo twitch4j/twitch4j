@@ -10,28 +10,33 @@ variables:
   # Submodule Support (Hugo)
   GIT_SUBMODULE_STRATEGY: recursive
 
+# Cache
+cache:
+  key: gradle
+  paths:
+  - .gradle/wrapper
+  - .gradle/caches
+
 # Stages
 stages:
-  - build
-  - test
-  - docs
-  - publishStage
-  - publishStable
+- build
+- test
+- docs
+- publishStage
+- publishStable
 
 # Build
 Assemble:
   stage: build
   script:
-  - chmod +x gradlew
-  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - export GRADLE_USER_HOME=`pwd`/.gradle
   - ./gradlew assemble
 
 # Test
 Run Tests:
   stage: test
   script:
-  - chmod +x gradlew
-  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - export GRADLE_USER_HOME=`pwd`/.gradle
   - ./gradlew test
 
 ###
@@ -39,12 +44,10 @@ Run Tests:
 ###
 test:
   image: registry.gitlab.com/pages/hugo:latest
-  stage: docs
+  stage: test
   script:
   - cd docs
   - hugo
-  except:
-  - master
 
 ###
 # Build & Publish on GitLab Pages
@@ -69,8 +72,7 @@ pages:
 Publish Prerelease:
   stage: publishStage
   script:
-  - chmod +x gradlew
-  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - export GRADLE_USER_HOME=`pwd`/.gradle
   - ./gradlew artifactoryPublish -Dsnapshot=true
   only:
   - /^v[0-9]+\.[0-9]+\.[0-9]+\-alpha\.[0-9]+$/
@@ -83,8 +85,7 @@ Publish Prerelease:
 Publish Release:
   stage: publishStable
   script:
-  - chmod +x gradlew
-  - chmod +x gradle/wrapper/gradle-wrapper.jar
+  - export GRADLE_USER_HOME=`pwd`/.gradle
   - ./gradlew bintrayUpload
   only:
   - /^v[0-9]+\.[0-9]+\.[0-9]+$/

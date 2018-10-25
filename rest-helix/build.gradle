@@ -19,6 +19,7 @@ dependencies {
 // Artifact Info
 project.ext {
 	groupId = 'com.github.twitch4j'
+	artifactNamespace = 'Twitch4J'
 	artifactName = 'Twitch4J-Helix'
 	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
 	artifactDescription = 'Twitch4J API - Helix Module'

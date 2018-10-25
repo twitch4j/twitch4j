@@ -97,19 +97,19 @@ publishing {
  * Artifactory Upload
  */
 artifactory {
-    contextUrl = 'http://oss.jfrog.org'
+    contextUrl = 'https://oss.jfrog.org'
     publish {
         repository {
             repoKey = 'oss-snapshot-local'
-            username = System.getenv("BINTRAY_USER")
-            password = System.getenv("BINTRAY_API_KEY")
+            username = System.getenv("ARTIFACTORY_USER")
+            password = System.getenv("ARTIFACTORY_API_KEY")
         }
         defaults {
             publications('mainProject')
             publishArtifacts = true
             publishPom = true
             properties = [
-                    'build.number': System.getenv("CI_PIPELINE_IID"),
+                    'build.number': String.valueOf(System.getenv("CI_PIPELINE_IID")),
                     'build.name'  : String.valueOf(project.artifactName).toLowerCase()
             ]
         }
@@ -117,8 +117,8 @@ artifactory {
     resolve {
         repoKey = 'jcenter'
     }
-    clientConfig.info.setBuildNumber(System.getenv("CI_PIPELINE_IID"))
-    clientConfig.info.setBuildName(String.valueOf(project.name).toLowerCase())
+	clientConfig.info.setBuildName(String.valueOf(project.name).toLowerCase())
+    clientConfig.info.setBuildNumber(String.valueOf(System.getenv("CI_PIPELINE_IID")))
 }
 
 /**
@@ -131,7 +131,7 @@ bintray {
     dryRun = false
     pkg {
         // jcenter repository namespace and name
-        userOrg = String.valueOf(System.getenv('CI_PROJECT_NAMESPACE')).toLowerCase()
+        userOrg = String.valueOf(project.artifactNamespace).toLowerCase()
         repo = 'maven'
         name = String.valueOf(project.artifactName).toLowerCase()
         desc = project.description
