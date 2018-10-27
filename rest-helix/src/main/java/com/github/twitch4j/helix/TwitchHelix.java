@@ -215,32 +215,126 @@ public interface TwitchHelix {
     );
 
     /**
-     * TODO: Get Users
+     * Get Users
+     * <p>
+     * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
+     *
+     * @param authToken Auth Token, optional, will include the users email address
+     * @param userIds   User ID. Multiple user IDs can be specified. Limit: 100.
+     * @param userNames User login name. Multiple login names can be specified. Limit: 100.
+     * @return HelixUser
      */
+    @RequestLine("GET /users?id={id}&login={login}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UserList> getUsers(
+        @Param("token") String authToken,
+        @Param("id") List<String> userIds,
+        @Param("login") List<String> userNames
+    );
 
     /**
-     * TODO: Get Users Follows
+     * Get Followers
+     * <p>
+     * Gets information on follow relationships between two Twitch users. Information returned is sorted in order, most recent follow first. This can return information like “who is lirik following,” “who is following lirik,” or “is user X following user Y.”
+     *
+     * @param fromId User ID. The request returns information about users who are being followed by the from_id user.
+     * @param toId   User ID. The request returns information about users who are following the to_id user.
+     * @param after  Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit  Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return FollowList
      */
+    @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
+    HystrixCommand<FollowList> getFollowers(
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
 
     /**
-     * TODO: Update User
+     * Update User
+     * <p>
+     * Updates the description of a user specified by a Bearer token.
+     * Requires scope: user:edit
+     *
+     * @param authToken   Auth Token
+     * @param description New user description
+     * @return
      */
+    @RequestLine("PUT /users?description={description}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UserList> updateUser(
+        @Param("token") String authToken,
+        @Param("description") String description
+    );
 
     /**
-     * TODO: Get User Extensions
+     * Get User Extensions
+     * <p>
+     * Gets a list of all extensions (both active and inactive) for a specified user, identified by a Bearer token. The response has a JSON payload with a data field containing an array of user-information elements.
+     * Required scope: user:read:broadcast
+     *
+     * @param authToken Auth Token
+     * @return ExtensionList
      */
+    @RequestLine("GET /users/extensions/list")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionList> getUserExtensions(
+        @Param("token") String authToken
+    );
 
     /**
-     * TODO: Get User Active Extensions
+     * Get User Active Extensions
+     * <p>
+     * Gets information about active extensions installed by a specified user, identified by a user ID or Bearer token.
+     * Optional scope: user:read:broadcast or user:edit:broadcast
+     *
+     * @param authToken Auth Token
+     * @param userId    ID of the user whose installed extensions will be returned. Limit: 1.
+     * @return
      */
+    @RequestLine("GET /users/extensions?user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
+        @Param("token") String authToken,
+        @Param("user_id") String userId
+    );
 
     /**
      * TODO: Update User Extensions
      */
 
     /**
-     * TODO: Get Videos
+     * Get Videos
+     * <p>
+     * Gets video information by video ID (one or more), user ID (one only), or game ID (one only).
+     * The response has a JSON payload with a data field containing an array of video elements. For lookup by user or game, pagination is available, along with several filters that can be specified as query string parameters.
+     *
+     * @param id       ID of the video being queried. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
+     * @param userId   ID of the user who owns the video. Limit 1.
+     * @param gameId   ID of the game the video is of. Limit 1.
+     * @param language Language of the video being queried. Limit: 1.
+     * @param period   Period during which the video was created. Valid values: "all", "day", "week", "month". Default: "all".
+     * @param sort     Sort order of the videos. Valid values: "time", "trending", "views". Default: "time".
+     * @param type     Type of video. Valid values: "all", "upload", "archive", "highlight". Default: "all".
+     * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param before   Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
+     * @return VideoList
      */
+    @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
+    HystrixCommand<VideoList> getVideos(
+        @Param("id") String id,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
+        @Param("language") String language,
+        @Param("period") String period,
+        @Param("sort") String sort,
+        @Param("type") String type,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit
+    );
 
     /**
      * TODO: Get Webhook Subscriptions

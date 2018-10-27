@@ -64,7 +64,6 @@ pages:
     - public
   only:
   - master
-  - feature/work-in-progress
 
 ###
 # Pre-Release

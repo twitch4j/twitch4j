@@ -3,7 +3,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
     id 'com.jfrog.bintray' version '1.8.4'
     id 'com.jfrog.artifactory' version '4.8.1'
-	id 'de.lukaskoerfer.gradle.delombok' version '0.2'
 }
 
 // Artifact Info
@@ -36,7 +35,6 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
 	apply plugin: 'com.jfrog.bintray'
 	apply plugin: 'com.jfrog.artifactory'
-	apply plugin: 'de.lukaskoerfer.gradle.delombok'
 
     // Source Compatiblity
     sourceCompatibility = 1.8
@@ -52,14 +50,11 @@ subprojects {
             dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
             dependency group: 'commons-io', name: 'commons-io', version: '2.6'
 
-            //
-            dependency group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
-
             // Event Dispatcher
             dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
 
 			// Credential Manager
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.5'
+			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.6'
 
 			// HTTP Client
             dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 @Tag("integration")
-public class ClipsTest extends AbtractEndpointTest {
+public class ClipsServiceTest extends AbtractEndpointTest {
 
     /**
      * Create Clips
@@ -43,4 +43,3 @@ public class ClipsTest extends AbtractEndpointTest {
     }
 
 }
-

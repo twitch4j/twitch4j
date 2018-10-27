@@ -5,7 +5,10 @@
 	<logger name="com.github.philippheuer.events4j" level="INFO"/>
 
 	<!-- Configure Twitch4J logger level -->
-	<logger name="twitch4j" level="TRACE"/>
+	<logger name="com.github.twitch4j" level="TRACE"/>
+
+	<!-- Hystrix -->
+	<logger name="com.netflix" level="INFO"/>
 
 	<!-- Appender Configuration [Console] -->
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

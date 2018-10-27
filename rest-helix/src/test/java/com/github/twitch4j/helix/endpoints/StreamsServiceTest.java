@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class StreamsEndpointTest extends AbtractEndpointTest {
+public class StreamsServiceTest extends AbtractEndpointTest {
 
     // Hearthstone GameId
     private static String hearthstoneGameId = "138585";
