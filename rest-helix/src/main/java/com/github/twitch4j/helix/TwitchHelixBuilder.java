@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 
 /**
- * Twitch API v5
+ * Twitch API - Helix
  * <p>
- * Documentation: https://dev.twitch.tv/docs/v5/
+ * Documentation: https://dev.twitch.tv/docs/api/
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -27,14 +27,11 @@ import okhttp3.OkHttpClient;
 public class TwitchHelixBuilder {
 
     /**
-     * Http Client
-     */
-    private final OkHttpClient okHttpClient = new OkHttpClient();
-    /**
      * Event Manager
      */
     @Wither
     private EventManager eventManager;
+
     /**
      * Client Id
      */

@@ -63,7 +63,7 @@ pages:
     paths:
     - public
   only:
-  - master
+  - develop
 
 ###
 # Pre-Release
