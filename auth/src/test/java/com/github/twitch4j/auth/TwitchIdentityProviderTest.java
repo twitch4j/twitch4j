@@ -27,7 +27,7 @@ public class TwitchIdentityProviderTest {
         credentialManager.registerIdentityProvider(new TwitchIdentityProvider("*clientId*", "", "http://localhost"));
 
         // add credential
-        Credential credential = new OAuth2Credential("twitch", "*authToken*");
+        Credential credential = new OAuth2Credential("twitch", null, "*authToken*");
         credentialManager.addCredential("twitch", credential);
     }
 
