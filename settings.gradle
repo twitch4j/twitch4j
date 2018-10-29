@@ -1,4 +1,4 @@
-include 'rest-helix', 'irc', 'auth', 'twitch4j'
+include 'auth', 'chat', 'rest-helix', 'twitch4j'
 
 rootProject.name = 'twitch4j'
 rootProject.children.each {

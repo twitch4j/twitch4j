@@ -88,38 +88,46 @@ userListObservable.subscribe(data -> {
 
 ## API Methods
 
-Analytics
-* [Analytics -> Extension Analytics Url](./clips-create.md)
-* [Analytics -> Game Analytics Url](./clips-create.md)
+Analytics:
 
-Bits
-* [Bits -> Get Leaderboard](./bits-leaderboard.md)
+- [Analytics -> Extension Analytics Url](./clips-create.md)
+- [Analytics -> Game Analytics Url](./clips-create.md)
 
-Clips
-* [Clips -> Create Clip](./clips-create.md)
-* [Clips -> Get Clips](./clips-get.md)
+Bits:
 
-Entitlements
-* Create Entitlement Grants Upload URL
+- [Bits -> Get Leaderboard](./bits-leaderboard.md)
 
-Games
-* Get Games
-* Get Top Games
+Clips:
 
-Streams
-* [Streams -> Get](./streams-get.md)
-* [Streams -> Get Metadata](./streams-getMetadata.md)
-* Create Stream Marker
-* Get Stream Markers
+- [Clips -> Create Clip](./clips-create.md)
+- [Clips -> Get Clips](./clips-get)
 
-Users
-* [Users -> Get](./users-get.md)
-* Get Users Follows
-* Update User
-* Get User Extensions
-* Get User Active Extensions
-* Update User Extensions
+Entitlements:
 
-Videos
-* Get Videos
-* Get Webhook Subscriptions
+- Create Entitlement Grants Upload URL
+
+Games:
+
+- Get Games
+- Get Top Games
+
+Streams:
+
+- [Streams -> Get](./streams-get.md)
+- [Streams -> Get Metadata](./streams-getMetadata.md)
+- Create Stream Marker
+- Get Stream Markers
+
+Users:
+
+- [Users -> Get](./users-get)
+- Get Users Follows
+- Update User
+- Get User Extensions
+- Get User Active Extensions
+- Update User Extensions
+
+Videos:
+
+- Get Videos
+- Get Webhook Subscriptions

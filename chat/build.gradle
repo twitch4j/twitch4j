@@ -6,9 +6,6 @@ dependencies {
 	// IRC
 	compile group: 'com.neovisionaries', name: 'nv-websocket-client'
 
-	// Args4J
-	compile group: 'args4j', name: 'args4j', version: '2.33'
-
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-auth')
 }

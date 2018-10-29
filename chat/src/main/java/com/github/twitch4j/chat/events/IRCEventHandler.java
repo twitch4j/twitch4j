@@ -40,18 +40,18 @@ public class IRCEventHandler {
 		this.eventManager = twitchChat.getEventManager();
 
 		// event consumers
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelMessage(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onWhisper(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelCheer(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelSubscription(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onClearChat(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientJoinEvent(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientLeaveEvent(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelModChange(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onNoticeEvent(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onHostOnEvent(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onHostOffEvent(event));
-		getEventManager().onEvent(IRCMessageEvent.class).subscribe(event -> onChannelState(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelMessage(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onWhisper(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelCheer(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelSubscription(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onClearChat(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientJoinEvent(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannnelClientLeaveEvent(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelModChange(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onNoticeEvent(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onHostOnEvent(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onHostOffEvent(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelState(event));
 	}
 
 	/**

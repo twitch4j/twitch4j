@@ -4,7 +4,7 @@ dependencies {
 	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-irc')
+	compile project(':' + rootProject.name + '-chat')
 	compile project(':' + rootProject.name + '-rest-helix')
 }
 
