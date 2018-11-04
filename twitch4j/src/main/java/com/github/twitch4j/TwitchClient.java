@@ -23,6 +23,11 @@ public class TwitchClient {
     private final TwitchChat chat;
 
     /**
+     * Modules
+     */
+    private final ModuleLoader moduleLoader;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -33,6 +38,7 @@ public class TwitchClient {
         this.eventManager = eventManager;
         this.helix = helix;
         this.chat = chat;
+        moduleLoader = new ModuleLoader(this);
     }
 
     /**
