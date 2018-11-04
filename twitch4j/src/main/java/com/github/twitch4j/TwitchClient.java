@@ -75,4 +75,13 @@ public class TwitchClient {
 
         return this.chat;
     }
+
+    /**
+     * Get Module Loader
+     *
+     * @return ModuleLoader
+     */
+    public ModuleLoader getModuleLoader() {
+        return this.moduleLoader;
+    }
 }
