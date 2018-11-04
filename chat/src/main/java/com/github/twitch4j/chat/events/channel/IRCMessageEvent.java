@@ -288,6 +288,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	/**
 	 * Gets a optional tag from the irc message
      *
+     * @param tagName The tag of the irc message
      * @return String tagValue
 	 */
 	public Optional<String> getTagValue(String tagName) {
