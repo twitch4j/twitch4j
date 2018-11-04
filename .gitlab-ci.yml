@@ -48,6 +48,7 @@ test:
   script:
   - cd docs
   - hugo
+  allow_failure: true
 
 ###
 # Build & Publish on GitLab Pages
@@ -64,6 +65,7 @@ pages:
     - public
   only:
   - develop
+  allow_failure: true
 
 ###
 # Pre-Release
