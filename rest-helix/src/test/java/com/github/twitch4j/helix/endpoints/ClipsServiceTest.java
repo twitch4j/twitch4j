@@ -22,7 +22,7 @@ public class ClipsServiceTest extends AbtractEndpointTest {
     @Disabled
     public void createClipTest() {
         // TestCase
-        CreateClip clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAuthToken(), null, null).execute();
+        CreateClip clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAccessToken(), null, null).execute();
 
         // Validate
     }

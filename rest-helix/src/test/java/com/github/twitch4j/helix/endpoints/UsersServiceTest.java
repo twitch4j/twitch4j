@@ -67,7 +67,7 @@ public class UsersServiceTest extends AbtractEndpointTest {
     @DisplayName("Update the user description")
     public void updateDescription() {
         // TestCase
-        UserList resultList = testUtils.getTwitchHelixClient().updateUser(testUtils.getCredential().getAuthToken(), "Twitch4J IntegrationTest User").execute();
+        UserList resultList = testUtils.getTwitchHelixClient().updateUser(testUtils.getCredential().getAccessToken(), "Twitch4J IntegrationTest User").execute();
     }
 
     /**
@@ -77,7 +77,7 @@ public class UsersServiceTest extends AbtractEndpointTest {
     @DisplayName("Get extension list for a specified user")
     public void getExtensionList() {
         // TestCase
-        ExtensionList resultList = testUtils.getTwitchHelixClient().getUserExtensions(testUtils.getCredential().getAuthToken()).execute();
+        ExtensionList resultList = testUtils.getTwitchHelixClient().getUserExtensions(testUtils.getCredential().getAccessToken()).execute();
 
         // Test
         assertTrue(resultList.getExtensions().size() > 0, "Should at least find one result from the followers method!");
@@ -97,7 +97,7 @@ public class UsersServiceTest extends AbtractEndpointTest {
     @DisplayName("Get the active extensions for a specified user")
     public void getActiveExtensionList() {
         // TestCase
-        ExtensionActiveList resultList = testUtils.getTwitchHelixClient().getUserActiveExtensions(testUtils.getCredential().getAuthToken(), twitchUserId).execute();
+        ExtensionActiveList resultList = testUtils.getTwitchHelixClient().getUserActiveExtensions(testUtils.getCredential().getAccessToken(), twitchUserId).execute();
 
         // Test
         assertTrue(resultList.getData().getPanels().size() == 3, "Should always get 3 panels!");

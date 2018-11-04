@@ -5,6 +5,7 @@ dependencies {
 
 	// Credential Manager
 	compile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
+	testCompile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews'
 }
 
 // Artifact Info

@@ -235,6 +235,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Gets the Channel Id (from Tags)
+     *
+     * @return Long channelId
 	 */
 	public Long getChannelId() {
 		if(getTags().containsKey("room-id")) {
@@ -246,6 +248,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Gets the User Id (from Tags)
+     *
+     * @return Long userId
 	 */
 	public Long getUserId() {
 		if(getTags().containsKey("user-id")) {
@@ -257,6 +261,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Gets the User Name (from Tags)
+     *
+     * @return String userName
 	 */
 	public String getUserName() {
 		if(getTags().containsKey("login")) {
@@ -268,6 +274,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
     /**
      * Gets the Target User Id (from Tags)
+     *
+     * @return Long targetUserId
      */
     public Long getTargetUserId() {
         if(getTags().containsKey("target-user-id")) {
@@ -279,6 +287,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Gets a optional tag from the irc message
+     *
+     * @return String tagValue
 	 */
 	public Optional<String> getTagValue(String tagName) {
 		if(getTags().containsKey(tagName)) {
@@ -294,6 +304,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Get User
+     *
+     * @return ChatUser
 	 */
 	public ChatUser getUser() {
 		return new ChatUser(getUserId(), getUserName());
@@ -301,6 +313,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
     /**
      * Get Target User
+     *
+     * @return ChatUser
      */
     public ChatUser getTargetUser() {
         return new ChatUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
@@ -309,6 +323,8 @@ public class IRCMessageEvent extends TwitchEvent {
 
 	/**
 	 * Get ChatChannel
+     *
+     * @return ChatChannel
 	 */
 	public ChatChannel getChannel() {
 		return new ChatChannel(getChannelId(), getChannelName().get());

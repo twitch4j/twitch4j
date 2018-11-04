@@ -18,6 +18,8 @@ public abstract class TwitchEvent extends Event {
 
 	/**
      * Get TwitchChat
+     *
+     * @return TwitchChat Instance
 	 */
 	public TwitchChat getTwitchChat() {
 	    return getServiceMediator().getService(TwitchChat.class, "twitch4j-chat");

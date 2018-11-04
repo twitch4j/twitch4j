@@ -10,7 +10,7 @@ public class TestUtils {
     }
 
     public OAuth2Credential getCredential() {
-        return new OAuth2Credential("twitch", null, System.getenv("TWITCH_AUTH_TOKEN"));
+        return new OAuth2Credential("twitch", System.getenv("TWITCH_AUTH_TOKEN"));
     }
 
 }

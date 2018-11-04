@@ -70,6 +70,9 @@ public class TwitchChat {
      * Constructor
      *
      * @param eventManager EventManager
+     * @param credentialManager CredentialManager
+     * @param chatCredential Chat Credential
+     * @param enableChannelCache Enable channel cache?
      */
     public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache) {
         this.eventManager = eventManager;
@@ -171,7 +174,7 @@ public class TwitchChat {
                         return; // do not continue script
                     }
 
-                    sendCommand("pass", String.format("oauth:%s", chatCredential.get().getAuthToken()));
+                    sendCommand("pass", String.format("oauth:%s", chatCredential.get().getAccessToken()));
                     sendCommand("nick", chatCredential.get().getUserName());
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel

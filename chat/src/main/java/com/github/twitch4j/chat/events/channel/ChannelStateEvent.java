@@ -36,6 +36,7 @@ public class ChannelStateEvent extends AbstractChannelEvent {
 		states.put(state, value);
 		this.states = Collections.unmodifiableMap(states);
 	}
+
 	public ChannelStateEvent(ChatChannel channel, Map<ChannelState, Object> state) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();
