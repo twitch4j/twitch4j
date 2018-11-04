@@ -48,13 +48,12 @@ test:
   script:
   - cd docs
   - hugo
-  allow_failure: true
 
 ###
 # Build & Publish on GitLab Pages
 ###
 pages:
-  image: registry.gitlab.com/pages/hugo:latest
+  image: registry.gitlab.com/pages/hugo:0.49.1
   stage: docs
   script:
   - cd docs
@@ -65,7 +64,6 @@ pages:
     - public
   only:
   - develop
-  allow_failure: true
 
 ###
 # Pre-Release
