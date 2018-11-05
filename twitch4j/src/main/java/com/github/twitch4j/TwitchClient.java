@@ -38,7 +38,7 @@ public class TwitchClient {
         this.eventManager = eventManager;
         this.helix = helix;
         this.chat = chat;
-        moduleLoader = new ModuleLoader(this);
+        this.moduleLoader = new ModuleLoader(this);
     }
 
     /**

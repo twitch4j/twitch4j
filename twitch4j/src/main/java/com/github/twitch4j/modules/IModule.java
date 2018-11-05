@@ -14,9 +14,8 @@ public abstract class IModule {
 	public abstract void disable();
 	// String getMinimumTwitch4JVersion(); TODO: version implementing?
 
-
 	@Override
 	public String toString() {
-		return String.format("%s v%s by %s", name, version, author);
+		return String.format("%s v[%s] by %s", name, version, author);
 	}
 }

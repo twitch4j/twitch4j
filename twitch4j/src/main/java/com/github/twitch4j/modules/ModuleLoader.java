@@ -21,6 +21,9 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
+/**
+ * Module Loader
+ */
 @Slf4j
 public class ModuleLoader {
 
