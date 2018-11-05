@@ -29,6 +29,8 @@ public class ChannelStateEvent extends AbstractChannelEvent {
 	 * Event Constructor
 	 *
 	 * @param channel The channel that this event originates from.
+     * @param state The changed state triggering the event
+     * @param value The value representing the state
 	 */
 	public ChannelStateEvent(ChatChannel channel, ChannelState state, Object value) {
 		super(channel);

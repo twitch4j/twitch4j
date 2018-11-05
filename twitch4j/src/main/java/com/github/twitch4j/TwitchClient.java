@@ -3,6 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.helix.TwitchHelix;
+import com.github.twitch4j.modules.ModuleLoader;
 
 public class TwitchClient {
 
@@ -22,6 +23,11 @@ public class TwitchClient {
     private final TwitchChat chat;
 
     /**
+     * Modules
+     */
+    private final ModuleLoader moduleLoader;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -32,6 +38,16 @@ public class TwitchClient {
         this.eventManager = eventManager;
         this.helix = helix;
         this.chat = chat;
+        this.moduleLoader = new ModuleLoader(this);
+    }
+
+    /**
+     * Get the event manager
+     *
+     * @return EventManager
+     */
+    public EventManager getEventManager() {
+        return this.eventManager;
     }
 
     /**
@@ -58,5 +74,14 @@ public class TwitchClient {
         }
 
         return this.chat;
+    }
+
+    /**
+     * Get Module Loader
+     *
+     * @return ModuleLoader
+     */
+    public ModuleLoader getModuleLoader() {
+        return this.moduleLoader;
     }
 }

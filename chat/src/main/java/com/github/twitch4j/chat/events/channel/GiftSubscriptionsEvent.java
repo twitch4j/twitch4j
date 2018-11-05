@@ -47,6 +47,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent {
      * @param user             The user that gifted the subscriptions
      * @param subscriptionPlan The subscription plan
      * @param count            The total amount of subs gifted
+     * @param totalCount       The amount the user gifted in total (all time)
      */
     public GiftSubscriptionsEvent(ChatChannel channel, ChatUser user, String subscriptionPlan, Integer count, Integer totalCount) {
         super(channel);
