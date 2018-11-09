@@ -15,7 +15,7 @@ project.ext {
 	groupId = 'com.github.twitch4j'
 	artifactNamespace = 'Twitch4J'
 	artifactName = 'Twitch4J-Chat'
-	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "") + (Boolean.valueOf(System.getProperty("snapshot")) ? "-SNAPSHOT" : "")
+	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
 	artifactDescription = 'Twitch4J Chat Module'
 	websiteUrl = 'https://github.com/twitch4j/twitch4j'
 	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
