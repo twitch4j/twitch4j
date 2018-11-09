@@ -81,25 +81,31 @@ subprojects {
         }
     }
 
+	// Source encoding
+	tasks.withType(JavaCompile) {
+		options.encoding = 'UTF-8'
+	}
+
 	// Common Dependencies
 	plugins.withType(JavaPlugin) {
 		dependencies {
-			// Logging
-			compile group: 'org.slf4j', name: 'slf4j-api'
-			testCompile group: 'ch.qos.logback', name: 'logback-classic'
+			// Annotation processors
+			compileOnly group: 'org.projectlombok', name: 'lombok'
+			annotationProcessor group: 'org.projectlombok', name: 'lombok'
+			testCompile group: 'org.projectlombok', name: 'lombok'
+			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
 			// Apache Commons
 			compile group: 'org.apache.commons', name: 'commons-lang3'
 			compile group: 'commons-io', name: 'commons-io'
 
+			// Logging
+			compile group: 'org.slf4j', name: 'slf4j-api'
+			testCompile group: 'ch.qos.logback', name: 'logback-classic'
+
 			// Test
 			testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api'
 			testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
-
-			// Getter & Setter
-			compileOnly group: 'org.projectlombok', name: 'lombok'
-			testCompile group: 'org.projectlombok', name: 'lombok'
-			annotationProcessor group: 'org.projectlombok', name: 'lombok'
 		}
 	}
 }
