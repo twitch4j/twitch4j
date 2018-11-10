@@ -15,6 +15,11 @@ While our IRC server generally follows RFC1459, there are several cases where it
 * The massive scale at which our chat servers operate, and
 * Complex Twitch-specific features that we provide (to viewers, broadcasters, and developers).
 
+Rate-Limiting
+
+* The library follows the official rate-limits and has a queue for a maximum of 200 messages.
+* After that old messages will be removed from the queue in favor of more recent messages.
+
 ## Twitch4J
 
 To use Twitch Chat and events from chat, you need to specify withEnableChat when building the Twitch4J Instance, as shown below:

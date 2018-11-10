@@ -49,8 +49,9 @@ subprojects {
             // Apache Commons
             dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
             dependency group: 'commons-io', name: 'commons-io', version: '2.6'
+			dependency group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
 
-            // Event Dispatcher
+			// Event Dispatcher
             dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
 
 			// Credential Manager
@@ -60,6 +61,9 @@ subprojects {
 			// HTTP Client
             dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'
 
+			// Rate Limiting
+			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.1.1'
+			
 			// Http Client
             dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.0.1'
             dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.0.1'

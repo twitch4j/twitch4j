@@ -38,7 +38,12 @@ public class TwitchClient {
         this.eventManager = eventManager;
         this.helix = helix;
         this.chat = chat;
+
+        // module loader
         this.moduleLoader = new ModuleLoader(this);
+
+        // register with serviceMediator
+        this.eventManager.getServiceMediator().addService("twitch4j", this);
     }
 
     /**

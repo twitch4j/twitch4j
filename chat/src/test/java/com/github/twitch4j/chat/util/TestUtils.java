@@ -1,10 +1,8 @@
-package com.github.twitch4j.helix;
+package com.github.twitch4j.chat.util;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 
 public class TestUtils {
-
-
 
     /**
      * Gets the OAuth Credential for integration tests
@@ -26,16 +24,6 @@ public class TestUtils {
         } catch (Exception ex) {
             // nothing
         }
-    }
-
-    /**
-     * Gets a instance of the Helix Client
-     * 
-     * @return TwitchHelix
-     */
-    public static TwitchHelix getTwitchHelixClient() {
-        TwitchHelix client = TwitchHelixBuilder.builder().build();
-        return client;
     }
 
 }

@@ -6,16 +6,18 @@ import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
+import com.neovisionaries.ws.client.*;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bucket4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.time.Duration;
 import java.util.*;
 
 @Slf4j
@@ -67,6 +69,21 @@ public class TwitchChat {
     protected final Map<String, Boolean> channelCache = new HashMap<>();
 
     /**
+     * IRC Message Bucket
+     */
+    protected final Bucket ircMessageBucket;
+
+    /**
+     * IRC Command Queue
+     */
+    protected final CircularFifoQueue<String> ircCommandQueue = new CircularFifoQueue<>(200);
+
+    /**
+     * IRC Command Queue Thread
+     */
+    protected final Thread queueThread;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -86,8 +103,44 @@ public class TwitchChat {
         // register event listeners
         IRCEventHandler ircEventHandler = new IRCEventHandler(this);
 
+        // initialize rate-limiting
+        this.ircMessageBucket = Bucket4j.builder()
+            .addLimit(Bandwidth.simple(20, Duration.ofSeconds(30)))
+            .build();
+
         // connect to irc
         this.connect();
+
+        // queue command worker
+        this.queueThread = new Thread(() -> {
+            while (true) {
+                try {
+                    // If connected, consume 1 token
+                    if (ircCommandQueue.size() > 0) {
+                        if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                            // block thread, until we can continue
+                            ircMessageBucket.asScheduler().consume(1);
+
+                            // pop one command from the queue and execute it
+                            String command = ircCommandQueue.remove();
+                            sendCommand(command);
+
+                            // Logging
+                            log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
+                            log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
+                        }
+                    }
+
+                    // sleep one second
+                    Thread.sleep(250);
+                } catch (Exception ex) {
+                    log.error("Failed to process message from command queue: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        });
+        queueThread.start();
+        log.debug("Started IRC Queue Worker");
     }
 
     /**
@@ -165,8 +218,6 @@ public class TwitchChat {
                 public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
                     log.info("Connecting to Twitch IRC {}", webSocketServer);
 
-                    sendCommand("cap req", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands");
-
                     // if credentials is null, it will automatically disconnect
                     if (!chatCredential.isPresent()) {
                         log.error("Can't find credentials for the chat account!");
@@ -174,18 +225,23 @@ public class TwitchChat {
                         return; // do not continue script
                     }
 
-                    sendCommand("pass", String.format("oauth:%s", chatCredential.get().getAccessToken()));
-                    sendCommand("nick", chatCredential.get().getUserName());
+                    // acquire capabilities
+                    sendCommand("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
+                    sendCommand("CAP END");
+
+                    // sign in
+                    sendCommand(String.format("pass oauth:%s", chatCredential.get().getAccessToken()));
+                    sendCommand(String.format("nick %s", chatCredential.get().getUserName()));
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
                     if (!channelCache.isEmpty()) {
                         for (String channel : channelCache.keySet()) {
-                            sendCommand("join", "#" + channel);
+                            sendCommand("join #" + channel);
                         }
                     }
 
                     // then join to own channel - required for sending or receiving whispers
-                    sendCommand("join", "#" + chatCredential.get().getUserName());
+                    sendCommand("join #" + chatCredential.get().getUserName());
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
@@ -198,10 +254,19 @@ public class TwitchChat {
                         .forEach(message -> {
                             if (!message.equals("")) {
                                 // Handle messages
+                                log.trace("Received WebSocketMessage: " + message);
+                                // - CAP
+                                if (message.contains(":req Invalid CAP command")) {
+                                    log.error("Failed to acquire requested IRC capabilities!");
+                                }
+                                else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
+                                    List<String> capabilities = Arrays.asList(message.replace(":tmi.twitch.tv CAP * ACK :", "").split(" "));
+                                    capabilities.forEach(cap -> log.debug("Acquired chat capability: " + cap ));
+                                }
                                 // - Ping
-                                if(message.contains("PING :tmi.twitch.tv")) {
-                                    sendPong(":tmi.twitch.tv");
-                                    log.trace("Responding to PING with PONG!");
+                                else if(message.contains("PING :tmi.twitch.tv")) {
+                                    sendCommand("PONG :tmi.twitch.tv");
+                                    log.debug("Responding to PING request!");
                                 }
                                 // - Login failed.
                                 else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
@@ -225,6 +290,8 @@ public class TwitchChat {
                             }
                         });
                 }
+
+                @Override
                 public void onDisconnected(WebSocket websocket,
                                            WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                            boolean closedByServer) {
@@ -238,6 +305,7 @@ public class TwitchChat {
                         log.info("Disconnected from Twitch IRC (WebSocket)!");
                     }
                 }
+
             });
 
 
@@ -248,26 +316,27 @@ public class TwitchChat {
 
     /**
      * Send IRC Command
+     *
      * @param command IRC Command
      * @param args command arguments
      */
-    private void sendCommand(String command, String... args) {
-        // will send command if connection has been established
-        if (connectionState.equals(TMIConnectionState.CONNECTED) || connectionState.equals(TMIConnectionState.CONNECTING)) {
-            // command will be uppercase.
-            this.webSocket.sendText(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
-        } else {
-            log.warn("Can't send IRC-WS Command [{} {}]", command.toUpperCase(), String.join(" ", args));
-        }
+    protected void sendCommand(String command, String... args) {
+        ircCommandQueue.add(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
     }
 
     /**
-     * Answer to twitch's ping request
+     * Send IRC Command
      *
-     * @param arg
+     * @param command IRC Command
      */
-    private void sendPong(String arg) {
-        sendCommand("PONG", arg);
+    private void sendCommand(String command) {
+        // will send command if connection has been established
+        if (connectionState.equals(TMIConnectionState.CONNECTED) || connectionState.equals(TMIConnectionState.CONNECTING)) {
+            // command will be uppercase.
+            this.webSocket.sendText(command);
+        } else {
+            log.warn("Can't send IRC-WS Command [{}]", command);
+        }
     }
 
     /**
@@ -275,12 +344,13 @@ public class TwitchChat {
      * @param channelName channel name
      */
     public void joinChannel(String channelName) {
-        if (!channelCache.containsKey(channelName.toLowerCase())) { {
+        if (!channelCache.containsKey(channelName.toLowerCase())) {
             sendCommand("join", "#" + channelName.toLowerCase());
             log.debug("Joining Channel [{}].", channelName.toLowerCase());
             channelCache.put(channelName.toLowerCase(), true);
-        }}
-
+        } else {
+            log.warn("Already joined channel {}", channelName);
+        }
     }
 
     /**
@@ -292,7 +362,19 @@ public class TwitchChat {
             sendCommand("part", "#" + channelName.toLowerCase());
             log.debug("Leaving Channel [{}].", channelName.toLowerCase());
             channelCache.remove(channelName.toLowerCase());
+        } else {
+            log.warn("Already left channel {}", channelName);
         }
+    }
+
+    /**
+     * Sending message to the joined channel
+     * @param channel channel name
+     * @param message message
+     */
+    public void sendMessage(String channel, String message) {
+        log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel, message);
+        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel, message));
     }
 
 }

@@ -79,6 +79,10 @@ public class TwitchHelixBuilder {
             .requestInterceptor(new CommonHeaderInterceptor(this))
             .retryer(new Retryer.Default(1, 100, 3))
             .target(TwitchHelix.class, baseUrl);
+
+        // register with serviceMediator
+        this.eventManager.getServiceMediator().addService("twitch4j-helix", client);
+
         return client;
     }
 }
