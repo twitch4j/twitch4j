@@ -6,6 +6,12 @@ description = project.artifactDescription
 version = project.artifactVersion
 
 /**
+ * java version requirements
+ */
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+/**
  * Testing
  */
 test {
@@ -24,6 +30,7 @@ javadoc {
         windowTitle = "${project.artifactName} (v${project.version})"
         encoding = "UTF-8"
     }
+
 	options.addBooleanOption('html5', true)
 }
 

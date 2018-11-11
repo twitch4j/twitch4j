@@ -3,7 +3,7 @@
 ####
 
 # Image
-image: openjdk:8-jdk-alpine
+image: openjdk:11-jdk-oracle
 
 # Variables
 variables:
