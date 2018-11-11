@@ -7,12 +7,6 @@ weight = 100
 
 Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
 
-## Authentication
-
-Optional scope: user:read:email
-
-If this is provided, the response includes the user’s email address.
-
 ## Method
 
 ```java
@@ -35,9 +29,31 @@ HystrixCommand<UserList> getUsers(
 );
 ```
 
+*Required Query String Parameters*
+
+None
+
+*Optional Query String Parameters*
+
+| Name          | Type      | Description  |
+| ------------- |:---------:| -----------------:|
+| authToken     | string    | Can be used if requesting information about your own account, to include the email |
+| id            | string    | User ID. Multiple user IDs can be specified. Limit: 100. |
+| login         | string    | User login name. Multiple login names can be specified. Limit: 100. |
+
 ## Code-Snippets
 
-### print user list
+### print user list - search by id
+
+```java
+UserList resultList = twitchClient.getHelix().getUsers(null, Arrays.asList("149223493"), null).execute();
+resultList.getUsers().forEach(user -> {
+	System.out.println(user);
+});
+```
+
+
+### print user list - search by name
 
 ```java
 UserList resultList = twitchClient.getHelix().getUsers(null, null, Arrays.asList("twitch4j")).execute();
