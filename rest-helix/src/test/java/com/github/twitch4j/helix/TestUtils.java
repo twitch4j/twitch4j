@@ -4,8 +4,6 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 
 public class TestUtils {
 
-
-
     /**
      * Gets the OAuth Credential for integration tests
      *

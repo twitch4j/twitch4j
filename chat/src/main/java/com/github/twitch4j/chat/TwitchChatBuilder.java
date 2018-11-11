@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Twitch Chat
  *
@@ -52,6 +55,11 @@ public class TwitchChatBuilder {
     private String baseUrl = "https://api.twitch.tv/helix";
 
     /**
+     * IRC Command Handlers
+     */
+    protected final List<String> commandPrefixes = new ArrayList<>();
+
+    /**
      * Initialize the builder
      * @return Twitch Chat Builder
      */
@@ -65,7 +73,19 @@ public class TwitchChatBuilder {
      */
     public TwitchChat build() {
         log.debug("TwitchChat: Initializing Module ...");
-        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache);
+        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache, this.commandPrefixes);
+
         return twitchChat;
+    }
+
+    /**
+     * With a CommandTrigger
+     *
+     * @param commandTrigger Command Trigger (Prefix)
+     * @return TwitchChatBuilder
+     */
+    public TwitchChatBuilder withCommandTrigger(String commandTrigger) {
+        this.commandPrefixes.add(commandTrigger);
+        return this;
     }
 }

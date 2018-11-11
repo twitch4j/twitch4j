@@ -26,6 +26,7 @@ public class TwitchChatTest {
         twitchChat = TwitchChatBuilder.builder()
             .withEventManager(eventManager)
             .withChatAccount(TestUtils.getCredential())
+            .withCommandTrigger("!")
             .build();
 
         // sleep for a few seconds so that we're connected
@@ -51,6 +52,22 @@ public class TwitchChatTest {
 
         // check if the message was send and received
         assertTrue(twitchChat.ircCommandQueue.size() == 0, "Can't find the message we send in the received messages!");
+    }
+
+    @Test
+    @DisplayName("Local test to keep it running for debugging")
+    @Disabled
+    public void localTestRun() {
+        // listen for events in channel
+        List<ChannelMessageEvent> channelMessages = new ArrayList<>();
+        twitchChat.joinChannel("twitch4j");
+        twitchChat.getEventManager().onEvent(ChannelMessageEvent.class).subscribe(event -> {
+            channelMessages.add(event);
+            log.debug(event.toString());
+        });
+
+        // sleep a second and look of the message was sended
+        TestUtils.sleepFor(120000);
     }
 
 }

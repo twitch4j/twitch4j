@@ -4,7 +4,9 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
+import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.neovisionaries.ws.client.*;
 import io.github.bucket4j.Bandwidth;
@@ -84,6 +86,11 @@ public class TwitchChat {
     protected final Thread queueThread;
 
     /**
+     * IRC Command Handlers
+     */
+    protected final List<String> commandPrefixes;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -91,11 +98,12 @@ public class TwitchChat {
      * @param chatCredential Chat Credential
      * @param enableChannelCache Enable channel cache?
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.enableChannelCache = enableChannelCache;
+        this.commandPrefixes = commandPrefixes;
 
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-chat", this);
@@ -141,6 +149,10 @@ public class TwitchChat {
         });
         queueThread.start();
         log.debug("Started IRC Queue Worker");
+
+        // Event Handlers
+        log.debug("Registering the following command triggers: " + commandPrefixes.toString());
+        eventManager.onEvent(ChannelMessageEvent.class).subscribe(event -> onChannelMessage(event));
     }
 
     /**
@@ -386,6 +398,33 @@ public class TwitchChat {
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
         ircCommandQueue.add(String.format("PRIVMSG #%s /w %s %s", chatCredential.get().getUserName(), targetUser, message));
+    }
+
+    /**
+     * On Channel Message
+     *
+     * @param event ChannelMessageEvent
+     */
+    private void onChannelMessage(ChannelMessageEvent event) {
+        Optional<String> prefix = Optional.empty();
+        Optional<String> commandWithoutPrefix = Optional.empty();
+
+        // try to find a `command` based on the prefix
+        for (String commandPrefix : this.commandPrefixes) {
+            if (event.getMessage().startsWith(commandPrefix)) {
+                prefix = Optional.ofNullable(commandPrefix);
+                commandWithoutPrefix = Optional.ofNullable(event.getMessage().substring(commandPrefix.length()));
+            }
+        }
+
+        // is command?
+        if (commandWithoutPrefix.isPresent()) {
+            log.debug("Detected a command in channel {} with content: {}", event.getChannel().getName(), commandWithoutPrefix.get());
+
+            // dispatch command event
+            CommandEvent commandEvent = new CommandEvent("channel", event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
+            eventManager.dispatchEvent(commandEvent);
+        }
     }
 
 }
