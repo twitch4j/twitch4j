@@ -24,7 +24,6 @@ javadoc {
         windowTitle = "${project.artifactName} (v${project.version})"
         encoding = "UTF-8"
     }
-	options.addBooleanOption('html5', true)
 }
 
 /**
