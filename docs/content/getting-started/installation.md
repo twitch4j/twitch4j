@@ -12,7 +12,7 @@ Add it to your build.gradle with:
 ```groovy
 repositories {
 	jcenter()
-	maven { url "https://oss.jfrog.org/artifactory/libs-snapshot"}
+	maven { url "https://oss.jfrog.org/artifactory/libs-release"}
 }
 ```
 and: (latest, you should use the actual version here)
@@ -33,7 +33,7 @@ Add it to your pom.xml with:
     </repository>
     <repository>
 	  <id>jcenter-snapshot</id>
-	  <url>https://oss.jfrog.org/artifactory/libs-snapshot/</url>
+	  <url>https://oss.jfrog.org/artifactory/libs-release/</url>
 	</repository>
 </repositories>
 ```
