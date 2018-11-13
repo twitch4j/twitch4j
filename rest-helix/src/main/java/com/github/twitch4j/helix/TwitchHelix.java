@@ -94,7 +94,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&has_delay={has_delay}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CreateClip> createClip(
+    HystrixCommand<CreateClipList> createClip(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("has_delay") Boolean hasDelay
@@ -130,21 +130,40 @@ public interface TwitchHelix {
      */
 
     /**
-     * TODO: Get Games
+     * Gets game information by game ID or name.
+     *
+     * @param id Game ID. At most 100 id values can be specified.
+     * @param name Game name. The name must be an exact match. For instance, “Pokemon” will not return a list of Pokemon games; instead, query the specific Pokemon game(s) in which you are interested. At most 100 name values can be specified.
+     * @return GameList
      */
-
+    @RequestLine("GET /games?id={id}&name={name}")
+    HystrixCommand<GameList> getGames(
+        @Param("id") List<String> id,
+        @Param("name") List<String> name
+    );
 
     /**
-     * TODO: Get Top Games
+     * Gets games sorted by number of current viewers on Twitch, most popular first.
+     *
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param first Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return GameList
      */
+    @RequestLine("GET /games/top?after={after}&before={before}&first={first}")
+    HystrixCommand<GameTopList> getTopGames(
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") String first
+    );
 
     /**
      * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      *
      * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param before      Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
      * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
      * @param gameIds     Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
      * @param language    Stream language. You can specify up to 100 languages.
      * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
@@ -155,8 +174,8 @@ public interface TwitchHelix {
     HystrixCommand<StreamList> getStreams(
         @Param("after") String after,
         @Param("before") String before,
-        @Param("community_id") List<UUID> communityId,
         @Param("first") Integer limit,
+        @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
         @Param("user_id") List<String> userIds,
@@ -168,8 +187,8 @@ public interface TwitchHelix {
      *
      * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param before      Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
      * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
      * @param gameIds     Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
      * @param language    Stream language. You can specify up to 100 languages.
      * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
@@ -180,8 +199,8 @@ public interface TwitchHelix {
     HystrixCommand<StreamMetadataList> getStreamsMetadata(
         @Param("after") String after,
         @Param("before") String before,
-        @Param("community_id") List<UUID> communityId,
         @Param("first") Integer limit,
+        @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
         @Param("user_id") List<String> userIds,

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
+import java.util.List;
+
 /**
  * Clip Data
  */
@@ -14,10 +16,9 @@ import lombok.*;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateClip {
+public class CreateClipList {
 
-    private String id;
+    @NonNull
+    private List<CreateClip> data;
 
-    @JsonProperty("edit_url")
-    private String editUrl;
 }

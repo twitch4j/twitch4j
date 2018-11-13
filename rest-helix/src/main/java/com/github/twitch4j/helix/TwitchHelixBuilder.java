@@ -2,7 +2,9 @@ package com.github.twitch4j.helix;
 
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.helix.interceptors.CommonHeaderInterceptor;
+import com.netflix.config.ConfigurationManager;
 import feign.Logger;
+import feign.Request;
 import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
@@ -13,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
 
 /**
  * Twitch API - Helix
@@ -30,7 +31,7 @@ public class TwitchHelixBuilder {
      * Event Manager
      */
     @Wither
-    private EventManager eventManager;
+    private EventManager eventManager = new EventManager();
 
     /**
      * Client Id
@@ -70,6 +71,7 @@ public class TwitchHelixBuilder {
      */
     public TwitchHelix build() {
         log.debug("Helix: Initializing Module ...");
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
         TwitchHelix client = HystrixFeign.builder()
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
@@ -77,7 +79,8 @@ public class TwitchHelixBuilder {
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
             .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new CommonHeaderInterceptor(this))
-            .retryer(new Retryer.Default(1, 100, 3))
+            .retryer(new Retryer.Default(1, 10000, 3))
+            .options(new Request.Options(5000, 15000))
             .target(TwitchHelix.class, baseUrl);
 
         // register with serviceMediator

@@ -1,7 +1,7 @@
 package com.github.twitch4j.helix.endpoints;
 
 import com.github.twitch4j.helix.domain.ClipList;
-import com.github.twitch4j.helix.domain.CreateClip;
+import com.github.twitch4j.helix.domain.CreateClipList;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -22,9 +22,12 @@ public class ClipsServiceTest extends AbtractEndpointTest {
     @Disabled
     public void createClipTest() {
         // TestCase
-        CreateClip clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAccessToken(), null, null).execute();
+        CreateClipList clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAccessToken(), "23161357", null).execute();
 
         // Validate
+        clipData.getData().forEach(clip -> {
+            System.out.println("Created Clip with ID: " + clip.getId());
+        });
     }
 
     /**

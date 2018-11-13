@@ -32,7 +32,7 @@ public class StreamsServiceTest extends AbtractEndpointTest {
     @DisplayName("Fetch information about current live streams")
     public void getStreams() {
         // TestCase
-        StreamList resultList = testUtils.getTwitchHelixClient().getStreams("", "", null, 5, null, null, null, null).execute();
+        StreamList resultList = testUtils.getTwitchHelixClient().getStreams("", "", 5, null, null, null, null, null).execute();
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams method!");
@@ -50,7 +50,7 @@ public class StreamsServiceTest extends AbtractEndpointTest {
     @DisplayName("Fetch meta-information (hearthstone) about live streams")
     public void getStreamMetadataForHearthstone() {
         // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 5, Arrays.asList(hearthstoneGameId), null, null, null).execute();
+        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", 5, null, Arrays.asList(hearthstoneGameId), null, null, null).execute();
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
@@ -70,7 +70,7 @@ public class StreamsServiceTest extends AbtractEndpointTest {
     @DisplayName("Fetch meta-information (overwatch) about live streams")
     public void getStreamMetadataForOverwatch() {
         // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", null, 5, Arrays.asList(overwatchGameId), null, null, null).execute();
+        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata("", "", 5, null, Arrays.asList(overwatchGameId), null, null, null).execute();
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
@@ -96,7 +96,11 @@ public class StreamsServiceTest extends AbtractEndpointTest {
         // Test
         assertTrue(resultList.getStreamMarkers().size() > 0, "Should at least find one result from the streams metadata method!");
         resultList.getStreamMarkers().forEach(stream -> {
-            System.out.println(stream);
+            stream.getVideos().forEach(videoMarker -> {
+                videoMarker.getMarkers().forEach(marker -> {
+                    System.out.println(marker.getId() + ":" + marker.getDescription());
+                });
+            });
         });
     }
 }

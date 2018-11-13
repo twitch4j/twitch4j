@@ -27,7 +27,7 @@ public class OverwatchMetadata {
     @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class OverwatchPlayer {
+    public static class OverwatchPlayer {
 
         // Hero Type
         private OverwatchHero hero;
@@ -42,7 +42,7 @@ public class OverwatchMetadata {
     @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class OverwatchHero {
+    public static class OverwatchHero {
 
         // Name of the Overwatch hero.
         @NonNull

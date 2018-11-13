@@ -1,25 +1,17 @@
 +++
 title="Users - Get"
-weight = 100
+weight = 60
 +++
 
 # Get Users
 
+## Description
+
 Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
 
-## Method
+## Method Definition
 
 ```java
-/**
- * Get Users
- * <p>
- * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
- *
- * @param authToken Auth Token, optional, will include the users email address
- * @param userIds   User ID. Multiple user IDs can be specified. Limit: 100.
- * @param userNames User login name. Multiple login names can be specified. Limit: 100.
- * @return HelixUser
- */
 @RequestLine("GET /users?id={id}&login={login}")
 @Headers("Authorization: Bearer {token}")
 HystrixCommand<UserList> getUsers(
@@ -29,17 +21,17 @@ HystrixCommand<UserList> getUsers(
 );
 ```
 
-*Required Query String Parameters*
+*Required Parameters*
 
 None
 
-*Optional Query String Parameters*
+*Optional Parameters*
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
 | authToken     | string    | Can be used if requesting information about your own account, to include the email |
-| id            | string    | User ID. Multiple user IDs can be specified. Limit: 100. |
-| login         | string    | User login name. Multiple login names can be specified. Limit: 100. |
+| id            | string    | User ID. Multiple user IDs can be specified. Limit: `100`. |
+| login         | string    | User login name. Multiple login names can be specified. Limit: `100`. |
 
 ## Code-Snippets
 

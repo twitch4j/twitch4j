@@ -90,16 +90,16 @@ userListObservable.subscribe(data -> {
 
 Analytics:
 
-- [Analytics -> Extension Analytics Url](./clips-create.md)
-- [Analytics -> Game Analytics Url](./clips-create.md)
+- [Analytics -> Extension Analytics Url](./analytics-extension-url)
+- [Analytics -> Game Analytics Url](./analytics-game-url)
 
 Bits:
 
-- [Bits -> Get Leaderboard](./bits-leaderboard.md)
+- [Bits -> Get Leaderboard](./bits-leaderboard)
 
 Clips:
 
-- [Clips -> Create Clip](./clips-create.md)
+- [Clips -> Create Clip](./clips-create)
 - [Clips -> Get Clips](./clips-get)
 
 Entitlements:
@@ -108,26 +108,26 @@ Entitlements:
 
 Games:
 
-- Get Games
-- Get Top Games
+- [Games -> Search](./games-get)
+- [Games -> Top Games](./games-top)
 
 Streams:
 
-- [Streams -> Get](./streams-get.md)
-- [Streams -> Get Metadata](./streams-getMetadata.md)
+- [Streams -> Search](./streams-get)
+- [Streams -> Get Metadata](./streams-getMetadata)
 - Create Stream Marker
-- Get Stream Markers
+- [Streams -> Get Markers](./streams-markers-get)
 
 Users:
 
 - [Users -> Get](./users-get)
-- Get Users Follows
-- Update User
-- Get User Extensions
-- Get User Active Extensions
+- [Users -> Get Followers](./users-followers)
+- [Users -> Update](./users-update)
+- [Users -> Get Extensions](./users-extensions)
+- [Users -> Get Active Extensions](./users-active-extensions)
 - Update User Extensions
 
 Videos:
 
-- Get Videos
+- [Videos -> Search](./videos-get)
 - Get Webhook Subscriptions
