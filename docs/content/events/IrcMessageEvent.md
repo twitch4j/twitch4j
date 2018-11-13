@@ -3,7 +3,7 @@ title="IRC Message"
 weight = 200
 +++
 
-# ChannelMessageEvent
+# RAW IRC Message Event
 
 ## Description
 
@@ -15,7 +15,7 @@ Requires the TwitchChat Module to be enabled and active for the source channel. 
 
 ## Examples
 
-### Printing the Raw Message
+### Printing the RAW Message
 
 ```java
 eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> {

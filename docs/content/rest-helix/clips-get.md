@@ -1,5 +1,5 @@
 +++
-title="Get Clips"
+title="Clips - Get"
 weight = 31
 +++
 

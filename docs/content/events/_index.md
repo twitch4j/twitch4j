@@ -10,5 +10,5 @@ Twitch4J triggers various internal events you can listen to to build chat bots o
 
 ## Event Catalogue
 
-* [IRCMessageEvent](./IrcMessageEvent.md)
-* [ChannelMessageEvent](./ChannelMessageEvent.md)
+* [IRCMessageEvent](./IrcMessageEvent)
+* [ChannelMessageEvent](./ChannelMessageEvent)
