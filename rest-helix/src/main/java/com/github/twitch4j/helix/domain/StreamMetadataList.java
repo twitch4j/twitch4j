@@ -25,4 +25,7 @@ public class StreamMetadataList {
     @JsonProperty("data")
     private List<StreamMetadata> streams;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }

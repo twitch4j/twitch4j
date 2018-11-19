@@ -24,6 +24,9 @@ public class ExtensionActiveList {
     @JsonProperty("data")
     private ActiveExtensions data;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor

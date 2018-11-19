@@ -33,4 +33,7 @@ public class FollowList {
      */
     private Integer total;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }

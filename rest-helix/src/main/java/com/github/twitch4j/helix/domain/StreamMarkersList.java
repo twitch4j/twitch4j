@@ -20,9 +20,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamMarkersList {
 
-    // Markers
     @NonNull
     @JsonProperty("data")
     private List<StreamMarkers> streamMarkers;
+
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
 
 }

@@ -4,24 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AccessLevel;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Stream List
+ * Pagination
  */
 @Data
+@Setter(AccessLevel.PRIVATE)
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StreamList {
-    /**
-     * Data
-     */
-    @JsonProperty("data")
-    private List<Stream> streams;
+public class HelixPagination {
 
-    @JsonProperty("pagination")
-    private HelixPagination pagination;
+    @JsonProperty("cursor")
+    private String cursor;
 
 }

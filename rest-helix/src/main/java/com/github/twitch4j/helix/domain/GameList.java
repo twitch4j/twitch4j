@@ -24,4 +24,7 @@ public class GameList {
     @JsonProperty("data")
     private List<Game> games;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }

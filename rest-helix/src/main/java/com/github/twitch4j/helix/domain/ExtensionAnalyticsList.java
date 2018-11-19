@@ -21,4 +21,7 @@ public class ExtensionAnalyticsList {
     @JsonProperty("data")
     private List<ExtensionAnalytics> extensionAnalytics;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }

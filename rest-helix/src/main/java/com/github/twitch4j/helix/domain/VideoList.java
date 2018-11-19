@@ -24,4 +24,7 @@ public class VideoList {
     @JsonProperty("data")
     private List<Video> videos;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }

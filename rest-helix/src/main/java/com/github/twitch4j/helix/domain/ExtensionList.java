@@ -24,4 +24,7 @@ public class ExtensionList {
     @JsonProperty("data")
     private List<Extension> extensions;
 
+    @JsonProperty("pagination")
+    private HelixPagination pagination;
+
 }
