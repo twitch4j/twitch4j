@@ -212,6 +212,14 @@ public class IRCMessageEvent extends TwitchEvent {
 			if (getBadges().containsKey("partner")) {
 				getClientPermissions().add(CommandPermission.PARTNER);
 			}
+            // VIP
+            if (getBadges().containsKey("vip")) {
+                getClientPermissions().add(CommandPermission.VIP);
+            }
+            // Twitch Staff
+            if (getBadges().containsKey("staff")) {
+                getClientPermissions().add(CommandPermission.TWITCHSTAFF);
+            }
 		}
 		// Moderator
 		if (getTags().containsKey("mod") && getTags().get("mod").equals("1")) {

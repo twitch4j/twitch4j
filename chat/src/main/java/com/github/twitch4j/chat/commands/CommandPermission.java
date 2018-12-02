@@ -26,7 +26,17 @@ public enum CommandPermission {
 	 */
 	SUBGIFTER,
 
-	/**
+    /**
+     * VIP
+     */
+    VIP,
+
+    /**
+     * Twitch Staff
+     */
+    TWITCHSTAFF,
+
+    /**
 	 * Channel Moderator
 	 */
 	MODERATOR,
