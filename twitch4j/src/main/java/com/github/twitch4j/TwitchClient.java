@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
+import kraken.TwitchKraken;
 
 public class TwitchClient {
 
@@ -16,6 +17,11 @@ public class TwitchClient {
      * API: Helix
      */
     private final TwitchHelix helix;
+
+    /**
+     * API: Kraken
+     */
+    private final TwitchKraken kraken;
 
     /**
      * Chat
@@ -32,11 +38,13 @@ public class TwitchClient {
      *
      * @param eventManager EventManager
      * @param helix TwitchHelix
+     * @param kraken TwitchKraken
      * @param chat TwitchChat
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchChat chat) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat) {
         this.eventManager = eventManager;
         this.helix = helix;
+        this.kraken = kraken;
         this.chat = chat;
 
         // module loader
@@ -66,6 +74,19 @@ public class TwitchClient {
         }
 
         return this.helix;
+    }
+
+    /**
+     * Get Helix
+     *
+     * @return TwitchHelix
+     */
+    public TwitchKraken getKraken() {
+        if (this.kraken == null) {
+            throw new RuntimeException("You have not enabled the Kraken Module! Please check out the documentation on Twitch4J -> Kraken.");
+        }
+
+        return this.kraken;
     }
 
     /**

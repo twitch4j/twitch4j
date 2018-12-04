@@ -35,6 +35,7 @@ Shared
 
 Project
 * Auth
+* API - Kraken (Deprecated)
 * API - Helix
 * Chat
 

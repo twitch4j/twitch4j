@@ -4,6 +4,8 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
+import kraken.TwitchKraken;
+import kraken.TwitchKrakenBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -39,6 +41,12 @@ public class TwitchClientBuilder {
      */
     @Wither
     private Boolean enableHelix = false;
+
+    /**
+     * Enabled: Kraken
+     */
+    @Wither
+    private Boolean enableKraken = false;
 
     /**
      * Enabled: Chat
@@ -102,6 +110,16 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: Kraken
+        TwitchKraken kraken = null;
+        if (this.enableKraken) {
+            kraken = TwitchKrakenBuilder.builder()
+                .withClientId(this.clientId)
+                .withClientSecret(this.clientSecret)
+                .withEventManager(eventManager)
+                .build();
+        }
+
         // Module: Chat
         TwitchChat chat = null;
         if (this.enableChat) {
@@ -114,7 +132,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, chat);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat);
 
         // Return new Client Instance
         return client;

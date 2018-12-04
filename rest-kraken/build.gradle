@@ -3,19 +3,26 @@ dependencies {
 	// Event Manager
 	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
 
+	// HTTP Client
+	compile group: 'io.github.openfeign', name: 'feign-okhttp'
+	compile group: 'io.github.openfeign', name: 'feign-jackson'
+	compile group: 'io.github.openfeign', name: 'feign-slf4j'
+	compile group: 'io.github.openfeign', name: 'feign-hystrix'
+
+	// Jackson (JSON)
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-chat')
-	compile project(':' + rootProject.name + '-rest-helix')
-	compile project(':' + rootProject.name + '-rest-kraken')
+	compile project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info
 project.ext {
 	groupId = 'com.github.twitch4j'
 	artifactNamespace = 'Twitch4J'
-	artifactName = 'Twitch4J'
+	artifactName = 'Twitch4J-Kraken'
 	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
-	artifactDescription = 'Twitch4J'
+	artifactDescription = 'Twitch4J API - Kraken Module'
 	websiteUrl = 'https://github.com/twitch4j/twitch4j'
 	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
 	vcsUrl = 'https://github.com/twitch4j/twitch4j.git'

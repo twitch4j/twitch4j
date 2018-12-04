@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Twitch - Helix API
+ */
 public interface TwitchHelix {
 
     /**

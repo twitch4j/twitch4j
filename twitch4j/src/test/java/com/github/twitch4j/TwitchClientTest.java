@@ -23,6 +23,8 @@ public class TwitchClientTest {
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
             .withEnableHelix(true)
+            .withEnableKraken(true)
+            .withEnableChat(false)
             .build();
     }
 
