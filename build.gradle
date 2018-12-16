@@ -70,6 +70,9 @@ subprojects {
             dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.1.0'
 			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.1.0'
 
+			// Hystrix
+			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
+
 			// Jackson (JSON)
             dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 

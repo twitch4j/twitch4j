@@ -1,0 +1,41 @@
+// Buildscript
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.apollographql.apollo:apollo-gradle-plugin:1.0.0-alpha3'
+	}
+}
+
+// Plugins
+apply plugin: 'com.apollographql.android'
+
+// Dependencies
+dependencies {
+	// GraphQL
+	compile group: 'com.apollographql.apollo', name: 'apollo-runtime', version: '1.0.0-alpha3'
+	compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
+
+	// Hystrix
+	compile group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
+
+	// Twitch4J Modules
+	compile project(':' + rootProject.name + '-common')
+	compile project(':' + rootProject.name + '-auth')
+}
+
+// Artifact Info
+project.ext {
+	groupId = 'com.github.twitch4j'
+	artifactNamespace = 'Twitch4J'
+	artifactName = 'Twitch4J-GraphQL'
+	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+	artifactDescription = 'Twitch4J GraphQL Module'
+	websiteUrl = 'https://github.com/twitch4j/twitch4j'
+	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
+	vcsUrl = 'https://github.com/twitch4j/twitch4j.git'
+}
+
+// Deployment Script
+apply from: '../deployment.gradle'

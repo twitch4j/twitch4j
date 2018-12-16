@@ -2,6 +2,7 @@ package com.github.twitch4j;
 
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
+import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
 import kraken.TwitchKraken;
@@ -29,6 +30,11 @@ public class TwitchClient {
     private final TwitchChat chat;
 
     /**
+     * GraphQL
+     */
+    private final TwitchGraphQL graphql;
+
+    /**
      * Modules
      */
     private final ModuleLoader moduleLoader;
@@ -40,12 +46,14 @@ public class TwitchClient {
      * @param helix TwitchHelix
      * @param kraken TwitchKraken
      * @param chat TwitchChat
+     * @param graphql TwitchGraphQL
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat, TwitchGraphQL graphql) {
         this.eventManager = eventManager;
         this.helix = helix;
         this.kraken = kraken;
         this.chat = chat;
+        this.graphql = graphql;
 
         // module loader
         this.moduleLoader = new ModuleLoader(this);
@@ -100,6 +108,19 @@ public class TwitchClient {
         }
 
         return this.chat;
+    }
+
+    /**
+     * Get GraphQL
+     *
+     * @return TwitchGraphQL
+     */
+    public TwitchGraphQL getGraphQL() {
+        if (this.graphql == null) {
+            throw new RuntimeException("You have not enabled the GraphQL Module! Please check out the documentation on Twitch4J -> GraphQL.");
+        }
+
+        return this.graphql;
     }
 
     /**

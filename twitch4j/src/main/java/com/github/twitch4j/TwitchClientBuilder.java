@@ -4,6 +4,8 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.graphql.TwitchGraphQL;
+import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import kraken.TwitchKraken;
 import kraken.TwitchKrakenBuilder;
 import lombok.AccessLevel;
@@ -53,6 +55,12 @@ public class TwitchClientBuilder {
      */
     @Wither
     private Boolean enableChat = false;
+
+    /**
+     * Enabled: GraphQL
+     */
+    @Wither
+    private Boolean enableGraphQL = false;
 
     /**
      * Chat Account
@@ -131,8 +139,18 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: GraphQL
+        TwitchGraphQL graphql = null;
+        if (this.enableGraphQL) {
+            graphql = TwitchGraphQLBuilder.builder()
+                .withEventManager(eventManager)
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
+                .build();
+        }
+
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat, graphql);
 
         // Return new Client Instance
         return client;

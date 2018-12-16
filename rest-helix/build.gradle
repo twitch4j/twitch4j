@@ -1,8 +1,5 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	// Event Manager
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
-
 	// HTTP Client
 	compile group: 'io.github.openfeign', name: 'feign-okhttp'
 	compile group: 'io.github.openfeign', name: 'feign-jackson'
@@ -13,6 +10,7 @@ dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 
 	// Twitch4J Modules
+	compile project(':' + rootProject.name + '-common')
 	compile project(':' + rootProject.name + '-auth')
 }
 

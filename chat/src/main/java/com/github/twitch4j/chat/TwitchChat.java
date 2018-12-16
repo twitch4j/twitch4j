@@ -97,6 +97,7 @@ public class TwitchChat {
      * @param credentialManager CredentialManager
      * @param chatCredential Chat Credential
      * @param enableChannelCache Enable channel cache?
+     * @param commandPrefixes Command Prefixes
      */
     public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
         this.eventManager = eventManager;

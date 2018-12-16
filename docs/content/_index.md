@@ -11,8 +11,10 @@ description = ""
 
 ## Modules
 
+* [API - GraphQL](./graphql)
 * [API - Helix](./rest-helix)
 * [API - Kraken](./rest-kraken)
+
 * [Chat](./chat)
 
 ## Contribute to this documentation

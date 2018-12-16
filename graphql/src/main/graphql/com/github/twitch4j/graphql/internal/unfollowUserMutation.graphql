@@ -1,0 +1,10 @@
+mutation unfollow($unfollowUserInput: UnfollowUserInput!) {
+	unfollowUser(input: $unfollowUserInput) {
+		follow {
+			  user {
+					  id
+			  }
+		}
+
+	}
+}

@@ -1,8 +1,5 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	// Event Manager
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
-
 	// Credential Manager
 	compile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
 	testCompile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews'
