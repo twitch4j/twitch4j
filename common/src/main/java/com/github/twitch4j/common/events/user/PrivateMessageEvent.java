@@ -1,11 +1,11 @@
-package com.github.twitch4j.chat.events.user;
+package com.github.twitch4j.common.events.user;
 
-import com.github.twitch4j.chat.commands.CommandPermission;
-import com.github.twitch4j.chat.events.TwitchEvent;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.events.TwitchEvent;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatUser;
 
 import java.util.Set;
 
@@ -20,7 +20,7 @@ public class PrivateMessageEvent extends TwitchEvent {
 	/**
 	 * User
 	 */
-	private final ChatUser user;
+	private final EventUser user;
 
 	/**
 	 * Message
@@ -39,7 +39,7 @@ public class PrivateMessageEvent extends TwitchEvent {
 	 * @param message     The plain text of the message.
 	 * @param permissions The permissions of the triggering user.
 	 */
-	public PrivateMessageEvent(ChatUser user, String message, Set<CommandPermission> permissions) {
+	public PrivateMessageEvent(EventUser user, String message, Set<CommandPermission> permissions) {
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;

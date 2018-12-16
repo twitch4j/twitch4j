@@ -1,11 +1,11 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
 
 /**
  * This event gets called when a client gains/loses mod status.
@@ -18,7 +18,7 @@ public class ChannelModEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private ChatUser user;
+	private EventUser user;
 
 	/**
 	 * Is Moderator?
@@ -32,7 +32,7 @@ public class ChannelModEvent extends AbstractChannelEvent {
 	 * @param user 		  The user that gained/lost mod status.
 	 * @param isMod		  Did the use gain or lose mod status?
 	 */
-	public ChannelModEvent(ChatChannel channel, ChatUser user, boolean isMod) {
+	public ChannelModEvent(EventChannel channel, EventUser user, boolean isMod) {
 		super(channel);
 		this.user = user;
 		this.isMod = isMod;

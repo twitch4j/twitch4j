@@ -1,4 +1,4 @@
-include 'common', 'auth', 'chat', 'rest-helix', 'rest-kraken', 'graphql', 'twitch4j'
+include 'common', 'auth', 'chat', 'rest-helix', 'rest-kraken', 'pubsub', 'graphql', 'twitch4j'
 
 rootProject.name = 'twitch4j'
 rootProject.children.each {

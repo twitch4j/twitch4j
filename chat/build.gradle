@@ -1,6 +1,6 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	// IRC
+	// WebSocket
 	compile group: 'com.neovisionaries', name: 'nv-websocket-client'
 
 	// Rate Limiting

@@ -1,7 +1,7 @@
 package com.github.twitch4j.chat.events.roomstate;
 
-import com.github.twitch4j.chat.domain.ChatChannel;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public abstract class ChannelStatesEvent extends AbstractChannelEvent {
 
 	private final boolean active;
 
-	public ChannelStatesEvent(ChatChannel channel, boolean active) {
+	public ChannelStatesEvent(EventChannel channel, boolean active) {
 		super(channel);
 		this.active = active;
 	}

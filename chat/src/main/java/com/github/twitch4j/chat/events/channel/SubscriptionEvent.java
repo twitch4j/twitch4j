@@ -1,12 +1,12 @@
 package com.github.twitch4j.chat.events.channel;
 
+import com.github.twitch4j.chat.enums.SubscriptionPlan;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
-import com.github.twitch4j.chat.enums.SubscriptionPlan;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target User
 	 */
-	private ChatUser user;
+	private EventUser user;
 
 	/**
 	 * Subscription Plan
@@ -49,7 +49,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	/**
 	 * User that gifted the sub
 	 */
-	private ChatUser giftedBy;
+	private EventUser giftedBy;
 
     /**
      * Event Constructor
@@ -62,7 +62,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
      * @param gifted Is gifted?
      * @param giftedBy User that gifted the sub
      */
-	public SubscriptionEvent(ChatChannel channel, ChatUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, ChatUser giftedBy) {
+	public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy) {
 		super(channel);
 		this.user = user;
 		this.subscriptionPlan = subPlan;

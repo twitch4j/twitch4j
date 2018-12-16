@@ -1,8 +1,8 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -23,7 +23,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent {
     /**
      * Event Target User
      */
-    private ChatUser user;
+    private EventUser user;
 
     /**
      * The Subscription
@@ -49,7 +49,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent {
      * @param count            The total amount of subs gifted
      * @param totalCount       The amount the user gifted in total (all time)
      */
-    public GiftSubscriptionsEvent(ChatChannel channel, ChatUser user, String subscriptionPlan, Integer count, Integer totalCount) {
+    public GiftSubscriptionsEvent(EventChannel channel, EventUser user, String subscriptionPlan, Integer count, Integer totalCount) {
         super(channel);
         this.user = user;
         this.subscriptionPlan = subscriptionPlan;

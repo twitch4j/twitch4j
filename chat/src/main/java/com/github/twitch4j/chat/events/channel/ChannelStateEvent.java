@@ -1,10 +1,10 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatChannel;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,14 +32,14 @@ public class ChannelStateEvent extends AbstractChannelEvent {
      * @param state The changed state triggering the event
      * @param value The value representing the state
 	 */
-	public ChannelStateEvent(ChatChannel channel, ChannelState state, Object value) {
+	public ChannelStateEvent(EventChannel channel, ChannelState state, Object value) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();
 		states.put(state, value);
 		this.states = Collections.unmodifiableMap(states);
 	}
 
-	public ChannelStateEvent(ChatChannel channel, Map<ChannelState, Object> state) {
+	public ChannelStateEvent(EventChannel channel, Map<ChannelState, Object> state) {
 		super(channel);
 		Map<ChannelState, Object> states = new HashMap<>();
 		states.putAll(state);

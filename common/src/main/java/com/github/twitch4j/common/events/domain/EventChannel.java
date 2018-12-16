@@ -1,11 +1,11 @@
-package com.github.twitch4j.chat.domain;
+package com.github.twitch4j.common.events.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ChatChannel {
+public class EventChannel {
 
     /**
      * Channel Id

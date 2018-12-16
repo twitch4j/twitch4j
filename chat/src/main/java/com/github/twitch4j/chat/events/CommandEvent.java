@@ -1,7 +1,7 @@
 package com.github.twitch4j.chat.events;
 
-import com.github.twitch4j.chat.commands.CommandPermission;
-import com.github.twitch4j.chat.domain.ChatUser;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
@@ -29,7 +29,7 @@ public class CommandEvent extends TwitchEvent {
     /**
      * User
      */
-    private ChatUser user;
+    private EventUser user;
 
     /**
      * Command Prefix
@@ -56,7 +56,7 @@ public class CommandEvent extends TwitchEvent {
      * @param command       The plain command without prefix.
      * @param permissions   The permissions of the triggering user.
      */
-    public CommandEvent(String source, String sourceId, ChatUser user, String commandPrefix, String command, Set<CommandPermission> permissions) {
+    public CommandEvent(String source, String sourceId, EventUser user, String commandPrefix, String command, Set<CommandPermission> permissions) {
         super();
         this.source = source;
         this.sourceId = sourceId;

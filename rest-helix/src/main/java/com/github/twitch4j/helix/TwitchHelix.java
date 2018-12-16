@@ -281,7 +281,7 @@ public interface TwitchHelix {
      *
      * @param authToken   Auth Token
      * @param description New user description
-     * @return
+     * @return UserList
      */
     @RequestLine("PUT /users?description={description}")
     @Headers("Authorization: Bearer {token}")
@@ -313,7 +313,7 @@ public interface TwitchHelix {
      *
      * @param authToken Auth Token
      * @param userId    ID of the user whose installed extensions will be returned. Limit: 1.
-     * @return
+     * @return ExtensionActiveList
      */
     @RequestLine("GET /users/extensions?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")

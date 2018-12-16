@@ -2,6 +2,7 @@ package com.github.twitch4j;
 
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
@@ -85,9 +86,9 @@ public class TwitchClient {
     }
 
     /**
-     * Get Helix
+     * Get Kraken
      *
-     * @return TwitchHelix
+     * @return TwitchKraken
      */
     public TwitchKraken getKraken() {
         if (this.kraken == null) {
@@ -115,6 +116,7 @@ public class TwitchClient {
      *
      * @return TwitchGraphQL
      */
+    @Unofficial
     public TwitchGraphQL getGraphQL() {
         if (this.graphql == null) {
             throw new RuntimeException("You have not enabled the GraphQL Module! Please check out the documentation on Twitch4J -> GraphQL.");

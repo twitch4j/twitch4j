@@ -1,10 +1,10 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatChannel;
 
 /**
  * ChatChannel Notice Event
@@ -31,7 +31,7 @@ public class ChannelNoticeEvent extends AbstractChannelEvent {
      * @param msgId Message Id
      * @param message message Content
      */
-	public ChannelNoticeEvent(ChatChannel channel, String msgId, String message) {
+	public ChannelNoticeEvent(EventChannel channel, String msgId, String message) {
 		super(channel);
 		this.msgId = msgId;
 		this.message = message;

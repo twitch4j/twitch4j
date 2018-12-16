@@ -1,0 +1,27 @@
+// In this section you declare the dependencies for your production and test code
+dependencies {
+	// WebSocket
+	compile group: 'com.neovisionaries', name: 'nv-websocket-client'
+
+	// FIFO Queue
+	compile group: 'org.apache.commons', name: 'commons-collections4'
+
+	// Twitch4J Modules
+	compile project(':' + rootProject.name + '-common')
+	compile project(':' + rootProject.name + '-auth')
+}
+
+// Artifact Info
+project.ext {
+	groupId = 'com.github.twitch4j'
+	artifactNamespace = 'Twitch4J'
+	artifactName = 'Twitch4J-PubSub'
+	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
+	artifactDescription = 'Twitch4J API - PubSub Module'
+	websiteUrl = 'https://github.com/twitch4j/twitch4j'
+	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
+	vcsUrl = 'https://github.com/twitch4j/twitch4j.git'
+}
+
+// Deployment Script
+apply from: '../deployment.gradle'

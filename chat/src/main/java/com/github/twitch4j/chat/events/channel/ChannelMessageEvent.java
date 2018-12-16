@@ -1,12 +1,12 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.commands.CommandPermission;
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
 
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private ChatUser user;
+	private EventUser user;
 
 	/**
 	 * Message
@@ -41,7 +41,7 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 	 * @param message     The plain text of the message.
 	 * @param permissions The permissions of the triggering user.
 	 */
-	public ChannelMessageEvent(ChatChannel channel, ChatUser user, String message, Set<CommandPermission> permissions) {
+	public ChannelMessageEvent(EventChannel channel, EventUser user, String message, Set<CommandPermission> permissions) {
 		super(channel);
 		this.user = user;
 		this.message = message;

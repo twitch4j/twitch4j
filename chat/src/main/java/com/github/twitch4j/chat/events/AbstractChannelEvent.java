@@ -1,9 +1,9 @@
 package com.github.twitch4j.chat.events;
 
+import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import com.github.twitch4j.chat.domain.ChatChannel;
 
 /**
  * This event is a base for events that originate from a channel
@@ -16,14 +16,14 @@ public class AbstractChannelEvent extends TwitchEvent {
 	/**
 	 * Event Channel
 	 */
-	private final ChatChannel channel;
+	private final EventChannel channel;
 
 	/**
 	 * Event Constructor
 	 *
 	 * @param channel The channel that this event originates from.
 	 */
-	public AbstractChannelEvent(ChatChannel channel) {
+	public AbstractChannelEvent(EventChannel channel) {
 		super();
 		this.channel = channel;
 	}

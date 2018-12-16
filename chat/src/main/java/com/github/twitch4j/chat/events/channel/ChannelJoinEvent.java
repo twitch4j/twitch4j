@@ -1,8 +1,8 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
@@ -18,7 +18,7 @@ public class ChannelJoinEvent extends AbstractChannelEvent {
 	/**
 	 * User
 	 */
-	private ChatUser user;
+	private EventUser user;
 
 	/**
 	 * Event Constructor
@@ -26,7 +26,7 @@ public class ChannelJoinEvent extends AbstractChannelEvent {
 	 * @param channel     The channel that this event originates from.
 	 * @param user        The user triggering the event.
 	 */
-	public ChannelJoinEvent(ChatChannel channel, ChatUser user) {
+	public ChannelJoinEvent(EventChannel channel, EventUser user) {
 		super(channel);
 		this.user = user;
 	}

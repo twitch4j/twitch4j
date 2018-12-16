@@ -1,4 +1,4 @@
-package com.github.twitch4j.chat.commands;
+package com.github.twitch4j.common.enums;
 
 public enum CommandPermission {
 	/**

@@ -1,10 +1,10 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
-import com.github.twitch4j.chat.domain.ChatChannel;
 
 /**
  * This event gets called when the user starts hosting someone.
@@ -17,7 +17,7 @@ public class HostOnEvent extends AbstractChannelEvent {
 	/**
 	 * Event Target ChatChannel
 	 */
-	private ChatChannel targetChannel;
+	private EventChannel targetChannel;
 
 	/**
 	 * Event Constructor
@@ -25,7 +25,7 @@ public class HostOnEvent extends AbstractChannelEvent {
 	 * @param channel       The channel that this event originates from.
 	 * @param targetChannel The channel that was hosted.
 	 */
-	public HostOnEvent(ChatChannel channel, ChatChannel targetChannel) {
+	public HostOnEvent(EventChannel channel, EventChannel targetChannel) {
 		super(channel);
 		this.targetChannel = targetChannel;
 	}

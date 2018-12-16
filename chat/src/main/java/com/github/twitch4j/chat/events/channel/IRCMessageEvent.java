@@ -1,11 +1,12 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.commands.CommandPermission;
+import com.github.twitch4j.chat.events.TwitchEvent;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.events.domain.EventUser;
+import com.github.twitch4j.common.util.TwitchUtils;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
-import com.github.twitch4j.chat.domain.ChatChannel;
-import com.github.twitch4j.chat.domain.ChatUser;
-import com.github.twitch4j.chat.events.TwitchEvent;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -24,6 +25,11 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * Tags
 	 */
 	private Map<String, String> tags = new HashMap<>();
+
+    /**
+     * Raw Tags
+     */
+    private Map<String, Object> rawTags = new HashMap<>();
 
 	/**
 	 * Badges
@@ -58,7 +64,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	/**
 	 * Client Permissions
 	 */
-	private final Set<CommandPermission> clientPermissions = new HashSet<CommandPermission>();
+	private final Set<CommandPermission> clientPermissions = new HashSet<>();
 
 	/**
 	 * RAW Message
@@ -74,7 +80,9 @@ public class IRCMessageEvent extends TwitchEvent {
 		this.rawMessage = rawMessage;
 
 		this.parseRawMessage();
-		this.parsePermissions();
+
+		// permissions
+		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags()));
 	}
 
 	/**
@@ -97,10 +105,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		if(matcher.matches()) {
 			// Parse Tags
 			setTags(parseTags(matcher.group("tags")));
-			if(getTags().containsKey("badges")) {
-				setBadges(parseBadges(getTags().get("badges")));
-			}
-
+            setRawTags(parseTags(matcher.group("tags")));
 			setClientName(parseClientName(matcher.group("clientName")));
 			setCommandType(matcher.group("command"));
 			setChannelName(Optional.ofNullable(matcher.group("channel")));
@@ -116,10 +121,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		if(matcherPM.matches()) {
 			// Parse Tags
 			setTags(parseTags(matcherPM.group("tags")));
-			if(getTags().containsKey("badges")) {
-				setBadges(parseBadges(getTags().get("badges")));
-			}
-
+            setRawTags(parseTags(matcher.group("tags")));
 			setClientName(parseClientName(matcherPM.group("clientName")));
 			setCommandType(matcherPM.group("command"));
 			setChannelName(Optional.ofNullable(matcherPM.group("channel")));
@@ -149,29 +151,6 @@ public class IRCMessageEvent extends TwitchEvent {
 	}
 
 	/**
-	 * Parse Badges from raw list
-	 *
-	 * @param raw The raw list of tags.
-	 * @return A key-value map of the tags.
-	 */
-	public Map parseBadges(String raw) {
-		Map<String, String> map = new HashMap<>();
-		if(StringUtils.isBlank(raw)) return map;
-
-		// Fix Whitespaces
-		raw = raw.replace("\\s", " ");
-
-		for (String tag: raw.split(",")) {
-			String[] val = tag.split("/");
-			final String key = val[0];
-			String value = (val.length > 1) ? val[1] : null;
-			map.put(key, value);
-		}
-
-		return Collections.unmodifiableMap(map); // formatting to Read-Only Map
-	}
-
-	/**
 	 * Gets the ClientName from the IRC User Identifier (:user!user@user.tmi.twitch.tv)
 	 *
 	 * @param raw Raw ClientName
@@ -189,56 +168,6 @@ public class IRCMessageEvent extends TwitchEvent {
 		}
 
 		return Optional.ofNullable(raw);
-	}
-
-	/**
-	 * Gets a users permissions based on the raw message
-	 */
-	public void parsePermissions() {
-		// Check for Permissions
-		if (getTags().containsKey("badges")) {
-			Boolean isChannelOwner = getTags().containsKey("user-id") && getTags().containsKey("room-id") && getTags().get("user-id").equals(getTags().get("room-id"));
-
-			// - Broadcaster
-			if (getBadges().containsKey("broadcaster") || isChannelOwner) {
-				getClientPermissions().add(CommandPermission.BROADCASTER);
-				getClientPermissions().add(CommandPermission.MODERATOR);
-			}
-			// Twitch Prime
-			if (getBadges().containsKey("premium")) {
-				getClientPermissions().add(CommandPermission.PRIME_TURBO);
-			}
-			// Partner
-			if (getBadges().containsKey("partner")) {
-				getClientPermissions().add(CommandPermission.PARTNER);
-			}
-            // VIP
-            if (getBadges().containsKey("vip")) {
-                getClientPermissions().add(CommandPermission.VIP);
-            }
-            // Twitch Staff
-            if (getBadges().containsKey("staff")) {
-                getClientPermissions().add(CommandPermission.TWITCHSTAFF);
-            }
-		}
-		// Moderator
-		if (getTags().containsKey("mod") && getTags().get("mod").equals("1")) {
-			getClientPermissions().add(CommandPermission.MODERATOR);
-		}
-		// Twitch Turbo
-		if (getTags().containsKey("turbo") && getTags().get("turbo").equals("1")) {
-			getClientPermissions().add(CommandPermission.PRIME_TURBO);
-		}
-		// Subscriber
-		if (getTags().containsKey("subscriber") && getTags().get("subscriber").equals("1")) {
-			getClientPermissions().add(CommandPermission.SUBSCRIBER);
-		}
-		// Sub Gifter
-		if (getTags().containsKey("sub-gifter") && getTags().get("sub-gifter").equals("1")) {
-			getClientPermissions().add(CommandPermission.SUBGIFTER);
-		}
-		// Everyone
-		getClientPermissions().add(CommandPermission.EVERYONE);
 	}
 
 	/**
@@ -316,8 +245,8 @@ public class IRCMessageEvent extends TwitchEvent {
      *
      * @return ChatUser
 	 */
-	public ChatUser getUser() {
-		return new ChatUser(getUserId(), getUserName());
+	public EventUser getUser() {
+		return new EventUser(getUserId(), getUserName());
 	}
 
     /**
@@ -325,8 +254,8 @@ public class IRCMessageEvent extends TwitchEvent {
      *
      * @return ChatUser
      */
-    public ChatUser getTargetUser() {
-        return new ChatUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
+    public EventUser getTargetUser() {
+        return new EventUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
     }
 
 
@@ -335,8 +264,8 @@ public class IRCMessageEvent extends TwitchEvent {
      *
      * @return ChatChannel
 	 */
-	public ChatChannel getChannel() {
-		return new ChatChannel(getChannelId(), getChannelName().get());
+	public EventChannel getChannel() {
+		return new EventChannel(getChannelId(), getChannelName().get());
 	}
 
 }
