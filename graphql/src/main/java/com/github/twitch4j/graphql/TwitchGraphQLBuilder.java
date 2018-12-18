@@ -61,7 +61,7 @@ public class TwitchGraphQLBuilder {
      */
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
-
+        log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
         TwitchGraphQL client = new TwitchGraphQL(eventManager, clientId, clientSecret);
 
         // register with serviceMediator
