@@ -6,6 +6,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
+import com.github.twitch4j.pubsub.TwitchPubSub;
 import kraken.TwitchKraken;
 
 public class TwitchClient {
@@ -31,6 +32,11 @@ public class TwitchClient {
     private final TwitchChat chat;
 
     /**
+     * PubSub
+     */
+    private final TwitchPubSub pubsub;
+
+    /**
      * GraphQL
      */
     private final TwitchGraphQL graphql;
@@ -47,13 +53,15 @@ public class TwitchClient {
      * @param helix TwitchHelix
      * @param kraken TwitchKraken
      * @param chat TwitchChat
+     * @param pubsub TwitchPubSub
      * @param graphql TwitchGraphQL
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat, TwitchGraphQL graphql) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
         this.eventManager = eventManager;
         this.helix = helix;
         this.kraken = kraken;
         this.chat = chat;
+        this.pubsub = pubsub;
         this.graphql = graphql;
 
         // module loader
@@ -109,6 +117,19 @@ public class TwitchClient {
         }
 
         return this.chat;
+    }
+
+    /**
+     * Get PubSub
+     *
+     * @return TwitchPubSub
+     */
+    public TwitchPubSub getPubSub() {
+        if (this.pubsub == null) {
+            throw new RuntimeException("You have not enabled the PubSub Module! Please check out the documentation on Twitch4J -> PubSub.");
+        }
+
+        return this.pubsub;
     }
 
     /**

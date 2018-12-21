@@ -6,6 +6,8 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
+import com.github.twitch4j.pubsub.TwitchPubSub;
+import com.github.twitch4j.pubsub.TwitchPubSubBuilder;
 import kraken.TwitchKraken;
 import kraken.TwitchKrakenBuilder;
 import lombok.AccessLevel;
@@ -139,6 +141,14 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: PubSub
+        TwitchPubSub pubsub = null;
+        if (this.enableGraphQL) {
+            pubsub = TwitchPubSubBuilder.builder()
+                .withEventManager(eventManager)
+                .build();
+        }
+
         // Module: GraphQL
         TwitchGraphQL graphql = null;
         if (this.enableGraphQL) {
@@ -150,7 +160,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat, pubsub, graphql);
 
         // Return new Client Instance
         return client;
