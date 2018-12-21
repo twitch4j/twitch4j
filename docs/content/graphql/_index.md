@@ -1,6 +1,6 @@
 +++
 title="GraphQL"
-weight = 200
+weight = 150
 +++
 
 # Twitch4J - GraphQL

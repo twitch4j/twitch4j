@@ -1,6 +1,6 @@
 +++
 title="Events"
-weight = 150
+weight = 200
 +++
 
 # Events
@@ -10,5 +10,13 @@ Twitch4J triggers various internal events you can listen to to build chat bots o
 
 ## Event Catalogue
 
-* [IRCMessageEvent](./IrcMessageEvent)
-* [ChannelMessageEvent](./ChannelMessageEvent)
+
+
+Channel:
+* [ChannelMessageEvent](./channel-message-event)
+
+User:
+* [PrivateMessageEvent](./private-message-event)
+
+Generic:
+* [IRCMessageEvent](./irc-message-event)
