@@ -1,7 +1,7 @@
 package kraken.endpoints;
 
-import kraken.domain.KrakenTeam;
-import kraken.domain.KrakenTeamList;
+import com.github.twitch4j.kraken.domain.KrakenTeam;
+import com.github.twitch4j.kraken.domain.KrakenTeamList;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

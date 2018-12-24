@@ -1,11 +1,12 @@
-package kraken;
+package com.github.twitch4j.kraken;
 
 import com.netflix.hystrix.HystrixCommand;
+import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import kraken.domain.KrakenIngestList;
-import kraken.domain.KrakenTeam;
-import kraken.domain.KrakenTeamList;
+import com.github.twitch4j.kraken.domain.KrakenIngestList;
+import com.github.twitch4j.kraken.domain.KrakenTeam;
+import com.github.twitch4j.kraken.domain.KrakenTeamList;
 
 /**
  * Twitch - Kraken API
@@ -13,6 +14,24 @@ import kraken.domain.KrakenTeamList;
  * Kraken is already deprecated, so we only offer methods which haven't been added to the new helix api yet. Please use the helix api if available.
  */
 public interface TwitchKraken {
+
+    /**
+     * Follow Channel
+     * <p>
+     * Adds a specified user to the followers of a specified channel.
+     *
+     * @param authToken Auth Token
+     * @param userId       User Id
+     * @param targetUserId 	Target User Id (the Channel the user will follow)
+     * @return Object
+     */
+    @RequestLine("PUT /users/{user}/follows/channels/{targetUser}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Object> addFollow(
+        @Param("token") String authToken,
+        @Param("user") Long userId,
+        @Param("targetUser") Long targetUserId
+    );
 
     /**
      * Get Ingest Server List

@@ -1,8 +1,8 @@
 package kraken.endpoints;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import kraken.TwitchKraken;
-import kraken.TwitchKrakenBuilder;
+import com.github.twitch4j.kraken.TwitchKraken;
+import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 
 abstract class AbstractKrakenServiceTest {
 

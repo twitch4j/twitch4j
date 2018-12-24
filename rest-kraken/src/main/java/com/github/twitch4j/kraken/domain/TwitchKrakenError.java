@@ -1,4 +1,4 @@
-package kraken.domain;
+package com.github.twitch4j.kraken.domain;
 
 import lombok.AccessLevel;
 import lombok.Data;

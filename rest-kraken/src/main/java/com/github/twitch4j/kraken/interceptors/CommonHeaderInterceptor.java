@@ -1,8 +1,8 @@
-package kraken.interceptors;
+package com.github.twitch4j.kraken.interceptors;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import kraken.TwitchKrakenBuilder;
+import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 
 /**
  * Injects ClientId Header, the User Agent and other common headers into each API Request

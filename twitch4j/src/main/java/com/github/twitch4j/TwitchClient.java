@@ -7,7 +7,7 @@ import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
-import kraken.TwitchKraken;
+import com.github.twitch4j.kraken.TwitchKraken;
 
 public class TwitchClient {
 

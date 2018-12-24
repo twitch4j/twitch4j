@@ -1,4 +1,4 @@
-package kraken;
+package com.github.twitch4j.kraken;
 
 import com.github.philippheuer.events4j.EventManager;
 import com.netflix.config.ConfigurationManager;
@@ -8,7 +8,7 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import kraken.interceptors.CommonHeaderInterceptor;
+import com.github.twitch4j.kraken.interceptors.CommonHeaderInterceptor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -99,6 +99,9 @@ Chat:
 Collections:
 - Open for Contributions
 
+Users:
+- [User -> Add Follow](./user-add-follow)
+
 Ingests:
 - [Ingests -> Get All](./ingests-get)
 

@@ -1,4 +1,4 @@
-package kraken;
+package com.github.twitch4j.kraken;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
@@ -6,9 +6,9 @@ import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
-import kraken.domain.TwitchKrakenError;
-import kraken.exception.NotFoundException;
-import kraken.exception.UnauthorizedException;
+import com.github.twitch4j.kraken.domain.TwitchKrakenError;
+import com.github.twitch4j.kraken.exception.NotFoundException;
+import com.github.twitch4j.kraken.exception.UnauthorizedException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
