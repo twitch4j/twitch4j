@@ -20,6 +20,9 @@ import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
  */
@@ -59,6 +62,11 @@ public class TwitchClientBuilder {
     private Boolean enableChat = false;
 
     /**
+     * IRC Command Handlers
+     */
+    protected final List<String> commandPrefixes = new ArrayList<>();
+
+    /**
      * Enabled: GraphQL
      */
     @Wither
@@ -87,6 +95,17 @@ public class TwitchClientBuilder {
      */
     @Wither
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
+
+    /**
+     * With a CommandTrigger
+     *
+     * @param commandTrigger Command Trigger (Prefix)
+     * @return TwitchClientBuilder
+     */
+    public TwitchClientBuilder withCommandTrigger(String commandTrigger) {
+        this.commandPrefixes.add(commandTrigger);
+        return this;
+    }
 
     /**
      * Initialize the builder
@@ -138,6 +157,7 @@ public class TwitchClientBuilder {
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
                 .withEnableChannelCache(enableChannelCache)
+                .withCommandTriggers(commandPrefixes)
                 .build();
         }
 

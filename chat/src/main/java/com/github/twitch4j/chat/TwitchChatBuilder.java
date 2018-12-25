@@ -12,6 +12,7 @@ import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -86,6 +87,17 @@ public class TwitchChatBuilder {
      */
     public TwitchChatBuilder withCommandTrigger(String commandTrigger) {
         this.commandPrefixes.add(commandTrigger);
+        return this;
+    }
+
+    /**
+     * With multiple CommandTriggers
+     *
+     * @param commandTrigger Command Trigger (Prefix)
+     * @return TwitchChatBuilder
+     */
+    public TwitchChatBuilder withCommandTriggers(Collection<String> commandTrigger) {
+        this.commandPrefixes.addAll(commandTrigger);
         return this;
     }
 }
