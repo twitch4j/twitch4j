@@ -19,7 +19,9 @@ public class TwitchUtils {
                 badges.putAll(parseBadges((String) tags.get("badges")));
             } else {
                 List<Map<String, String>> badgeList = (List<Map<String, String>>) tags.get("badges");
-                badgeList.forEach(badge -> badges.put(badge.get("id"), "1"));
+                if (badgeList != null) {
+                    badgeList.forEach(badge -> badges.put(badge.get("id"), "1"));
+                }
             }
 
             // - Broadcaster
