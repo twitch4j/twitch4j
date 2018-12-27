@@ -1,4 +1,4 @@
-package com.github.twitch4j.helix.exception;
+package com.github.twitch4j.common.exception;
 
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 

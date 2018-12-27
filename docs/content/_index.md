@@ -20,6 +20,7 @@ Official
 
 Unofficial
 
+* [API - Messaging Interface](./rest-tmi)
 * [API - GraphQL](./graphql)
 
 Deprecated / Scheduled for removal

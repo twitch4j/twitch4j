@@ -10,6 +10,8 @@ import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.pubsub.TwitchPubSubBuilder;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
+import com.github.twitch4j.tmi.TwitchMessagingInterface;
+import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -54,6 +56,12 @@ public class TwitchClientBuilder {
      */
     @Wither
     private Boolean enableKraken = false;
+
+    /**
+     * Enabled: TMI
+     */
+    @Wither
+    private Boolean enableTMI = false;
 
     /**
      * Enabled: Chat
@@ -149,6 +157,16 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: TMI
+        TwitchMessagingInterface tmi = null;
+        if (this.enableTMI) {
+            tmi = TwitchMessagingInterfaceBuilder.builder()
+                .withClientId(this.clientId)
+                .withClientSecret(this.clientSecret)
+                .withEventManager(eventManager)
+                .build();
+        }
+
         // Module: Chat
         TwitchChat chat = null;
         if (this.enableChat) {
@@ -180,7 +198,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, chat, pubsub, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
 
         // Return new Client Instance
         return client;

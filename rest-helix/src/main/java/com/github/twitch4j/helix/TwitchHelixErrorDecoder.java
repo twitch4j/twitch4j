@@ -2,8 +2,8 @@ package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.helix.domain.TwitchHelixError;
-import com.github.twitch4j.helix.exception.NotFoundException;
-import com.github.twitch4j.helix.exception.UnauthorizedException;
+import com.github.twitch4j.common.exception.NotFoundException;
+import com.github.twitch4j.common.exception.UnauthorizedException;
 import feign.Request;
 import feign.Response;
 import feign.RetryableException;

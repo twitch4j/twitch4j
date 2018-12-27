@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +63,10 @@ public class TwitchChatTest {
         List<ChannelMessageEvent> channelMessages = new ArrayList<>();
         twitchChat.joinChannel("twitch4j");
         twitchChat.getEventManager().onEvent(ChannelMessageEvent.class).subscribe(event -> {
-            channelMessages.add(event);
+            log.debug(event.toString());
+        });
+
+        twitchChat.getEventManager().onEvent(CommandEvent.class).subscribe(event -> {
             log.debug(event.toString());
         });
 

@@ -1,27 +1,27 @@
-package com.github.twitch4j.kraken;
+package com.github.twitch4j.tmi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
+import com.github.twitch4j.tmi.domain.TMIError;
 import feign.Request;
 import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
-import com.github.twitch4j.kraken.domain.TwitchKrakenError;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class TwitchKrakenErrorDecoder implements ErrorDecoder {
+public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
 
     // Decoder
     final Decoder decoder;
 
     // Error Decoder
-    final ErrorDecoder defaultDecoder = new Default();
+    final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
 
     // ObjectMapper
     final ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +31,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
      *
      * @param decoder Feign Decoder
      */
-    public TwitchKrakenErrorDecoder(Decoder decoder) {
+    public TwitchMessagingInterfaceErrorDecoder(Decoder decoder) {
         this.decoder = decoder;
     }
 
@@ -66,7 +66,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
                 return new RetryableException("getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
             }
 
-            TwitchKrakenError error = objectMapper.readValue(responseBody, TwitchKrakenError.class);
+            TMIError error = objectMapper.readValue(responseBody, TMIError.class);
             return new ContextedRuntimeException("Helix API Error")
                 .addContextValue("requestUrl", response.request().url())
                 .addContextValue("requestMethod", response.request().httpMethod())

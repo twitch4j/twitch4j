@@ -8,6 +8,7 @@ import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.kraken.TwitchKraken;
+import com.github.twitch4j.tmi.TwitchMessagingInterface;
 
 public class TwitchClient {
 
@@ -25,6 +26,11 @@ public class TwitchClient {
      * API: Kraken
      */
     private final TwitchKraken kraken;
+
+    /**
+     * API: TMI
+     */
+    private final TwitchMessagingInterface messagingInterface;
 
     /**
      * Chat
@@ -52,14 +58,16 @@ public class TwitchClient {
      * @param eventManager EventManager
      * @param helix TwitchHelix
      * @param kraken TwitchKraken
+     * @param messagingInterface TwitchMessagingInterface
      * @param chat TwitchChat
      * @param pubsub TwitchPubSub
      * @param graphql TwitchGraphQL
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
         this.eventManager = eventManager;
         this.helix = helix;
         this.kraken = kraken;
+        this.messagingInterface = messagingInterface;
         this.chat = chat;
         this.pubsub = pubsub;
         this.graphql = graphql;
@@ -98,12 +106,27 @@ public class TwitchClient {
      *
      * @return TwitchKraken
      */
+    @Deprecated
     public TwitchKraken getKraken() {
         if (this.kraken == null) {
             throw new RuntimeException("You have not enabled the Kraken Module! Please check out the documentation on Twitch4J -> Kraken.");
         }
 
         return this.kraken;
+    }
+
+    /**
+     * Get MessagingInterface (API)
+     *
+     * @return TwitchMessagingInterface
+     */
+    @Unofficial
+    public TwitchMessagingInterface getMessagingInterface() {
+        if (this.messagingInterface == null) {
+            throw new RuntimeException("You have not enabled the Twitch Messaging Interface Module! Please check out the documentation on Twitch4J -> TMI.");
+        }
+
+        return this.messagingInterface;
     }
 
     /**

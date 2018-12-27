@@ -1,4 +1,4 @@
-package com.github.twitch4j.kraken;
+package com.github.twitch4j.tmi;
 
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
@@ -15,47 +15,50 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Twitch API - Messaging Interface
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKraken> {
+public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMessagingInterface> {
 
     /**
      * BaseUrl
      */
-    private String baseUrl = "https://api.twitch.tv/kraken";
+    private String baseUrl = "https://tmi.twitch.tv";
 
     /**
      * Initialize the builder
      *
-     * @return Twitch Kraken Builder
+     * @return Twitch Helix Builder
      */
-    public static TwitchKrakenBuilder builder() {
-        return new TwitchKrakenBuilder();
+    public static TwitchMessagingInterfaceBuilder builder() {
+        return new TwitchMessagingInterfaceBuilder();
     }
 
     /**
-     * Twitch API Client (Kraken)
+     * Twitch API Client (Helix)
      *
-     * @return TwitchKraken
+     * @return TwitchHelix
      */
-    public TwitchKraken build() {
-        log.debug("Kraken: Initializing Module ...");
+    public TwitchMessagingInterface build() {
+        log.debug("TMI: Initializing Module ...");
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
-        TwitchKraken client = HystrixFeign.builder()
+        TwitchMessagingInterface client = HystrixFeign.builder()
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
-            .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
+            .errorDecoder(new TwitchMessagingInterfaceErrorDecoder(new JacksonDecoder()))
             .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this))
             .retryer(new Retryer.Default(1, 10000, 3))
             .options(new Request.Options(5000, 15000))
-            .target(TwitchKraken.class, baseUrl);
+            .target(TwitchMessagingInterface.class, baseUrl);
 
         // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-kraken", client);
+        getEventManager().getServiceMediator().addService("twitch4j-api-tmi", client);
 
         return client;
     }

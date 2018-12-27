@@ -5,6 +5,7 @@ dependencies {
 	compile project(':' + rootProject.name + '-chat')
 	compile project(':' + rootProject.name + '-rest-helix')
 	compile project(':' + rootProject.name + '-rest-kraken')
+	compile project(':' + rootProject.name + '-rest-tmi')
 	compile project(':' + rootProject.name + '-pubsub')
 	compile project(':' + rootProject.name + '-graphql')
 }
