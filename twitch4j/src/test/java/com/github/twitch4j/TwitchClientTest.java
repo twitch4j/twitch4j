@@ -45,7 +45,10 @@ public class TwitchClientTest {
             .withEventManager(eventManager)
             .withEnableHelix(true)
             .withEnableKraken(true)
+            .withEnableTMI(true)
             .withEnableChat(false)
+            .withEnablePubSub(true)
+            .withEnableGraphQL(true)
             .build();
 
         // register all event listeners

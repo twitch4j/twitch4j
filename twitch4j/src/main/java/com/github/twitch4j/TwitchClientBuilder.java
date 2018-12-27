@@ -75,6 +75,12 @@ public class TwitchClientBuilder {
     protected final List<String> commandPrefixes = new ArrayList<>();
 
     /**
+     * Enabled: PubSub
+     */
+    @Wither
+    private Boolean enablePubSub = false;
+
+    /**
      * Enabled: GraphQL
      */
     @Wither
@@ -181,7 +187,7 @@ public class TwitchClientBuilder {
 
         // Module: PubSub
         TwitchPubSub pubsub = null;
-        if (this.enableGraphQL) {
+        if (this.enablePubSub) {
             pubsub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .build();

@@ -4,9 +4,7 @@ import com.github.philippheuer.events4j.EventManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 
 @Slf4j
 @Getter
@@ -17,19 +15,16 @@ public class TwitchAPIBuilder<T> {
     /**
      * Event Manager
      */
-    @Wither
     private EventManager eventManager = new EventManager();
 
     /**
      * Client Id
      */
-    @Wither
     private String clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
 
     /**
      * Client Secret
      */
-    @Wither
     private String clientSecret = "**SECRET**";
 
     /**
@@ -38,12 +33,33 @@ public class TwitchAPIBuilder<T> {
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
 
     /**
-     * Builder Method (Placeholder)
+     * With EventManager
      *
-     * @return
+     * @return T
      */
-    public T build() {
-        throw new NotImplementedException("Builder didn't implement build yet, please check your code!");
+    public T withEventManager(EventManager eventManager) {
+        this.eventManager = eventManager;
+        return (T) this;
+    }
+
+    /**
+     * With Client Id
+     *
+     * @return T
+     */
+    public T withClientId(String clientId) {
+        this.clientId = clientId;
+        return (T) this;
+    }
+
+    /**
+     * With Client Secret
+     *
+     * @return T
+     */
+    public T withClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+        return (T) this;
     }
 
 }

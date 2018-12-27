@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMessagingInterface> {
+public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMessagingInterfaceBuilder> {
 
     /**
      * BaseUrl

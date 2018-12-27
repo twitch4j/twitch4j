@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKraken> {
+public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
 
     /**
      * BaseUrl

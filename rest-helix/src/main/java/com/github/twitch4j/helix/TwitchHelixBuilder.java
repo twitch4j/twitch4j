@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelix> {
+public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
 
     /**
      * BaseUrl
@@ -43,7 +43,6 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelix> {
      *
      * @return TwitchHelix
      */
-    @Override
     public TwitchHelix build() {
         log.debug("Helix: Initializing Module ...");
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
