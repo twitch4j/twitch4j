@@ -33,7 +33,7 @@ Initialize the PubSub as Standalone Module:
 TwitchPubSub client = TwitchPubSubBuilder.builder().build();
 ```
 
-## Consume the Results
+## Handle the Results
 
 Messages received over PubSub will be dispatched using the EventManager, please see the Twitch4J -> Events Documentation on how to listen for events or check out the individual pages below for specific code samples.
 
