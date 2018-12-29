@@ -2,13 +2,18 @@ package com.github.twitch4j.auth;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.IdentityProvider;
+import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import lombok.Getter;
+
+import java.util.Optional;
 
 public class TwitchAuth {
 
     /**
      * Credential Manager
      */
+    @Getter
     private final CredentialManager credentialManager;
 
     /**
@@ -23,8 +28,14 @@ public class TwitchAuth {
         this.credentialManager = credentialManager;
 
         // register the twitch identityProvider
-        IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
-        this.credentialManager.registerIdentityProvider(identityProvider);
+        Optional<OAuth2IdentityProvider> ip = this.credentialManager.getOAuth2IdentityProviderByName("twitch");
+        if (ip.isPresent()) {
+            // already registered
+        } else {
+            // register
+            IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
+            this.credentialManager.registerIdentityProvider(identityProvider);
+        }
     }
 
 }

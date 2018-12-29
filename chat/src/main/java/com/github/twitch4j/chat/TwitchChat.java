@@ -106,6 +106,21 @@ public class TwitchChat {
         this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
 
+        // credential validation
+        if (this.chatCredential.isPresent() == false) {
+            log.error("TwitchChat: No ChatAccount provided, Chat will not be available! Please look at the docs Twitch4J -> Chat");
+        } else if(this.chatCredential.get().getUserName() == null) {
+            log.info("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
+
+            // credential manager
+            Optional<OAuth2Credential> credential = credentialManager.getOAuth2IdentityProviderByName("twitch").get().getAdditionalCredentialInformation(this.chatCredential.get());
+            if (credential.isPresent()) {
+                this.chatCredential = credential;
+            } else {
+                log.error("TwitchChat: Failed to get AccessToken Information, the token is probably not valid. Please check the docs Twitch4J -> Chat on how to obtain a valid token.");
+            }
+        }
+
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-chat", this);
 

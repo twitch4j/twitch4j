@@ -1,6 +1,9 @@
 package com.github.twitch4j.chat;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.util.TestUtils;
@@ -20,12 +23,17 @@ public class TwitchChatTest {
 
     @BeforeAll
     public static void connectToChat() {
-        // external event manager
+        // event manager
         EventManager eventManager = new EventManager();
+
+        // credential manager
+        CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
+        credentialManager.registerIdentityProvider(new TwitchIdentityProvider("jzkbprff40iqj646a697cyrvl0zt2m6", "**SECRET**", ""));
 
         // construct twitchChat
         twitchChat = TwitchChatBuilder.builder()
             .withEventManager(eventManager)
+            .withCredentialManager(credentialManager)
             .withChatAccount(TestUtils.getCredential())
             .withCommandTrigger("!")
             .build();

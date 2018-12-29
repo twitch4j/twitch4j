@@ -49,10 +49,20 @@ You can pass in your oauth token as 2nd value, if you don't have one you can gen
 
 ## Use Standalone
 
-Initialize the Chat Feature as Standalone Module:
+Initialize the Chat Feature as Standalone Module, also requires setting up the EventManager and the CredentialManger yourself:
 
 ```java
+// event manager
+EventManager eventManager = new EventManager();
+
+// credential manager
+CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
+credentialManager.registerIdentityProvider(new TwitchIdentityProvider("jzkbprff40iqj646a697cyrvl0zt2m6", "**SECRET**", ""));
+
+// twitch4j - chat
 TwitchChat client = TwitchChatBuilder.builder()
+			.withEventManager(eventManager)
+			.withCredentialManager(credentialManager)
 			.withChatAccount(oAuth2CredentialHere)
             .build();
 ```

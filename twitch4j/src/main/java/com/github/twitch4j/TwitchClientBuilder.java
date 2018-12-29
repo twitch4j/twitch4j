@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.pubsub.TwitchPubSub;
@@ -44,6 +45,12 @@ public class TwitchClientBuilder {
      */
     @Wither
     private String clientSecret;
+
+    /**
+     * Redirect Url
+     */
+    @Wither
+    private String redirectUrl = "http://localhost";
 
     /**
      * Enabled: Helix
@@ -105,7 +112,7 @@ public class TwitchClientBuilder {
     private EventManager eventManager = new EventManager();
 
     /**
-     * EventManager
+     * CredentialManager
      */
     @Wither
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
@@ -142,6 +149,9 @@ public class TwitchClientBuilder {
             this.clientId = "jzkbprff40iqj646a697cyrvl0zt2m6";
             this.clientSecret = "**secret**";
         }
+
+        // Module: Auth (registers Twitch Identity Providers)
+        TwitchAuth authModule = new TwitchAuth(credentialManager, clientId, clientSecret, redirectUrl);
 
         // Module: Helix
         TwitchHelix helix = null;
