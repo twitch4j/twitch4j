@@ -254,7 +254,11 @@ public class TwitchChat {
                     }
 
                     // then join to own channel - required for sending or receiving whispers
-                    sendCommand("join #" + chatCredential.get().getUserName());
+                    if (chatCredential.get().getUserName() != null) {
+                        sendCommand("join #" + chatCredential.get().getUserName());
+                    } else {
+                        log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
+                    }
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
