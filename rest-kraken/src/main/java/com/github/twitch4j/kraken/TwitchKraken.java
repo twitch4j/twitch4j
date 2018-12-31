@@ -26,7 +26,7 @@ public interface TwitchKraken {
      * @return Object
      */
     @RequestLine("PUT /users/{user}/follows/channels/{targetUser}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers("Authorization: OAuth {token}")
     HystrixCommand<Object> addFollow(
         @Param("token") String authToken,
         @Param("user") Long userId,
