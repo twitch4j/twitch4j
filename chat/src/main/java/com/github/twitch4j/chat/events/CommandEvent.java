@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.events;
 
 import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class CommandEvent extends TwitchEvent {
     /**
      * Source: channel / privateMessage
      */
-    private String source;
+    private CommandSource source;
 
     /**
      * Source Id: channelName or userName
@@ -56,7 +57,7 @@ public class CommandEvent extends TwitchEvent {
      * @param command       The plain command without prefix.
      * @param permissions   The permissions of the triggering user.
      */
-    public CommandEvent(String source, String sourceId, EventUser user, String commandPrefix, String command, Set<CommandPermission> permissions) {
+    public CommandEvent(CommandSource source, String sourceId, EventUser user, String commandPrefix, String command, Set<CommandPermission> permissions) {
         super();
         this.source = source;
         this.sourceId = sourceId;
@@ -72,6 +73,10 @@ public class CommandEvent extends TwitchEvent {
      * @param message Message
      */
     public void respondToUser(String message) {
-        getTwitchChat().sendMessage(sourceId, message);
+        if (source.equals(CommandSource.CHANNEL)) {
+            getTwitchChat().sendMessage(sourceId, message);
+        } else if (source.equals(CommandSource.PRIVATE_MESSAGE)) {
+            getTwitchChat().sendMessage(sourceId, "/w " + sourceId + " " + message);
+        }
     }
 }
