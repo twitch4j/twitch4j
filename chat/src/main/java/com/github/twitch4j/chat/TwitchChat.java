@@ -3,6 +3,7 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
@@ -442,7 +443,7 @@ public class TwitchChat {
             log.debug("Detected a command in channel {} with content: {}", event.getChannel().getName(), commandWithoutPrefix.get());
 
             // dispatch command event
-            CommandEvent commandEvent = new CommandEvent("channel", event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
+            CommandEvent commandEvent = new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
             eventManager.dispatchEvent(commandEvent);
         }
     }

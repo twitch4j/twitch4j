@@ -7,9 +7,13 @@ weight = 10
 
 If you use any module that reqires auth directly, you need to setup your credentialManager and pass it into the builder on the `.withCredentialManager(credentialManager)` method.
 
-The setup requires the TwitchAuth Module to run to register the twitch identity provider within the credentialManager.
+## Register the twitch identity provider using the AuthModule
 
-## Example
+```java
+
+```
+
+## Register the twitch identity provider manually
 
 ```java
 CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
