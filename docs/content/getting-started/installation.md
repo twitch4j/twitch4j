@@ -19,7 +19,7 @@ and: (latest, you should use the actual version here)
 
 ```groovy
 dependencies {
-    compile group: 'com.github.twitch4j', name: 'twitch4j', '1.0.0-alpha.6'
+    compile group: 'com.github.twitch4j', name: 'twitch4j', '1.0.0-alpha.7'
 }
 ```
 
@@ -43,7 +43,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>1.0.0-alpha.6</version>
+    <version>1.0.0-alpha.7</version>
 </dependency>
 ```
 
