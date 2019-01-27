@@ -8,6 +8,8 @@ dependencies {
 
 	// Jackson (JSON)
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
+	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-common')

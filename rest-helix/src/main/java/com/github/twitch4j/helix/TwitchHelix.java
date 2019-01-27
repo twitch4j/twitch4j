@@ -84,7 +84,7 @@ public interface TwitchHelix {
         @Param("count") String count,
         @Param("period") String period,
         @Param("started_at") String startedAt,
-        @Param("user_id") String userId
+        @Param("user_id") Long userId
     );
 
     /**
@@ -181,7 +181,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<String> userIds,
+        @Param("user_id") List<Long> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -206,7 +206,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<String> userIds,
+        @Param("user_id") List<Long> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -232,8 +232,8 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit,
-        @Param("user_id") String userId,
-        @Param("video_id") String videoId
+        @Param("user_id") Long userId,
+        @Param("video_id") Long videoId
     );
 
     /**
@@ -250,7 +250,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserList> getUsers(
         @Param("token") String authToken,
-        @Param("id") List<String> userIds,
+        @Param("id") List<Long> userIds,
         @Param("login") List<String> userNames
     );
 
@@ -267,8 +267,8 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     HystrixCommand<FollowList> getFollowers(
-        @Param("from_id") String fromId,
-        @Param("to_id") String toId,
+        @Param("from_id") Long fromId,
+        @Param("to_id") Long toId,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -319,7 +319,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
         @Param("token") String authToken,
-        @Param("user_id") String userId
+        @Param("user_id") Long userId
     );
 
     /**
@@ -347,8 +347,8 @@ public interface TwitchHelix {
     @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
     HystrixCommand<VideoList> getVideos(
         @Param("id") String id,
-        @Param("user_id") String userId,
-        @Param("game_id") String gameId,
+        @Param("user_id") Long userId,
+        @Param("game_id") Long gameId,
         @Param("language") String language,
         @Param("period") String period,
         @Param("sort") String sort,

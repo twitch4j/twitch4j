@@ -18,7 +18,7 @@ HystrixCommand<GameAnalyticsList> getGameAnalyticUrl(
 	@Param("token") String authToken,
 	@Param("after") String after,
 	@Param("first") Integer limit,
-	@Param("game_id") String gameId,
+	@Param("game_id") Long gameId,
 	@Param("type") String type,
 	@Param("started_at") String startedAt,
 	@Param("ended_at") String endedAt

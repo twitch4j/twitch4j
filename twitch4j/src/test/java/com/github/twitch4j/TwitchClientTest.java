@@ -1,5 +1,6 @@
 package com.github.twitch4j;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.extern.slf4j.Slf4j;

@@ -20,9 +20,9 @@ HystrixCommand<StreamMetadataList> getStreamsMetadata(
 	@Param("before") String before,
 	@Param("first") Integer limit,
 	@Param("community_id") List<UUID> communityId,
-	@Param("game_id") List<String> gameIds,
+	@Param("game_id") List<Long> gameIds,
 	@Param("language") String language,
-	@Param("user_id") List<String> userIds,
+	@Param("user_id") List<Long> userIds,
 	@Param("user_login") List<String> userLogins
 );
 ```

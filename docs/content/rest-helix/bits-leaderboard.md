@@ -19,7 +19,7 @@ HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
 	@Param("count") String count,
 	@Param("period") String period,
 	@Param("started_at") String startedAt,
-	@Param("user_id") String userId
+	@Param("user_id") Long userId
 );
 ```
 

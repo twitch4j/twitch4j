@@ -16,7 +16,7 @@ The response has a JSON payload with a `data` field containing an array of clip 
 ```java
 @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
 HystrixCommand<ClipList> getClips(
-	@Param("broadcaster_id") String broadcasterId,
+	@Param("broadcaster_id") Long broadcasterId,
 	@Param("game_id") String gameId,
 	@Param("id") String id,
 	@Param("after") String after,

@@ -16,7 +16,7 @@ Gets information about one or more specified Twitch users. Users are identified 
 @Headers("Authorization: Bearer {token}")
 HystrixCommand<UserList> getUsers(
 	@Param("token") String authToken,
-	@Param("id") List<String> userIds,
+	@Param("id") List<Long> userIds,
 	@Param("login") List<String> userNames
 );
 ```

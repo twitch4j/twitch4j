@@ -17,8 +17,8 @@ The response has a JSON payload with a data field containing an array of video e
 @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
 HystrixCommand<VideoList> getVideos(
 	@Param("id") String id,
-	@Param("user_id") String userId,
-	@Param("game_id") String gameId,
+	@Param("user_id") Long userId,
+	@Param("game_id") Long gameId,
 	@Param("language") String language,
 	@Param("period") String period,
 	@Param("sort") String sort,

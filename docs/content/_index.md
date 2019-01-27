@@ -9,11 +9,11 @@ description = ""
 
 * [Getting Started](./getting-started)
 * [Events](./events)
+* [Twitch4J](./twitch4j)
 
 ## Modules
 
 Official
-
 * [API - Helix](./rest-helix)
 * [PubSub](./pubsub)
 * [Chat](./chat)

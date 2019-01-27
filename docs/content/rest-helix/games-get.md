@@ -16,7 +16,7 @@ The response has a JSON payload with a data field containing an array of games e
 ```java
 @RequestLine("GET /games?id={id}&name={name}")
 HystrixCommand<GameList> getGames(
-	@Param("id") List<String> id,
+	@Param("id") List<Long> id,
 	@Param("name") List<String> name
 );
 ```

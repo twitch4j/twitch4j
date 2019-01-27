@@ -9,6 +9,7 @@ import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
+import lombok.Getter;
 
 public class TwitchClient {
 
@@ -51,6 +52,13 @@ public class TwitchClient {
      * Modules
      */
     private final ModuleLoader moduleLoader;
+
+    /**
+     * TwitchClientHelper
+     * <p>
+     * A helper method that contains some common use-cases, like follow events / go live event listeners / ...
+     */
+    private final TwitchClientHelper twitchClientHelper = new TwitchClientHelper(this);
 
     /**
      * Constructor
@@ -176,5 +184,14 @@ public class TwitchClient {
      */
     public ModuleLoader getModuleLoader() {
         return this.moduleLoader;
+    }
+
+    /**
+     * Get TwitchClientHelper
+     *
+     * @return TwitchClientHelper
+     */
+    public TwitchClientHelper getClientHelper() {
+        return this.twitchClientHelper;
     }
 }

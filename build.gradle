@@ -74,7 +74,10 @@ subprojects {
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.9.8'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.9.8'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
 
 			// WebSocket
 			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.6'

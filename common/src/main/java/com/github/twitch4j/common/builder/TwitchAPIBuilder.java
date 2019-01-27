@@ -35,6 +35,7 @@ public class TwitchAPIBuilder<T> {
     /**
      * With EventManager
      *
+     * @param eventManager EventManager
      * @return T
      */
     public T withEventManager(EventManager eventManager) {
@@ -45,6 +46,7 @@ public class TwitchAPIBuilder<T> {
     /**
      * With Client Id
      *
+     * @param clientId ClientId
      * @return T
      */
     public T withClientId(String clientId) {
@@ -55,6 +57,7 @@ public class TwitchAPIBuilder<T> {
     /**
      * With Client Secret
      *
+     * @param clientSecret ClientSecret
      * @return T
      */
     public T withClientSecret(String clientSecret) {

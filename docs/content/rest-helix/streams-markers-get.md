@@ -21,8 +21,8 @@ HystrixCommand<StreamMarkersList> getStreamMarkers(
 	@Param("after") String after,
 	@Param("before") String before,
 	@Param("first") Integer limit,
-	@Param("user_id") String userId,
-	@Param("video_id") String videoId
+	@Param("user_id") Long userId,
+	@Param("video_id") Long videoId
 );
 ```
 

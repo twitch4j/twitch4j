@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UsersServiceTest extends AbtractEndpointTest {
 
     // UserId
-    private static String twitchUserId = "149223493";
+    private static Long twitchUserId = 149223493l;
 
     /**
      * Get Users
@@ -32,7 +32,7 @@ public class UsersServiceTest extends AbtractEndpointTest {
         // Test
         assertTrue(resultList.getUsers().size() > 0, "Should at least find one result from the streams method!");
         resultList.getUsers().forEach(user -> {
-            assertEquals(user.getId(), "149223493", "Twitch4J user id should be 149223493!");
+            assertTrue(user.getId().equals(149223493l), "Twitch4J user id should be 149223493!");
             assertEquals(user.getLogin(), "twitch4j", "Twitch4J user name should be twitch4j!");
             assertEquals(user.getDisplayName(), "twitch4j", "Twitch4J user display name should be twitch4j!");
             assertEquals(user.getType(), "", "Type should be empty!");

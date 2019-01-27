@@ -16,7 +16,7 @@ Gets information about active extensions installed by a specified user, identifi
 @Headers("Authorization: Bearer {token}")
 HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
 	@Param("token") String authToken,
-	@Param("user_id") String userId
+	@Param("user_id") Long userId
 );
 ```
 
