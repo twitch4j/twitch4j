@@ -19,7 +19,7 @@ and: (latest, you should use the actual version here)
 
 ```groovy
 dependencies {
-    compile group: 'com.github.twitch4j', name: 'twitch4j', '1.0.0-alpha.7'
+    compile group: 'com.github.twitch4j', name: 'twitch4j', version: '1.0.0-alpha.7'
 }
 ```
 
