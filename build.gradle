@@ -102,7 +102,7 @@ subprojects {
 			// Annotation processors
 			compileOnly group: 'org.projectlombok', name: 'lombok'
 			annotationProcessor group: 'org.projectlombok', name: 'lombok'
-			testCompile group: 'org.projectlombok', name: 'lombok'
+			testCompileOnly group: 'org.projectlombok', name: 'lombok'
 			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
 			// Apache Commons

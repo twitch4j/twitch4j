@@ -121,7 +121,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		if(matcherPM.matches()) {
 			// Parse Tags
 			setTags(parseTags(matcherPM.group("tags")));
-            setRawTags(parseTags(matcher.group("tags")));
+			setRawTags(parseTags(matcherPM.group("tags")));
 			setClientName(parseClientName(matcherPM.group("clientName")));
 			setCommandType(matcherPM.group("command"));
 			setChannelName(Optional.ofNullable(matcherPM.group("channel")));
