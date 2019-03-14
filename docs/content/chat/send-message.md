@@ -1,5 +1,5 @@
 +++
-title="Send Channel Channel"
+title="Send Channel Message"
 weight = 202
 +++
 
