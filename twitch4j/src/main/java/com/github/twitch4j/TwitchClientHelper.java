@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
@@ -68,19 +69,19 @@ public class TwitchClientHelper {
 
                     // check go live / stream events
                     try {
+                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, 1, null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
+
                         listenForGoLive.forEach(channel -> {
                             ChannelCache currentChannelCache = channelInformation.get(channel.getId());
-                            StreamList streams = twitchClient.getHelix().getStreams(null, null, 1, null, null, null, Arrays.asList(channel.getId()), null).execute();
+                            Optional<Stream> stream = allStreams.getStreams().stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
                             boolean dispatchGoLiveEvent = false;
                             boolean dispatchGoOfflineEvent = false;
                             boolean dispatchTitleChangedEvent = false;
                             boolean dispatchGameChangedEvent = false;
 
-                            if (streams.getStreams().size() > 0) {
+                            if (stream.isPresent()) {
                                 // is live
-                                Stream stream = streams.getStreams().get(0);
-
                                 // - live status
                                 if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
                                     dispatchGoLiveEvent = true;
@@ -89,16 +90,16 @@ public class TwitchClientHelper {
                                 boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
                                 // - change stream title event
-                                if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
+                                if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
                                     dispatchTitleChangedEvent = true;
                                 }
-                                currentChannelCache.setTitle(stream.getTitle());
+                                currentChannelCache.setTitle(stream.get().getTitle());
 
                                 // - change game event
-                                if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.getGameId())) {
+                                if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
                                     dispatchGameChangedEvent = true;
                                 }
-                                currentChannelCache.setGameId(stream.getGameId());
+                                currentChannelCache.setGameId(stream.get().getGameId());
                             } else {
                                 // was online previously?
                                 if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
