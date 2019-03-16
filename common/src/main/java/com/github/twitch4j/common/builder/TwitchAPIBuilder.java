@@ -65,6 +65,12 @@ public class TwitchAPIBuilder<T> {
         return (T) this;
     }
 
+    /**
+     * With Client Secret
+     *
+     * @param userAgent userAgent
+     * @return T
+     */
     public T withUserAgent(String userAgent) {
         this.userAgent = userAgent;
         return (T) this;
