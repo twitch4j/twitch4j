@@ -13,7 +13,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SubscriptionList {
     @JsonProperty("data")
-    private List<Subscription> streams;
+    private List<Subscription> subscriptions;
 
     @JsonProperty("pagination")
     private HelixPagination pagination;
