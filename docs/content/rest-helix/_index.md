@@ -73,6 +73,11 @@ Streams:
 - Create Stream Marker
 - [Streams -> Get Markers](./streams-markers-get)
 
+Subscriptions:
+
+- [Subscriptions -> Get All](./subscriptions-get)
+- [Subscriptions -> Get by UserId](./subscriptions-byuser)
+
 Users:
 
 - [Users -> Get](./users-get)

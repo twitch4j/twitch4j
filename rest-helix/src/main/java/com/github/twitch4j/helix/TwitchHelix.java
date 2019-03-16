@@ -237,16 +237,36 @@ public interface TwitchHelix {
     );
 
     /**
-     * Get status of of a broadcaster’s subscriptions.
+     * Get all subscribers of a channel
+     *
+     * @param authToken User Auth Token
+     * @param broadcasterId User ID of the broadcaster. Must match the User ID in the Bearer token.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before    Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return SubscriptionList
+     */
+    @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&after={after}&before={before}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionList> getSubscriptions(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") Long broadcasterId,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Check subscription status of provided user IDs (one or more) for a given channel
      *
      * @param authToken User Auth Token
      * @param broadcasterId User ID of the broadcaster. Must match the User ID in the Bearer token.
      * @param userIds Unique identifier of account to get subscription status of. Accepts up to 100 values.
-     * @return Object
+     * @return SubscriptionList
      */
-    @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}")
+    @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SubscriptionList> getSubscriptions(
+    HystrixCommand<SubscriptionList> getSubscriptionsByUser(
         @Param("token") String authToken,
         @Param("broadcaster_id") Long broadcasterId,
         @Param("user_id") List<Long> userIds
