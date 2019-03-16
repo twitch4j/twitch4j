@@ -237,10 +237,11 @@ public interface TwitchHelix {
     );
 
     /**
-     * Get all of a broadcaster’s subscriptions.
+     * Get status of of a broadcaster’s subscriptions.
      *
      * @param authToken User Auth Token
      * @param broadcasterId User ID of the broadcaster. Must match the User ID in the Bearer token.
+     * @param userIds List of User IDs to check status on
      * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param before    Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
@@ -251,11 +252,12 @@ public interface TwitchHelix {
     HystrixCommand<SubscriptionList> getSubscriptions(
         @Param("token") String authToken,
         @Param("broadcaster_id") Long broadcasterId,
+        @Param("user_id") List<Long> userIds,
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
     );
-
+    
     /**
      * Get Users
      * <p>

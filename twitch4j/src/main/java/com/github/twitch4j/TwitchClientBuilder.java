@@ -112,6 +112,12 @@ public class TwitchClientBuilder {
     private EventManager eventManager = new EventManager();
 
     /**
+     * User Agent
+     */
+    @Wither
+    private String userAgent;
+
+    /**
      * CredentialManager
      */
     @Wither
@@ -160,6 +166,7 @@ public class TwitchClientBuilder {
                 .withClientId(this.clientId)
                 .withClientSecret(this.clientSecret)
                 .withEventManager(eventManager)
+                .withUserAgent(userAgent)
                 .build();
         }
 
@@ -170,6 +177,7 @@ public class TwitchClientBuilder {
                 .withClientId(this.clientId)
                 .withClientSecret(this.clientSecret)
                 .withEventManager(eventManager)
+                .withUserAgent(userAgent)
                 .build();
         }
 
@@ -180,6 +188,7 @@ public class TwitchClientBuilder {
                 .withClientId(this.clientId)
                 .withClientSecret(this.clientSecret)
                 .withEventManager(eventManager)
+                .withUserAgent(userAgent)
                 .build();
         }
 
