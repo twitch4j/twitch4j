@@ -66,7 +66,7 @@ public class TwitchAPIBuilder<T> {
     }
 
     /**
-     * With Client Secret
+     * With User Agent
      *
      * @param userAgent userAgent
      * @return T
