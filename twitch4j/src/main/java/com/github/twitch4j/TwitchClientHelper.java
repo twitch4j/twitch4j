@@ -136,7 +136,7 @@ public class TwitchClientHelper {
                         });
                     } catch (Exception ex) {
                         log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
-                        ex.printStackTrace();
+                        twitchClient.getErrorTrackingManager().handleException(ex);
                     }
 
                     // check follow events
@@ -173,7 +173,7 @@ public class TwitchClientHelper {
 
                     } catch (Exception ex) {
                         log.error("Failed to check for Follow Events: " + ex.getMessage());
-                        ex.printStackTrace();
+                        twitchClient.getErrorTrackingManager().handleException(ex);
                     }
 
                     // sleep one second
@@ -195,7 +195,7 @@ public class TwitchClientHelper {
      * @param channelName Channel Name
      */
     public void enableStreamEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Arrays.asList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -221,7 +221,7 @@ public class TwitchClientHelper {
      * @param channelName Channel Name
      */
     public void enableFollowEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Arrays.asList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {

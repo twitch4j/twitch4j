@@ -9,6 +9,9 @@ dependencies {
 	compileOnly group: 'io.github.openfeign', name: 'feign-slf4j'
 	compileOnly group: 'io.github.openfeign', name: 'feign-hystrix'
 
+	// SentryIO
+	compile group: 'io.sentry', name: 'sentry', version: '1.7.22'
+
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-auth')
 }

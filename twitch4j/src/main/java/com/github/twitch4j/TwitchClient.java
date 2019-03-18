@@ -3,6 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.errortracking.ErrorTrackingManager;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.modules.ModuleLoader;
@@ -17,6 +18,12 @@ public class TwitchClient {
      * Event Manager
      */
     private final EventManager eventManager;
+
+    /**
+     * Error Tracking Manager
+     */
+    @Getter
+    private final ErrorTrackingManager errorTrackingManager;
 
     /**
      * API: Helix
@@ -64,6 +71,7 @@ public class TwitchClient {
      * Constructor
      *
      * @param eventManager EventManager
+     * @param errorTrackingManager ErrorTrackingManager
      * @param helix TwitchHelix
      * @param kraken TwitchKraken
      * @param messagingInterface TwitchMessagingInterface
@@ -71,8 +79,9 @@ public class TwitchClient {
      * @param pubsub TwitchPubSub
      * @param graphql TwitchGraphQL
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
+    public TwitchClient(EventManager eventManager, ErrorTrackingManager errorTrackingManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
         this.eventManager = eventManager;
+        this.errorTrackingManager = errorTrackingManager;
         this.helix = helix;
         this.kraken = kraken;
         this.messagingInterface = messagingInterface;
