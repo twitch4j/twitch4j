@@ -43,7 +43,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>1.0.0-alpha.8</version>
+    <version>1.0.0-alpha.9</version>
 </dependency>
 ```
 

@@ -5,7 +5,6 @@
  	Issue is not a place for questions and spam.
 -->
 ### Prerequisites
-* [ ] I have read and understood the [contribution guidelines](https://github.com/twitch4j/twitch4j/blob/master/.github/CONTRIBUTING.md) and I accept them.
 * [ ] This pull request follows the code style of the project
 * [ ] I have tested this feature
 

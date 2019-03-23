@@ -1,52 +1,28 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-
+name: Feature Request
+about: Suggest a new feature, that should be added to the library.
 ---
 
 <!--
-	Thanks to using Twitch4J
- 	Before you submit pull request/issue read Contributing guidelines.
- 	We do not anwser the questions. If you have ask, go to https://discord.gg/FQ5vgW3
- 	Issue is not a place for questions and spam.
+	Thanks to using Twitch4J. Please do not ask questions here, join us on our discord server instead: https://discord.gg/FQ5vgW3
 -->
 
 ### Prerequisites
 * [ ] If this is a question/suggestion, I have already considered discuss it on [Discord Server](https://discord.gg/FQ5vgW3)
 * [ ] This issue specifically has something to do with Twitch4J
 * [ ] I have attempted to [look for similar issues](https://github.com/twitch4j/twitch4j/issues) already
-* [ ] I have read and understood the [contribution guidelines](https://github.com/twitch4j/twitch4j/blob/master/.github/CONTRIBUTING.md) and I accept them.
-
-<!-- Without marking last checkbox, your issue will be declined -->
 
 ### Description
-<!--
-	Here is your description. Providing much more information helps out fixing 
-	or reproduce your problemas fast as possible.
-	For providing codes or stacktraces, consider adding them using a tripple backquotes '```' between.
-	It will be better readable for us.
--->
+<!-- Is your feature request related to a problem? Please describe.
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
 
-### Steps to Reproduce
-<!-- 
-	Your reproduction steps. What you need to reproduce. Step by step explain it.
-	
-	ex.
-	
-1. [First step]
-2. [Second step]
--->
+### Solutions
+<!-- Describe the solution you'd like
+A clear and concise description of what you want to happen. -->
 
----
+### Alternatives
+<!-- Describe alternatives you've considered
+A clear and concise description of any alternative solutions or features you've considered. -->
 
-**Expected behavior:** 
-<!-- What was supposed to happen -->
-**Actual behavior:** 
-<!-- What actually happened -->
-**Stacktrace (if applicable):** 
-<!-- link to the stacktrace or block code using tipple backquotes -->
-**Version affected:** 
-<!-- The version/commit you are using -->
-
-### Additional Information 
-<!-- Any other information that may be able to help me with the problem. Remove them it is not necercarly. -->
+### Additional context
+<!-- Add any other context or screenshots about the feature request here. -->
