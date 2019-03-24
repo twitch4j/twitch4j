@@ -304,13 +304,13 @@ public class IRCEventHandler {
 							states.put(ChannelStateEvent.ChannelState.FOLLOWERS, Long.parseLong(v));
 							break;
 						case "r9k":
-							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
+							states.put(ChannelStateEvent.ChannelState.R9K, v.equals("1"));
 							break;
 						case "slow":
 							states.put(ChannelStateEvent.ChannelState.SLOW, Long.parseLong(v));
 							break;
 						case "subs-only":
-							states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
+							states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, v.equals("1"));
 							break;
 						default:
 							break;
