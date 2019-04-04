@@ -28,7 +28,7 @@ public class SentryIOErrorTracking implements ErrorTracker {
     public SentryIOErrorTracking(String dsn) {
         // Create a SentryClient instance that you manage manually.
         sentryClient = SentryClientFactory.sentryClient(dsn);
-        sentryClient.setRelease("v1.0.0-alpha.9");
+        sentryClient.setRelease("v1.0.0-alpha.10");
 
         // Get the current context instance.
         context = sentryClient.getContext();
