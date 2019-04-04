@@ -15,7 +15,9 @@ The response has a JSON payload with a data field containing an array of video e
 
 ```java
 @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
+@Headers("Authorization: Bearer {token}")
 HystrixCommand<VideoList> getVideos(
+    @Param("token") String authToken,
 	@Param("id") String id,
 	@Param("user_id") Long userId,
 	@Param("game_id") Long gameId,
@@ -41,6 +43,7 @@ HystrixCommand<VideoList> getVideos(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
+| authToken     | string    | User Auth Token |
 | after | string | Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query. |
 | before | string | Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query. |
 | limit | string | Maximum number of objects to return. Maximum: 100. Default: 20. |

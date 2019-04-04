@@ -117,6 +117,7 @@ public interface TwitchHelix {
      * @return ClipList Clip List
      */
     @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
+    @Deprecated
     HystrixCommand<ClipList> getClips(
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
@@ -145,7 +146,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ClipList> getClipsUsingAuth(
+    HystrixCommand<ClipList> getClips(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
@@ -169,6 +170,7 @@ public interface TwitchHelix {
      * @return GameList
      */
     @RequestLine("GET /games?id={id}&name={name}")
+    @Deprecated
     HystrixCommand<GameList> getGames(
         @Param("id") List<String> id,
         @Param("name") List<String> name
@@ -185,7 +187,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /games?id={id}&name={name}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<GameList> getGamesUsingAuth(
+    HystrixCommand<GameList> getGames(
         @Param("token") String authToken,
         @Param("id") List<String> id,
         @Param("name") List<String> name
@@ -200,6 +202,7 @@ public interface TwitchHelix {
      * @return GameList
      */
     @RequestLine("GET /games/top?after={after}&before={before}&first={first}")
+    @Deprecated
     HystrixCommand<GameTopList> getTopGames(
         @Param("after") String after,
         @Param("before") String before,
@@ -218,7 +221,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /games/top?after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<GameTopList> getTopGamesUsingAuth(
+    HystrixCommand<GameTopList> getTopGames(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -239,6 +242,7 @@ public interface TwitchHelix {
      * @return StreamList
      */
     @RequestLine("GET /streams?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
+    @Deprecated
     HystrixCommand<StreamList> getStreams(
         @Param("after") String after,
         @Param("before") String before,
@@ -267,7 +271,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamList> getStreamsUsingAuth(
+    HystrixCommand<StreamList> getStreams(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -293,6 +297,7 @@ public interface TwitchHelix {
      * @return StreamMetadataList
      */
     @RequestLine("GET /streams/metadata?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
+    @Deprecated
     HystrixCommand<StreamMetadataList> getStreamsMetadata(
         @Param("after") String after,
         @Param("before") String before,
@@ -321,7 +326,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams/metadata?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamMetadataList> getStreamsMetadataUsingAuth(
+    HystrixCommand<StreamMetadataList> getStreamsMetadata(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -425,6 +430,7 @@ public interface TwitchHelix {
      * @return FollowList
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
+    @Deprecated
     HystrixCommand<FollowList> getFollowers(
         @Param("from_id") Long fromId,
         @Param("to_id") Long toId,
@@ -447,7 +453,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<FollowList> getFollowersUsingAuth(
+    HystrixCommand<FollowList> getFollowers(
         @Param("token") String authToken,
         @Param("from_id") Long fromId,
         @Param("to_id") Long toId,
@@ -527,6 +533,7 @@ public interface TwitchHelix {
      * @return VideoList
      */
     @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
+    @Deprecated
     HystrixCommand<VideoList> getVideos(
         @Param("id") String id,
         @Param("user_id") Long userId,
@@ -562,7 +569,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<VideoList> getVideosUsingAuth(
+    HystrixCommand<VideoList> getVideos(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") Long userId,

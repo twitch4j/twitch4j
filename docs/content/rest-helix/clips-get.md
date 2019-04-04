@@ -15,7 +15,9 @@ The response has a JSON payload with a `data` field containing an array of clip 
 
 ```java
 @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
+@Headers("Authorization: Bearer {token}")
 HystrixCommand<ClipList> getClips(
+    @Param("token") String authToken,
 	@Param("broadcaster_id") Long broadcasterId,
 	@Param("game_id") String gameId,
 	@Param("id") String id,
@@ -39,6 +41,7 @@ HystrixCommand<ClipList> getClips(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
+| authToken     | string    | User Auth Token |
 | after | string | Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. This applies only to queries specifying broadcaster_id or game_id. The cursor value specified here is from the pagination response field of a prior query. |
 | before  | string | Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. This applies only to queries specifying broadcaster_id or game_id. The cursor value specified here is from the pagination response field of a prior query. |
 | first | string | Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.) If this is specified, started_at also must be specified; otherwise, the time period is ignored. |
