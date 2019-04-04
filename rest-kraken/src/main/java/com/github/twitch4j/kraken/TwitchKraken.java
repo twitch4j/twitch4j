@@ -1,9 +1,13 @@
 package com.github.twitch4j.kraken;
 
+import java.util.List;
+
 import com.github.twitch4j.kraken.domain.KrakenIngestList;
 import com.github.twitch4j.kraken.domain.KrakenSubscriptionList;
 import com.github.twitch4j.kraken.domain.KrakenTeam;
 import com.github.twitch4j.kraken.domain.KrakenTeamList;
+import com.github.twitch4j.kraken.domain.KrakenUser;
+import com.github.twitch4j.kraken.domain.KrakenUserList;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Headers;
 import feign.Param;
@@ -101,5 +105,21 @@ public interface TwitchKraken {
     @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeam> getTeamByName(
         @Param("name") String name
+    );
+    
+    /**
+     * Get Users
+     * <p>
+     * Gets a list of specified user objects.
+     * 
+     * @param logins User login name (lower case channelname/username). Multiple login names can be specified. Limit: 100.
+     * @return KrakenUser
+     */
+    @RequestLine("GET /users?login={logins}")
+    @Headers({
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<KrakenUserList> getUsersByLogin(
+    	@Param("logins") List<String> logins	
     );
 }
