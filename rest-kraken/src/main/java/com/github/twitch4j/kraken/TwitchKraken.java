@@ -122,4 +122,5 @@ public interface TwitchKraken {
     HystrixCommand<KrakenUserList> getUsersByLogin(
     	@Param("logins") List<String> logins	
     );
+
 }
