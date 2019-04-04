@@ -58,6 +58,7 @@ Channel
 - [Channel - Get Subscriptions](./channel-get-subscribers)
 
 Users:
+- [User -> Get](./user-get)
 - [User -> Add Follow](./user-add-follow)
 
 Ingests:
