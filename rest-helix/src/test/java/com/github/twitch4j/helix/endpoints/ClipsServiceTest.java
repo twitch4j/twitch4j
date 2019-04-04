@@ -37,7 +37,7 @@ public class ClipsServiceTest extends AbtractEndpointTest {
     @DisplayName("Get Clips")
     public void getClips() {
         // TestCase
-        ClipList clipList = testUtils.getTwitchHelixClient().getClips(null, "488552", null, null, null, null, null, null).execute();
+        ClipList clipList = testUtils.getTwitchHelixClient().getClips(null, null, "488552", null, null, null, null, null, null).execute();
 
         // Validate
         clipList.getData().forEach(clip -> {

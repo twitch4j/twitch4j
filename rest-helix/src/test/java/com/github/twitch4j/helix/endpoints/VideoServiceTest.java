@@ -23,7 +23,7 @@ public class VideoServiceTest extends AbtractEndpointTest {
     @DisplayName("Fetch videos")
     public void getVideos() {
         // TestCase
-        VideoList resultList = testUtils.getTwitchHelixClient().getVideos(null, null, overwatchGameId, null, null, null, null, null, null, 100).execute();
+        VideoList resultList = testUtils.getTwitchHelixClient().getVideos(null, null, null, overwatchGameId, null, null, null, null, null, null, 100).execute();
 
         // Test
         assertTrue(resultList.getVideos().size() > 0, "Should at least find one result from the videos method!");
