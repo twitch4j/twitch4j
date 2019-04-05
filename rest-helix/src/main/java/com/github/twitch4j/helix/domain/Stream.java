@@ -52,6 +52,10 @@ public class Stream {
     @NonNull
     private Calendar startedAt;
 
+    // Ids of active tags on the stream 
+    @NonNull
+    private List<UUID> tagIds;
+    
     // Stream language.
     @NonNull
     private String language;

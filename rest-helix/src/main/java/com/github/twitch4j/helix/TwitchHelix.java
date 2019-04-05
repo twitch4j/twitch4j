@@ -2,6 +2,8 @@ package com.github.twitch4j.helix;
 
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
+
+import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -337,7 +339,60 @@ public interface TwitchHelix {
         @Param("user_id") List<Long> userIds,
         @Param("user_login") List<String> userLogins
     );
-
+    
+    /**
+     * Gets available Twitch stream tags.
+     * 
+     * @param authToken User Token or App auth Token, for increased rate-limits
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param tagIds    Returns tags by one or more specified tag IDs. You can specify up to 100 IDs. If you search by tagIds, no pagination is used. 
+     * @return StreamTagList
+     */
+    @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")    
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamTagList> getAllStreamTags(
+            @Param("token") String authToken,
+            @Param("after") String after,
+            @Param("first") Integer limit,
+            @Param("tag_id") List<UUID> tagIds
+    );
+    
+    /**
+     * Gets stream tags which are active on the specified stream.
+     * 
+     * @param authToken     User Token or App auth Token, for increased rate-limits
+     * @param broadcasterId ID of the stream to fetch current tags from 
+     * @return StreamTagList
+     */
+    @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")    
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamTagList> getStreamTags(
+            @Param("token") String authToken,
+            @Param("broadcaster_id") Long broadcasterId
+    );
+    
+    /**
+     * Replaces the active stream tags on the specified stream with the specified tags (or clears all tags, if no new tags are specified).
+     * Requires scope: user:edit:broadcast
+     * 
+     * @param authToken     Auth Token
+     * @param broadcasterId ID of the stream to replace tags for
+     * @param tagIds        Tag ids to replace the current stream tags with. Maximum: 100. If empty, all tags are cleared from the stream. Tags currently expire 72 hours after they are applied, unless the stream is live within that time period.
+     */
+    @RequestLine("PUT /streams/tags?broadcaster_id={broadcaster_id}")
+    @Headers    
+    ({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })    
+    @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
+    void replaceStreamTags(
+            @Param("token") String authToken,
+            @Param("broadcaster_id") Long broadcasterId,
+            @Param(value = "tag_ids", expander = ObjectToJsonExpander.class ) List<UUID> tagIds
+    		);
+    
     /**
      * TODO: Create Stream Marker
      */
