@@ -387,11 +387,11 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })    
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
-    void replaceStreamTags(
+    HystrixCommand<Object> replaceStreamTags(
             @Param("token") String authToken,
             @Param("broadcaster_id") Long broadcasterId,
             @Param(value = "tag_ids", expander = ObjectToJsonExpander.class ) List<UUID> tagIds
-    		);
+    );
     
     /**
      * TODO: Create Stream Marker
