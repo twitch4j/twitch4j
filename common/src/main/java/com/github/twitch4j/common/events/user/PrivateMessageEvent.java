@@ -45,7 +45,4 @@ public class PrivateMessageEvent extends TwitchEvent {
 		this.permissions = permissions;
 	}
 
-	public void sendResponse(String message) {
-		// getClient().getMessageInterface().sendPrivateMessage(user.getName(), message);
-	}
 }
