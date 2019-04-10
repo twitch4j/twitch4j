@@ -418,8 +418,8 @@ public class TwitchChat {
      * @param message message
      */
     public void sendMessage(String channel, String message) {
-        log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel, message);
-        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel, message));
+        log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
+        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel.toLowerCase(), message));
     }
 
     /**
