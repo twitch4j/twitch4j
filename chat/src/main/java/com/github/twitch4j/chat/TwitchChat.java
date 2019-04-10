@@ -434,6 +434,50 @@ public class TwitchChat {
     }
 
     /**
+     * Timeout a user
+     *
+     * @param channel channel
+     * @param user username
+     * @param duration duration
+     * @param reason reason
+     */
+    public void timeout(String channel, String user, Duration duration, String reason) {
+        StringBuilder sb = new StringBuilder()
+            .append(duration.getSeconds());
+        if (reason != null) {
+            sb.append(" ").append(reason);
+        }
+
+        sendMessage(channel, String.format("/timeout %s %s", user, sb.toString()));
+    }
+
+    /**
+     * Ban a user
+     *
+     * @param channel channel
+     * @param user username
+     * @param reason reason
+     */
+    public void ban(String channel, String user, String reason) {
+        StringBuilder sb = new StringBuilder(user);
+        if (reason != null) {
+            sb.append(" ").append(reason);
+        }
+
+        sendMessage(channel, String.format("/ban %s", sb.toString()));
+    }
+
+    /**
+     * Unban a user
+     *
+     * @param channel channel
+     * @param user username
+     */
+    public void unban(String channel, String user) {
+        sendMessage(channel, String.format("/unban %s", user));
+    }
+
+    /**
      * On Channel Message
      *
      * @param event ChannelMessageEvent
