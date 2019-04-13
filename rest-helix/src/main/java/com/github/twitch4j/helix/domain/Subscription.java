@@ -33,10 +33,10 @@ public class Subscription {
 
     // ID of the subscribed user.
     @NonNull
-    private String userId;
+    private Integer userId;
 
     // Login name of the subscribed user.
     @NonNull
-    private Integer userName;
+    private String userName;
 
 }
