@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,6 +30,12 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
      * BaseUrl
      */
     private String baseUrl = "https://api.twitch.tv/helix";
+
+    /**
+     * Default Timeout
+     */
+    @Wither
+    private Integer timeout = 5000;
 
     /**
      * Initialize the builder
@@ -62,8 +69,8 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
             .logger(new Logger.ErrorLogger())
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this))
-            .retryer(new Retryer.Default(1, 10000, 3))
-            .options(new Request.Options(5000, 15000))
+            .options(new Request.Options(timeout / 3, timeout))
+            .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);
 
         // register with serviceMediator

@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +26,12 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
      * BaseUrl
      */
     private String baseUrl = "https://api.twitch.tv/kraken";
+
+    /**
+     * Default Timeout
+     */
+    @Wither
+    private Integer timeout = 5000;
 
     /**
      * Initialize the builder
@@ -50,8 +57,8 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this))
-            .retryer(new Retryer.Default(1, 10000, 3))
-            .options(new Request.Options(5000, 15000))
+            .options(new Request.Options(timeout / 3, timeout))
+            .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchKraken.class, baseUrl);
 
         // register with serviceMediator

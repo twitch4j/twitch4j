@@ -42,6 +42,12 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private String redirectUrl = "http://localhost";
 
     /**
+     * Default Timeout
+     */
+    @Wither
+    private Integer timeout = 5000;
+
+    /**
      * Enabled: Helix
      */
     @Wither
@@ -152,6 +158,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientSecret(getClientSecret())
                 .withEventManager(eventManager)
                 .withUserAgent(userAgent)
+                .withTimeout(timeout)
                 .build();
         }
 
@@ -163,6 +170,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientSecret(getClientSecret())
                 .withEventManager(eventManager)
                 .withUserAgent(userAgent)
+                .withTimeout(timeout)
                 .build();
         }
 
