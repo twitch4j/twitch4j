@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -52,9 +53,8 @@ public class Stream {
     @NonNull
     private Calendar startedAt;
 
-    // Ids of active tags on the stream 
-    @NonNull
-    private List<UUID> tagIds;
+    // Ids of active tags on the stream
+    private List<UUID> tagIds = new ArrayList<>();
     
     // Stream language.
     @NonNull

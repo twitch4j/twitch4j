@@ -102,7 +102,7 @@ public class TwitchAPIBuilder<T> {
      * @return ErrorTracker
      */
     public ErrorTracker getModuleErrorTracker(String moduleName) {
-        ErrorTracker errorTracker = new SentryIOErrorTracking("https://2bbb1bbc08484819afb5a14a77707761@sentry.io/1418066");
+        ErrorTracker errorTracker = new SentryIOErrorTracking("https://2bbb1bbc08484819afb5a14a77707761@sentry.io/1418066?stacktrace.app.packages=com.github.twitch4j,com.github.philippheuer");
         errorTracker.addTag("module", moduleName);
         return errorTracker;
     }

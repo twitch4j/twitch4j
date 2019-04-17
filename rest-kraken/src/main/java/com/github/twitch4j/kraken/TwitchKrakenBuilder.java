@@ -49,13 +49,17 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
      */
     public TwitchKraken build() {
         log.debug("Kraken: Initializing Module ...");
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
+
+        // Hystrix
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+
+        // Build
         TwitchKraken client = HystrixFeign.builder()
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder(), getErrorTrackingManager()))
-            .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, timeout))
             .retryer(new Retryer.Default(500, timeout, 2))

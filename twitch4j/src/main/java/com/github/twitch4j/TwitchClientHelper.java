@@ -69,7 +69,7 @@ public class TwitchClientHelper {
 
                     // check go live / stream events
                     try {
-                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, null, 1, null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
+                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
 
                         listenForGoLive.forEach(channel -> {
                             ChannelCache currentChannelCache = channelInformation.get(channel.getId());

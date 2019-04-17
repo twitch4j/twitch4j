@@ -55,7 +55,8 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
         log.debug("Helix: Initializing Module ...");
 
         // Hystrix
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 5000);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
 
         // Jackson ObjectMapper
         ObjectMapper mapper = new ObjectMapper();
