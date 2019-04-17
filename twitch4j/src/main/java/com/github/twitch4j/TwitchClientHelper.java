@@ -10,6 +10,8 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
+import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -68,12 +70,12 @@ public class TwitchClientHelper {
                     }
 
                     // check go live / stream events
+                    HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
                     try {
-                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
-
+                        List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
                         listenForGoLive.forEach(channel -> {
                             ChannelCache currentChannelCache = channelInformation.get(channel.getId());
-                            Optional<Stream> stream = allStreams.getStreams().stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
+                            Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
                             boolean dispatchGoLiveEvent = false;
                             boolean dispatchGoOfflineEvent = false;
@@ -135,19 +137,25 @@ public class TwitchClientHelper {
                             }
                         });
                     } catch (Exception ex) {
+                        if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
+                            twitchClient.getErrorTrackingManager().handleException(hystrixGetAllStreams.getFailedExecutionException());
+                        }
+
                         log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                         twitchClient.getErrorTrackingManager().handleException(ex);
                     }
 
                     // check follow events
-                    try {
-                        for (EventChannel channel : listenForFollow) {
+                    for (EventChannel channel : listenForFollow) {
+                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channel.getId(), null, null);
+
+                        try {
                             ChannelCache currentChannelCache = channelInformation.get(channel.getId());
                             LocalDateTime lastFollowDate = null;
 
                             if (currentChannelCache.getLastFollowCheck() != null) {
-                                FollowList followList = twitchClient.getHelix().getFollowers(null, null, channel.getId(), null, null).execute();
-                                for (Follow follow : followList.getFollows()) {
+                                List<Follow> followList = commandGetFollowers.execute().getFollows();
+                                for (Follow follow : followList) {
                                     // update lastFollowDate
                                     if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
                                         lastFollowDate = follow.getFollowedAt();
@@ -169,11 +177,14 @@ public class TwitchClientHelper {
                                 // tracks the date of the latest follow to identify new ones later on
                                 currentChannelCache.setLastFollowCheck(lastFollowDate);
                             }
-                        }
+                        } catch (Exception ex) {
+                            if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                                twitchClient.getErrorTrackingManager().handleException(commandGetFollowers.getFailedExecutionException());
+                            }
 
-                    } catch (Exception ex) {
-                        log.error("Failed to check for Follow Events: " + ex.getMessage());
-                        twitchClient.getErrorTrackingManager().handleException(ex);
+                            log.error("Failed to check for Follow Events: " + ex.getMessage());
+                            twitchClient.getErrorTrackingManager().handleException(ex);
+                        }
                     }
 
                     // sleep one second
