@@ -379,6 +379,7 @@ public interface TwitchHelix {
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream to replace tags for
      * @param tagIds        Tag ids to replace the current stream tags with. Maximum: 100. If empty, all tags are cleared from the stream. Tags currently expire 72 hours after they are applied, unless the stream is live within that time period.
+     * @return Object       nothing
      */
     @RequestLine("PUT /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers    

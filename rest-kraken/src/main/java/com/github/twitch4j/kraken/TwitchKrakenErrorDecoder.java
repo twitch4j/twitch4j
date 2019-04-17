@@ -1,6 +1,8 @@
 package com.github.twitch4j.kraken;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.philippheuer.events4j.EventManager;
+import com.github.twitch4j.common.errortracking.ErrorTrackingManager;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
 import feign.Request;
@@ -9,13 +11,18 @@ import feign.RetryableException;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import com.github.twitch4j.kraken.domain.TwitchKrakenError;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public class TwitchKrakenErrorDecoder implements ErrorDecoder {
+
+    // EventManager
+    final ErrorTrackingManager errorTrackingManager;
 
     // Decoder
     final Decoder decoder;
@@ -31,8 +38,9 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
      *
      * @param decoder Feign Decoder
      */
-    public TwitchKrakenErrorDecoder(Decoder decoder) {
+    public TwitchKrakenErrorDecoder(Decoder decoder, ErrorTrackingManager errorTrackingManager) {
         this.decoder = decoder;
+        this.errorTrackingManager = errorTrackingManager;
     }
 
     /**
@@ -44,39 +52,52 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
      */
     @Override
     public Exception decode(String methodKey, Response response) {
+        Exception ex = null;
+
         try {
             String responseBody = IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
 
             if (response.status() == 401) {
-                throw new UnauthorizedException()
+                ex = new UnauthorizedException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 404) {
-                throw new NotFoundException()
+                ex = new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
+            } else if (response.status() == 429) {
+                ex = new ContextedRuntimeException("To many requests!")
+                    .addContextValue("requestUrl", response.request().url())
+                    .addContextValue("requestMethod", response.request().httpMethod())
+                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
+                    .addContextValue("responseBody", responseBody);;
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.
-                return new RetryableException("getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
+                ex = new RetryableException("getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
+            } else {
+                TwitchKrakenError error = objectMapper.readValue(responseBody, TwitchKrakenError.class);
+                ex = new ContextedRuntimeException("Helix API Error")
+                    .addContextValue("requestUrl", response.request().url())
+                    .addContextValue("requestMethod", response.request().httpMethod())
+                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
+                    .addContextValue("responseBody", responseBody)
+                    .addContextValue("errorType", error.getError())
+                    .addContextValue("errorStatus", error.getStatus())
+                    .addContextValue("errorType", error.getMessage());
             }
-
-            TwitchKrakenError error = objectMapper.readValue(responseBody, TwitchKrakenError.class);
-            return new ContextedRuntimeException("Helix API Error")
-                .addContextValue("requestUrl", response.request().url())
-                .addContextValue("requestMethod", response.request().httpMethod())
-                .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
-                .addContextValue("responseBody", responseBody)
-                .addContextValue("errorType", error.getError())
-                .addContextValue("errorStatus", error.getStatus())
-                .addContextValue("errorType", error.getMessage());
         } catch (IOException fallbackToDefault) {
-            return defaultDecoder.decode(methodKey, response);
+            ex = defaultDecoder.decode(methodKey, response);
         }
+
+        // dispatch exception event
+        errorTrackingManager.handleException(ex);
+
+        return ex;
     }
 }

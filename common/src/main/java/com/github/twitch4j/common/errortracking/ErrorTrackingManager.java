@@ -1,12 +1,14 @@
 package com.github.twitch4j.common.errortracking;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 @Data
+@Slf4j
 public class ErrorTrackingManager implements ErrorTracker {
 
     private Set<ErrorTracker> errorTrackers;
@@ -33,6 +35,7 @@ public class ErrorTrackingManager implements ErrorTracker {
      * @param ex Exception
      */
     public void handleException(Throwable ex) {
+        log.error(ex.toString());
         errorTrackers.forEach(tracker -> tracker.handleException(ex));
     }
 

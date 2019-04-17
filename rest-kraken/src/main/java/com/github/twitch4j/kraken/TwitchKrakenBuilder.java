@@ -54,7 +54,7 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
-            .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
+            .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder(), getErrorTrackingManager()))
             .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, timeout))

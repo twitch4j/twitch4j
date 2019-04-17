@@ -69,7 +69,7 @@ public class TwitchClientHelper {
 
                     // check go live / stream events
                     try {
-                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, 1, null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
+                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, null, 1, null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
 
                         listenForGoLive.forEach(channel -> {
                             ChannelCache currentChannelCache = channelInformation.get(channel.getId());
@@ -146,7 +146,7 @@ public class TwitchClientHelper {
                             LocalDateTime lastFollowDate = null;
 
                             if (currentChannelCache.getLastFollowCheck() != null) {
-                                FollowList followList = twitchClient.getHelix().getFollowers(null, channel.getId(), null, null).execute();
+                                FollowList followList = twitchClient.getHelix().getFollowers(null, null, channel.getId(), null, null).execute();
                                 for (Follow follow : followList.getFollows()) {
                                     // update lastFollowDate
                                     if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
