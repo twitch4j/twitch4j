@@ -52,6 +52,7 @@ public class IRCEventHandler {
         eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onHostOnEvent(event));
         eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onHostOffEvent(event));
         eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onChannelState(event));
+        eventManager.onEvent(IRCMessageEvent.class).subscribe(event -> onRaid(event));
 	}
 
 	/**
@@ -164,6 +165,25 @@ public class IRCEventHandler {
 			}
 		}
 	}
+        
+        /**
+         * ChatChannel Raid Event (receiving)
+         * @param event IRCMessageEvent
+         */
+        public void onRaid(IRCMessageEvent event) {
+                if (event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id") && event.getTags().get("msg-id").equalsIgnoreCase("raid")) {
+                        EventChannel channel = event.getChannel();
+                        EventUser raider = event.getUser();
+                        Integer viewers;
+                        try {
+                                viewers = Integer.parseInt(event.getTags().get("msg-param-viewerCount"));
+                        }
+                        catch(NumberFormatException ex) {
+                                viewers = 0;
+                        }
+                        eventManager.dispatchEvent(new RaidEvent(channel, raider, viewers));
+                }
+        }
 
 	/**
 	 * ChatChannel clearing chat, timeouting or banning user Event
