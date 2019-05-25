@@ -131,9 +131,13 @@ public class IRCEventHandler {
 				if(cumulativeMonths == 0) {
 					cumulativeMonths = 1;
 				}
+                                
+                                // check user's sub streak
+                                // Twitch API specifies that 0 is returned if the user chooses not to share their streak
+                                Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
 
 				// Dispatch Event
-                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null));
+                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak));
 			}
 			// Receive Gifted Sub
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {
@@ -150,7 +154,7 @@ public class IRCEventHandler {
 				}
 
 				// Dispatch Event
-                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy));
+                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy, 0));
 			}
 			// Gift X Subs
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("submysterygift")) {
