@@ -124,15 +124,16 @@ public class IRCEventHandler {
                 EventUser user = event.getUser();
 				String subPlan = event.getTagValue("msg-param-sub-plan").get();
 				boolean isResub = event.getTags().get("msg-id").equalsIgnoreCase("resub");
-				Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
+				Integer cumulativeMonths = (event.getTags().containsKey("msg-param-cumulative-months")) ? Integer.parseInt(event.getTags().get("msg-param-cumulative-months")) : 0;
+                                //according to the Twitch docs, msg-param-months is used only for giftsubs, which are handled below
 
 				// twitch sometimes returns 0 months for new subs
-				if(subStreak == 0) {
-					subStreak = 1;
+				if(cumulativeMonths == 0) {
+					cumulativeMonths = 1;
 				}
 
 				// Dispatch Event
-                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, false, null));
+                eventManager.dispatchEvent(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null));
 			}
 			// Receive Gifted Sub
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {

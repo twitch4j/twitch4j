@@ -58,7 +58,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
      * @param user User that subscribed
      * @param subPlan Sub Plan
      * @param message Sub Message
-     * @param months Months
+     * @param months number of months user has been subscribed (cumulative, not consecutive)
      * @param gifted Is gifted?
      * @param giftedBy User that gifted the sub
      */
