@@ -68,7 +68,7 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
             .logger(new Logger.ErrorLogger())
-            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), getErrorTrackingManager()))
+            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, timeout))
             .retryer(new Retryer.Default(500, timeout, 2))

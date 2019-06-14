@@ -9,7 +9,6 @@ import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
-import com.github.twitch4j.common.errortracking.ErrorTrackingManager;
 import com.neovisionaries.ws.client.*;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -38,12 +37,6 @@ public class TwitchChat {
      */
     @Getter
     private final CredentialManager credentialManager;
-
-    /**
-     * Error Tracking Manager
-     */
-    @Getter
-    private final ErrorTrackingManager errorTrackingManager;
 
     /**
      * OAuth2Credential, used to sign in to twitch chat
@@ -107,10 +100,9 @@ public class TwitchChat {
      * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, ErrorTrackingManager errorTrackingManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
-        this.errorTrackingManager = errorTrackingManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
@@ -168,7 +160,6 @@ public class TwitchChat {
                     Thread.sleep(250);
                 } catch (Exception ex) {
                     log.error("Failed to process message from command queue: " + ex.getMessage());
-                    errorTrackingManager.handleException(ex);
                 }
             }
         });
@@ -197,13 +188,11 @@ public class TwitchChat {
                 this.webSocket.connect();
             } catch (Exception ex) {
                 log.error("Connection to Twitch IRC failed: {} - Retrying ...", ex.getMessage());
-                errorTrackingManager.handleException(ex);
-
                 // Sleep 1 second before trying to reconnect
                 try {
                     Thread.sleep(1000);
                 } catch (Exception et) {
-                    errorTrackingManager.handleException(et);
+
                 }
 
                 // reconnect
@@ -300,7 +289,6 @@ public class TwitchChat {
                                 // - CAP
                                 if (message.contains(":req Invalid CAP command")) {
                                     log.error("Failed to acquire requested IRC capabilities!");
-                                    errorTrackingManager.handleException(new RuntimeException("Failed to acquire requested IRC capabilities!"));
                                 }
                                 else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
                                     List<String> capabilities = Arrays.asList(message.replace(":tmi.twitch.tv CAP * ACK :", "").split(" "));
@@ -328,7 +316,6 @@ public class TwitchChat {
                                         }
                                     } catch (Exception ex) {
                                         log.error(ex.getMessage(), ex);
-                                        errorTrackingManager.handleException(ex);
                                     }
                                 }
                             }
@@ -352,10 +339,8 @@ public class TwitchChat {
 
             });
 
-
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            errorTrackingManager.handleException(ex);
         }
     }
 

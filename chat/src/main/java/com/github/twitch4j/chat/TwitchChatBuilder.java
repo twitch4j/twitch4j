@@ -5,8 +5,6 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
-import com.github.twitch4j.common.errortracking.ErrorTracker;
-import com.github.twitch4j.common.errortracking.SentryIOErrorTracking;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Twitch Chat
@@ -78,10 +75,9 @@ public class TwitchChatBuilder extends TwitchAPIBuilder<TwitchChatBuilder> {
      */
     public TwitchChat build() {
         log.debug("TwitchChat: Initializing ErrorTracking ...");
-        getErrorTrackingManager().addErrorTracker(getModuleErrorTracker("TwitchChat"));
 
         log.debug("TwitchChat: Initializing Module ...");
-        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.getErrorTrackingManager(), this.chatAccount, this.enableChannelCache, this.commandPrefixes);
+        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache, this.commandPrefixes);
 
         return twitchChat;
     }

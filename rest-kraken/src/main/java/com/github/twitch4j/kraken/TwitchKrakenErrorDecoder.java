@@ -1,8 +1,6 @@
 package com.github.twitch4j.kraken;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.philippheuer.events4j.EventManager;
-import com.github.twitch4j.common.errortracking.ErrorTrackingManager;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
 import feign.Request;
@@ -21,9 +19,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class TwitchKrakenErrorDecoder implements ErrorDecoder {
 
-    // EventManager
-    final ErrorTrackingManager errorTrackingManager;
-
     // Decoder
     final Decoder decoder;
 
@@ -38,9 +33,8 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
      *
      * @param decoder Feign Decoder
      */
-    public TwitchKrakenErrorDecoder(Decoder decoder, ErrorTrackingManager errorTrackingManager) {
+    public TwitchKrakenErrorDecoder(Decoder decoder) {
         this.decoder = decoder;
-        this.errorTrackingManager = errorTrackingManager;
     }
 
     /**
@@ -94,9 +88,6 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);
         }
-
-        // dispatch exception event
-        errorTrackingManager.handleException(ex);
 
         return ex;
     }

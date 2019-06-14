@@ -1,7 +1,6 @@
 package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.twitch4j.common.errortracking.ErrorTrackingManager;
 import com.github.twitch4j.helix.domain.TwitchHelixError;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
@@ -20,9 +19,6 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class TwitchHelixErrorDecoder implements ErrorDecoder {
 
-    // Error Tracking Manager
-    final ErrorTrackingManager errorTrackingManager;
-
     // Decoder
     final Decoder decoder;
 
@@ -37,9 +33,8 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
      *
      * @param decoder Feign Decoder
      */
-    public TwitchHelixErrorDecoder(Decoder decoder, ErrorTrackingManager errorTrackingManager) {
+    public TwitchHelixErrorDecoder(Decoder decoder) {
         this.decoder = decoder;
-        this.errorTrackingManager = errorTrackingManager;
     }
 
     /**
@@ -93,9 +88,6 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);
         }
-
-        // dispatch exception event
-        errorTrackingManager.handleException(ex);
 
         return ex;
     }

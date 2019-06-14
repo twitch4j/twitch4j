@@ -145,7 +145,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
      */
     public TwitchClient build() {
         log.debug("TwitchClient: Initializing ErrorTracking ...");
-        getErrorTrackingManager().addErrorTracker(getModuleErrorTracker("TwitchChat"));
 
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth authModule = new TwitchAuth(credentialManager, getClientId(), getClientSecret(), redirectUrl);
@@ -216,7 +215,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, getErrorTrackingManager(), helix, kraken, tmi, chat, pubsub, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
 
         // Return new Client Instance
         return client;
