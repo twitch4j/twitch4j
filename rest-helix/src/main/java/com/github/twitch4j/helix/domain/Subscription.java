@@ -37,6 +37,6 @@ public class Subscription {
 
     // Login name of the subscribed user.
     @NonNull
-    private Integer userName;
+    private String userName;
 
 }
