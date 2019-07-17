@@ -49,7 +49,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
         Exception ex = null;
 
         try {
-            String responseBody = IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
