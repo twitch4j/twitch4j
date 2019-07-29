@@ -1,5 +1,7 @@
 package com.github.twitch4j;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.events4j.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
@@ -11,12 +13,12 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +50,10 @@ public class TwitchClientHelper {
     /**
      * Channel Information Cache
      */
-    private Map<Long, ChannelCache> channelInformation = new HashMap<>();
+    private Cache<Long, ChannelCache> channelInformation = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .maximumSize(10_000)
+        .build();
 
     /**
      * Constructor
@@ -74,7 +79,7 @@ public class TwitchClientHelper {
                     try {
                         List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
                         listenForGoLive.forEach(channel -> {
-                            ChannelCache currentChannelCache = channelInformation.get(channel.getId());
+                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
                             Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
                             boolean dispatchGoLiveEvent = false;
@@ -82,7 +87,7 @@ public class TwitchClientHelper {
                             boolean dispatchTitleChangedEvent = false;
                             boolean dispatchGameChangedEvent = false;
 
-                            if (stream.isPresent()) {
+                            if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
                                 // is live
                                 // - live status
                                 if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
@@ -149,7 +154,7 @@ public class TwitchClientHelper {
                         HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channel.getId(), null, null);
 
                         try {
-                            ChannelCache currentChannelCache = channelInformation.get(channel.getId());
+                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
                             LocalDateTime lastFollowDate = null;
 
                             if (currentChannelCache.getLastFollowCheck() != null) {
@@ -212,7 +217,7 @@ public class TwitchClientHelper {
                 listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
 
                 // initialize cache
-                if (!channelInformation.containsKey(user.getId())) {
+                if (channelInformation.getIfPresent(user.getId()) == null) {
                     channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
                 }
 
@@ -238,7 +243,7 @@ public class TwitchClientHelper {
                 listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
 
                 // initialize cache
-                if (!channelInformation.containsKey(user.getId())) {
+                if (channelInformation.getIfPresent(user.getId()) == null) {
                     channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
                 }
 

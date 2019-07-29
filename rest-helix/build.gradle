@@ -1,15 +1,16 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// HTTP Client
-	compile group: 'io.github.openfeign', name: 'feign-okhttp'
-	compile group: 'io.github.openfeign', name: 'feign-jackson'
-	compile group: 'io.github.openfeign', name: 'feign-slf4j'
-	compile group: 'io.github.openfeign', name: 'feign-hystrix'
+	api group: 'io.github.openfeign', name: 'feign-okhttp'
+	api group: 'io.github.openfeign', name: 'feign-jackson'
+	api group: 'io.github.openfeign', name: 'feign-slf4j'
+	api group: 'io.github.openfeign', name: 'feign-hystrix'
+	api group: 'commons-configuration', name: 'commons-configuration'
 
 	// Jackson (JSON)
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
-	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+	api group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+	api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
+	api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-common')
