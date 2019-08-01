@@ -67,12 +67,12 @@ subprojects {
 
 			// Rate Limiting
 			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.1.1'
-			
+
 			// Http Client
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.1.0'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.1.0'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.1.0'
-			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.1.0'
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.2.3'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.2.3'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.2.3'
+			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.2.3'
 
 			// Hystrix
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
