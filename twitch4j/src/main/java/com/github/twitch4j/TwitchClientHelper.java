@@ -204,7 +204,7 @@ public class TwitchClientHelper {
     }
 
     /**
-     * GoLive Listener
+     * Enable StreamEvent Listener
      *
      * @param channelName Channel Name
      */
@@ -225,7 +225,33 @@ public class TwitchClientHelper {
                 startOrStopEventGenerationThread();
             });
         } else {
-            log.error("Failed to add channel " + channelName + " to GoLive Listener, maybe it doesn't exist!");
+            log.error("Failed to add channel " + channelName + " to stream event listener!");
+        }
+    }
+
+    /**
+     * Disable StreamEvent Listener
+     *
+     * @param channelName Channel Name
+     */
+    public void disableStreamEventListener(String channelName) {
+        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> {
+                // add to list
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+
+                // invalidate cache
+                if (channelInformation.getIfPresent(user.getId()) != null) {
+                    channelInformation.invalidate(user.getId());
+                }
+
+                // start thread if needed
+                startOrStopEventGenerationThread();
+            });
+        } else {
+            log.error("Failed to remove channel " + channelName + " from stream event listener!");
         }
     }
 
@@ -252,6 +278,32 @@ public class TwitchClientHelper {
             });
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
+        }
+    }
+
+    /**
+     * Disable Follow Listener
+     *
+     * @param channelName Channel Name
+     */
+    public void disableFollowEventListener(String channelName) {
+        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> {
+                // add to list
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+
+                // invalidate cache
+                if (channelInformation.getIfPresent(user.getId()) != null) {
+                    channelInformation.invalidate(user.getId());
+                }
+
+                // start thread if needed
+                startOrStopEventGenerationThread();
+            });
+        } else {
+            log.error("Failed to remove channel " + channelName + " from follow listener!");
         }
     }
 
