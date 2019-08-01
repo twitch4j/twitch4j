@@ -10,6 +10,7 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.okhttp.OkHttpClient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -65,6 +66,7 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
 
         // Feign
         TwitchHelix client = HystrixFeign.builder()
+            .client(new OkHttpClient())
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
             .logger(new Logger.ErrorLogger())

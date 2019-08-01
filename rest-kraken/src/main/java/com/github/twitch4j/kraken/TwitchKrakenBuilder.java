@@ -9,6 +9,7 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.okhttp.OkHttpClient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +57,7 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
 
         // Build
         TwitchKraken client = HystrixFeign.builder()
+            .client(new OkHttpClient())
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
