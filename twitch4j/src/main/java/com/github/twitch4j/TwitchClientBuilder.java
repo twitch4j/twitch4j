@@ -23,6 +23,9 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.TopicProcessor;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +107,19 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
      * EventManager
      */
     @Wither
-    private EventManager eventManager = new EventManager();
+    private EventManager eventManager = null;
+
+    /**
+     * How many threads should the eventManager use to process the events?
+     */
+    @Wither
+    private Integer eventManagerThreads = Runtime.getRuntime().availableProcessors() * 2;
+
+    /**
+     * How many events can be queued before the eventManager should start dropping events?
+     */
+    @Wither
+    private Integer eventManagerBufferSize = 16384;
 
     /**
      * User Agent
@@ -148,6 +163,13 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
 
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth authModule = new TwitchAuth(credentialManager, getClientId(), getClientSecret(), redirectUrl);
+
+        // Customized EventManager Init
+        if (eventManager == null) {
+            eventManager = new EventManager(Schedulers.newParallel("events4j-scheduler", eventManagerThreads), TopicProcessor.create("events4j-processor", eventManagerBufferSize), FluxSink.OverflowStrategy.BUFFER);
+        }
+        // EventManager
+        eventManager.enableAnnotationBasedEvents();
 
         // Module: Helix
         TwitchHelix helix = null;

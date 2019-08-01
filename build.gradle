@@ -23,6 +23,8 @@ allprojects {
 	repositories {
 		jcenter()
 		maven { url "https://dl.bintray.com/philippheuer/maven" }
+		maven { url "https://maven.google.com" }
+		mavenLocal()
 	}
 }
 
@@ -54,7 +56,7 @@ subprojects {
 			dependency group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
 			// Event Dispatcher
-            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
+            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.5.0'
 
 			// Credential Manager
 			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.20'
