@@ -23,12 +23,15 @@ allprojects {
 	repositories {
 		jcenter()
 		maven { url "https://dl.bintray.com/philippheuer/maven" }
+		maven { url "https://maven.google.com" }
+		mavenLocal()
 	}
 }
 
 // Subprojects
 subprojects {
     apply plugin: 'java'
+	apply plugin: 'java-library'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
@@ -50,9 +53,10 @@ subprojects {
             dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
             dependency group: 'commons-io', name: 'commons-io', version: '2.6'
 			dependency group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
+			dependency group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
 			// Event Dispatcher
-            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.4.0'
+            dependency group: 'com.github.philippheuer.events4j', name: 'events4j', version: '0.5.0'
 
 			// Credential Manager
 			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.20'
@@ -63,7 +67,7 @@ subprojects {
 
 			// Rate Limiting
 			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.1.1'
-			
+
 			// Http Client
             dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.2.3'
             dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.2.3'

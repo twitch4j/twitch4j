@@ -49,7 +49,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
         Exception ex = null;
 
         try {
-            String responseBody = IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
@@ -73,7 +73,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.
-                ex = new RetryableException(503, "getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
+                ex = new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
             } else {
                 TwitchHelixError error = objectMapper.readValue(responseBody, TwitchHelixError.class);
                 ex = new ContextedRuntimeException("Helix API Error")
