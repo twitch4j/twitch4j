@@ -10,7 +10,10 @@ public class JsonEscaper implements Param.Expander {
 
 	@Override
 	public String expand(Object value) {
-		return new String(JSON_ESCAPER.quoteAsString(value.toString()));
+		if(value == null)
+			return "";
+		else
+			return new String(JSON_ESCAPER.quoteAsString(value.toString()));
 	}
 
 }
