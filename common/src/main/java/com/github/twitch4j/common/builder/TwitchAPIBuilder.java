@@ -76,4 +76,16 @@ public class TwitchAPIBuilder<T> {
         return (T) this;
     }
 
+    /**
+     * With Max Queue Size
+     *
+     * @param maxQueueSize maxQueueSize
+     * @return T
+     */
+    public T withMaxQueueSize(Integer maxQueueSize) {
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", maxQueueSize);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", maxQueueSize);
+        return (T) this;
+    }
+
 }
