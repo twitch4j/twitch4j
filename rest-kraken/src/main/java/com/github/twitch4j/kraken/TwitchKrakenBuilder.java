@@ -54,6 +54,8 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
         // Hystrix
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
         // Build
         TwitchKraken client = HystrixFeign.builder()

@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,6 +32,12 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
     private String baseUrl = "https://tmi.twitch.tv";
 
     /**
+     * Default Timeout
+     */
+    @Wither
+    private Integer timeout = 5000;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -46,7 +53,14 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
      */
     public TwitchMessagingInterface build() {
         log.debug("TMI: Initializing Module ...");
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
+
+        // Hystrix
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
+
+        // Build
         TwitchMessagingInterface client = HystrixFeign.builder()
             .client(new OkHttpClient())
             .encoder(new JacksonEncoder())

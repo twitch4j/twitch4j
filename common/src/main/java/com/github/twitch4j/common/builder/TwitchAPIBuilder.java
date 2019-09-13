@@ -1,9 +1,11 @@
 package com.github.twitch4j.common.builder;
 
 import com.github.philippheuer.events4j.EventManager;
+import com.netflix.config.ConfigurationManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,6 +33,11 @@ public class TwitchAPIBuilder<T> {
      * User Agent
      */
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
+
+    /**
+     * HTTP Request Queue Size
+     */
+    private Integer requestQueueSize = -1;
 
     /**
      * With EventManager
@@ -77,14 +84,13 @@ public class TwitchAPIBuilder<T> {
     }
 
     /**
-     * With Max Queue Size
+     * Set the size of the http request queue
      *
-     * @param maxQueueSize maxQueueSize
+     * @param requestQueueSize requestQueueSize
      * @return T
      */
-    public T withMaxQueueSize(Integer maxQueueSize) {
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", maxQueueSize);
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", maxQueueSize);
+    public T withRequestQueueSize(Integer requestQueueSize) {
+        this.requestQueueSize = requestQueueSize;
         return (T) this;
     }
 
