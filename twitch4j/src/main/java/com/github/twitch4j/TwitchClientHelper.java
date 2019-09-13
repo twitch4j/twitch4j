@@ -143,7 +143,7 @@ public class TwitchClientHelper {
                         });
                     } catch (Exception ex) {
                         if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
-                            log.trace(hystrixGetAllStreams.getFailedExecutionException().getStackTrace().toString());
+                            log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
                         }
 
                         log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
@@ -183,7 +183,7 @@ public class TwitchClientHelper {
                             }
                         } catch (Exception ex) {
                             if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                                log.trace(ex.getStackTrace().toString());
+                                log.trace(ex.getMessage(), ex);
                             }
 
                             log.error("Failed to check for Follow Events: " + ex.getMessage());

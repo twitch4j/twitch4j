@@ -355,6 +355,15 @@ public class TwitchChat {
     }
 
     /**
+     * Send raw irc command
+     *
+     * @param command raw irc command
+     */
+    public void sendRaw(String command) {
+        ircCommandQueue.add(command);
+    }
+
+    /**
      * Send IRC Command
      *
      * @param command IRC Command
