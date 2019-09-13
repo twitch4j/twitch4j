@@ -128,12 +128,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
 
     /**
-     * Max Queue Size
-     */
-    @Wither
-    private Integer maxQueueSize = -1;
-
-    /**
      * CredentialManager
      */
     @Wither
@@ -185,7 +179,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientSecret(getClientSecret())
                 .withEventManager(eventManager)
                 .withUserAgent(userAgent)
-                .withMaxQueueSize(maxQueueSize)
+                .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
                 .build();
         }
@@ -198,7 +192,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientSecret(getClientSecret())
                 .withEventManager(eventManager)
                 .withUserAgent(userAgent)
-                .withMaxQueueSize(maxQueueSize)
+                .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
                 .build();
         }
@@ -211,6 +205,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientSecret(getClientSecret())
                 .withEventManager(eventManager)
                 .withUserAgent(userAgent)
+                .withRequestQueueSize(getRequestQueueSize())
+                .withTimeout(timeout)
                 .build();
         }
 
