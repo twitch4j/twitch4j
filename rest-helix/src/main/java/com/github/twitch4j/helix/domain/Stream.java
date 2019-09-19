@@ -24,14 +24,14 @@ public class Stream {
 
     // Stream ID.
     @NonNull
-    private Long id;
+    private String id;
 
     // ID of the user who is streaming.
     @NonNull
-    private Long userId;
+    private String userId;
 
     // ID of the game being played on the stream.
-    private Long gameId;
+    private String gameId;
 
     // Array of community IDs.
     @NonNull
@@ -55,7 +55,7 @@ public class Stream {
 
     // Ids of active tags on the stream
     private List<UUID> tagIds = new ArrayList<>();
-    
+
     // Stream language.
     @NonNull
     private String language;

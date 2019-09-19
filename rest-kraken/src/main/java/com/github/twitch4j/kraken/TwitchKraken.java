@@ -39,7 +39,7 @@ public interface TwitchKraken {
     })
     HystrixCommand<KrakenSubscriptionList> getChannelSubscribers(
         @Param("token") String authToken,
-        @Param("channelId") Long channelId,
+        @Param("channelId") String channelId,
         @Param("limit") Integer limit,
         @Param("offset") Integer offset,
         @Param("direction") String direction
@@ -62,8 +62,8 @@ public interface TwitchKraken {
     })
     HystrixCommand<Object> addFollow(
         @Param("token") String authToken,
-        @Param("user") Long userId,
-        @Param("targetUser") Long targetUserId
+        @Param("user") String userId,
+        @Param("targetUser") String targetUserId
     );
 
     /**
@@ -89,8 +89,8 @@ public interface TwitchKraken {
     @RequestLine("GET /teams?limit={limit}&offset={offset}")
     @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeamList> getAllTeams(
-        @Param("limit") Long limit,
-        @Param("offset") Long offset
+        @Param("limit") Integer limit,
+        @Param("offset") Integer offset
     );
 
     /**

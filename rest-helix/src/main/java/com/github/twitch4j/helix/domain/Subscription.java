@@ -14,7 +14,7 @@ public class Subscription {
 
     // User ID of the broadcaster.
     @NonNull
-    private Long broadcasterId;
+    private String broadcasterId;
 
     // Username of the broadcaster.
     @NonNull
