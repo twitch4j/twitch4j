@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class StreamsServiceTest extends AbtractEndpointTest {
 
     // UserId
-    private static Long twitchUserId = 149223493L;
+    private static String twitchUserId = "149223493";
 
     // Hearthstone GameId
     private static String hearthstoneGameId = "138585";
@@ -94,7 +94,7 @@ public class StreamsServiceTest extends AbtractEndpointTest {
     @Disabled
     public void getStreamMarkers() {
         // TestCase
-        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, 217359661l, 137512364l).execute();
+        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, "217359661", "137512364").execute();
 
         // Test
         assertTrue(resultList.getStreamMarkers().size() > 0, "Should at least find one result from the streams metadata method!");
