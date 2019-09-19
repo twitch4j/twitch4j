@@ -86,7 +86,7 @@ public interface TwitchHelix {
         @Param("count") String count,
         @Param("period") String period,
         @Param("started_at") String startedAt,
-        @Param("user_id") Long userId
+        @Param("user_id") String userId
     );
 
     /**
@@ -132,10 +132,10 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only). 
+     * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
      * Using user-token or app-token to increase rate limits.
      *
-     * @param authToken User or App auth Token, for increased rate-limits  
+     * @param authToken User or App auth Token, for increased rate-limits
      * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
      * @param gameId        ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
      * @param id            ID of the clip being queried. Limit: 100.
@@ -179,7 +179,7 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets game information by game ID or name. 
+     * Gets game information by game ID or name.
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
@@ -212,7 +212,7 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets games sorted by number of current viewers on Twitch, most popular first. 
+     * Gets games sorted by number of current viewers on Twitch, most popular first.
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
@@ -252,12 +252,12 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
     /**
-     * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams. 
+     * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
@@ -281,7 +281,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -307,12 +307,12 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
     /**
-     * Gets metadata information about active streams playing Overwatch or Hearthstone. Streams are sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams. 
+     * Gets metadata information about active streams playing Overwatch or Hearthstone. Streams are sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken   User or App auth Token, for increased rate-limits
@@ -336,20 +336,20 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
-    
+
     /**
      * Gets available Twitch stream tags.
-     * 
+     *
      * @param authToken User Token or App auth Token, for increased rate-limits
      * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param tagIds    Returns tags by one or more specified tag IDs. You can specify up to 100 IDs. If you search by tagIds, no pagination is used. 
+     * @param tagIds    Returns tags by one or more specified tag IDs. You can specify up to 100 IDs. If you search by tagIds, no pagination is used.
      * @return StreamTagList
      */
-    @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")    
+    @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getAllStreamTags(
             @Param("token") String authToken,
@@ -357,43 +357,43 @@ public interface TwitchHelix {
             @Param("first") Integer limit,
             @Param("tag_id") List<UUID> tagIds
     );
-    
+
     /**
      * Gets stream tags which are active on the specified stream.
-     * 
+     *
      * @param authToken     User Token or App auth Token, for increased rate-limits
-     * @param broadcasterId ID of the stream to fetch current tags from 
+     * @param broadcasterId ID of the stream to fetch current tags from
      * @return StreamTagList
      */
-    @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")    
+    @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getStreamTags(
             @Param("token") String authToken,
-            @Param("broadcaster_id") Long broadcasterId
+            @Param("broadcaster_id") String broadcasterId
     );
-    
+
     /**
      * Replaces the active stream tags on the specified stream with the specified tags (or clears all tags, if no new tags are specified).
      * Requires scope: user:edit:broadcast
-     * 
+     *
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream to replace tags for
      * @param tagIds        Tag ids to replace the current stream tags with. Maximum: 100. If empty, all tags are cleared from the stream. Tags currently expire 72 hours after they are applied, unless the stream is live within that time period.
      * @return Object       nothing
      */
     @RequestLine("PUT /streams/tags?broadcaster_id={broadcaster_id}")
-    @Headers    
+    @Headers
     ({
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
-    })    
+    })
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
     HystrixCommand<Object> replaceStreamTags(
             @Param("token") String authToken,
-            @Param("broadcaster_id") Long broadcasterId,
+            @Param("broadcaster_id") String broadcasterId,
             @Param(value = "tag_ids", expander = ObjectToJsonExpander.class ) List<UUID> tagIds
     );
-    
+
     /**
      * TODO: Create Stream Marker
      */
@@ -416,8 +416,8 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit,
-        @Param("user_id") Long userId,
-        @Param("video_id") Long videoId
+        @Param("user_id") String userId,
+        @Param("video_id") String videoId
     );
 
     /**
@@ -434,7 +434,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SubscriptionList> getSubscriptions(
         @Param("token") String authToken,
-        @Param("broadcaster_id") Long broadcasterId,
+        @Param("broadcaster_id") String broadcasterId,
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
@@ -452,10 +452,10 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SubscriptionList> getSubscriptionsByUser(
         @Param("token") String authToken,
-        @Param("broadcaster_id") Long broadcasterId,
-        @Param("user_id") List<Long> userIds
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds
     );
-    
+
     /**
      * Get Users
      * <p>
@@ -470,7 +470,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserList> getUsers(
         @Param("token") String authToken,
-        @Param("id") List<Long> userIds,
+        @Param("id") List<String> userIds,
         @Param("login") List<String> userNames
     );
 
@@ -488,8 +488,8 @@ public interface TwitchHelix {
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Deprecated
     HystrixCommand<FollowList> getFollowers(
-        @Param("from_id") Long fromId,
-        @Param("to_id") Long toId,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -511,8 +511,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<FollowList> getFollowers(
         @Param("token") String authToken,
-        @Param("from_id") Long fromId,
-        @Param("to_id") Long toId,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -563,7 +563,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
         @Param("token") String authToken,
-        @Param("user_id") Long userId
+        @Param("user_id") String userId
     );
 
     /**
@@ -592,8 +592,8 @@ public interface TwitchHelix {
     @Deprecated
     HystrixCommand<VideoList> getVideos(
         @Param("id") String id,
-        @Param("user_id") Long userId,
-        @Param("game_id") Long gameId,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
         @Param("language") String language,
         @Param("period") String period,
         @Param("sort") String sort,
@@ -609,7 +609,7 @@ public interface TwitchHelix {
      * Gets video information by video ID (one or more), user ID (one only), or game ID (one only).
      * The response has a JSON payload with a data field containing an array of video elements. For lookup by user or game, pagination is available, along with several filters that can be specified as query string parameters.
      * Using user-token or app-token to increase rate limits.
-     * 
+     *
      * @param authToken User or App auth Token, for increased rate-limits
      * @param id       ID of the video being queried. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
      * @param userId   ID of the user who owns the video. Limit 1.
@@ -628,8 +628,8 @@ public interface TwitchHelix {
     HystrixCommand<VideoList> getVideos(
         @Param("token") String authToken,
         @Param("id") String id,
-        @Param("user_id") Long userId,
-        @Param("game_id") Long gameId,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
         @Param("language") String language,
         @Param("period") String period,
         @Param("sort") String sort,
@@ -639,7 +639,7 @@ public interface TwitchHelix {
         @Param("first") Integer limit
     );
 
-    
+
     /**
      * TODO: Get Webhook Subscriptions
      */
