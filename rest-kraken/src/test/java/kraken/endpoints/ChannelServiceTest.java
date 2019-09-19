@@ -17,7 +17,7 @@ public class ChannelServiceTest extends AbstractKrakenServiceTest {
     @DisplayName("getSubscribers")
     @Disabled // test acc has no subs
     public void getSubscribers() {
-        KrakenSubscriptionList resultList = getTwitchKrakenClient().getChannelSubscribers(AbstractKrakenServiceTest.getCredential().getAccessToken(), 149223493l, null, null, null).execute();
+        KrakenSubscriptionList resultList = getTwitchKrakenClient().getChannelSubscribers(AbstractKrakenServiceTest.getCredential().getAccessToken(), "149223493l", null, null, null).execute();
 
         assertTrue(resultList.getSubscriptions().size() > 0, "Didn't find any subscriptions!");
     }
