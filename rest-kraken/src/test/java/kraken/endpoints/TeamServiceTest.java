@@ -1,5 +1,7 @@
 package kraken.endpoints;
 
+import com.github.twitch4j.kraken.TwitchKraken;
+import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.kraken.domain.KrakenTeam;
 import com.github.twitch4j.kraken.domain.KrakenTeamList;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,8 @@ public class TeamServiceTest extends AbstractKrakenServiceTest {
         KrakenTeam result = getTwitchKrakenClient().getTeamByName("staff").execute();
 
         assertNotNull(result, "Didn't find the specified team!");
+
+        assertTrue(result.getUsers().size() > 1, "Should be at least one team member");
     }
 
 }
