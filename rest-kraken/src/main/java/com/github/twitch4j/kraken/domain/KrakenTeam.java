@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Model representing a team.
@@ -29,4 +30,6 @@ public class KrakenTeam {
 	private Date createdAt;
 
 	private Date updatedAt;
+
+	private List<KrakenTeamUser> users;
 }
