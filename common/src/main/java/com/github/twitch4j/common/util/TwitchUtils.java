@@ -45,6 +45,11 @@ public class TwitchUtils {
             if (badges.containsKey("staff")) {
                 permissionSet.add(CommandPermission.TWITCHSTAFF);
             }
+            // Founder
+            if(badges.containsKey("founder")) {
+                permissionSet.add(CommandPermission.FOUNDER);
+                permissionSet.add(CommandPermission.SUBSCRIBER);
+            }
         }
         // Moderator
         if (tags.containsKey("mod") && tags.get("mod").equals("1")) {
