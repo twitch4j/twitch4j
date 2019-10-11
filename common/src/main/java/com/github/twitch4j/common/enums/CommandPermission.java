@@ -22,6 +22,11 @@ public enum CommandPermission {
 	SUBSCRIBER,
 
 	/**
+	 * Founder (first 10 subscribers of an Affiliate, or first 25 subscribers of a Partner)
+	 */
+	FOUNDER,
+
+	/**
 	 * Gifted a sub
 	 */
 	SUBGIFTER,
