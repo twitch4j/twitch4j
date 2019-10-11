@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UsersServiceTest extends AbtractEndpointTest {
 
     // UserId
-    private static Long twitchUserId = 149223493l;
+    private static String twitchUserId = "149223493l";
 
     /**
      * Get Users

@@ -234,7 +234,7 @@ public class TwitchPubSub {
                                 // todo
                             } else if (message.getData().getTopic().startsWith("whispers")) {
                                 // Whisper
-                                EventUser eventUser = new EventUser(Long.valueOf((Integer) message.getData().getMessage().getMessageData().get("from_id")), (String) message.getData().getMessage().getMessageDataTags().get("display_name"));
+                                EventUser eventUser = new EventUser((String) message.getData().getMessage().getMessageData().get("from_id"), (String) message.getData().getMessage().getMessageDataTags().get("display_name"));
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, (String) message.getData().getMessage().getMessageData().get("body"), TwitchUtils.getPermissionsFromTags(message.getData().getMessage().getMessageDataTags()));
                                 eventManager.dispatchEvent(privateMessageEvent);
                             } else {

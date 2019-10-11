@@ -22,7 +22,7 @@ public class ChannelChangeGameEvent extends TwitchEvent {
     /**
      * GameId
      */
-    private final Long gameId;
+    private final String gameId;
 
     /**
      * Event Constructor
@@ -30,7 +30,7 @@ public class ChannelChangeGameEvent extends TwitchEvent {
      * @param channel        The channel that went live
      * @param gameId         The gameId
      */
-    public ChannelChangeGameEvent(EventChannel channel, Long gameId) {
+    public ChannelChangeGameEvent(EventChannel channel, String gameId) {
         this.channel = channel;
         this.gameId = gameId;
     }

@@ -30,7 +30,7 @@ public class ChannelCache {
     /**
      * Current Game Id
      */
-    private Long gameId;
+    private String gameId;
 
     /**
      * Last Follow Check

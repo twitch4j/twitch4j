@@ -143,7 +143,7 @@ public class IRCEventHandler {
 			else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {
 				// Load Info
 				EventChannel channel = event.getChannel();
-                EventUser user = new EventUser(Long.parseLong(event.getTagValue("msg-param-recipient-id").get()), event.getTagValue("msg-param-recipient-user-name").get());
+                EventUser user = new EventUser(event.getTagValue("msg-param-recipient-id").get(), event.getTagValue("msg-param-recipient-user-name").get());
                 EventUser giftedBy = event.getUser();
 				String subPlan = event.getTagValue("msg-param-sub-plan").get();
 				Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
