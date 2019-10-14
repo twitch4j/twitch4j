@@ -16,6 +16,7 @@ public class KrakenTeam {
 
 	private String name;
 
+	@JsonProperty("display_name")
 	private String displayName;
 
 	private String info;
@@ -26,7 +27,9 @@ public class KrakenTeam {
 
 	private String banner;
 
-	private Date createdAt;
+    @JsonProperty("created_at")
+    private Date createdAt;
 
-	private Date updatedAt;
+    @JsonProperty("updated_at")
+    private Date updatedAt;
 }
