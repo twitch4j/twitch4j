@@ -13,5 +13,5 @@ public class Configuration {
     /**
      * Automatically load modules
      */
-    public static boolean LOAD_MODULES = true;
+    public static boolean LOAD_MODULES = false;
 }

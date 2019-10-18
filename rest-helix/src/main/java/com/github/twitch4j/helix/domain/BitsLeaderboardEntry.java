@@ -17,7 +17,7 @@ public class BitsLeaderboardEntry {
 
     // ID of the user (viewer) in the leaderboard entry.
     @NonNull
-    private Long userId;
+    private String userId;
 
     // Leaderboard rank of the user.
     private Integer rank;

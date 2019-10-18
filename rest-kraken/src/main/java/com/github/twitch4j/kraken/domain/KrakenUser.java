@@ -9,7 +9,7 @@ import java.util.Date;
 public class KrakenUser {
 
 	@JsonProperty("_id")
-	private Long id;
+	private String id;
 
 	private String name;
 

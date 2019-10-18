@@ -83,7 +83,7 @@ public interface TwitchHelix {
         @Param("count") String count,
         @Param("period") String period,
         @Param("started_at") String startedAt,
-        @Param("user_id") Long userId
+        @Param("user_id") String userId
     );
 
     /**
@@ -285,7 +285,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -314,7 +314,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -340,7 +340,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -369,7 +369,7 @@ public interface TwitchHelix {
         @Param("community_id") List<UUID> communityId,
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
-        @Param("user_id") List<Long> userIds,
+        @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     );
 
@@ -402,7 +402,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getStreamTags(
             @Param("token") String authToken,
-            @Param("broadcaster_id") Long broadcasterId
+            @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -423,7 +423,7 @@ public interface TwitchHelix {
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
     HystrixCommand<Object> replaceStreamTags(
             @Param("token") String authToken,
-            @Param("broadcaster_id") Long broadcasterId,
+            @Param("broadcaster_id") String broadcasterId,
             @Param(value = "tag_ids", expander = ObjectToJsonExpander.class ) List<UUID> tagIds
     );
 
@@ -449,8 +449,8 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit,
-        @Param("user_id") Long userId,
-        @Param("video_id") Long videoId
+        @Param("user_id") String userId,
+        @Param("video_id") String videoId
     );
 
     /**
@@ -467,7 +467,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SubscriptionList> getSubscriptions(
         @Param("token") String authToken,
-        @Param("broadcaster_id") Long broadcasterId,
+        @Param("broadcaster_id") String broadcasterId,
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
@@ -485,8 +485,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SubscriptionList> getSubscriptionsByUser(
         @Param("token") String authToken,
-        @Param("broadcaster_id") Long broadcasterId,
-        @Param("user_id") List<Long> userIds
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds
     );
 
     /**
@@ -503,7 +503,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserList> getUsers(
         @Param("token") String authToken,
-        @Param("id") List<Long> userIds,
+        @Param("id") List<String> userIds,
         @Param("login") List<String> userNames
     );
 
@@ -521,8 +521,8 @@ public interface TwitchHelix {
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Deprecated
     HystrixCommand<FollowList> getFollowers(
-        @Param("from_id") Long fromId,
-        @Param("to_id") Long toId,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -544,8 +544,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<FollowList> getFollowers(
         @Param("token") String authToken,
-        @Param("from_id") Long fromId,
-        @Param("to_id") Long toId,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -596,7 +596,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
         @Param("token") String authToken,
-        @Param("user_id") Long userId
+        @Param("user_id") String userId
     );
 
     /**
@@ -625,8 +625,8 @@ public interface TwitchHelix {
     @Deprecated
     HystrixCommand<VideoList> getVideos(
         @Param("id") String id,
-        @Param("user_id") Long userId,
-        @Param("game_id") Long gameId,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
         @Param("language") String language,
         @Param("period") String period,
         @Param("sort") String sort,
@@ -661,8 +661,8 @@ public interface TwitchHelix {
     HystrixCommand<VideoList> getVideos(
         @Param("token") String authToken,
         @Param("id") String id,
-        @Param("user_id") Long userId,
-        @Param("game_id") Long gameId,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
         @Param("language") String language,
         @Param("period") String period,
         @Param("sort") String sort,

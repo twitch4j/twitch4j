@@ -19,10 +19,10 @@ public class StreamMetadata {
 
     // ID of the user who is streaming.
     @NonNull
-    private Long userId;
+    private String userId;
 
     // ID of the game being played on the stream.
-    private Long gameId;
+    private String gameId;
 
     // Object containing the Hearthstone metadata, if available; otherwise, null.
     private HearthstoneMetadata hearthstone;

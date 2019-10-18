@@ -50,7 +50,7 @@ public class TwitchClientHelper {
     /**
      * Channel Information Cache
      */
-    private Cache<Long, ChannelCache> channelInformation = Caffeine.newBuilder()
+    private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
         .maximumSize(10_000)
         .build();

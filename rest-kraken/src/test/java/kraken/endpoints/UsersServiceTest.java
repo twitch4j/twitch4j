@@ -26,7 +26,7 @@ public class UsersServiceTest extends AbstractKrakenServiceTest {
     	KrakenUserList resultList = getTwitchKrakenClient().getUsersByLogin(Arrays.asList("twitch4j")).execute();
         assertTrue(resultList.getUsers().size() == 1, "Number of found users was not 1!");
         KrakenUser user = resultList.getUsers().get(0);
-        assertTrue(user.getId().equals(149223493l), "Twitch4J user id should be 149223493!");
+        assertTrue(user.getId().equals("149223493"), "Twitch4J user id should be 149223493!");
         assertTrue(user.getBio().equals("Twitch4J IntegrationTest User"), "Twitch4J user bio should be \"Twitch4J IntegrationTest User\"!");
         assertEquals(user.getName(), "twitch4j", "Twitch4J user name should be twitch4j!");
         assertEquals(user.getDisplayName(), "twitch4j", "Twitch4J user display name should be twitch4j!");
