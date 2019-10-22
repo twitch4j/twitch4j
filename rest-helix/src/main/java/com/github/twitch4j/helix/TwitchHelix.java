@@ -446,7 +446,7 @@ public interface TwitchHelix {
     @Body("%7B\"user_id\": \"{user_id}\", \"description\": \"{description}\"%7D")
     HystrixCommand<StreamMarker> createStreamMarker(
             @Param("token") String authToken,
-            @Param("user_id") Long userId,
+            @Param("user_id") String userId,
             @Param(value = "description", expander = JsonEscaper.class ) String description
     );
 
