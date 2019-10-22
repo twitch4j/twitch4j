@@ -22,13 +22,13 @@ import java.util.Date;
 public class Follow {
 
     // ID of the user following the to_id user.
-    private Long fromId;
+    private String fromId;
 
     // Login name corresponding to from_id.
     private String fromName;
 
     // ID of the user being followed by the from_id user.
-    private Long toId;
+    private String toId;
 
     // Login name corresponding to to_id.
     private String toName;

@@ -10,7 +10,7 @@ public class EventUser {
     /**
      * User Id
      */
-    private final Long id;
+    private final String id;
 
     /**
      * User Name

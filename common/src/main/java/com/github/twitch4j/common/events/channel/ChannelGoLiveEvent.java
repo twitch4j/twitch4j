@@ -27,7 +27,7 @@ public class ChannelGoLiveEvent extends TwitchEvent {
     /**
      * GameId
      */
-    private final Long gameId;
+    private final String gameId;
 
     /**
      * Event Constructor
@@ -36,7 +36,7 @@ public class ChannelGoLiveEvent extends TwitchEvent {
      * @param title          The stream title
      * @param gameId         The gameId
      */
-    public ChannelGoLiveEvent(EventChannel channel, String title, Long gameId) {
+    public ChannelGoLiveEvent(EventChannel channel, String title, String gameId) {
         this.channel = channel;
         this.title = title;
         this.gameId = gameId;

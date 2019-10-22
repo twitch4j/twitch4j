@@ -10,7 +10,7 @@ public class EventChannel {
     /**
      * Channel Id
      */
-    private final Long id;
+    private final String id;
 
     /**
      * Channel Name

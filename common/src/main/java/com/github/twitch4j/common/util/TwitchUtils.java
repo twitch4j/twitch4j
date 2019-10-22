@@ -24,7 +24,7 @@ public class TwitchUtils {
                 }
             }
 
-            // - Broadcaster
+            // Broadcaster
             if (badges.containsKey("broadcaster")) {
                 permissionSet.add(CommandPermission.BROADCASTER);
                 permissionSet.add(CommandPermission.MODERATOR);
@@ -32,6 +32,10 @@ public class TwitchUtils {
             // Twitch Prime
             if (badges.containsKey("premium")) {
                 permissionSet.add(CommandPermission.PRIME_TURBO);
+            }
+            // Moderator
+            if (badges.containsKey("moderator")) {
+                permissionSet.add(CommandPermission.MODERATOR);
             }
             // Partner
             if (badges.containsKey("partner")) {
@@ -41,27 +45,40 @@ public class TwitchUtils {
             if (badges.containsKey("vip")) {
                 permissionSet.add(CommandPermission.VIP);
             }
+            // Turbo
+            if (badges.containsKey("turbo")) {
+                permissionSet.add(CommandPermission.PRIME_TURBO);
+            }
             // Twitch Staff
             if (badges.containsKey("staff")) {
                 permissionSet.add(CommandPermission.TWITCHSTAFF);
             }
+            // Subscriber
+            if(badges.containsKey("subscriber")) {
+                permissionSet.add(CommandPermission.SUBSCRIBER);
+            }
+            // SubGifter
+            if(badges.containsKey("sub-gifter")) {
+                permissionSet.add(CommandPermission.SUBGIFTER);
+            }
+            // Founder
+            if(badges.containsKey("founder")) {
+                permissionSet.add(CommandPermission.FOUNDER);
+                permissionSet.add(CommandPermission.SUBSCRIBER);
+
+                // also contains info about the tier if needed
+                /*
+                if (badges.get("founder").equals("0")) {
+                    // Tier 1 Founder
+                } else if (badges.get("founder").equals("1")) {
+                    // Tier 2 Founder
+                } else if (badges.get("founder").equals("2")) {
+                    // Tier 3 Founder
+                }
+                */
+            }
         }
-        // Moderator
-        if (tags.containsKey("mod") && tags.get("mod").equals("1")) {
-            permissionSet.add(CommandPermission.MODERATOR);
-        }
-        // Twitch Turbo
-        if (tags.containsKey("turbo") && tags.get("turbo").equals("1")) {
-            permissionSet.add(CommandPermission.PRIME_TURBO);
-        }
-        // Subscriber
-        if (tags.containsKey("subscriber") && tags.get("subscriber").equals("1")) {
-            permissionSet.add(CommandPermission.SUBSCRIBER);
-        }
-        // Sub Gifter
-        if (tags.containsKey("sub-gifter") && tags.get("sub-gifter").equals("1")) {
-            permissionSet.add(CommandPermission.SUBGIFTER);
-        }
+
         // Everyone
         permissionSet.add(CommandPermission.EVERYONE);
 

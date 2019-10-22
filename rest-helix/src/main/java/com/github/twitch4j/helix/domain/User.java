@@ -19,7 +19,7 @@ import lombok.Setter;
 public class User {
 
     // User’s ID.
-    private Long id;
+    private String id;
 
     // User’s login name.
     private String login;

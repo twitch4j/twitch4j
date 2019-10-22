@@ -10,26 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Subscription {
-
-    // User ID of the broadcaster.
-    @NonNull
-    private String broadcasterId;
-
-    // Username of the broadcaster.
-    @NonNull
-    private String broadcasterName;
-
-    // Determines if the subscription is a gift subscription.
-    private Boolean isGift;
-
-    // Type of subscription (Tier 1, Tier 2, Tier 3). 1000 = Tier 1, 2000 = Tier 2, 3000 = Tier 3 subscriptions.
-    @NonNull
-    private String tier;
-
-    // Name of the subscription.
-    @NonNull
-    private String plan_name;
+public class Moderator {
 
     // ID of the subscribed user.
     @NonNull

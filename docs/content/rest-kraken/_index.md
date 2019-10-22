@@ -14,13 +14,13 @@ Once you create a developer application, you are assigned a client ID. Some auth
 
 Because your client secret is confidential, we cannot show it to you once you leave the page, so make sure to record it somewhere safe. Also, generating a new client secret immediately invalidates the current one, which might make your API requests fail until your app is updated.
 
-Warning: Client IDs should be unique for each application: do not re-use client IDs across multiple applications. Also, applications should request the appropriate set of scopes for the intended target APIs. Failure to adhere to these guidelines may result in the suspension of your application’s access to the Twitch API.
+**Warning:** Client IDs should be unique for each application: do not re-use client IDs across multiple applications. Also, applications should request the appropriate set of scopes for the intended target APIs. Failure to adhere to these guidelines may result in the suspension of your application’s access to the Twitch API.
 
-You can create new application on the [Twitch Developer Console](https://glass.twitch.tv/console/apps/create)
+You can register a new application on the [Twitch Developer Console](https://dev.twitch.tv/console/apps/create)
 
 ## As Module: Twitch4J
 
-To use Helix you need to enable the Helix API when building the Twitch4J Instance, as shown below:
+To use Kraken you need to enable the Kraken API when building the full Twitch4J Client Instance, as shown below:
 
 ```java
 TwitchClient twitchClient = TwitchClientBuilder.builder()
@@ -32,7 +32,7 @@ TwitchClient twitchClient = TwitchClientBuilder.builder()
 
 ## Standalone
 
-Initialize the Helix API as Standalone Module:
+If you just want to use the Kraken API by itself, as Standalone Module:
 
 ```java
 TwitchKraken client = TwitchKrakenBuilder.builder()
@@ -43,7 +43,8 @@ TwitchKraken client = TwitchKrakenBuilder.builder()
 
 ## API Methods
 
-All methods that were added to helix have been removed from the kraken module, please use those instead.
+All methods that were added to the Helix API (aka the "New Twitch API") have been removed from this Kraken module, so please use those instead.
+Twitch documentation for this API can be found on the Twitch Developers web site for the [API v5](https://dev.twitch.tv/docs/v5).
 
 ChannelFeed:
 - Open for Contributions
