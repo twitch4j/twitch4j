@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.domain.Event;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -26,6 +27,7 @@ import com.github.twitch4j.helix.TwitchHelixBuilder;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.TopicProcessor;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.concurrent.WaitStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,8 +168,16 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
 
         // Customized EventManager Init
         if (eventManager == null) {
-            eventManager = new EventManager(Schedulers.newParallel("events4j-scheduler", eventManagerThreads), TopicProcessor.create("events4j-processor", eventManagerBufferSize), FluxSink.OverflowStrategy.BUFFER);
+            eventManager = new EventManager(
+                Schedulers.newParallel("events4j-scheduler", eventManagerThreads),
+                TopicProcessor.<Event>builder()
+                    .name("events4j-processor")
+                    .waitStrategy(WaitStrategy.sleeping())
+                    .bufferSize(eventManagerBufferSize)
+                    .build(),
+                FluxSink.OverflowStrategy.BUFFER);
         }
+
         // EventManager
         eventManager.enableAnnotationBasedEvents();
 
