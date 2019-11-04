@@ -4,7 +4,7 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.EventManager;
-import com.github.twitch4j.common.builder.TwitchAPIBuilder;
+import com.github.twitch4j.common.builder.TwitchEventAwareAPIBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +25,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TwitchChatBuilder extends TwitchAPIBuilder<TwitchChatBuilder> {
+public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuilder> {
 
     /**
      * Event Manager

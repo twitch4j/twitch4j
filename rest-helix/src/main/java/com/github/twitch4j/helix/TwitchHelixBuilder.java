@@ -79,7 +79,7 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
             .target(TwitchHelix.class, baseUrl);
 
         // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-helix", client);
+        // getEventManager().getServiceMediator().addService("twitch4j-helix", client);
 
         return client;
     }

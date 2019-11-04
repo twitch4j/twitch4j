@@ -1,11 +1,8 @@
 package com.github.twitch4j.common.builder;
 
-import com.github.philippheuer.events4j.EventManager;
-import com.netflix.config.ConfigurationManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -13,11 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TwitchAPIBuilder<T> {
-
-    /**
-     * Event Manager
-     */
-    private EventManager eventManager = new EventManager();
 
     /**
      * Client Id
@@ -38,17 +30,6 @@ public class TwitchAPIBuilder<T> {
      * HTTP Request Queue Size
      */
     private Integer requestQueueSize = -1;
-
-    /**
-     * With EventManager
-     *
-     * @param eventManager EventManager
-     * @return T
-     */
-    public T withEventManager(EventManager eventManager) {
-        this.eventManager = eventManager;
-        return (T) this;
-    }
 
     /**
      * With Client Id

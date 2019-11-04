@@ -70,7 +70,7 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
             .target(TwitchKraken.class, baseUrl);
 
         // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-kraken", client);
+        // getEventManager().getServiceMediator().addService("twitch4j-kraken", client);
 
         return client;
     }
