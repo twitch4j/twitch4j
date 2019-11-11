@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 /**
- * Heartstone Metadata
+ * Hearthstone Metadata
  */
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -16,16 +16,16 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HearthstoneMetadata {
 
-    // The Broadcaster
+    /** The Broadcaster */
     @NonNull
     private HearthstonePlayer broadcaster;
 
-    // The Opponent
+    /** The Opponent */
     @NonNull
     private HearthstonePlayer opponent;
 
     /**
-     * Heartstone Player
+     * Hearthstone Player
      */
     @Data
     @Setter(AccessLevel.PRIVATE)
@@ -34,13 +34,13 @@ public class HearthstoneMetadata {
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class HearthstonePlayer {
 
-        // Hero Type
+        /** Hero Type */
         private HearthstoneHero hero;
 
     }
 
     /**
-     * Heartstone Hero
+     * Hearthstone Hero
      */
     @Data
     @Setter(AccessLevel.PRIVATE)
@@ -49,16 +49,16 @@ public class HearthstoneMetadata {
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class HearthstoneHero {
 
-        // Name of the Hearthstone hero.
+        /** Name of the Hearthstone hero. */
         @NonNull
         private String name;
 
-        // Class of the Hearthstone hero.
+        /** Class of the Hearthstone hero. */
         @NonNull
         @JsonProperty("class")
         private String className;
 
-        // Type of Hearthstone hero.
+        /** Type of Hearthstone hero. */
         @NonNull
         private String type;
 

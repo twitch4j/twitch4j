@@ -17,16 +17,16 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamMetadata {
 
-    // ID of the user who is streaming.
+    /** ID of the user who is streaming. */
     @NonNull
     private String userId;
 
-    // ID of the game being played on the stream.
+    /** ID of the game being played on the stream. */
     private String gameId;
 
-    // Object containing the Hearthstone metadata, if available; otherwise, null.
+    /** Object containing the Hearthstone metadata, if available; otherwise, null. */
     private HearthstoneMetadata hearthstone;
 
-    // Object containing the Overwatch metadata, if available; otherwise, null.
+    /** Object containing the Overwatch metadata, if available; otherwise, null. */
     private OverwatchMetadata overwatch;
 }

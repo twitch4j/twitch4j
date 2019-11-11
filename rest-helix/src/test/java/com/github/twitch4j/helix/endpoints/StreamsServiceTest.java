@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 public class StreamsServiceTest extends AbtractEndpointTest {
 
-    // UserId
+    /** UserId */
     private static String twitchUserId = "149223493";
 
-    // Hearthstone GameId
+    /** Hearthstone GameId */
     private static String hearthstoneGameId = "138585";
 
-    // Overwatch GameId
+     /** Overwatch GameId */
     private static String overwatchGameId = "488552";
 
     /**
