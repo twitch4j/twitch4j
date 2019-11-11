@@ -20,19 +20,19 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Extension {
 
-    // ID of the extension.
+    /** ID of the extension. */
     private String id;
 
-    // Name of the extension.
+    /** Name of the extension. */
     private String name;
 
-    // Version of the extension.
+    /** Version of the extension. */
     private String version;
 
-    // Indicates whether the extension is configured such that it can be activated.
+    /** Indicates whether the extension is configured such that it can be activated. */
     private String canActivate;
 
-    // Types for which the extension can be activated. Valid values: "component", "mobile", "panel", "overlay".
+    /** Types for which the extension can be activated. Valid values: "component", "mobile", "panel", "overlay". */
     private List<String> type;
 
 }

@@ -15,14 +15,14 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BitsLeaderboardEntry {
 
-    // ID of the user (viewer) in the leaderboard entry.
+    /** ID of the user (viewer) in the leaderboard entry. */
     @NonNull
     private String userId;
 
-    // Leaderboard rank of the user.
+    /** Leaderboard rank of the user. */
     private Integer rank;
 
-    // Leaderboard score (number of Bits) of the user.
+    /** Leaderboard score (number of Bits) of the user. */
     private Integer score;
 
 }

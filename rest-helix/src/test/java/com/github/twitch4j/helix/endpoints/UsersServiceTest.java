@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("integration")
 public class UsersServiceTest extends AbtractEndpointTest {
 
-    // UserId
+    /** UserId */
     private static String twitchUserId = "149223493l";
 
     /**

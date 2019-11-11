@@ -22,45 +22,45 @@ import java.util.regex.Pattern;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Stream {
 
-    // Stream ID.
+    /** Stream ID. */
     @NonNull
     private String id;
 
-    // ID of the user who is streaming.
+    /** ID of the user who is streaming. */
     @NonNull
     private String userId;
 
-    // ID of the game being played on the stream.
+    /** ID of the game being played on the stream. */
     private String gameId;
 
-    // Array of community IDs.
+    /** Array of community IDs. */
     @NonNull
     private List<UUID> communityIds;
 
-    // Stream type: "live" or "" (in case of error).
+    /** Stream type: "live" or "" (in case of error). */
     @NonNull
     private String type;
 
-    // Stream title.
+    /** Stream title. */
     @NonNull
     private String title;
 
-    // Number of viewers watching the stream at the time of the query.
+    /** Number of viewers watching the stream at the time of the query. */
     @NonNull
     private Integer viewerCount;
 
-    // UTC timestamp on when the stream started
+    /** UTC timestamp on when the stream started */
     @NonNull
     private Calendar startedAt;
 
-    // Ids of active tags on the stream
+    /** Ids of active tags on the stream */
     private List<UUID> tagIds = new ArrayList<>();
 
-    // Stream language.
+    /** Stream language. */
     @NonNull
     private String language;
 
-    // Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image
+    /** Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image */
     @NonNull
     private String thumbnailUrl;
 

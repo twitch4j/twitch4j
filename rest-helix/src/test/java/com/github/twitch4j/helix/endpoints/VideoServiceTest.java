@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 public class VideoServiceTest extends AbtractEndpointTest {
 
-    // Overwatch GameId
+    /** Overwatch GameId */
     private static String overwatchGameId = "488552l";
 
     /**
