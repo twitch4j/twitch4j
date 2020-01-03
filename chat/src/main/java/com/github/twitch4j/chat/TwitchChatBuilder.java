@@ -3,7 +3,7 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.builder.TwitchEventAwareAPIBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

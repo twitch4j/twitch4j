@@ -1,13 +1,23 @@
 package com.github.twitch4j;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
+import com.github.twitch4j.helix.domain.UserList;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Slf4j
 @Tag("unittest")
@@ -37,13 +47,10 @@ public class TwitchClientTest {
     @Test
     @DisplayName("Test for local execution in error diagnostics")
     @Disabled
-    public void localTest() {
-        // external event manager (for shared module usage - streamlabs4j)
-        EventManager eventManager = new EventManager();
-
+    public void localTest() throws Exception {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
-            .withEventManager(eventManager)
+            .withEventManager(null)
             .withEnableHelix(true)
             .withEnableKraken(true)
             .withEnableTMI(true)
@@ -53,8 +60,8 @@ public class TwitchClientTest {
             .build();
 
         // register all event listeners
-        eventManager.onEvent(PrivateMessageEvent.class).subscribe(event -> {
-            System.out.println("[Whisper] " + event.getUser().getName() + ": " + event.getMessage());
+        twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
+            System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
         });
     }
 

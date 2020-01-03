@@ -2,7 +2,8 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
@@ -48,7 +49,7 @@ public class TwitchChatTest {
         // listen for events in channel
         List<ChannelMessageEvent> channelMessages = new ArrayList<>();
         twitchChat.joinChannel("twitch4j");
-        twitchChat.getEventManager().onEvent(ChannelMessageEvent.class).subscribe(event -> {
+        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
             channelMessages.add(event);
             log.debug(event.toString());
         });
@@ -70,11 +71,11 @@ public class TwitchChatTest {
         // listen for events in channel
         List<ChannelMessageEvent> channelMessages = new ArrayList<>();
         twitchChat.joinChannel("twitch4j");
-        twitchChat.getEventManager().onEvent(ChannelMessageEvent.class).subscribe(event -> {
+        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
             log.debug(event.toString());
         });
 
-        twitchChat.getEventManager().onEvent(CommandEvent.class).subscribe(event -> {
+        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(CommandEvent.class, event -> {
             log.debug(event.toString());
         });
 

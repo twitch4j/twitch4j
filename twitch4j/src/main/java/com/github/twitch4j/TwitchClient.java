@@ -1,6 +1,6 @@
 package com.github.twitch4j;
 
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.graphql.TwitchGraphQL;

@@ -1,6 +1,6 @@
 package com.github.twitch4j.common.builder;
 
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

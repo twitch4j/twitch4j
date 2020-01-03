@@ -1,7 +1,8 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Event Manager
-	compile group: 'com.github.philippheuer.events4j', name: 'events4j'
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j-core'
+	compile group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple'
 
 	// HTTP Client (for common feign extensions/interceptors/...)
 	compileOnly group: 'io.github.openfeign', name: 'feign-okhttp'

@@ -1,6 +1,6 @@
 package com.github.twitch4j.graphql;
 
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.TwitchTestUtils;
 import com.github.twitch4j.graphql.internal.FollowMutation;
 import com.github.twitch4j.graphql.internal.UnfollowMutation;

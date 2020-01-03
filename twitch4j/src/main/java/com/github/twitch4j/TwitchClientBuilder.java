@@ -3,8 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
-import com.github.philippheuer.events4j.domain.Event;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -24,10 +23,6 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.TopicProcessor;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.concurrent.WaitStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,20 +161,11 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth authModule = new TwitchAuth(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
-        // Customized EventManager Init
+        // Default EventManager
         if (eventManager == null) {
-            eventManager = new EventManager(
-                Schedulers.newParallel("events4j-scheduler", eventManagerThreads),
-                TopicProcessor.<Event>builder()
-                    .name("events4j-processor")
-                    .waitStrategy(WaitStrategy.sleeping())
-                    .bufferSize(eventManagerBufferSize)
-                    .build(),
-                FluxSink.OverflowStrategy.BUFFER);
+            eventManager = new EventManager();
+            eventManager.autoDiscovery();
         }
-
-        // EventManager
-        eventManager.enableAnnotationBasedEvents();
 
         // Module: Helix
         TwitchHelix helix = null;
@@ -187,7 +173,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             helix = TwitchHelixBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                //.withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
@@ -200,7 +185,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             kraken = TwitchKrakenBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                //.withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
@@ -213,7 +197,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             tmi = TwitchMessagingInterfaceBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                //.withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)

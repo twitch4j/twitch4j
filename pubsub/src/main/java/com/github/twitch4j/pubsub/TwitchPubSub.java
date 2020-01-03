@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TimeUtils;
@@ -236,7 +236,7 @@ public class TwitchPubSub {
                                 // Whisper
                                 EventUser eventUser = new EventUser((String) message.getData().getMessage().getMessageData().get("from_id"), (String) message.getData().getMessage().getMessageDataTags().get("display_name"));
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, (String) message.getData().getMessage().getMessageData().get("body"), TwitchUtils.getPermissionsFromTags(message.getData().getMessage().getMessageDataTags()));
-                                eventManager.dispatchEvent(privateMessageEvent);
+                                eventManager.publish(privateMessageEvent);
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }

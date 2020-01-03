@@ -1,6 +1,6 @@
 package com.github.twitch4j.pubsub;
 
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;

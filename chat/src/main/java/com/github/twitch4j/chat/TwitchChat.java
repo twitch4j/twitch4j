@@ -2,7 +2,8 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.CommandEvent;
@@ -168,7 +169,9 @@ public class TwitchChat {
 
         // Event Handlers
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
-        eventManager.onEvent(ChannelMessageEvent.class).subscribe(event -> onChannelMessage(event));
+
+        // register event handler
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> onChannelMessage(event));
     }
 
     /**
@@ -310,7 +313,7 @@ public class TwitchChat {
                                         IRCMessageEvent event = new IRCMessageEvent(message);
 
                                         if(event.isValid()) {
-                                            eventManager.dispatchEvent(event);
+                                            eventManager.publish(event);
                                         } else {
                                             log.trace("Can't parse {}", event.getRawMessage());
                                         }
@@ -494,7 +497,7 @@ public class TwitchChat {
 
             // dispatch command event
             CommandEvent commandEvent = new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
-            eventManager.dispatchEvent(commandEvent);
+            eventManager.publish(commandEvent);
         }
     }
 

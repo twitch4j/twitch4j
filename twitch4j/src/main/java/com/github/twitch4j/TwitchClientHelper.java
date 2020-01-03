@@ -2,7 +2,7 @@ package com.github.twitch4j;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.philippheuer.events4j.domain.Event;
+import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent;
@@ -123,22 +123,22 @@ public class TwitchClientHelper {
                             // - go live event
                             if (dispatchGoLiveEvent) {
                                 Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - go offline event
                             if (dispatchGoOfflineEvent) {
                                 Event event = new ChannelGoOfflineEvent(channel);
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - title changed event
                             if (dispatchTitleChangedEvent) {
                                 Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - game changed event
                             if (dispatchGameChangedEvent) {
                                 Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                         });
                     } catch (Exception ex) {
@@ -169,7 +169,7 @@ public class TwitchClientHelper {
                                     if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
                                         // dispatch event
                                         FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                        twitchClient.getEventManager().dispatchEvent(event);
+                                        twitchClient.getEventManager().publish(event);
                                     }
                                 }
                             }
