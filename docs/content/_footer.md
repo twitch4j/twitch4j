@@ -1,1 +1,1 @@
-© 2018 - Twitch4J
+© 2020 - Twitch4J

@@ -27,10 +27,18 @@ Deprecated / Scheduled for removal
 
 * [API - Kraken](./rest-kraken)
 
+## Events
+
+Many modules can generate events which you can handle in some way, like PubSub, Chat, ...
+
+For a list of available events / information on how to listen to events please check out: [Events](./events)
+
 ## Results of API Calls
 
-This API Client provides you 3 methods to handle / process the results.
+This API Client provides you 3 methods to handle / process the results of api calls.
 
+<details>
+  <summary>Show</summary>
 ### Synchronous Execution
 
 You can execute any api call synchronously with the execute() method, as shown in the following example:
@@ -68,9 +76,10 @@ You then retrieve the value of the command by subscribing to the Observable:
 
 ```java
 userListObservable.subscribe(data -> {
-    // your code to work with the result data
+  // your code to work with the result data
 });
 ```
+</details>
 
 ## Contribute to this documentation
 
