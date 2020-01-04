@@ -18,6 +18,11 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class ChannelMessageEvent extends AbstractChannelEvent {
 
+    /**
+     * RAW Message Event
+     */
+    private final IRCMessageEvent messageEvent;
+
 	/**
 	 * User
 	 */
@@ -37,12 +42,14 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 	 * Event Constructor
 	 *
 	 * @param channel     The channel that this event originates from.
+     * @param messageEvent The raw message event
 	 * @param user        The user who triggered the event.
 	 * @param message     The plain text of the message.
 	 * @param permissions The permissions of the triggering user.
 	 */
-	public ChannelMessageEvent(EventChannel channel, EventUser user, String message, Set<CommandPermission> permissions) {
+	public ChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message, Set<CommandPermission> permissions) {
 		super(channel);
+        this.messageEvent = messageEvent;
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;

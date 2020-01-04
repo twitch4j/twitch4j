@@ -70,10 +70,10 @@ public class IRCEventHandler {
 				// Dispatch Event
 				if(event.getMessage().get().startsWith("\u0001ACTION ")) {
 					// Action
-                    eventManager.publish(new ChannelMessageActionEvent(channel, user, event.getMessage().get().substring(8), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, event.getMessage().get().substring(8), event.getClientPermissions()));
 				} else {
 					// Regular Message
-                    eventManager.publish(new ChannelMessageEvent(channel, user, event.getMessage().get(), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageEvent(channel, event, user, event.getMessage().get(), event.getClientPermissions()));
 				}
 			}
 		}
