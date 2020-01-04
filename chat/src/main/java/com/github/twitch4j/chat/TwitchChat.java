@@ -25,7 +25,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public class TwitchChat {
+public class TwitchChat implements AutoCloseable {
 
     /**
      * EventManager
@@ -88,6 +88,11 @@ public class TwitchChat {
     protected final Thread queueThread;
 
     /**
+     * IRC Command Queue Thread
+     */
+    protected Boolean stopQueueThread = false;
+
+    /**
      * IRC Command Handlers
      */
     protected final List<String> commandPrefixes;
@@ -139,7 +144,7 @@ public class TwitchChat {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (true) {
+            while (stopQueueThread == false) {
                 try {
                     // If connected, consume 1 token
                     if (ircCommandQueue.size() > 0) {
@@ -496,9 +501,16 @@ public class TwitchChat {
             log.debug("Detected a command in channel {} with content: {}", event.getChannel().getName(), commandWithoutPrefix.get());
 
             // dispatch command event
-            CommandEvent commandEvent = new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
-            eventManager.publish(commandEvent);
+            eventManager.publish(new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions()));
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        this.stopQueueThread = true;
+        this.disconnect();
     }
 
 }

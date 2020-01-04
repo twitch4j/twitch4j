@@ -28,7 +28,7 @@ import java.util.*;
  * Twitch PubSub
  */
 @Slf4j
-public class TwitchPubSub {
+public class TwitchPubSub implements AutoCloseable {
 
     /**
      * EventManager
@@ -57,6 +57,11 @@ public class TwitchPubSub {
      * Command Queue Thread
      */
     protected final Thread queueThread;
+
+    /**
+     * is Closed?
+     */
+    protected boolean isClosed = false;
 
     /**
      * Command Queue
@@ -93,7 +98,7 @@ public class TwitchPubSub {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (true) {
+            while (isClosed == false) {
                 try {
                     // check if we need to send a PING (every 4 minutes, disconnect after 5 minutes without sending ping)
                     if (TimeUtils.getCurrentTimeInMillis() - lastPing > 4 * 60 * 1000) {
@@ -378,6 +383,16 @@ public class TwitchPubSub {
         request.getData().put("topics", Arrays.asList("whispers." + userId.toString()));
 
         listenOnTopic(request);
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        if (!isClosed) {
+            disconnect();
+            isClosed = true;
+        }
     }
 
 }

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * A helper class that covers a few basic use cases of most library users
  */
 @Slf4j
-public class TwitchClientHelper {
+public class TwitchClientHelper implements AutoCloseable {
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -48,6 +48,11 @@ public class TwitchClientHelper {
     protected final Thread eventGenerationThread;
 
     /**
+     * Event Listener Thread
+     */
+    protected Boolean stopEventGenerationThread = false;
+
+    /**
      * Channel Information Cache
      */
     private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
@@ -67,7 +72,7 @@ public class TwitchClientHelper {
         this.eventGenerationThread = new Thread(() -> {
             log.debug("Started TwitchClientHelper Thread to listen for goLive/Follow events");
 
-            while (true) {
+            while (stopEventGenerationThread == false) {
                 try {
                     // check if the thread was interrupted
                     if (Thread.interrupted()) {
@@ -322,6 +327,14 @@ public class TwitchClientHelper {
                 eventGenerationThread.interrupt();
             }
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        stopEventGenerationThread = true;
+        eventGenerationThread.interrupt();
     }
 
 }
