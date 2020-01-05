@@ -5,7 +5,7 @@ buildscript {
 		maven { url "https://maven.google.com" }
 	}
 	dependencies {
-		classpath 'com.apollographql.apollo:apollo-gradle-plugin:1.0.1'
+		classpath 'com.apollographql.apollo:apollo-gradle-plugin:1.2.2'
 	}
 }
 
@@ -15,11 +15,11 @@ apply plugin: 'com.apollographql.android'
 // Dependencies
 dependencies {
 	// GraphQL
-	compile group: 'com.apollographql.apollo', name: 'apollo-runtime', version: '1.0.1'
-	compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
+	compile group: 'com.apollographql.apollo', name: 'apollo-runtime', version: '1.2.2'
+	compile group: 'org.jetbrains', name: 'annotations'
 
 	// Hystrix
-	compile group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
+	compile group: 'com.netflix.hystrix', name: 'hystrix-core'
 
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-common')

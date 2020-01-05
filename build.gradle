@@ -1,8 +1,8 @@
 // Plugins
 plugins {
-    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.jfrog.artifactory' version '4.8.1'
+    id 'com.jfrog.artifactory' version '4.13.0'
 }
 
 // Artifact Info
@@ -22,7 +22,6 @@ allprojects {
 	// Repositories
 	repositories {
 		jcenter()
-		maven { url "https://dl.bintray.com/philippheuer/maven" }
 		maven { url "https://maven.google.com" }
 		mavenLocal()
 	}
@@ -46,13 +45,13 @@ subprojects {
     dependencyManagement {
         dependencies {
             // Logging
-            dependency group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+            dependency group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
             dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
             // Apache Commons
-            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.8.1'
+            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
             dependency group: 'commons-io', name: 'commons-io', version: '2.6'
-			dependency group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
+			dependency group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 			dependency group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
 			// Event Dispatcher
@@ -60,36 +59,38 @@ subprojects {
 			dependency group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.7.1'
 			
 			// Credential Manager
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.0.20'
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews', version: '0.0.13'
+			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.0'
 
 			// HTTP Client
-            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.11.0'
+            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.0'
 
 			// Rate Limiting
-			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.1.1'
+			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
 
 			// Http Client
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.2.3'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.2.3'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.2.3'
-			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.2.3'
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.7.0'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.7.0'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.7.0'
+			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.7.0'
 
 			// Hystrix
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.9.8'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.9.8'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
+			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.10.1'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.1'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
 
 			// WebSocket
-			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.6'
+			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
+
+			// Annotations
+			dependency group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
 
             // Testing
-            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.1'
-			dependency group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
+            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
+			dependency group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
 
             // Lombok
             dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
