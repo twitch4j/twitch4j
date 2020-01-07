@@ -133,9 +133,9 @@ public class IRCEventHandler {
 					cumulativeMonths = 1;
 				}
                                 
-                                // check user's sub streak
-                                // Twitch API specifies that 0 is returned if the user chooses not to share their streak
-                                Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
+                // check user's sub streak
+                // Twitch API specifies that 0 is returned if the user chooses not to share their streak
+                Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
 
 				// Dispatch Event
                 eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak));

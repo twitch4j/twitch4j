@@ -246,7 +246,11 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return ChatUser
 	 */
 	public EventUser getUser() {
-		return new EventUser(getUserId(), getUserName());
+	    if (getUserId() != null || getUserName() != null) {
+            return new EventUser(getUserId(), getUserName());
+        }
+
+		return null;
 	}
 
     /**
