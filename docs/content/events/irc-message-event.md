@@ -11,7 +11,7 @@ The irc message received before it gets parsed and the real event gets dispatche
 
 ## Dependencies
 
-Requires the TwitchChat Module to be enabled and active for the source channel. See [TwitchChat](../chat).
+Requires the TwitchChat Module to be enabled and active for the source channel. See [TwitchChat](../../chat).
 
 ## Examples
 
