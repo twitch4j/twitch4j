@@ -23,3 +23,7 @@ TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
             .build();
 ```
+
+## Logging
+
+Please check out [Logging](./logging) on how to set up logging.
