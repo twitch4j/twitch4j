@@ -62,25 +62,25 @@ subprojects {
 			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.0'
 
 			// HTTP Client
-            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.0'
+            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
 
 			// Rate Limiting
 			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
 
 			// Http Client
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.7.0'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.7.0'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.7.0'
-			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.7.0'
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.7.4'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.7.4'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.7.4'
+			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.7.4'
 
 			// Hystrix
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
-			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.10.1'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.1'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.1'
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
+			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.10.2'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.2'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.2'
 
 			// WebSocket
 			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
@@ -89,11 +89,11 @@ subprojects {
 			dependency group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
 
             // Testing
-            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
-			dependency group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
+			dependency group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.0'
 
             // Lombok
-            dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
+            dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
         }
     }
 
