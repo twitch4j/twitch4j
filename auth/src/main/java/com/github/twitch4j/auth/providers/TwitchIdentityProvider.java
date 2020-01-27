@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,6 +16,7 @@ import java.util.Optional;
 /**
  * Twitch Identity Provider
  */
+@Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
     /**
@@ -37,9 +39,9 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @param credential OAuth2 Credential
      */
     public Optional<OAuth2Credential> getAdditionalCredentialInformation(OAuth2Credential credential) {
+        OkHttpClient client = new OkHttpClient();
         try {
             // api call
-            OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                 .url("https://id.twitch.tv/oauth2/validate")
                 .header("Authorization", "OAuth " + credential.getAccessToken())
@@ -67,6 +69,18 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
         } catch (Exception ex) {
             // ignore, invalid token
+        } finally {
+            client.dispatcher().executorService().shutdown();
+            client.connectionPool().evictAll();
+
+            if (client.cache() != null && !client.cache().isClosed()) {
+                try {
+                    client.cache().close();
+                } catch (Exception ex) {
+                    log.warn("Failed to close OkHttp Client Cache ... [{}]", ex.getMessage());
+                }
+
+            }
         }
 
         return Optional.empty();
