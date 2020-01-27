@@ -1,16 +1,23 @@
 package com.github.twitch4j.pubsub;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
+import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
-import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -22,6 +29,10 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -230,18 +241,51 @@ public class TwitchPubSub implements AutoCloseable {
                         // parse message
                         PubSubResponse message = TypeConvert.jsonToObject(text, PubSubResponse.class);
                         if (message.getType().equals(PubSubType.MESSAGE)) {
+                            String topic = message.getData().getTopic();
+                            String type = message.getData().getMessage().getType();
+                            JsonNode msgData = message.getData().getMessage().getMessageData();
+
                             // Handle Messages
-                            if (message.getData().getTopic().startsWith("channel-bits-events-v1")) {
+                            if (topic.startsWith("channel-bits-events-v1")) {
                                 // todo
-                            } else if (message.getData().getTopic().startsWith("channel-subscribe-events-v1")) {
+                            } else if (topic.startsWith("channel-subscribe-events-v1")) {
                                 // todo
-                            } else if (message.getData().getTopic().startsWith("channel-commerce-events-v1")) {
+                            } else if (topic.startsWith("channel-commerce-events-v1")) {
                                 // todo
-                            } else if (message.getData().getTopic().startsWith("whispers")) {
-                                // Whisper
-                                EventUser eventUser = new EventUser((String) message.getData().getMessage().getMessageData().get("from_id"), (String) message.getData().getMessage().getMessageDataTags().get("display_name"));
-                                PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, (String) message.getData().getMessage().getMessageData().get("body"), TwitchUtils.getPermissionsFromTags(message.getData().getMessage().getMessageDataTags()));
+                            } else if (topic.startsWith("whispers") && (type.equals("whisper_sent") || type.equals("whisper_received"))) {
+                                // Whisper data is escaped Json cast into a String
+                                JsonNode msgDataParsed = TypeConvert.jsonToObject(msgData.asText(), JsonNode.class);
+
+                                //TypeReference<T> allows type parameters (unlike Class<T>) and avoids needing @SuppressWarnings("unchecked")
+                                Map<String, Object> tags = TypeConvert.convertValue(msgDataParsed.path("tags"), new TypeReference<Map<String, Object>>(){});
+
+                                String fromId = msgDataParsed.get("from_id").asText();
+                                String displayName = (String) tags.get("display_name");
+                                EventUser eventUser = new EventUser(fromId, displayName);
+
+                                String body = msgDataParsed.get("body").asText();
+
+                                Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags);
+
+                                PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);
+
+                            } else if (topic.startsWith("community-points-channel-v1")) {
+                                String timestampText = msgData.path("timestamp").asText();
+                                Calendar timestamp = GregorianCalendar.from(
+                                    ZonedDateTime.ofInstant(
+                                        Instant.from(DateTimeFormatter.ISO_INSTANT.parse(timestampText)),
+                                        ZoneId.systemDefault()
+                                    )
+                                );
+                                ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
+
+                                switch(type) {
+                                    case "reward-redeemed": eventManager.publish(new RewardRedeemedEvent(timestamp, redemption)); break;
+                                    case "redemption-status-update": eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, redemption)); break;
+                                    default: eventManager.publish(new ChannelPointsRedemptionEvent(timestamp, redemption));
+                                }
+
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -327,12 +371,12 @@ public class TwitchPubSub implements AutoCloseable {
      * @param credential Credential (any)
      * @param userId Target User Id
      */
-    public void listenForCheerEvents(OAuth2Credential credential, Long userId) {
+    public void listenForCheerEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-bits-events-v1." + userId.toString()));
+        request.getData().put("topics", Arrays.asList("channel-bits-events-v1." + userId));
 
         listenOnTopic(request);
     }
@@ -343,12 +387,12 @@ public class TwitchPubSub implements AutoCloseable {
      * @param credential Credential (for targetUserId, scope: channel_subscriptions)
      * @param userId Target User Id
      */
-    public void listenForSubscriptionEvents(OAuth2Credential credential, Long userId) {
+    public void listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-subscribe-events-v1." + userId.toString()));
+        request.getData().put("topics", Arrays.asList("channel-subscribe-events-v1." + userId));
 
         listenOnTopic(request);
     }
@@ -359,12 +403,12 @@ public class TwitchPubSub implements AutoCloseable {
      * @param credential Credential (any)
      * @param userId Target User Id
      */
-    public void listenForCommerceEvents(OAuth2Credential credential, Long userId) {
+    public void listenForCommerceEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-commerce-events-v1." + userId.toString()));
+        request.getData().put("topics", Arrays.asList("channel-commerce-events-v1." + userId));
 
         listenOnTopic(request);
     }
@@ -375,12 +419,28 @@ public class TwitchPubSub implements AutoCloseable {
      * @param credential Credential (for targetUserId, scope: whispers:read)
      * @param userId Target User Id
      */
-    public void listenForWhisperEvents(OAuth2Credential credential, Long userId) {
+    public void listenForWhisperEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("whispers." + userId.toString()));
+        request.getData().put("topics", Arrays.asList("whispers." + userId));
+
+        listenOnTopic(request);
+    }
+
+    /**
+     * Event Listener: Channel Points redemption events
+     *
+     * @param credential Credential (any)
+     * @param channelId Target Channel Id
+     */
+    public void listenForChannelPointsEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Arrays.asList("community-points-channel-v1." + channelId));
 
         listenOnTopic(request);
     }
