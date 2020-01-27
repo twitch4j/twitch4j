@@ -356,93 +356,133 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     /**
+     * Queue PubSub request
+     * @param request PubSub request (or Topic)
+     */
+    private void queueRequest(PubSubRequest request) {
+        commandQueue.add(TypeConvert.objectToJson(request));
+    }
+
+    /**
      * Send WS Message to subscribe to a topic
      *
      * @param request Topic
      */
-    public void listenOnTopic(PubSubRequest request) {
-        commandQueue.add(TypeConvert.objectToJson(request));
+    public PubSubSubscription listenOnTopic(PubSubRequest request) {
+        queueRequest(request);
         subscribedTopics.add(request);
+        return new PubSubSubscription(request);
+    }
+
+    /**
+     * Unsubscribe from a topic.
+     * Usage example:
+     * <pre>
+     *      PubSubSubscription subscription = twitchPubSub.listenForCheerEvents(...);
+     *      // ...
+     *      twitchPubSub.unsubscribeFromTopic(subscription);
+     * </pre>
+     * @param subscription Subscription
+     */
+    public void unsubscribeFromTopic(PubSubSubscription subscription) {
+        PubSubRequest request = subscription.getRequest();
+        if(request.getType() != PubSubType.LISTEN) {
+            log.warn("Cannot unsubscribe using request with unexpected type: {}", request.getType());
+            return;
+        }
+        int topicIndex = subscribedTopics.indexOf(request);
+        if(topicIndex == -1) {
+            log.warn("Not subscribed to topic: {}", request);
+            return;
+        }
+        subscribedTopics.remove(topicIndex);
+
+        // use data from original request and send UNLISTEN
+        PubSubRequest unlistenRequest = new PubSubRequest();
+        unlistenRequest.setType(PubSubType.UNLISTEN);
+        unlistenRequest.setNonce(request.getNonce());
+        unlistenRequest.setData(request.getData());
+        queueRequest(unlistenRequest);
     }
 
     /**
      * Event Listener: Anyone cheers on a specified channel.
-     *
      * @param credential Credential (any)
      * @param userId Target User Id
+     * @return PubSubSubscription
      */
-    public void listenForCheerEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-bits-events-v1." + userId));
+        request.getData().put("topics", Collections.singletonList("channel-bits-events-v1." + userId));
 
-        listenOnTopic(request);
+        return listenOnTopic(request);
     }
 
     /**
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
-     *
      * @param credential Credential (for targetUserId, scope: channel_subscriptions)
      * @param userId Target User Id
+     * @return PubSubSubscription
      */
-    public void listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-subscribe-events-v1." + userId));
+        request.getData().put("topics", Collections.singletonList("channel-subscribe-events-v1." + userId));
 
-        listenOnTopic(request);
+        return listenOnTopic(request);
     }
 
     /**
      * Event Listener: Anyone makes a purchase on a channel.
-     *
      * @param credential Credential (any)
      * @param userId Target User Id
+     * @return PubSubSubscription
      */
-    public void listenForCommerceEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("channel-commerce-events-v1." + userId));
+        request.getData().put("topics", Collections.singletonList("channel-commerce-events-v1." + userId));
 
-        listenOnTopic(request);
+        return listenOnTopic(request);
     }
 
     /**
      * Event Listener: Anyone whispers the specified user.
-     *
      * @param credential Credential (for targetUserId, scope: whispers:read)
      * @param userId Target User Id
+     * @return PubSubSubscription
      */
-    public void listenForWhisperEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForWhisperEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("whispers." + userId));
+        request.getData().put("topics", Collections.singletonList("whispers." + userId));
 
-        listenOnTopic(request);
+        return listenOnTopic(request);
     }
 
     /**
-     * Event Listener: Channel Points redemption events
+     * Event Listener: Anyone makes a channel points redemption on a channel.
      *
      * @param credential Credential (any)
      * @param channelId Target Channel Id
      */
-    public void listenForChannelPointsEvents(OAuth2Credential credential, String channelId) {
+    public PubSubSubscription listenForChannelPointsRedemptionEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Arrays.asList("community-points-channel-v1." + channelId));
+        request.getData().put("topics", Collections.singletonList("community-points-channel-v1." + channelId));
 
-        listenOnTopic(request);
+        return listenOnTopic(request);
     }
 
     /**
