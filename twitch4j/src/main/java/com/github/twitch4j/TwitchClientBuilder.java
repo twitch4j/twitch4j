@@ -14,6 +14,7 @@ import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
+import io.github.bucket4j.Bandwidth;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,6 +121,18 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private Integer eventManagerBufferSize = 16384;
 
     /**
+     * Size of the ChatQueue
+     */
+    @Wither
+    protected Integer chatQueueSize = 200;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    @Wither
+    protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
+
+    /**
      * User Agent
      */
     @Wither
@@ -212,6 +226,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withChatAccount(chatAccount)
                 .withEnableChannelCache(enableChannelCache)
                 .withCommandTriggers(commandPrefixes)
+                .withChatQueueSize(chatQueueSize)
+                .withChatRateLimit(chatRateLimit)
                 .build();
         }
 

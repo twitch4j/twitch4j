@@ -9,7 +9,6 @@ import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
-import com.netflix.hystrix.Hystrix;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -7,6 +7,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.helix.domain.UserList;
+import com.github.twitch4j.util.TestUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -51,18 +52,24 @@ public class TwitchClientTest {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(null)
-            .withEnableHelix(true)
-            .withEnableKraken(true)
-            .withEnableTMI(true)
-            .withEnableChat(false)
-            .withEnablePubSub(true)
-            .withEnableGraphQL(true)
+            .withEnableHelix(false)
+            .withEnableKraken(false)
+            .withEnableTMI(false)
+            .withEnableChat(true)
+            .withChatAccount(TestUtils.getCredential())
+            .withEnablePubSub(false)
+            .withEnableGraphQL(false)
             .build();
+
+        // join twitch4j channel
+        twitchClient.getChat().joinChannel("twitch4j");
 
         // register all event listeners
         twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
             System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
         });
+
+        TestUtils.sleepFor(5000);
     }
 
 }

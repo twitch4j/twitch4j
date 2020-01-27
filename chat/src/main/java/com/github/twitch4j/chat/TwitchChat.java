@@ -80,7 +80,12 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue
      */
-    protected final CircularFifoQueue<String> ircCommandQueue = new CircularFifoQueue<>(200);
+    protected final CircularFifoQueue<String> ircCommandQueue;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    protected final Bandwidth chatRateLimit;
 
     /**
      * IRC Command Queue Thread
@@ -106,12 +111,14 @@ public class TwitchChat implements AutoCloseable {
      * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
+        this.ircCommandQueue = new CircularFifoQueue<>(chatQueueSize);
+        this.chatRateLimit = chatRateLimit;
 
         // credential validation
         if (this.chatCredential.isPresent() == false) {
@@ -136,7 +143,7 @@ public class TwitchChat implements AutoCloseable {
 
         // initialize rate-limiting
         this.ircMessageBucket = Bucket4j.builder()
-            .addLimit(Bandwidth.simple(20, Duration.ofSeconds(30)))
+            .addLimit(this.chatRateLimit)
             .build();
 
         // connect to irc
