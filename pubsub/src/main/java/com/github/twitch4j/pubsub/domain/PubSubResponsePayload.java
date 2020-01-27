@@ -24,7 +24,4 @@ public class PubSubResponsePayload {
     private void unpackMessage(String message) {
         this.message = TypeConvert.jsonToObject(message, PubSubResponsePayloadMessage.class);
     }
-
-
-
 }
