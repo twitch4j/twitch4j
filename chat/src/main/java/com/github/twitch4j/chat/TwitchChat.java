@@ -2,7 +2,8 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.CommandEvent;
@@ -24,7 +25,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public class TwitchChat {
+public class TwitchChat implements AutoCloseable {
 
     /**
      * EventManager
@@ -79,12 +80,22 @@ public class TwitchChat {
     /**
      * IRC Command Queue
      */
-    protected final CircularFifoQueue<String> ircCommandQueue = new CircularFifoQueue<>(200);
+    protected final CircularFifoQueue<String> ircCommandQueue;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    protected final Bandwidth chatRateLimit;
 
     /**
      * IRC Command Queue Thread
      */
     protected final Thread queueThread;
+
+    /**
+     * IRC Command Queue Thread
+     */
+    protected Boolean stopQueueThread = false;
 
     /**
      * IRC Command Handlers
@@ -100,12 +111,14 @@ public class TwitchChat {
      * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
+        this.ircCommandQueue = new CircularFifoQueue<>(chatQueueSize);
+        this.chatRateLimit = chatRateLimit;
 
         // credential validation
         if (this.chatCredential.isPresent() == false) {
@@ -130,7 +143,7 @@ public class TwitchChat {
 
         // initialize rate-limiting
         this.ircMessageBucket = Bucket4j.builder()
-            .addLimit(Bandwidth.simple(20, Duration.ofSeconds(30)))
+            .addLimit(this.chatRateLimit)
             .build();
 
         // connect to irc
@@ -138,7 +151,7 @@ public class TwitchChat {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (true) {
+            while (stopQueueThread == false) {
                 try {
                     // If connected, consume 1 token
                     if (ircCommandQueue.size() > 0) {
@@ -168,7 +181,9 @@ public class TwitchChat {
 
         // Event Handlers
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
-        eventManager.onEvent(ChannelMessageEvent.class).subscribe(event -> onChannelMessage(event));
+
+        // register event handler
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> onChannelMessage(event));
     }
 
     /**
@@ -310,7 +325,7 @@ public class TwitchChat {
                                         IRCMessageEvent event = new IRCMessageEvent(message);
 
                                         if(event.isValid()) {
-                                            eventManager.dispatchEvent(event);
+                                            eventManager.publish(event);
                                         } else {
                                             log.trace("Can't parse {}", event.getRawMessage());
                                         }
@@ -493,9 +508,16 @@ public class TwitchChat {
             log.debug("Detected a command in channel {} with content: {}", event.getChannel().getName(), commandWithoutPrefix.get());
 
             // dispatch command event
-            CommandEvent commandEvent = new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
-            eventManager.dispatchEvent(commandEvent);
+            eventManager.publish(new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions()));
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        this.stopQueueThread = true;
+        this.disconnect();
     }
 
 }

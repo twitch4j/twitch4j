@@ -73,7 +73,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.
-                ex = new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
+                ex = new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null, response.request());
             } else {
                 TwitchKrakenError error = objectMapper.readValue(responseBody, TwitchKrakenError.class);
                 ex = new ContextedRuntimeException("Helix API Error")

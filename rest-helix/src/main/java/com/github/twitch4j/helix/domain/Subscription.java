@@ -12,30 +12,30 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Subscription {
 
-    // User ID of the broadcaster.
+    /** User ID of the broadcaster. */
     @NonNull
     private String broadcasterId;
 
-    // Username of the broadcaster.
+    /** Username of the broadcaster. */
     @NonNull
     private String broadcasterName;
 
-    // Determines if the subscription is a gift subscription.
+    /** Determines if the subscription is a gift subscription. */
     private Boolean isGift;
 
-    // Type of subscription (Tier 1, Tier 2, Tier 3). 1000 = Tier 1, 2000 = Tier 2, 3000 = Tier 3 subscriptions.
+    /** Type of subscription (Tier 1, Tier 2, Tier 3). 1000 = Tier 1, 2000 = Tier 2, 3000 = Tier 3 subscriptions. */
     @NonNull
     private String tier;
 
-    // Name of the subscription.
+    /** Name of the subscription. */
     @NonNull
     private String plan_name;
 
-    // ID of the subscribed user.
+    /** ID of the subscribed user. */
     @NonNull
     private String userId;
 
-    // Login name of the subscribed user.
+    /** Login name of the subscribed user. */
     @NonNull
     private String userName;
 

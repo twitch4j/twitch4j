@@ -18,28 +18,28 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Chatters {
 
-    // Viewer Count
+    /** Viewer Count */
     @NonNull
     @JsonProperty("chatter_count")
     private Integer viewerCount;
 
-    // VIPS
+    /** VIPS */
     @JsonIgnore
     private List<String> vips;
 
-    // Staff
+    /** Staff */
     @JsonIgnore
     private List<String> staff;
 
-    // Admins
+    /** Admins */
     @JsonIgnore
     private List<String> admins;
 
-    // Moderators
+    /** Moderators */
     @JsonIgnore
     private List<String> moderators;
 
-    // Viewers
+    /** Viewers */
     @JsonIgnore
     private List<String> viewers;
 

@@ -1,6 +1,6 @@
 package com.github.twitch4j;
 
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -9,8 +9,10 @@ import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
+import lombok.extern.slf4j.Slf4j;
 
-public class TwitchClient {
+@Slf4j
+public class TwitchClient implements AutoCloseable {
 
     /**
      * Event Manager
@@ -192,5 +194,23 @@ public class TwitchClient {
      */
     public TwitchClientHelper getClientHelper() {
         return this.twitchClientHelper;
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        log.info("Closing TwitchClient ...");
+
+        // Modules
+        if (this.chat != null) {
+            this.chat.close();
+        }
+        if (this.pubsub != null) {
+            this.pubsub.close();
+        }
+        if (this.twitchClientHelper != null) {
+            twitchClientHelper.close();
+        }
     }
 }

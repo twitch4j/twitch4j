@@ -19,11 +19,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamMarkers {
 
-    // Stream ID.
+    /** Stream ID. */
     @NonNull
     private String userId;
 
-    // Markers
+    /** Markers */
     @NonNull
     private List<VideoMarkers> videos;
 

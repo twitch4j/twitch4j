@@ -2,7 +2,7 @@ package com.github.twitch4j;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.philippheuer.events4j.domain.Event;
+import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * A helper class that covers a few basic use cases of most library users
  */
 @Slf4j
-public class TwitchClientHelper {
+public class TwitchClientHelper implements AutoCloseable {
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -48,6 +48,11 @@ public class TwitchClientHelper {
     protected final Thread eventGenerationThread;
 
     /**
+     * Event Listener Thread
+     */
+    protected Boolean stopEventGenerationThread = false;
+
+    /**
      * Channel Information Cache
      */
     private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
@@ -67,7 +72,7 @@ public class TwitchClientHelper {
         this.eventGenerationThread = new Thread(() -> {
             log.debug("Started TwitchClientHelper Thread to listen for goLive/Follow events");
 
-            while (true) {
+            while (stopEventGenerationThread == false) {
                 try {
                     // check if the thread was interrupted
                     if (Thread.interrupted()) {
@@ -123,22 +128,22 @@ public class TwitchClientHelper {
                             // - go live event
                             if (dispatchGoLiveEvent) {
                                 Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - go offline event
                             if (dispatchGoOfflineEvent) {
                                 Event event = new ChannelGoOfflineEvent(channel);
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - title changed event
                             if (dispatchTitleChangedEvent) {
                                 Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                             // - game changed event
                             if (dispatchGameChangedEvent) {
                                 Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
+                                twitchClient.getEventManager().publish(event);
                             }
                         });
                     } catch (Exception ex) {
@@ -169,7 +174,7 @@ public class TwitchClientHelper {
                                     if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
                                         // dispatch event
                                         FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                        twitchClient.getEventManager().dispatchEvent(event);
+                                        twitchClient.getEventManager().publish(event);
                                     }
                                 }
                             }
@@ -322,6 +327,14 @@ public class TwitchClientHelper {
                 eventGenerationThread.interrupt();
             }
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        stopEventGenerationThread = true;
+        eventGenerationThread.interrupt();
     }
 
 }

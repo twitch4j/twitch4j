@@ -78,9 +78,6 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);
 
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-helix", client);
-
         return client;
     }
 }

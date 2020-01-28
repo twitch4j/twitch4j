@@ -69,9 +69,6 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchKraken.class, baseUrl);
 
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-kraken", client);
-
         return client;
     }
 }

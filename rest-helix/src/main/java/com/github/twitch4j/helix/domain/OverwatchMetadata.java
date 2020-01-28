@@ -15,7 +15,7 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OverwatchMetadata {
 
-    // The Broadcaster
+    /** The Broadcaster */
     @NonNull
     private OverwatchPlayer broadcaster;
 
@@ -29,7 +29,7 @@ public class OverwatchMetadata {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class OverwatchPlayer {
 
-        // Hero Type
+        /** Hero Type */
         private OverwatchHero hero;
 
     }
@@ -44,15 +44,15 @@ public class OverwatchMetadata {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class OverwatchHero {
 
-        // Name of the Overwatch hero.
+        /** Name of the Overwatch hero. */
         @NonNull
         private String name;
 
-        // Role of the Overwatch hero.
+        /** Role of the Overwatch hero. */
         @NonNull
         private String role;
 
-        // Ability being used by the broadcaster.
+        /** Ability being used by the broadcaster. */
         @NonNull
         private String ability;
 

@@ -73,9 +73,6 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
             .options(new Request.Options(5000, 15000))
             .target(TwitchMessagingInterface.class, baseUrl);
 
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-api-tmi", client);
-
         return client;
     }
 }

@@ -2,10 +2,8 @@ package com.github.twitch4j.auth;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
-import com.github.philippheuer.credentialmanager.authcontroller.GUIAuthController;
 import com.github.philippheuer.credentialmanager.domain.Credential;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.twitch4j.auth.domain.TwitchScopes;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -13,8 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-
-import java.util.Arrays;
 
 @Slf4j
 @Tag("unittest")
@@ -40,12 +36,14 @@ public class TwitchIdentityProviderTest {
     /**
      * Test - Twitch Identity Provider - GUI
      */
+    /*
     @Test
     @DisplayName("GUI Authentication Test")
     @Disabled
     @SneakyThrows
     public void testGuiAuthenticationController() {
         // build
+
         GUIAuthController guiAuthController = new GUIAuthController();
         CredentialManager credentialManager = CredentialManagerBuilder.builder()
             .withAuthenticationController(guiAuthController)
@@ -66,5 +64,6 @@ public class TwitchIdentityProviderTest {
             System.out.println(c.toString());
         });
     }
+    */
 
 }

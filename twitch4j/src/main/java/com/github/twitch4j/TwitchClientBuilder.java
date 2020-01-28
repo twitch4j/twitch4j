@@ -3,7 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -14,6 +14,7 @@ import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
+import io.github.bucket4j.Bandwidth;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -23,10 +24,8 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.TopicProcessor;
-import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +121,18 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private Integer eventManagerBufferSize = 16384;
 
     /**
+     * Size of the ChatQueue
+     */
+    @Wither
+    protected Integer chatQueueSize = 200;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    @Wither
+    protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
+
+    /**
      * User Agent
      */
     @Wither
@@ -164,12 +175,11 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth authModule = new TwitchAuth(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
-        // Customized EventManager Init
+        // Default EventManager
         if (eventManager == null) {
-            eventManager = new EventManager(Schedulers.newParallel("events4j-scheduler", eventManagerThreads), TopicProcessor.create("events4j-processor", eventManagerBufferSize), FluxSink.OverflowStrategy.BUFFER);
+            eventManager = new EventManager();
+            eventManager.autoDiscovery();
         }
-        // EventManager
-        eventManager.enableAnnotationBasedEvents();
 
         // Module: Helix
         TwitchHelix helix = null;
@@ -177,7 +187,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             helix = TwitchHelixBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                .withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
@@ -190,7 +199,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             kraken = TwitchKrakenBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                .withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
@@ -203,7 +211,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             tmi = TwitchMessagingInterfaceBuilder.builder()
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
-                .withEventManager(eventManager)
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(getRequestQueueSize())
                 .withTimeout(timeout)
@@ -219,6 +226,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withChatAccount(chatAccount)
                 .withEnableChannelCache(enableChannelCache)
                 .withCommandTriggers(commandPrefixes)
+                .withChatQueueSize(chatQueueSize)
+                .withChatRateLimit(chatRateLimit)
                 .build();
         }
 

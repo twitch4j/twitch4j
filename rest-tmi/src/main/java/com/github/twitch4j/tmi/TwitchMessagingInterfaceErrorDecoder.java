@@ -63,7 +63,7 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
                 // Check the status page for relevant updates.
-                return new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null);
+                return new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null, response.request());
             }
 
             TMIError error = objectMapper.readValue(responseBody, TMIError.class);
