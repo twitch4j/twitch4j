@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Model representing the response for Create Stream Marker.
@@ -17,7 +16,6 @@ import lombok.ToString;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
 public class StreamMarker {
     
     private String createdAt, description, id;
