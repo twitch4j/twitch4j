@@ -428,13 +428,13 @@ public interface TwitchHelix {
     );
 
     /**
-     * Creates a marker at the current time during a live stream. A marker is a temporal indicator that appears on the Twitch web UI for highlight creation. Markers are meant to remind streamers and their video editors of important moments during a stream.
+     * Creates a marker at the current time during a live stream. A marker is a temporal indicator that appears on the Twitch web UI for highlight creation and can also be retrieved with 
+     * {@link #getStreamMarkers(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String) getStreamMarkers}. Markers are meant to remind streamers and their video editors of important moments during a stream.
      * Markers can be created only if the broadcast identified by the specified {@code userId} is live and has enabled VOD (past broadcast) storage. Marker creation will fail if the broadcaster is airing a premiere or a rerun.
      * Requires scope: user:edit:broadcast
      * 
      * @param authToken     Auth Token
-     * @param userId        ID of the broadcaster to create a marker for
-     * @param description   Optional description to include with the marker
+     * @param highlight     User id and optional description for the marker
      * @return StreamMarker
      */
     @RequestLine("POST /streams/markers")
@@ -443,11 +443,9 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"user_id\": \"{user_id}\", \"description\": \"{description}\"%7D")
     HystrixCommand<StreamMarker> createStreamMarker(
-            @Param("token") String authToken,
-            @Param("user_id") String userId,
-            @Param(value = "description", expander = JsonEscaper.class ) String description
+            Highlight highlight,
+            @Param("token") String authToken
     );
 
     /**
