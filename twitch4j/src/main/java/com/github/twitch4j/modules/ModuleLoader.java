@@ -1,10 +1,10 @@
 package com.github.twitch4j.modules;
 
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.modules.event.ModuleDisabledEvent;
 import com.github.twitch4j.modules.event.ModuleEnabledEvent;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;

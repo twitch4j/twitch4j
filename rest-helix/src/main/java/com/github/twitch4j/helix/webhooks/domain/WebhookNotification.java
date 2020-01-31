@@ -1,23 +1,22 @@
-package com.github.twitch4j.helix.domain;
+package com.github.twitch4j.helix.webhooks.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
 
-/**
- * Clip Data
- */
 @Data
 @Setter(AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateClipList {
+public class WebhookNotification {
 
-    @NonNull
-    private List<CreateClip> data;
+    @JsonProperty("data")
+    private Map<String, Object> data;
 
 }

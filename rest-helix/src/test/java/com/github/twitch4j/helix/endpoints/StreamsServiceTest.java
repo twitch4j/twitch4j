@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class StreamsServiceTest extends AbtractEndpointTest {
+public class StreamsServiceTest extends AbstractEndpointTest {
 
     /** UserId */
     private static String twitchUserId = "149223493";
