@@ -113,6 +113,8 @@ public class TwitchChat implements AutoCloseable {
      * @param chatCredential Chat Credential
      * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
+     * @param chatQueueSize Chat Queue Size
+     * @param chatRateLimit Bandwidth / Bucket
      */
     public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
         this.eventManager = eventManager;
