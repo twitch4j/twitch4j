@@ -5,6 +5,7 @@ import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.github.twitch4j.helix.webhooks.topics.StreamsTopic;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ public class WebhooksServiceTest extends AbstractEndpointTest {
 
     @Test
     @DisplayName("Request a Stream Changed webhook subscription and verify using Get Webhook Subscriptions")
+    @Disabled
     public void getStreams() {
         WebhookRequest request = new WebhookRequest(
             System.getenv("CALLBACK_URL"),
