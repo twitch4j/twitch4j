@@ -140,9 +140,9 @@ public class TwitchPubSub implements AutoCloseable {
                     }
 
                     // sleep one second
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (Exception ex) {
-                    log.error("PubSub: Unexpected error in worker thread: " + ex.getMessage());
+                    log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
         });
