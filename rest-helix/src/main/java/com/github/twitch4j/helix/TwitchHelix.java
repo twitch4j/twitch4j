@@ -444,8 +444,8 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     HystrixCommand<StreamMarker> createStreamMarker(
-            Highlight highlight,
-            @Param("token") String authToken
+        @Param("token") String authToken,
+        Highlight highlight
     );
 
     /**
