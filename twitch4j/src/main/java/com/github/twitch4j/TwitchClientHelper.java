@@ -80,78 +80,80 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
 
                     // check go live / stream events
-                    HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
-                    try {
-                        List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
-                        listenForGoLive.forEach(channel -> {
-                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
-                            Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
+                    if (listenForGoLive.size() > 0) {
+                        HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
+                        try {
+                            List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
+                            listenForGoLive.forEach(channel -> {
+                                ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                                Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
-                            boolean dispatchGoLiveEvent = false;
-                            boolean dispatchGoOfflineEvent = false;
-                            boolean dispatchTitleChangedEvent = false;
-                            boolean dispatchGameChangedEvent = false;
+                                boolean dispatchGoLiveEvent = false;
+                                boolean dispatchGoOfflineEvent = false;
+                                boolean dispatchTitleChangedEvent = false;
+                                boolean dispatchGameChangedEvent = false;
 
-                            if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
-                                // is live
-                                // - live status
-                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
-                                    dispatchGoLiveEvent = true;
+                                if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
+                                    // is live
+                                    // - live status
+                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                                        dispatchGoLiveEvent = true;
+                                    }
+                                    currentChannelCache.setIsLive(true);
+                                    boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
+
+                                    // - change stream title event
+                                    if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
+                                        dispatchTitleChangedEvent = true;
+                                    }
+                                    currentChannelCache.setTitle(stream.get().getTitle());
+
+                                    // - change game event
+                                    if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
+                                        dispatchGameChangedEvent = true;
+                                    }
+                                    currentChannelCache.setGameId(stream.get().getGameId());
+                                } else {
+                                    // was online previously?
+                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                                        dispatchGoOfflineEvent = true;
+                                    }
+
+                                    // is offline
+                                    currentChannelCache.setIsLive(false);
+                                    currentChannelCache.setTitle(null);
+                                    currentChannelCache.setGameId(null);
                                 }
-                                currentChannelCache.setIsLive(true);
-                                boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
-                                // - change stream title event
-                                if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
-                                    dispatchTitleChangedEvent = true;
+                                // dispatch events
+                                // - go live event
+                                if (dispatchGoLiveEvent) {
+                                    Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
                                 }
-                                currentChannelCache.setTitle(stream.get().getTitle());
-
-                                // - change game event
-                                if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
-                                    dispatchGameChangedEvent = true;
+                                // - go offline event
+                                if (dispatchGoOfflineEvent) {
+                                    Event event = new ChannelGoOfflineEvent(channel);
+                                    twitchClient.getEventManager().publish(event);
                                 }
-                                currentChannelCache.setGameId(stream.get().getGameId());
-                            } else {
-                                // was online previously?
-                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
-                                    dispatchGoOfflineEvent = true;
+                                // - title changed event
+                                if (dispatchTitleChangedEvent) {
+                                    Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                    twitchClient.getEventManager().publish(event);
                                 }
-
-                                // is offline
-                                currentChannelCache.setIsLive(false);
-                                currentChannelCache.setTitle(null);
-                                currentChannelCache.setGameId(null);
+                                // - game changed event
+                                if (dispatchGameChangedEvent) {
+                                    Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
+                                }
+                            });
+                        } catch (Exception ex) {
+                            if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
+                                log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
                             }
 
-                            // dispatch events
-                            // - go live event
-                            if (dispatchGoLiveEvent) {
-                                Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - go offline event
-                            if (dispatchGoOfflineEvent) {
-                                Event event = new ChannelGoOfflineEvent(channel);
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - title changed event
-                            if (dispatchTitleChangedEvent) {
-                                Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - game changed event
-                            if (dispatchGameChangedEvent) {
-                                Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                        });
-                    } catch (Exception ex) {
-                        if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
-                            log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
+                            log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                         }
-
-                        log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                     }
 
                     // check follow events
