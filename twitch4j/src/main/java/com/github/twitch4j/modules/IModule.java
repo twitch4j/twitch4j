@@ -1,8 +1,8 @@
 package com.github.twitch4j.modules;
 
+import com.github.twitch4j.TwitchClient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import com.github.twitch4j.TwitchClient;
 
 @Getter
 @AllArgsConstructor

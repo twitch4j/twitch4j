@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class VideoServiceTest extends AbtractEndpointTest {
+public class VideoServiceTest extends AbstractEndpointTest {
 
     /** Overwatch GameId */
     private static String overwatchGameId = "488552l";

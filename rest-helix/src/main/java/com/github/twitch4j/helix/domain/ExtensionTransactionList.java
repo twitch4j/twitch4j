@@ -9,18 +9,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Clip Data
- */
+import java.util.List;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateClip {
-
-    private String id;
-
-    @JsonProperty("edit_url")
-    private String editUrl;
+public class ExtensionTransactionList {
+	
+	/**
+     * Array of requested transactions.
+	 */
+	@JsonProperty("data")
+	private List<ExtensionTransaction> transactions;
+	
+	/**
+     * If provided, is the key used to fetch the next page of data. If not provided, the current response is the last page of data available.
+	 */
+	@JsonProperty("pagination")
+	private String pagination;
+	
 }

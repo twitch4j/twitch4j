@@ -1,17 +1,13 @@
 package com.github.twitch4j.kraken;
 
-import java.util.List;
-
-import com.github.twitch4j.kraken.domain.KrakenIngestList;
-import com.github.twitch4j.kraken.domain.KrakenSubscriptionList;
-import com.github.twitch4j.kraken.domain.KrakenTeam;
-import com.github.twitch4j.kraken.domain.KrakenTeamList;
-import com.github.twitch4j.kraken.domain.KrakenUserList;
+import com.github.twitch4j.kraken.domain.*;
 import com.netflix.hystrix.HystrixCommand;
 import feign.CollectionFormat;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+
+import java.util.List;
 
 /**
  * Twitch - Kraken API
