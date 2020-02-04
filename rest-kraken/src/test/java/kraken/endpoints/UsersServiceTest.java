@@ -1,19 +1,17 @@
 package kraken.endpoints;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Arrays;
-
+import com.github.twitch4j.kraken.domain.KrakenUser;
+import com.github.twitch4j.kraken.domain.KrakenUserList;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.github.twitch4j.kraken.domain.KrakenUser;
-import com.github.twitch4j.kraken.domain.KrakenUserList;
+import java.util.Arrays;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")

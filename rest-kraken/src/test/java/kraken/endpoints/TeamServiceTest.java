@@ -1,7 +1,5 @@
 package kraken.endpoints;
 
-import com.github.twitch4j.kraken.TwitchKraken;
-import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.kraken.domain.KrakenTeam;
 import com.github.twitch4j.kraken.domain.KrakenTeamList;
 import lombok.extern.slf4j.Slf4j;

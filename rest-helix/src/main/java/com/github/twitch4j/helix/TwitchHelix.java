@@ -1,8 +1,8 @@
 package com.github.twitch4j.helix;
 
 import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
-
 import feign.*;
 
 import java.util.Date;
@@ -84,6 +84,26 @@ public interface TwitchHelix {
         @Param("period") String period,
         @Param("started_at") String startedAt,
         @Param("user_id") String userId
+    );
+
+    /**
+     * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
+     *
+     * @param authtoken App Access  OAuth Token
+     * @param extensionId ID of the extension to list transactions for.
+     * @param transactionIds Transaction IDs to look up. Can include multiple to fetch multiple transactions in a single request. Maximum: 100
+     * @param after The cursor used to fetch the next page of data. This only applies to queries without ID. If an ID is specified, it supersedes the cursor.
+     * @param limit Maximum number of objects to return. Maximum: 100 Default: 20
+     * @return ExtensionTransactionList
+     */
+    @RequestLine("GET helix/extensions/transactions?extension_id={extensionId}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionTransactionList> getExtensionTransactions(
+        @Param("token") String authtoken,
+        @Param("extension_id") String extensionId,
+        @Param("id") List<String> transactionIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
     );
 
     /**
@@ -689,9 +709,50 @@ public interface TwitchHelix {
         @Param("first") Integer limit
     );
 
+    /**
+     * Get Webhook Subscriptions
+     * <p>
+     * Gets the Webhook subscriptions of a user identified by a Bearer token, in order of expiration.
+     *
+     * The response has a JSON payload with a data field containing an array of subscription elements and a pagination field containing information required to query for more subscriptions.
+     *
+     * @param authToken User or App auth Token, for increased rate-limits
+     * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
+     * @return WebhookSubscriptionList
+     */
+    @RequestLine("GET /webhooks/subscriptions?after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<WebhookSubscriptionList> getWebhookSubscriptions(
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
 
     /**
-     * TODO: Get Webhook Subscriptions
+     * Subscribe to or unsubscribe from events for a specified topic.
+     *
+     * <p>
+     * Web hook response payloads mimic their respective New Twitch API endpoint responses (with minor omissions for unnecessary fields).
+     * That is, a call to a web hook returns in its payload the same data as a call to the corresponding endpoint in the new Twitch API.
+     * </p>
+     *
+     * <p>
+     * When you submit a request to subscribe to an event (with the Subscribe To/Unsubscribe From Events endpoint), your request is asynchronously validated to confirm you are allowed to create the subscription.<br>
+     * Depending on the results of this validation, Twitch responds by sending you one of two GET requests:
+     * <p> * Subscription verify</p>
+     * <p> * Subscription denied</p>
+     *
+     * @param request WebhookRequest to be converted to the Json body of the API call.
+     * @param authToken   Auth Token
+     *
+     * @see <a href="https://dev.twitch.tv/docs/api/webhooks-guid/">Twitch Webhooks Guide</a>
+     * @return The response from the server
      */
-
+    @RequestLine("POST /webhooks/hub")
+    @Headers({"Authorization: Bearer {token}", "content-type: application/json"})
+    HystrixCommand<Response> requestWebhookSubscription(
+        WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
+        @Param("token") String authToken
+    );
 }
