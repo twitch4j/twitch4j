@@ -2,7 +2,6 @@ package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.common.enums.CommandPermission;
-import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;

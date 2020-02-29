@@ -1,24 +1,14 @@
 package com.github.twitch4j;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.github.twitch4j.common.enums.CommandPermission;
-import com.github.twitch4j.common.events.user.PrivateMessageEvent;
-import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.util.TestUtils;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 @Slf4j
 @Tag("unittest")

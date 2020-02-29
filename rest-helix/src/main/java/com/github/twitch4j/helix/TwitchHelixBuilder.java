@@ -11,11 +11,7 @@ import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -35,7 +31,7 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
     /**
      * Default Timeout
      */
-    @Wither
+    @With
     private Integer timeout = 5000;
 
     /**

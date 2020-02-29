@@ -22,12 +22,8 @@ import io.github.bucket4j.Bandwidth;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
-import com.github.twitch4j.chat.TwitchChat;
-import com.github.twitch4j.chat.TwitchChatBuilder;
-import com.github.twitch4j.helix.TwitchHelix;
-import com.github.twitch4j.helix.TwitchHelixBuilder;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -44,37 +40,37 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     /**
      * Redirect Url
      */
-    @Wither
+    @With
     private String redirectUrl = "http://localhost";
 
     /**
      * Default Timeout
      */
-    @Wither
+    @With
     private Integer timeout = 5000;
 
     /**
      * Enabled: Helix
      */
-    @Wither
+    @With
     private Boolean enableHelix = false;
 
     /**
      * Enabled: Kraken
      */
-    @Wither
+    @With
     private Boolean enableKraken = false;
 
     /**
      * Enabled: TMI
      */
-    @Wither
+    @With
     private Boolean enableTMI = false;
 
     /**
      * Enabled: Chat
      */
-    @Wither
+    @With
     private Boolean enableChat = false;
 
     /**
@@ -85,68 +81,74 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     /**
      * Enabled: PubSub
      */
-    @Wither
+    @With
     private Boolean enablePubSub = false;
 
     /**
      * Enabled: GraphQL
      */
-    @Wither
+    @With
     private Boolean enableGraphQL = false;
 
     /**
      * Chat Account
      */
-    @Wither
+    @With
     private OAuth2Credential chatAccount;
 
     /**
      * Channel Cache
      */
-    @Wither
+    @With
     private Boolean enableChannelCache = false;
 
     /**
      * EventManager
      */
-    @Wither
+    @With
     private EventManager eventManager = null;
 
     /**
      * How many threads should the eventManager use to process the events?
      */
-    @Wither
+    @With
     private Integer eventManagerThreads = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * How many events can be queued before the eventManager should start dropping events?
      */
-    @Wither
+    @With
     private Integer eventManagerBufferSize = 16384;
 
     /**
      * Size of the ChatQueue
      */
-    @Wither
+    @With
     protected Integer chatQueueSize = 200;
 
     /**
      * Custom RateLimit for ChatMessages
      */
-    @Wither
+    @With
     protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
 
     /**
      * User Agent
      */
-    @Wither
+    @With
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
 
     /**
      * CredentialManager
      */
-    @Wither
+    @With
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
+
+    /**
+     * Default Auth Token for API Requests
+     */
+    @With
+    private OAuth2Credential defaultAuthToken = null;
 
     /**
      * With a CommandTrigger
@@ -158,6 +160,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         this.commandPrefixes.add(commandTrigger);
         return this;
     }
+
 
     /**
      * Initialize the builder
@@ -255,6 +258,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
 
         // Module: Client
         final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
+        client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
 
         // Return new Client Instance
         return client;

@@ -2,6 +2,7 @@ package com.github.twitch4j;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
@@ -13,6 +14,7 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -56,6 +58,12 @@ public class TwitchClientHelper implements AutoCloseable {
     protected Boolean stopEventGenerationThread = false;
 
     /**
+     * Default Auth Token for Twitch API Requests
+     */
+    @Setter
+    private OAuth2Credential defaultAuthToken = null;
+
+    /**
      * Channel Information Cache
      */
     private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
@@ -84,7 +92,7 @@ public class TwitchClientHelper implements AutoCloseable {
 
                     // check go live / stream events
                     if (listenForGoLive.size() > 0) {
-                        HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
+                        HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
                         try {
                             List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
                             listenForGoLive.forEach(channel -> {
@@ -161,7 +169,7 @@ public class TwitchClientHelper implements AutoCloseable {
 
                     // check follow events
                     for (EventChannel channel : listenForFollow) {
-                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channel.getId(), null, null);
+                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
 
                         try {
                             ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
@@ -219,7 +227,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * @param channelName Channel Name
      */
     public void enableStreamEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -245,7 +253,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * @param channelName Channel Name
      */
     public void disableStreamEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -271,7 +279,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * @param channelName Channel Name
      */
     public void enableFollowEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -297,7 +305,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * @param channelName Channel Name
      */
     public void disableFollowEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {

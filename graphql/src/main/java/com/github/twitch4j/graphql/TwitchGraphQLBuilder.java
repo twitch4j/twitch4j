@@ -1,11 +1,7 @@
 package com.github.twitch4j.graphql;
 
 import com.github.philippheuer.events4j.core.EventManager;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,19 +16,19 @@ public class TwitchGraphQLBuilder {
     /**
      * Event Manager
      */
-    @Wither
+    @With
     private EventManager eventManager = new EventManager();
 
     /**
      * Client Id
      */
-    @Wither
+    @With
     private String clientId = "kimne78kx3ncx6brgo4mv6wki5h1ko";
 
     /**
      * Client Secret
      */
-    @Wither
+    @With
     private String clientSecret = "**SECRET**";
 
     /**

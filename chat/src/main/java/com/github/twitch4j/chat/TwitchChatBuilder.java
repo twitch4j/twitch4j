@@ -6,11 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.builder.TwitchEventAwareAPIBuilder;
 import io.github.bucket4j.Bandwidth;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -32,25 +28,25 @@ public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuil
     /**
      * Event Manager
      */
-    @Wither
+    @With
     private EventManager eventManager = new EventManager();
 
     /**
      * Credential Manager
      */
-    @Wither
+    @With
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
      * IRC User Id
      */
-    @Wither
+    @With
     private OAuth2Credential chatAccount;
 
     /**
      * Enable Channel Cache to keep track of mods/timeouts/bans/
      */
-    @Wither
+    @With
     private Boolean enableChannelCache = false;
 
     /**
@@ -66,13 +62,13 @@ public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuil
     /**
      * Size of the ChatQueue
      */
-    @Wither
+    @With
     protected Integer chatQueueSize = 200;
 
     /**
      * Custom RateLimit for ChatMessages
      */
-    @Wither
+    @With
     protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
 
     /**
