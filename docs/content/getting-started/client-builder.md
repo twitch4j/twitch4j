@@ -26,4 +26,4 @@ TwitchClient twitchClient = TwitchClientBuilder.builder()
 
 ## Logging
 
-Please check out [Logging](./logging) on how to set up logging.
+Please check out [Logging](../logging) on how to set up logging.
