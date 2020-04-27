@@ -130,21 +130,15 @@ public interface TwitchKraken {
      *
      * @return Object
      */
-
     @Headers({
         "Authorization: OAuth {token}",
         "Accept: application/vnd.twitchtv.v5+json",
-
-    })@RequestLine("PUT /channels/{channelId}?channel[status]={title}")
-
-
+    })
+    @RequestLine("PUT /channels/{channelId}?channel[status]={title}")
     HystrixCommand<Object> updateTitle(
-
         @Param("token") String authToken,
         @Param("channelId") String channelId,
         @Param("title") String title
-
     );
 
 }
-
