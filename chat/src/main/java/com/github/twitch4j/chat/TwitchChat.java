@@ -64,12 +64,12 @@ public class TwitchChat implements AutoCloseable {
      * The connection state
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
-    private TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
+    private transient TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
     /**
      * Channel Cache
      */
-    protected final Map<String, Boolean> channelCache = new HashMap<>();
+    protected final transient Map<String, Boolean> channelCache = new HashMap<>();
 
     /**
      * IRC Message Bucket
@@ -79,7 +79,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue
      */
-    protected final ArrayBlockingQueue<String> ircCommandQueue;
+    protected final transient ArrayBlockingQueue<String> ircCommandQueue;
 
     /**
      * Custom RateLimit for ChatMessages
@@ -94,7 +94,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue Thread
      */
-    protected Boolean stopQueueThread = false;
+    protected transient Boolean stopQueueThread = false;
 
     /**
      * IRC Command Handlers
@@ -150,28 +150,28 @@ public class TwitchChat implements AutoCloseable {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (stopQueueThread == false) {
+            while (true) {
                 try {
-                    // If connected, consume 1 token
-                    while(true) {
-                        if (connectionState.equals(TMIConnectionState.CONNECTED)) {
-                            // wait for a command to enter the queue
-                            String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
-                            if(command != null) {
-                                // block thread, until we can continue
-                                ircMessageBucket.asScheduler().consume(1);
+                    if(stopQueueThread == true)
+                        break;
+                    // wait for a command to enter the queue
+                    String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
+                    if(command != null) {
+                        // block thread, until we can continue
+                        ircMessageBucket.asScheduler().consume(1);
+                        // Send until we are connected
+                        while (true) {
+                            if (connectionState.equals(TMIConnectionState.CONNECTED)) {
                                 sendCommand(command);
-
-                                // Logging
-                                log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
-                                log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
+                                break;
                             }
-                        } else {
                             // sleep to wait for reconnection
                             Thread.sleep(250);
                         }
+                        // Logging
+                        log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
+                        log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
                     }
-
                 } catch (Exception ex) {
                     log.error("Failed to process message from command queue: " + ex.getMessage());
                 }
