@@ -135,29 +135,28 @@ public class TwitchClientHelper implements AutoCloseable {
                                     currentChannelCache.setIsLive(false);
                                     currentChannelCache.setTitle(null);
                                     currentChannelCache.setGameId(null);
+                                }
 
-
-                                    // dispatch events
-                                    // - go live event
-                                    if (dispatchGoLiveEvent) {
-                                        Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                        twitchClient.getEventManager().publish(event);
-                                    }
-                                    // - go offline event
-                                    if (dispatchGoOfflineEvent) {
-                                        Event event = new ChannelGoOfflineEvent(channel);
-                                        twitchClient.getEventManager().publish(event);
-                                    }
-                                    // - title changed event
-                                    if (dispatchTitleChangedEvent) {
-                                        Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                        twitchClient.getEventManager().publish(event);
-                                    }
-                                    // - game changed event
-                                    if (dispatchGameChangedEvent) {
-                                        Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                        twitchClient.getEventManager().publish(event);
-                                    }
+                                // dispatch events
+                                // - go live event
+                                if (dispatchGoLiveEvent) {
+                                    Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
+                                }
+                                // - go offline event
+                                if (dispatchGoOfflineEvent) {
+                                    Event event = new ChannelGoOfflineEvent(channel);
+                                    twitchClient.getEventManager().publish(event);
+                                }
+                                // - title changed event
+                                if (dispatchTitleChangedEvent) {
+                                    Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                    twitchClient.getEventManager().publish(event);
+                                }
+                                // - game changed event
+                                if (dispatchGameChangedEvent) {
+                                    Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
                                 }
                             });
                     } catch (Exception ex) {
