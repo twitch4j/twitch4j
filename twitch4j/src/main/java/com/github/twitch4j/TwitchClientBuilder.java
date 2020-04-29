@@ -202,6 +202,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             eventManager.autoDiscovery();
         }
 
+        if(scheduledThreadPoolExecutor == null) {
+            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        }
+
         // Module: Helix
         TwitchHelix helix = null;
         if (this.enableHelix) {
@@ -270,14 +274,13 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .build();
         }
 
-        if(scheduledThreadPoolExecutor == null) {
-            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        }
+
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql, scheduledThreadPoolExecutor, helperThreadRate);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
         client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
-
+        client.getClientHelper().setExecutor(scheduledThreadPoolExecutor);
+        client.getClientHelper().setThreadRate(helperThreadRate);
 
         // Return new Client Instance
         return client;
