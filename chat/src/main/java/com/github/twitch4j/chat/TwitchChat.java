@@ -15,6 +15,7 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.BlockingStrategy;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import lombok.AccessLevel;
@@ -27,6 +28,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
 public class TwitchChat implements AutoCloseable {
@@ -152,28 +154,35 @@ public class TwitchChat implements AutoCloseable {
         this.queueThread = new Thread(() -> {
             while (true) {
                 try {
-                    if(stopQueueThread == true)
+                    // If we need to stop, end the loop
+                    if(stopQueueThread)
                         break;
-                    // wait for a command to enter the queue
+
+                    // wait for one second for a command to enter the queue
                     String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
                     if(command != null) {
-                        // block thread, until we can continue
-                        ircMessageBucket.asScheduler().consume(1);
-                        // Send until we are connected
+                        // Send the message, retrying forever until we are connected.
                         while (true) {
                             if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                                // block thread, until we can continue
+                                ircMessageBucket.asScheduler().consume(1);
+
                                 sendCommand(command);
                                 break;
                             }
                             // sleep to wait for reconnection
                             TimeUnit.MILLISECONDS.sleep(500L);
+
+                            // Checking for a stop again in this loop
+                            if(stopQueueThread)
+                                break;
                         }
                         // Logging
                         log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
                         log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
                     }
                 } catch (Exception ex) {
-                    log.error("Failed to process message from command queue: " + ex.getMessage());
+                    log.error("Failed to process message from command queue", ex);
                 }
             }
         });
