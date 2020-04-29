@@ -166,7 +166,7 @@ public class TwitchChat implements AutoCloseable {
                                 break;
                             }
                             // sleep to wait for reconnection
-                            Thread.sleep(250);
+                            TimeUnit.MILLISECONDS.sleep(500L);
                         }
                         // Logging
                         log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
