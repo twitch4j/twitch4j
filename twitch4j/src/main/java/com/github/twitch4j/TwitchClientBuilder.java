@@ -32,6 +32,7 @@ import com.github.twitch4j.helix.TwitchHelixBuilder;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
@@ -149,6 +150,18 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
+     * Thread Pool Executor
+     */
+    @Wither
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+
+    /**
+     * Millisecond Delay for Client Helper Thread
+     */
+    @Wither
+    private long helperThreadRate = 10000L;
+
+    /**
      * With a CommandTrigger
      *
      * @param commandTrigger Command Trigger (Prefix)
@@ -254,7 +267,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql, scheduledThreadPoolExecutor, helperThreadRate);
 
         // Return new Client Instance
         return client;

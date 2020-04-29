@@ -19,6 +19,7 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Slf4j
 @Tag("unittest")
@@ -59,6 +60,8 @@ public class TwitchClientTest {
             .withChatAccount(TestUtils.getCredential())
             .withEnablePubSub(false)
             .withEnableGraphQL(false)
+            .withScheduledThreadPoolExecutor(new ScheduledThreadPoolExecutor(1))
+            .withHelperThreadRate(10000L)
             .build();
 
         // join twitch4j channel
