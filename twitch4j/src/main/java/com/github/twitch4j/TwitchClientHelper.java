@@ -87,78 +87,74 @@ public class TwitchClientHelper implements AutoCloseable {
         // Thread
         this.eventGenerationThread = new Thread(() -> {
             try {
-                // check if the thread was interrupted
-                if (Thread.interrupted()) {
-                    throw new InterruptedException();
-                }
-                    // check go live / stream events
-                    if (listenForGoLive.size() > 0) {
-                        HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
-                        try {
-                            List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
-                            listenForGoLive.forEach(channel -> {
-                                ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
-                                Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
+                // check go live / stream events
+                if (listenForGoLive.size() > 0) {
+                    HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
+                    try {
+                        List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
+                        listenForGoLive.forEach(channel -> {
+                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                            Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
-                                boolean dispatchGoLiveEvent = false;
-                                boolean dispatchGoOfflineEvent = false;
-                                boolean dispatchTitleChangedEvent = false;
-                                boolean dispatchGameChangedEvent = false;
+                            boolean dispatchGoLiveEvent = false;
+                            boolean dispatchGoOfflineEvent = false;
+                            boolean dispatchTitleChangedEvent = false;
+                            boolean dispatchGameChangedEvent = false;
 
-                                if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
-                                    // is live
-                                    // - live status
-                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
-                                        dispatchGoLiveEvent = true;
-                                    }
-                                    currentChannelCache.setIsLive(true);
-                                    boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
+                            if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
+                                // is live
+                                // - live status
+                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                                    dispatchGoLiveEvent = true;
+                                }
+                                currentChannelCache.setIsLive(true);
+                                boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
-                                    // - change stream title event
-                                    if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
-                                        dispatchTitleChangedEvent = true;
-                                    }
-                                    currentChannelCache.setTitle(stream.get().getTitle());
+                                // - change stream title event
+                                if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
+                                    dispatchTitleChangedEvent = true;
+                                }
+                                currentChannelCache.setTitle(stream.get().getTitle());
 
-                                    // - change game event
-                                    if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
-                                        dispatchGameChangedEvent = true;
-                                    }
-                                    currentChannelCache.setGameId(stream.get().getGameId());
-                                } else {
-                                    // was online previously?
-                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
-                                        dispatchGoOfflineEvent = true;
-                                    }
-
-                                    // is offline
-                                    currentChannelCache.setIsLive(false);
-                                    currentChannelCache.setTitle(null);
-                                    currentChannelCache.setGameId(null);
+                                // - change game event
+                                if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
+                                    dispatchGameChangedEvent = true;
+                                }
+                                currentChannelCache.setGameId(stream.get().getGameId());
+                            } else {
+                                // was online previously?
+                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                                    dispatchGoOfflineEvent = true;
                                 }
 
-                                // dispatch events
-                                // - go live event
-                                if (dispatchGoLiveEvent) {
-                                    Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - go offline event
-                                if (dispatchGoOfflineEvent) {
-                                    Event event = new ChannelGoOfflineEvent(channel);
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - title changed event
-                                if (dispatchTitleChangedEvent) {
-                                    Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - game changed event
-                                if (dispatchGameChangedEvent) {
-                                    Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                            });
+                                // is offline
+                                currentChannelCache.setIsLive(false);
+                                currentChannelCache.setTitle(null);
+                                currentChannelCache.setGameId(null);
+                            }
+
+                            // dispatch events
+                            // - go live event
+                            if (dispatchGoLiveEvent) {
+                                Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                twitchClient.getEventManager().publish(event);
+                            }
+                            // - go offline event
+                            if (dispatchGoOfflineEvent) {
+                                Event event = new ChannelGoOfflineEvent(channel);
+                                twitchClient.getEventManager().publish(event);
+                            }
+                            // - title changed event
+                            if (dispatchTitleChangedEvent) {
+                                Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                twitchClient.getEventManager().publish(event);
+                            }
+                            // - game changed event
+                            if (dispatchGameChangedEvent) {
+                                Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                twitchClient.getEventManager().publish(event);
+                            }
+                        });
                     } catch (Exception ex) {
                         if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
                             log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
@@ -209,14 +205,9 @@ public class TwitchClientHelper implements AutoCloseable {
                         }
                     }
                 }
-            } catch (InterruptedException ex) {
-                // exit thread, since it's not needed anymore
-                log.debug("TwitchClientHelper Thread has been disabled, it's not needed anymore since we aren't listening for any events with the helper.");
-
             } catch (Exception ex) {
                 log.error("Failed to check for events in TwitchClientHelper Thread: " + ex.getMessage());
             }
-
         });
     }
 
@@ -231,20 +222,19 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                if(listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                if(!listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
                     log.info("Channel {} already added for Stream Events", channelName);
-                    return;
-                }
-                listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
+                } else {
+                    listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
 
-                // initialize cache
-                if (channelInformation.getIfPresent(user.getId()) == null) {
-                    channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
+                    // initialize cache
+                    if (channelInformation.getIfPresent(user.getId()) == null) {
+                        channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
+                    }
                 }
 
-                // start thread if needed
-                startOrStopEventGenerationThread();
             });
+            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel {} to stream event listener!", channelName);
         }
@@ -267,10 +257,9 @@ public class TwitchClientHelper implements AutoCloseable {
                 if (channelInformation.getIfPresent(user.getId()) != null) {
                     channelInformation.invalidate(user.getId());
                 }
-
-                // start thread if needed
-                startOrStopEventGenerationThread();
             });
+            // start thread if needed
+            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from stream event listener!");
         }
@@ -288,19 +277,18 @@ public class TwitchClientHelper implements AutoCloseable {
             users.getUsers().forEach(user -> {
                 if(listenForFollow.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
                     log.info("Channel {} already added for Stream Events", channelName);
-                    return;
-                }
-                // add to list
-                listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
+                } else {
+                    // add to list
+                    listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
 
-                // initialize cache
-                if (channelInformation.getIfPresent(user.getId()) == null) {
-                    channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
+                    // initialize cache
+                    if (channelInformation.getIfPresent(user.getId()) == null) {
+                        channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
+                    }
                 }
-
-                // start thread if needed
-                startOrStopEventGenerationThread();
             });
+            // start thread if needed
+            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
         }
@@ -323,10 +311,8 @@ public class TwitchClientHelper implements AutoCloseable {
                 if (channelInformation.getIfPresent(user.getId()) != null) {
                     channelInformation.invalidate(user.getId());
                 }
-
-                // start thread if needed
-                startOrStopEventGenerationThread();
             });
+            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from follow listener!");
         }
