@@ -168,43 +168,45 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                 }
 
-                // check follow events
-                for (EventChannel channel : listenForFollow) {
-                    HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
-                    try {
-                        ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
-                        LocalDateTime lastFollowDate = null;
+                if(listenForFollow.size() > 0) {
+                    // check follow events
+                    for (EventChannel channel : listenForFollow) {
+                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
+                        try {
+                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                            LocalDateTime lastFollowDate = null;
 
-                        if (currentChannelCache.getLastFollowCheck() != null) {
-                            List<Follow> followList = commandGetFollowers.execute().getFollows();
-                            for (Follow follow : followList) {
-                                // update lastFollowDate
-                                if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
-                                    lastFollowDate = follow.getFollowedAt();
-                                }
+                            if (currentChannelCache.getLastFollowCheck() != null) {
+                                List<Follow> followList = commandGetFollowers.execute().getFollows();
+                                for (Follow follow : followList) {
+                                    // update lastFollowDate
+                                    if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
+                                        lastFollowDate = follow.getFollowedAt();
+                                    }
 
-                                // is new follower?
-                                if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
-                                    // dispatch event
-                                    FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                    twitchClient.getEventManager().publish(event);
+                                    // is new follower?
+                                    if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
+                                        // dispatch event
+                                        FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
+                                        twitchClient.getEventManager().publish(event);
+                                    }
                                 }
                             }
-                        }
 
-                        if (currentChannelCache.getLastFollowCheck() == null) {
-                            // only happens if the user doesn't have any followers at all
-                            currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
-                        } else {
-                            // tracks the date of the latest follow to identify new ones later on
-                            currentChannelCache.setLastFollowCheck(lastFollowDate);
-                        }
-                    } catch (Exception ex) {
-                        if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                            log.trace(ex.getMessage(), ex);
-                        }
+                            if (currentChannelCache.getLastFollowCheck() == null) {
+                                // only happens if the user doesn't have any followers at all
+                                currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
+                            } else {
+                                // tracks the date of the latest follow to identify new ones later on
+                                currentChannelCache.setLastFollowCheck(lastFollowDate);
+                            }
+                        } catch (Exception ex) {
+                            if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                                log.trace(ex.getMessage(), ex);
+                            }
 
-                        log.error("Failed to check for Follow Events: " + ex.getMessage());
+                            log.error("Failed to check for Follow Events: " + ex.getMessage());
+                        }
                     }
                 }
             } catch (InterruptedException ex) {
