@@ -155,7 +155,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
      * Default Auth Token for API Requests
      */
     @With
-    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
 
     /**
      * Millisecond Delay for Client Helper Thread
@@ -268,6 +268,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withClientId(getClientId())
                 .withClientSecret(getClientSecret())
                 .build();
+        }
+
+        if(scheduledThreadPoolExecutor == null) {
+            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         }
 
         // Module: Client
