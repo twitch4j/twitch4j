@@ -1,8 +1,9 @@
 package com.github.twitch4j;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
-import com.github.twitch4j.common.events.user.PrivateMessageEvent;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -37,25 +38,28 @@ public class TwitchClientTest {
     @Test
     @DisplayName("Test for local execution in error diagnostics")
     @Disabled
-    public void localTest() {
-        // external event manager (for shared module usage - streamlabs4j)
-        EventManager eventManager = new EventManager();
-
+    public void localTest() throws Exception {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
-            .withEventManager(eventManager)
-            .withEnableHelix(true)
-            .withEnableKraken(true)
-            .withEnableTMI(true)
-            .withEnableChat(false)
-            .withEnablePubSub(true)
-            .withEnableGraphQL(true)
+            .withEventManager(null)
+            .withEnableHelix(false)
+            .withEnableKraken(false)
+            .withEnableTMI(false)
+            .withEnableChat(true)
+            .withChatAccount(TestUtils.getCredential())
+            .withEnablePubSub(false)
+            .withEnableGraphQL(false)
             .build();
 
+        // join twitch4j channel
+        twitchClient.getChat().joinChannel("twitch4j");
+
         // register all event listeners
-        eventManager.onEvent(PrivateMessageEvent.class).subscribe(event -> {
-            System.out.println("[Whisper] " + event.getUser().getName() + ": " + event.getMessage());
+        twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
+            System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
         });
+
+        TestUtils.sleepFor(5000);
     }
 
 }

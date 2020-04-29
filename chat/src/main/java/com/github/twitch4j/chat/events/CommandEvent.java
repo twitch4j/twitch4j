@@ -1,7 +1,7 @@
 package com.github.twitch4j.chat.events;
 
-import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.chat.enums.CommandSource;
+import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

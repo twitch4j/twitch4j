@@ -37,7 +37,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	private Optional<String> message;
 
 	/**
-	 * X Months subscription streak
+	 * Cumulative months subscribed
 	 */
 	private Integer months;
 
@@ -50,6 +50,12 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 	 * User that gifted the sub
 	 */
 	private EventUser giftedBy;
+        
+        
+        /**
+         * Consecutive months subscribed
+         */
+        private Integer subStreak;
 
     /**
      * Event Constructor
@@ -58,11 +64,12 @@ public class SubscriptionEvent extends AbstractChannelEvent {
      * @param user User that subscribed
      * @param subPlan Sub Plan
      * @param message Sub Message
-     * @param months Months
+     * @param months Cumulative number of months user has been subscribed (not consecutive)
      * @param gifted Is gifted?
      * @param giftedBy User that gifted the sub
+     * @param subStreak Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
      */
-	public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy) {
+	public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak) {
 		super(channel);
 		this.user = user;
 		this.subscriptionPlan = subPlan;
@@ -70,6 +77,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
 		this.months = months;
 		this.gifted = gifted;
 		this.giftedBy = giftedBy;
+                this.subStreak = subStreak;
 	}
 
     /**

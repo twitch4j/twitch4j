@@ -1,6 +1,9 @@
 package com.github.twitch4j;
 
-import com.github.philippheuer.events4j.domain.Event;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
 import com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent;
@@ -10,18 +13,24 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
+import com.netflix.hystrix.HystrixCommand;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
  */
 @Slf4j
-public class TwitchClientHelper {
+public class TwitchClientHelper implements AutoCloseable {
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -44,9 +53,23 @@ public class TwitchClientHelper {
     protected final Thread eventGenerationThread;
 
     /**
+     * Event Listener Thread
+     */
+    protected Boolean stopEventGenerationThread = false;
+
+    /**
+     * Default Auth Token for Twitch API Requests
+     */
+    @Setter
+    private OAuth2Credential defaultAuthToken = null;
+
+    /**
      * Channel Information Cache
      */
-    private Map<Long, ChannelCache> channelInformation = new HashMap<>();
+    private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .maximumSize(10_000)
+        .build();
 
     /**
      * Constructor
@@ -60,7 +83,7 @@ public class TwitchClientHelper {
         this.eventGenerationThread = new Thread(() -> {
             log.debug("Started TwitchClientHelper Thread to listen for goLive/Follow events");
 
-            while (true) {
+            while (stopEventGenerationThread == false) {
                 try {
                     // check if the thread was interrupted
                     if (Thread.interrupted()) {
@@ -68,86 +91,93 @@ public class TwitchClientHelper {
                     }
 
                     // check go live / stream events
-                    try {
-                        StreamList allStreams = twitchClient.getHelix().getStreams(null, null, 1, null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null).execute();
+                    if (listenForGoLive.size() > 0) {
+                        HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
+                        try {
+                            List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
+                            listenForGoLive.forEach(channel -> {
+                                ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                                Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
 
-                        listenForGoLive.forEach(channel -> {
-                            ChannelCache currentChannelCache = channelInformation.get(channel.getId());
-                            Optional<Stream> stream = allStreams.getStreams().stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
+                                boolean dispatchGoLiveEvent = false;
+                                boolean dispatchGoOfflineEvent = false;
+                                boolean dispatchTitleChangedEvent = false;
+                                boolean dispatchGameChangedEvent = false;
 
-                            boolean dispatchGoLiveEvent = false;
-                            boolean dispatchGoOfflineEvent = false;
-                            boolean dispatchTitleChangedEvent = false;
-                            boolean dispatchGameChangedEvent = false;
+                                if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
+                                    // is live
+                                    // - live status
+                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                                        dispatchGoLiveEvent = true;
+                                    }
+                                    currentChannelCache.setIsLive(true);
+                                    boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
-                            if (stream.isPresent()) {
-                                // is live
-                                // - live status
-                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
-                                    dispatchGoLiveEvent = true;
+                                    // - change stream title event
+                                    if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
+                                        dispatchTitleChangedEvent = true;
+                                    }
+                                    currentChannelCache.setTitle(stream.get().getTitle());
+
+                                    // - change game event
+                                    if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
+                                        dispatchGameChangedEvent = true;
+                                    }
+                                    currentChannelCache.setGameId(stream.get().getGameId());
+                                } else {
+                                    // was online previously?
+                                    if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                                        dispatchGoOfflineEvent = true;
+                                    }
+
+                                    // is offline
+                                    currentChannelCache.setIsLive(false);
+                                    currentChannelCache.setTitle(null);
+                                    currentChannelCache.setGameId(null);
                                 }
-                                currentChannelCache.setIsLive(true);
-                                boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
-                                // - change stream title event
-                                if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
-                                    dispatchTitleChangedEvent = true;
+                                // dispatch events
+                                // - go live event
+                                if (dispatchGoLiveEvent) {
+                                    Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
                                 }
-                                currentChannelCache.setTitle(stream.get().getTitle());
-
-                                // - change game event
-                                if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
-                                    dispatchGameChangedEvent = true;
+                                // - go offline event
+                                if (dispatchGoOfflineEvent) {
+                                    Event event = new ChannelGoOfflineEvent(channel);
+                                    twitchClient.getEventManager().publish(event);
                                 }
-                                currentChannelCache.setGameId(stream.get().getGameId());
-                            } else {
-                                // was online previously?
-                                if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
-                                    dispatchGoOfflineEvent = true;
+                                // - title changed event
+                                if (dispatchTitleChangedEvent) {
+                                    Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                    twitchClient.getEventManager().publish(event);
                                 }
-
-                                // is offline
-                                currentChannelCache.setIsLive(false);
-                                currentChannelCache.setTitle(null);
-                                currentChannelCache.setGameId(null);
+                                // - game changed event
+                                if (dispatchGameChangedEvent) {
+                                    Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                    twitchClient.getEventManager().publish(event);
+                                }
+                            });
+                        } catch (Exception ex) {
+                            if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
+                                log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
                             }
 
-                            // dispatch events
-                            // - go live event
-                            if (dispatchGoLiveEvent) {
-                                Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
-                            }
-                            // - go offline event
-                            if (dispatchGoOfflineEvent) {
-                                Event event = new ChannelGoOfflineEvent(channel);
-                                twitchClient.getEventManager().dispatchEvent(event);
-                            }
-                            // - title changed event
-                            if (dispatchTitleChangedEvent) {
-                                Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                twitchClient.getEventManager().dispatchEvent(event);
-                            }
-                            // - game changed event
-                            if (dispatchGameChangedEvent) {
-                                Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                twitchClient.getEventManager().dispatchEvent(event);
-                            }
-                        });
-                    } catch (Exception ex) {
-                        log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
-                        ex.printStackTrace();
+                            log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
+                        }
                     }
 
                     // check follow events
-                    try {
-                        for (EventChannel channel : listenForFollow) {
-                            ChannelCache currentChannelCache = channelInformation.get(channel.getId());
+                    for (EventChannel channel : listenForFollow) {
+                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
+
+                        try {
+                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
                             LocalDateTime lastFollowDate = null;
 
                             if (currentChannelCache.getLastFollowCheck() != null) {
-                                FollowList followList = twitchClient.getHelix().getFollowers(null, channel.getId(), null, null).execute();
-                                for (Follow follow : followList.getFollows()) {
+                                List<Follow> followList = commandGetFollowers.execute().getFollows();
+                                for (Follow follow : followList) {
                                     // update lastFollowDate
                                     if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
                                         lastFollowDate = follow.getFollowedAt();
@@ -157,7 +187,7 @@ public class TwitchClientHelper {
                                     if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
                                         // dispatch event
                                         FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                        twitchClient.getEventManager().dispatchEvent(event);
+                                        twitchClient.getEventManager().publish(event);
                                     }
                                 }
                             }
@@ -169,11 +199,13 @@ public class TwitchClientHelper {
                                 // tracks the date of the latest follow to identify new ones later on
                                 currentChannelCache.setLastFollowCheck(lastFollowDate);
                             }
-                        }
+                        } catch (Exception ex) {
+                            if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                                log.trace(ex.getMessage(), ex);
+                            }
 
-                    } catch (Exception ex) {
-                        log.error("Failed to check for Follow Events: " + ex.getMessage());
-                        ex.printStackTrace();
+                            log.error("Failed to check for Follow Events: " + ex.getMessage());
+                        }
                     }
 
                     // sleep one second
@@ -190,12 +222,12 @@ public class TwitchClientHelper {
     }
 
     /**
-     * GoLive Listener
+     * Enable StreamEvent Listener
      *
      * @param channelName Channel Name
      */
     public void enableStreamEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Arrays.asList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -203,7 +235,7 @@ public class TwitchClientHelper {
                 listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
 
                 // initialize cache
-                if (!channelInformation.containsKey(user.getId())) {
+                if (channelInformation.getIfPresent(user.getId()) == null) {
                     channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
                 }
 
@@ -211,7 +243,33 @@ public class TwitchClientHelper {
                 startOrStopEventGenerationThread();
             });
         } else {
-            log.error("Failed to add channel " + channelName + " to GoLive Listener, maybe it doesn't exist!");
+            log.error("Failed to add channel " + channelName + " to stream event listener!");
+        }
+    }
+
+    /**
+     * Disable StreamEvent Listener
+     *
+     * @param channelName Channel Name
+     */
+    public void disableStreamEventListener(String channelName) {
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> {
+                // add to list
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+
+                // invalidate cache
+                if (channelInformation.getIfPresent(user.getId()) != null) {
+                    channelInformation.invalidate(user.getId());
+                }
+
+                // start thread if needed
+                startOrStopEventGenerationThread();
+            });
+        } else {
+            log.error("Failed to remove channel " + channelName + " from stream event listener!");
         }
     }
 
@@ -221,7 +279,7 @@ public class TwitchClientHelper {
      * @param channelName Channel Name
      */
     public void enableFollowEventListener(String channelName) {
-        UserList users = twitchClient.getHelix().getUsers(null, null, Arrays.asList(channelName)).execute();
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
@@ -229,7 +287,7 @@ public class TwitchClientHelper {
                 listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
 
                 // initialize cache
-                if (!channelInformation.containsKey(user.getId())) {
+                if (channelInformation.getIfPresent(user.getId()) == null) {
                     channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
                 }
 
@@ -238,6 +296,32 @@ public class TwitchClientHelper {
             });
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
+        }
+    }
+
+    /**
+     * Disable Follow Listener
+     *
+     * @param channelName Channel Name
+     */
+    public void disableFollowEventListener(String channelName) {
+        UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> {
+                // add to list
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+
+                // invalidate cache
+                if (channelInformation.getIfPresent(user.getId()) != null) {
+                    channelInformation.invalidate(user.getId());
+                }
+
+                // start thread if needed
+                startOrStopEventGenerationThread();
+            });
+        } else {
+            log.error("Failed to remove channel " + channelName + " from follow listener!");
         }
     }
 
@@ -256,6 +340,14 @@ public class TwitchClientHelper {
                 eventGenerationThread.interrupt();
             }
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        stopEventGenerationThread = true;
+        eventGenerationThread.interrupt();
     }
 
 }

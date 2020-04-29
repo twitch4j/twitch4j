@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class BitsServiceTest extends AbtractEndpointTest {
+public class BitsServiceTest extends AbstractEndpointTest {
 
     /**
      * Get Bits Leaderboard

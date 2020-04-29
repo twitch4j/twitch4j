@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class AnalyticsServiceTest extends AbtractEndpointTest {
+public class AnalyticsServiceTest extends AbstractEndpointTest {
 
     /**
      * Get Extension Analytics

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Follow
@@ -21,19 +20,19 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Follow {
 
-    // ID of the user following the to_id user.
-    private Long fromId;
+    /** ID of the user following the to_id user. */
+    private String fromId;
 
-    // Login name corresponding to from_id.
+    /** Login name corresponding to from_id. */
     private String fromName;
 
-    // ID of the user being followed by the from_id user.
-    private Long toId;
+    /** ID of the user being followed by the from_id user. */
+    private String toId;
 
-    // Login name corresponding to to_id.
+    /** Login name corresponding to to_id. */
     private String toName;
 
-    // Date and time when the from_id user followed the to_id user.
+    /** Date and time when the from_id user followed the to_id user. */
     private LocalDateTime followedAt;
 
 }

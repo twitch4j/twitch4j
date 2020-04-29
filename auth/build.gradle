@@ -2,7 +2,13 @@
 dependencies {
 	// Credential Manager
 	compile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
-	testCompile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews'
+	//testCompile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews'
+
+	// Http Client
+	compile group: 'com.squareup.okhttp3', name: 'okhttp'
+
+	// Jackson
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 }
 
 // Artifact Info

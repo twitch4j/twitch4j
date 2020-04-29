@@ -15,7 +15,9 @@ The response has a JSON payload with a data field containing an array of follow 
 
 ```java
 @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
+@Headers("Authorization: Bearer {token}")
 HystrixCommand<FollowList> getFollowers(
+    @Param("token") String authToken,
 	@Param("from_id") String fromId,
 	@Param("to_id") String toId,
 	@Param("after") String after,
@@ -31,6 +33,7 @@ None
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
+| authToken     | string    | User Auth Token |
 | after | string | Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query. |
 | first | string | Maximum number of objects to return. Maximum: 100. Default: 20. |
 | from_id | string | User ID. The request returns information about users who are being followed by the from_id user. |

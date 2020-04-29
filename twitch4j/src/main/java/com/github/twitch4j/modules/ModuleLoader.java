@@ -1,10 +1,10 @@
 package com.github.twitch4j.modules;
 
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.modules.event.ModuleDisabledEvent;
 import com.github.twitch4j.modules.event.ModuleEnabledEvent;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import java.io.File;
@@ -83,7 +83,7 @@ public class ModuleLoader {
 		ModulePair pair = new ModulePair(module, active);
 		String moduleName = module.getClass().getSimpleName();
 		if (!modules.containsKey(moduleName))
-			if (active) client.getEventManager().dispatchEvent(new ModuleEnabledEvent(module));
+			if (active) client.getEventManager().publish(new ModuleEnabledEvent(module));
 			modules.put(moduleName, pair);
 	}
 
@@ -99,7 +99,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (!pair.isActive()) {
-				client.getEventManager().dispatchEvent(new ModuleEnabledEvent(pair.getModule()));
+				client.getEventManager().publish(new ModuleEnabledEvent(pair.getModule()));
 				pair.getModule().enable(client);
 				pair.setActive(true);
 			}
@@ -110,7 +110,7 @@ public class ModuleLoader {
 		if (modules.containsKey(name)) {
 			ModulePair pair = modules.get(name);
 			if (pair.isActive()) {
-				client.getEventManager().dispatchEvent(new ModuleDisabledEvent(pair.getModule()));
+				client.getEventManager().publish(new ModuleDisabledEvent(pair.getModule()));
 				pair.getModule().disable();
 				pair.setActive(false);
 			}

@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Game
@@ -20,13 +20,24 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
 
-    // Game ID.
+    /** Game ID. */
     private String id;
 
-    // Game name.
+    /** Game name. */
     private String name;
 
-    // Template URL for the game’s box art.
+    /** Template URL for the game’s box art. */
     private String boxArtUrl;
+    
+    /**
+     * Gets the game's box art url for specific dimensions
+     *
+     * @param width  game's box art width
+     * @param height game's box art height
+     * @return String
+     */
+    public String getBoxArtUrl(Integer width, Integer height) {
+        return boxArtUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
+    }
 
 }

@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class GamesServiceTest extends AbtractEndpointTest {
+public class GamesServiceTest extends AbstractEndpointTest {
 
-    // Overwatch GameId
+    /** Overwatch GameId */
     private static String overwatchGameId = "488552";
 
     @Test
     @DisplayName("Get Games")
     public void getGames() {
         // TestCase
-        GameList resultList = testUtils.getTwitchHelixClient().getGames(Arrays.asList(overwatchGameId), null).execute();
+        GameList resultList = testUtils.getTwitchHelixClient().getGames(null, Arrays.asList(overwatchGameId), null).execute();
 
         // Test
         assertTrue(resultList.getGames().size() > 0, "Should at least find one result from the streams method!");
@@ -37,7 +37,7 @@ public class GamesServiceTest extends AbtractEndpointTest {
     @DisplayName("Get Top Games")
     public void getTopGames() {
         // TestCase
-        GameTopList resultList = testUtils.getTwitchHelixClient().getTopGames(null, null, null).execute();
+        GameTopList resultList = testUtils.getTwitchHelixClient().getTopGames(null, null, null, null).execute();
 
         // Test
         assertTrue(resultList.getGames().size() > 0, "Should at least find one result from the getTopGames method!");

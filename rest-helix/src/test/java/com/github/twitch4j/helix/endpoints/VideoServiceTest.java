@@ -11,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Tag("integration")
-public class VideoServiceTest extends AbtractEndpointTest {
+public class VideoServiceTest extends AbstractEndpointTest {
 
-    // Overwatch GameId
-    private static Long overwatchGameId = 488552l;
+    /** Overwatch GameId */
+    private static String overwatchGameId = "488552l";
 
     /**
      * Get Videos
@@ -23,7 +23,7 @@ public class VideoServiceTest extends AbtractEndpointTest {
     @DisplayName("Fetch videos")
     public void getVideos() {
         // TestCase
-        VideoList resultList = testUtils.getTwitchHelixClient().getVideos(null, null, overwatchGameId, null, null, null, null, null, null, 100).execute();
+        VideoList resultList = testUtils.getTwitchHelixClient().getVideos(null, null, null, overwatchGameId, null, null, null, null, null, null, 100).execute();
 
         // Test
         assertTrue(resultList.getVideos().size() > 0, "Should at least find one result from the videos method!");

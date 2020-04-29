@@ -28,9 +28,13 @@ public class TeamServiceTest extends AbstractKrakenServiceTest {
     @DisplayName("getTeamByName")
     @Disabled
     public void getTeamByName() {
-        KrakenTeam result = getTwitchKrakenClient().getTeamByName("staff").execute();
+        KrakenTeam team = getTwitchKrakenClient().getTeamByName("staff").execute();
 
-        assertNotNull(result, "Didn't find the specified team!");
+        assertNotNull(team, "Didn't find the specified team!");
+        assertNotNull(team.getDisplayName(), "Team did not have a Display Name");
+        assertNotNull(team.getCreatedAt(), "Team did not have a 'Created At' date");
+        assertNotNull(team.getUpdatedAt(), "Team did not have a 'Updated At' date");
+        assertTrue(team.getUsers().size() > 1, "Should be at least one team member");
     }
 
 }

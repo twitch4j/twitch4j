@@ -9,10 +9,8 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import feign.okhttp.OkHttpClient;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +23,12 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
      * BaseUrl
      */
     private String baseUrl = "https://api.twitch.tv/kraken";
+
+    /**
+     * Default Timeout
+     */
+    @With
+    private Integer timeout = 5000;
 
     /**
      * Initialize the builder
@@ -42,20 +46,24 @@ public class TwitchKrakenBuilder extends TwitchAPIBuilder<TwitchKrakenBuilder> {
      */
     public TwitchKraken build() {
         log.debug("Kraken: Initializing Module ...");
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
+
+        // Hystrix
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
+
+        // Build
         TwitchKraken client = HystrixFeign.builder()
+            .client(new OkHttpClient())
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
-            .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this))
-            .retryer(new Retryer.Default(1, 10000, 3))
-            .options(new Request.Options(5000, 15000))
+            .options(new Request.Options(timeout / 3, timeout))
+            .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchKraken.class, baseUrl);
-
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-kraken", client);
 
         return client;
     }

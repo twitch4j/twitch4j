@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * Channel Cache
@@ -30,7 +29,7 @@ public class ChannelCache {
     /**
      * Current Game Id
      */
-    private Long gameId;
+    private String gameId;
 
     /**
      * Last Follow Check

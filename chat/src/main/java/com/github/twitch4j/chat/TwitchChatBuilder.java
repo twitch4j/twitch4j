@@ -3,18 +3,16 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Wither;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.builder.TwitchEventAwareAPIBuilder;
+import io.github.bucket4j.Bandwidth;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Twitch Chat
@@ -25,30 +23,30 @@ import java.util.Optional;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TwitchChatBuilder {
+public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuilder> {
 
     /**
      * Event Manager
      */
-    @Wither
+    @With
     private EventManager eventManager = new EventManager();
 
     /**
      * Credential Manager
      */
-    @Wither
+    @With
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
      * IRC User Id
      */
-    @Wither
+    @With
     private OAuth2Credential chatAccount;
 
     /**
      * Enable Channel Cache to keep track of mods/timeouts/bans/
      */
-    @Wither
+    @With
     private Boolean enableChannelCache = false;
 
     /**
@@ -60,6 +58,18 @@ public class TwitchChatBuilder {
      * IRC Command Handlers
      */
     protected final List<String> commandPrefixes = new ArrayList<>();
+
+    /**
+     * Size of the ChatQueue
+     */
+    @With
+    protected Integer chatQueueSize = 200;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    @With
+    protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
 
     /**
      * Initialize the builder
@@ -74,8 +84,10 @@ public class TwitchChatBuilder {
      * @return TwitchHelix
      */
     public TwitchChat build() {
+        log.debug("TwitchChat: Initializing ErrorTracking ...");
+
         log.debug("TwitchChat: Initializing Module ...");
-        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache, this.commandPrefixes);
+        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit);
 
         return twitchChat;
     }

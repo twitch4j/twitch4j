@@ -10,10 +10,8 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import feign.okhttp.OkHttpClient;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,6 +27,12 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
      * BaseUrl
      */
     private String baseUrl = "https://api.twitch.tv/helix";
+
+    /**
+     * Default Timeout
+     */
+    @With
+    private Integer timeout = 5000;
 
     /**
      * Initialize the builder
@@ -48,7 +52,10 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
         log.debug("Helix: Initializing Module ...");
 
         // Hystrix
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 5000);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
         // Jackson ObjectMapper
         ObjectMapper mapper = new ObjectMapper();
@@ -57,17 +64,15 @@ public class TwitchHelixBuilder extends TwitchAPIBuilder<TwitchHelixBuilder> {
 
         // Feign
         TwitchHelix client = HystrixFeign.builder()
+            .client(new OkHttpClient())
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
             .logger(new Logger.ErrorLogger())
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this))
-            .retryer(new Retryer.Default(1, 10000, 3))
-            .options(new Request.Options(5000, 15000))
+            .options(new Request.Options(timeout / 3, timeout))
+            .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);
-
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-helix", client);
 
         return client;
     }

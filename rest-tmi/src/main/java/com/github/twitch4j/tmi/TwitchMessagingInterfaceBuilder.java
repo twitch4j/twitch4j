@@ -9,10 +9,8 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import feign.okhttp.OkHttpClient;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,6 +28,12 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
     private String baseUrl = "https://tmi.twitch.tv";
 
     /**
+     * Default Timeout
+     */
+    @With
+    private Integer timeout = 5000;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -45,8 +49,16 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
      */
     public TwitchMessagingInterface build() {
         log.debug("TMI: Initializing Module ...");
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 2500);
+
+        // Hystrix
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
+
+        // Build
         TwitchMessagingInterface client = HystrixFeign.builder()
+            .client(new OkHttpClient())
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
@@ -56,9 +68,6 @@ public class TwitchMessagingInterfaceBuilder extends TwitchAPIBuilder<TwitchMess
             .retryer(new Retryer.Default(1, 10000, 3))
             .options(new Request.Options(5000, 15000))
             .target(TwitchMessagingInterface.class, baseUrl);
-
-        // register with serviceMediator
-        getEventManager().getServiceMediator().addService("twitch4j-api-tmi", client);
 
         return client;
     }

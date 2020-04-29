@@ -2,14 +2,18 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.EventManager;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
-import com.neovisionaries.ws.client.*;
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
@@ -24,7 +28,7 @@ import java.time.Duration;
 import java.util.*;
 
 @Slf4j
-public class TwitchChat {
+public class TwitchChat implements AutoCloseable {
 
     /**
      * EventManager
@@ -79,12 +83,22 @@ public class TwitchChat {
     /**
      * IRC Command Queue
      */
-    protected final CircularFifoQueue<String> ircCommandQueue = new CircularFifoQueue<>(200);
+    protected final CircularFifoQueue<String> ircCommandQueue;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    protected final Bandwidth chatRateLimit;
 
     /**
      * IRC Command Queue Thread
      */
     protected final Thread queueThread;
+
+    /**
+     * IRC Command Queue Thread
+     */
+    protected Boolean stopQueueThread = false;
 
     /**
      * IRC Command Handlers
@@ -99,13 +113,17 @@ public class TwitchChat {
      * @param chatCredential Chat Credential
      * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
+     * @param chatQueueSize Chat Queue Size
+     * @param chatRateLimit Bandwidth / Bucket
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
+        this.ircCommandQueue = new CircularFifoQueue<>(chatQueueSize);
+        this.chatRateLimit = chatRateLimit;
 
         // credential validation
         if (this.chatCredential.isPresent() == false) {
@@ -130,7 +148,7 @@ public class TwitchChat {
 
         // initialize rate-limiting
         this.ircMessageBucket = Bucket4j.builder()
-            .addLimit(Bandwidth.simple(20, Duration.ofSeconds(30)))
+            .addLimit(this.chatRateLimit)
             .build();
 
         // connect to irc
@@ -138,7 +156,7 @@ public class TwitchChat {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (true) {
+            while (stopQueueThread == false) {
                 try {
                     // If connected, consume 1 token
                     if (ircCommandQueue.size() > 0) {
@@ -160,7 +178,6 @@ public class TwitchChat {
                     Thread.sleep(250);
                 } catch (Exception ex) {
                     log.error("Failed to process message from command queue: " + ex.getMessage());
-                    ex.printStackTrace();
                 }
             }
         });
@@ -169,7 +186,9 @@ public class TwitchChat {
 
         // Event Handlers
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
-        eventManager.onEvent(ChannelMessageEvent.class).subscribe(event -> onChannelMessage(event));
+
+        // register event handler
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> onChannelMessage(event));
     }
 
     /**
@@ -189,7 +208,6 @@ public class TwitchChat {
                 this.webSocket.connect();
             } catch (Exception ex) {
                 log.error("Connection to Twitch IRC failed: {} - Retrying ...", ex.getMessage());
-
                 // Sleep 1 second before trying to reconnect
                 try {
                     Thread.sleep(1000);
@@ -312,7 +330,7 @@ public class TwitchChat {
                                         IRCMessageEvent event = new IRCMessageEvent(message);
 
                                         if(event.isValid()) {
-                                            eventManager.dispatchEvent(event);
+                                            eventManager.publish(event);
                                         } else {
                                             log.trace("Can't parse {}", event.getRawMessage());
                                         }
@@ -341,7 +359,6 @@ public class TwitchChat {
 
             });
 
-
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
@@ -355,6 +372,15 @@ public class TwitchChat {
      */
     protected void sendCommand(String command, String... args) {
         ircCommandQueue.add(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+    }
+
+    /**
+     * Send raw irc command
+     *
+     * @param command raw irc command
+     */
+    public void sendRaw(String command) {
+        ircCommandQueue.add(command);
     }
 
     /**
@@ -406,8 +432,8 @@ public class TwitchChat {
      * @param message message
      */
     public void sendMessage(String channel, String message) {
-        log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel, message);
-        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel, message));
+        log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
+        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel.toLowerCase(), message));
     }
 
     /**
@@ -418,7 +444,51 @@ public class TwitchChat {
      */
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
-        ircCommandQueue.add(String.format("PRIVMSG #%s /w %s %s", chatCredential.get().getUserName(), targetUser, message));
+        ircCommandQueue.add(String.format("PRIVMSG #%s :/w %s %s", chatCredential.get().getUserName(), targetUser, message));
+    }
+
+    /**
+     * Timeout a user
+     *
+     * @param channel channel
+     * @param user username
+     * @param duration duration
+     * @param reason reason
+     */
+    public void timeout(String channel, String user, Duration duration, String reason) {
+        StringBuilder sb = new StringBuilder()
+            .append(duration.getSeconds());
+        if (reason != null) {
+            sb.append(" ").append(reason);
+        }
+
+        sendMessage(channel, String.format("/timeout %s %s", user, sb.toString()));
+    }
+
+    /**
+     * Ban a user
+     *
+     * @param channel channel
+     * @param user username
+     * @param reason reason
+     */
+    public void ban(String channel, String user, String reason) {
+        StringBuilder sb = new StringBuilder(user);
+        if (reason != null) {
+            sb.append(" ").append(reason);
+        }
+
+        sendMessage(channel, String.format("/ban %s", sb.toString()));
+    }
+
+    /**
+     * Unban a user
+     *
+     * @param channel channel
+     * @param user username
+     */
+    public void unban(String channel, String user) {
+        sendMessage(channel, String.format("/unban %s", user));
     }
 
     /**
@@ -443,9 +513,16 @@ public class TwitchChat {
             log.debug("Detected a command in channel {} with content: {}", event.getChannel().getName(), commandWithoutPrefix.get());
 
             // dispatch command event
-            CommandEvent commandEvent = new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions());
-            eventManager.dispatchEvent(commandEvent);
+            eventManager.publish(new CommandEvent(CommandSource.CHANNEL, event.getChannel().getName(), event.getUser(), prefix.get(), commandWithoutPrefix.get(), event.getPermissions()));
         }
+    }
+
+    /**
+     * Close
+     */
+    public void close() {
+        this.stopQueueThread = true;
+        this.disconnect();
     }
 
 }

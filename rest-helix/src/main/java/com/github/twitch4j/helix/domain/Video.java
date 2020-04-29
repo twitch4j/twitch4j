@@ -20,46 +20,46 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Video {
 
-    // ID of the video.
+    /** ID of the video. */
     private String id;
 
-    // ID of the user who owns the video.
+    /** ID of the user who owns the video. */
     private String userId;
 
-    // Login name corresponding to user_id.
+    /** Login name corresponding to user_id. */
     private String userName;
 
-    // Title of the video.
+    /** Title of the video. */
     private String title;
 
-    // Description of the video.
+    /** Description of the video. */
     private String description;
 
-    // Date when the video was created.
+    /** Date when the video was created. */
     private Date createdAt;
 
-    // Date when the video was published.
+    /** Date when the video was published. */
     private Date publishedAt;
 
-    // URL of the video.
+    /** URL of the video. */
     private String url;
 
-    // Template URL for the thumbnail of the video.
+    /** Template URL for the thumbnail of the video. */
     private String thumbnailUrl;
 
-    // Indicates whether the video is publicly viewable. Valid values: "public", "private".
+    /** Indicates whether the video is publicly viewable. Valid values: "public", "private". */
     private String viewable;
 
-    // Number of times the video has been viewed.
+    /** Number of times the video has been viewed. */
     private Integer viewCount;
 
-    // Language of the video.
+    /** Language of the video. */
     private String language;
 
-    // Type of video. Valid values: "upload", "archive", "highlight".
+    /** Type of video. Valid values: "upload", "archive", "highlight". */
     private String type;
 
-    // Length of the video.
+    /** Length of the video. */
     private String duration;
 
 }
