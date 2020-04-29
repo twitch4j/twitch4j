@@ -64,12 +64,12 @@ public class TwitchChat implements AutoCloseable {
      * The connection state
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
-    private transient TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
+    private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
     /**
      * Channel Cache
      */
-    protected final transient Map<String, Boolean> channelCache = new HashMap<>();
+    protected final Map<String, Boolean> channelCache = new HashMap<>();
 
     /**
      * IRC Message Bucket
@@ -79,7 +79,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue
      */
-    protected final transient ArrayBlockingQueue<String> ircCommandQueue;
+    protected final ArrayBlockingQueue<String> ircCommandQueue;
 
     /**
      * Custom RateLimit for ChatMessages
@@ -94,7 +94,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue Thread
      */
-    protected transient Boolean stopQueueThread = false;
+    protected volatile Boolean stopQueueThread = false;
 
     /**
      * IRC Command Handlers
