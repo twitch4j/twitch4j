@@ -68,21 +68,20 @@ public class TwitchClientHelper implements AutoCloseable {
         .maximumSize(10_000)
         .build();
 
-    private final ScheduledThreadPoolExecutor executor;
+    @Setter
+    private ScheduledThreadPoolExecutor executor;
 
-    private final long threadRate;
+    @Setter
+    private long threadRate;
 
     /**
      * Constructor
      *
      * @param twitchClient TwitchClient
-     * @param executor ScheduledThreadPoolExecutor
-     * @param rate Long
+
      */
-    public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor, long rate) {
+    public TwitchClientHelper(TwitchClient twitchClient) {
         this.twitchClient = twitchClient;
-        this.executor = executor;
-        this.threadRate = rate;
 
         // Thread
         this.eventGenerationThread = new Thread(() -> {
