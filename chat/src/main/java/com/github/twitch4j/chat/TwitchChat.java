@@ -22,10 +22,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class TwitchChat implements AutoCloseable {
@@ -46,7 +47,7 @@ public class TwitchChat implements AutoCloseable {
      * OAuth2Credential, used to sign in to twitch chat
      */
     @Getter(AccessLevel.NONE)
-    private Optional<OAuth2Credential> chatCredential = Optional.empty();
+    private Optional<OAuth2Credential> chatCredential;
 
     /**
      * The WebSocket Server
@@ -66,11 +67,6 @@ public class TwitchChat implements AutoCloseable {
     private TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
     /**
-     * Enable Channel Cache
-     */
-    private Boolean enableChannelCache = false;
-
-    /**
      * Channel Cache
      */
     protected final Map<String, Boolean> channelCache = new HashMap<>();
@@ -83,7 +79,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * IRC Command Queue
      */
-    protected final CircularFifoQueue<String> ircCommandQueue;
+    protected final ArrayBlockingQueue<String> ircCommandQueue;
 
     /**
      * Custom RateLimit for ChatMessages
@@ -111,18 +107,16 @@ public class TwitchChat implements AutoCloseable {
      * @param eventManager EventManager
      * @param credentialManager CredentialManager
      * @param chatCredential Chat Credential
-     * @param enableChannelCache Enable channel cache?
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
      * @param chatRateLimit Bandwidth / Bucket
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, Boolean enableChannelCache, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
-        this.enableChannelCache = enableChannelCache;
         this.commandPrefixes = commandPrefixes;
-        this.ircCommandQueue = new CircularFifoQueue<>(chatQueueSize);
+        this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.chatRateLimit = chatRateLimit;
 
         // credential validation
@@ -159,23 +153,25 @@ public class TwitchChat implements AutoCloseable {
             while (stopQueueThread == false) {
                 try {
                     // If connected, consume 1 token
-                    if (ircCommandQueue.size() > 0) {
+                    while(true) {
                         if (connectionState.equals(TMIConnectionState.CONNECTED)) {
-                            // block thread, until we can continue
-                            ircMessageBucket.asScheduler().consume(1);
+                            // wait for a command to enter the queue
+                            String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
+                            if(command != null) {
+                                // block thread, until we can continue
+                                ircMessageBucket.asScheduler().consume(1);
+                                sendCommand(command);
 
-                            // pop one command from the queue and execute it
-                            String command = ircCommandQueue.remove();
-                            sendCommand(command);
-
-                            // Logging
-                            log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
-                            log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
+                                // Logging
+                                log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
+                                log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
+                            }
+                        } else {
+                            // sleep to wait for reconnection
+                            Thread.sleep(250);
                         }
                     }
 
-                    // sleep one second
-                    Thread.sleep(250);
                 } catch (Exception ex) {
                     log.error("Failed to process message from command queue: " + ex.getMessage());
                 }
@@ -525,4 +521,21 @@ public class TwitchChat implements AutoCloseable {
         this.disconnect();
     }
 
+    /**
+     * Check if Chat is currently in a channel
+     * @param channelName channel to check (without # prefix)
+     * @return boolean
+     */
+    public boolean isChannelJoined(String channelName) {
+        return channelCache.getOrDefault(channelName, false);
+    }
+
+    /**
+     * Returns a list of all channels currently joined (without # prefix)
+     *
+     * @return List Channel Names
+     */
+    public List<String> getCurrentChannels() {
+        return Collections.unmodifiableList(new ArrayList<>(channelCache.keySet()));
+    }
 }
