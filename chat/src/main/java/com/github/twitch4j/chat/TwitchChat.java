@@ -15,7 +15,6 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.BlockingStrategy;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import lombok.AccessLevel;
@@ -28,7 +27,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
 public class TwitchChat implements AutoCloseable {
