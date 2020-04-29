@@ -526,7 +526,6 @@ public interface TwitchHelix {
         @Param("user_id") List<String> userIds
     );
 
-
     /**
      * Get Users
      * <p>
