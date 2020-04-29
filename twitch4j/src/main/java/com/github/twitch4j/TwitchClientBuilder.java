@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
@@ -157,6 +158,21 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private OAuth2Credential defaultAuthToken = null;
 
     /**
+     * Default Auth Token for API Requests
+     */
+     * Thread Pool Executor
+     */
+    @With
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+
+    /**
+     * Millisecond Delay for Client Helper Thread
+     */
+    @With
+    private long helperThreadRate = 10000L;
+
+
+    /**
      * With a CommandTrigger
      *
      * @param commandTrigger Command Trigger (Prefix)
@@ -263,8 +279,9 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         }
 
         // Module: Client
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql, scheduledThreadPoolExecutor, helperThreadRate);
         client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
+
 
         // Return new Client Instance
         return client;

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -53,42 +54,43 @@ public class TwitchClientHelper implements AutoCloseable {
     protected final Thread eventGenerationThread;
 
     /**
-     * Event Listener Thread
-     */
-    protected Boolean stopEventGenerationThread = false;
-
-    /**
      * Default Auth Token for Twitch API Requests
      */
     @Setter
     private OAuth2Credential defaultAuthToken = null;
 
     /**
+
      * Channel Information Cache
      */
-    private Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
+    private final Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
         .maximumSize(10_000)
         .build();
+
+    private final ScheduledThreadPoolExecutor executor;
+
+    private final long threadRate;
 
     /**
      * Constructor
      *
      * @param twitchClient TwitchClient
+     * @param executor ScheduledThreadPoolExecutor
+     * @param rate Long
      */
-    public TwitchClientHelper(TwitchClient twitchClient) {
+    public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor, long rate) {
         this.twitchClient = twitchClient;
+        this.executor = executor;
+        this.threadRate = rate;
 
         // Thread
         this.eventGenerationThread = new Thread(() -> {
-            log.debug("Started TwitchClientHelper Thread to listen for goLive/Follow events");
-
-            while (stopEventGenerationThread == false) {
-                try {
-                    // check if the thread was interrupted
-                    if (Thread.interrupted()) {
-                        throw new InterruptedException();
-                    }
+            try {
+                // check if the thread was interrupted
+                if (Thread.interrupted()) {
+                    throw new InterruptedException();
+                }
 
                     // check go live / stream events
                     if (listenForGoLive.size() > 0) {
@@ -134,90 +136,88 @@ public class TwitchClientHelper implements AutoCloseable {
                                     currentChannelCache.setIsLive(false);
                                     currentChannelCache.setTitle(null);
                                     currentChannelCache.setGameId(null);
-                                }
 
-                                // dispatch events
-                                // - go live event
-                                if (dispatchGoLiveEvent) {
-                                    Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - go offline event
-                                if (dispatchGoOfflineEvent) {
-                                    Event event = new ChannelGoOfflineEvent(channel);
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - title changed event
-                                if (dispatchTitleChangedEvent) {
-                                    Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                                // - game changed event
-                                if (dispatchGameChangedEvent) {
-                                    Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                    twitchClient.getEventManager().publish(event);
-                                }
-                            });
-                        } catch (Exception ex) {
-                            if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
-                                log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
+
+                            // dispatch events
+                            // - go live event
+                            if (dispatchGoLiveEvent) {
+                                Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                twitchClient.getEventManager().publish(event);
                             }
-
-                            log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
+                            // - go offline event
+                            if (dispatchGoOfflineEvent) {
+                                Event event = new ChannelGoOfflineEvent(channel);
+                                twitchClient.getEventManager().publish(event);
+                            }
+                            // - title changed event
+                            if (dispatchTitleChangedEvent) {
+                                Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                twitchClient.getEventManager().publish(event);
+                            }
+                            // - game changed event
+                            if (dispatchGameChangedEvent) {
+                                Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                twitchClient.getEventManager().publish(event);
+                            }
+                        });
+                    } catch (Exception ex) {
+                        if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
+                            log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
                         }
+
+                        log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                     }
+                }
 
                     // check follow events
                     for (EventChannel channel : listenForFollow) {
                         HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
 
-                        try {
-                            ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
-                            LocalDateTime lastFollowDate = null;
 
-                            if (currentChannelCache.getLastFollowCheck() != null) {
-                                List<Follow> followList = commandGetFollowers.execute().getFollows();
-                                for (Follow follow : followList) {
-                                    // update lastFollowDate
-                                    if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
-                                        lastFollowDate = follow.getFollowedAt();
-                                    }
+                    try {
+                        ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                        LocalDateTime lastFollowDate = null;
 
-                                    // is new follower?
-                                    if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
-                                        // dispatch event
-                                        FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                        twitchClient.getEventManager().publish(event);
-                                    }
+                        if (currentChannelCache.getLastFollowCheck() != null) {
+                            List<Follow> followList = commandGetFollowers.execute().getFollows();
+                            for (Follow follow : followList) {
+                                // update lastFollowDate
+                                if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
+                                    lastFollowDate = follow.getFollowedAt();
+                                }
+
+                                // is new follower?
+                                if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
+                                    // dispatch event
+                                    FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
+                                    twitchClient.getEventManager().publish(event);
                                 }
                             }
-
-                            if (currentChannelCache.getLastFollowCheck() == null) {
-                                // only happens if the user doesn't have any followers at all
-                                currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
-                            } else {
-                                // tracks the date of the latest follow to identify new ones later on
-                                currentChannelCache.setLastFollowCheck(lastFollowDate);
-                            }
-                        } catch (Exception ex) {
-                            if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                                log.trace(ex.getMessage(), ex);
-                            }
-
-                            log.error("Failed to check for Follow Events: " + ex.getMessage());
                         }
-                    }
 
-                    // sleep one second
-                    Thread.sleep(10000);
-                } catch (InterruptedException ex) {
-                    // exit thread, since it's not needed anymore
-                    log.debug("TwitchClientHelper Thread has been disabled, it's not needed anymore since we aren't listening for any events with the helper.");
-                    return;
-                } catch (Exception ex) {
-                    log.error("Failed to check for events in TwitchClientHelper Thread: " + ex.getMessage());
+                        if (currentChannelCache.getLastFollowCheck() == null) {
+                            // only happens if the user doesn't have any followers at all
+                            currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
+                        } else {
+                            // tracks the date of the latest follow to identify new ones later on
+                            currentChannelCache.setLastFollowCheck(lastFollowDate);
+                        }
+                    } catch (Exception ex) {
+                        if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                            log.trace(ex.getMessage(), ex);
+                        }
+
+                        log.error("Failed to check for Follow Events: " + ex.getMessage());
+                    }
                 }
+            } catch (InterruptedException ex) {
+                // exit thread, since it's not needed anymore
+                log.debug("TwitchClientHelper Thread has been disabled, it's not needed anymore since we aren't listening for any events with the helper.");
+
+            } catch (Exception ex) {
+                log.error("Failed to check for events in TwitchClientHelper Thread: " + ex.getMessage());
             }
+
         });
     }
 
@@ -232,6 +232,10 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
+                if(listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                    log.info("Channel {} already added for Stream Events", channelName);
+                    return;
+                }
                 listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
 
                 // initialize cache
@@ -243,7 +247,7 @@ public class TwitchClientHelper implements AutoCloseable {
                 startOrStopEventGenerationThread();
             });
         } else {
-            log.error("Failed to add channel " + channelName + " to stream event listener!");
+            log.error("Failed to add channel {} to stream event listener!", channelName);
         }
     }
 
@@ -283,6 +287,10 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
+                if(listenForFollow.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                    log.info("Channel {} already added for Stream Events", channelName);
+                    return;
+                }
                 // add to list
                 listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
 
@@ -331,14 +339,10 @@ public class TwitchClientHelper implements AutoCloseable {
     private void startOrStopEventGenerationThread() {
         if (listenForGoLive.size() > 0 || listenForFollow.size() > 0) {
             // thread should be active
-            if (!eventGenerationThread.isAlive()) {
-                eventGenerationThread.start();
-            }
+            executor.scheduleWithFixedDelay(this.eventGenerationThread, threadRate, threadRate, TimeUnit.MILLISECONDS);
         } else {
             // thread can be stopped
-            if (eventGenerationThread.isAlive() && !eventGenerationThread.isInterrupted()) {
-                eventGenerationThread.interrupt();
-            }
+            executor.remove(this.eventGenerationThread);
         }
     }
 
@@ -346,8 +350,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * Close
      */
     public void close() {
-        stopEventGenerationThread = true;
-        eventGenerationThread.interrupt();
+        executor.remove(this.eventGenerationThread);
     }
 
 }

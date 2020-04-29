@@ -11,6 +11,8 @@ import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 @Slf4j
 public class TwitchClient implements AutoCloseable {
 
@@ -59,7 +61,7 @@ public class TwitchClient implements AutoCloseable {
      * <p>
      * A helper method that contains some common use-cases, like follow events / go live event listeners / ...
      */
-    private final TwitchClientHelper twitchClientHelper = new TwitchClientHelper(this);
+    private final TwitchClientHelper twitchClientHelper;
 
     /**
      * Constructor
@@ -71,8 +73,10 @@ public class TwitchClient implements AutoCloseable {
      * @param chat TwitchChat
      * @param pubsub TwitchPubSub
      * @param graphql TwitchGraphQL
+     * @param executor ScheduledThreadPoolExecutor
+     * @param helperThreadRate long
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, ScheduledThreadPoolExecutor executor, long helperThreadRate) {
         this.eventManager = eventManager;
         this.helix = helix;
         this.kraken = kraken;
@@ -80,7 +84,7 @@ public class TwitchClient implements AutoCloseable {
         this.chat = chat;
         this.pubsub = pubsub;
         this.graphql = graphql;
-
+        this.twitchClientHelper = new TwitchClientHelper(this, executor, helperThreadRate);
         // module loader
         this.moduleLoader = new ModuleLoader(this);
 
