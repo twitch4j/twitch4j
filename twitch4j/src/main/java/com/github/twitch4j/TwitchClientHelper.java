@@ -91,7 +91,6 @@ public class TwitchClientHelper implements AutoCloseable {
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
-
                     // check go live / stream events
                     if (listenForGoLive.size() > 0) {
                         HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
@@ -138,28 +137,29 @@ public class TwitchClientHelper implements AutoCloseable {
                                     currentChannelCache.setGameId(null);
 
 
-                            // dispatch events
-                            // - go live event
-                            if (dispatchGoLiveEvent) {
-                                Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - go offline event
-                            if (dispatchGoOfflineEvent) {
-                                Event event = new ChannelGoOfflineEvent(channel);
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - title changed event
-                            if (dispatchTitleChangedEvent) {
-                                Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                            // - game changed event
-                            if (dispatchGameChangedEvent) {
-                                Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                                twitchClient.getEventManager().publish(event);
-                            }
-                        });
+                                    // dispatch events
+                                    // - go live event
+                                    if (dispatchGoLiveEvent) {
+                                        Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                                        twitchClient.getEventManager().publish(event);
+                                    }
+                                    // - go offline event
+                                    if (dispatchGoOfflineEvent) {
+                                        Event event = new ChannelGoOfflineEvent(channel);
+                                        twitchClient.getEventManager().publish(event);
+                                    }
+                                    // - title changed event
+                                    if (dispatchTitleChangedEvent) {
+                                        Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                                        twitchClient.getEventManager().publish(event);
+                                    }
+                                    // - game changed event
+                                    if (dispatchGameChangedEvent) {
+                                        Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                                        twitchClient.getEventManager().publish(event);
+                                    }
+                                }
+                            });
                     } catch (Exception ex) {
                         if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
                             log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
@@ -169,11 +169,9 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                 }
 
-                    // check follow events
-                    for (EventChannel channel : listenForFollow) {
-                        HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
-
-
+                // check follow events
+                for (EventChannel channel : listenForFollow) {
+                    HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
                     try {
                         ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
                         LocalDateTime lastFollowDate = null;

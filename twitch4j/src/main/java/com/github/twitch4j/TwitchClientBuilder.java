@@ -140,12 +140,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
 
     /**
-     * User Agent
-     */
-    @Wither
-    private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";;
-
-    /**
      * CredentialManager
      */
     @With
@@ -159,8 +153,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
 
     /**
      * Default Auth Token for API Requests
-     */
-     * Thread Pool Executor
      */
     @With
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
