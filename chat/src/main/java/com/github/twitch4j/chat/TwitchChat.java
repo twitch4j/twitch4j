@@ -152,17 +152,13 @@ public class TwitchChat implements AutoCloseable {
 
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (true) {
+            while (!stopQueueThread) {
                 try {
-                    // If we need to stop, end the loop
-                    if(stopQueueThread)
-                        break;
-
                     // wait for one second for a command to enter the queue
                     String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
                     if(command != null) {
                         // Send the message, retrying forever until we are connected.
-                        while (true) {
+                        while (!stopQueueThread) {
                             if (connectionState.equals(TMIConnectionState.CONNECTED)) {
                                 // block thread, until we can continue
                                 ircMessageBucket.asScheduler().consume(1);
@@ -172,10 +168,6 @@ public class TwitchChat implements AutoCloseable {
                             }
                             // sleep to wait for reconnection
                             TimeUnit.MILLISECONDS.sleep(500L);
-
-                            // Checking for a stop again in this loop
-                            if(stopQueueThread)
-                                break;
                         }
                         // Logging
                         log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
@@ -185,6 +177,7 @@ public class TwitchChat implements AutoCloseable {
                     log.error("Failed to process message from command queue", ex);
                 }
             }
+
         });
         queueThread.start();
         log.debug("Started IRC Queue Worker");
@@ -193,7 +186,7 @@ public class TwitchChat implements AutoCloseable {
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
 
         // register event handler
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> onChannelMessage(event));
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**
@@ -508,8 +501,8 @@ public class TwitchChat implements AutoCloseable {
         // try to find a `command` based on the prefix
         for (String commandPrefix : this.commandPrefixes) {
             if (event.getMessage().startsWith(commandPrefix)) {
-                prefix = Optional.ofNullable(commandPrefix);
-                commandWithoutPrefix = Optional.ofNullable(event.getMessage().substring(commandPrefix.length()));
+                prefix = Optional.of(commandPrefix);
+                commandWithoutPrefix = Optional.of(event.getMessage().substring(commandPrefix.length()));
             }
         }
 
