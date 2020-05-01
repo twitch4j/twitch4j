@@ -48,7 +48,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch followers")
     public void getFollowers() {
         // TestCase
-        FollowList resultList = testUtils.getTwitchHelixClient().getFollowers(twitchUserId, null, null, 100).execute();
+        FollowList resultList = testUtils.getTwitchHelixClient().getFollowers(testUtils.getCredential().getAccessToken(), twitchUserId, null, null, 100).execute();
 
         // Test
         assertTrue(resultList.getFollows().size() > 0, "Should at least find one result from the followers method!");

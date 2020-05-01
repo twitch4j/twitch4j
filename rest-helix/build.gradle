@@ -12,6 +12,9 @@ dependencies {
 	api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
 	api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
+	// Cache
+	compile group: 'com.github.ben-manes.caffeine', name: 'caffeine'
+
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-common')
 	compile project(':' + rootProject.name + '-auth')

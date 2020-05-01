@@ -49,7 +49,7 @@ subprojects {
             dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
             // Apache Commons
-            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
             dependency group: 'commons-io', name: 'commons-io', version: '2.6'
 			dependency group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 			dependency group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
@@ -57,15 +57,18 @@ subprojects {
 			// Event Dispatcher
  			dependency group: 'com.github.philippheuer.events4j', name: 'events4j-core', version: '0.7.1'
 			dependency group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.7.1'
-			
+
 			// Credential Manager
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.0'
+			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
 
 			// HTTP Client
-            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
+            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.6.0'
 
 			// Rate Limiting
 			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
+
+			// Caching
+			dependency group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
 
 			// Http Client
             dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.7.4'
@@ -77,10 +80,10 @@ subprojects {
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
-			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.10.2'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.2'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.2'
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.0'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.11.0'
+			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.0'
 
 			// WebSocket
 			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'

@@ -10,7 +10,7 @@ dependencies {
 	compile project(':' + rootProject.name + '-graphql')
 
 	// Cache
-	compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.7.0'
+	compile group: 'com.github.ben-manes.caffeine', name: 'caffeine'
 }
 
 // Artifact Info
