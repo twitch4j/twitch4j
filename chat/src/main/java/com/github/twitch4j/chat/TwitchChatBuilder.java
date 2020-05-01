@@ -87,7 +87,7 @@ public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuil
         log.debug("TwitchChat: Initializing ErrorTracking ...");
 
         log.debug("TwitchChat: Initializing Module ...");
-        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.enableChannelCache, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit);
+        TwitchChat twitchChat = new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit);
 
         return twitchChat;
     }

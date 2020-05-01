@@ -6,9 +6,6 @@ dependencies {
 	// Rate Limiting
 	compile group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core'
 
-	// FIFO Queue
-	compile group: 'org.apache.commons', name: 'commons-collections4'
-
 	// Twitch4J Modules
 	compile project(':' + rootProject.name + '-common')
 	compile project(':' + rootProject.name + '-auth')

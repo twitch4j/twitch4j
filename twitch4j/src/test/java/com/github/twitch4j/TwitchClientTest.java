@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Slf4j
 @Tag("unittest")
@@ -49,6 +50,8 @@ public class TwitchClientTest {
             .withChatAccount(TestUtils.getCredential())
             .withEnablePubSub(false)
             .withEnableGraphQL(false)
+            .withScheduledThreadPoolExecutor(new ScheduledThreadPoolExecutor(1))
+            .withHelperThreadRate(10000L)
             .build();
 
         // join twitch4j channel

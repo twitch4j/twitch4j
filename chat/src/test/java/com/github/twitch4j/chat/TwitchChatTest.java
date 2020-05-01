@@ -26,6 +26,7 @@ public class TwitchChatTest {
     public static void connectToChat() {
         // event manager
         EventManager eventManager = new EventManager();
+        eventManager.autoDiscovery();
 
         // credential manager
         CredentialManager credentialManager = CredentialManagerBuilder.builder().build();

@@ -33,7 +33,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * Access token cache
      */
-    private Cache<String, OAuth2Credential> accessTokenCache = Caffeine.newBuilder()
+    private final Cache<String, OAuth2Credential> accessTokenCache = Caffeine.newBuilder()
         .expireAfterWrite(15, TimeUnit.MINUTES)
         .maximumSize(10_000)
         .build();

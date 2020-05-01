@@ -59,7 +59,7 @@ public class TwitchClient implements AutoCloseable {
      * <p>
      * A helper method that contains some common use-cases, like follow events / go live event listeners / ...
      */
-    private final TwitchClientHelper twitchClientHelper = new TwitchClientHelper(this);
+    private final TwitchClientHelper twitchClientHelper;
 
     /**
      * Constructor
@@ -80,6 +80,7 @@ public class TwitchClient implements AutoCloseable {
         this.chat = chat;
         this.pubsub = pubsub;
         this.graphql = graphql;
+        this.twitchClientHelper = new TwitchClientHelper(this);
 
         // module loader
         this.moduleLoader = new ModuleLoader(this);

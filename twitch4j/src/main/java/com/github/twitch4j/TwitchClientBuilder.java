@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
@@ -145,6 +146,18 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
+     * Scheduler Thread Pool Executor
+     */
+    @With
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
+
+    /**
+     * Millisecond Delay for Client Helper Thread
+     */
+    @With
+    private long helperThreadRate = 10000L;
+
+    /**
      * Default Auth Token for API Requests
      */
     @With
@@ -160,7 +173,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         this.commandPrefixes.add(commandTrigger);
         return this;
     }
-
 
     /**
      * Initialize the builder
@@ -186,6 +198,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         if (eventManager == null) {
             eventManager = new EventManager();
             eventManager.autoDiscovery();
+        }
+
+        if(scheduledThreadPoolExecutor == null) {
+            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         }
 
         // Module: Helix
@@ -256,9 +272,11 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .build();
         }
 
-        // Module: Client
+        // Module: ClientHelper
         final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
         client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
+        client.getClientHelper().setExecutor(scheduledThreadPoolExecutor);
+        client.getClientHelper().setThreadRate(helperThreadRate);
 
         // Return new Client Instance
         return client;
