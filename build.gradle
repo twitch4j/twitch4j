@@ -71,10 +71,10 @@ subprojects {
 			dependency group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
 
 			// Http Client
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.7.4'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '10.7.4'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '10.7.4'
-			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '10.7.4'
+            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '11.0'
+            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '11.0'
+            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '11.0'
+			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '11.0'
 
 			// Hystrix
 			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'

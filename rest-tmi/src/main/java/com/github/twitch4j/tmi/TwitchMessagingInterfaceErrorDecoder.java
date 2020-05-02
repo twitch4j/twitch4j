@@ -67,7 +67,7 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
             }
 
             TMIError error = objectMapper.readValue(responseBody, TMIError.class);
-            return new ContextedRuntimeException("Helix API Error")
+            return new ContextedRuntimeException("TMI API Error")
                 .addContextValue("requestUrl", response.request().url())
                 .addContextValue("requestMethod", response.request().httpMethod())
                 .addContextValue("requestHeaders", response.request().headers().entrySet().toString())

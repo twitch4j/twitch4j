@@ -33,9 +33,9 @@ public class TwitchPubSubBuilder {
      */
     public TwitchPubSub build() {
         log.debug("PubSub: Initializing Module ...");
-        TwitchPubSub twitchChat = new TwitchPubSub(this.eventManager);
+        TwitchPubSub twitchPubSub = new TwitchPubSub(this.eventManager);
 
-        return twitchChat;
+        return twitchPubSub;
     }
 
 }
