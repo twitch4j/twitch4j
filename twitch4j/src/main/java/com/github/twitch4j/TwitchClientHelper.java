@@ -19,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -36,12 +33,12 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Holds the channels that are checked for live/offline state changes
      */
-    private List<EventChannel> listenForGoLive = new ArrayList<>();
+    private Set<EventChannel> listenForGoLive = new HashSet<>();
 
     /**
      * Holds the channels that are checked for new followers
      */
-    private List<EventChannel> listenForFollow = new ArrayList<>();
+    private Set<EventChannel> listenForFollow = new HashSet<>();
 
     /**
      * TwitchClient
@@ -287,7 +284,7 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 if(listenForFollow.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
-                    log.info("Channel {} already added for Stream Events", channelName);
+                    log.info("Channel {} already added for Follow Events", channelName);
                 } else {
                     // add to list
                     listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
