@@ -26,16 +26,16 @@ public class TwitchAuth {
      */
     public TwitchAuth(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
         this.credentialManager = credentialManager;
-
-        // register the twitch identityProvider
-        Optional<OAuth2IdentityProvider> ip = this.credentialManager.getOAuth2IdentityProviderByName("twitch");
-        if (ip.isPresent()) {
-            // already registered
-        } else {
-            // register
-            IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
-            this.credentialManager.registerIdentityProvider(identityProvider);
-        }
+        registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl);
     }
 
+    public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
+        // register the twitch identityProvider
+        Optional<OAuth2IdentityProvider> ip = credentialManager.getOAuth2IdentityProviderByName("twitch");
+        if (!ip.isPresent()) {
+            // register
+            IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
+            credentialManager.registerIdentityProvider(identityProvider);
+        }
+    }
 }

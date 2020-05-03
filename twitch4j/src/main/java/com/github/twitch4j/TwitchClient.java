@@ -11,6 +11,8 @@ import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 @Slf4j
 public class TwitchClient implements AutoCloseable {
 
@@ -55,6 +57,11 @@ public class TwitchClient implements AutoCloseable {
     private final ModuleLoader moduleLoader;
 
     /**
+     * Scheduled Thread Pool Executor
+     */
+    private final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
+
+    /**
      * TwitchClientHelper
      * <p>
      * A helper method that contains some common use-cases, like follow events / go live event listeners / ...
@@ -71,8 +78,9 @@ public class TwitchClient implements AutoCloseable {
      * @param chat TwitchChat
      * @param pubsub TwitchPubSub
      * @param graphql TwitchGraphQL
+     * @param threadPoolExecutor ScheduledThreadPoolExecutor
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, ScheduledThreadPoolExecutor threadPoolExecutor) {
         this.eventManager = eventManager;
         this.helix = helix;
         this.kraken = kraken;
@@ -80,7 +88,8 @@ public class TwitchClient implements AutoCloseable {
         this.chat = chat;
         this.pubsub = pubsub;
         this.graphql = graphql;
-        this.twitchClientHelper = new TwitchClientHelper(this);
+        this.twitchClientHelper = new TwitchClientHelper(this, threadPoolExecutor);
+        this.scheduledThreadPoolExecutor = threadPoolExecutor;
 
         // module loader
         this.moduleLoader = new ModuleLoader(this);
@@ -213,5 +222,6 @@ public class TwitchClient implements AutoCloseable {
         if (this.twitchClientHelper != null) {
             twitchClientHelper.close();
         }
+        scheduledThreadPoolExecutor.shutdownNow();
     }
 }

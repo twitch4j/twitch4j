@@ -8,6 +8,7 @@ import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.common.builder.TwitchAPIBuilder;
+import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -98,28 +99,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private OAuth2Credential chatAccount;
 
     /**
-     * Channel Cache
-     */
-    @With
-    private Boolean enableChannelCache = false;
-
-    /**
      * EventManager
      */
     @With
     private EventManager eventManager = null;
-
-    /**
-     * How many threads should the eventManager use to process the events?
-     */
-    @With
-    private Integer eventManagerThreads = Runtime.getRuntime().availableProcessors() * 2;
-
-    /**
-     * How many events can be queued before the eventManager should start dropping events?
-     */
-    @With
-    private Integer eventManagerBufferSize = 16384;
 
     /**
      * Size of the ChatQueue
@@ -132,6 +115,12 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
      */
     @With
     protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
+
+    /**
+     * Wait time for taking items off chat queue in milliseconds. Default recommended
+     */
+    @With
+    private long chatQueueTimeout = 1000L;
 
     /**
      * User Agent
@@ -192,7 +181,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         log.debug("TwitchClient: Initializing ErrorTracking ...");
 
         // Module: Auth (registers Twitch Identity Providers)
-        TwitchAuth authModule = new TwitchAuth(credentialManager, getClientId(), getClientSecret(), redirectUrl);
+        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
         // Default EventManager
         if (eventManager == null) {
@@ -200,9 +189,9 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             eventManager.autoDiscovery();
         }
 
-        if(scheduledThreadPoolExecutor == null) {
-            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        }
+        if(scheduledThreadPoolExecutor == null)
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+
 
         // Module: Helix
         TwitchHelix helix = null;
@@ -244,14 +233,13 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         TwitchChat chat = null;
         if (this.enableChat) {
             chat = TwitchChatBuilder.builder()
-                .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
-                .withEnableChannelCache(enableChannelCache)
-                .withCommandTriggers(commandPrefixes)
                 .withChatQueueSize(chatQueueSize)
                 .withChatRateLimit(chatRateLimit)
-                .build();
+                .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
+                .withChatQueueTimeout(chatQueueTimeout)
+                .withCommandTriggers(commandPrefixes).build();
         }
 
         // Module: PubSub
@@ -259,6 +247,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         if (this.enablePubSub) {
             pubsub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
+                .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .build();
         }
 
@@ -273,9 +262,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         }
 
         // Module: ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql);
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql, scheduledThreadPoolExecutor);
         client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
-        client.getClientHelper().setExecutor(scheduledThreadPoolExecutor);
         client.getClientHelper().setThreadRate(helperThreadRate);
 
         // Return new Client Instance

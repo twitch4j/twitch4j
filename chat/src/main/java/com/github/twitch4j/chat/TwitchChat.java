@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -69,7 +71,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * Channel Cache
      */
-    protected final Map<String, Boolean> channelCache = new HashMap<>();
+    protected final Map<String, Boolean> channelCache = new ConcurrentHashMap<>();
 
     /**
      * IRC Message Bucket
@@ -92,7 +94,7 @@ public class TwitchChat implements AutoCloseable {
     protected final Thread queueThread;
 
     /**
-     * IRC Command Queue Thread
+     * Command Queue Thread stop flag
      */
     protected volatile Boolean stopQueueThread = false;
 
@@ -100,6 +102,17 @@ public class TwitchChat implements AutoCloseable {
      * IRC Command Handlers
      */
     protected final List<String> commandPrefixes;
+
+    /**
+     * Thread Pool Executor
+     */
+    protected final ScheduledThreadPoolExecutor taskExecutor;
+
+    /**
+     * Time to wait for an item on the chat queue before continuing to next iteration
+     * If set too high your thread will be late check to shutdown
+     */
+    protected final long chatQueueTimeout;
 
     /**
      * Constructor
@@ -110,14 +123,18 @@ public class TwitchChat implements AutoCloseable {
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
      * @param chatRateLimit Bandwidth / Bucket
+     * @param taskExecutor ScheduledThreadPoolExecutor
+     * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.commandPrefixes = commandPrefixes;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.chatRateLimit = chatRateLimit;
+        this.taskExecutor = taskExecutor;
+        this.chatQueueTimeout = chatQueueTimeout;
 
         // credential validation
         if (this.chatCredential.isPresent() == false) {
@@ -151,9 +168,10 @@ public class TwitchChat implements AutoCloseable {
         // queue command worker
         this.queueThread = new Thread(() -> {
             while (!stopQueueThread) {
+                String command = null;
                 try {
-                    // wait for one second for a command to enter the queue
-                    String command = ircCommandQueue.poll(1L, TimeUnit.SECONDS);
+                    // wait for queue, only have a timeout set to allow multiple loops to check stopQueueThread
+                    command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
                     if(command != null) {
                         // Send the message, retrying forever until we are connected.
                         while (!stopQueueThread) {
@@ -164,8 +182,8 @@ public class TwitchChat implements AutoCloseable {
                                 sendCommand(command);
                                 break;
                             }
-                            // sleep to wait for reconnection
-                            TimeUnit.MILLISECONDS.sleep(500L);
+                            // Sleep for 25 milliseconds to wait for reconnection
+                            TimeUnit.MILLISECONDS.sleep(25L);
                         }
                         // Logging
                         log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
@@ -173,11 +191,23 @@ public class TwitchChat implements AutoCloseable {
                     }
                 } catch (Exception ex) {
                     log.error("Failed to process message from command queue", ex);
+
+                    // Reschedule command for processing
+                    if(command != null) {
+                        try {
+                            ircCommandQueue.put(command);
+                        } catch (InterruptedException e) {
+                            log.error("Failed to reschedule command", e);
+                        }
+                    }
+
                 }
             }
 
         });
-        queueThread.start();
+
+        // Thread will start right now
+        taskExecutor.schedule(this.queueThread, 1L, TimeUnit.MILLISECONDS);
         log.debug("Started IRC Queue Worker");
 
         // Event Handlers
@@ -203,16 +233,16 @@ public class TwitchChat implements AutoCloseable {
                 // Connect to IRC WebSocket
                 this.webSocket.connect();
             } catch (Exception ex) {
-                log.error("Connection to Twitch IRC failed: {} - Retrying ...", ex.getMessage());
-                // Sleep 1 second before trying to reconnect
+                log.error("Connection to Twitch IRC failed: Retrying ...", ex);
+                // Sleep half before trying to reconnect
                 try {
-                    Thread.sleep(1000);
-                } catch (Exception et) {
+                    TimeUnit.MILLISECONDS.sleep(500L);
+                } catch (Exception ignored) {
 
+                } finally {
+                    // reconnect
+                    reconnect();
                 }
-
-                // reconnect
-                reconnect();
             }
         }
     }
@@ -452,13 +482,12 @@ public class TwitchChat implements AutoCloseable {
      * @param reason reason
      */
     public void timeout(String channel, String user, Duration duration, String reason) {
-        StringBuilder sb = new StringBuilder()
-            .append(duration.getSeconds());
+        StringBuilder sb = new StringBuilder(user).append(duration.getSeconds());
         if (reason != null) {
             sb.append(" ").append(reason);
         }
 
-        sendMessage(channel, String.format("/timeout %s %s", user, sb.toString()));
+        sendMessage(channel, String.format("/timeout %s", sb.toString()));
     }
 
     /**
@@ -519,6 +548,7 @@ public class TwitchChat implements AutoCloseable {
      */
     public void close() {
         this.stopQueueThread = true;
+        this.taskExecutor.remove(this.queueThread);
         this.disconnect();
     }
 

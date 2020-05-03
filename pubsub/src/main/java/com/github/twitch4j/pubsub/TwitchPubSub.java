@@ -27,13 +27,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Twitch PubSub
@@ -70,6 +72,11 @@ public class TwitchPubSub implements AutoCloseable {
     protected final Thread queueThread;
 
     /**
+     * Heartbeat Thread
+     */
+    protected final Thread heartbeatThread;
+
+    /**
      * is Closed?
      */
     protected boolean isClosed = false;
@@ -77,7 +84,7 @@ public class TwitchPubSub implements AutoCloseable {
     /**
      * Command Queue
      */
-    protected final CircularFifoQueue<String> commandQueue = new CircularFifoQueue<>(200);
+    protected final ArrayBlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(200);
 
     /**
      * Holds the subscribed topics in case we need to reconnect
@@ -95,11 +102,18 @@ public class TwitchPubSub implements AutoCloseable {
     protected long lastPong = TimeUtils.getCurrentTimeInMillis();
 
     /**
+     * Thread Pool Executor
+     */
+    protected final ScheduledThreadPoolExecutor taskExecutor;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
+     * @param taskExecutor ScheduledThreadPoolExecutor
      */
-    public TwitchPubSub(EventManager eventManager) {
+    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
         this.eventManager = eventManager;
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-pubsub", this);
@@ -107,20 +121,24 @@ public class TwitchPubSub implements AutoCloseable {
         // connect
         this.connect();
 
+        // Run heartbeat every 4 minutes
+        this.heartbeatThread = new Thread(() -> {
+            if(isClosed)
+                return;
+
+            PubSubRequest request = new PubSubRequest();
+            request.setType(PubSubType.PING);
+            sendCommand(TypeConvert.objectToJson(request));
+
+            log.debug("PubSub: Sending PING!");
+            lastPing = TimeUtils.getCurrentTimeInMillis();
+        });
+
+        taskExecutor.scheduleAtFixedRate(this.heartbeatThread, 0, 4L, TimeUnit.MINUTES);
         // queue command worker
         this.queueThread = new Thread(() -> {
-            while (isClosed == false) {
+            while (!isClosed) {
                 try {
-                    // check if we need to send a PING (every 4 minutes, disconnect after 5 minutes without sending ping)
-                    if (TimeUtils.getCurrentTimeInMillis() - lastPing > 4 * 60 * 1000) {
-                        PubSubRequest request = new PubSubRequest();
-                        request.setType(PubSubType.PING);
-                        sendCommand(TypeConvert.objectToJson(request));
-
-                        log.debug("PubSub: Sending PING!");
-                        lastPing = TimeUtils.getCurrentTimeInMillis();
-                    }
-
                     // check for missing pong response
                     if (TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000 && lastPong < lastPing) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
@@ -128,25 +146,21 @@ public class TwitchPubSub implements AutoCloseable {
                     }
 
                     // If connected, send one message from the queue
-                    if (commandQueue.size() > 0) {
+                    String command = commandQueue.poll(1000L, TimeUnit.MILLISECONDS);
+                    if(command != null) {
                         if (connectionState.equals(TMIConnectionState.CONNECTED)) {
-                            // pop one command from the queue and execute it
-                            String command = commandQueue.remove();
                             sendCommand(command);
-
                             // Logging
                             log.debug("Processed command from queue: [{}].", command);
                         }
                     }
-
-                    // sleep one second
-                    Thread.sleep(1000);
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
         });
-        queueThread.start();
+
+        taskExecutor.schedule(this.queueThread, 1L, TimeUnit.MILLISECONDS);
         log.debug("PubSub: Started Queue Worker Thread");
     }
 
@@ -170,13 +184,13 @@ public class TwitchPubSub implements AutoCloseable {
 
                 // Sleep 1 second before trying to reconnect
                 try {
-                    Thread.sleep(1000);
-                } catch (Exception et) {
+                    TimeUnit.SECONDS.sleep(1L);
+                } catch (Exception ignored) {
 
+                } finally {
+                    // reconnect
+                    reconnect();
                 }
-
-                // reconnect
-                reconnect();
             }
         }
     }
@@ -492,8 +506,10 @@ public class TwitchPubSub implements AutoCloseable {
      */
     public void close() {
         if (!isClosed) {
-            disconnect();
             isClosed = true;
+            taskExecutor.remove(this.heartbeatThread);
+            taskExecutor.remove(this.queueThread);
+            disconnect();
         }
     }
 

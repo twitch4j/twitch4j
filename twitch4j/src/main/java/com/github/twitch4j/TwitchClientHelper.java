@@ -19,7 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -33,17 +37,17 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Holds the channels that are checked for live/offline state changes
      */
-    private Set<EventChannel> listenForGoLive = new HashSet<>();
+    private final Set<EventChannel> listenForGoLive = ConcurrentHashMap.newKeySet();
 
     /**
      * Holds the channels that are checked for new followers
      */
-    private Set<EventChannel> listenForFollow = new HashSet<>();
+    private final Set<EventChannel> listenForFollow = ConcurrentHashMap.newKeySet();
 
     /**
      * TwitchClient
      */
-    private TwitchClient twitchClient;
+    private final TwitchClient twitchClient;
 
     /**
      * Event Thread - Stream Status
@@ -54,11 +58,6 @@ public class TwitchClientHelper implements AutoCloseable {
      * Event Thread - Followers
      */
     protected final Thread followerEventThread;
-
-    /**
-     * Event Listener Thread
-     */
-    protected Boolean stopEventGenerationThread = false;
 
     /**
      * Default Auth Token for Twitch API Requests
@@ -77,8 +76,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Scheduled Thread Pool Executor
      */
-    @Setter
-    private ScheduledThreadPoolExecutor executor;
+    private final ScheduledThreadPoolExecutor executor;
 
     /**
      * Thread Rate
@@ -90,11 +88,11 @@ public class TwitchClientHelper implements AutoCloseable {
      * Constructor
      *
      * @param twitchClient TwitchClient
-
+     * @param executor ScheduledThreadPoolExecutor
      */
-    public TwitchClientHelper(TwitchClient twitchClient) {
+    public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor) {
         this.twitchClient = twitchClient;
-
+        this.executor = executor;
         // Threads
         this.streamStatusEventThread = new Thread(() -> {
             // check go live / stream events
@@ -230,7 +228,7 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                if(!listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                if(listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
                     log.info("Channel {} already added for Stream Events", channelName);
                 } else {
                     listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
@@ -333,7 +331,7 @@ public class TwitchClientHelper implements AutoCloseable {
         // stream status event thread
         if (listenForGoLive.size() > 0) {
             // thread should be active
-            executor.scheduleWithFixedDelay(this.streamStatusEventThread, threadRate, threadRate, TimeUnit.MILLISECONDS);
+            executor.scheduleWithFixedDelay(this.streamStatusEventThread, 1, threadRate, TimeUnit.MILLISECONDS);
         } else {
             // thread can be stopped
             executor.remove(this.streamStatusEventThread);
@@ -342,7 +340,7 @@ public class TwitchClientHelper implements AutoCloseable {
         // follower event thread
         if (listenForFollow.size() > 0) {
             // thread should be active
-            executor.scheduleWithFixedDelay(this.followerEventThread, threadRate, threadRate, TimeUnit.MILLISECONDS);
+            executor.scheduleWithFixedDelay(this.followerEventThread, 1, threadRate, TimeUnit.MILLISECONDS);
         } else {
             // thread can be stopped
             executor.remove(this.followerEventThread);

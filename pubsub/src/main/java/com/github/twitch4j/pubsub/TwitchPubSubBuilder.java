@@ -1,8 +1,11 @@
 package com.github.twitch4j.pubsub;
 
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Twitch PubSub Builder
@@ -17,7 +20,13 @@ public class TwitchPubSubBuilder {
      * Event Manager
      */
     @With
-    private EventManager eventManager = new EventManager();
+    private EventManager eventManager = null;
+
+    /**
+     * Scheduler Thread Pool Executor
+     */
+    @With
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
 
     /**
      * Initialize the builder
@@ -33,9 +42,15 @@ public class TwitchPubSubBuilder {
      */
     public TwitchPubSub build() {
         log.debug("PubSub: Initializing Module ...");
-        TwitchPubSub twitchPubSub = new TwitchPubSub(this.eventManager);
+        if(scheduledThreadPoolExecutor == null)
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
 
-        return twitchPubSub;
+        if(eventManager == null) {
+            eventManager = new EventManager();
+            eventManager.autoDiscovery();
+        }
+
+        return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor);
     }
 
 }
