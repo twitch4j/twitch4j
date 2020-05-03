@@ -5,9 +5,11 @@ import com.github.philippheuer.credentialmanager.domain.IdentityProvider;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
+@Slf4j
 public class TwitchAuth {
 
     /**
@@ -36,6 +38,8 @@ public class TwitchAuth {
             // register
             IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
             credentialManager.registerIdentityProvider(identityProvider);
+        } else {
+            log.warn("TwitchIdentityProvider was already registered, ignoring call to TwitchAuth.registerIdentityProvider!");
         }
     }
 }

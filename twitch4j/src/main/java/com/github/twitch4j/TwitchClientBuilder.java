@@ -27,8 +27,8 @@ import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -78,7 +78,7 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     /**
      * IRC Command Handlers
      */
-    protected final List<String> commandPrefixes = new ArrayList<>();
+    protected final Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Enabled: PubSub
@@ -189,9 +189,9 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
             eventManager.autoDiscovery();
         }
 
+        // Default ScheduledThreadPoolExecutor
         if(scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
-
 
         // Module: Helix
         TwitchHelix helix = null;
@@ -239,13 +239,14 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .withChatRateLimit(chatRateLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withChatQueueTimeout(chatQueueTimeout)
-                .withCommandTriggers(commandPrefixes).build();
+                .withCommandTriggers(commandPrefixes)
+                .build();
         }
 
         // Module: PubSub
-        TwitchPubSub pubsub = null;
+        TwitchPubSub pubSub = null;
         if (this.enablePubSub) {
-            pubsub = TwitchPubSubBuilder.builder()
+            pubSub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .build();
@@ -261,8 +262,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
                 .build();
         }
 
-        // Module: ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubsub, graphql, scheduledThreadPoolExecutor);
+        // Module: TwitchClient & ClientHelper
+        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
         client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
         client.getClientHelper().setThreadRate(helperThreadRate);
 

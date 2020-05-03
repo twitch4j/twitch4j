@@ -10,6 +10,7 @@ import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -222,6 +223,14 @@ public class TwitchClient implements AutoCloseable {
         if (this.twitchClientHelper != null) {
             twitchClientHelper.close();
         }
-        scheduledThreadPoolExecutor.shutdownNow();
+
+        // Shutdown ThreadPools created by Twitch4J
+        if (scheduledThreadPoolExecutor.getThreadFactory() instanceof BasicThreadFactory) {
+            BasicThreadFactory threadFactory = (BasicThreadFactory) scheduledThreadPoolExecutor.getThreadFactory();
+
+            if (threadFactory.getNamingPattern().equalsIgnoreCase("twitch4j-%d")) {
+                scheduledThreadPoolExecutor.shutdownNow();
+            }
+        }
     }
 }
