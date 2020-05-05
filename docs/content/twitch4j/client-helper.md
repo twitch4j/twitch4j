@@ -13,6 +13,16 @@ Current Features:
 
 Those methods require the `Helix Module`, so enable it in the `TwitchClientBuilder`.
 
+## Default Credential
+
+When using the client helper, you will need to specify a default credential (any) that gets used for all requests for increased ratelimits, this is mandatory!
+
+```java
+TwitchClient twitchClient = TwitchClientBuilder.builder()
+    .withDefaultAuthToken(new OAuth2Credential("twitch", "oauthtokenhere"))
+    .build();
+```
+
 ## Register for Stream GoLive / GoOffline / GameChange / TitleChange Events
 
 ```java
