@@ -228,11 +228,10 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                if(listenForGoLive.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                final boolean add = listenForGoLive.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                if (!add) {
                     log.info("Channel {} already added for Stream Events", channelName);
                 } else {
-                    listenForGoLive.add(new EventChannel(user.getId(), user.getLogin()));
-
                     // initialize cache
                     if (channelInformation.getIfPresent(user.getId()) == null) {
                         channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
@@ -257,7 +256,7 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
 
                 // invalidate cache
                 if (channelInformation.getIfPresent(user.getId()) != null) {
@@ -281,12 +280,12 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
-                if(listenForFollow.stream().anyMatch(eventChannel -> eventChannel.getName().equalsIgnoreCase(channelName))) {
+                // add to list
+                final boolean add = listenForFollow.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+
+                if (!add) {
                     log.info("Channel {} already added for Follow Events", channelName);
                 } else {
-                    // add to list
-                    listenForFollow.add(new EventChannel(user.getId(), user.getLogin()));
-
                     // initialize cache
                     if (channelInformation.getIfPresent(user.getId()) == null) {
                         channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
@@ -311,7 +310,7 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin()));
+                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
 
                 // invalidate cache
                 if (channelInformation.getIfPresent(user.getId()) != null) {
