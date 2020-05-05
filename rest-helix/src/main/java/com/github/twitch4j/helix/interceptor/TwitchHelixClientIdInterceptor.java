@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-import com.github.twitch4j.common.builder.TwitchAPIBuilder;
+import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * Reference to the Client Builder
      */
-    private final TwitchAPIBuilder twitchAPIBuilder;
+    private final TwitchHelixBuilder twitchAPIBuilder;
 
     /**
      * Reference to the twitch identity provider
@@ -43,7 +43,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      *
      * @param twitchHelixBuilder Twitch Client Builder
      */
-    public TwitchHelixClientIdInterceptor(TwitchAPIBuilder twitchHelixBuilder) {
+    public TwitchHelixClientIdInterceptor(TwitchHelixBuilder twitchHelixBuilder) {
         this.twitchAPIBuilder = twitchHelixBuilder;
 
         // we can use the request to get additional info without client id / secret / etc.

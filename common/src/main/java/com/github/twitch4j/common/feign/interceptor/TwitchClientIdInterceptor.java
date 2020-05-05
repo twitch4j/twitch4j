@@ -1,6 +1,5 @@
 package com.github.twitch4j.common.feign.interceptor;
 
-import com.github.twitch4j.common.builder.TwitchAPIBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
@@ -10,17 +9,24 @@ import feign.RequestTemplate;
 public class TwitchClientIdInterceptor implements RequestInterceptor {
 
     /**
-     * Reference to the Client Builder
+     * Client Id
      */
-    private final TwitchAPIBuilder twitchAPIBuilder;
+    private String clientId;
+
+    /**
+     * User Agent
+     */
+    private String userAgent;
 
     /**
      * Constructor
      *
-     * @param twitchHelixBuilder Twitch Client Builder
+     * @param clientId Client Id
+     * @param userAgent User Agent
      */
-    public TwitchClientIdInterceptor(TwitchAPIBuilder twitchHelixBuilder) {
-        this.twitchAPIBuilder = twitchHelixBuilder;
+    public TwitchClientIdInterceptor(String clientId, String userAgent) {
+        this.clientId = clientId;
+        this.userAgent = userAgent;
     }
 
     /**
@@ -30,7 +36,7 @@ public class TwitchClientIdInterceptor implements RequestInterceptor {
      */
     @Override
     public void apply(RequestTemplate template) {
-        template.header("Client-Id", twitchAPIBuilder.getClientId());
-        template.header("User-Agent", twitchAPIBuilder.getUserAgent());
+        template.header("Client-Id", clientId);
+        template.header("User-Agent", userAgent);
     }
 }

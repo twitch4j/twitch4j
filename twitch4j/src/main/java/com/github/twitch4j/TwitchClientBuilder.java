@@ -7,7 +7,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
-import com.github.twitch4j.common.builder.TwitchAPIBuilder;
+import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
@@ -20,10 +20,7 @@ import com.github.twitch4j.pubsub.TwitchPubSubBuilder;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import io.github.bucket4j.Bandwidth;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -35,9 +32,34 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * Builder to get a TwitchClient Instance by provided various options, to provide the user with a lot of customizable options.
  */
 @Slf4j
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
+public class TwitchClientBuilder {
+
+    /**
+     * Client Id
+     */
+    @With
+    private String clientId = Twitch4JGlobal.clientId;
+
+    /**
+     * Client Secret
+     */
+    @With
+    private String clientSecret = Twitch4JGlobal.clientSecret;
+
+    /**
+     * User Agent
+     */
+    @With
+    private String userAgent = Twitch4JGlobal.userAgent;
+
+    /**
+     * HTTP Request Queue Size
+     */
+    @With
+    private Integer requestQueueSize = -1;
 
     /**
      * Redirect Url
@@ -123,12 +145,6 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
     private long chatQueueTimeout = 1000L;
 
     /**
-     * User Agent
-     */
-    @With
-    private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
-
-    /**
      * CredentialManager
      */
     @With
@@ -197,10 +213,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         TwitchHelix helix = null;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
-                .withClientId(getClientId())
-                .withClientSecret(getClientSecret())
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
-                .withRequestQueueSize(getRequestQueueSize())
+                .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .build();
         }
@@ -209,10 +225,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         TwitchKraken kraken = null;
         if (this.enableKraken) {
             kraken = TwitchKrakenBuilder.builder()
-                .withClientId(getClientId())
-                .withClientSecret(getClientSecret())
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
-                .withRequestQueueSize(getRequestQueueSize())
+                .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .build();
         }
@@ -221,10 +237,10 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         TwitchMessagingInterface tmi = null;
         if (this.enableTMI) {
             tmi = TwitchMessagingInterfaceBuilder.builder()
-                .withClientId(getClientId())
-                .withClientSecret(getClientSecret())
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
-                .withRequestQueueSize(getRequestQueueSize())
+                .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .build();
         }
@@ -257,8 +273,8 @@ public class TwitchClientBuilder extends TwitchAPIBuilder<TwitchClientBuilder> {
         if (this.enableGraphQL) {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
-                .withClientId(getClientId())
-                .withClientSecret(getClientSecret())
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
                 .build();
         }
 

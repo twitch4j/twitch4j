@@ -4,7 +4,7 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.builder.TwitchEventAwareAPIBuilder;
+import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
@@ -25,7 +25,25 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TwitchChatBuilder extends TwitchEventAwareAPIBuilder<TwitchChatBuilder> {
+public class TwitchChatBuilder {
+
+    /**
+     * Client Id
+     */
+    @With
+    private String clientId = Twitch4JGlobal.clientId;
+
+    /**
+     * Client Secret
+     */
+    @With
+    private String clientSecret = Twitch4JGlobal.clientSecret;
+
+    /**
+     * HTTP Request Queue Size
+     */
+    @With
+    private Integer requestQueueSize = -1;
 
     /**
      * Event Manager
