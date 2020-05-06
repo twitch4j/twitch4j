@@ -249,6 +249,7 @@ public class TwitchClientBuilder {
         TwitchChat chat = null;
         if (this.enableChat) {
             chat = TwitchChatBuilder.builder()
+                .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
                 .withChatQueueSize(chatQueueSize)
