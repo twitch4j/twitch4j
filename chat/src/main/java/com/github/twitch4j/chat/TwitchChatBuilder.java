@@ -81,6 +81,12 @@ public class TwitchChatBuilder {
     protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
 
     /**
+     * Custom RateLimit for Whispers
+     */
+    @With
+    protected Bandwidth[] whisperRateLimit = { Bandwidth.simple(100, Duration.ofSeconds(60)), Bandwidth.simple(3, Duration.ofSeconds(1)) };
+
+    /**
      * Scheduler Thread Pool Executor
      */
     @With
@@ -116,7 +122,7 @@ public class TwitchChatBuilder {
         }
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout);
     }
 
     /**

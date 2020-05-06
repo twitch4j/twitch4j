@@ -17,6 +17,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
+import io.github.bucket4j.local.LocalBucketBuilder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -79,14 +82,29 @@ public class TwitchChat implements AutoCloseable {
     protected final Bucket ircMessageBucket;
 
     /**
+     * IRC Whisper Bucket
+     */
+    protected final Bucket ircWhisperBucket;
+
+    /**
      * IRC Command Queue
      */
-    protected final ArrayBlockingQueue<String> ircCommandQueue;
+    protected final BlockingQueue<String> ircCommandQueue;
+
+    /**
+     * Whisper-specific Command Queue
+     */
+    protected final BlockingQueue<String> whisperCommandQueue;
 
     /**
      * Custom RateLimit for ChatMessages
      */
     protected final Bandwidth chatRateLimit;
+
+    /**
+     * Custom RateLimit for Whispers
+     */
+    protected final Bandwidth[] whisperRateLimit;
 
     /**
      * IRC Command Queue Thread
@@ -126,13 +144,15 @@ public class TwitchChat implements AutoCloseable {
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = Optional.ofNullable(chatCredential);
         this.commandPrefixes = commandPrefixes;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
+        this.whisperCommandQueue = new LinkedBlockingQueue<>();
         this.chatRateLimit = chatRateLimit;
+        this.whisperRateLimit = whisperRateLimit;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
 
@@ -162,6 +182,12 @@ public class TwitchChat implements AutoCloseable {
             .addLimit(this.chatRateLimit)
             .build();
 
+        final LocalBucketBuilder whisperBucketBuilder = Bucket4j.builder();
+        for (Bandwidth bandwidth : whisperRateLimit) {
+            whisperBucketBuilder.addLimit(bandwidth);
+        }
+        this.ircWhisperBucket = whisperBucketBuilder.build();
+
         // connect to irc
         this.connect();
 
@@ -169,15 +195,25 @@ public class TwitchChat implements AutoCloseable {
         this.queueThread = new Thread(() -> {
             while (!stopQueueThread) {
                 String command = null;
+                Bucket bucket;
                 try {
                     // wait for queue, only have a timeout set to allow multiple loops to check stopQueueThread
-                    command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                    // attempt to grab command from whisper queue before falling back to the general queue
+                    if (!whisperCommandQueue.isEmpty() && ircWhisperBucket.tryConsume(1L)) {
+                        ircWhisperBucket.addTokens(1L);
+                        command = whisperCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                        bucket = ircWhisperBucket;
+                    } else {
+                        command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                        bucket = ircMessageBucket;
+                    }
+
                     if(command != null) {
                         // Send the message, retrying forever until we are connected.
                         while (!stopQueueThread) {
                             if (connectionState.equals(TMIConnectionState.CONNECTED)) {
                                 // block thread, until we can continue
-                                ircMessageBucket.asScheduler().consume(1);
+                                bucket.asScheduler().consume(1);
 
                                 sendCommand(command);
                                 break;
@@ -397,7 +433,7 @@ public class TwitchChat implements AutoCloseable {
      * @param args command arguments
      */
     protected void sendCommand(String command, String... args) {
-        ircCommandQueue.add(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+        ircCommandQueue.offer(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
     }
 
     /**
@@ -406,7 +442,7 @@ public class TwitchChat implements AutoCloseable {
      * @param command raw irc command
      */
     public void sendRaw(String command) {
-        ircCommandQueue.add(command);
+        ircCommandQueue.offer(command);
     }
 
     /**
@@ -459,7 +495,7 @@ public class TwitchChat implements AutoCloseable {
      */
     public void sendMessage(String channel, String message) {
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        ircCommandQueue.add(String.format("PRIVMSG #%s :%s", channel.toLowerCase(), message));
+        ircCommandQueue.offer(String.format("PRIVMSG #%s :%s", channel.toLowerCase(), message));
     }
 
     /**
@@ -470,7 +506,7 @@ public class TwitchChat implements AutoCloseable {
      */
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
-        ircCommandQueue.add(String.format("PRIVMSG #%s :/w %s %s", chatCredential.get().getUserName(), targetUser, message));
+        whisperCommandQueue.offer(String.format("PRIVMSG #%s :/w %s %s", chatCredential.get().getUserName(), targetUser, message));
     }
 
     /**
