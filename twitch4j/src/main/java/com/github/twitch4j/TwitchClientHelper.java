@@ -263,7 +263,6 @@ public class TwitchClientHelper implements AutoCloseable {
                     channelInformation.invalidate(user.getId());
                 }
             });
-            // start thread if needed
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from stream event listener!");
@@ -282,7 +281,6 @@ public class TwitchClientHelper implements AutoCloseable {
             users.getUsers().forEach(user -> {
                 // add to list
                 final boolean add = listenForFollow.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
-
                 if (!add) {
                     log.info("Channel {} already added for Follow Events", channelName);
                 } else {
@@ -292,7 +290,6 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                 }
             });
-            // start thread if needed
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
