@@ -42,6 +42,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
         resultList.getStreams().forEach(stream -> {
             assertNotNull(stream.getId(), "Id should not be null!");
             assertNotNull(stream.getUserId(), "UserId should not be null!");
+            assertNotNull(stream.getUserName(), "UserName should not be null!");
             // assertNotNull(stream.getGameId(), "GameId should not be null!");
         });
     }

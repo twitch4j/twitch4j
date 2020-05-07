@@ -30,6 +30,10 @@ public class Stream {
     @NonNull
     private String userId;
 
+    /** Display name of the user who is streaming */
+    @NonNull
+    private String userName;
+
     /** ID of the game being played on the stream. */
     private String gameId;
 
