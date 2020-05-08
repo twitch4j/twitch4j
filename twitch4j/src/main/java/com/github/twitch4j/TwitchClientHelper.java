@@ -100,16 +100,21 @@ public class TwitchClientHelper implements AutoCloseable {
                 HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
                 try {
                     List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
-                    listenForGoLive.forEach(channel -> {
-                        ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
-                        Optional<Stream> stream = streams.stream().filter(s -> s.getUserId().equals(channel.getId())).findFirst();
+                    streams.forEach(stream -> {
+                        final EventChannel channel = new EventChannel(stream.getId(), stream.getUserName().toLowerCase());
+
+                        // Check if the channel's live status is still desired to be tracked
+                        if (!listenForGoLive.contains(channel))
+                            return;
+
+                        ChannelCache currentChannelCache = channelInformation.get(stream.getId(), s -> new ChannelCache(null, null, null, null));
 
                         boolean dispatchGoLiveEvent = false;
                         boolean dispatchGoOfflineEvent = false;
                         boolean dispatchTitleChangedEvent = false;
                         boolean dispatchGameChangedEvent = false;
 
-                        if (stream.isPresent() && stream.get().getType().equalsIgnoreCase("live")) {
+                        if (stream.getType().equalsIgnoreCase("live")) {
                             // is live
                             // - live status
                             if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
@@ -119,16 +124,16 @@ public class TwitchClientHelper implements AutoCloseable {
                             boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
                             // - change stream title event
-                            if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.get().getTitle())) {
+                            if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
                                 dispatchTitleChangedEvent = true;
                             }
-                            currentChannelCache.setTitle(stream.get().getTitle());
+                            currentChannelCache.setTitle(stream.getTitle());
 
                             // - change game event
-                            if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.get().getGameId())) {
+                            if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.getGameId())) {
                                 dispatchGameChangedEvent = true;
                             }
-                            currentChannelCache.setGameId(stream.get().getGameId());
+                            currentChannelCache.setGameId(stream.getGameId());
                         } else {
                             // was online previously?
                             if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
@@ -263,7 +268,6 @@ public class TwitchClientHelper implements AutoCloseable {
                     channelInformation.invalidate(user.getId());
                 }
             });
-            // start thread if needed
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from stream event listener!");
@@ -282,7 +286,6 @@ public class TwitchClientHelper implements AutoCloseable {
             users.getUsers().forEach(user -> {
                 // add to list
                 final boolean add = listenForFollow.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
-
                 if (!add) {
                     log.info("Channel {} already added for Follow Events", channelName);
                 } else {
@@ -292,7 +295,6 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                 }
             });
-            // start thread if needed
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
