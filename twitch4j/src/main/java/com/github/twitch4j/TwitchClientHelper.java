@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -50,14 +52,24 @@ public class TwitchClientHelper implements AutoCloseable {
     private final TwitchClient twitchClient;
 
     /**
-     * Event Thread - Stream Status
+     * Event Task - Stream Status
      */
-    protected final Thread streamStatusEventThread;
+    private final Runnable streamStatusEventTask;
 
     /**
-     * Event Thread - Followers
+     * The {@link ScheduledFuture} associated with streamStatusEventTask, in an atomic wrapper
      */
-    protected final Thread followerEventThread;
+    private final AtomicReference<ScheduledFuture<?>> streamStatusEventFuture = new AtomicReference<>();
+
+    /**
+     * Event Task - Followers
+     */
+    private final Runnable followerEventTask;
+
+    /**
+     * The {@link ScheduledFuture} associated with followerEventTask, in an atomic wrapper
+     */
+    private final AtomicReference<ScheduledFuture<?>> followerEventFuture = new AtomicReference<>();
 
     /**
      * Default Auth Token for Twitch API Requests
@@ -94,7 +106,7 @@ public class TwitchClientHelper implements AutoCloseable {
         this.twitchClient = twitchClient;
         this.executor = executor;
         // Threads
-        this.streamStatusEventThread = new Thread(() -> {
+        this.streamStatusEventTask = () -> {
             // check go live / stream events
             if (listenForGoLive.size() > 0) {
                 HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
@@ -176,9 +188,9 @@ public class TwitchClientHelper implements AutoCloseable {
                     log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                 }
             }
-        });
-        this.followerEventThread = new Thread(() -> {
-            if(listenForFollow.size() > 0) {
+        };
+        this.followerEventTask = () -> {
+            if (listenForFollow.size() > 0) {
                 // check follow events
                 for (EventChannel channel : listenForFollow) {
                     HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
@@ -219,7 +231,7 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                 }
             }
-        });
+        };
     }
 
     /**
@@ -260,8 +272,8 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
-                // add to list
-                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                // remove from list
+                listenForGoLive.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
 
                 // invalidate cache
                 if (channelInformation.getIfPresent(user.getId()) != null) {
@@ -330,30 +342,45 @@ public class TwitchClientHelper implements AutoCloseable {
      */
     private void startOrStopEventGenerationThread() {
         // stream status event thread
-        if (listenForGoLive.size() > 0) {
-            // thread should be active
-            executor.scheduleWithFixedDelay(this.streamStatusEventThread, 1, threadRate, TimeUnit.MILLISECONDS);
-        } else {
-            // thread can be stopped
-            executor.remove(this.streamStatusEventThread);
-        }
+        streamStatusEventFuture.updateAndGet(scheduledFuture -> {
+            if (listenForGoLive.size() > 0) {
+                if (scheduledFuture == null)
+                    return executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate,
+                        TimeUnit.MILLISECONDS);
+                return scheduledFuture;
+            } else {
+                if (scheduledFuture != null) {
+                    scheduledFuture.cancel(false);
+                }
+                return null;
+            }
+        });
 
         // follower event thread
-        if (listenForFollow.size() > 0) {
-            // thread should be active
-            executor.scheduleWithFixedDelay(this.followerEventThread, 1, threadRate, TimeUnit.MILLISECONDS);
-        } else {
-            // thread can be stopped
-            executor.remove(this.followerEventThread);
-        }
+        followerEventFuture.updateAndGet(scheduledFuture -> {
+            if (listenForFollow.size() > 0) {
+                if (scheduledFuture == null)
+                    return executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
+                return scheduledFuture;
+            } else {
+                if (scheduledFuture != null)
+                    scheduledFuture.cancel(false);
+                return null;
+            }
+        });
     }
 
     /**
      * Close
      */
     public void close() {
-        executor.remove(this.streamStatusEventThread);
-        executor.remove(this.followerEventThread);
+        final ScheduledFuture<?> streamStatusFuture = this.streamStatusEventFuture.get();
+        if (streamStatusFuture != null)
+            streamStatusFuture.cancel(false);
+
+        final ScheduledFuture<?> followerFuture = this.followerEventFuture.get();
+        if (followerFuture != null)
+            followerFuture.cancel(false);
     }
 
 }
