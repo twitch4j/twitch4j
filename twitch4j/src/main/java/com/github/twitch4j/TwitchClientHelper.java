@@ -113,13 +113,13 @@ public class TwitchClientHelper implements AutoCloseable {
                 try {
                     List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
                     streams.forEach(stream -> {
-                        final EventChannel channel = new EventChannel(stream.getId(), stream.getUserName().toLowerCase());
+                        final EventChannel channel = new EventChannel(stream.getUserId(), stream.getUserName().toLowerCase());
 
                         // Check if the channel's live status is still desired to be tracked
                         if (!listenForGoLive.contains(channel))
                             return;
 
-                        ChannelCache currentChannelCache = channelInformation.get(stream.getId(), s -> new ChannelCache(null, null, null, null));
+                        ChannelCache currentChannelCache = channelInformation.get(stream.getUserId(), s -> new ChannelCache(null, null, null, null));
 
                         boolean dispatchGoLiveEvent = false;
                         boolean dispatchGoOfflineEvent = false;
