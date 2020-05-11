@@ -17,6 +17,11 @@ import java.time.LocalDateTime;
 public class ChannelCache {
 
     /**
+     * User Name
+     */
+    private String userName;
+
+    /**
      * IsLive
      */
     private Boolean isLive;
