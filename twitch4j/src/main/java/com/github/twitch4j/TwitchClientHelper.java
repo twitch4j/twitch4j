@@ -19,16 +19,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
@@ -39,12 +38,12 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Holds the channels that are checked for live/offline state changes
      */
-    private final Set<EventChannel> listenForGoLive = ConcurrentHashMap.newKeySet();
+    private final Set<String> listenForGoLive = ConcurrentHashMap.newKeySet();
 
     /**
      * Holds the channels that are checked for new followers
      */
-    private final Set<EventChannel> listenForFollow = ConcurrentHashMap.newKeySet();
+    private final Set<String> listenForFollow = ConcurrentHashMap.newKeySet();
 
     /**
      * TwitchClient
@@ -109,14 +108,14 @@ public class TwitchClientHelper implements AutoCloseable {
         this.streamStatusEventTask = () -> {
             // check go live / stream events
             if (listenForGoLive.size() > 0) {
-                HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, listenForGoLive.stream().map(EventChannel::getId).collect(Collectors.toList()), null);
+                HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, new ArrayList<>(listenForGoLive), null);
                 try {
                     List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
                     streams.forEach(stream -> {
-                        final EventChannel channel = new EventChannel(stream.getId(), stream.getUserName().toLowerCase());
+                        final EventChannel channel = new EventChannel(stream.getId(), stream.getUserName());
 
                         // Check if the channel's live status is still desired to be tracked
-                        if (!listenForGoLive.contains(channel))
+                        if (!listenForGoLive.contains(stream.getUserId()))
                             return;
 
                         ChannelCache currentChannelCache = channelInformation.get(stream.getId(), s -> new ChannelCache(null, null, null, null));
@@ -192,14 +191,17 @@ public class TwitchClientHelper implements AutoCloseable {
         this.followerEventTask = () -> {
             if (listenForFollow.size() > 0) {
                 // check follow events
-                for (EventChannel channel : listenForFollow) {
-                    HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channel.getId(), null, null);
+                for (String channelId : listenForFollow) {
+                    HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channelId, null, null);
                     try {
-                        ChannelCache currentChannelCache = channelInformation.getIfPresent(channel.getId());
+                        ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null));
                         LocalDateTime lastFollowDate = null;
 
                         if (currentChannelCache.getLastFollowCheck() != null) {
                             List<Follow> followList = commandGetFollowers.execute().getFollows();
+                            EventChannel channel = null;
+                            if (!followList.isEmpty())
+                                channel = new EventChannel(channelId, followList.get(0).getToName());
                             for (Follow follow : followList) {
                                 // update lastFollowDate
                                 if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
@@ -245,14 +247,12 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                final boolean add = listenForGoLive.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                final boolean add = listenForGoLive.add(user.getId());
                 if (!add) {
                     log.info("Channel {} already added for Stream Events", channelName);
                 } else {
                     // initialize cache
-                    if (channelInformation.getIfPresent(user.getId()) == null) {
-                        channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
-                    }
+                    channelInformation.get(user.getId(), s -> new ChannelCache(null, null, null, null));
                 }
 
             });
@@ -273,12 +273,10 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // remove from list
-                listenForGoLive.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                listenForGoLive.remove(user.getId());
 
                 // invalidate cache
-                if (channelInformation.getIfPresent(user.getId()) != null) {
-                    channelInformation.invalidate(user.getId());
-                }
+                channelInformation.invalidate(user.getId());
             });
             startOrStopEventGenerationThread();
         } else {
@@ -297,14 +295,12 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                final boolean add = listenForFollow.add(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                final boolean add = listenForFollow.add(user.getId());
                 if (!add) {
                     log.info("Channel {} already added for Follow Events", channelName);
                 } else {
                     // initialize cache
-                    if (channelInformation.getIfPresent(user.getId()) == null) {
-                        channelInformation.put(user.getId(), new ChannelCache(null, null, null, null));
-                    }
+                    channelInformation.get(user.getId(), s -> new ChannelCache(null, null, null, null));
                 }
             });
             startOrStopEventGenerationThread();
@@ -324,12 +320,10 @@ public class TwitchClientHelper implements AutoCloseable {
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> {
                 // add to list
-                listenForFollow.remove(new EventChannel(user.getId(), user.getLogin().toLowerCase()));
+                listenForFollow.remove(user.getId());
 
                 // invalidate cache
-                if (channelInformation.getIfPresent(user.getId()) != null) {
-                    channelInformation.invalidate(user.getId());
-                }
+                channelInformation.invalidate(user.getId());
             });
             startOrStopEventGenerationThread();
         } else {
