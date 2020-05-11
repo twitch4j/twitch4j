@@ -21,7 +21,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -110,22 +112,26 @@ public class TwitchClientHelper implements AutoCloseable {
             if (listenForGoLive.size() > 0) {
                 HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, new ArrayList<>(listenForGoLive), null);
                 try {
-                    List<Stream> streams = hystrixGetAllStreams.execute().getStreams();
-                    streams.forEach(stream -> {
-                        final EventChannel channel = new EventChannel(stream.getUserId(), stream.getUserName());
+                    Map<String, Stream> streams = new HashMap<>();
+                    listenForGoLive.forEach(id -> streams.put(id, null));
+                    hystrixGetAllStreams.execute().getStreams().forEach(s -> streams.put(s.getUserId(), s));
 
+                    streams.forEach((userId, stream) -> {
                         // Check if the channel's live status is still desired to be tracked
-                        if (!listenForGoLive.contains(stream.getUserId()))
+                        if (!listenForGoLive.contains(userId))
                             return;
 
-                        ChannelCache currentChannelCache = channelInformation.get(stream.getUserId(), s -> new ChannelCache(null, null, null, null));
+                        ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null,null, null, null, null));
+                        if (stream != null)
+                            currentChannelCache.setUserName(stream.getUserName());
+                        final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
 
                         boolean dispatchGoLiveEvent = false;
                         boolean dispatchGoOfflineEvent = false;
                         boolean dispatchTitleChangedEvent = false;
                         boolean dispatchGameChangedEvent = false;
 
-                        if (stream.getType().equalsIgnoreCase("live")) {
+                        if (stream != null && stream.getType().equalsIgnoreCase("live")) {
                             // is live
                             // - live status
                             if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
@@ -194,7 +200,7 @@ public class TwitchClientHelper implements AutoCloseable {
                 for (String channelId : listenForFollow) {
                     HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channelId, null, null);
                     try {
-                        ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null));
+                        ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
                         LocalDateTime lastFollowDate = null;
 
                         if (currentChannelCache.getLastFollowCheck() != null) {
@@ -252,9 +258,8 @@ public class TwitchClientHelper implements AutoCloseable {
                     log.info("Channel {} already added for Stream Events", channelName);
                 } else {
                     // initialize cache
-                    channelInformation.get(user.getId(), s -> new ChannelCache(null, null, null, null));
+                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(),null, null, null, null));
                 }
-
             });
             startOrStopEventGenerationThread();
         } else {
@@ -300,7 +305,7 @@ public class TwitchClientHelper implements AutoCloseable {
                     log.info("Channel {} already added for Follow Events", channelName);
                 } else {
                     // initialize cache
-                    channelInformation.get(user.getId(), s -> new ChannelCache(null, null, null, null));
+                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(), null, null, null, null));
                 }
             });
             startOrStopEventGenerationThread();
