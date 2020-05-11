@@ -16,14 +16,14 @@ public class ChannelPointsReward {
 	private String title;
 	private String prompt;
 	private long cost;
-	private boolean userInputRequired;
-	private boolean subOnly;
+	private boolean isUserInputRequired;
+	private boolean isSubOnly;
 	private Image image;
 	private Image defaultImage;
 	private String backgroundColor;
-	private boolean enabled;
-	private boolean paused;
-	private boolean inStock;
+	private boolean isEnabled;
+	private boolean isPaused;
+	private boolean isInStock;
 	private MaxPerStream maxPerStream;
 	private boolean shouldRedemptionsSkipRequestQueue;
 
