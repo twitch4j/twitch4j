@@ -121,7 +121,7 @@ public class TwitchClientHelper implements AutoCloseable {
                         if (!listenForGoLive.contains(userId))
                             return;
 
-                        ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null,null, null, null, null));
+                        ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null, null, null, null, null));
                         if (stream != null)
                             currentChannelCache.setUserName(stream.getUserName());
                         final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
@@ -258,7 +258,7 @@ public class TwitchClientHelper implements AutoCloseable {
                     log.info("Channel {} already added for Stream Events", channelName);
                 } else {
                     // initialize cache
-                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(),null, null, null, null));
+                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(), null, null, null, null));
                 }
             });
             startOrStopEventGenerationThread();
