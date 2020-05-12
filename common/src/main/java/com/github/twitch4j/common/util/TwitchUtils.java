@@ -8,7 +8,7 @@ import java.util.*;
 public class TwitchUtils {
 
     public static Set<CommandPermission> getPermissionsFromTags(Map<String, Object> tags) {
-        Set<CommandPermission> permissionSet = new HashSet<>();
+        Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
 
         // Check for Permissions
         if (tags.containsKey("badges")) {
@@ -78,9 +78,6 @@ public class TwitchUtils {
                 */
             }
         }
-
-        // Everyone
-        permissionSet.add(CommandPermission.EVERYONE);
 
         return permissionSet;
     }

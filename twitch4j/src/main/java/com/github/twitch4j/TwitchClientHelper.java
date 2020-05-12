@@ -11,6 +11,7 @@ import com.github.twitch4j.common.events.channel.ChannelGoLiveEvent;
 import com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
+import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +36,11 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class TwitchClientHelper implements AutoCloseable {
+
+    /**
+     * The greatest number of streams or followers that can be requested in a single API call
+     */
+    private static final int MAX_LIMIT = 100;
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -109,11 +114,11 @@ public class TwitchClientHelper implements AutoCloseable {
         // Threads
         this.streamStatusEventTask = () -> {
             // check go live / stream events
-            if (listenForGoLive.size() > 0) {
-                HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, listenForGoLive.size(), null, null, null, new ArrayList<>(listenForGoLive), null);
+            CollectionUtils.chunked(listenForGoLive, MAX_LIMIT).forEach(channels -> {
+                HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(defaultAuthToken.getAccessToken(), null, null, channels.size(), null, null, null, channels, null);
                 try {
                     Map<String, Stream> streams = new HashMap<>();
-                    listenForGoLive.forEach(id -> streams.put(id, null));
+                    channels.forEach(id -> streams.put(id, null));
                     hystrixGetAllStreams.execute().getStreams().forEach(s -> streams.put(s.getUserId(), s));
 
                     streams.forEach((userId, stream) -> {
@@ -192,51 +197,49 @@ public class TwitchClientHelper implements AutoCloseable {
 
                     log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
                 }
-            }
+            });
         };
         this.followerEventTask = () -> {
-            if (listenForFollow.size() > 0) {
-                // check follow events
-                for (String channelId : listenForFollow) {
-                    HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channelId, null, null);
-                    try {
-                        ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
-                        LocalDateTime lastFollowDate = null;
+            // check follow events
+            for (String channelId : listenForFollow) {
+                HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(defaultAuthToken.getAccessToken(), null, channelId, null, MAX_LIMIT);
+                try {
+                    ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
+                    LocalDateTime lastFollowDate = null;
 
-                        if (currentChannelCache.getLastFollowCheck() != null) {
-                            List<Follow> followList = commandGetFollowers.execute().getFollows();
-                            EventChannel channel = null;
-                            if (!followList.isEmpty())
-                                channel = new EventChannel(channelId, followList.get(0).getToName());
-                            for (Follow follow : followList) {
-                                // update lastFollowDate
-                                if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
-                                    lastFollowDate = follow.getFollowedAt();
-                                }
+                    if (currentChannelCache.getLastFollowCheck() != null) {
+                        List<Follow> followList = commandGetFollowers.execute().getFollows();
+                        EventChannel channel = null;
+                        if (!followList.isEmpty())
+                            channel = new EventChannel(channelId, followList.get(0).getToName());
+                        for (Follow follow : followList) {
+                            // update lastFollowDate
+                            if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
+                                lastFollowDate = follow.getFollowedAt();
+                            }
 
-                                // is new follower?
-                                if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
-                                    // dispatch event
-                                    FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                    twitchClient.getEventManager().publish(event);
-                                }
+                            // is new follower?
+                            if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
+                                // dispatch event
+                                FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
+                                twitchClient.getEventManager().publish(event);
                             }
                         }
-
-                        if (currentChannelCache.getLastFollowCheck() == null) {
-                            // only happens if the user doesn't have any followers at all
-                            currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
-                        } else {
-                            // tracks the date of the latest follow to identify new ones later on
-                            currentChannelCache.setLastFollowCheck(lastFollowDate);
-                        }
-                    } catch (Exception ex) {
-                        if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                            log.trace(ex.getMessage(), ex);
-                        }
-
-                        log.error("Failed to check for Follow Events: " + ex.getMessage());
                     }
+
+                    if (currentChannelCache.getLastFollowCheck() == null) {
+                        // only happens if the user doesn't have any followers at all
+                        currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
+                    } else {
+                        // tracks the date of the latest follow to identify new ones later on
+                        currentChannelCache.setLastFollowCheck(lastFollowDate);
+                    }
+                } catch (Exception ex) {
+                    if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                        log.trace(ex.getMessage(), ex);
+                    }
+
+                    log.error("Failed to check for Follow Events: " + ex.getMessage());
                 }
             }
         };
