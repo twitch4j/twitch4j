@@ -30,7 +30,7 @@ public class Extension {
     private String version;
 
     /** Indicates whether the extension is configured such that it can be activated. */
-    private String canActivate;
+    private Boolean canActivate;
 
     /** Types for which the extension can be activated. Valid values: "component", "mobile", "panel", "overlay". */
     private List<String> type;
