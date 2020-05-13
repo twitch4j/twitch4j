@@ -254,20 +254,30 @@ public class TwitchClientHelper implements AutoCloseable {
         UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> {
-                // add to list
-                final boolean add = listenForGoLive.add(user.getId());
-                if (!add) {
-                    log.info("Channel {} already added for Stream Events", channelName);
-                } else {
-                    // initialize cache
-                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(), null, null, null, null));
-                }
-            });
+            users.getUsers().forEach(user -> enableStreamEventListener(user.getId(), user.getLogin()));
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel {} to stream event listener!", channelName);
         }
+    }
+
+    /**
+     * Enable StreamEvent Listener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @param channelName Channel Name
+     * @return true if the channel was added, false otherwise
+     */
+    public boolean enableStreamEventListener(String channelId, String channelName) {
+        // add to set
+        final boolean add = listenForGoLive.add(channelId);
+        if (!add) {
+            log.info("Channel {} already added for Stream Events", channelName);
+        } else {
+            // initialize cache
+            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+        }
+        return add;
     }
 
     /**
@@ -279,17 +289,25 @@ public class TwitchClientHelper implements AutoCloseable {
         UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> {
-                // remove from list
-                listenForGoLive.remove(user.getId());
-
-                // invalidate cache
-                channelInformation.invalidate(user.getId());
-            });
+            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from stream event listener!");
         }
+    }
+
+    /**
+     * Disable StreamEventListener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @return true if the channel was removed
+     */
+    public boolean disableStreamEventListenerForId(String channelId) {
+        // invalidate cache
+        channelInformation.invalidate(channelId);
+
+        // remove from set
+        return listenForGoLive.remove(channelId);
     }
 
     /**
@@ -301,20 +319,30 @@ public class TwitchClientHelper implements AutoCloseable {
         UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> {
-                // add to list
-                final boolean add = listenForFollow.add(user.getId());
-                if (!add) {
-                    log.info("Channel {} already added for Follow Events", channelName);
-                } else {
-                    // initialize cache
-                    channelInformation.get(user.getId(), s -> new ChannelCache(user.getLogin(), null, null, null, null));
-                }
-            });
+            users.getUsers().forEach(user -> enableFollowEventListener(user.getId(), user.getLogin()));
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
         }
+    }
+
+    /**
+     * Enable Follow Listener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @param channelName Channel Name
+     * @return true if the channel was added, false otherwise
+     */
+    public boolean enableFollowEventListener(String channelId, String channelName) {
+        // add to list
+        final boolean add = listenForFollow.add(channelId);
+        if (!add) {
+            log.info("Channel {} already added for Follow Events", channelName);
+        } else {
+            // initialize cache
+            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+        }
+        return add;
     }
 
     /**
@@ -326,17 +354,25 @@ public class TwitchClientHelper implements AutoCloseable {
         UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> {
-                // add to list
-                listenForFollow.remove(user.getId());
-
-                // invalidate cache
-                channelInformation.invalidate(user.getId());
-            });
+            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
             startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from follow listener!");
         }
+    }
+
+    /**
+     * Disable Follow Listener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @return true when a previously-tracked channel was removed, false otherwise
+     */
+    public boolean disableFollowEventListenerForId(String channelId) {
+        // invalidate cache
+        channelInformation.invalidate(channelId);
+
+        // remove from set
+        return listenForFollow.remove(channelId);
     }
 
     /**
