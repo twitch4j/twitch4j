@@ -255,10 +255,21 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> enableStreamEventListener(user.getId(), user.getLogin()));
-            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel {} to stream event listener!", channelName);
         }
+    }
+
+    /**
+     * Enable StreamEvent Listener for the given channel names
+     *
+     * @param channelNames the channel names to be added
+     */
+    public void enableStreamEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, channels).execute();
+            users.getUsers().forEach(user -> enableStreamEventListener(user.getId(), user.getLogin()));
+        });
     }
 
     /**
@@ -277,6 +288,7 @@ public class TwitchClientHelper implements AutoCloseable {
             // initialize cache
             channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
         }
+        startOrStopEventGenerationThread();
         return add;
     }
 
@@ -290,24 +302,38 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
-            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from stream event listener!");
         }
     }
 
     /**
+     * Disable StreamEvent Listener for the given channel names
+     *
+     * @param channelNames the channel names to be removed
+     */
+    public void disableStreamEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, channels).execute();
+            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
+        });
+    }
+
+    /**
      * Disable StreamEventListener, without invoking a Helix API call
      *
      * @param channelId Channel Id
-     * @return true if the channel was removed
+     * @return true if the channel was removed, false otherwise
      */
     public boolean disableStreamEventListenerForId(String channelId) {
+        // remove from set
+        boolean remove = listenForGoLive.remove(channelId);
+
         // invalidate cache
         channelInformation.invalidate(channelId);
 
-        // remove from set
-        return listenForGoLive.remove(channelId);
+        startOrStopEventGenerationThread();
+        return remove;
     }
 
     /**
@@ -320,10 +346,21 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> enableFollowEventListener(user.getId(), user.getLogin()));
-            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
         }
+    }
+
+    /**
+     * Enable Follow Listener for the given channel names
+     *
+     * @param channelNames the channel names to be added
+     */
+    public void enableFollowEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, channels).execute();
+            users.getUsers().forEach(user -> enableFollowEventListener(user.getId(), user.getLogin()));
+        });
     }
 
     /**
@@ -342,6 +379,7 @@ public class TwitchClientHelper implements AutoCloseable {
             // initialize cache
             channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
         }
+        startOrStopEventGenerationThread();
         return add;
     }
 
@@ -355,10 +393,21 @@ public class TwitchClientHelper implements AutoCloseable {
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
-            startOrStopEventGenerationThread();
         } else {
             log.error("Failed to remove channel " + channelName + " from follow listener!");
         }
+    }
+
+    /**
+     * Disable Follow Listener for the given channel names
+     *
+     * @param channelNames the channel names to be removed
+     */
+    public void disableFollowEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = twitchClient.getHelix().getUsers(defaultAuthToken.getAccessToken(), null, channels).execute();
+            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
+        });
     }
 
     /**
@@ -368,11 +417,14 @@ public class TwitchClientHelper implements AutoCloseable {
      * @return true when a previously-tracked channel was removed, false otherwise
      */
     public boolean disableFollowEventListenerForId(String channelId) {
+        // remove from set
+        boolean remove = listenForFollow.remove(channelId);
+
         // invalidate cache
         channelInformation.invalidate(channelId);
 
-        // remove from set
-        return listenForFollow.remove(channelId);
+        startOrStopEventGenerationThread();
+        return remove;
     }
 
     /**
@@ -383,8 +435,7 @@ public class TwitchClientHelper implements AutoCloseable {
         streamStatusEventFuture.updateAndGet(scheduledFuture -> {
             if (listenForGoLive.size() > 0) {
                 if (scheduledFuture == null)
-                    return executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate,
-                        TimeUnit.MILLISECONDS);
+                    return executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
                 return scheduledFuture;
             } else {
                 if (scheduledFuture != null) {
