@@ -16,16 +16,16 @@ public class ChannelPointsReward {
 	private String title;
 	private String prompt;
 	private long cost;
-	private boolean isUserInputRequired;
-	private boolean isSubOnly;
+	private Boolean isUserInputRequired;
+	private Boolean isSubOnly;
 	private Image image;
 	private Image defaultImage;
 	private String backgroundColor;
-	private boolean isEnabled;
-	private boolean isPaused;
-	private boolean isInStock;
+	private Boolean isEnabled;
+	private Boolean isPaused;
+	private Boolean isInStock;
 	private MaxPerStream maxPerStream;
-	private boolean shouldRedemptionsSkipRequestQueue;
+	private Boolean shouldRedemptionsSkipRequestQueue;
 
 	@Data
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -42,7 +42,7 @@ public class ChannelPointsReward {
 	@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MaxPerStream {
-		private boolean isEnabled;
+		private Boolean isEnabled;
 		private long maxPerStream;
 	}
 }
