@@ -19,14 +19,64 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatModerationAction {
 
+    /**
+     * The raw string for the class of moderation action. Can be "chat_channel_moderation" or "chat_login_moderation"
+     *
+     * @see ChatModerationAction#getModType()
+     */
     private String type;
+
+    /**
+     * The raw string for the specific moderation action. Examples include "timeout" or "slow"
+     *
+     * @see ChatModerationAction#getModerationAction()
+     */
     private String moderationAction;
+
+    /**
+     * The arguments passed to the moderation action command. Can be null.
+     *
+     * @see ChatModerationAction#getTargetedUserName()
+     * @see ChatModerationAction#getReason()
+     * @see ChatModerationAction#getDeletedMessage()
+     * @see ChatModerationAction#getTimeoutDuration()
+     * @see ChatModerationAction#getSlowDuration()
+     * @see ChatModerationAction#getFollowersDuration()
+     */
     private List<String> args;
+
+    /**
+     * The login for the account that triggered the moderation action
+     */
     private String createdBy;
+
+    /**
+     * The user id for the account that triggered the moderation action
+     */
     private String createdByUserId;
+
+    /**
+     * The relevant message id, if the action was a message deletion
+     */
     private String msgId;
+
+    /**
+     * The user id for the targeted account by the moderation action (e.g. the user id that was banned)
+     */
     private String targetUserId;
+
+    /**
+     * The user name for the targeted account by the moderation action (e.g. the user login that was banned)
+     * <p>
+     * Note: While this field is included in the pubsub response, the API appears to never populate it with a non-empty string
+     */
     private String targetUserLogin;
+
+    /**
+     * Whether the moderation action was triggered by AutoMod
+     *
+     * @see <a href="https://help.twitch.tv/s/article/setting-up-moderation-for-your-twitch-channel?language=en_US#automod">Twitch Docs</a>
+     */
     private Boolean fromAutomod;
 
     /**
