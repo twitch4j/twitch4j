@@ -40,7 +40,7 @@ public class ChatModerationAction {
      * @return the specific moderation action that took place, in a convenient enum form
      */
     public ModerationAction getModAction() {
-        return ModerationAction.mappings.get(moderationAction);
+        return ModerationAction.MAPPINGS.get(moderationAction);
     }
 
     /**
@@ -137,36 +137,99 @@ public class ChatModerationAction {
     }
 
     public enum ModerationAction {
+        /**
+         * User was banned
+         */
         BAN,
+        /**
+         * User was unbanned
+         */
         UNBAN,
+        /**
+         * User was timed out
+         */
         TIMEOUT,
+        /**
+         * User time out was removed
+         */
         UNTIMEOUT,
+        /**
+         * Chat message was deleted
+         */
         DELETE,
+        /**
+         * Chat slow mode was enabled
+         */
         SLOW,
+        /**
+         * Chat slow mode was disabled
+         */
         SLOW_OFF,
+        /**
+         * Chat followers only mode was enabled
+         */
         FOLLOWERS,
+        /**
+         * Chat followers only mode was disabled
+         */
         FOLLOWERS_OFF,
+        /**
+         * Unique chat mode was enabled
+         */
         R9K_BETA,
+        /**
+         * Unique chat mode was disabled
+         */
         R9K_BETA_OFF,
+        /**
+         * Emote only chat was enabled
+         */
         EMOTE_ONLY,
+        /**
+         * Emote only chat was disabled
+         */
         EMOTE_ONLY_OFF,
+        /**
+         * Subscribers-only chat was enabled
+         */
         SUBSCRIBERS,
+        /**
+         * Subscribers-only chat was disabled
+         */
         SUBSCRIBERS_OFF,
+        /**
+         * User was given VIP status
+         */
         VIP,
+        /**
+         * User VIP status was removed
+         */
         UNVIP,
+        /**
+         * User was modded
+         */
         MOD,
+        /**
+         * User was unmodded
+         */
         UNMOD,
+        /**
+         * Another channel was hosted
+         */
         HOST,
+        /**
+         * Channel exited host mode
+         */
         UNHOST;
 
         @Getter
         private final String twitchString;
 
         ModerationAction() {
-            this.twitchString = this.name().toLowerCase().replace('_', ' ');
+            this.twitchString = this.name().toLowerCase().replace("_", "");
         }
 
-        private static final Map<String, ModerationAction> mappings = Arrays.stream(ModerationAction.values())
+        private static final Map<String, ModerationAction> MAPPINGS = Arrays.stream(ModerationAction.values())
             .collect(Collectors.toMap(ModerationAction::getTwitchString, Function.identity()));
     }
 }
