@@ -64,7 +64,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	/**
 	 * Client Permissions
 	 */
-	private final Set<CommandPermission> clientPermissions = new HashSet<>();
+	private final Set<CommandPermission> clientPermissions = EnumSet.noneOf(CommandPermission.class);
 
 	/**
 	 * RAW Message
