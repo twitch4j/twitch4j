@@ -272,13 +272,49 @@ public class ChatModerationAction {
         /**
          * Channel exited host mode
          */
-        UNHOST;
+        UNHOST,
+        /**
+         * The message was flagged by AutoMod for manual review
+         */
+        AUTOMOD_REJECTED("automod_rejected"),
+        /**
+         * Moderator added a permitted term to AutoMod
+         */
+        ADD_PERMITTED_TERM("add_permitted_term"),
+        /**
+         * Moderator added a blocked term to AutoMod
+         */
+        ADD_BLOCKED_TERM("add_blocked_term"),
+        /**
+         * Moderator deleted a permitted term from AutoMod
+         */
+        DELETE_PERMITTED_TERM("delete_permitted_term"),
+        /**
+         * Moderator deleted a blocked term from AutoMod
+         */
+        DELETE_BLOCKED_TERM("delete_blocked_term"),
+        /**
+         * Moderator approved a message that was flagged by AutoMod
+         */
+        APPROVED_AUTOMOD_MESSAGE("approved_automod_message"),
+        /**
+         * Moderator denied a message that was flagged by AutoMod
+         */
+        DENIED_AUTOMOD_MESSAGE("denied_automod_message"),
+        /**
+         * AutoMod settings were modified
+         */
+        MODIFIED_AUTOMOD_PROPERTIES("modified_automod_properties");
 
         @Getter
         private final String twitchString;
 
         ModerationAction() {
             this.twitchString = this.name().toLowerCase().replace("_", "");
+        }
+
+        ModerationAction(String twitchString) {
+            this.twitchString = twitchString;
         }
 
         private static final Map<String, ModerationAction> MAPPINGS = Arrays.stream(ModerationAction.values())
