@@ -262,12 +262,13 @@ public class TwitchPubSub implements AutoCloseable {
                             String topic = message.getData().getTopic();
                             String type = message.getData().getMessage().getType();
                             JsonNode msgData = message.getData().getMessage().getMessageData();
+                            String rawMessage = message.getData().getMessage().getRawMessage();
 
                             // Handle Messages
                             if (topic.startsWith("channel-bits-events-v2")) {
                                 eventManager.publish(new ChannelBitsEvent(TypeConvert.convertValue(msgData, ChannelBitsData.class)));
                             } else if (topic.startsWith("channel-bits-badge-unlocks")) {
-                                eventManager.publish(new ChannelBitsBadgeUnlockEvent(TypeConvert.convertValue(msgData, BitsBadgeData.class)));
+                                eventManager.publish(new ChannelBitsBadgeUnlockEvent(TypeConvert.jsonToObject(rawMessage, BitsBadgeData.class)));
                             } else if (topic.startsWith("channel-subscribe-events-v1")) {
                                 // todo
                             } else if (topic.startsWith("channel-commerce-events-v1")) {
