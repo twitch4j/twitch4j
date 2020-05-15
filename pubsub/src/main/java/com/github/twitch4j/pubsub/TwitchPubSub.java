@@ -16,12 +16,14 @@ import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.CommerceData;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
+import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
 import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.neovisionaries.ws.client.WebSocket;
@@ -272,7 +274,7 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("channel-bits-badge-unlocks")) {
                                 eventManager.publish(new ChannelBitsBadgeUnlockEvent(TypeConvert.jsonToObject(rawMessage, BitsBadgeData.class)));
                             } else if (topic.startsWith("channel-subscribe-events-v1")) {
-                                // todo
+                                eventManager.publish(new ChannelSubscribeEvent(TypeConvert.jsonToObject(rawMessage, SubscriptionData.class)));
                             } else if (topic.startsWith("channel-commerce-events-v1")) {
                                 eventManager.publish(new ChannelCommerceEvent(TypeConvert.jsonToObject(rawMessage, CommerceData.class)));
                             } else if (topic.startsWith("whispers") && (type.equals("whisper_sent") || type.equals("whisper_received"))) {

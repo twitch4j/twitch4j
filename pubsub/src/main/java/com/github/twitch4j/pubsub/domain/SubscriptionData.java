@@ -8,15 +8,22 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CommerceData {
+public class SubscriptionData {
     private String userName;
     private String displayName;
     private String channelName;
     private String userId;
     private String channelId;
     private String time;
-    private String itemImageUrl;
-    private String itemDescription;
-    private Boolean supportsChannel;
-    private CommerceMessage purchaseMessage;
+    private String subPlan; // "Prime"/"1000"/"2000"/"3000"
+    private String subPlanName;
+    @Deprecated
+    private Integer months;
+    private Integer cumulativeMonths;
+    private Integer streakMonths;
+    private String context; // "sub"/"resub"/"subgift"/"anonsubgift"
+    private CommerceMessage subMessage;
+    private String recipientId;
+    private String recipientUserName;
+    private String recipientDisplayName;
 }
