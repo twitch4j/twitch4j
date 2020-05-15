@@ -303,7 +303,9 @@ public class TwitchPubSub implements AutoCloseable {
                                 }
 
                             } else if (topic.startsWith("chat_moderator_actions")) {
-                                eventManager.publish(new ChatModerationEvent(TypeConvert.convertValue(msgData, ChatModerationAction.class)));
+                                String channelId = topic.substring(topic.lastIndexOf('.') + 1);
+                                ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
+                                eventManager.publish(new ChatModerationEvent(channelId, data));
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }

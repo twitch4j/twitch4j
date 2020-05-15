@@ -10,6 +10,11 @@ import lombok.EqualsAndHashCode;
 public class ChatModerationEvent extends TwitchEvent {
 
     /**
+     * The ID for the channel where the moderation action took place
+     */
+    private final String channelId;
+
+    /**
      * Data regarding the moderation action that took place
      */
     private final ChatModerationAction data;

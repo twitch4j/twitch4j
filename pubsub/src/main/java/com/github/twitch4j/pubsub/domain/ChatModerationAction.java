@@ -79,19 +79,21 @@ public class ChatModerationAction {
      */
     private Boolean fromAutomod;
 
-    /**
-     * @return the specific moderation type that took place, in a convenient enum form
+    /*
+     * Library-generated helper fields/methods
      */
-    public ModerationType getModType() {
-        return ModerationType.parse(type);
-    }
 
     /**
-     * @return the specific moderation action that took place, in a convenient enum form
+     * The specific moderation type that took place, in a convenient enum form
      */
-    public ModerationAction getModAction() {
-        return ModerationAction.MAPPINGS.get(moderationAction);
-    }
+    @Getter(lazy = true)
+    private final ModerationType modType = ModerationType.parse(type);
+
+    /**
+     * The specific moderation action that took place, in a convenient enum form
+     */
+    @Getter(lazy = true)
+    private final ModerationAction modAction = ModerationAction.MAPPINGS.get(moderationAction);
 
     /**
      * @return optional wrapper around the username that was specified in a ban, unban, timeout, untimeout, vip,
@@ -110,7 +112,7 @@ public class ChatModerationAction {
     }
 
     /**
-     * @return the reason associated with the ban or timeout (or an empty string if none was specified)
+     * @return optional wrapper around the reason associated with the ban or timeout (or an empty string if none was specified)
      */
     public Optional<String> getReason() {
         switch (getModAction()) {
