@@ -274,6 +274,14 @@ public class ChatModerationAction {
          */
         UNHOST,
         /**
+         * A raid on another channel was initiated
+         */
+        RAID,
+        /**
+         * Channel exited raid mode
+         */
+        UNRAID,
+        /**
          * The message was flagged by AutoMod for manual review
          */
         AUTOMOD_REJECTED("automod_rejected"),
