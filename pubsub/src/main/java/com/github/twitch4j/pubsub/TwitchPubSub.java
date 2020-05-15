@@ -310,6 +310,12 @@ public class TwitchPubSub implements AutoCloseable {
                                 switch(type) {
                                     case "reward-redeemed": eventManager.publish(new RewardRedeemedEvent(timestamp, redemption)); break;
                                     case "redemption-status-update": eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, redemption)); break;
+                                    case "custom-reward-created":
+                                        // todo
+                                    case "custom-reward-updated":
+                                        // todo
+                                    case "custom-reward-deleted":
+                                        // todo
                                     default: eventManager.publish(new ChannelPointsRedemptionEvent(timestamp, redemption));
                                 }
 
@@ -565,6 +571,98 @@ public class TwitchPubSub implements AutoCloseable {
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
         request.getData().put("topics", Collections.singletonList("community-points-channel-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    /*
+     * Undocumented topics - Use at your own risk
+     */
+
+    @Deprecated
+    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("ads." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForDashboardActivityFeedEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("dashboard-activity-feed." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForUserChannelPointsEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("community-points-user-v1." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForChannelDropEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-drop-events." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-WEEK"));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("leaderboard-events-v1.sub-gift-sent-" + channelId + "-WEEK"));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForChannelSubGiftsEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-sub-gifts-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForRaidEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("raid." + channelId));
 
         return listenOnTopic(request);
     }
