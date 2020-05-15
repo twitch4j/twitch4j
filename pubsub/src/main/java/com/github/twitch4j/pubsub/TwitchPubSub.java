@@ -10,12 +10,14 @@ import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
+import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
@@ -264,6 +266,8 @@ public class TwitchPubSub implements AutoCloseable {
                             // Handle Messages
                             if (topic.startsWith("channel-bits-events-v2")) {
                                 eventManager.publish(new ChannelBitsEvent(TypeConvert.convertValue(msgData, ChannelBitsData.class)));
+                            } else if (topic.startsWith("channel-bits-badge-unlocks")) {
+                                eventManager.publish(new ChannelBitsBadgeUnlockEvent(TypeConvert.convertValue(msgData, BitsBadgeData.class)));
                             } else if (topic.startsWith("channel-subscribe-events-v1")) {
                                 // todo
                             } else if (topic.startsWith("channel-commerce-events-v1")) {
@@ -420,6 +424,23 @@ public class TwitchPubSub implements AutoCloseable {
         unlistenRequest.setNonce(request.getNonce());
         unlistenRequest.setData(request.getData());
         queueRequest(unlistenRequest);
+    }
+
+    /**
+     * Event Listener: User earned a new Bits badge and shared the notification with chat
+     *
+     * @param credential Credential (for target user id, scope: bits:read)
+     * @param userId Target User Id
+     * @return PubSubSubscription
+     */
+    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-bits-badge-unlocks." + userId));
+
+        return listenOnTopic(request);
     }
 
     /**
