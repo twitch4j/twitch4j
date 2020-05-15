@@ -508,6 +508,18 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     /**
+     * Event Listener: A moderator performs an action in the channel
+     *
+     * @param credential Credential (for userId, scope: channel:moderate)
+     * @param userId The user id associated with the credential
+     * @param roomId The user id associated with the target channel
+     * @return PubSubSubscription
+     */
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String roomId) {
+        return listenForModerationEvents(credential, userId + "." + roomId);
+    }
+
+    /**
      * Event Listener: Anyone makes a channel points redemption on a channel.
      *
      * @param credential Credential (any)
