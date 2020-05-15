@@ -569,6 +569,116 @@ public class TwitchPubSub implements AutoCloseable {
         return listenOnTopic(request);
     }
 
+    @Deprecated
+    public PubSubSubscription listenForBroadcastSettingUpdateEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("broadcast-settings-update." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForStreamChatRoomEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("stream-chat-room-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForChannelChatroomEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("chatrooms-channel-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForUserChatroomEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("chatrooms-user-v1." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForUserBitsUpdateEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("user-bits-updates-v1." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForUserImageUpdateEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("user-image-update." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("following." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForFriendshipEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("friendship." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("presence." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("video-playback." + userId));
+
+        return listenOnTopic(request);
+    }
+
     /**
      * Close
      */
