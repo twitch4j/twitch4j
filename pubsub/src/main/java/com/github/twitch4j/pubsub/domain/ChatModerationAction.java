@@ -97,7 +97,7 @@ public class ChatModerationAction {
 
     /**
      * @return optional wrapper around the username that was specified in a ban, unban, timeout, untimeout, vip,
-     * unvip, mod, unmod, host, or delete message command
+     * unvip, mod, unmod, host, raid, or delete message command
      */
     public Optional<String> getTargetedUserName() {
         final ModerationAction action = getModAction();
@@ -105,7 +105,8 @@ public class ChatModerationAction {
             || action == ModerationAction.TIMEOUT || action == ModerationAction.UNTIMEOUT
             || action == ModerationAction.DELETE || action == ModerationAction.HOST
             || action == ModerationAction.VIP || action == ModerationAction.UNVIP
-            || action == ModerationAction.MOD || action == ModerationAction.UNMOD))
+            || action == ModerationAction.MOD || action == ModerationAction.UNMOD
+            || action == ModerationAction.RAID))
             return Optional.of(args.get(0));
 
         return Optional.ofNullable(this.targetUserLogin).filter(s -> !s.isEmpty());
