@@ -570,6 +570,28 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
+    public PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-ext-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForHypeTrainEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("hype-train-events-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
     public PubSubSubscription listenForBroadcastSettingUpdateEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -669,12 +691,12 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
-    public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Collections.singletonList("video-playback." + userId));
+        request.getData().put("topics", Collections.singletonList("video-playback." + channelId));
 
         return listenOnTopic(request);
     }
