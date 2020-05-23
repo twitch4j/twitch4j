@@ -1,0 +1,9 @@
+# project
+PROJECT_TYPE=java
+
+# documentation
+DOCUMENTATION_TYPE=hugo
+HUGO_SOURCE=docs
+
+# publish
+PUBLISH_TYPE=bintray

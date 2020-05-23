@@ -61,3 +61,7 @@ src/*/java/twitch4j/example/*
 
 # Hugo
 **/public/*
+
+# Pipeline
+dist/*
+tmp/*

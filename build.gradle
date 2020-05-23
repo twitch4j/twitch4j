@@ -1,7 +1,7 @@
 // Plugins
 plugins {
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'com.jfrog.bintray' version '1.8.4'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'com.jfrog.bintray' version '1.8.5'
     id 'com.jfrog.artifactory' version '4.13.0'
 }
 
@@ -114,16 +114,16 @@ subprojects {
 			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
 			// Apache Commons
-			compile group: 'org.apache.commons', name: 'commons-lang3'
-			compile group: 'commons-io', name: 'commons-io'
+			api group: 'org.apache.commons', name: 'commons-lang3'
+			api group: 'commons-io', name: 'commons-io'
 
 			// Logging
-			compile group: 'org.slf4j', name: 'slf4j-api'
-			testCompile group: 'ch.qos.logback', name: 'logback-classic'
+			api group: 'org.slf4j', name: 'slf4j-api'
+			testImplementation group: 'ch.qos.logback', name: 'logback-classic'
 
 			// Test
-			testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api'
-			testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
+			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
 		}
 	}
 }
