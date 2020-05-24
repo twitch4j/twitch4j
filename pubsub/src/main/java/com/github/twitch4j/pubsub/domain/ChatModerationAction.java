@@ -84,16 +84,16 @@ public class ChatModerationAction {
      */
 
     /**
-     * The specific moderation type that took place, in a convenient enum form
-     */
-    @Getter(lazy = true)
-    private final ModerationType modType = ModerationType.parse(type);
-
-    /**
      * The specific moderation action that took place, in a convenient enum form
      */
     @Getter(lazy = true)
     private final ModerationAction modAction = ModerationAction.MAPPINGS.get(moderationAction);
+
+    /**
+     * The specific moderation type that took place, in a convenient enum form
+     */
+    @Getter(lazy = true)
+    private final ModerationType modType = ModerationType.parse(type, modAction);
 
     /**
      * @return optional wrapper around the username that was specified in a ban, unban, timeout, untimeout, vip,
@@ -178,11 +178,16 @@ public class ChatModerationAction {
         CHANNEL,
         LOGIN;
 
-        private static ModerationType parse(String twitchString) {
+        private static ModerationType parse(String twitchString, ModerationAction modAction) {
             if ("chat_channel_moderation".equals(twitchString))
                 return CHANNEL;
 
             if ("chat_login_moderation".equals(twitchString))
+                return LOGIN;
+
+            // API inconsistency documented here https://github.com/twitchdev/issues/issues/99
+            if (modAction == ModerationAction.MOD || modAction == ModerationAction.UNMOD
+                || modAction == ModerationAction.VIP || modAction == ModerationAction.UNVIP)
                 return LOGIN;
 
             return null; // should not occur
