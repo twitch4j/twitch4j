@@ -450,6 +450,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone cheers on a specified channel.
+     *
      * @param credential Credential (for target user id, scope: bits:read)
      * @param userId Target User Id
      * @return PubSubSubscription
@@ -466,6 +467,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
+     *
      * @param credential Credential (for targetUserId, scope: channel_subscriptions)
      * @param userId Target User Id
      * @return PubSubSubscription
@@ -482,6 +484,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone makes a purchase on a channel.
+     *
      * @param credential Credential (any)
      * @param userId Target User Id
      * @return PubSubSubscription
@@ -499,6 +502,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone whispers the specified user.
+     *
      * @param credential Credential (for targetUserId, scope: whispers:read)
      * @param userId Target User Id
      * @return PubSubSubscription
