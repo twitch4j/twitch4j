@@ -1,8 +1,7 @@
 // Plugins
 plugins {
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'com.jfrog.bintray' version '1.8.5'
-    id 'com.jfrog.artifactory' version '4.13.0'
+    id 'com.jfrog.bintray' version '1.8.5' apply false
+    id 'com.jfrog.artifactory' version '4.13.0' apply false
 }
 
 // Artifact Info
@@ -34,7 +33,6 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'maven-publish'
-    apply plugin: 'io.spring.dependency-management'
 	apply plugin: 'com.jfrog.bintray'
 	apply plugin: 'com.jfrog.artifactory'
 
@@ -42,62 +40,55 @@ subprojects {
     sourceCompatibility = 1.8
 
     // Dependency Management for Subprojects
-    dependencyManagement {
-        dependencies {
-            // Logging
-            dependency group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-            dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+	dependencies {
+		constraints {
+			// Logging
+			api group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+			api group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
-            // Apache Commons
-            dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-            dependency group: 'commons-io', name: 'commons-io', version: '2.6'
-			dependency group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
+			// Apache Commons
+			api group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+			api group: 'commons-io', name: 'commons-io', version: '2.6'
+			api group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
 			// Event Dispatcher
- 			dependency group: 'com.github.philippheuer.events4j', name: 'events4j-core', version: '0.7.1'
-			dependency group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.7.1'
+			api group: 'com.github.philippheuer.events4j', name: 'events4j-core', version: '0.7.1'
+			api group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.7.1'
 
 			// Credential Manager
-			dependency group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
+			api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
 
 			// HTTP Client
-            dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.6.0'
+			api group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.6.0'
 
 			// Rate Limiting
-			dependency group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
+			api group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
 
 			// Caching
-			dependency group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
+			api group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
 
 			// Http Client
-            dependency group: 'io.github.openfeign', name: 'feign-okhttp', version: '11.0'
-            dependency group: 'io.github.openfeign', name: 'feign-jackson', version: '11.0'
-            dependency group: 'io.github.openfeign', name: 'feign-slf4j', version: '11.0'
-			dependency group: 'io.github.openfeign', name: 'feign-hystrix', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-okhttp', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-jackson', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-slf4j', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-hystrix', version: '11.0'
 
 			// Hystrix
-			dependency group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
+			api group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
-			dependency group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.0'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.11.0'
-			dependency group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.0'
+			api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
+			api group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.0'
+			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.11.0'
+			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.0'
 
 			// WebSocket
-			dependency group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
+			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
 
 			// Annotations
-			dependency group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
-
-            // Testing
-            dependency group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
-			dependency group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.0'
-
-            // Lombok
-            dependency group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-        }
-    }
+			api group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
+		}
+	}
 
 	// Source encoding
 	tasks.withType(JavaCompile) {
@@ -108,10 +99,10 @@ subprojects {
 	plugins.withType(JavaPlugin) {
 		dependencies {
 			// Annotation processors
-			compileOnly group: 'org.projectlombok', name: 'lombok'
-			annotationProcessor group: 'org.projectlombok', name: 'lombok'
-			testCompileOnly group: 'org.projectlombok', name: 'lombok'
-			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+			compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
 
 			// Apache Commons
 			api group: 'org.apache.commons', name: 'commons-lang3'
@@ -122,8 +113,8 @@ subprojects {
 			testImplementation group: 'ch.qos.logback', name: 'logback-classic'
 
 			// Test
-			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api'
-			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
+			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
+			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.0'
 		}
 	}
 }

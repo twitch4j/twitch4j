@@ -1,14 +1,14 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Credential Manager
-	compile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
+	api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager'
 	//testCompile group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager-ews'
 
 	// Http Client
-	compile group: 'com.squareup.okhttp3', name: 'okhttp'
+	api group: 'com.squareup.okhttp3', name: 'okhttp'
 
 	// Jackson
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+	api group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 }
 
 // Artifact Info

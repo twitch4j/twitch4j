@@ -15,15 +15,15 @@ apply plugin: 'com.apollographql.android'
 // Dependencies
 dependencies {
 	// GraphQL
-	compile group: 'com.apollographql.apollo', name: 'apollo-runtime', version: '1.2.2'
-	compile group: 'org.jetbrains', name: 'annotations'
+	api group: 'com.apollographql.apollo', name: 'apollo-runtime', version: '1.2.2'
+	api group: 'org.jetbrains', name: 'annotations'
 
 	// Hystrix
-	compile group: 'com.netflix.hystrix', name: 'hystrix-core'
+	api group: 'com.netflix.hystrix', name: 'hystrix-core'
 
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-common')
-	compile project(':' + rootProject.name + '-auth')
+	api project(':' + rootProject.name + '-common')
+	api project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info
