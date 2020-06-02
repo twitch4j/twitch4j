@@ -14,6 +14,7 @@ import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.CommerceData;
+import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
@@ -24,6 +25,7 @@ import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
+import com.github.twitch4j.pubsub.events.ChatModerationEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.neovisionaries.ws.client.WebSocket;
@@ -311,6 +313,10 @@ public class TwitchPubSub implements AutoCloseable {
                                     default: eventManager.publish(new ChannelPointsRedemptionEvent(timestamp, redemption));
                                 }
 
+                            } else if (topic.startsWith("chat_moderator_actions")) {
+                                String channelId = topic.substring(topic.lastIndexOf('.') + 1);
+                                ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
+                                eventManager.publish(new ChatModerationEvent(channelId, data));
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -515,6 +521,35 @@ public class TwitchPubSub implements AutoCloseable {
         request.getData().put("topics", Collections.singletonList("whispers." + userId));
 
         return listenOnTopic(request);
+    }
+
+    /**
+     * Event Listener: A moderator performs an action in the channel
+     *
+     * @param credential Credential (for channelId, scope: channel:moderate)
+     * @param channelId Target Channel Id
+     * @return PubSubSubscription
+     */
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId) {
+        final PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("chat_moderator_actions." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    /**
+     * Event Listener: A moderator performs an action in the channel
+     *
+     * @param credential Credential (for userId, scope: channel:moderate)
+     * @param userId The user id associated with the credential
+     * @param roomId The user id associated with the target channel
+     * @return PubSubSubscription
+     */
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String roomId) {
+        return listenForModerationEvents(credential, userId + "." + roomId);
     }
 
     /**

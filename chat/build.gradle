@@ -1,14 +1,14 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// WebSocket
-	compile group: 'com.neovisionaries', name: 'nv-websocket-client'
+	implementation group: 'com.neovisionaries', name: 'nv-websocket-client'
 
 	// Rate Limiting
-	compile group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core'
+	api group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core'
 
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-common')
-	compile project(':' + rootProject.name + '-auth')
+	api project(':' + rootProject.name + '-common')
+	api project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info

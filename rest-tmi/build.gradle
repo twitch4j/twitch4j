@@ -5,14 +5,14 @@ dependencies {
 	api group: 'io.github.openfeign', name: 'feign-jackson'
 	api group: 'io.github.openfeign', name: 'feign-slf4j'
 	api group: 'io.github.openfeign', name: 'feign-hystrix'
-	api group: 'commons-configuration', name: 'commons-configuration'
+	implementation group: 'commons-configuration', name: 'commons-configuration'
 
 	// Jackson (JSON)
 	api group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
 
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-common')
-	compile project(':' + rootProject.name + '-auth')
+	api project(':' + rootProject.name + '-common')
+	api project(':' + rootProject.name + '-auth')
 }
 
 // Artifact Info

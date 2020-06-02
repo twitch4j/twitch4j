@@ -1,8 +1,9 @@
-baseURL = "http://github.com/twitch4j"
+baseURL = ""
 languageCode = "en-us"
 DefaultContentLanguage = "en"
 defaultContentLanguageInSubdir = false
 enableMissingTranslationPlaceholders = false
+relativeurls = true
 
 theme = "docdock"
 
@@ -11,7 +12,7 @@ pygmentsStyle = "monokailight"
 
 [Languages]
 [Languages.en]
-title = "Twitch4J - Official Documentation"
+title = "Twitch4J - Documentation"
 weight = 1
 languageName = "English"
 

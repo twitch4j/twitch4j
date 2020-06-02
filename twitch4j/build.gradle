@@ -1,16 +1,16 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Twitch4J Modules
-	compile project(':' + rootProject.name + '-common')
-	compile project(':' + rootProject.name + '-chat')
-	compile project(':' + rootProject.name + '-rest-helix')
-	compile project(':' + rootProject.name + '-rest-kraken')
-	compile project(':' + rootProject.name + '-rest-tmi')
-	compile project(':' + rootProject.name + '-pubsub')
-	compile project(':' + rootProject.name + '-graphql')
+	api project(':' + rootProject.name + '-common')
+	api project(':' + rootProject.name + '-chat')
+	api project(':' + rootProject.name + '-rest-helix')
+	api project(':' + rootProject.name + '-rest-kraken')
+	api project(':' + rootProject.name + '-rest-tmi')
+	api project(':' + rootProject.name + '-pubsub')
+	api project(':' + rootProject.name + '-graphql')
 
 	// Cache
-	compile group: 'com.github.ben-manes.caffeine', name: 'caffeine'
+	api group: 'com.github.ben-manes.caffeine', name: 'caffeine'
 }
 
 // Artifact Info
