@@ -23,6 +23,7 @@ public class UserBanEvent extends AbstractChannelEvent {
 	/**
 	 * Reason for Punishment
 	 */
+	@Deprecated
 	private String reason;
 
 	/**
