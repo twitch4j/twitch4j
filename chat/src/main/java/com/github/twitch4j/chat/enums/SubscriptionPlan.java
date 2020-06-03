@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 /**
  * Enumeric Twitch Subscription Plan
  */
+@Deprecated
 @RequiredArgsConstructor
 public enum SubscriptionPlan {
 	NONE("none"),
