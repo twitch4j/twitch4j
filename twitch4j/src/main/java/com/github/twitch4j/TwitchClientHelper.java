@@ -216,8 +216,12 @@ public class TwitchClientHelper implements AutoCloseable {
                     if (currentChannelCache.getLastFollowCheck() != null) {
                         List<Follow> followList = commandGetFollowers.execute().getFollows();
                         EventChannel channel = null;
-                        if (!followList.isEmpty())
-                            channel = new EventChannel(channelId, followList.get(0).getToName());
+                        if (!followList.isEmpty()) {
+                            // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                            if (currentChannelCache.getUserName() == null)
+                                currentChannelCache.setUserName(followList.get(0).getToName());
+                            channel = new EventChannel(channelId, currentChannelCache.getUserName());
+                        }
                         for (Follow follow : followList) {
                             // update lastFollowDate
                             if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
