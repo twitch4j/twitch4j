@@ -5,14 +5,14 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
-import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
-import com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent;
-import com.github.twitch4j.common.events.channel.ChannelGoLiveEvent;
-import com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.domain.ChannelCache;
+import com.github.twitch4j.events.ChannelChangeGameEvent;
+import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelGoLiveEvent;
+import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
 import lombok.Setter;
@@ -128,7 +128,8 @@ public class TwitchClientHelper implements AutoCloseable {
                             return;
 
                         ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null, null, null, null, null));
-                        if (stream != null)
+                        // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
+                        if (stream != null && currentChannelCache.getUserName() == null)
                             currentChannelCache.setUserName(stream.getUserName());
                         final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
 
@@ -172,23 +173,27 @@ public class TwitchClientHelper implements AutoCloseable {
                         // dispatch events
                         // - go live event
                         if (dispatchGoLiveEvent) {
-                            Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelGoLiveEvent(channel, stream));
                         }
                         // - go offline event
                         if (dispatchGoOfflineEvent) {
-                            Event event = new ChannelGoOfflineEvent(channel);
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent(channel);
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelGoOfflineEvent(channel));
                         }
                         // - title changed event
                         if (dispatchTitleChangedEvent) {
-                            Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelChangeTitleEvent(channel, stream));
                         }
                         // - game changed event
                         if (dispatchGameChangedEvent) {
-                            Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelChangeGameEvent(channel, stream));
                         }
                     });
                 } catch (Exception ex) {
