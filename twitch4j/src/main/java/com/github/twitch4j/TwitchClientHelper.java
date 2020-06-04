@@ -16,6 +16,7 @@ import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -106,7 +107,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * Constructor
      *
      * @param twitchClient TwitchClient
-     * @param executor ScheduledThreadPoolExecutor
+     * @param executor     ScheduledThreadPoolExecutor
      */
     public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor) {
         this.twitchClient = twitchClient;
@@ -275,7 +276,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Enable StreamEvent Listener, without invoking a Helix API call
      *
-     * @param channelId Channel Id
+     * @param channelId   Channel Id
      * @param channelName Channel Name
      * @return true if the channel was added, false otherwise
      */
@@ -366,7 +367,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Enable Follow Listener, without invoking a Helix API call
      *
-     * @param channelId Channel Id
+     * @param channelId   Channel Id
      * @param channelName Channel Name
      * @return true if the channel was added, false otherwise
      */
@@ -430,33 +431,27 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Start or quit the thread, depending on usage
      */
+    @Synchronized
     private void startOrStopEventGenerationThread() {
         // stream status event thread
-        streamStatusEventFuture.updateAndGet(scheduledFuture -> {
-            if (listenForGoLive.size() > 0) {
-                if (scheduledFuture == null)
-                    return executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
-                return scheduledFuture;
-            } else {
-                if (scheduledFuture != null) {
-                    scheduledFuture.cancel(false);
-                }
-                return null;
-            }
-        });
+        if (listenForGoLive.size() > 0) {
+            if (streamStatusEventFuture.get() == null)
+                streamStatusEventFuture.set(executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
+        } else {
+            final ScheduledFuture<?> scheduledFuture = streamStatusEventFuture.getAndSet(null);
+            if (scheduledFuture != null)
+                scheduledFuture.cancel(false);
+        }
 
         // follower event thread
-        followerEventFuture.updateAndGet(scheduledFuture -> {
-            if (listenForFollow.size() > 0) {
-                if (scheduledFuture == null)
-                    return executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
-                return scheduledFuture;
-            } else {
-                if (scheduledFuture != null)
-                    scheduledFuture.cancel(false);
-                return null;
-            }
-        });
+        if (listenForFollow.size() > 0) {
+            if (followerEventFuture.get() == null)
+                followerEventFuture.set(executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
+        } else {
+            final ScheduledFuture<?> scheduledFuture = followerEventFuture.getAndSet(null);
+            if (scheduledFuture != null)
+                scheduledFuture.cancel(false);
+        }
     }
 
     /**
@@ -470,6 +465,9 @@ public class TwitchClientHelper implements AutoCloseable {
         final ScheduledFuture<?> followerFuture = this.followerEventFuture.get();
         if (followerFuture != null)
             followerFuture.cancel(false);
+
+        streamStatusEventFuture.lazySet(null);
+        followerEventFuture.lazySet(null);
     }
 
 }
