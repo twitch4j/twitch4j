@@ -307,16 +307,37 @@ public class TwitchPubSub implements AutoCloseable {
                                 );
                                 ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
 
-                                switch(type) {
-                                    case "reward-redeemed": eventManager.publish(new RewardRedeemedEvent(timestamp, redemption)); break;
-                                    case "redemption-status-update": eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, redemption)); break;
+                                switch (type) {
+                                    case "reward-redeemed":
+                                        eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
+                                        break;
+                                    case "redemption-status-update":
+                                        eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, redemption));
+                                        break;
                                     case "custom-reward-created":
                                         // todo
                                     case "custom-reward-updated":
                                         // todo
                                     case "custom-reward-deleted":
                                         // todo
-                                    default: eventManager.publish(new ChannelPointsRedemptionEvent(timestamp, redemption));
+                                    case "update-redemption-statuses-progress":
+                                        // todo
+                                    case "update-redemption-statuses-finished":
+                                        // todo
+                                    default:
+                                        eventManager.publish(new ChannelPointsRedemptionEvent(timestamp, redemption));
+                                }
+
+                            } else if (topic.startsWith("raid")) {
+                                switch (type) {
+                                    case "raid_go_v2":
+                                        // todo
+                                    case "raid_update":
+                                        // todo
+                                    case "raid_update_v2":
+                                        // todo
+                                    default:
+                                        break;
                                 }
 
                             } else if (topic.startsWith("chat_moderator_actions")) {
