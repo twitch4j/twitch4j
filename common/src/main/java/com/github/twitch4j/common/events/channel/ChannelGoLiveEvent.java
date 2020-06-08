@@ -12,6 +12,7 @@ import lombok.Value;
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
+@Deprecated
 public class ChannelGoLiveEvent extends TwitchEvent {
 
     /**

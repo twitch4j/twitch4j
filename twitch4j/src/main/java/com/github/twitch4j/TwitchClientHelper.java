@@ -5,17 +5,18 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
-import com.github.twitch4j.common.events.channel.ChannelChangeGameEvent;
-import com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent;
-import com.github.twitch4j.common.events.channel.ChannelGoLiveEvent;
-import com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.domain.ChannelCache;
+import com.github.twitch4j.events.ChannelChangeGameEvent;
+import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelGoLiveEvent;
+import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -106,7 +107,7 @@ public class TwitchClientHelper implements AutoCloseable {
      * Constructor
      *
      * @param twitchClient TwitchClient
-     * @param executor ScheduledThreadPoolExecutor
+     * @param executor     ScheduledThreadPoolExecutor
      */
     public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor) {
         this.twitchClient = twitchClient;
@@ -127,7 +128,8 @@ public class TwitchClientHelper implements AutoCloseable {
                             return;
 
                         ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null, null, null, null, null));
-                        if (stream != null)
+                        // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
+                        if (stream != null && currentChannelCache.getUserName() == null)
                             currentChannelCache.setUserName(stream.getUserName());
                         final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
 
@@ -171,23 +173,27 @@ public class TwitchClientHelper implements AutoCloseable {
                         // dispatch events
                         // - go live event
                         if (dispatchGoLiveEvent) {
-                            Event event = new ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelGoLiveEvent(channel, stream));
                         }
                         // - go offline event
                         if (dispatchGoOfflineEvent) {
-                            Event event = new ChannelGoOfflineEvent(channel);
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent(channel);
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelGoOfflineEvent(channel));
                         }
                         // - title changed event
                         if (dispatchTitleChangedEvent) {
-                            Event event = new ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelChangeTitleEvent(channel, stream));
                         }
                         // - game changed event
                         if (dispatchGameChangedEvent) {
-                            Event event = new ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
                             twitchClient.getEventManager().publish(event);
+                            twitchClient.getEventManager().publish(new ChannelChangeGameEvent(channel, stream));
                         }
                     });
                 } catch (Exception ex) {
@@ -210,8 +216,12 @@ public class TwitchClientHelper implements AutoCloseable {
                     if (currentChannelCache.getLastFollowCheck() != null) {
                         List<Follow> followList = commandGetFollowers.execute().getFollows();
                         EventChannel channel = null;
-                        if (!followList.isEmpty())
-                            channel = new EventChannel(channelId, followList.get(0).getToName());
+                        if (!followList.isEmpty()) {
+                            // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                            if (currentChannelCache.getUserName() == null)
+                                currentChannelCache.setUserName(followList.get(0).getToName());
+                            channel = new EventChannel(channelId, currentChannelCache.getUserName());
+                        }
                         for (Follow follow : followList) {
                             // update lastFollowDate
                             if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
@@ -275,7 +285,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Enable StreamEvent Listener, without invoking a Helix API call
      *
-     * @param channelId Channel Id
+     * @param channelId   Channel Id
      * @param channelName Channel Name
      * @return true if the channel was added, false otherwise
      */
@@ -366,7 +376,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Enable Follow Listener, without invoking a Helix API call
      *
-     * @param channelId Channel Id
+     * @param channelId   Channel Id
      * @param channelName Channel Name
      * @return true if the channel was added, false otherwise
      */
@@ -430,33 +440,27 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Start or quit the thread, depending on usage
      */
+    @Synchronized
     private void startOrStopEventGenerationThread() {
         // stream status event thread
-        streamStatusEventFuture.updateAndGet(scheduledFuture -> {
-            if (listenForGoLive.size() > 0) {
-                if (scheduledFuture == null)
-                    return executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
-                return scheduledFuture;
-            } else {
-                if (scheduledFuture != null) {
-                    scheduledFuture.cancel(false);
-                }
-                return null;
-            }
-        });
+        if (listenForGoLive.size() > 0) {
+            if (streamStatusEventFuture.get() == null)
+                streamStatusEventFuture.set(executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
+        } else {
+            final ScheduledFuture<?> scheduledFuture = streamStatusEventFuture.getAndSet(null);
+            if (scheduledFuture != null)
+                scheduledFuture.cancel(false);
+        }
 
         // follower event thread
-        followerEventFuture.updateAndGet(scheduledFuture -> {
-            if (listenForFollow.size() > 0) {
-                if (scheduledFuture == null)
-                    return executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS);
-                return scheduledFuture;
-            } else {
-                if (scheduledFuture != null)
-                    scheduledFuture.cancel(false);
-                return null;
-            }
-        });
+        if (listenForFollow.size() > 0) {
+            if (followerEventFuture.get() == null)
+                followerEventFuture.set(executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
+        } else {
+            final ScheduledFuture<?> scheduledFuture = followerEventFuture.getAndSet(null);
+            if (scheduledFuture != null)
+                scheduledFuture.cancel(false);
+        }
     }
 
     /**
@@ -470,6 +474,9 @@ public class TwitchClientHelper implements AutoCloseable {
         final ScheduledFuture<?> followerFuture = this.followerEventFuture.get();
         if (followerFuture != null)
             followerFuture.cancel(false);
+
+        streamStatusEventFuture.lazySet(null);
+        followerEventFuture.lazySet(null);
     }
 
 }
