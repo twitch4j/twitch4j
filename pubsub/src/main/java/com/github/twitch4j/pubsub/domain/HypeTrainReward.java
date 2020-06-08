@@ -8,15 +8,11 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RaidUpdateOld {
+public class HypeTrainReward {
+    private String type;
     private String id;
-    private String creatorId;
-    private String sourceId;
-    private String targetId;
-    private String announceTime;
-    private String raidTime;
-    private Integer remainingDurationSeconds;
-    private Integer transitionJitterSeconds;
-    private Integer forceRaidNowSeconds;
-    private Integer viewerCount;
+    private String groupId;
+    private Integer rewardLevel;
+    private String setId;
+    private String token;
 }

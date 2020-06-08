@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RaidUpdate {
+public class RaidData {
     private String id;
     private String creatorId;
     private String sourceId;
