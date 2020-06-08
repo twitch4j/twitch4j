@@ -22,7 +22,7 @@ public class ChannelPointsGain {
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PointGainMultiplier {
-        private String reason_code;
+        private String reasonCode;
         private Double factor;
     }
 }

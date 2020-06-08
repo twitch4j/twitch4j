@@ -660,6 +660,17 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
+    public PubSubSubscription listenForBountyBoardEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-bounty-board-events.cta." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
     public PubSubSubscription listenForDashboardActivityFeedEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -726,6 +737,17 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
+    public PubSubSubscription listenForChannelSquadEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-squad-updates." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
     public PubSubSubscription listenForRaidEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -748,6 +770,17 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
+    public PubSubSubscription listenForExtensionControlEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("extension-control." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
     public PubSubSubscription listenForHypeTrainEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -765,6 +798,39 @@ public class TwitchPubSub implements AutoCloseable {
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
         request.getData().put("topics", Collections.singletonList("broadcast-settings-update." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForCelebrationEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("celebration-events-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForPublicCheerEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-cheer-events-public-v1." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForStreamChangeEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("stream-change-by-channel." + channelId));
 
         return listenOnTopic(request);
     }
@@ -854,6 +920,17 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Deprecated
+    public PubSubSubscription listenForPollEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("polls." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
     public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -871,6 +948,17 @@ public class TwitchPubSub implements AutoCloseable {
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
         request.getData().put("topics", Collections.singletonList("video-playback." + channelId));
+
+        return listenOnTopic(request);
+    }
+
+    @Deprecated
+    public PubSubSubscription listenForWatchPartyEvents(OAuth2Credential credential, String channelId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("pv-watch-party-events." + channelId));
 
         return listenOnTopic(request);
     }
