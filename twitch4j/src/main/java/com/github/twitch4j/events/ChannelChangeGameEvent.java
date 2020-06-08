@@ -26,6 +26,8 @@ public class ChannelChangeGameEvent extends TwitchEvent {
     /**
      * The new stream gameId
      */
-    String gameId = stream.getGameId();
+    public String getGameId() {
+        return stream.getGameId();
+    }
 
 }

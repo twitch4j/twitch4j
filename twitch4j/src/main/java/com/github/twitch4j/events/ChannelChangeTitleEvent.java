@@ -26,6 +26,8 @@ public class ChannelChangeTitleEvent extends TwitchEvent {
     /**
      * The new stream title
      */
-    String title = stream.getTitle();
+    public String getTitle() {
+        return stream.getTitle();
+    }
 
 }
