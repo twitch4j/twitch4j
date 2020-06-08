@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -27,11 +28,9 @@ public class ChatModerationAction {
     private String type;
 
     /**
-     * The raw string for the specific moderation action. Examples include "timeout" or "slow"
-     *
-     * @see ChatModerationAction#getModerationAction()
+     * The specific moderation action that took place, in a convenient enum form
      */
-    private String moderationAction;
+    private ModerationAction moderationAction;
 
     /**
      * The arguments passed to the moderation action command. Can be null.
@@ -84,23 +83,17 @@ public class ChatModerationAction {
      */
 
     /**
-     * The specific moderation action that took place, in a convenient enum form
-     */
-    @Getter(lazy = true)
-    private final ModerationAction modAction = ModerationAction.MAPPINGS.get(moderationAction);
-
-    /**
      * The specific moderation type that took place, in a convenient enum form
      */
     @Getter(lazy = true)
-    private final ModerationType modType = ModerationType.parse(type, modAction);
+    private final ModerationType modType = ModerationType.parse(type, moderationAction);
 
     /**
      * @return optional wrapper around the username that was specified in a ban, unban, timeout, untimeout, vip,
      * unvip, mod, unmod, host, raid, or delete message command
      */
     public Optional<String> getTargetedUserName() {
-        final ModerationAction action = getModAction();
+        final ModerationAction action = getModerationAction();
         if (args != null && args.size() > 0 && (action == ModerationAction.BAN || action == ModerationAction.UNBAN
             || action == ModerationAction.TIMEOUT || action == ModerationAction.UNTIMEOUT
             || action == ModerationAction.DELETE || action == ModerationAction.HOST
@@ -116,7 +109,7 @@ public class ChatModerationAction {
      * @return optional wrapper around the reason associated with the ban or timeout (or an empty string if none was specified)
      */
     public Optional<String> getReason() {
-        switch (getModAction()) {
+        switch (getModerationAction()) {
             case BAN:
                 if (args != null && args.size() > 1)
                     return Optional.of(args.get(1));
@@ -134,7 +127,7 @@ public class ChatModerationAction {
      * @return optional wrapper around the message that was deleted
      */
     public Optional<String> getDeletedMessage() {
-        if (getModAction() == ModerationAction.DELETE && args != null && args.size() > 1)
+        if (getModerationAction() == ModerationAction.DELETE && args != null && args.size() > 1)
             return Optional.of(args.get(1));
 
         return Optional.empty();
@@ -144,7 +137,7 @@ public class ChatModerationAction {
      * @return optional wrapper around the duration the user was timed out for, in seconds
      */
     public OptionalInt getTimeoutDuration() {
-        if (getModAction() == ModerationAction.TIMEOUT && args != null && args.size() > 1)
+        if (getModerationAction() == ModerationAction.TIMEOUT && args != null && args.size() > 1)
             return OptionalInt.of(Integer.parseInt(args.get(1)));
 
         return OptionalInt.empty();
@@ -154,7 +147,7 @@ public class ChatModerationAction {
      * @return optional wrapper around the slow mode delay, in seconds
      */
     public OptionalInt getSlowDuration() {
-        if (getModAction() == ModerationAction.SLOW && args != null && args.size() > 0)
+        if (getModerationAction() == ModerationAction.SLOW && args != null && args.size() > 0)
             return OptionalInt.of(Integer.parseInt(args.get(0)));
 
         return OptionalInt.empty();
@@ -164,7 +157,7 @@ public class ChatModerationAction {
      * @return optional wrapper around the duration followers only mode was set to, in minutes
      */
     public OptionalInt getFollowersDuration() {
-        if (getModAction() == ModerationAction.FOLLOWERS && args != null && args.size() > 0)
+        if (getModerationAction() == ModerationAction.FOLLOWERS && args != null && args.size() > 0)
             return OptionalInt.of(Integer.parseInt(args.get(0)));
 
         return OptionalInt.empty();
@@ -333,5 +326,10 @@ public class ChatModerationAction {
 
         private static final Map<String, ModerationAction> MAPPINGS = Arrays.stream(ModerationAction.values())
             .collect(Collectors.toMap(ModerationAction::getTwitchString, Function.identity()));
+
+        @JsonCreator
+        public static ModerationAction fromString(String action) {
+            return MAPPINGS.get(action);
+        }
     }
 }

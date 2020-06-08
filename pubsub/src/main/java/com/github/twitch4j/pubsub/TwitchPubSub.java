@@ -10,13 +10,21 @@ import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.BitsBadgeData;
+import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.domain.CommerceData;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
+import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
+import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
+import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
+import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.ChatModerationEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
@@ -260,14 +268,17 @@ public class TwitchPubSub implements AutoCloseable {
                             String topic = message.getData().getTopic();
                             String type = message.getData().getMessage().getType();
                             JsonNode msgData = message.getData().getMessage().getMessageData();
+                            String rawMessage = message.getData().getMessage().getRawMessage();
 
                             // Handle Messages
-                            if (topic.startsWith("channel-bits-events-v1")) {
-                                // todo
+                            if (topic.startsWith("channel-bits-events-v2")) {
+                                eventManager.publish(new ChannelBitsEvent(TypeConvert.convertValue(msgData, ChannelBitsData.class)));
+                            } else if (topic.startsWith("channel-bits-badge-unlocks")) {
+                                eventManager.publish(new ChannelBitsBadgeUnlockEvent(TypeConvert.jsonToObject(rawMessage, BitsBadgeData.class)));
                             } else if (topic.startsWith("channel-subscribe-events-v1")) {
-                                // todo
+                                eventManager.publish(new ChannelSubscribeEvent(TypeConvert.jsonToObject(rawMessage, SubscriptionData.class)));
                             } else if (topic.startsWith("channel-commerce-events-v1")) {
-                                // todo
+                                eventManager.publish(new ChannelCommerceEvent(TypeConvert.jsonToObject(rawMessage, CommerceData.class)));
                             } else if (topic.startsWith("whispers") && (type.equals("whisper_sent") || type.equals("whisper_received"))) {
                                 // Whisper data is escaped Json cast into a String
                                 JsonNode msgDataParsed = TypeConvert.jsonToObject(msgData.asText(), JsonNode.class);
@@ -427,8 +438,26 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     /**
+     * Event Listener: User earned a new Bits badge and shared the notification with chat
+     *
+     * @param credential Credential (for target user id, scope: bits:read)
+     * @param userId Target User Id
+     * @return PubSubSubscription
+     */
+    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String userId) {
+        PubSubRequest request = new PubSubRequest();
+        request.setType(PubSubType.LISTEN);
+        request.setNonce(UUID.randomUUID().toString());
+        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("topics", Collections.singletonList("channel-bits-badge-unlocks." + userId));
+
+        return listenOnTopic(request);
+    }
+
+    /**
      * Event Listener: Anyone cheers on a specified channel.
-     * @param credential Credential (any)
+     *
+     * @param credential Credential (for target user id, scope: bits:read)
      * @param userId Target User Id
      * @return PubSubSubscription
      */
@@ -437,13 +466,14 @@ public class TwitchPubSub implements AutoCloseable {
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Collections.singletonList("channel-bits-events-v1." + userId));
+        request.getData().put("topics", Collections.singletonList("channel-bits-events-v2." + userId));
 
         return listenOnTopic(request);
     }
 
     /**
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
+     *
      * @param credential Credential (for targetUserId, scope: channel_subscriptions)
      * @param userId Target User Id
      * @return PubSubSubscription
@@ -460,10 +490,12 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone makes a purchase on a channel.
+     *
      * @param credential Credential (any)
      * @param userId Target User Id
      * @return PubSubSubscription
      */
+    @Deprecated
     public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String userId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
@@ -476,6 +508,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Event Listener: Anyone whispers the specified user.
+     *
      * @param credential Credential (for targetUserId, scope: whispers:read)
      * @param userId Target User Id
      * @return PubSubSubscription

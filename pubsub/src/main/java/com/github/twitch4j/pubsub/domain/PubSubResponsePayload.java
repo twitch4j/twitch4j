@@ -23,5 +23,6 @@ public class PubSubResponsePayload {
     @JsonProperty("message")
     private void unpackMessage(String message) {
         this.message = TypeConvert.jsonToObject(message, PubSubResponsePayloadMessage.class);
+        this.message.setRawMessage(message);
     }
 }
