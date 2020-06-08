@@ -8,15 +8,11 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RaidGo {
-    private String id;
-    private String creatorId;
-    private String sourceId;
-    private String targetId;
-    private String targetLogin;
-    private String targetDisplayName;
-    private String targetProfileImage;
-    private Integer transitionJitterSeconds;
-    private Integer forceRaidNowSeconds;
-    private Integer viewerCount;
+public class HypeProgression {
+    private String userId;
+    private Integer sequenceId;
+    private String action;
+    private String source;
+    private Integer quantity;
+    private HypeTrainProgress progress;
 }

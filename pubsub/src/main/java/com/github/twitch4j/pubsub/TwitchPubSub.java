@@ -10,11 +10,17 @@ import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.CommerceData;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
+import com.github.twitch4j.pubsub.domain.HypeLevelUp;
+import com.github.twitch4j.pubsub.domain.HypeProgression;
+import com.github.twitch4j.pubsub.domain.HypeTrainConductor;
+import com.github.twitch4j.pubsub.domain.HypeTrainEnd;
+import com.github.twitch4j.pubsub.domain.HypeTrainStart;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
@@ -26,6 +32,12 @@ import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.ChatModerationEvent;
+import com.github.twitch4j.pubsub.events.ChannelPointsUserEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainConductorUpdateEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainEndEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainLevelUpEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainProgressionEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.neovisionaries.ws.client.WebSocket;
@@ -332,11 +344,10 @@ public class TwitchPubSub implements AutoCloseable {
                                 switch (type) {
                                     case "raid_go_v2":
                                         // todo
-                                    case "raid_update":
-                                        // todo
                                     case "raid_update_v2":
                                         // todo
                                     default:
+                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
 
@@ -344,6 +355,43 @@ public class TwitchPubSub implements AutoCloseable {
                                 String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
                                 eventManager.publish(new ChatModerationEvent(channelId, data));
+                            } else if (topic.startsWith("following")) {
+                                final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
+                                // todo
+                            } else if (topic.startsWith("hype-train-events-v1")) {
+                                final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
+                                switch (type) {
+                                    case "hype-train-start":
+                                        final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
+                                        eventManager.publish(new HypeTrainStartEvent(startData));
+                                        break;
+                                    case "hype-train-progression":
+                                        final HypeProgression progressionData = TypeConvert.convertValue(msgData, HypeProgression.class);
+                                        eventManager.publish(new HypeTrainProgressionEvent(channelId, progressionData));
+                                        break;
+                                    case "hype-train-level-up":
+                                        final HypeLevelUp levelUpData = TypeConvert.convertValue(msgData, HypeLevelUp.class);
+                                        eventManager.publish(new HypeTrainLevelUpEvent(channelId, levelUpData));
+                                        break;
+                                    case "hype-train-end":
+                                        final HypeTrainEnd endData = TypeConvert.convertValue(msgData, HypeTrainEnd.class);
+                                        eventManager.publish(new HypeTrainEndEvent(channelId, endData));
+                                        break;
+                                    case "hype-train-conductor-update":
+                                        final HypeTrainConductor conductorData = TypeConvert.convertValue(msgData, HypeTrainConductor.class);
+                                        eventManager.publish(new HypeTrainConductorUpdateEvent(channelId, conductorData));
+                                        break;
+                                    default:
+                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        break;
+                                }
+                            } else if (topic.startsWith("community-points-user-v1")) {
+                                if (type.equalsIgnoreCase("points-earned")) {
+                                    final ChannelPointsEarned data = TypeConvert.convertValue(msgData, ChannelPointsEarned.class);
+                                    eventManager.publish(new ChannelPointsUserEvent(data));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -776,13 +824,20 @@ public class TwitchPubSub implements AutoCloseable {
         return listenOnTopic(request);
     }
 
+    /**
+     * Event Listener: Anyone follows the specified channel.
+     *
+     * @param credential {@link OAuth2Credential}
+     * @param channelId the id for the channel
+     * @return PubSubSubscription
+     */
     @Deprecated
-    public PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String userId) {
+    public PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String channelId) {
         PubSubRequest request = new PubSubRequest();
         request.setType(PubSubType.LISTEN);
         request.setNonce(UUID.randomUUID().toString());
         request.getData().put("auth_token", credential.getAccessToken());
-        request.getData().put("topics", Collections.singletonList("following." + userId));
+        request.getData().put("topics", Collections.singletonList("following." + channelId));
 
         return listenOnTopic(request);
     }
