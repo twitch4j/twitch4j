@@ -15,6 +15,6 @@ import lombok.Setter;
 @Setter(AccessLevel.NONE)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RaidUpdateEvent extends TwitchEvent {
+public class RaidCancelEvent extends TwitchEvent {
     private RaidData raid;
 }

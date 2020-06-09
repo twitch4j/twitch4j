@@ -13,8 +13,11 @@ import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
+import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.CommerceData;
+import com.github.twitch4j.pubsub.domain.FollowingData;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.HypeLevelUp;
 import com.github.twitch4j.pubsub.domain.HypeProgression;
@@ -30,14 +33,19 @@ import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.github.twitch4j.pubsub.events.ChannelPointsUserEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.ChatModerationEvent;
-import com.github.twitch4j.pubsub.events.ChannelPointsUserEvent;
+import com.github.twitch4j.pubsub.events.FollowingEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainConductorUpdateEvent;
+import com.github.twitch4j.pubsub.events.HypeTrainCooldownExpirationEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainEndEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainLevelUpEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainProgressionEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
+import com.github.twitch4j.pubsub.events.RaidCancelEvent;
+import com.github.twitch4j.pubsub.events.RaidGoEvent;
+import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.neovisionaries.ws.client.WebSocket;
@@ -54,7 +62,14 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -145,7 +160,7 @@ public class TwitchPubSub implements AutoCloseable {
 
         // Run heartbeat every 4 minutes
         this.heartbeatThread = new Thread(() -> {
-            if(isClosed)
+            if (isClosed)
                 return;
 
             PubSubRequest request = new PubSubRequest();
@@ -169,7 +184,7 @@ public class TwitchPubSub implements AutoCloseable {
 
                     // If connected, send one message from the queue
                     String command = commandQueue.poll(1000L, TimeUnit.MILLISECONDS);
-                    if(command != null) {
+                    if (command != null) {
                         if (connectionState.equals(TMIConnectionState.CONNECTED)) {
                             sendCommand(command);
                             // Logging
@@ -296,7 +311,7 @@ public class TwitchPubSub implements AutoCloseable {
                                 JsonNode msgDataParsed = TypeConvert.jsonToObject(msgData.asText(), JsonNode.class);
 
                                 //TypeReference<T> allows type parameters (unlike Class<T>) and avoids needing @SuppressWarnings("unchecked")
-                                Map<String, Object> tags = TypeConvert.convertValue(msgDataParsed.path("tags"), new TypeReference<Map<String, Object>>(){});
+                                Map<String, Object> tags = TypeConvert.convertValue(msgDataParsed.path("tags"), new TypeReference<Map<String, Object>>() {});
 
                                 String fromId = msgDataParsed.get("from_id").asText();
                                 String displayName = (String) tags.get("display_name");
@@ -343,9 +358,14 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("raid")) {
                                 switch (type) {
                                     case "raid_go_v2":
-                                        // todo
+                                        eventManager.publish(TypeConvert.jsonToObject(rawMessage, RaidGoEvent.class));
+                                        break;
                                     case "raid_update_v2":
-                                        // todo
+                                        eventManager.publish(TypeConvert.jsonToObject(rawMessage, RaidUpdateEvent.class));
+                                        break;
+                                    case "raid_cancel_v2":
+                                        eventManager.publish(TypeConvert.jsonToObject(rawMessage, RaidCancelEvent.class));
+                                        break;
                                     default:
                                         log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                         break;
@@ -357,7 +377,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 eventManager.publish(new ChatModerationEvent(channelId, data));
                             } else if (topic.startsWith("following")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
-                                // todo
+                                final FollowingData data = TypeConvert.jsonToObject(rawMessage, FollowingData.class);
+                                eventManager.publish(new FollowingEvent(channelId, data));
                             } else if (topic.startsWith("hype-train-events-v1")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 switch (type) {
@@ -380,6 +401,9 @@ public class TwitchPubSub implements AutoCloseable {
                                     case "hype-train-conductor-update":
                                         final HypeTrainConductor conductorData = TypeConvert.convertValue(msgData, HypeTrainConductor.class);
                                         eventManager.publish(new HypeTrainConductorUpdateEvent(channelId, conductorData));
+                                        break;
+                                    case "hype-train-cooldown-expiration":
+                                        eventManager.publish(new HypeTrainCooldownExpirationEvent(channelId));
                                         break;
                                     default:
                                         log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
@@ -463,6 +487,7 @@ public class TwitchPubSub implements AutoCloseable {
 
     /**
      * Queue PubSub request
+     *
      * @param request PubSub request (or Topic)
      */
     private void queueRequest(PubSubRequest request) {
@@ -489,16 +514,17 @@ public class TwitchPubSub implements AutoCloseable {
      *      // ...
      *      twitchPubSub.unsubscribeFromTopic(subscription);
      * </pre>
+     *
      * @param subscription Subscription
      */
     public void unsubscribeFromTopic(PubSubSubscription subscription) {
         PubSubRequest request = subscription.getRequest();
-        if(request.getType() != PubSubType.LISTEN) {
+        if (request.getType() != PubSubType.LISTEN) {
             log.warn("Cannot unsubscribe using request with unexpected type: {}", request.getType());
             return;
         }
         int topicIndex = subscribedTopics.indexOf(request);
-        if(topicIndex == -1) {
+        if (topicIndex == -1) {
             log.warn("Not subscribed to topic: {}", request);
             return;
         }
@@ -516,7 +542,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: User earned a new Bits badge and shared the notification with chat
      *
      * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId Target User Id
+     * @param userId     Target User Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String userId) {
@@ -533,7 +559,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone cheers on a specified channel.
      *
      * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId Target User Id
+     * @param userId     Target User Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String userId) {
@@ -550,7 +576,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
      *
      * @param credential Credential (for targetUserId, scope: channel_subscriptions)
-     * @param userId Target User Id
+     * @param userId     Target User Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
@@ -567,7 +593,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone makes a purchase on a channel.
      *
      * @param credential Credential (any)
-     * @param userId Target User Id
+     * @param userId     Target User Id
      * @return PubSubSubscription
      */
     @Deprecated
@@ -585,7 +611,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone whispers the specified user.
      *
      * @param credential Credential (for targetUserId, scope: whispers:read)
-     * @param userId Target User Id
+     * @param userId     Target User Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForWhisperEvents(OAuth2Credential credential, String userId) {
@@ -602,7 +628,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for channelId, scope: channel:moderate)
-     * @param channelId Target Channel Id
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId) {
@@ -619,8 +645,8 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for userId, scope: channel:moderate)
-     * @param userId The user id associated with the credential
-     * @param roomId The user id associated with the target channel
+     * @param userId     The user id associated with the credential
+     * @param roomId     The user id associated with the target channel
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String roomId) {
@@ -631,7 +657,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone makes a channel points redemption on a channel.
      *
      * @param credential Credential (any)
-     * @param channelId Target Channel Id
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
     public PubSubSubscription listenForChannelPointsRedemptionEvents(OAuth2Credential credential, String channelId) {
@@ -894,7 +920,7 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: Anyone follows the specified channel.
      *
      * @param credential {@link OAuth2Credential}
-     * @param channelId the id for the channel
+     * @param channelId  the id for the channel
      * @return PubSubSubscription
      */
     @Deprecated
