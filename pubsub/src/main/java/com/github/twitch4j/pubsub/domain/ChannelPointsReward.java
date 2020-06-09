@@ -26,6 +26,7 @@ public class ChannelPointsReward {
 	private Boolean isInStock;
 	private MaxPerStream maxPerStream;
 	private Boolean shouldRedemptionsSkipRequestQueue;
+	private String updatedForIndicatorAt;
 
 	@Data
 	@JsonIgnoreProperties(ignoreUnknown = true)

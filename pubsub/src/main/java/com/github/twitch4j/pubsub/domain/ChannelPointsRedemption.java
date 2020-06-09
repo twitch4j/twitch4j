@@ -41,7 +41,7 @@ public class ChannelPointsRedemption {
 	private String userInput;
 
 	/**
-	 * reward redemption status, will be FULFULLED if a user skips the reward queue, UNFULFILLED otherwise
+	 * reward redemption status, will be FULFILLED if a user skips the reward queue, UNFULFILLED otherwise
 	 */
 	private String status;
 
