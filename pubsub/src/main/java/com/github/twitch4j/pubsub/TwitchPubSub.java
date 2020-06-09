@@ -16,6 +16,7 @@ import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
+import com.github.twitch4j.pubsub.domain.ClaimData;
 import com.github.twitch4j.pubsub.domain.CommerceData;
 import com.github.twitch4j.pubsub.domain.FollowingData;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
@@ -24,30 +25,13 @@ import com.github.twitch4j.pubsub.domain.HypeProgression;
 import com.github.twitch4j.pubsub.domain.HypeTrainConductor;
 import com.github.twitch4j.pubsub.domain.HypeTrainEnd;
 import com.github.twitch4j.pubsub.domain.HypeTrainStart;
+import com.github.twitch4j.pubsub.domain.PointsSpent;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
-import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
-import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
-import com.github.twitch4j.pubsub.events.ChannelCommerceEvent;
-import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
-import com.github.twitch4j.pubsub.events.ChannelPointsUserEvent;
-import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
-import com.github.twitch4j.pubsub.events.ChatModerationEvent;
-import com.github.twitch4j.pubsub.events.FollowingEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainConductorUpdateEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainCooldownExpirationEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainEndEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainLevelUpEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainProgressionEvent;
-import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
-import com.github.twitch4j.pubsub.events.RaidCancelEvent;
-import com.github.twitch4j.pubsub.events.RaidGoEvent;
-import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
-import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.pubsub.events.*;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -410,11 +394,30 @@ public class TwitchPubSub implements AutoCloseable {
                                         break;
                                 }
                             } else if (topic.startsWith("community-points-user-v1")) {
-                                if (type.equalsIgnoreCase("points-earned")) {
-                                    final ChannelPointsEarned data = TypeConvert.convertValue(msgData, ChannelPointsEarned.class);
-                                    eventManager.publish(new ChannelPointsUserEvent(data));
-                                } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                switch (type) {
+                                    case "points-earned":
+                                        final ChannelPointsEarned pointsEarned = TypeConvert.convertValue(msgData, ChannelPointsEarned.class);
+                                        eventManager.publish(new PointsEarnedEvent(pointsEarned));
+                                        break;
+                                    case "claim-available":
+                                        final ClaimData claimAvailable = TypeConvert.convertValue(msgData, ClaimData.class);
+                                        eventManager.publish(new ClaimAvailableEvent(claimAvailable));
+                                        break;
+                                    case "claim-claimed":
+                                        final ClaimData claimClaimed = TypeConvert.convertValue(msgData, ClaimData.class);
+                                        eventManager.publish(new ClaimClaimedEvent(claimClaimed));
+                                        break;
+                                    case "points-spent":
+                                        final PointsSpent pointsSpent = TypeConvert.convertValue(msgData, PointsSpent.class);
+                                        eventManager.publish(new PointsSpentEvent(pointsSpent));
+                                        break;
+                                    case "global-last-viewed-content-updated":
+                                    case "channel-last-viewed-content-updated":
+                                        // unimportant
+                                        break;
+                                    default:
+                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        break;
                                 }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
