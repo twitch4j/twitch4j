@@ -17,6 +17,7 @@ import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.ClaimData;
 import com.github.twitch4j.pubsub.domain.CommerceData;
@@ -30,6 +31,7 @@ import com.github.twitch4j.pubsub.domain.HypeTrainStart;
 import com.github.twitch4j.pubsub.domain.PointsSpent;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
+import com.github.twitch4j.pubsub.domain.RedemptionProgress;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
@@ -47,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -313,31 +314,43 @@ public class TwitchPubSub implements AutoCloseable {
 
                             } else if (topic.startsWith("community-points-channel-v1")) {
                                 String timestampText = msgData.path("timestamp").asText();
+                                Instant instant = Instant.parse(timestampText);
                                 Calendar timestamp = GregorianCalendar.from(
                                     ZonedDateTime.ofInstant(
-                                        Instant.from(DateTimeFormatter.ISO_INSTANT.parse(timestampText)),
+                                        instant,
                                         ZoneId.systemDefault()
                                     )
                                 );
-                                ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
 
                                 switch (type) {
                                     case "reward-redeemed":
+                                        ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
                                         eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
                                         break;
                                     case "redemption-status-update":
-                                        eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, redemption));
+                                        ChannelPointsRedemption updatedRedemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
+                                        eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, updatedRedemption));
                                         break;
                                     case "custom-reward-created":
-                                        // todo
+                                        ChannelPointsReward newReward = TypeConvert.convertValue(msgData.path("new_reward"), ChannelPointsReward.class);
+                                        eventManager.publish(new CustomRewardCreatedEvent(instant, newReward));
+                                        break;
                                     case "custom-reward-updated":
-                                        // todo
+                                        ChannelPointsReward updatedReward = TypeConvert.convertValue(msgData.path("updated_reward"), ChannelPointsReward.class);
+                                        eventManager.publish(new CustomRewardUpdatedEvent(instant, updatedReward));
+                                        break;
                                     case "custom-reward-deleted":
-                                        // todo
+                                        ChannelPointsReward deletedReward = TypeConvert.convertValue(msgData.path("deleted_reward"), ChannelPointsReward.class);
+                                        eventManager.publish(new CustomRewardDeletedEvent(instant, deletedReward));
+                                        break;
                                     case "update-redemption-statuses-progress":
-                                        // todo
+                                        RedemptionProgress redemptionProgress = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
+                                        eventManager.publish(new UpdateRedemptionProgressEvent(instant, redemptionProgress));
+                                        break;
                                     case "update-redemption-statuses-finished":
-                                        // todo
+                                        RedemptionProgress redemptionFinished = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
+                                        eventManager.publish(new UpdateRedemptionFinishedEvent(instant, redemptionFinished));
+                                        break;
                                     default:
                                         log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                         break;
@@ -522,7 +535,7 @@ public class TwitchPubSub implements AutoCloseable {
         PubSubRequest request = new PubSubRequest();
         request.setType(type);
         request.setNonce(CryptoUtils.generateNonce(32));
-        request.getData().put("auth_token", credential.getAccessToken());
+        request.getData().put("auth_token", credential != null ? credential.getAccessToken() : "");
         request.getData().put("topics", topics);
 
         return listenOnTopic(request);

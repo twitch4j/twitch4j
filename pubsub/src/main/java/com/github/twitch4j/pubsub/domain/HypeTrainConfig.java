@@ -39,7 +39,6 @@ public class HypeTrainConfig {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ConductorRewards {
         @JsonProperty("BITS")
@@ -49,7 +48,6 @@ public class HypeTrainConfig {
         private ConductorReward subs;
 
         @Data
-        @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ConductorReward {
             @JsonProperty("CURRENT")
@@ -73,7 +71,6 @@ public class HypeTrainConfig {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DifficultySettings {
         @JsonProperty("EASY")
