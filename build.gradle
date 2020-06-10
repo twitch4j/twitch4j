@@ -52,8 +52,8 @@ subprojects {
 			api group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
 			// Event Dispatcher
-			api group: 'com.github.philippheuer.events4j', name: 'events4j-core', version: '0.7.1'
-			api group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.7.1'
+			api group: 'com.github.philippheuer.events4j', name: 'events4j-core', version: '0.8.0'
+			api group: 'com.github.philippheuer.events4j', name: 'events4j-handler-simple', version: '0.8.0'
 
 			// Credential Manager
 			api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
