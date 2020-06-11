@@ -12,27 +12,7 @@ import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
-import com.github.twitch4j.pubsub.domain.BitsBadgeData;
-import com.github.twitch4j.pubsub.domain.ChannelBitsData;
-import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
-import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
-import com.github.twitch4j.pubsub.domain.ChatModerationAction;
-import com.github.twitch4j.pubsub.domain.ClaimData;
-import com.github.twitch4j.pubsub.domain.CommerceData;
-import com.github.twitch4j.pubsub.domain.FollowingData;
-import com.github.twitch4j.pubsub.domain.ChatModerationAction;
-import com.github.twitch4j.pubsub.domain.HypeLevelUp;
-import com.github.twitch4j.pubsub.domain.HypeProgression;
-import com.github.twitch4j.pubsub.domain.HypeTrainConductor;
-import com.github.twitch4j.pubsub.domain.HypeTrainEnd;
-import com.github.twitch4j.pubsub.domain.HypeTrainStart;
-import com.github.twitch4j.pubsub.domain.PointsSpent;
-import com.github.twitch4j.pubsub.domain.PubSubRequest;
-import com.github.twitch4j.pubsub.domain.PubSubResponse;
-import com.github.twitch4j.pubsub.domain.RedemptionProgress;
-import com.github.twitch4j.pubsub.domain.SubscriptionData;
+import com.github.twitch4j.pubsub.domain.*;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.enums.TMIConnectionState;
 import com.github.twitch4j.pubsub.events.*;
@@ -49,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -441,6 +422,19 @@ public class TwitchPubSub implements AutoCloseable {
                                         log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
+                            } else if (topic.startsWith("leaderboard-events-v1")) {
+                                final Leaderboard leaderboard = TypeConvert.jsonToObject(rawMessage, Leaderboard.class);
+                                switch (leaderboard.getIdentifier().getDomain()) {
+                                    case "bits-usage-by-channel-v1":
+                                        eventManager.publish(new BitsLeaderboardEvent(leaderboard));
+                                        break;
+                                    case "sub-gifts-sent":
+                                        eventManager.publish(new SubLeaderboardEvent(leaderboard));
+                                        break;
+                                    default:
+                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        break;
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -543,6 +537,10 @@ public class TwitchPubSub implements AutoCloseable {
 
     public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, String topic) {
         return listenOnTopic(type, credential, Collections.singletonList(topic));
+    }
+
+    public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, String... topics) {
+        return listenOnTopic(type, credential, Arrays.asList(topics));
     }
 
     /**
@@ -703,6 +701,11 @@ public class TwitchPubSub implements AutoCloseable {
     @Unofficial
     public PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gift-sent-" + channelId + "-WEEK");
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForLeaderboardEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-WEEK", "leaderboard-events-v1.sub-gift-sent-" + channelId + "-WEEK");
     }
 
     @Unofficial
