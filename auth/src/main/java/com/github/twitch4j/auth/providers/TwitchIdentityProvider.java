@@ -46,7 +46,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @return an OAuth credential in an optional wrapper
      */
     public Optional<OAuth2Credential> getAppAccessToken(String delimitedScopes) {
-        HttpUrl url = HttpUrl.parse("https://id.twitch.tv/oauth2/token").newBuilder()
+        HttpUrl url = HttpUrl.parse(this.tokenUrl).newBuilder()
             .addQueryParameter("client_id", this.clientId)
             .addQueryParameter("client_secret", this.clientSecret)
             .addQueryParameter("grant_type", "client_credentials")
@@ -61,14 +61,16 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         OkHttpClient client = new OkHttpClient();
         try {
             Response response = client.newCall(request).execute();
+            String json = response.body().string();
             if (response.isSuccessful()) {
-                String json = response.body().string();
                 Map<String, Object> map = new ObjectMapper().readValue(json, new TypeReference<HashMap<String, Object>>() {});
                 String accessToken = (String) map.get("access_token");
                 String refreshToken = (String) map.get("refresh_token");
                 Integer expiresIn = (Integer) map.get("expires_in");
                 List<String> scopes = (List<String>) map.get("scope");
-                return Optional.of(new OAuth2Credential("twitch", accessToken, refreshToken, null, null, expiresIn, scopes));
+                return Optional.of(new OAuth2Credential(this.providerName, accessToken, refreshToken, null, null, expiresIn, scopes));
+            } else {
+                log.warn("Unable to create app access token! Code: " + response.code() + " - " + json);
             }
         } catch (Exception ignored) {
         } finally {
