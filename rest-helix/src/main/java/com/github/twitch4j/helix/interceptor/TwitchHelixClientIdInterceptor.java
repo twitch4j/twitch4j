@@ -9,6 +9,7 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -39,15 +40,18 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         .build();
 
     /**
+     * The default app access token that is used if no oauth was passed by the user
+     */
+    private volatile OAuth2Credential defaultAppAccessToken;
+
+    /**
      * Constructor
      *
      * @param twitchHelixBuilder Twitch Client Builder
      */
     public TwitchHelixClientIdInterceptor(TwitchHelixBuilder twitchHelixBuilder) {
         this.twitchAPIBuilder = twitchHelixBuilder;
-
-        // we can use the request to get additional info without client id / secret / etc.
-        twitchIdentityProvider = new TwitchIdentityProvider(null, null, null);
+        twitchIdentityProvider = new TwitchIdentityProvider(twitchHelixBuilder.getClientId(), twitchHelixBuilder.getClientSecret(), null);
     }
 
     /**
@@ -63,25 +67,51 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         if (template.headers().containsKey("Authorization")) {
             String oauthToken = template.headers().get("Authorization").iterator().next().substring("Bearer ".length());
 
-            OAuth2Credential verifiedCredential = accessTokenCache.getIfPresent(oauthToken);
-            if (verifiedCredential == null) {
-                log.debug("Getting matching client-id for authorization token {}", oauthToken.substring(0, 5));
+            if (oauthToken.isEmpty()) {
+                String clientSecret = twitchAPIBuilder.getClientSecret();
+                if (defaultAppAccessToken == null && (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) || clientSecret.charAt(0) == '*'))
+                    throw new RuntimeException("Necessary OAuth token was missing from Helix call, without the means to generate one!");
 
-                Optional<OAuth2Credential> requestedCredential = twitchIdentityProvider.getAdditionalCredentialInformation(new OAuth2Credential("twitch", oauthToken));
-                if (!requestedCredential.isPresent()) {
-                    throw new RuntimeException("Failed to get the client_id for the provided authentication token, the authentication token may be invalid!");
+                try {
+                    oauthToken = getOrCreateAppAccessToken().getAccessToken();
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to generate an app access token as no oauth token was passed to this Helix call", e);
                 }
 
-                verifiedCredential = requestedCredential.get();
-                accessTokenCache.put(oauthToken, verifiedCredential);
+                template.removeHeader("Authorization");
+                template.header("Authorization", "Bearer " + oauthToken);
+            } else {
+                OAuth2Credential verifiedCredential = accessTokenCache.getIfPresent(oauthToken);
+                if (verifiedCredential == null) {
+                    log.debug("Getting matching client-id for authorization token {}", oauthToken.substring(0, 5));
+
+                    Optional<OAuth2Credential> requestedCredential = twitchIdentityProvider.getAdditionalCredentialInformation(new OAuth2Credential("twitch", oauthToken));
+                    if (!requestedCredential.isPresent()) {
+                        throw new RuntimeException("Failed to get the client_id for the provided authentication token, the authentication token may be invalid!");
+                    }
+
+                    verifiedCredential = requestedCredential.get();
+                    accessTokenCache.put(oauthToken, verifiedCredential);
+                }
+
+                clientId = (String) verifiedCredential.getContext().get("client_id");
             }
 
-            clientId = (String) verifiedCredential.getContext().get("client_id");
             log.debug("Setting new client-id {} for token {}", clientId, oauthToken.substring(0, 5));
         }
 
         // set headers
         template.header("Client-Id", clientId);
         template.header("User-Agent", twitchAPIBuilder.getUserAgent());
+    }
+
+    private OAuth2Credential getOrCreateAppAccessToken() {
+        if (defaultAppAccessToken == null)
+            synchronized (this) {
+                if (defaultAppAccessToken == null)
+                    return (this.defaultAppAccessToken = twitchIdentityProvider.getAppAccessToken());
+            }
+
+        return this.defaultAppAccessToken;
     }
 }

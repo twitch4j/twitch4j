@@ -24,7 +24,7 @@ public class TwitchIdentityProviderTest {
         CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
         // register idp
-        credentialManager.registerIdentityProvider(new TwitchIdentityProvider("nzymnj7ao06w2u1smp8tqnmmp0rc5f", "g5puvhnijc9w09m8lnaqc1jy1ao78c", "http://localhost:31921/process_oauth2"));
+        credentialManager.registerIdentityProvider(new TwitchIdentityProvider("nzymnj7ao06w2u1smp8tqnmmp0rc5f", "*SECRET*", "http://localhost:31921/process_oauth2"));
 
         // add credential
         Credential credential = new OAuth2Credential("twitch", "*authToken*");
@@ -48,7 +48,7 @@ public class TwitchIdentityProviderTest {
             .build();
 
         // register idp
-        TwitchIdentityProvider twitchIdentityProvider = new TwitchIdentityProvider("nzymnj7ao06w2u1smp8tqnmmp0rc5f", "g5puvhnijc9w09m8lnaqc1jy1ao78c", "http://localhost:31921/process_oauth2");
+        TwitchIdentityProvider twitchIdentityProvider = new TwitchIdentityProvider("nzymnj7ao06w2u1smp8tqnmmp0rc5f", "*SECRET*", "http://localhost:31921/process_oauth2");
         credentialManager.registerIdentityProvider(twitchIdentityProvider);
 
         // start oauth2 flow
