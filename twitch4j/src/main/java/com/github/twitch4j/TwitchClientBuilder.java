@@ -166,7 +166,7 @@ public class TwitchClientBuilder {
      * Default Auth Token for API Requests
      */
     @With
-    private OAuth2Credential defaultAuthToken = null;
+    private OAuth2Credential defaultAuthToken = new OAuth2Credential("twitch", "");
 
     /**
      * With a CommandTrigger
