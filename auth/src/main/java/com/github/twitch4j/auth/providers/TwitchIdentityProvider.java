@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.util.HashMap;
@@ -88,6 +90,42 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Revokes an access token.
+     * <p>
+     * The clientId passed to {@link TwitchIdentityProvider} must match that used to create the credential
+     *
+     * @param credential the {@link OAuth2Credential} to be revoked
+     * @return whether the credential was successfully revoked
+     */
+    public boolean revokeCredential(OAuth2Credential credential) {
+        HttpUrl url = HttpUrl.parse("https://id.twitch.tv/oauth2/revoke").newBuilder()
+            .addQueryParameter("client_id", clientId)
+            .addQueryParameter("token", credential.getAccessToken())
+            .build();
+
+        Request request = new Request.Builder()
+            .url(url)
+            .post(RequestBody.create("", null))
+            .build();
+
+        final OkHttpClient client = new OkHttpClient();
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                return true;
+            } else {
+                log.warn("Unable to revoke access token! Code: " + response.code() + " - " + response.body().string());
+            }
+        } catch (Exception ignored) {
+        } finally {
+            client.dispatcher().executorService().shutdown();
+            client.connectionPool().evictAll();
+        }
+
+        return false;
     }
 
 }
