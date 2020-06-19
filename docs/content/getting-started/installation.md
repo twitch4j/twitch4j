@@ -41,7 +41,3 @@ and: (latest, you should use the actual version here)
     <version>1.0.0</version>
 </dependency>
 ```
-
-## fatJar
-
-[Download](http://localhost)
