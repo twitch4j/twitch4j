@@ -72,6 +72,7 @@ subprojects {
 			api group: 'io.github.openfeign', name: 'feign-jackson', version: '11.0'
 			api group: 'io.github.openfeign', name: 'feign-slf4j', version: '11.0'
 			api group: 'io.github.openfeign', name: 'feign-hystrix', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.0'
 
 			// Hystrix
 			api group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'

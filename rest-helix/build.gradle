@@ -5,6 +5,7 @@ dependencies {
 	api group: 'io.github.openfeign', name: 'feign-jackson'
 	api group: 'io.github.openfeign', name: 'feign-slf4j'
 	api group: 'io.github.openfeign', name: 'feign-hystrix'
+	api group: 'io.github.openfeign', name: 'feign-httpclient'
 	api group: 'commons-configuration', name: 'commons-configuration'
 
 	// Jackson (JSON)

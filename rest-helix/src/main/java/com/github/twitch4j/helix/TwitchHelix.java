@@ -66,6 +66,13 @@ public interface TwitchHelix {
         @Param("ended_at") String endedAt
     );
 
+    @RequestLine("GET /bits/cheermotes?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CheermoteList> getCheermotes(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
     /**
      * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
      *
@@ -89,21 +96,72 @@ public interface TwitchHelix {
     /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
-     * @param authtoken App Access  OAuth Token
+     * @param authToken App Access  OAuth Token
      * @param extensionId ID of the extension to list transactions for.
      * @param transactionIds Transaction IDs to look up. Can include multiple to fetch multiple transactions in a single request. Maximum: 100
      * @param after The cursor used to fetch the next page of data. This only applies to queries without ID. If an ID is specified, it supersedes the cursor.
      * @param limit Maximum number of objects to return. Maximum: 100 Default: 20
      * @return ExtensionTransactionList
      */
-    @RequestLine("GET helix/extensions/transactions?extension_id={extensionId}")
+    @RequestLine("GET /extensions/transactions?after={after}&extension_id={extension_id}&first={first}&id={id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ExtensionTransactionList> getExtensionTransactions(
-        @Param("token") String authtoken,
+        @Param("token") String authToken,
         @Param("extension_id") String extensionId,
         @Param("id") List<String> transactionIds,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    @RequestLine("GET /search/categories?after={after}&first={first}&query={query}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CategorySearchList> searchCategories(
+        @Param("token") String authToken,
+        @Param("query") String query,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    @RequestLine("GET /channels?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChannelInformationList> getChannelInformation(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") List<String> broadcasterId
+    );
+
+    @RequestLine("PATCH /channels?broadcaster_id={broadcaster_id}")
+    @Headers
+        ({
+            "Authorization: Bearer {token}",
+            "Content-Type: application/json"
+        })
+    @Body("%7B\"status\":\"{status}\",\"game_id\":\"{game_id}\",\"broadcaster_language\":\"{broadcaster_language}\",\"title\":\"{title}\",\"description\":\"{description}\"%7D")
+    HystrixCommand<Object> updateChannelInformation(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("status") String status,
+        @Param("game_id") String gameId,
+        @Param("broadcaster_language") String broadcasterLanguage,
+        @Param("title") String title,
+        @Param("description") String description
+    );
+
+    @RequestLine("GET /search/channels?after={after}&first={first}&live_only={live_only}&query={query}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChannelSearchList> searchChannels(
+        @Param("token") String authToken,
+        @Param("query") String query,
+        @Param("first") Integer limit,
+        @Param("after") String after,
+        @Param("live_only") Boolean liveOnly
+    );
+
+    @RequestLine("POST /channels/commercial?broadcaster_id={broadcaster_id}&length={length}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CommercialList> startCommercial(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("length") Integer length
     );
 
     /**
@@ -151,9 +209,13 @@ public interface TwitchHelix {
         @Param("ended_at") Date endedAt
     );
 
-    /**
-     * TODO: Create Entitlement Grants Upload URL
-     */
+    @RequestLine("POST /entitlements/upload?manifest_id={manifest_id}&type={type}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UploadEntitlementUrlList> createEntitlementUploadUrl(
+        @Param("token") String authToken,
+        @Param("manifest_id") String manifest_id,
+        @Param("type") String type
+    );
 
     /**
      * Gets game information by game ID or name.
@@ -170,6 +232,16 @@ public interface TwitchHelix {
         @Param("token") String authToken,
         @Param("id") List<String> id,
         @Param("name") List<String> name
+    );
+
+    @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&id={id}&cursor={cursor}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("first") Integer limit,
+        @Param("id") String id,
+        @Param("cursor") String cursor
     );
 
     /**
@@ -254,6 +326,13 @@ public interface TwitchHelix {
         @Param("language") String language,
         @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
+    );
+
+    @RequestLine("GET /streams/key?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamKeyList> getStreamKey(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -459,6 +538,24 @@ public interface TwitchHelix {
         @Param("first") Integer limit
     );
 
+    @RequestLine("POST /users/follows")
+    @Headers("Authorization: Bearer {token}")
+    @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":\"{allow_notifications}\"%7D")
+    HystrixCommand<Object> createFollow(
+        @Param("token") String authToken,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId,
+        @Param("allow_notifications") Boolean allowNotifications
+    );
+
+    @RequestLine("DELETE /users/follows?from_id={from_id}&to_id={to_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Object> deleteFollow(
+        @Param("token") String authToken,
+        @Param("from_id") String fromId,
+        @Param("to_id") String toId
+    );
+
     /**
      * Update User
      * <p>
@@ -508,9 +605,15 @@ public interface TwitchHelix {
         @Param("user_id") String userId
     );
 
-    /**
-     * TODO: Update User Extensions
-     */
+    @RequestLine("PUT /users/extensions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<ExtensionActiveList> updateUserExtensions(
+        @Param("token") String authToken,
+        ExtensionActiveList extensions
+    );
 
     /**
      * Get Videos
