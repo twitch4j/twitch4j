@@ -11,15 +11,14 @@ We recommend using a dependency management tool to manage twitch4j and sub depen
 Add it to your build.gradle with:
 ```groovy
 repositories {
-	jcenter()
-	maven { url "https://oss.jfrog.org/artifactory/libs-release"}
+    jcenter()
 }
 ```
 and: (latest, you should use the actual version here)
 
 ```groovy
 dependencies {
-    compile group: 'com.github.twitch4j', name: 'twitch4j', version: '1.0.0-alpha.20'
+    compile group: 'com.github.twitch4j', name: 'twitch4j', version: '1.0.0'
 }
 ```
 
@@ -31,10 +30,6 @@ Add it to your pom.xml with:
       <id>jcenter</id>
       <url>https://jcenter.bintray.com/</url>
     </repository>
-    <repository>
-	  <id>jcenter-snapshot</id>
-	  <url>https://oss.jfrog.org/artifactory/libs-release/</url>
-	</repository>
 </repositories>
 ```
 and: (latest, you should use the actual version here)
@@ -43,7 +38,7 @@ and: (latest, you should use the actual version here)
 <dependency>
     <groupId>com.github.twitch4j</groupId>
     <artifactId>twitch4j</artifactId>
-    <version>1.0.0-alpha.20</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
