@@ -270,9 +270,11 @@ public interface TwitchHelix {
      * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
      * @param userLogins  Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
      * @return StreamMetadataList
+     * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-the-helix-get-streams-metadata-endpoint/26407">Expected to break on/after July 20, 2020</a>
      */
     @RequestLine("GET /streams/metadata?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<StreamMetadataList> getStreamsMetadata(
         @Param("token") String authToken,
         @Param("after") String after,
