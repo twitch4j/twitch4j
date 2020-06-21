@@ -14,6 +14,11 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UploadEntitlementUrl {
 
+    /**
+     * The URL where you will upload the manifest file
+     * This is the URL of a pre-signed S3 bucket
+     * Lease time: 15 minutes
+     */
     @JsonIgnore
     private String url;
 

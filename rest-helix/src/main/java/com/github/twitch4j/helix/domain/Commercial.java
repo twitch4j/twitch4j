@@ -11,7 +11,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Commercial {
+    /**
+     * Length of the triggered commercial
+     */
     private Integer length;
+
+    /**
+     * Provides contextual information on why the request failed
+     */
     private String message;
+
+    /**
+     * Seconds until the next commercial can be served on this channel
+     */
     private Integer retryAfter;
 }

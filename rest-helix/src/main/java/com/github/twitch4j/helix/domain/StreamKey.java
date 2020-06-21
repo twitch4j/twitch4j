@@ -13,6 +13,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamKey {
 
+    /**
+     * Stream key for the channel
+     */
     @NonNull
     private String streamKey;
 
