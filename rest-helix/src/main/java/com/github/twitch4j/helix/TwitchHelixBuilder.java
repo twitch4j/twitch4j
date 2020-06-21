@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
@@ -42,6 +43,12 @@ public class TwitchHelixBuilder {
      */
     @With
     private String userAgent = Twitch4JGlobal.userAgent;
+
+    /**
+     * Default Auth Token for API Requests
+     */
+    @With
+    private OAuth2Credential defaultAuthToken = null;
 
     /**
      * HTTP Request Queue Size
