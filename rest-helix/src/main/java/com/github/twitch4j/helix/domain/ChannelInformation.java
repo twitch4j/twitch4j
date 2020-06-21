@@ -67,7 +67,7 @@ public class ChannelInformation {
     /**
      * Channel’s streaming status
      * <p>
-     * Note: Officially Documented yet always returns null
+     * Note: Officially documented yet always returns null
      */
     @Deprecated
     private String status;

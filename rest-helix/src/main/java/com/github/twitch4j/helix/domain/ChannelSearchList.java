@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Channels that matched the search query
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

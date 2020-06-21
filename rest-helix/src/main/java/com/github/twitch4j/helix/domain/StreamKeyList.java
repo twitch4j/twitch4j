@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Stream Keys
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

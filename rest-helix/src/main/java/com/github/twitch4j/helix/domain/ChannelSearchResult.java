@@ -50,7 +50,7 @@ public class ChannelSearchResult {
      * <p>
      * Note: Category Tags are not returned
      *
-     * @see <a href="https://www.twitch.tv/directory/all/tags>Tag types</a>
+     * @see <a href="https://www.twitch.tv/directory/all/tags">Tag types</a>
      */
     private List<String> tagsIds;
 

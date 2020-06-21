@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Commercials attempted
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

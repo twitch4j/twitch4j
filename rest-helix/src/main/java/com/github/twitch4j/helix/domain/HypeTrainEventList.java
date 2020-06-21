@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Hype Train Events
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

@@ -70,7 +70,7 @@ public interface TwitchHelix {
      * Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat
      *
      * @param authToken Auth Token
-     * @param broadcasterId ID for the broadcaster who might own specialized Cheermotes
+     * @param broadcasterId ID for the broadcaster who might own specialized Cheermotes (optional)
      * @return CheermoteList
      */
     @RequestLine("GET /bits/cheermotes?broadcaster_id={broadcaster_id}")

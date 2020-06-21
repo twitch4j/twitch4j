@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Cheermote {
     /**
-     * "Cheer"
+     * The name of the Cheermote (e.g., "Cheer", "PogChamp", "Kappa")
      */
     private String prefix;
 
@@ -81,7 +81,7 @@ public class Cheermote {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Tier {
         /**
-         * ID of the emote tier. Possible tiers are: 1,100,500,1000,5000, 10k, or 100k
+         * ID of the emote tier. Possible tiers are: 1, 100, 500, 1000, 5000, 10k, or 100k
          */
         @NonNull
         private String id;

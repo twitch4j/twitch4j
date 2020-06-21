@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Available Cheermotes
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

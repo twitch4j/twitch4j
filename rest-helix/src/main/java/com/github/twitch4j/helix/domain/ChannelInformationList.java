@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * Information for channels
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor

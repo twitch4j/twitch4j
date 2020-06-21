@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * URLs to upload entitlements to
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
