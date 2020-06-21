@@ -206,7 +206,7 @@ public class TwitchClientBuilder {
         }
 
         // Default ScheduledThreadPoolExecutor
-        if(scheduledThreadPoolExecutor == null)
+        if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
 
         // Module: Helix
@@ -216,6 +216,7 @@ public class TwitchClientBuilder {
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
+                .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .build();

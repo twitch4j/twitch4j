@@ -42,7 +42,12 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * The default app access token that is used if no oauth was passed by the user
      */
-    private volatile OAuth2Credential defaultAppAccessToken;
+    private volatile OAuth2Credential defaultAuthToken;
+
+    /**
+     * The default client id, typically associated with {@link TwitchHelixClientIdInterceptor#defaultAuthToken}
+     */
+    private String defaultClientId;
 
     /**
      * Constructor
@@ -52,6 +57,13 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     public TwitchHelixClientIdInterceptor(TwitchHelixBuilder twitchHelixBuilder) {
         this.twitchAPIBuilder = twitchHelixBuilder;
         twitchIdentityProvider = new TwitchIdentityProvider(twitchHelixBuilder.getClientId(), twitchHelixBuilder.getClientSecret(), null);
+        this.defaultClientId = twitchAPIBuilder.getClientId();
+        OAuth2Credential defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
+        if (defaultAuthToken != null && !defaultAuthToken.getAccessToken().isEmpty()) {
+            this.defaultAuthToken = defaultAuthToken;
+            twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken)
+                .ifPresent(oauth -> this.defaultClientId = (String) oauth.getContext().get("client_id"));
+        }
     }
 
     /**
@@ -61,7 +73,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      */
     @Override
     public void apply(RequestTemplate template) {
-        String clientId = twitchAPIBuilder.getClientId();
+        String clientId = this.defaultClientId;
 
         // if a oauth token is passed is has to match that client id, default to global client id otherwise (for ie. token verification)
         if (template.headers().containsKey("Authorization")) {
@@ -69,11 +81,11 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
             if (oauthToken.isEmpty()) {
                 String clientSecret = twitchAPIBuilder.getClientSecret();
-                if (defaultAppAccessToken == null && (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) || clientSecret.charAt(0) == '*'))
+                if (defaultAuthToken == null && (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret) || clientSecret.charAt(0) == '*'))
                     throw new RuntimeException("Necessary OAuth token was missing from Helix call, without the means to generate one!");
 
                 try {
-                    oauthToken = getOrCreateAppAccessToken().getAccessToken();
+                    oauthToken = getOrCreateAuthToken().getAccessToken();
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to generate an app access token as no oauth token was passed to this Helix call", e);
                 }
@@ -105,13 +117,13 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         template.header("User-Agent", twitchAPIBuilder.getUserAgent());
     }
 
-    private OAuth2Credential getOrCreateAppAccessToken() {
-        if (defaultAppAccessToken == null)
+    private OAuth2Credential getOrCreateAuthToken() {
+        if (defaultAuthToken == null)
             synchronized (this) {
-                if (defaultAppAccessToken == null)
-                    return (this.defaultAppAccessToken = twitchIdentityProvider.getAppAccessToken());
+                if (defaultAuthToken == null)
+                    return (this.defaultAuthToken = twitchIdentityProvider.getAppAccessToken());
             }
 
-        return this.defaultAppAccessToken;
+        return this.defaultAuthToken;
     }
 }
