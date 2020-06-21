@@ -130,20 +130,14 @@ public interface TwitchHelix {
     );
 
     @RequestLine("PATCH /channels?broadcaster_id={broadcaster_id}")
-    @Headers
-        ({
-            "Authorization: Bearer {token}",
-            "Content-Type: application/json"
-        })
-    @Body("%7B\"status\":\"{status}\",\"game_id\":\"{game_id}\",\"broadcaster_language\":\"{broadcaster_language}\",\"title\":\"{title}\",\"description\":\"{description}\"%7D")
-    HystrixCommand<Object> updateChannelInformation(
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<Void> updateChannelInformation(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
-        @Param("status") String status,
-        @Param("game_id") String gameId,
-        @Param("broadcaster_language") String broadcasterLanguage,
-        @Param("title") String title,
-        @Param("description") String description
+        ChannelInformation channelInformation
     );
 
     @RequestLine("GET /search/channels?after={after}&first={first}&live_only={live_only}&query={query}")
@@ -406,16 +400,15 @@ public interface TwitchHelix {
      * @return Object       nothing
      */
     @RequestLine("PUT /streams/tags?broadcaster_id={broadcaster_id}")
-    @Headers
-    ({
+    @Headers({
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
-    HystrixCommand<Object> replaceStreamTags(
+    HystrixCommand<Void> replaceStreamTags(
             @Param("token") String authToken,
             @Param("broadcaster_id") String broadcasterId,
-            @Param(value = "tag_ids", expander = ObjectToJsonExpander.class ) List<UUID> tagIds
+            @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
     );
 
     /**
@@ -429,8 +422,7 @@ public interface TwitchHelix {
      * @return StreamMarker
      */
     @RequestLine("POST /streams/markers")
-    @Headers
-    ({
+    @Headers({
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
@@ -539,18 +531,21 @@ public interface TwitchHelix {
     );
 
     @RequestLine("POST /users/follows")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":\"{allow_notifications}\"%7D")
-    HystrixCommand<Object> createFollow(
+    HystrixCommand<Void> createFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
         @Param("to_id") String toId,
-        @Param("allow_notifications") Boolean allowNotifications
+        @Param("allow_notifications") boolean allowNotifications
     );
 
     @RequestLine("DELETE /users/follows?from_id={from_id}&to_id={to_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Object> deleteFollow(
+    HystrixCommand<Void> deleteFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
         @Param("to_id") String toId

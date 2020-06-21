@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.endpoints;
 
+import com.github.twitch4j.helix.TestUtils;
 import com.github.twitch4j.helix.domain.ExtensionActiveList;
 import com.github.twitch4j.helix.domain.ExtensionList;
 import com.github.twitch4j.helix.domain.FollowList;
@@ -58,6 +59,18 @@ public class UsersServiceTest extends AbstractEndpointTest {
             assertNotNull(follow.getToId(), "ToId should not be null!");
             assertNotNull(follow.getToName(), "ToName should not be null!");
         });
+    }
+
+    @Test
+    @DisplayName("Create User Follows")
+    public void createFollow() {
+        TestUtils.getTwitchHelixClient().createFollow(TestUtils.getCredential().getAccessToken(), twitchUserId, "12826", false).execute();
+    }
+
+    @Test
+    @DisplayName("Delete User Follows")
+    public void deleteFollow() {
+        TestUtils.getTwitchHelixClient().deleteFollow(TestUtils.getCredential().getAccessToken(), twitchUserId, "12826").execute();
     }
 
     /**

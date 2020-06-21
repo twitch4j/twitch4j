@@ -1,7 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -11,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -30,15 +28,8 @@ public class Cheermote {
     private List<Tier> tiers;
     private Type type;
     private Integer order;
-    @JsonIgnore
     private Instant lastUpdated;
     private Boolean isCharitable;
-
-    @JsonProperty("last_updated")
-    private void unpackLastUpdated(String lastUpdated) {
-        if (StringUtils.isNotEmpty(lastUpdated))
-            this.lastUpdated = Instant.parse(lastUpdated);
-    }
 
     public enum Type {
         GLOBAL_FIRST_PARTY,
@@ -70,8 +61,46 @@ public class Cheermote {
         private String id;
         private Long minBits;
         private String color;
-        private Object images;
+        private ThemedImages images;
         private Boolean canCheer;
         private Boolean showInBitsCard;
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ThemedImages {
+        private ImageSet dark;
+        private ImageSet light;
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ImageSet {
+        @JsonProperty("animated")
+        private SizedImages animatedImages;
+
+        @JsonProperty("static")
+        private SizedImages staticImages;
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SizedImages {
+        @JsonProperty("1")
+        private String size10;
+        @JsonProperty("1.5")
+        private String size15;
+        @JsonProperty("2")
+        private String size20;
+        @JsonProperty("3")
+        private String size30;
+        @JsonProperty("4")
+        private String size40;
     }
 }

@@ -1,7 +1,9 @@
 package com.github.twitch4j.helix.endpoints;
 
+import com.github.twitch4j.helix.TestUtils;
 import com.github.twitch4j.helix.domain.*;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -47,11 +49,20 @@ public class StreamsServiceTest extends AbstractEndpointTest {
         });
     }
 
+    @Test
+    @DisplayName("Fetch the user's stream key")
+    public void getStreamKey() {
+        List<StreamKey> resultList = TestUtils.getTwitchHelixClient().getStreamKey(TestUtils.getCredential().getAccessToken(), twitchUserId).execute().getKeys();
+        Assertions.assertFalse(resultList.isEmpty());
+        resultList.forEach(key -> Assertions.assertNotNull(key.getStreamKey()));
+    }
+
     /**
      * Get Stream Metadata (Hearthstone)
      */
     @Test
     @DisplayName("Fetch meta-information (hearthstone) about live streams")
+    @Deprecated
     public void getStreamMetadataForHearthstone() {
         // TestCase
         StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata(null, "", "", 5, null, Arrays.asList(hearthstoneGameId), null, null, null).execute();
@@ -72,6 +83,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
      */
     @Test
     @DisplayName("Fetch meta-information (overwatch) about live streams")
+    @Deprecated
     public void getStreamMetadataForOverwatch() {
         // TestCase
         StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata(null, "", "", 5, null, Arrays.asList(overwatchGameId), null, null, null).execute();

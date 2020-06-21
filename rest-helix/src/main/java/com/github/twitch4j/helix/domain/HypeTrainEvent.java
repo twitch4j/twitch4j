@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -21,7 +22,7 @@ public class HypeTrainEvent {
     @NonNull
     private String id;
     private String eventType;
-    private String eventTimestamp;
+    private Instant eventTimestamp;
     private String version;
     private EventData eventData;
 
@@ -33,14 +34,14 @@ public class HypeTrainEvent {
     public static class EventData {
         @NonNull
         private String broadcasterId;
-        private String cooldownEndTime;
-        private String expiresAt;
+        private Instant cooldownEndTime;
+        private Instant expiresAt;
         private Long goal;
         @NonNull
         private String id;
         private Contribution lastContribution;
         private Integer level;
-        private String startedAt;
+        private Instant startedAt;
         private List<Contribution> topContributions;
     }
 
