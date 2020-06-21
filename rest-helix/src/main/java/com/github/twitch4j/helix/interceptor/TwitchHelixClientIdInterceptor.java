@@ -58,12 +58,10 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         this.twitchAPIBuilder = twitchHelixBuilder;
         twitchIdentityProvider = new TwitchIdentityProvider(twitchHelixBuilder.getClientId(), twitchHelixBuilder.getClientSecret(), null);
         this.defaultClientId = twitchAPIBuilder.getClientId();
-        OAuth2Credential defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
-        if (defaultAuthToken != null && !defaultAuthToken.getAccessToken().isEmpty()) {
-            this.defaultAuthToken = defaultAuthToken;
+        this.defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
+        if (defaultAuthToken != null)
             twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken)
                 .ifPresent(oauth -> this.defaultClientId = (String) oauth.getContext().get("client_id"));
-        }
     }
 
     /**

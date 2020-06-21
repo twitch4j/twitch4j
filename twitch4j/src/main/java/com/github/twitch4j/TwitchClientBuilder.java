@@ -166,7 +166,7 @@ public class TwitchClientBuilder {
      * Default Auth Token for API Requests
      */
     @With
-    private OAuth2Credential defaultAuthToken = new OAuth2Credential("twitch", "");
+    private OAuth2Credential defaultAuthToken = null;
 
     /**
      * With a CommandTrigger
@@ -282,7 +282,6 @@ public class TwitchClientBuilder {
 
         // Module: TwitchClient & ClientHelper
         final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
-        client.getClientHelper().setDefaultAuthToken(defaultAuthToken);
         client.getClientHelper().setThreadRate(helperThreadRate);
 
         // Return new Client Instance
