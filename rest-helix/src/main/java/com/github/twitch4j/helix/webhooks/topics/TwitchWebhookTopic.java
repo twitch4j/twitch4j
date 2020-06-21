@@ -120,6 +120,10 @@ public abstract class TwitchWebhookTopic<T> {
                     String toId = params.get("to_id");
                     return new FollowsTopic(fromId, toId);
                 }
+                case(HypeTrainTopic.PATH): {
+                    String broadcasterId = params.get("broadcaster_id");
+                    return new HypeTrainTopic(broadcasterId);
+                }
                 case(ModeratorChangeTopic.PATH): {
                     String broadcasterId = params.get("broadcaster_id");
                     String userId = params.get("user_id");
