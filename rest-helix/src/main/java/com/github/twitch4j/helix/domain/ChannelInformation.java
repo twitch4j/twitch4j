@@ -46,8 +46,6 @@ public class ChannelInformation {
 
     /**
      * Current game name being played on the channel
-     * <p>
-     * Note: Not adequately documented by Twitch, yet is available in {@link TwitchHelix#getChannelInformation(String, List)}
      */
     private String gameName;
 
@@ -56,19 +54,4 @@ public class ChannelInformation {
      */
     private String title;
 
-    /**
-     * Description of the stream
-     * <p>
-     * Note: Officially documented yet always returns null
-     */
-    @Deprecated
-    private String description;
-
-    /**
-     * Channel’s streaming status
-     * <p>
-     * Note: Officially documented yet always returns null
-     */
-    @Deprecated
-    private String status;
 }

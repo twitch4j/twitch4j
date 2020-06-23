@@ -393,7 +393,7 @@ public interface TwitchHelix {
     /**
      * Gets the channel stream key for a user
      *
-     * @param authToken Auth Token (scope: user:read:stream_key)
+     * @param authToken Auth Token (scope: channel:read:stream_key)
      * @param broadcasterId User ID of the broadcaster
      * @return StreamKeyList
      */
