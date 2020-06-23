@@ -23,13 +23,19 @@ public class Subscription {
     /** Determines if the subscription is a gift subscription. */
     private Boolean isGift;
 
+    /** ID of the user who gifted the sub. */
+    private String gifterId;
+
+    /** Display name of the user who gifted the sub. */
+    private String gifterName;
+
     /** Type of subscription (Tier 1, Tier 2, Tier 3). 1000 = Tier 1, 2000 = Tier 2, 3000 = Tier 3 subscriptions. */
     @NonNull
     private String tier;
 
     /** Name of the subscription. */
     @NonNull
-    private String plan_name;
+    private String planName;
 
     /** ID of the subscribed user. */
     @NonNull
@@ -38,5 +44,14 @@ public class Subscription {
     /** Login name of the subscribed user. */
     @NonNull
     private String userName;
+
+    /**
+     * @return the subscription plan name
+     * @see #getPlanName() for the non-deprecated version
+     */
+    @Deprecated
+    public String getPlan_name() {
+        return this.planName;
+    }
 
 }
