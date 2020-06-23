@@ -27,3 +27,7 @@ Restart IDE.
 Download the latest `lombok.jar` from the [official Website](https://projectlombok.org/download.html).
 
 Just run `lombok.jar` which will open the setup dialog, you need to specify your eclipse installation path here.
+
+## Javadoc Generation
+
+To generate the Javadocs in HTML5 you should use Java 9 or newer - the option will be set automatically based on your java version.

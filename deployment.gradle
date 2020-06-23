@@ -31,7 +31,9 @@ javadoc {
         encoding = "UTF-8"
     }
 
-	options.addBooleanOption('html5', true)
+	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
+		options.addBooleanOption('html5', true)
+	}
 }
 
 /**
