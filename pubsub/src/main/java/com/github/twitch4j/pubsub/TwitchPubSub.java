@@ -438,6 +438,8 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("polls")) {
                                 PollData pollData = TypeConvert.convertValue(msgData.path("poll"), PollData.class);
                                 eventManager.publish(new PollsEvent(type, pollData));
+                            } else if (topic.startsWith("friendship")) {
+                                eventManager.publish(new FriendshipEvent(TypeConvert.jsonToObject(rawMessage, FriendshipData.class)));
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
