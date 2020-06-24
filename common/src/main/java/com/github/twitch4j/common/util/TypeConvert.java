@@ -10,7 +10,7 @@ public class TypeConvert {
      * ObjectMapper
      */
     @Getter
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     public static String objectToJson(Object object) {
         try {
