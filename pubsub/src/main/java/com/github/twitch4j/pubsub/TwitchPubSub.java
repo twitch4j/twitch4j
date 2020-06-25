@@ -452,6 +452,14 @@ public class TwitchPubSub implements AutoCloseable {
                                 }
                             } else if (topic.startsWith("channel-sub-gifts-v1")) {
                                 eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
+                            } else if (topic.startsWith("channel-cheer-events-public-v1")) {
+                                String channelId = topic.substring(topic.indexOf('.') + 1);
+                                if ("cheerbomb".equalsIgnoreCase(type)) {
+                                    CheerbombData cheerbomb = TypeConvert.convertValue(msgData, CheerbombData.class);
+                                    eventManager.publish(new CheerbombEvent(channelId, cheerbomb));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
