@@ -450,6 +450,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("channel-sub-gifts-v1")) {
+                                eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
