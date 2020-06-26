@@ -460,6 +460,12 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("onsite-notifications")) {
+                                if ("create-notification".equalsIgnoreCase(type)) {
+                                    eventManager.publish(new OnsiteNotificationCreationEvent(TypeConvert.convertValue(msgData, CreateNotificationData.class)));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -877,7 +883,6 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     public PubSubSubscription listenForOnsiteNotificationEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "onsite-notifications." + userId);
     }
