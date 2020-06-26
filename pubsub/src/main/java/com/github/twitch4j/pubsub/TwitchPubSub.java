@@ -361,6 +361,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 final FollowingData data = TypeConvert.jsonToObject(rawMessage, FollowingData.class);
                                 eventManager.publish(new FollowingEvent(channelId, data));
+                            } else if (topic.startsWith("hype-train-events-v1.rewards")) {
+                                eventManager.publish(new HypeTrainRewardsEvent(TypeConvert.convertValue(msgData, HypeTrainRewardsData.class)));
                             } else if (topic.startsWith("hype-train-events-v1")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 switch (type) {
@@ -789,7 +791,6 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     public PubSubSubscription listenForHypeTrainRewardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1.rewards." + channelId);
     }
