@@ -1,7 +1,9 @@
 package com.github.twitch4j.kraken;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.kraken.domain.*;
 import com.netflix.hystrix.HystrixCommand;
+import feign.Body;
 import feign.CollectionFormat;
 import feign.Headers;
 import feign.Param;
@@ -39,6 +41,50 @@ public interface TwitchKraken {
         @Param("limit") Integer limit,
         @Param("offset") Integer offset,
         @Param("direction") String direction
+    );
+
+    /**
+     * Approve Automod
+     * <p>
+     * Approve a message that was flagged by Automod
+     *
+     * @param authToken Auth Token
+     * @param msgId unique id for the message
+     * @return no content for a successful call
+     */
+    @Unofficial
+    @RequestLine("POST /chat/twitchbot/approve")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"msg_id\":\"{msg_id}\"%7D")
+    HystrixCommand<Void> approveAutomodMessage(
+        @Param("token") String authToken,
+        @Param("msg_id") String msgId
+    );
+
+    /**
+     * Deny Automod
+     * <p>
+     * Deny a message that was flagged by Automod
+     *
+     * @param authToken Auth Token
+     * @param msgId unique id for the message
+     * @return no content for a successful call
+     */
+    @Unofficial
+    @RequestLine("POST /chat/twitchbot/deny")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"msg_id\":\"{msg_id}\"%7D")
+    HystrixCommand<Void> denyAutomodMessage(
+        @Param("token") String authToken,
+        @Param("msg_id") String msgId
     );
 
     /**
