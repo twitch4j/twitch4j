@@ -694,16 +694,25 @@ public class TwitchPubSub implements AutoCloseable {
      */
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "ads." + userId);
     }
 
     @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
     public PubSubSubscription listenForBountyBoardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-bounty-board-events.cta." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForDashboardActivityFeedEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "dashboard-activity-feed." + userId);
     }
@@ -714,6 +723,7 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForChannelDropEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-drop-events." + channelId);
     }
@@ -721,6 +731,12 @@ public class TwitchPubSub implements AutoCloseable {
     @Unofficial
     public PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-WEEK");
+    }
+
+    @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForChannelPrimeGiftStatusEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-prime-gifting-status." + channelId);
     }
 
     @Unofficial
@@ -739,6 +755,7 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForChannelSquadEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-squad-updates." + channelId);
     }
@@ -749,11 +766,13 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-ext-v1." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForExtensionControlEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "extension-control." + channelId);
     }
@@ -764,11 +783,19 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForHypeTrainRewardEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1.rewards." + channelId);
+    }
+
+    @Unofficial
+    @Deprecated
     public PubSubSubscription listenForBroadcastSettingUpdateEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "broadcast-settings-update." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForCelebrationEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "celebration-events-v1." + channelId);
     }
@@ -779,31 +806,55 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForStreamChangeEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "stream-change-by-channel." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForStreamChatRoomEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "stream-chat-room-v1." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForChannelChatroomEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-channel-v1." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForUserChatroomEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-user-v1." + userId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForUserBitsUpdateEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "user-bits-updates-v1." + userId);
     }
 
     @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForUserCampaignEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-campaign-events." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForUserPropertiesUpdateEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-properties-update." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForUserSubscribeEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-subscribe-events-v1." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
     public PubSubSubscription listenForUserImageUpdateEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "user-image-update." + userId);
     }
@@ -826,6 +877,12 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForOnsiteNotificationEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "onsite-notifications." + userId);
+    }
+
+    @Unofficial
     public PubSubSubscription listenForPollEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "polls." + channelId);
     }
@@ -836,11 +893,13 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "video-playback." + channelId);
     }
 
     @Unofficial
+    @Deprecated
     public PubSubSubscription listenForWatchPartyEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "pv-watch-party-events." + channelId);
     }
