@@ -199,8 +199,12 @@ public interface TwitchHelix {
      * @param length Desired length of the commercial in seconds. Valid options are 30, 60, 90, 120, 150, 180.
      * @return CommercialList
      */
-    @RequestLine("POST /channels/commercial?broadcaster_id={broadcaster_id}&length={length}")
-    @Headers("Authorization: Bearer {token}")
+    @RequestLine("POST /channels/commercial")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"broadcaster_id\":\"{broadcaster_id}\",\"length\":{length}%7D")
     HystrixCommand<CommercialList> startCommercial(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
@@ -621,7 +625,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":\"{allow_notifications}\"%7D")
+    @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":{allow_notifications}%7D")
     HystrixCommand<Void> createFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
