@@ -9,6 +9,7 @@ public class CollectionUtils {
     /**
      * Assigns elements of the given iterable to chunks not exceeding the desired size
      *
+     * @param <T> type of the iterable
      * @param iterable the source of elements to be assigned to a chunk
      * @param size the maximum size of each chunk
      * @return a list of the chunks, or an empty list if the iterable yielded no elements

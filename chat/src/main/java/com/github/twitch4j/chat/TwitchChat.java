@@ -146,7 +146,8 @@ public class TwitchChat implements AutoCloseable {
      * @param chatCredential Chat Credential
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
-     * @param chatRateLimit Bandwidth / Bucket
+     * @param chatRateLimit Bandwidth / Bucket for chat
+     * @param whisperRateLimit Bandwidth / Buckets for whispers
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      */
