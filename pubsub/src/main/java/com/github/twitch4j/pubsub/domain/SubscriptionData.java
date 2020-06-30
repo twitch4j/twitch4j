@@ -89,6 +89,8 @@ public class SubscriptionData {
 
     /**
      * The id of the user that received the subscription
+     *
+     * @return the recipient id
      */
     public String getRecipientId() {
         return this.recipientId != null ? this.recipientId : this.userId;
@@ -96,6 +98,8 @@ public class SubscriptionData {
 
     /**
      * The login name of the user that received the subscription
+     *
+     * @return the recipient name
      */
     public String getRecipientUserName() {
         return this.recipientUserName != null ? this.recipientUserName : this.userName;
@@ -103,6 +107,8 @@ public class SubscriptionData {
 
     /**
      * The display name of the user that received the subscription
+     *
+     * @return the recipient display name
      */
     public String getRecipientDisplayName() {
         return this.recipientDisplayName != null ? this.recipientDisplayName : this.displayName;
