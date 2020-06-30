@@ -47,7 +47,7 @@ public class Subscription {
 
     /**
      * @return the subscription plan name
-     * @see #getPlanName() for the non-deprecated version
+     * @deprecated will be removed in favor of .getPlanName()
      */
     @Deprecated
     public String getPlan_name() {
