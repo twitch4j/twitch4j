@@ -140,11 +140,6 @@ public class TwitchChat implements AutoCloseable {
     protected final long chatQueueTimeout;
 
     /**
-     * Proxy Configuration
-     */
-    protected final ProxyConfig proxyConfig;
-
-    /**
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
@@ -174,7 +169,6 @@ public class TwitchChat implements AutoCloseable {
         this.whisperRateLimit = whisperRateLimit;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
-        this.proxyConfig = proxyConfig;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
