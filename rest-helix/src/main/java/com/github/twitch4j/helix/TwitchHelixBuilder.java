@@ -2,6 +2,7 @@ package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
@@ -68,6 +69,12 @@ public class TwitchHelixBuilder {
     private Integer timeout = 5000;
 
     /**
+     * Proxy Configuration
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -95,9 +102,14 @@ public class TwitchHelixBuilder {
         // - Modules
         mapper.findAndRegisterModules();
 
+        // Create HttpClient with proxy
+        okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
+        if (proxyConfig != null)
+            proxyConfig.apply(clientBuilder);
+
         // Feign
         TwitchHelix client = HystrixFeign.builder()
-            .client(new OkHttpClient())
+            .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
             .logger(new Logger.ErrorLogger())

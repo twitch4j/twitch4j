@@ -1,5 +1,6 @@
 package com.github.twitch4j.tmi;
 
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
@@ -60,6 +61,12 @@ public class TwitchMessagingInterfaceBuilder {
     private Integer timeout = 5000;
 
     /**
+     * Proxy Configuration
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -82,9 +89,14 @@ public class TwitchMessagingInterfaceBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Create HttpClient with proxy
+        okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
+        if (proxyConfig != null)
+            proxyConfig.apply(clientBuilder);
+
         // Build
         TwitchMessagingInterface client = HystrixFeign.builder()
-            .client(new OkHttpClient())
+            .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())
