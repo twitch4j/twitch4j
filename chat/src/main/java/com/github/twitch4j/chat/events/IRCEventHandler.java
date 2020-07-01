@@ -114,22 +114,24 @@ public class IRCEventHandler {
 
     /**
      * ChatChannel Subscription Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannelSubscription(IRCMessageEvent event) {
-        if (event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id")) {
+        final String msgId;
+        if (event.getCommandType().equals("USERNOTICE") && (msgId = event.getTags().get("msg-id")) != null) {
+            EventChannel channel = event.getChannel();
+
             // Sub
-            if(event.getTags().get("msg-id").equalsIgnoreCase("sub") || event.getTags().get("msg-id").equalsIgnoreCase("resub")) {
+            if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
                 // Load Info
-                EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                boolean isResub = event.getTags().get("msg-id").equalsIgnoreCase("resub");
-                Integer cumulativeMonths = (event.getTags().containsKey("msg-param-cumulative-months")) ? Integer.parseInt(event.getTags().get("msg-param-cumulative-months")) : 0;
+                int cumulativeMonths = event.getTags().containsKey("msg-param-cumulative-months") ? Integer.parseInt(event.getTags().get("msg-param-cumulative-months")) : 0;
                 //according to the Twitch docs, msg-param-months is used only for giftsubs, which are handled below
 
                 // twitch sometimes returns 0 months for new subs
-                if(cumulativeMonths == 0) {
+                if (cumulativeMonths == 0) {
                     cumulativeMonths = 1;
                 }
 
@@ -138,29 +140,31 @@ public class IRCEventHandler {
                 Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null));
             }
             // Receive Gifted Sub
-            else if(event.getTags().get("msg-id").equalsIgnoreCase("subgift")) {
+            else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
                 // Load Info
-                EventChannel channel = event.getChannel();
                 EventUser user = new EventUser(event.getTagValue("msg-param-recipient-id").get(), event.getTagValue("msg-param-recipient-user-name").get());
                 EventUser giftedBy = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                Integer subStreak = (event.getTags().containsKey("msg-param-months")) ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
+                int subStreak = event.getTags().containsKey("msg-param-months") ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
 
                 // twitch sometimes returns 0 months for new subs
-                if(subStreak == 0) {
+                if (subStreak == 0) {
                     subStreak = 1;
                 }
 
+                // Handle multi-month gifts
+                String giftMonthsParam = event.getTags().get("msg-params-gift-months");
+                int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
+
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy, 0));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy, 0, giftMonths));
             }
             // Gift X Subs
-            else if(event.getTags().get("msg-id").equalsIgnoreCase("submysterygift")) {
+            else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
                 // Load Info
-                EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
                 Integer subsGifted = (event.getTags().containsKey("msg-param-mass-gift-count")) ? Integer.parseInt(event.getTags().get("msg-param-mass-gift-count")) : 0;
