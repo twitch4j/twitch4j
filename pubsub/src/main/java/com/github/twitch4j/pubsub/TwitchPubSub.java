@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
@@ -114,16 +115,27 @@ public class TwitchPubSub implements AutoCloseable {
     protected final ScheduledExecutorService taskExecutor;
 
     /**
+     * WebSocket Factory
+     */
+    protected final WebSocketFactory webSocketFactory;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
      * @param taskExecutor ScheduledThreadPoolExecutor
+     * @param proxyConfig  ProxyConfig
      */
-    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor) {
+    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig) {
         this.taskExecutor = taskExecutor;
         this.eventManager = eventManager;
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-pubsub", this);
+
+        // WebSocket Factory and proxy settings
+        this.webSocketFactory = new WebSocketFactory();
+        if (proxyConfig != null)
+            proxyConfig.apply(webSocketFactory.getProxySettings());
 
         // connect
         this.connect();
@@ -234,7 +246,7 @@ public class TwitchPubSub implements AutoCloseable {
     private void createWebSocket() {
         try {
             // WebSocket
-            this.webSocket = new WebSocketFactory().createSocket(WEB_SOCKET_SERVER);
+            this.webSocket = webSocketFactory.createSocket(WEB_SOCKET_SERVER);
 
             // WebSocket Listeners
             this.webSocket.clearListeners();

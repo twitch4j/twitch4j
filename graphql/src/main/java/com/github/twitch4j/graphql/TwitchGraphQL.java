@@ -3,15 +3,12 @@ package com.github.twitch4j.graphql;
 import com.apollographql.apollo.ApolloClient;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.graphql.command.CommandFollowUser;
 import com.github.twitch4j.graphql.command.CommandUnfollowUser;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-
-import java.io.IOException;
 
 @Slf4j
 public class TwitchGraphQL {
@@ -32,16 +29,23 @@ public class TwitchGraphQL {
     private String clientSecret;
 
     /**
+     * Proxy Configuration
+     */
+    private final ProxyConfig proxyConfig;
+
+    /**
      * Constructor
      *
      * @param eventManager Event Manager
-     * @param clientId Client Id
+     * @param clientId     Client Id
      * @param clientSecret Client Secret
+     * @param proxyConfig  Proxy Config
      */
-    public TwitchGraphQL(EventManager eventManager, String clientId, String clientSecret) {
+    public TwitchGraphQL(EventManager eventManager, String clientId, String clientSecret, ProxyConfig proxyConfig) {
         this.eventManager = eventManager;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
+        this.proxyConfig = proxyConfig;
     }
 
     /**
@@ -52,30 +56,30 @@ public class TwitchGraphQL {
      */
     private ApolloClient getApolloClient(OAuth2Credential credential) {
         // Http Client
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Interceptor.Chain chain) throws IOException {
-                    Request original = chain.request();
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+            .addInterceptor(chain -> {
+                Request original = chain.request();
 
-                    Request.Builder requestBuilder = original
-                        .newBuilder()
-                        .header("Client-Id", clientId);
+                Request.Builder requestBuilder = original
+                    .newBuilder()
+                    .header("Client-Id", clientId);
 
-                    if (credential != null) {
-                        requestBuilder.header("Authorization", "OAuth " + credential.getAccessToken());
-                    }
-
-                    Request request = requestBuilder.build();
-                    return chain.proceed(request);
+                if (credential != null) {
+                    requestBuilder.header("Authorization", "OAuth " + credential.getAccessToken());
                 }
-            })
-            .build();
+
+                Request request = requestBuilder.build();
+                return chain.proceed(request);
+            });
+
+        // Apply proxy settings to Http Client
+        if (proxyConfig != null)
+            proxyConfig.apply(clientBuilder);
 
         // Apollo Client
         return ApolloClient.builder()
             .serverUrl("https://api.twitch.tv/gql")
-            .okHttpClient(okHttpClient)
+            .okHttpClient(clientBuilder.build())
             .build();
     }
 

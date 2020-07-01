@@ -11,6 +11,7 @@ import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -139,6 +140,16 @@ public class TwitchChat implements AutoCloseable {
     protected final long chatQueueTimeout;
 
     /**
+     * Proxy Configuration
+     */
+    protected final ProxyConfig proxyConfig;
+
+    /**
+     * WebSocket Factory
+     */
+    protected final WebSocketFactory webSocketFactory;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -150,8 +161,9 @@ public class TwitchChat implements AutoCloseable {
      * @param whisperRateLimit Bandwidth / Buckets for whispers
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
+     * @param proxyConfig Proxy Configuration
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -162,6 +174,12 @@ public class TwitchChat implements AutoCloseable {
         this.whisperRateLimit = whisperRateLimit;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
+        this.proxyConfig = proxyConfig;
+
+        // Create WebSocketFactory and apply proxy settings
+        this.webSocketFactory = new WebSocketFactory();
+        if (proxyConfig != null)
+            proxyConfig.apply(webSocketFactory.getProxySettings());
 
         // credential validation
         if (this.chatCredential == null) {
@@ -326,7 +344,7 @@ public class TwitchChat implements AutoCloseable {
     private void createWebSocket() {
         try {
             // WebSocket
-            this.webSocket = new WebSocketFactory().createSocket(WEB_SOCKET_SERVER);
+            this.webSocket = webSocketFactory.createSocket(WEB_SOCKET_SERVER);
 
             // WebSocket Listeners
             this.webSocket.clearListeners();

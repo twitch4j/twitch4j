@@ -1,6 +1,7 @@
 package com.github.twitch4j.graphql;
 
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.config.ProxyConfig;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +19,12 @@ public class TwitchGraphQLBuilder {
      */
     @With
     private EventManager eventManager = new EventManager();
+
+    /**
+     * Proxy Configuration
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
 
     /**
      * Client Id
@@ -58,7 +65,7 @@ public class TwitchGraphQLBuilder {
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
-        TwitchGraphQL client = new TwitchGraphQL(eventManager, clientId, clientSecret);
+        TwitchGraphQL client = new TwitchGraphQL(eventManager, clientId, clientSecret, proxyConfig);
 
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-graphql", client);

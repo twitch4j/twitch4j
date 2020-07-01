@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
@@ -18,7 +19,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Twitch Chat
- *
+ * <p>
  * Documentation: https://dev.twitch.tv/docs/irc
  */
 @Slf4j
@@ -99,7 +100,14 @@ public class TwitchChatBuilder {
     private long chatQueueTimeout = 1000L;
 
     /**
+     * Proxy Configuraiton
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
+
+    /**
      * Initialize the builder
+     *
      * @return Twitch Chat Builder
      */
     public static TwitchChatBuilder builder() {
@@ -108,21 +116,22 @@ public class TwitchChatBuilder {
 
     /**
      * Twitch API Client (Helix)
+     *
      * @return TwitchHelix
      */
     public TwitchChat build() {
         log.debug("TwitchChat: Initializing ErrorTracking ...");
 
-        if(scheduledThreadPoolExecutor == null)
+        if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
 
-        if(eventManager == null) {
+        if (eventManager == null) {
             eventManager = new EventManager();
             eventManager.autoDiscovery();
         }
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig);
     }
 
     /**

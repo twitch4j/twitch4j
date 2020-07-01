@@ -1,5 +1,6 @@
 package com.github.twitch4j.kraken;
 
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
@@ -57,6 +58,12 @@ public class TwitchKrakenBuilder {
     private Integer timeout = 5000;
 
     /**
+     * ProxyConfiguration
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Kraken Builder
@@ -79,9 +86,14 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Create HttpClient with proxy
+        okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
+        if (proxyConfig != null)
+            proxyConfig.apply(clientBuilder);
+
         // Build
         TwitchKraken client = HystrixFeign.builder()
-            .client(new OkHttpClient())
+            .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
             .logger(new Logger.ErrorLogger())

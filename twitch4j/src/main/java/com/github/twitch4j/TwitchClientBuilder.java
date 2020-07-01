@@ -7,6 +7,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -169,6 +170,12 @@ public class TwitchClientBuilder {
     private OAuth2Credential defaultAuthToken = null;
 
     /**
+     * Proxy Configuration
+     */
+    @With
+    private ProxyConfig proxyConfig = null;
+
+    /**
      * With a CommandTrigger
      *
      * @param commandTrigger Command Trigger (Prefix)
@@ -219,6 +226,7 @@ public class TwitchClientBuilder {
                 .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
@@ -231,6 +239,7 @@ public class TwitchClientBuilder {
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
@@ -243,6 +252,7 @@ public class TwitchClientBuilder {
                 .withUserAgent(userAgent)
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
@@ -258,6 +268,7 @@ public class TwitchClientBuilder {
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withCommandTriggers(commandPrefixes)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
@@ -267,6 +278,7 @@ public class TwitchClientBuilder {
             pubSub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
@@ -277,6 +289,7 @@ public class TwitchClientBuilder {
                 .withEventManager(eventManager)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
+                .withProxyConfig(proxyConfig)
                 .build();
         }
 
