@@ -77,6 +77,16 @@ public class SubscriptionData {
     private SubscriptionType context;
 
     /**
+     * Whether this sub message was caused by a gift subscription
+     */
+    private Boolean isGift;
+
+    /**
+     * Number of months gifted as part of a single, multi-month gift
+     */
+    private Integer multiMonthDuration;
+
+    /**
      * The accompanying message when the subscription was shared
      */
     private CommerceMessage subMessage;

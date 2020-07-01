@@ -1,7 +1,7 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.enums.SubscriptionPlan;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
@@ -21,71 +21,86 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = false)
 public class SubscriptionEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event Target User
-	 */
-	private EventUser user;
+    /**
+     * Event Target User
+     */
+    EventUser user;
 
-	/**
-	 * Subscription Plan
-	 */
-    private String subscriptionPlan;
+    /**
+     * Subscription Plan
+     */
+    String subscriptionPlan;
 
-	/**
-	 * Subscription Message
-	 */
-	private Optional<String> message;
+    /**
+     * Subscription Plan, in enum form
+     */
+    @Getter(lazy = true)
+    SubscriptionPlan subPlan = SubscriptionPlan.fromString(subscriptionPlan);
 
-	/**
-	 * Cumulative months subscribed
-	 */
-	private Integer months;
+    /**
+     * Subscription Message
+     */
+    Optional<String> message;
 
-	/**
-	 * Was this sub gifted?
-	 */
-	private Boolean gifted;
+    /**
+     * Cumulative months subscribed
+     */
+    Integer months;
 
-	/**
-	 * User that gifted the sub
-	 */
-	private EventUser giftedBy;
-        
-        
-        /**
-         * Consecutive months subscribed
-         */
-        private Integer subStreak;
+    /**
+     * Was this sub gifted?
+     */
+    Boolean gifted;
+
+    /**
+     * User that gifted the sub
+     */
+    EventUser giftedBy;
+
+    /**
+     * Consecutive months subscribed
+     */
+    Integer subStreak;
+
+    /**
+     * The number of months gifted as part of a single, multi-month gift
+     */
+    Integer giftMonths;
 
     /**
      * Event Constructor
      *
-     * @param channel ChatChannel the user subscribed to
-     * @param user User that subscribed
-     * @param subPlan Sub Plan
-     * @param message Sub Message
-     * @param months Cumulative number of months user has been subscribed (not consecutive)
-     * @param gifted Is gifted?
-     * @param giftedBy User that gifted the sub
-     * @param subStreak Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
+     * @param channel    ChatChannel the user subscribed to
+     * @param user       User that subscribed
+     * @param subPlan    Sub Plan
+     * @param message    Sub Message
+     * @param months     Cumulative number of months user has been subscribed (not consecutive)
+     * @param gifted     Is gifted?
+     * @param giftedBy   User that gifted the sub
+     * @param subStreak  Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
+     * @param giftMonths The number of months gifted as part of a single, multi-month gift
      */
-	public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak) {
-		super(channel);
-		this.user = user;
-		this.subscriptionPlan = subPlan;
-		this.message = message;
-		this.months = months;
-		this.gifted = gifted;
-		this.giftedBy = giftedBy;
-                this.subStreak = subStreak;
-	}
+    public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths) {
+        super(channel);
+        this.user = user;
+        this.subscriptionPlan = subPlan;
+        this.message = message;
+        this.months = months;
+        this.gifted = gifted;
+        this.giftedBy = giftedBy;
+        this.subStreak = subStreak;
+        this.giftMonths = giftMonths;
+    }
 
     /**
      * Gets the Subscription Plan
+     *
      * @return SubscriptionPlan
+     * @deprecated will be removed in favor of .getSubPlan()
      */
-	public SubscriptionPlan getSubscriptionPlanName() {
-        return SubscriptionPlan.fromString(this.subscriptionPlan);
+    @Deprecated
+    public com.github.twitch4j.chat.enums.SubscriptionPlan getSubscriptionPlanName() {
+        return com.github.twitch4j.chat.enums.SubscriptionPlan.fromString(this.subscriptionPlan);
     }
 
 }
