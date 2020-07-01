@@ -101,6 +101,42 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the status of one or more provided codes.
+     * <p>
+     * The API is throttled to one request per second per authenticated user.
+     *
+     * @param authToken App access token. The client ID associated with the app access token must be approved by Twitch as part of a contracted arrangement.
+     * @param code      The code to get the status of. 1-20 code parameters are allowed.
+     * @param userId    Represents a numeric Twitch user ID. The user account which is going to receive the entitlement associated with the code.
+     * @return CodeStatusList
+     */
+    @RequestLine("GET /entitlements/codes?code={code}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CodeStatusList> getCodeStatus(
+        @Param("token") String authToken,
+        @Param("code") List<String> code,
+        @Param("user_id") Integer userId
+    );
+
+    /**
+     * Redeems one or more provided codes to the authenticated Twitch user.
+     * <p>
+     * The API is throttled to one request per second per authenticated user.
+     *
+     * @param authToken App access token. The client ID associated with the app access token must be one approved by Twitch.
+     * @param code      The code to redeem to the authenticated user’s account. 1-20 code parameters are allowed.
+     * @param userId    Represents a numeric Twitch user ID. The user account which is going to receive the entitlement associated with the code.
+     * @return CodeStatusList
+     */
+    @RequestLine("POST /entitlements/codes?code={code}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CodeStatusList> redeemCode(
+        @Param("token") String authToken,
+        @Param("code") List<String> code,
+        @Param("user_id") Integer userId
+    );
+
+    /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
      * @param authToken App Access  OAuth Token
@@ -308,6 +344,66 @@ public interface TwitchHelix {
         @Param("first") Integer limit,
         @Param("id") String id,
         @Param("cursor") String cursor
+    );
+
+    /**
+     * Returns all banned and timed-out users in a channel.
+     *
+     * @param authToken     Auth Token (scope: moderation:read)
+     * @param broadcasterId Required: Provided broadcaster_id must match the user_id in the auth token.
+     * @param userId        Optional: Filters the results for only those with a matching user_id. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination.
+     * @param before        Optional: Cursor for backward pagination.
+     * @return BannedUserList
+     */
+    @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BannedUserList> getBannedUsers(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userId,
+        @Param("after") String after,
+        @Param("before") String before
+    );
+
+    /**
+     * Returns all user bans and un-bans in a channel.
+     *
+     * @param authToken     Auth Token (scope: moderation:read)
+     * @param broadcasterId Required: Provided broadcaster_id must match the user_id in the auth token.
+     * @param userId        Optional: Filters the results and only returns a status object for users who are banned in this channel and have a matching user_id. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination.
+     * @param limit         Optional: Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return BannedEventList
+     */
+    @RequestLine("GET /moderation/banned/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BannedEventList> getBannedEvents(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Determines whether a string message meets the channel’s AutoMod requirements.
+     *
+     * @param authToken     Auth Token (scope: moderation:read)
+     * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
+     * @param messages      the messages to be checked
+     * @return AutomodEnforceStatusList
+     */
+    @RequestLine("POST /moderation/enforcements/status?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"data\":[{message}]%7D")
+    HystrixCommand<AutomodEnforceStatusList> checkAutomodStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("message") List<AutomodEnforceCheck> messages
     );
 
     /**
@@ -724,16 +820,16 @@ public interface TwitchHelix {
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param id       ID of the video being queried. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
-     * @param userId   ID of the user who owns the video. Limit 1.
-     * @param gameId   ID of the game the video is of. Limit 1.
-     * @param language Language of the video being queried. Limit: 1.
-     * @param period   Period during which the video was created. Valid values: "all", "day", "week", "month". Default: "all".
-     * @param sort     Sort order of the videos. Valid values: "time", "trending", "views". Default: "time".
-     * @param type     Type of video. Valid values: "all", "upload", "archive", "highlight". Default: "all".
-     * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param before   Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
+     * @param id        Required: ID of the video being queried. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
+     * @param userId    Required: ID of the user who owns the video. Limit 1.
+     * @param gameId    Required: ID of the game the video is of. Limit 1.
+     * @param language  Optional: Language of the video being queried. Limit: 1.
+     * @param period    Optional: Period during which the video was created. Valid values: "all", "day", "week", "month". Default: "all".
+     * @param sort      Optional: Sort order of the videos. Valid values: "time", "trending", "views". Default: "time".
+     * @param type      Optional: Type of video. Valid values: "all", "upload", "archive", "highlight". Default: "all".
+     * @param after     Optional: Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param before    Optional: Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Optional: Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return VideoList
      */
     @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
