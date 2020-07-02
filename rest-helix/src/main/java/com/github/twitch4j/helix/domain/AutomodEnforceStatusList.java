@@ -18,6 +18,6 @@ public class AutomodEnforceStatusList {
 
     @NonNull
     @JsonProperty("data")
-    private List<AutomodEnforceStatus> data;
+    private List<AutomodEnforceStatus> statuses;
 
 }

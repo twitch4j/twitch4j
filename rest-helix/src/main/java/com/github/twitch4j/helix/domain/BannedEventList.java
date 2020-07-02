@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.List;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class BannedEventList {
 
     @NonNull
     @JsonProperty("data")
-    private BannedEvent events;
+    private List<BannedEvent> events;
 
     @JsonProperty("pagination")
     private HelixPagination pagination;
