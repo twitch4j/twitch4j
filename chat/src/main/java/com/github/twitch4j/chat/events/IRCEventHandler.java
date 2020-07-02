@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.*;
+import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
@@ -175,6 +176,28 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
+            }
+            // Upgrading from a gifted sub
+            else if (msgId.equalsIgnoreCase("giftpaidupgrade") || msgId.equalsIgnoreCase("anongiftpaidupgrade")) {
+                // Load Info
+                EventUser user = event.getUser();
+                String promoName = event.getTagValue("msg-param-promo-name").orElse(null);
+                String giftTotalParam = event.getTags().get("msg-param-promo-gift-total");
+                Integer giftTotal = giftTotalParam != null ? Integer.parseInt(giftTotalParam) : null;
+                String senderLogin = event.getTagValue("msg-param-sender-login").orElse(null);
+                String senderName = event.getTagValue("msg-param-sender-name").orElse(null);
+
+                // Dispatch Event
+                eventManager.publish(new GiftSubUpgradeEvent(channel, user, promoName, giftTotal, senderLogin, senderName));
+            }
+            // Upgrading from a Prime sub to a normal one
+            else if (msgId.equalsIgnoreCase("primepaidupgrade")) {
+                // Load Info
+                EventUser user = event.getUser();
+                SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);
+
+                // Dispatch Event
+                eventManager.publish(new PrimeSubUpgradeEvent(channel, user, subPlan));
             }
         }
     }
