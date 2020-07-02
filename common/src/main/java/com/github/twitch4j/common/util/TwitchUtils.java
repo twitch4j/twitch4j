@@ -13,12 +13,12 @@ public class TwitchUtils {
      *
      * @see <a href="https://discuss.dev.twitch.tv/t/anonymous-sub-gifting-to-launch-11-15-launch-details/18683">Official Announcement</a>
      */
-    public static final EventUser ANONYMOUS_GIFTER = new EventUser("274598607", "AnAnonymousGifter");
+    public static final EventUser ANONYMOUS_GIFTER = new EventUser("274598607", "ananonymousgifter");
 
     /**
      * The account used by twitch to signify an anonymous cheerer
      */
-    public static final EventUser ANONYMOUS_CHEERER = new EventUser("407665396", "AnAnonymousCheerer");
+    public static final EventUser ANONYMOUS_CHEERER = new EventUser("407665396", "ananonymouscheerer");
 
     public static Set<CommandPermission> getPermissionsFromTags(Map<String, Object> tags) {
         Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
