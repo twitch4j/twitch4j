@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -50,6 +51,7 @@ public class Subscription {
      * @deprecated will be removed in favor of .getPlanName()
      */
     @Deprecated
+    @JsonIgnore
     public String getPlan_name() {
         return this.planName;
     }
