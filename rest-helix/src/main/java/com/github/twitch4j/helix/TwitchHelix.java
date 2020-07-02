@@ -399,11 +399,10 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"data\":[{message}]%7D")
     HystrixCommand<AutomodEnforceStatusList> checkAutomodStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
-        @Param("message") List<AutomodEnforceCheck> messages
+        AutomodEnforceCheckList messages
     );
 
     /**
