@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_CHEERER;
+import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
+
 /**
  * IRC Event Handler
  *
@@ -107,7 +110,7 @@ public class IRCEventHandler {
                 Integer bits = Integer.parseInt(event.getTags().get("bits"));
 
                 // Dispatch Event
-                eventManager.publish(new CheerEvent(channel, user, message, bits));
+                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits));
             }
         }
     }
@@ -160,7 +163,7 @@ public class IRCEventHandler {
                 int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy, 0, giftMonths));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths));
             }
             // Gift X Subs
             else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
@@ -171,7 +174,7 @@ public class IRCEventHandler {
                 Integer subsGiftedTotal = (event.getTags().containsKey("msg-param-sender-count")) ? Integer.parseInt(event.getTags().get("msg-param-sender-count")) : 0;
 
                 // Dispatch Event
-                eventManager.publish(new GiftSubscriptionsEvent(channel, user, subPlan, subsGifted, subsGiftedTotal));
+                eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
             }
         }
     }
