@@ -10,6 +10,7 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Getter;
 
+import java.time.Month;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -198,6 +199,21 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new PrimeSubUpgradeEvent(channel, user, subPlan));
+            }
+            // Extend Subscription
+            else if (msgId.equalsIgnoreCase("extendsub")) {
+                // Load Info
+                EventUser user = event.getUser();
+                SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);
+
+                String cumMonthsParam = event.getTags().get("msg-param-cumulative-months");
+                int cumulativeMonths = cumMonthsParam != null ? Math.max(Integer.parseInt(cumMonthsParam), 1) : 1;
+
+                String endMonthParam = event.getTags().get("msg-param-sub-benefit-end-month");
+                Month endMonth = endMonthParam != null ? Month.of(Integer.parseInt(endMonthParam)) : null;
+
+                // Dispatch Event
+                eventManager.publish(new ExtendSubscriptionEvent(channel, user, subPlan, cumulativeMonths, endMonth));
             }
         }
     }
