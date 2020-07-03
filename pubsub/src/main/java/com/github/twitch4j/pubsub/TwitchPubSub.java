@@ -480,6 +480,12 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("video-playback")) {
+                                int dot = topic.indexOf('.');
+                                String channel = topic.substring(dot + 1);
+                                boolean hasId = topic.charAt(dot - 1) == 'd';
+                                VideoPlaybackData data = TypeConvert.jsonToObject(rawMessage, VideoPlaybackData.class);
+                                eventManager.publish(new VideoPlaybackEvent(hasId ? channel : null, hasId ? null : channel, data));
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -911,9 +917,13 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "video-playback." + channelId);
+        return listenOnTopic(PubSubType.LISTEN, credential, "video-playback-by-id." + channelId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForVideoPlaybackByNameEvents(OAuth2Credential credential, String channelName) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "video-playback." + channelName.toLowerCase());
     }
 
     @Unofficial
