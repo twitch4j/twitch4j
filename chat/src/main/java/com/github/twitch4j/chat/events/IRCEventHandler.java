@@ -161,7 +161,7 @@ public class IRCEventHandler {
                 }
 
                 // Handle multi-month gifts
-                String giftMonthsParam = event.getTags().get("msg-params-gift-months");
+                String giftMonthsParam = event.getTags().get("msg-param-gift-months");
                 int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
 
                 // Dispatch Event
