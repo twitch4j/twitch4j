@@ -48,6 +48,7 @@ public class IRCEventHandler {
         // register event handlers
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelMessage);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onWhisper);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelCheer);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelSubscription);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onClearChat);
@@ -96,6 +97,25 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new PrivateMessageEvent(user, event.getMessage().get(), event.getClientPermissions()));
+        }
+    }
+
+    /**
+     * ChatChannel Bits Badge Earned Event Parser
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onBitsBadgeTier(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "bitsbadgetier".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            // Load Info
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+
+            String thresholdParam = event.getTags().get("msg-param-threshold");
+            int bitsThreshold = thresholdParam != null ? Integer.parseInt(thresholdParam) : -1;
+
+            // Dispatch Event
+            eventManager.publish(new BitsBadgeEarnedEvent(channel, user, bitsThreshold));
         }
     }
 
@@ -245,9 +265,12 @@ public class IRCEventHandler {
      */
     public void onRitual(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && "ritual".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
             String ritualName = event.getTagValue("msg-param-ritual-name").orElse(null);
+
+            // Dispatch Event
             eventManager.publish(new RitualEvent(channel, user, ritualName));
         }
     }
