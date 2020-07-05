@@ -61,6 +61,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRewardGift);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
     }
 
@@ -267,6 +268,33 @@ public class IRCEventHandler {
     public void onUnraid(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && "unraid".equalsIgnoreCase(event.getTags().get("msg-id"))) {
             eventManager.publish(new RaidCancellationEvent(event.getChannel()));
+        }
+    }
+
+    /**
+     * ChatChannel Reward Gift Event Parser: monetary event triggered emotes to be shared
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onRewardGift(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "rewardgift".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            // Load Info
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+            String domain = event.getTagValue("msg-param-domain").orElse(null);
+            String triggerType = event.getTagValue("msg-param-trigger-type").orElse(null);
+
+            String selectedCountParam = event.getTags().get("msg-param-selected-count");
+            Integer selectedCount = selectedCountParam != null ? Integer.parseInt(selectedCountParam) : null;
+
+            String totalRewardCountParam = event.getTags().get("msg-param-total-reward-count");
+            Integer totalRewardCount = totalRewardCountParam != null ? Integer.parseInt(totalRewardCountParam) : null;
+
+            String triggerAmountParam = event.getTags().get("msg-param-trigger-amount");
+            Integer triggerAmount = triggerAmountParam != null ? Integer.parseInt(triggerAmountParam) : null;
+
+            // Dispatch Event
+            eventManager.publish(new RewardGiftEvent(channel, user, domain, triggerType, selectedCount, totalRewardCount, triggerAmount));
         }
     }
 
