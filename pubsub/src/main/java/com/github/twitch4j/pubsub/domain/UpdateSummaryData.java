@@ -5,9 +5,6 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateNotificationData {
+public class UpdateSummaryData {
     private NotificationSummary summary;
-    private OnsiteNotification notification;
-    private Boolean persistent;
-    private Boolean toast;
 }

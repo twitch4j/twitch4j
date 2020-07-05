@@ -465,6 +465,10 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("onsite-notifications")) {
                                 if ("create-notification".equalsIgnoreCase(type)) {
                                     eventManager.publish(new OnsiteNotificationCreationEvent(TypeConvert.convertValue(msgData, CreateNotificationData.class)));
+                                } else if ("update-summary".equalsIgnoreCase(type)) {
+                                    String id = topic.substring(topic.indexOf('.') + 1);
+                                    UpdateSummaryData data = TypeConvert.convertValue(msgData, UpdateSummaryData.class);
+                                    eventManager.publish(new UpdateOnsiteNotificationSummaryEvent(id, data));
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
@@ -744,7 +748,17 @@ public class TwitchPubSub implements AutoCloseable {
 
     @Unofficial
     public PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-WEEK");
+        return listenForChannelBitsLeaderboardEvents(credential, channelId, "WEEK");
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForChannelBitsLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
+        return listenForChannelBitsLeaderboardEvents(credential, channelId, "MONTH");
+    }
+
+    @Unofficial
+    private PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit);
     }
 
     @Unofficial
@@ -755,12 +769,37 @@ public class TwitchPubSub implements AutoCloseable {
 
     @Unofficial
     public PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gift-sent-" + channelId + "-WEEK");
+        return listenForChannelSubLeaderboardEvents(credential, channelId, "WEEK");
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForChannelSubLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
+        return listenForChannelSubLeaderboardEvents(credential, channelId, "MONTH");
+    }
+
+    @Unofficial
+    private PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit);
     }
 
     @Unofficial
     public PubSubSubscription listenForLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-WEEK", "leaderboard-events-v1.sub-gift-sent-" + channelId + "-WEEK");
+        return listenForLeaderboardEvents(credential, channelId, "WEEK");
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
+        return listenForLeaderboardEvents(credential, channelId, "MONTH");
+    }
+
+    @Unofficial
+    private PubSubSubscription listenForLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
+        return listenOnTopic(
+            PubSubType.LISTEN,
+            credential,
+            "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit,
+            "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit
+        );
     }
 
     @Unofficial
@@ -811,6 +850,12 @@ public class TwitchPubSub implements AutoCloseable {
     @Deprecated
     public PubSubSubscription listenForCelebrationEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "celebration-events-v1." + channelId);
+    }
+
+    @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForPublicBitEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bit-events-public." + channelId);
     }
 
     @Unofficial
