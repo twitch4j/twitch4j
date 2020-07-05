@@ -54,6 +54,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOnEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onPayForward);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRewardGift);
@@ -192,6 +193,38 @@ public class IRCEventHandler {
                 // Dispatch Event
                 eventManager.publish(new GiftSubscriptionsEvent(channel, user, subPlan, subsGifted, subsGiftedTotal));
             }
+        }
+    }
+
+    /**
+     * ChatChannel Pay Forward Event Parser: user pays forward a gift they previously received
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onPayForward(IRCMessageEvent event) {
+        String msgId;
+        if ("USERNOTICE".equals(event.getCommandType()) && (msgId = event.getTags().get("msg-id")) != null
+            && (msgId.equalsIgnoreCase("standardpayforward") || msgId.equalsIgnoreCase("communitypayforward"))) {
+            // Load Info
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+
+            // Present for both standard & community when not anonymous
+            String gifterId = event.getTagValue("msg-param-prior-gifter-id").orElse(null);
+            String gifterName = gifterId != null
+                ? event.getTagValue("msg-param-prior-gifter-user-name").orElseGet(() -> event.getTagValue("msg-param-prior-gifter-display-name").orElse(null))
+                : null;
+            EventUser gifter = gifterId != null ? new EventUser(gifterId, gifterName) : null;
+
+            // Only present for standard
+            String recipientId = msgId.charAt(0) == 's' ? event.getTagValue("msg-param-recipient-id").orElse(null) : null;
+            String recipientName = recipientId != null
+                ? event.getTagValue("msg-param-recipient-user-name").orElseGet(() -> event.getTagValue("msg-param-recipient-display-name").orElse(null))
+                : null;
+            EventUser recipient = recipientId != null ? new EventUser(recipientId, recipientName) : null;
+
+            // Dispatch Event
+            eventManager.publish(new PayForwardEvent(channel, user, gifter, recipient));
         }
     }
 
