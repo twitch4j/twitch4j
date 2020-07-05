@@ -59,6 +59,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
     }
 
     /**
@@ -234,6 +235,20 @@ public class IRCEventHandler {
                 viewers = 0;
             }
             eventManager.publish(new RaidEvent(channel, raider, viewers));
+        }
+    }
+
+    /**
+     * ChatChannel Ritual Event Parser: celebration of a shared viewer milestone
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onRitual(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "ritual".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+            String ritualName = event.getTagValue("msg-param-ritual-name").orElse(null);
+            eventManager.publish(new RitualEvent(channel, user, ritualName));
         }
     }
 
