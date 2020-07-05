@@ -60,6 +60,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
     }
 
@@ -255,6 +256,17 @@ public class IRCEventHandler {
                 viewers = 0;
             }
             eventManager.publish(new RaidEvent(channel, raider, viewers));
+        }
+    }
+
+    /**
+     * ChatChannel Unraid Parser: raid cancellation
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onUnraid(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "unraid".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            eventManager.publish(new RaidCancellationEvent(event.getChannel()));
         }
     }
 
