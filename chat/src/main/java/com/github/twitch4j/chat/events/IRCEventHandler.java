@@ -59,6 +59,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOnEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onGiftReceived);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onPayForward);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
@@ -239,6 +240,24 @@ public class IRCEventHandler {
                 // Dispatch Event
                 eventManager.publish(new ExtendSubscriptionEvent(channel, user, subPlan, cumulativeMonths, endMonth));
             }
+        }
+    }
+
+    /**
+     * ChatChannel Prime Community Gift Event Parser: user receives a gift from a prime member
+     *
+     * @param event the {@link IRCMessageEvent} to be checked
+     */
+    public void onGiftReceived(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "primecommunitygiftreceived".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            // Load Info
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+            String giftName = event.getTagValue("msg-param-gift-name").orElse(null);
+            String recipientName = event.getTagValue("msg-param-recipient").orElse(null);
+
+            // Dispatch Event
+            eventManager.publish(new PrimeGiftReceivedEvent(channel, user, giftName, recipientName));
         }
     }
 
