@@ -381,14 +381,17 @@ public class TwitchChat implements AutoCloseable {
                     }
                     sendCommand(String.format("nick %s", userName));
 
+                    // account for above sendCommand(String) calls in our rate-limits
+                    ircMessageBucket.tryConsume(4L);
+
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
                     for (String channel : channelCache) {
-                        sendCommand("join #" + channel);
+                        sendCommand("join", '#' + channel);
                     }
 
                     // then join to own channel - required for sending or receiving whispers
                     if (chatCredential != null && userName != null) {
-                        sendCommand("join #" + chatCredential.getUserName());
+                        sendCommand("join", '#' + chatCredential.getUserName());
                     } else {
                         log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
                     }
@@ -416,6 +419,7 @@ public class TwitchChat implements AutoCloseable {
                                 // - Ping
                                 else if(message.contains("PING :tmi.twitch.tv")) {
                                     sendCommand("PONG :tmi.twitch.tv");
+                                    ircMessageBucket.tryConsume(1L);
                                     log.debug("Responding to PING request!");
                                 }
                                 // - Login failed.
