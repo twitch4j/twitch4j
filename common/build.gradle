@@ -11,7 +11,7 @@ dependencies {
 	compileOnly group: 'io.github.openfeign', name: 'feign-hystrix'
 
 	// Websocket (for common proxy settings)
-	api group: 'com.neovisionaries', name: 'nv-websocket-client'
+	compileOnly group: 'com.neovisionaries', name: 'nv-websocket-client'
 
 	// Twitch4J Modules
 	api project(':' + rootProject.name + '-auth')
