@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -63,9 +64,20 @@ public class TwitchChat implements AutoCloseable {
     private OAuth2Credential chatCredential;
 
     /**
-     * The WebSocket Server
+     * Twitch's official WebSocket Server
      */
-    private static final String WEB_SOCKET_SERVER = "wss://irc-ws.chat.twitch.tv:443";
+    public static final String TWITCH_WEB_SOCKET_SERVER = "wss://irc-ws.chat.twitch.tv:443";
+
+    /**
+     * The websocket url for the chat client to connect to.
+     */
+    protected final String baseUrl;
+
+    /**
+     * Whether the {@link OAuth2Credential} password should be sent when the baseUrl does not
+     * match the official twitch websocket server, thus bypassing a security check in the library.
+     */
+    protected final boolean sendCredentialToThirdPartyHost;
 
     /**
      * WebSocket Client
@@ -150,6 +162,8 @@ public class TwitchChat implements AutoCloseable {
      * @param eventManager EventManager
      * @param credentialManager CredentialManager
      * @param chatCredential Chat Credential
+     * @param baseUrl The websocket url for the chat client to connect to
+     * @param sendCredentialToThirdPartyHost Whether the password should be sent when the baseUrl is not official
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
      * @param chatRateLimit Bandwidth / Bucket for chat
@@ -158,10 +172,12 @@ public class TwitchChat implements AutoCloseable {
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      * @param proxyConfig Proxy Configuration
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
+        this.baseUrl = baseUrl;
+        this.sendCredentialToThirdPartyHost = sendCredentialToThirdPartyHost;
         this.commandPrefixes = commandPrefixes;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.whisperCommandQueue = new LinkedBlockingQueue<>();
@@ -173,7 +189,7 @@ public class TwitchChat implements AutoCloseable {
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
         if (proxyConfig != null)
-            proxyConfig.apply(webSocketFactory.getProxySettings());
+            proxyConfig.applyWs(webSocketFactory.getProxySettings());
 
         // credential validation
         if (this.chatCredential == null) {
@@ -338,7 +354,7 @@ public class TwitchChat implements AutoCloseable {
     private void createWebSocket() {
         try {
             // WebSocket
-            this.webSocket = webSocketFactory.createSocket(WEB_SOCKET_SERVER);
+            this.webSocket = webSocketFactory.createSocket(this.baseUrl);
 
             // WebSocket Listeners
             this.webSocket.clearListeners();
@@ -346,7 +362,7 @@ public class TwitchChat implements AutoCloseable {
 
                 @Override
                 public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
-                    log.info("Connecting to Twitch IRC {}", WEB_SOCKET_SERVER);
+                    log.info("Connecting to Twitch IRC {}", baseUrl);
 
                     // acquire capabilities
                     sendCommand("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
@@ -355,7 +371,10 @@ public class TwitchChat implements AutoCloseable {
                     // sign in
                     String userName;
                     if (chatCredential != null) {
-                        sendCommand(String.format("pass oauth:%s", chatCredential.getAccessToken()));
+                        boolean sendRealPass = sendCredentialToThirdPartyHost // check whether this security feature has been overridden
+                            || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER) // check whether the url is exactly the official one
+                            || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER.substring(0, TWITCH_WEB_SOCKET_SERVER.length() - 4)); // check whether the url matches without the port
+                        sendCommand(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)));
                         userName = chatCredential.getUserName();
                     } else {
                         userName = "justinfan" + ThreadLocalRandom.current().nextInt(100000);
@@ -536,7 +555,7 @@ public class TwitchChat implements AutoCloseable {
      * @param reason reason
      */
     public void timeout(String channel, String user, Duration duration, String reason) {
-        StringBuilder sb = new StringBuilder(user).append(duration.getSeconds());
+        StringBuilder sb = new StringBuilder(user).append(' ').append(duration.getSeconds());
         if (reason != null) {
             sb.append(" ").append(reason);
         }

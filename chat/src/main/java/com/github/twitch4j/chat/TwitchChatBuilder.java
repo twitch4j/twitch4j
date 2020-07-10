@@ -65,6 +65,22 @@ public class TwitchChatBuilder {
     private OAuth2Credential chatAccount;
 
     /**
+     * A custom websocket url for {@link TwitchChat} to connect to.
+     * Must include the scheme (e.g. ws:// or wss://).
+     */
+    @With
+    private String baseUrl = TwitchChat.TWITCH_WEB_SOCKET_SERVER;
+
+    /**
+     * Whether the {@link OAuth2Credential} password should be sent when the baseUrl does not
+     * match the official twitch websocket server, thus bypassing a security check in the library.
+     * <p>
+     * Do not depart from the default false value unless you understand the consequences.
+     */
+    @With
+    private boolean sendCredentialToThirdPartyHost = false;
+
+    /**
      * IRC Command Handlers
      */
     protected final List<String> commandPrefixes = new ArrayList<>();
@@ -131,7 +147,7 @@ public class TwitchChatBuilder {
         }
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig);
     }
 
     /**

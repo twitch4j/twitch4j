@@ -135,7 +135,7 @@ public class TwitchPubSub implements AutoCloseable {
         // WebSocket Factory and proxy settings
         this.webSocketFactory = new WebSocketFactory();
         if (proxyConfig != null)
-            proxyConfig.apply(webSocketFactory.getProxySettings());
+            proxyConfig.applyWs(webSocketFactory.getProxySettings());
 
         // connect
         this.connect();
