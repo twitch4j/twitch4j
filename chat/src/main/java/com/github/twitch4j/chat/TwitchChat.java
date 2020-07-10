@@ -252,7 +252,7 @@ public class TwitchChat implements AutoCloseable {
                                 // block thread, until we can continue
                                 bucket.asScheduler().consume(1);
 
-                                sendCommand(command);
+                                sendTextToWebSocket(command, false);
                                 break;
                             }
                             // Sleep for 25 milliseconds to wait for reconnection
@@ -325,8 +325,8 @@ public class TwitchChat implements AutoCloseable {
     @Synchronized
     public void disconnect() {
         if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+            sendTextToWebSocket("QUIT", true); // safe disconnect
             connectionState = TMIConnectionState.DISCONNECTING;
-            sendCommand("QUIT"); // safe disconnect
         }
 
         connectionState = TMIConnectionState.DISCONNECTED;
@@ -365,8 +365,8 @@ public class TwitchChat implements AutoCloseable {
                     log.info("Connecting to Twitch IRC {}", baseUrl);
 
                     // acquire capabilities
-                    sendCommand("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership");
-                    sendCommand("CAP END");
+                    sendTextToWebSocket("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership", true);
+                    sendTextToWebSocket("CAP END", true);
 
                     // sign in
                     String userName;
@@ -374,15 +374,12 @@ public class TwitchChat implements AutoCloseable {
                         boolean sendRealPass = sendCredentialToThirdPartyHost // check whether this security feature has been overridden
                             || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER) // check whether the url is exactly the official one
                             || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER.substring(0, TWITCH_WEB_SOCKET_SERVER.length() - 4)); // check whether the url matches without the port
-                        sendCommand(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)));
+                        sendTextToWebSocket(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)), true);
                         userName = chatCredential.getUserName();
                     } else {
                         userName = "justinfan" + ThreadLocalRandom.current().nextInt(100000);
                     }
-                    sendCommand(String.format("nick %s", userName));
-
-                    // account for above sendCommand(String) calls in our rate-limits
-                    ircMessageBucket.tryConsume(4L);
+                    sendTextToWebSocket(String.format("nick %s", userName), true);
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
                     for (String channel : channelCache) {
@@ -418,8 +415,7 @@ public class TwitchChat implements AutoCloseable {
                                 }
                                 // - Ping
                                 else if(message.contains("PING :tmi.twitch.tv")) {
-                                    sendCommand("PONG :tmi.twitch.tv");
-                                    ircMessageBucket.tryConsume(1L);
+                                    sendTextToWebSocket("PONG :tmi.twitch.tv", true);
                                     log.debug("Responding to PING request!");
                                 }
                                 // - Login failed.
@@ -487,18 +483,28 @@ public class TwitchChat implements AutoCloseable {
     }
 
     /**
-     * Send IRC Command
+     * Send IRC Command (for Login/...)
+     * <p>
+     * Sends important irc commands for login / capabilities and similar.
+     * Will consume tokens to respect the ratelimit, but will bypass the limit if the bucket is empty.
      *
      * @param command IRC Command
+     * @param consumeToken should a token be consumed when sending this text?
      */
-    private void sendCommand(String command) {
-        // will send command if connection has been established
-        if (connectionState.equals(TMIConnectionState.CONNECTED) || connectionState.equals(TMIConnectionState.CONNECTING)) {
-            // command will be uppercase.
-            this.webSocket.sendText(command);
-        } else {
-            log.warn("Can't send IRC-WS Command [{}]", command);
+    private boolean sendTextToWebSocket(String command, Boolean consumeToken) {
+        // will send text only if CONNECTED or CONNECTING
+        if (!connectionState.equals(TMIConnectionState.CONNECTED) && !connectionState.equals(TMIConnectionState.CONNECTING)) {
+            return false;
         }
+
+        // consume tokens if available, but ignore if not as those are important system commands (CAP, Login, ...)
+        if (consumeToken)
+            ircMessageBucket.tryConsume(1L);
+
+        // command will be uppercase.
+        this.webSocket.sendText(command);
+
+        return true;
     }
 
     /**
