@@ -67,7 +67,7 @@ public class ProxyConfig {
      *
      * @param settings WebSocket's proxy settings
      */
-    public void apply(ProxySettings settings) {
+    public void applyWs(ProxySettings settings) {
         settings.setHost(this.hostname)
             .setPort(this.port)
             .setId(this.username)
