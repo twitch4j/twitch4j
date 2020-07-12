@@ -5,8 +5,10 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.chat.events.channel.CheerEvent;
 import com.github.twitch4j.chat.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -39,9 +43,10 @@ public class TwitchChatTest {
             .withChatAccount(TestUtils.getCredential())
             .withCommandTrigger("!")
             .build();
+        twitchChat.joinChannel("twitch4j");
 
-        // sleep for a few seconds so that we're connected
-        TestUtils.sleepFor(5000);
+        // wait until we're connected
+        await().atMost(10, SECONDS).until(() -> twitchChat.getConnectionState() == TMIConnectionState.CONNECTED);
     }
 
     @Test

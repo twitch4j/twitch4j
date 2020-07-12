@@ -69,6 +69,11 @@ public class TwitchChat implements AutoCloseable {
     public static final String TWITCH_WEB_SOCKET_SERVER = "wss://irc-ws.chat.twitch.tv:443";
 
     /**
+     * ThirdParty WebSocket Server for Testing
+     */
+    public static final String TWITCH_FDGT_SOCKET_SERVER = "wss://irc.fdgt.dev";
+
+    /**
      * The websocket url for the chat client to connect to.
      */
     protected final String baseUrl;
@@ -88,6 +93,7 @@ public class TwitchChat implements AutoCloseable {
      * The connection state
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
+    @Getter
     private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
     /**

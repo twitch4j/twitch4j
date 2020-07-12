@@ -115,6 +115,10 @@ subprojects {
 			// Test
 			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
 			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.0'
+
+			// Awaitability
+			testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.0.3'
+			testImplementation group: 'com.github.javafaker', name: 'javafaker', version: '0.15'
 		}
 	}
 }
