@@ -23,6 +23,7 @@ import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -212,9 +213,20 @@ public class TwitchClientBuilder {
             eventManager.autoDiscovery();
         }
 
-        // Default ScheduledThreadPoolExecutor
-        if (scheduledThreadPoolExecutor == null)
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+        // Determinate required threadPool size
+        int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;
+        if (enableChat)
+            poolSize = poolSize + TwitchChat.REQUIRED_THREAD_COUNT;
+        if (enablePubSub)
+            poolSize = poolSize + TwitchPubSub.REQUIRED_THREAD_COUNT;
+
+        // check a provided threadPool or initialize a default one
+        if (scheduledThreadPoolExecutor != null && scheduledThreadPoolExecutor.getCorePoolSize() < poolSize) {
+            log.warn("Twitch4J requires a scheduledThreadPoolExecutor with at least {} threads to be fully functional! Some features may not work as expected.", poolSize);
+        }
+        if (scheduledThreadPoolExecutor == null) {
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-"+ RandomStringUtils.random(4, true, true), poolSize);
+        }
 
         // Module: Helix
         TwitchHelix helix = null;

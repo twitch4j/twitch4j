@@ -10,6 +10,7 @@ import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -139,7 +140,7 @@ public class TwitchChatBuilder {
         log.debug("TwitchChat: Initializing ErrorTracking ...");
 
         if (scheduledThreadPoolExecutor == null)
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-chat-"+ RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT);
 
         if (eventManager == null) {
             eventManager = new EventManager();

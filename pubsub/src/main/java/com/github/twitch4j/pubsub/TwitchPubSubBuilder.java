@@ -5,6 +5,7 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -52,7 +53,7 @@ public class TwitchPubSubBuilder {
     public TwitchPubSub build() {
         log.debug("PubSub: Initializing Module ...");
         if (scheduledThreadPoolExecutor == null)
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-pubsub-"+ RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT);
 
         if (eventManager == null) {
             eventManager = new EventManager();

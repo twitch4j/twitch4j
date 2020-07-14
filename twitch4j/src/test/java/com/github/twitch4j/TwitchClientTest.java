@@ -34,7 +34,7 @@ public class TwitchClientTest {
     @Test
     @DisplayName("Test if the Twitch4J ThreadPool is closed on shutdown")
     public void testScheduledThreadPoolExecutorShutdown() {
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", 10);
 
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
@@ -51,7 +51,7 @@ public class TwitchClientTest {
     @Test
     @DisplayName("Test if externally provided scheduledThreadPoolExecutor are still alive after closing Twitch4J")
     public void testScheduledThreadPoolExecutorExternalKeepAlive() {
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor();
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", 10);
 
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
@@ -78,15 +78,15 @@ public class TwitchClientTest {
             .withEnableHelix(true)
             .withEnableKraken(false)
             .withEnableTMI(false)
-            .withEnableChat(false)
+            .withEnableChat(true)
             .withChatAccount(TestUtils.getCredential())
-            .withEnablePubSub(false)
+            .withDefaultAuthToken(TestUtils.getCredential())
+            .withEnablePubSub(true)
             .withEnableGraphQL(false)
-            .withScheduledThreadPoolExecutor(new ScheduledThreadPoolExecutor(1))
             .withHelperThreadRate(10000L)
             .build();
 
-        // code here
+        // your code here
     }
 
 }

@@ -5,25 +5,28 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class ThreadUtils {
-    private static ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     /**
-     * A singular thread pool executor for all submodules
+     * The default thread pool executor used in twitch4j
+     * <p>
+     * PubSub: 2 Thread(s)
+     * Chat: 1 Thread(s)
+     * ClientHelper: 2 Thread(s)
+     *
      * @return ScheduledThreadPoolExecutor
      */
-    public static ScheduledThreadPoolExecutor getDefaultScheduledThreadPoolExecutor() {
-        if(scheduledThreadPoolExecutor == null) {
-            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
-                .namingPattern("twitch4j-%d")
-                .daemon(false)
-                .priority(Thread.NORM_PRIORITY)
-                .build();
+    public static ScheduledThreadPoolExecutor getDefaultScheduledThreadPoolExecutor(String namePrefix, Integer poolSize) {
+        BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
+            .namingPattern(namePrefix+"-%d")
+            .daemon(false)
+            .priority(Thread.NORM_PRIORITY)
+            .build();
 
-            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-            scheduledThreadPoolExecutor.setThreadFactory(threadFactory);
-            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-            scheduledThreadPoolExecutor.setMaximumPoolSize(Runtime.getRuntime().availableProcessors() * 8);
-        }
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(poolSize);
+        scheduledThreadPoolExecutor.setThreadFactory(threadFactory);
+        scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+
         return scheduledThreadPoolExecutor;
     }
+
 }

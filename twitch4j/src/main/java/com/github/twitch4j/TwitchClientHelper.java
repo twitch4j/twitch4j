@@ -37,6 +37,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class TwitchClientHelper implements AutoCloseable {
 
+    public static final int REQUIRED_THREAD_COUNT = 2;
+
     /**
      * The greatest number of streams or followers that can be requested in a single API call
      */

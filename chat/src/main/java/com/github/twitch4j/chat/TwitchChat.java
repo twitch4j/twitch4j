@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchChat implements AutoCloseable {
 
+    public static final int REQUIRED_THREAD_COUNT = 1;
+
     /**
      * EventManager
      */

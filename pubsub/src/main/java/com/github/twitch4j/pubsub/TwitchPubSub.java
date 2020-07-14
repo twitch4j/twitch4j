@@ -51,6 +51,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchPubSub implements AutoCloseable {
 
+    public static final int REQUIRED_THREAD_COUNT = 2;
+
     /**
      * EventManager
      */
