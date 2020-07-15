@@ -147,6 +147,14 @@ public class TwitchClientBuilder {
     private long chatQueueTimeout = 1000L;
 
     /**
+     * Sets the default server used for chat
+     * <p>
+     * Defaults to TwitchChat.TWITCH_WEB_SOCKET_SERVER, you can use TwitchChat.FDGT_TEST_SOCKET_SERVER for testing
+     */
+    @With
+    private String chatServer = TwitchChat.TWITCH_WEB_SOCKET_SERVER;
+
+    /**
      * CredentialManager
      */
     @With
@@ -278,6 +286,7 @@ public class TwitchClientBuilder {
                 .withChatQueueSize(chatQueueSize)
                 .withChatRateLimit(chatRateLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
+                .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
