@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchPubSub implements AutoCloseable {
 
-    public static final int REQUIRED_THREAD_COUNT = 2;
+    public static final int REQUIRED_THREAD_COUNT = 1;
 
     /**
      * EventManager
@@ -156,29 +156,33 @@ public class TwitchPubSub implements AutoCloseable {
         }, 0, 4L, TimeUnit.MINUTES);
 
         // queue command worker
-        this.queueTask = taskExecutor.schedule(() -> {
+        this.queueTask = taskExecutor.scheduleWithFixedDelay(() -> {
             while (!isClosed) {
                 try {
                     // check for missing pong response
-                    if (TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000 && lastPong < lastPing) {
+                    if (lastPong < lastPing && TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
                         reconnect();
                     }
 
                     // If connected, send one message from the queue
-                    String command = commandQueue.poll(1000L, TimeUnit.MILLISECONDS);
-                    if (command != null) {
-                        if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                    if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                        String command = commandQueue.poll();
+                        if (command != null) {
                             sendCommand(command);
                             // Logging
                             log.debug("Processed command from queue: [{}].", command);
+                        } else {
+                            break; // try again later
                         }
+                    } else {
+                        break; // try again later
                     }
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
-        }, 1L, TimeUnit.MILLISECONDS);
+        }, 0, 50L, TimeUnit.MILLISECONDS);
 
         log.debug("PubSub: Started Queue Worker Thread");
     }

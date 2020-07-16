@@ -39,21 +39,21 @@ public class TwitchPubSubBuilder {
     /**
      * Initialize the builder
      *
-     * @return Twitch Chat Builder
+     * @return Twitch PubSub Builder
      */
     public static TwitchPubSubBuilder builder() {
         return new TwitchPubSubBuilder();
     }
 
     /**
-     * Twitch API Client (Helix)
+     * Twitch PubSub Client
      *
-     * @return TwitchHelix
+     * @return TwitchPubSub
      */
     public TwitchPubSub build() {
         log.debug("PubSub: Initializing Module ...");
         if (scheduledThreadPoolExecutor == null)
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-pubsub-"+ RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT);
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-pubsub-" + RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT);
 
         if (eventManager == null) {
             eventManager = new EventManager();
