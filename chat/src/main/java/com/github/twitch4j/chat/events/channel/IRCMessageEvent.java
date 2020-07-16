@@ -1,6 +1,9 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.TwitchEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.chat.flag.FlagParser;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -65,6 +68,13 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * Client Permissions
 	 */
 	private final Set<CommandPermission> clientPermissions = EnumSet.noneOf(CommandPermission.class);
+
+    /**
+     * AutoMod Message Flag Indicators, relevant for PRIVMSG and USERNOTICE
+     */
+    @Unofficial
+    @Getter(lazy = true)
+    private final List<AutoModFlag> flags = FlagParser.parseFlags(this);
 
 	/**
 	 * RAW Message
