@@ -124,16 +124,6 @@ public class TwitchChat implements AutoCloseable {
     protected final BlockingQueue<String> whisperCommandQueue;
 
     /**
-     * Custom RateLimit for ChatMessages
-     */
-    protected final Bandwidth chatRateLimit;
-
-    /**
-     * Custom RateLimit for Whispers
-     */
-    protected final Bandwidth[] whisperRateLimit;
-
-    /**
      * IRC Command Queue Thread
      */
     protected final ScheduledFuture<?> queueThread;
@@ -165,6 +155,11 @@ public class TwitchChat implements AutoCloseable {
     protected final WebSocketFactory webSocketFactory;
 
     /**
+     * Whether one's own channel should automatically be joined
+     */
+    protected final boolean autoJoinOwnChannel;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -174,13 +169,14 @@ public class TwitchChat implements AutoCloseable {
      * @param sendCredentialToThirdPartyHost Whether the password should be sent when the baseUrl is not official
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
-     * @param chatRateLimit Bandwidth / Bucket for chat
-     * @param whisperRateLimit Bandwidth / Buckets for whispers
+     * @param ircMessageBucket Bucket for chat
+     * @param ircWhisperBucket Bucket for whispers
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      * @param proxyConfig Proxy Configuration
+     * @param autoJoinOwnChannel Whether one's own channel should automatically be joined
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -189,10 +185,11 @@ public class TwitchChat implements AutoCloseable {
         this.commandPrefixes = commandPrefixes;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.whisperCommandQueue = new LinkedBlockingQueue<>();
-        this.chatRateLimit = chatRateLimit;
-        this.whisperRateLimit = whisperRateLimit;
+        this.ircMessageBucket = ircMessageBucket;
+        this.ircWhisperBucket = ircWhisperBucket;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
+        this.autoJoinOwnChannel = autoJoinOwnChannel;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -221,17 +218,6 @@ public class TwitchChat implements AutoCloseable {
 
         // register event listeners
         IRCEventHandler ircEventHandler = new IRCEventHandler(this);
-
-        // initialize rate-limiting
-        this.ircMessageBucket = Bucket4j.builder()
-            .addLimit(this.chatRateLimit)
-            .build();
-
-        final LocalBucketBuilder whisperBucketBuilder = Bucket4j.builder();
-        for (Bandwidth bandwidth : whisperRateLimit) {
-            whisperBucketBuilder.addLimit(bandwidth);
-        }
-        this.ircWhisperBucket = whisperBucketBuilder.build();
 
         // connect to irc
         this.connect();
@@ -396,7 +382,8 @@ public class TwitchChat implements AutoCloseable {
 
                     // then join to own channel - required for sending or receiving whispers
                     if (chatCredential != null && userName != null) {
-                        sendCommand("join", '#' + chatCredential.getUserName());
+                        if (autoJoinOwnChannel)
+                            sendCommand("join", '#' + chatCredential.getUserName());
                     } else {
                         log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
                     }

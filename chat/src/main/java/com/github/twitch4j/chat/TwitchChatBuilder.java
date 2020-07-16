@@ -4,15 +4,16 @@ import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -96,13 +97,19 @@ public class TwitchChatBuilder {
      * Custom RateLimit for ChatMessages
      */
     @With
-    protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
+    protected Bandwidth chatRateLimit = TwitchChatLimitHelper.USER_MESSAGE_LIMIT;
 
     /**
      * Custom RateLimit for Whispers
      */
     @With
-    protected Bandwidth[] whisperRateLimit = { Bandwidth.simple(100, Duration.ofSeconds(60)), Bandwidth.simple(3, Duration.ofSeconds(1)) };
+    protected Bandwidth[] whisperRateLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
+
+    @With
+    protected Bucket ircMessageBucket = null;
+
+    @With
+    protected Bucket ircWhisperBucket = null;
 
     /**
      * Scheduler Thread Pool Executor
@@ -121,6 +128,12 @@ public class TwitchChatBuilder {
      */
     @With
     private ProxyConfig proxyConfig = null;
+
+    /**
+     * Whether one's own channel should automatically be joined
+     */
+    @With
+    private boolean autoJoinOwnChannel = true;
 
     /**
      * Initialize the builder
@@ -147,8 +160,14 @@ public class TwitchChatBuilder {
             eventManager.autoDiscovery();
         }
 
+        if (ircMessageBucket == null)
+            ircMessageBucket = TwitchChatLimitHelper.createBucket(this.chatRateLimit);
+
+        if (ircWhisperBucket == null)
+            ircWhisperBucket = TwitchChatLimitHelper.createBucket(this.whisperRateLimit);
+
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel);
     }
 
     /**
