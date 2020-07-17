@@ -44,6 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Twitch PubSub
@@ -51,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchPubSub implements AutoCloseable {
 
-    public static final int REQUIRED_THREAD_COUNT = 2;
+    public static final int REQUIRED_THREAD_COUNT = 1;
 
     /**
      * EventManager
@@ -75,6 +76,21 @@ public class TwitchPubSub implements AutoCloseable {
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
     private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
+
+    /**
+     * Whether {@link #flushCommand} is currently executing
+     */
+    private final AtomicBoolean flushing = new AtomicBoolean();
+
+    /**
+     * Whether an expedited flush has already been submitted
+     */
+    private final AtomicBoolean flushRequested = new AtomicBoolean();
+
+    /**
+     * The {@link Runnable} for flushing the {@link #commandQueue}
+     */
+    private final Runnable flushCommand;
 
     /**
      * Command Queue Thread
@@ -155,30 +171,46 @@ public class TwitchPubSub implements AutoCloseable {
             lastPing = TimeUtils.getCurrentTimeInMillis();
         }, 0, 4L, TimeUnit.MINUTES);
 
-        // queue command worker
-        this.queueTask = taskExecutor.schedule(() -> {
+        // Runnable for flushing the command queue
+        this.flushCommand = () -> {
+            // Only allow a single thread to flush at a time
+            if (flushing.getAndSet(true))
+                return;
+
+            // Attempt to flush the queue
             while (!isClosed) {
                 try {
                     // check for missing pong response
-                    if (TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000 && lastPong < lastPing) {
+                    if (lastPong < lastPing && TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
                         reconnect();
                     }
 
                     // If connected, send one message from the queue
-                    String command = commandQueue.poll(1000L, TimeUnit.MILLISECONDS);
-                    if (command != null) {
-                        if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                    if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                        String command = commandQueue.poll();
+                        if (command != null) {
                             sendCommand(command);
                             // Logging
                             log.debug("Processed command from queue: [{}].", command);
+                        } else {
+                            break; // try again later
                         }
+                    } else {
+                        break; // try again later
                     }
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
-        }, 1L, TimeUnit.MILLISECONDS);
+
+            // Indicate that flushing has completed
+            flushRequested.set(false);
+            flushing.set(false);
+        };
+
+        // queue command worker
+        this.queueTask = taskExecutor.scheduleWithFixedDelay(flushCommand, 0, 2500L, TimeUnit.MILLISECONDS);
 
         log.debug("PubSub: Started Queue Worker Thread");
     }
@@ -568,6 +600,10 @@ public class TwitchPubSub implements AutoCloseable {
      */
     private void queueRequest(PubSubRequest request) {
         commandQueue.add(TypeConvert.objectToJson(request));
+
+        // Expedite command execution if we aren't already flushing the queue and another expedition hasn't already been requested
+        if (!flushing.get() && !flushRequested.getAndSet(true))
+            taskExecutor.schedule(this.flushCommand, 50L, TimeUnit.MILLISECONDS); // allow for some accumulation of requests before flushing
     }
 
     /**
