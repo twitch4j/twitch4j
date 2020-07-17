@@ -44,6 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Twitch PubSub
@@ -75,6 +76,21 @@ public class TwitchPubSub implements AutoCloseable {
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
     private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
+
+    /**
+     * Whether {@link #flushCommand} is currently executing
+     */
+    private final AtomicBoolean flushing = new AtomicBoolean();
+
+    /**
+     * Whether an expedited flush has already been submitted
+     */
+    private final AtomicBoolean flushRequested = new AtomicBoolean();
+
+    /**
+     * The {@link Runnable} for flushing the {@link #commandQueue}
+     */
+    private final Runnable flushCommand;
 
     /**
      * Command Queue Thread
@@ -155,8 +171,13 @@ public class TwitchPubSub implements AutoCloseable {
             lastPing = TimeUtils.getCurrentTimeInMillis();
         }, 0, 4L, TimeUnit.MINUTES);
 
-        // queue command worker
-        this.queueTask = taskExecutor.scheduleWithFixedDelay(() -> {
+        // Runnable for flushing the command queue
+        this.flushCommand = () -> {
+            // Only allow a single thread to flush at a time
+            if (flushing.getAndSet(true))
+                return;
+
+            // Attempt to flush the queue
             while (!isClosed) {
                 try {
                     // check for missing pong response
@@ -182,7 +203,14 @@ public class TwitchPubSub implements AutoCloseable {
                     log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
-        }, 0, 50L, TimeUnit.MILLISECONDS);
+
+            // Indicate that flushing has completed
+            flushRequested.set(false);
+            flushing.set(false);
+        };
+
+        // queue command worker
+        this.queueTask = taskExecutor.scheduleWithFixedDelay(flushCommand, 0, 2500L, TimeUnit.MILLISECONDS);
 
         log.debug("PubSub: Started Queue Worker Thread");
     }
@@ -572,6 +600,10 @@ public class TwitchPubSub implements AutoCloseable {
      */
     private void queueRequest(PubSubRequest request) {
         commandQueue.add(TypeConvert.objectToJson(request));
+
+        // Expedite command execution if we aren't already flushing the queue and another expedition hasn't already been requested
+        if (!flushing.get() && !flushRequested.getAndSet(true))
+            taskExecutor.schedule(this.flushCommand, 50L, TimeUnit.MILLISECONDS); // allow for some accumulation of requests before flushing
     }
 
     /**

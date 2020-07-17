@@ -29,7 +29,7 @@ public class VideoPlaybackData {
     /**
      * Sent when {@link #getType()} is {@link Type#VIEW_COUNT}.
      */
-    private Integer viewCount;
+    private Integer viewers;
 
     /**
      * Sent when {@link #getType()} is {@link Type#COMMERCIAL}.
