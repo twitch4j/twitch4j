@@ -1,11 +1,15 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
+
+import java.util.List;
 
 /**
  * This event gets called when a user receives bits.
@@ -30,6 +34,12 @@ public class CheerEvent extends AbstractChannelEvent {
 	 */
 	private Integer bits;
 
+    /**
+     * Regions of {@link #getMessage()} that were flagged by AutoMod (Unofficial)
+     */
+    @Unofficial
+    private List<AutoModFlag> flags;
+
 	/**
 	 * Event Constructor
 	 *
@@ -37,11 +47,13 @@ public class CheerEvent extends AbstractChannelEvent {
 	 * @param user The donating user.
 	 * @param message The donation message.
 	 * @param bits The amount of bits.
+	 * @param flags The regions of the message that were flagged by AutoMod.
 	 */
-	public CheerEvent(EventChannel channel, EventUser user, String message, Integer bits) {
+	public CheerEvent(EventChannel channel, EventUser user, String message, Integer bits, List<AutoModFlag> flags) {
 		super(channel);
 		this.user = user;
 		this.message = message;
 		this.bits = bits;
+		this.flags = flags;
 	}
 }
