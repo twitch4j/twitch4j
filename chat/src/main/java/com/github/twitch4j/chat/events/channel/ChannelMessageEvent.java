@@ -1,6 +1,8 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -8,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,4 +57,12 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 		this.message = message;
 		this.permissions = permissions;
 	}
+
+    /**
+     * @return the regions of the message that were flagged by AutoMod.
+     */
+    @Unofficial
+    public List<AutoModFlag> getFlags() {
+        return this.messageEvent.getFlags();
+    }
 }
