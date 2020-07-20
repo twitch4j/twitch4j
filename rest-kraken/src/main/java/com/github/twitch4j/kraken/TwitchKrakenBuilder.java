@@ -1,5 +1,6 @@
 package com.github.twitch4j.kraken;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
@@ -86,6 +87,11 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Jackson ObjectMapper
+        ObjectMapper mapper = new ObjectMapper();
+        // - Modules
+        mapper.findAndRegisterModules();
+
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
         if (proxyConfig != null)
@@ -94,8 +100,8 @@ public class TwitchKrakenBuilder {
         // Build
         TwitchKraken client = HystrixFeign.builder()
             .client(new OkHttpClient(clientBuilder.build()))
-            .encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder(mapper))
+            .decoder(new JacksonDecoder(mapper))
             .logger(new Logger.ErrorLogger())
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))

@@ -1,5 +1,6 @@
 package kraken.endpoints;
 
+import com.github.twitch4j.kraken.domain.KrakenEmoticon;
 import com.github.twitch4j.kraken.domain.KrakenUser;
 import com.github.twitch4j.kraken.domain.KrakenUserList;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +10,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -21,7 +26,7 @@ public class UsersServiceTest extends AbstractKrakenServiceTest {
     @DisplayName("getUsers")
     @Disabled
     public void getUsers() {
-    	KrakenUserList resultList = getTwitchKrakenClient().getUsersByLogin(Arrays.asList("twitch4j")).execute();
+        KrakenUserList resultList = getTwitchKrakenClient().getUsersByLogin(Arrays.asList("twitch4j")).execute();
         assertTrue(resultList.getUsers().size() == 1, "Number of found users was not 1!");
         KrakenUser user = resultList.getUsers().get(0);
         assertTrue(user.getId().equals("149223493"), "Twitch4J user id should be 149223493!");
@@ -31,4 +36,21 @@ public class UsersServiceTest extends AbstractKrakenServiceTest {
         assertEquals(user.getType(), "user", "Twitch4J user type should be user!");
         assertEquals(user.getCreatedAt().getTime(), 1488456578184L, "Twitch4J user creation date is invalid!");
     }
+
+    @Test
+    @DisplayName("getBlocks")
+    @Disabled
+    public void getBlocks() {
+        List<KrakenUser> resultList = getTwitchKrakenClient().getUserBlockList(getCredential().getAccessToken(), "149223493", null, null).execute().getBlocks();
+        assertNotNull(resultList);
+    }
+
+    @Test
+    @DisplayName("getUserEmotes")
+    @Disabled
+    public void getUserEmotes() {
+        Map<String, Set<KrakenEmoticon>> results = getTwitchKrakenClient().getUserEmotes(getCredential().getAccessToken(), "149223493").execute().getEmoticonSets();
+        assertNotNull(results);
+    }
+
 }
