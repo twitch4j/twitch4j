@@ -13,6 +13,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.CryptoUtils;
+import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -163,6 +164,19 @@ public class TwitchChat implements AutoCloseable {
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
+
+    /**
+     * Helper class to compute delays between connection retries.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/irc/guide#re-connecting-to-twitch-irc">Official suggestion</a>
+     */
+    protected final ExponentialBackoffStrategy backoff = ExponentialBackoffStrategy.builder()
+        .immediateFirst(true)
+        .baseMillis(Duration.ofSeconds(1).toMillis())
+        .jitter(true)
+        .multiplier(2.0)
+        .maximumBackoff(Duration.ofMinutes(5).toMillis())
+        .build();
 
     /**
      * Constructor
@@ -403,6 +417,7 @@ public class TwitchChat implements AutoCloseable {
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
+                    backoff.reset();
                 }
 
                 @Override
@@ -454,10 +469,10 @@ public class TwitchChat implements AutoCloseable {
                                            WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                            boolean closedByServer) {
                     if (!connectionState.equals(TMIConnectionState.DISCONNECTING)) {
-                        log.info("Connection to Twitch IRC lost (WebSocket)! Retrying ...");
+                        log.info("Connection to Twitch IRC lost (WebSocket)! Retrying soon ...");
 
                         // connection lost - reconnecting
-                        reconnect();
+                        taskExecutor.schedule(() -> reconnect(), backoff.get(), TimeUnit.MILLISECONDS);
                     } else {
                         connectionState = TMIConnectionState.DISCONNECTED;
                         log.info("Disconnected from Twitch IRC (WebSocket)!");
