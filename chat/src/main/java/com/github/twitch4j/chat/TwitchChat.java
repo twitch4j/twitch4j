@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchChat implements AutoCloseable {
 
-    public static final int REQUIRED_THREAD_COUNT = 1;
+    public static final int REQUIRED_THREAD_COUNT = 2;
 
     /**
      * EventManager
@@ -177,6 +178,11 @@ public class TwitchChat implements AutoCloseable {
         .multiplier(2.0)
         .maximumBackoff(Duration.ofMinutes(5).toMillis())
         .build();
+
+    /**
+     * Calls {@link ExponentialBackoffStrategy#reset()} upon a successful websocket connection
+     */
+    private volatile Future<?> backoffClearer;
 
     /**
      * Constructor
@@ -328,9 +334,9 @@ public class TwitchChat implements AutoCloseable {
                 this.webSocket.connect();
             } catch (Exception ex) {
                 log.error("Connection to Twitch IRC failed: Retrying ...", ex);
-                // Sleep half before trying to reconnect
+                // Sleep before trying to reconnect
                 try {
-                    TimeUnit.MILLISECONDS.sleep(500L);
+                    backoff.sleep();
                 } catch (Exception ignored) {
 
                 } finally {
@@ -417,7 +423,10 @@ public class TwitchChat implements AutoCloseable {
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
-                    backoff.reset();
+                    backoffClearer = taskExecutor.schedule(() -> {
+                        if (connectionState == TMIConnectionState.CONNECTED)
+                            backoff.reset();
+                    }, 30, TimeUnit.SECONDS);
                 }
 
                 @Override
@@ -472,6 +481,7 @@ public class TwitchChat implements AutoCloseable {
                         log.info("Connection to Twitch IRC lost (WebSocket)! Retrying soon ...");
 
                         // connection lost - reconnecting
+                        if (backoffClearer != null) backoffClearer.cancel(false);
                         taskExecutor.schedule(() -> reconnect(), backoff.get(), TimeUnit.MILLISECONDS);
                     } else {
                         connectionState = TMIConnectionState.DISCONNECTED;
