@@ -161,6 +161,11 @@ public class TwitchPubSub implements AutoCloseable {
         .build();
 
     /**
+     * Calls {@link ExponentialBackoffStrategy#reset()} upon a successful websocket connection
+     */
+    private volatile Future<?> backoffClearer;
+
+    /**
      * Constructor
      *
      * @param eventManager EventManager
@@ -256,9 +261,9 @@ public class TwitchPubSub implements AutoCloseable {
             } catch (Exception ex) {
                 log.error("PubSub: Connection to Twitch PubSub failed: {} - Retrying ...", ex.getMessage());
 
-                // Sleep 1 second before trying to reconnect
+                // Sleep before trying to reconnect
                 try {
-                    TimeUnit.SECONDS.sleep(1L);
+                    backoff.sleep();
                 } catch (Exception ignored) {
 
                 } finally {
@@ -315,7 +320,10 @@ public class TwitchPubSub implements AutoCloseable {
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
-                    backoff.reset();
+                    backoffClearer = taskExecutor.schedule(() -> {
+                        if (connectionState == TMIConnectionState.CONNECTED)
+                            backoff.reset();
+                    }, 30, TimeUnit.SECONDS);
 
                     log.info("Connected to Twitch PubSub {}", WEB_SOCKET_SERVER);
 
@@ -587,6 +595,7 @@ public class TwitchPubSub implements AutoCloseable {
                         log.info("Connection to Twitch PubSub lost (WebSocket)! Retrying soon ...");
 
                         // connection lost - reconnecting
+                        if (backoffClearer != null) backoffClearer.cancel(false);
                         taskExecutor.schedule(() -> reconnect(), backoff.get(), TimeUnit.MILLISECONDS);
                     } else {
                         connectionState = TMIConnectionState.DISCONNECTED;
