@@ -328,7 +328,15 @@ public class TwitchPubSub implements AutoCloseable {
                     log.info("Connected to Twitch PubSub {}", WEB_SOCKET_SERVER);
 
                     // resubscribe to all topics after disconnect
-                    subscribedTopics.forEach(topic -> listenOnTopic(topic));
+                    // This involves nonce reuse, which is bad cryptography, but not a serious problem for this context
+                    // To avoid reuse, we can:
+                    // 0) stop other threads from updating subscribedTopics
+                    // 1) create a new PubSubRequest for each element of subscribedTopics (with a new nonce)
+                    // 2) clear subscribedTopics
+                    // 3) allow other threads to update subscribedTopics again
+                    // 4) send unlisten requests for the old elements of subscribedTopics (optional?)
+                    // 5) call listenOnTopic for each new PubSubRequest
+                    subscribedTopics.forEach(topic -> queueRequest(topic));
                 }
 
                 @Override
