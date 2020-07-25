@@ -1,5 +1,7 @@
 package kraken.endpoints;
 
+import com.github.twitch4j.kraken.domain.KrakenBlock;
+import com.github.twitch4j.kraken.domain.KrakenBlockTransaction;
 import com.github.twitch4j.kraken.domain.KrakenEmoticon;
 import com.github.twitch4j.kraken.domain.KrakenUser;
 import com.github.twitch4j.kraken.domain.KrakenUserList;
@@ -41,8 +43,23 @@ public class UsersServiceTest extends AbstractKrakenServiceTest {
     @DisplayName("getBlocks")
     @Disabled
     public void getBlocks() {
-        List<KrakenUser> resultList = getTwitchKrakenClient().getUserBlockList(getCredential().getAccessToken(), "149223493", null, null).execute().getBlocks();
+        List<KrakenBlock> resultList = getTwitchKrakenClient().getUserBlockList(getCredential().getAccessToken(), "149223493", null, null).execute().getBlocks();
         assertNotNull(resultList);
+    }
+
+    @Test
+    @DisplayName("blockUser")
+    @Disabled
+    public void blockUser() {
+        KrakenBlockTransaction block = getTwitchKrakenClient().blockUser(getCredential().getAccessToken(), "149223493", "12427").execute();
+        assertNotNull(block);
+    }
+
+    @Test
+    @DisplayName("unblockUser")
+    @Disabled
+    public void unblockUser() {
+        getTwitchKrakenClient().unblockUser(getCredential().getAccessToken(), "149223493", "12427").execute();
     }
 
     @Test
