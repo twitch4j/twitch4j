@@ -22,7 +22,7 @@ public class KrakenVideo {
     private String title;
     private String description;
     private String descriptionHtml;
-    private Integer broadcastId;
+    private Long broadcastId;
     private String broadcastType;
     private String status;
     private String tagList;

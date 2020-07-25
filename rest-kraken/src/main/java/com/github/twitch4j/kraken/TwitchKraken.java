@@ -478,7 +478,7 @@ public interface TwitchKraken {
      * @return {@link KrakenVideo}, the updated video
      */
     @RequestLine(
-        value = "POST /videos/{video_id}?description={description}&game={game}&language={language}&tag_list={tag_list}&title={title}",
+        value = "PUT /videos/{video_id}?description={description}&game={game}&language={language}&tag_list={tag_list}&title={title}",
         collectionFormat = CollectionFormat.CSV
     )
     @Headers({

@@ -58,6 +58,9 @@ public class TwitchKrakenBuilder {
     @With
     private Integer timeout = 5000;
 
+    @With
+    private Integer uploadTimeout = 4 * 60 * 1000;
+
     /**
      * ProxyConfiguration
      */
@@ -86,6 +89,9 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
+
+        // Hystrix: Timeout modification for file uploads
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#uploadVideoPart(URI,String,String,int,byte[]).execution.isolation.thread.timeoutInMilliseconds", uploadTimeout);
 
         // Jackson ObjectMapper
         ObjectMapper mapper = new ObjectMapper();
