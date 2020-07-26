@@ -39,6 +39,11 @@ public class IRCMessageEvent extends TwitchEvent {
 	 */
 	private Map<String, String> badges = new HashMap<>();
 
+    /**
+     * Metadata related to the chat badges in the badges tag
+     */
+    private Map<String, String> badgeInfo = new HashMap<>();
+
 	/**
 	 * Client
 	 */
@@ -91,8 +96,9 @@ public class IRCMessageEvent extends TwitchEvent {
 
 		this.parseRawMessage();
 
-		// permissions
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags()));
+        // permissions and badges
+		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges));
+		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
 	}
 
 	/**
@@ -232,6 +238,36 @@ public class IRCMessageEvent extends TwitchEvent {
         return null;
     }
 
+    /**
+     * @return the exact number of months the user has been a subscriber, or empty if they are not subscribed
+     */
+    public OptionalInt getSubscriberMonths() {
+        final String monthsStr = badgeInfo.get("subscriber");
+
+        if (monthsStr != null)
+            try {
+                return OptionalInt.of(Integer.parseInt(monthsStr));
+            } catch (Exception ignored) {
+            }
+
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return the tier at which the user is subscribed, or empty if they are not subscribed
+     */
+    public OptionalInt getSubscriptionTier() {
+        final String subscriber = badges.get("subscriber");
+
+        if (subscriber != null)
+            try {
+                return OptionalInt.of(Math.max(Integer.parseInt(subscriber) / 1000, 1));
+            } catch (Exception ignored) {
+            }
+
+        return OptionalInt.empty();
+    }
+
 	/**
 	 * Gets a optional tag from the irc message
      *
@@ -239,15 +275,9 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String tagValue
 	 */
 	public Optional<String> getTagValue(String tagName) {
-		if(getTags().containsKey(tagName)) {
-			String value = getTags().get(tagName);
-			if(StringUtils.isBlank(value)) return Optional.empty();
-
-			value = value.replaceAll("\\\\s", " ");
-			return Optional.ofNullable(value);
-		}
-
-		return Optional.empty();
+	    return Optional.ofNullable(getTags().get(tagName))
+            .filter(StringUtils::isNotBlank)
+            .map(s -> s.replaceAll("\\\\s", " "));
 	}
 
 	/**
