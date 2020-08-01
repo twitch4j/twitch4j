@@ -1,8 +1,6 @@
 package com.github.twitch4j.common.util;
 
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.Value;
 
 import java.time.Duration;
@@ -75,7 +73,6 @@ public class ExponentialBackoffStrategy {
     /**
      * The number of consecutive failures that have occurred.
      */
-    @Getter(value = AccessLevel.PROTECTED)
     AtomicInteger failures = new AtomicInteger();
 
     /**
@@ -156,7 +153,15 @@ public class ExponentialBackoffStrategy {
      * Resets the failure count for exponential backoff calculations.
      */
     public void reset() {
-        this.failures.set(0);
+        setFailures(0);
+    }
+
+    public void setFailures(int failures) {
+        this.failures.set(failures);
+    }
+
+    public int getFailures() {
+        return this.failures.get();
     }
 
     /**
