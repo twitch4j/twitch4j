@@ -338,7 +338,7 @@ public class TwitchClientBuilder {
 
         // Module: TwitchClient & ClientHelper
         final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
-        client.getClientHelper().setThreadRate(helperThreadRate);
+        client.getClientHelper().setThreadDelay(helperThreadRate);
 
         // Return new Client Instance
         return client;
