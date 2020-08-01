@@ -77,10 +77,9 @@ subprojects {
 			api group: 'com.netflix.hystrix', name: 'hystrix-core', version: '1.5.18'
 
 			// Jackson (JSON)
-			api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
-			api group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.0'
-			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.11.0'
-			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.0'
+			api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.1'
+			api group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.1'
+			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.1'
 
 			// WebSocket
 			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
