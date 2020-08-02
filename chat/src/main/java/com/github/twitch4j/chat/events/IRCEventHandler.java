@@ -135,9 +135,11 @@ public class IRCEventHandler {
                 EventUser user = event.getUser();
                 String message = event.getMessage().orElse("");
                 Integer bits = Integer.parseInt(event.getTags().get("bits"));
+                int subMonths = event.getSubscriberMonths().orElse(0);
+                int subTier = event.getSubscriptionTier().orElse(0);
 
                 // Dispatch Event
-                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, event.getFlags()));
+                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
         }
     }
