@@ -35,6 +35,16 @@ public class CheerEvent extends AbstractChannelEvent {
 	private Integer bits;
 
     /**
+     * The exact number of months the user has been a subscriber, or zero if not subscribed
+     */
+    private int subscriberMonths;
+
+    /**
+     * The tier at which the user is subscribed (prime is treated as 1), or zero if not subscribed
+     */
+    private int subscriptionTier;
+
+    /**
      * Regions of {@link #getMessage()} that were flagged by AutoMod (Unofficial)
      */
     @Unofficial
@@ -42,18 +52,22 @@ public class CheerEvent extends AbstractChannelEvent {
 
 	/**
 	 * Event Constructor
-	 *
-	 * @param channel The channel that this event originates from.
-	 * @param user The donating user.
-	 * @param message The donation message.
-	 * @param bits The amount of bits.
-	 * @param flags The regions of the message that were flagged by AutoMod.
-	 */
-	public CheerEvent(EventChannel channel, EventUser user, String message, Integer bits, List<AutoModFlag> flags) {
+     *
+     * @param channel The channel that this event originates from.
+     * @param user The donating user.
+     * @param message The donation message.
+     * @param bits The amount of bits.
+     * @param subscriberMonths The exact number of months the user has been a subscriber.
+     * @param subscriptionTier The tier at which the user is subscribed.
+     * @param flags The regions of the message that were flagged by AutoMod.
+     */
+	public CheerEvent(EventChannel channel, EventUser user, String message, Integer bits, int subscriberMonths, int subscriptionTier, List<AutoModFlag> flags) {
 		super(channel);
 		this.user = user;
 		this.message = message;
 		this.bits = bits;
-		this.flags = flags;
+        this.subscriberMonths = subscriberMonths;
+        this.subscriptionTier = subscriptionTier;
+        this.flags = flags;
 	}
 }
