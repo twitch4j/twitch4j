@@ -11,7 +11,9 @@ import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.util.ChatReply;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.neovisionaries.ws.client.WebSocket;
@@ -30,6 +32,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -574,8 +577,44 @@ public class TwitchChat implements AutoCloseable {
      * @param message message
      */
     public void sendMessage(String channel, String message) {
+        this.sendMessage(channel, message, null);
+    }
+
+    /**
+     * Sends a message to the channel while including an optional nonce and/or reply parent.
+     *
+     * @param channel    the name of the channel to send the message to.
+     * @param message    the message to be sent.
+     * @param nonce      the cryptographic nonce (optional).
+     * @param replyMsgId the msgId of the parent message being replied to (optional).
+     */
+    @Unofficial
+    public void sendMessage(String channel, String message, String nonce, String replyMsgId) {
+        final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
+        if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
+        if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
+        this.sendMessage(channel, message, tags);
+    }
+
+    /**
+     * Sends a message to the channel while including the specified message tags.
+     *
+     * @param channel the name of the channel to send the message to.
+     * @param message the message to be sent.
+     * @param tags    the message tags (unofficial).
+     */
+    public void sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
+        StringBuilder sb = new StringBuilder();
+        if (tags != null && !tags.isEmpty()) {
+            sb.append('@');
+            tags.forEach((k, v) -> sb.append(k).append('=').append(v).append(';'));
+            sb.setLength(sb.length() - 1); // remove last semi-colon
+            sb.append(' ');
+        }
+        sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
+
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        ircCommandQueue.offer(String.format("PRIVMSG #%s :%s", channel.toLowerCase(), message));
+        ircCommandQueue.offer(sb.toString());
     }
 
     /**
@@ -587,6 +626,17 @@ public class TwitchChat implements AutoCloseable {
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
         whisperCommandQueue.offer(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message));
+    }
+
+    /**
+     * Deletes a message.
+     *
+     * @param channel     the name of the channel to delete the message from.
+     * @param targetMsgId the unique id of the message to be deleted.
+     * @see IRCMessageEvent#getMessageId()
+     */
+    public void delete(String channel, String targetMsgId) {
+        sendMessage(channel, String.format("/delete %s", targetMsgId));
     }
 
     /**

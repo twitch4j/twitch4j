@@ -24,6 +24,9 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
 
+    @Unofficial
+    public static final String NONCE_TAG_NAME = "client-nonce";
+
 	/**
 	 * Tags
 	 */
@@ -236,6 +239,23 @@ public class IRCMessageEvent extends TwitchEvent {
         }
 
         return null;
+    }
+
+    /**
+     * The message UUID that is used for deletion by a moderator or a chat reply (from Tags)
+     *
+     * @return the unique ID for the message
+     */
+    public Optional<String> getMessageId() {
+        return getTagValue("id");
+    }
+
+    /**
+     * @return the client nonce for the message.
+     */
+    @Unofficial
+    public Optional<String> getNonce() {
+        return getTagValue(NONCE_TAG_NAME);
     }
 
     /**
