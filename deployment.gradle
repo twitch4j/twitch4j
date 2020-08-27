@@ -139,6 +139,8 @@ bintray {
     key = System.getenv("BINTRAY_API_KEY")
     publications = ['mainProject']
     dryRun = false
+	publish = true
+	override = false
     pkg {
         // jcenter repository namespace and name
         userOrg = String.valueOf(project.artifactNamespace).toLowerCase()
