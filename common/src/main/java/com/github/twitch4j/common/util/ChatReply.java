@@ -6,6 +6,8 @@ import lombok.Value;
 
 import java.util.Map;
 
+import static com.github.twitch4j.common.util.EscapeUtils.unescapeTagValue;
+
 /**
  * Meta-info regarding the <i>parent</i> message being replied to.
  */
@@ -54,10 +56,10 @@ public class ChatReply {
 
         return new ChatReply(
             msgId,
-            tags.get("reply-parent-msg-body"),
+            unescapeTagValue(tags.get("reply-parent-msg-body")),
             tags.get("reply-parent-user-id"),
             tags.get("reply-parent-user-login"),
-            tags.get("reply-parent-display-name")
+            unescapeTagValue(tags.get("reply-parent-display-name"))
         );
     }
 }
