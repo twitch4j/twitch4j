@@ -7,6 +7,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
+import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -297,7 +298,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	public Optional<String> getTagValue(String tagName) {
 	    return Optional.ofNullable(getTags().get(tagName))
             .filter(StringUtils::isNotBlank)
-            .map(s -> s.replaceAll("\\\\s", " "));
+            .map(EscapeUtils::unescapeTagValue);
 	}
 
 	/**

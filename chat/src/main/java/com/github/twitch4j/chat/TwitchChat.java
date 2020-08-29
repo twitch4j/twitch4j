@@ -15,6 +15,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ChatReply;
 import com.github.twitch4j.common.util.CryptoUtils;
+import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -607,7 +608,7 @@ public class TwitchChat implements AutoCloseable {
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {
             sb.append('@');
-            tags.forEach((k, v) -> sb.append(k).append('=').append(escapeTagValue(v)).append(';'));
+            tags.forEach((k, v) -> sb.append(k).append('=').append(EscapeUtils.escapeTagValue(v)).append(';'));
             sb.setCharAt(sb.length() - 1, ' '); // replace last semi-colon with space
         }
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
@@ -734,41 +735,4 @@ public class TwitchChat implements AutoCloseable {
     public List<String> getCurrentChannels() {
         return Collections.unmodifiableList(new ArrayList<>(channelCache));
     }
-
-    /**
-     * Escapes a value for use in an IRC message tag.
-     *
-     * @param value the unescaped message tag value
-     * @return the escaped tag value
-     * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Offical spec</a>
-     */
-    private static String escapeTagValue(Object value) {
-        if (value == null) return "";
-        char[] unescaped = value.toString().toCharArray();
-        StringBuilder sb = new StringBuilder(unescaped.length);
-        for (char c : unescaped) {
-            switch (c) {
-                case ';':
-                    sb.append("\\:");
-                    break;
-                case ' ':
-                    sb.append("\\s");
-                    break;
-                case '\\':
-                    sb.append("\\\\");
-                    break;
-                case '\r':
-                    sb.append("\\r");
-                    break;
-                case '\n':
-                    sb.append("\\n");
-                    break;
-                default:
-                    sb.append(c);
-                    break;
-            }
-        }
-        return sb.toString();
-    }
-
 }
