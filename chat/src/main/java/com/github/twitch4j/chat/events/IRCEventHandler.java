@@ -9,6 +9,7 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Month;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
  * Listens for any irc triggered events and created the corresponding events for the EventDispatcher.
  */
 @Getter
+@Slf4j
 public class IRCEventHandler {
 
     /**
@@ -65,6 +67,7 @@ public class IRCEventHandler {
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRewardGift);
         eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
+        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
     }
 
     /**
@@ -459,7 +462,7 @@ public class IRCEventHandler {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
             String messageId = event.getTagValue("msg-id").get();
-            String message = event.getMessage().get();
+            String message = event.getMessage().orElse(null); // can be null, ie. bad_delete_message_error
 
             eventManager.publish(new ChannelNoticeEvent(channel, messageId, message));
         }
@@ -522,6 +525,20 @@ public class IRCEventHandler {
                 });
             }
             eventManager.publish(new ChannelStateEvent(channel, states));
+        }
+    }
+
+    public void onMessageDeleteResponse(IRCMessageEvent event) {
+        if (event.getCommandType().equals("NOTICE")) {
+            EventChannel channel = event.getChannel();
+            String messageId = event.getTagValue("msg-id").get();
+
+            if (messageId.equals("delete_message_success")) {
+                eventManager.publish(new MessageDeleteSuccess(channel));
+            } else if (messageId.equals("bad_delete_message_error")) {
+                eventManager.publish(new MessageDeleteError(channel));
+                log.warn("Failed to delete a message in {}!", channel.getName());
+            }
         }
     }
 }
