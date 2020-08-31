@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Value;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -84,6 +85,30 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 		this.subscriberMonths = messageEvent.getSubscriberMonths().orElse(0);
 		this.subscriptionTier = messageEvent.getSubscriptionTier().orElse(0);
 	}
+
+    /**
+     * @return whether "Highlight My Message" was redeemed for this event
+     */
+    @Unofficial
+    public boolean isHighlightedMessage() {
+        return "highlighted-message".equals(getMessageEvent().getTags().get("msg-id"));
+    }
+
+    /**
+     * @return whether "Send a Message in Sub-Only Mode" was redeemed for this event
+     */
+    @Unofficial
+    public boolean isSkipSubsModeMessage() {
+        return "skip-subs-mode-message".equals(getMessageEvent().getTags().get("msg-id"));
+    }
+
+    /**
+     * @return the id for the custom reward that was redeemed with this associated message, in an optional wrapper
+     */
+    @Unofficial
+    public Optional<String> getCustomRewardId() {
+        return getMessageEvent().getTagValue("custom-reward-id");
+    }
 
     /**
      * @return the regions of the message that were flagged by AutoMod.
