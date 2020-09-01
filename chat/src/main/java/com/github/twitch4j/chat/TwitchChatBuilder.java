@@ -9,12 +9,14 @@ import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -80,6 +82,13 @@ public class TwitchChatBuilder {
      */
     @With
     private boolean sendCredentialToThirdPartyHost = false;
+
+    /**
+     * User IDs of Bot Owners for applying {@link com.github.twitch4j.common.enums.CommandPermission#OWNER}
+     */
+    @Setter
+    @Accessors(chain = true)
+    protected Collection<String> botOwnerIds = new HashSet<>();
 
     /**
      * IRC Command Handlers
@@ -148,7 +157,7 @@ public class TwitchChatBuilder {
         }
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.botOwnerIds);
     }
 
     /**
@@ -170,6 +179,28 @@ public class TwitchChatBuilder {
      */
     public TwitchChatBuilder withCommandTriggers(Collection<String> commandTrigger) {
         this.commandPrefixes.addAll(commandTrigger);
+        return this;
+    }
+
+    /**
+     * With a Bot Owner's User ID
+     *
+     * @param userId the user id
+     * @return TwitchChatBuilder
+     */
+    public TwitchChatBuilder withBotOwnerId(String userId) {
+        this.botOwnerIds.add(userId);
+        return this;
+    }
+
+    /**
+     * With multiple Bot Owner User IDs
+     *
+     * @param botOwnerIds the user ids
+     * @return TwitchChatBuilder
+     */
+    public TwitchChatBuilder withBotOwnerIds(Collection<String> botOwnerIds) {
+        this.botOwnerIds.addAll(botOwnerIds);
         return this;
     }
 }

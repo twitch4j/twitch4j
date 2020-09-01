@@ -90,18 +90,28 @@ public class IRCMessageEvent extends TwitchEvent {
 	 */
 	private final String rawMessage;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param rawMessage      The raw message.
-	 */
-	public IRCMessageEvent(String rawMessage) {
+    /**
+     * Event Constructor
+     *
+     * @param rawMessage The raw message.
+     */
+    public IRCMessageEvent(String rawMessage) {
+        this(rawMessage, null);
+    }
+
+    /**
+     * Event Constructor
+     *
+     * @param rawMessage  The raw message.
+     * @param botOwnerIds The bot owner ids.
+     */
+	public IRCMessageEvent(String rawMessage, Collection<String> botOwnerIds) {
 		this.rawMessage = rawMessage;
 
 		this.parseRawMessage();
 
         // permissions and badges
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges));
+		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
 		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
 	}
 
