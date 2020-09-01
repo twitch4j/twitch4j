@@ -34,8 +34,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,6 +137,11 @@ public class TwitchPubSub implements AutoCloseable {
     protected final ScheduledExecutorService taskExecutor;
 
     /**
+     * Bot Owner IDs
+     */
+    private final Collection<String> botOwnerIds;
+
+    /**
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
@@ -171,9 +178,11 @@ public class TwitchPubSub implements AutoCloseable {
      * @param eventManager EventManager
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param proxyConfig  ProxyConfig
+     * @param botOwnerIds  Bot Owner IDs
      */
-    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig) {
+    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds) {
         this.taskExecutor = taskExecutor;
+        this.botOwnerIds = botOwnerIds;
         this.eventManager = eventManager;
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-pubsub", this);
@@ -374,7 +383,7 @@ public class TwitchPubSub implements AutoCloseable {
 
                                 String body = msgDataParsed.get("body").asText();
 
-                                Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags);
+                                Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags, new HashMap<>(), fromId, botOwnerIds);
 
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);

@@ -26,6 +26,10 @@ public class TwitchUtils {
     }
 
     public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges) {
+        return getPermissionsFromTags(tags, badges, null, null);
+    }
+
+    public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges, String userId, Collection<String> botOwnerIds) {
         Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
 
         // Check for Permissions
@@ -94,6 +98,9 @@ public class TwitchUtils {
                 */
             }
         }
+
+        if (userId != null && botOwnerIds != null && botOwnerIds.contains(userId))
+            permissionSet.add(CommandPermission.OWNER);
 
         return permissionSet;
     }

@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -150,6 +151,11 @@ public class TwitchChat implements AutoCloseable {
     protected volatile Boolean stopQueueThread = false;
 
     /**
+     * Bot Owner IDs
+     */
+    protected final Collection<String> botOwnerIds;
+
+    /**
      * IRC Command Handlers
      */
     protected final List<String> commandPrefixes;
@@ -203,14 +209,16 @@ public class TwitchChat implements AutoCloseable {
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      * @param proxyConfig Proxy Configuration
+     * @param botOwnerIds Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
         this.baseUrl = baseUrl;
         this.sendCredentialToThirdPartyHost = sendCredentialToThirdPartyHost;
         this.commandPrefixes = commandPrefixes;
+        this.botOwnerIds = botOwnerIds;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.whisperCommandQueue = new LinkedBlockingQueue<>();
         this.chatRateLimit = chatRateLimit;
@@ -462,7 +470,7 @@ public class TwitchChat implements AutoCloseable {
                                 else
                                 {
                                     try {
-                                        IRCMessageEvent event = new IRCMessageEvent(message);
+                                        IRCMessageEvent event = new IRCMessageEvent(message, botOwnerIds);
 
                                         if(event.isValid()) {
                                             eventManager.publish(event);

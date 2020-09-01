@@ -4,9 +4,12 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -37,6 +40,13 @@ public class TwitchPubSubBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * User IDs of Bot Owners for applying {@link com.github.twitch4j.common.enums.CommandPermission#OWNER}
+     */
+    @Setter
+    @Accessors(chain = true)
+    private Collection<String> botOwnerIds = new HashSet<>();
+
+    /**
      * Initialize the builder
      *
      * @return Twitch PubSub Builder
@@ -60,7 +70,28 @@ public class TwitchPubSubBuilder {
             eventManager.autoDiscovery();
         }
 
-        return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig);
+        return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds);
     }
 
+    /**
+     * With a Bot Owner's User ID
+     *
+     * @param userId the user id
+     * @return TwitchPubSubBuilder
+     */
+    public TwitchPubSubBuilder withBotOwnerId(String userId) {
+        this.botOwnerIds.add(userId);
+        return this;
+    }
+
+    /**
+     * With multiple Bot Owner User IDs
+     *
+     * @param botOwnerIds the user ids
+     * @return TwitchPubSubBuilder
+     */
+    public TwitchPubSubBuilder withBotOwnerIds(Collection<String> botOwnerIds) {
+        this.botOwnerIds.addAll(botOwnerIds);
+        return this;
+    }
 }
