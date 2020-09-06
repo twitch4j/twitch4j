@@ -5,17 +5,17 @@ import com.github.twitch4j.extensions.domain.ConfigurationSegment;
 import com.github.twitch4j.extensions.domain.ConfigurationSegmentType;
 import com.github.twitch4j.extensions.domain.ExtensionConfigurationSegment;
 import com.github.twitch4j.extensions.domain.ExtensionSecretList;
+import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * Twitch - Helix Extensions
+ * Twitch - Extensions API
  */
 public interface TwitchExtensions {
 
@@ -127,7 +127,7 @@ public interface TwitchExtensions {
         @Param("token") String jsonWebToken,
         @Param("extension_version") String extensionVersion,
         @Param("channel_id") String channelId,
-        @Param("required_configuration") String requiredConfiguration
+        @Param(value = "required_configuration", expander = JsonStringExpander.class) String requiredConfiguration
     );
 
     /**
@@ -170,7 +170,6 @@ public interface TwitchExtensions {
     @Headers({
         "Client-Id: {client_id}",
         "Authorization: Bearer {token}"
-        // "Content-Type: application/json"
     })
     HystrixCommand<Map<String, ConfigurationSegment>> getExtensionChannelConfiguration(
         @Param("client_id") String clientId,
@@ -195,7 +194,6 @@ public interface TwitchExtensions {
     @Headers({
         "Client-Id: {client_id}",
         "Authorization: Bearer {token}"
-        // "Content-Type: application/json"
     })
     HystrixCommand<Map<String, ConfigurationSegment>> getExtensionConfigurationSegment(
         @Param("client_id") String clientId,
@@ -224,13 +222,13 @@ public interface TwitchExtensions {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"content_type\":\"application/json\",\"message\":\"{message}\",\"targets\":[{targets}]%7D")
+    @Body("%7B\"content_type\":\"application/json\",\"message\":\"{message}\",\"targets\":[\"{targets}\"]%7D")
     HystrixCommand<Void> sendExtensionPubSubMessage(
         @Param("client_id") String clientId,
         @Param("token") String jsonWebToken,
         @Param("channel_id") String channelId,
-        @Param("message") String message,
-        @Param("targets") List<String> targets
+        @Param(value = "message", expander = JsonStringExpander.class) String message,
+        @Param(value = "targets") String targets // Cannot be treated as List<String> due to feign limitation (" is converted to %22 and Param#encoded is deprecated/ineffective)
     );
 
     /**
@@ -262,7 +260,7 @@ public interface TwitchExtensions {
         @Param("token") String jsonWebToken,
         @Param("extension_version") String extensionVersion,
         @Param("channel_id") String channelId,
-        @Param("text") String text
+        @Param(value = "text", expander = JsonStringExpander.class) String text
     );
 
 }
