@@ -511,7 +511,7 @@ public class TwitchClientHelper implements AutoCloseable {
     private void runRecursiveStreamStatusCheck() {
         if (streamStatusEventFuture.get() != null)
             synchronized (streamStatusEventFuture) {
-                if (streamStatusEventFuture.get() != null)
+                if (cancel(streamStatusEventFuture))
                     streamStatusEventFuture.set(
                         executor.submit(
                             new ListenerRunnable<>(
@@ -536,7 +536,7 @@ public class TwitchClientHelper implements AutoCloseable {
     private void runRecursiveFollowerCheck() {
         if (followerEventFuture.get() != null)
             synchronized (followerEventFuture) {
-                if (followerEventFuture.get() != null)
+                if (cancel(followerEventFuture))
                     followerEventFuture.set(
                         executor.submit(
                             new ListenerRunnable<>(
@@ -608,7 +608,7 @@ public class TwitchClientHelper implements AutoCloseable {
                 // Try again later if the task wasn't cancelled
                 if (futureReference.get() != null)
                     synchronized (futureReference) {
-                        if (futureReference.get() != null) {
+                        if (cancel(futureReference)) {
                             backoff.get().reset();
                             futureReference.set(executor.schedule(startCommand, backoff.get().get(), TimeUnit.MILLISECONDS));
                         }
@@ -626,7 +626,7 @@ public class TwitchClientHelper implements AutoCloseable {
             // Queue up the next check (if the task hasn't been cancelled)
             if (futureReference.get() != null)
                 synchronized (futureReference) {
-                    if (futureReference.get() != null)
+                    if (cancel(futureReference))
                         futureReference.set(
                             executor.schedule(
                                 index + 1 < channels.size() ? () -> run(index + 1) : startCommand,
@@ -636,6 +636,11 @@ public class TwitchClientHelper implements AutoCloseable {
                         );
                 }
         }
+    }
+
+    private static boolean cancel(AtomicReference<Future<?>> futureRef) {
+        Future<?> future = futureRef.get();
+        return future != null && future.cancel(false);
     }
 
 }
