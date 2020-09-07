@@ -170,7 +170,7 @@ public class TwitchClientBuilder {
      * Millisecond Delay for Client Helper Thread
      */
     @With
-    private long helperThreadRate = 10000L;
+    private long helperThreadDelay = 10000L;
 
     /**
      * Default Auth Token for API Requests
@@ -193,6 +193,21 @@ public class TwitchClientBuilder {
     public TwitchClientBuilder withCommandTrigger(String commandTrigger) {
         this.commandPrefixes.add(commandTrigger);
         return this;
+    }
+
+    /**
+     * With a base thread delay for API calls by {@link TwitchClientHelper}
+     * <p>
+     * Note: the method name has been a misnomer as it has always set the <i>delay</i> rather than a rate.
+     * One can change the <i>rate</i> at any time via {@link TwitchClientHelper#setThreadRate(long)}.
+     *
+     * @param helperThreadDelay TwitchClientHelper Base Thread Delay
+     * @return TwitchClientBuilder
+     * @deprecated in favor of withHelperThreadDelay
+     */
+    @Deprecated
+    public TwitchClientBuilder withHelperThreadRate(long helperThreadDelay) {
+        return this.withHelperThreadDelay(helperThreadDelay);
     }
 
     /**
@@ -316,7 +331,7 @@ public class TwitchClientBuilder {
 
         // Module: TwitchClient & ClientHelper
         final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
-        client.getClientHelper().setThreadDelay(helperThreadRate);
+        client.getClientHelper().setThreadDelay(helperThreadDelay);
 
         // Return new Client Instance
         return client;
