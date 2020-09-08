@@ -50,7 +50,7 @@ public class TwitchChatTest {
         // listen for events in channel
         List<ChannelMessageEvent> channelMessages = new ArrayList<>();
         twitchChat.joinChannel("twitch4j");
-        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
+        twitchChat.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
             channelMessages.add(event);
             log.debug(event.toString());
         });
@@ -72,11 +72,11 @@ public class TwitchChatTest {
         // listen for events in channel
         List<ChannelMessageEvent> channelMessages = new ArrayList<>();
         twitchChat.joinChannel("twitch4j");
-        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, event -> {
+        twitchChat.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
             log.debug(event.toString());
         });
 
-        twitchChat.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(CommandEvent.class, event -> {
+        twitchChat.getEventManager().onEvent(CommandEvent.class, event -> {
             log.debug(event.toString());
         });
 
