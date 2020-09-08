@@ -326,7 +326,7 @@ public class TwitchChat implements AutoCloseable {
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
 
         // register event handler
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(ChannelMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**

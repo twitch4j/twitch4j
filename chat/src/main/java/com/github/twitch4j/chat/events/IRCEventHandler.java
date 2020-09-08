@@ -49,26 +49,26 @@ public class IRCEventHandler {
         this.eventManager = twitchChat.getEventManager();
 
         // register event handlers
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelMessage);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onWhisper);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelCheer);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelSubscription);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onClearChat);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannnelClientJoinEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelModChange);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onNoticeEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOnEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onGiftReceived);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onPayForward);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRewardGift);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent(IRCMessageEvent.class, this::onWhisper);
+        eventManager.onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelCheer);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelSubscription);
+        eventManager.onEvent(IRCMessageEvent.class, this::onClearChat);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientJoinEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelModChange);
+        eventManager.onEvent(IRCMessageEvent.class, this::onNoticeEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onHostOnEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onHostOffEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelState);
+        eventManager.onEvent(IRCMessageEvent.class, this::onGiftReceived);
+        eventManager.onEvent(IRCMessageEvent.class, this::onPayForward);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRaid);
+        eventManager.onEvent(IRCMessageEvent.class, this::onUnraid);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRewardGift);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRitual);
+        eventManager.onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
     }
 
     /**

@@ -3,7 +3,9 @@ package com.github.twitch4j;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
@@ -138,6 +140,12 @@ public class TwitchClientBuilder {
     private EventManager eventManager = null;
 
     /**
+     * EventManager
+     */
+    @With
+    private Class<? extends IEventHandler> defaultEventHandler = null;
+
+    /**
      * Size of the ChatQueue
      */
     @With
@@ -254,6 +262,9 @@ public class TwitchClientBuilder {
         if (eventManager == null) {
             eventManager = new EventManager();
             eventManager.autoDiscovery();
+        }
+        if (defaultEventHandler != null) {
+            eventManager.setDefaultEventHandler(defaultEventHandler);
         }
 
         // Determinate required threadPool size
