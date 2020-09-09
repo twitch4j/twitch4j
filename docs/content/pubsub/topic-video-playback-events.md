@@ -60,10 +60,10 @@ twitchClient.getPubSub().listenForVideoPlaybackByNameEvents(credential, "twitch4
 
 ```java
 // Handle all subtypes
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(VideoPlaybackEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(VideoPlaybackEvent.class, System.out::println);
 
 // Alternatively, only consider a specific subtype
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(VideoPlaybackEvent.class, e -> {
+twitchClient.getEventManager().onEvent(VideoPlaybackEvent.class, e -> {
 	if (e.getData().getType() == VideoPlaybackData.Type.STREAM_UP) {
 		System.out.println(e); // Handle Go Live
 	}

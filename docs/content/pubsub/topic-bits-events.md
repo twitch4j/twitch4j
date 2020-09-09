@@ -29,5 +29,5 @@ Subscribe to all cheers to user twitch4j and register a listener that prints all
 ```java
 twitchClient.getPubSub().listenForCheerEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelBitsEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelBitsEvent.class, System.out::println);
 ```
