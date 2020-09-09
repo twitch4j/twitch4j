@@ -31,5 +31,5 @@ Subscribe to all whispers to user twitch4j and register a listener that prints a
 ```java
 twitchClient.getPubSub().listenForWhisperEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(PrivateMessageEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(PrivateMessageEvent.class, System.out::println);
 ```

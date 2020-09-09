@@ -29,5 +29,5 @@ Subscribe to all subscription events to the twitch4j channel and register a list
 ```java
 twitchClient.getPubSub().listenForSubscriptionEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelSubscribeEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelSubscribeEvent.class, System.out::println);
 ```

@@ -39,10 +39,10 @@ Subscribe to presence events for user `twitch4j` and register a listener that pr
 twitchClient.getPubSub().listenForPresenceEvents(credential, "149223493");
 
 // Listen for presence updates
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(UserPresenceEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(UserPresenceEvent.class, System.out::println);
 
 // Listen for updates to the user's presence settings
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(PresenceSettingsEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(PresenceSettingsEvent.class, System.out::println);
 ```
 
 ### Example: Live status monitoring
@@ -54,7 +54,7 @@ Note: these events tend to be fired significantly faster than the documented ana
 Disclaimer: do not solely rely upon this code; fallback mechanisms should be employed as well.
 
 ```java
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(UserPresenceEvent.class, e -> {
+twitchClient.getEventManager().onEvent(UserPresenceEvent.class, e -> {
 	boolean wentLive = e.getData().getActivities().stream().anyMatch(a -> "broadcasting".equalsIgnoreCase(a.getType()));
 	if (wentLive) {
 		System.out.println(e); // Handle Go Live

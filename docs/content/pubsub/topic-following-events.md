@@ -28,5 +28,5 @@ Subscribe to new follower events for user twitch4j and register a listener that 
 ```java
 twitchClient.getPubSub().listenForFollowingEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(FollowingEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(FollowingEvent.class, System.out::println);
 ```

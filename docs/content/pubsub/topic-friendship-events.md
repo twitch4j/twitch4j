@@ -32,5 +32,5 @@ Subscribe to friendship events for user twitch4j and register a listener that pr
 ```java
 twitchClient.getPubSub().listenForFriendshipEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(FriendshipEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(FriendshipEvent.class, System.out::println);
 ```

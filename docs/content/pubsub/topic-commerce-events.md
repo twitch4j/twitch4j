@@ -29,5 +29,5 @@ Subscribe to all commerce purchases in the twitch4j channel and register a liste
 ```java
 twitchClient.getPubSub().listenForCommerceEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelCommerceEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelCommerceEvent.class, System.out::println);
 ```

@@ -31,7 +31,7 @@ Subscribe to all moderation events in the twitch4j channel and register a listen
 ```java
 twitchClient.getPubSub().listenForModerationEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChatModerationEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChatModerationEvent.class, System.out::println);
 ```
 
 ### Unofficial

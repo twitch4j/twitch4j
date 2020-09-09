@@ -29,10 +29,10 @@ Subscribe to all onsite notifications for user `twitch4j` and register listeners
 twitchClient.getPubSub().listenForOnsiteNotificationEvents(credential, "149223493");
 
 // Listen to notification creations
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(OnsiteNotificationCreationEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(OnsiteNotificationCreationEvent.class, System.out::println);
 
 // Listen for notification summary updates
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(UpdateOnsiteNotificationSummaryEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(UpdateOnsiteNotificationSummaryEvent.class, System.out::println);
 ```
 
 ### Example: Live status monitoring
@@ -55,7 +55,7 @@ interestedChannelIds.add("142621956");
 twitchClient.getPubSub().listenForOnsiteNotificationEvents(credential, userId);
 
 // Listen to notification creations
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(OnsiteNotificationCreationEvent.class, e -> {
+twitchClient.getEventManager().onEvent(OnsiteNotificationCreationEvent.class, e -> {
 	OnsiteNotification notification = e.getData().getNotification();
 	if ("streamup".equalsIgnoreCase(notification.getType())) {
 		List<OnsiteNotification.Creator> creators = notification.getCreators();

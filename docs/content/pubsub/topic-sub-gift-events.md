@@ -28,5 +28,5 @@ Subscribe to all sub gift events in channel `twitch4j` and register a listener t
 ```java
 twitchClient.getPubSub().listenForChannelSubGiftsEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelSubGiftEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelSubGiftEvent.class, System.out::println);
 ```
