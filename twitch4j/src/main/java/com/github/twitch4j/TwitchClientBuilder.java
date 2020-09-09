@@ -5,13 +5,14 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
+import com.github.twitch4j.extensions.TwitchExtensions;
+import com.github.twitch4j.extensions.TwitchExtensionsBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -78,6 +79,12 @@ public class TwitchClientBuilder {
      */
     @With
     private Integer timeout = 5000;
+
+    /**
+     * Enabled: Extensions
+     */
+    @With
+    private Boolean enableExtensions = false;
 
     /**
      * Enabled: Helix
@@ -282,6 +289,19 @@ public class TwitchClientBuilder {
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-"+ RandomStringUtils.random(4, true, true), poolSize);
         }
 
+        // Module: Extensions
+        TwitchExtensions extensions = null;
+        if (this.enableExtensions) {
+            extensions = TwitchExtensionsBuilder.builder()
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
+                .withUserAgent(userAgent)
+                .withRequestQueueSize(requestQueueSize)
+                .withTimeout(timeout)
+                .withProxyConfig(proxyConfig)
+                .build();
+        }
+
         // Module: Helix
         TwitchHelix helix = null;
         if (this.enableHelix) {
@@ -363,7 +383,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: TwitchClient & ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
+        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
         client.getClientHelper().setThreadDelay(helperThreadDelay);
 
         // Return new Client Instance

@@ -83,7 +83,7 @@ public class TwitchClientTest {
             .withDefaultAuthToken(TestUtils.getCredential())
             .withEnablePubSub(true)
             .withEnableGraphQL(false)
-            .withHelperThreadRate(10000L)
+            .withHelperThreadDelay(10000L)
             .build();
 
         // your code here
