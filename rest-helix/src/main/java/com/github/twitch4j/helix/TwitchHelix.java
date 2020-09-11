@@ -6,7 +6,7 @@ import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -289,8 +289,8 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit,
-        @Param("started_at") Date startedAt,
-        @Param("ended_at") Date endedAt
+        @Param("started_at") Instant startedAt,
+        @Param("ended_at") Instant endedAt
     );
 
     /**
