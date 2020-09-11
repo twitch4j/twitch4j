@@ -30,13 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -391,21 +387,15 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("community-points-channel-v1")) {
                                 String timestampText = msgData.path("timestamp").asText();
                                 Instant instant = Instant.parse(timestampText);
-                                Calendar timestamp = GregorianCalendar.from(
-                                    ZonedDateTime.ofInstant(
-                                        instant,
-                                        ZoneId.systemDefault()
-                                    )
-                                );
 
                                 switch (type) {
                                     case "reward-redeemed":
                                         ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
+                                        eventManager.publish(new RewardRedeemedEvent(instant, redemption));
                                         break;
                                     case "redemption-status-update":
                                         ChannelPointsRedemption updatedRedemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, updatedRedemption));
+                                        eventManager.publish(new RedemptionStatusUpdateEvent(instant, updatedRedemption));
                                         break;
                                     case "custom-reward-created":
                                         ChannelPointsReward newReward = TypeConvert.convertValue(msgData.path("new_reward"), ChannelPointsReward.class);
@@ -507,9 +497,8 @@ public class TwitchPubSub implements AutoCloseable {
                                         eventManager.publish(new PointsSpentEvent(pointsSpent));
                                         break;
                                     case "reward-redeemed":
-                                        final Calendar timestamp = GregorianCalendar.from(ZonedDateTime.ofInstant(Instant.parse(msgData.path("timestamp").asText()), ZoneId.systemDefault()));
                                         final ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
+                                        eventManager.publish(new RewardRedeemedEvent(Instant.parse(msgData.path("timestamp").asText()), redemption));
                                         break;
                                     case "global-last-viewed-content-updated":
                                     case "channel-last-viewed-content-updated":

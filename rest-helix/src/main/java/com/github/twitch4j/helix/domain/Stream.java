@@ -1,11 +1,15 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.twitch4j.common.util.TimeUtils;
 import lombok.*;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -55,7 +59,8 @@ public class Stream {
 
     /** UTC timestamp on when the stream started */
     @NonNull
-    private Calendar startedAt;
+    @JsonProperty("started_at")
+    private Instant startedAtInstant;
 
     /** Ids of active tags on the stream */
     private List<UUID> tagIds = new ArrayList<>();
@@ -74,8 +79,7 @@ public class Stream {
      * @return The stream uptime.
      */
     public Duration getUptime() {
-        Duration uptime = Duration.between(startedAt.toInstant(), Calendar.getInstance().toInstant());
-        return uptime;
+        return Duration.between(startedAtInstant, Instant.now());
     }
 
     /**
@@ -87,5 +91,15 @@ public class Stream {
      */
     public String getThumbnailUrl(Integer width, Integer height) {
         return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
+    }
+
+    /**
+     * @return the timestamp on when the stream started, in the system default zone
+     * @deprecated in favor of getStartedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Calendar getStartedAt() {
+        return TimeUtils.fromInstant(startedAtInstant);
     }
 }
