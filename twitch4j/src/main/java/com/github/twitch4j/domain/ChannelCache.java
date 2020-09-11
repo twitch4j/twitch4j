@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Channel Cache
@@ -39,5 +39,5 @@ public class ChannelCache {
     /**
      * Last Follow Check
      */
-    private LocalDateTime lastFollowCheck;
+    private Instant lastFollowCheck;
 }

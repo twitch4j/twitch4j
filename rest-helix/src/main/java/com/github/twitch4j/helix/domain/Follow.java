@@ -1,6 +1,8 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
@@ -8,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * Follow
@@ -33,6 +37,17 @@ public class Follow {
     private String toName;
 
     /** Date and time when the from_id user followed the to_id user. */
-    private LocalDateTime followedAt;
+    @JsonProperty("followed_at")
+    private Instant followedAtInstant;
+
+    /**
+     * @return the date and time when the from_id user followed the to_id user.
+     * @deprecated in favor of getFollowedAtInstant
+     */
+    @JsonIgnore
+    @Deprecated
+    public LocalDateTime getFollowedAt() {
+        return LocalDateTime.ofInstant(followedAtInstant, ZoneOffset.UTC);
+    }
 
 }
