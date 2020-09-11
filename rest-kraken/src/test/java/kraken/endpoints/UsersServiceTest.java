@@ -36,7 +36,7 @@ public class UsersServiceTest extends AbstractKrakenServiceTest {
         assertEquals(user.getName(), "twitch4j", "Twitch4J user name should be twitch4j!");
         assertEquals(user.getDisplayName(), "twitch4j", "Twitch4J user display name should be twitch4j!");
         assertEquals(user.getType(), "user", "Twitch4J user type should be user!");
-        assertEquals(user.getCreatedAt().getTime(), 1488456578184L, "Twitch4J user creation date is invalid!");
+        assertEquals(user.getCreatedAtInstant().toEpochMilli(), 1488456578184L, "Twitch4J user creation date is invalid!");
     }
 
     @Test

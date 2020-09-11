@@ -1,13 +1,14 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -16,13 +17,34 @@ import java.util.Date;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AnaylticsDateRange {
 
     /** Starting date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z. */
-    private Date startedAt;
+    @JsonProperty("started_at")
+    private Instant startedAtInstant;
 
     /** Ending date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z. */
-    private Date endedAt;
+    @JsonProperty("ended_at")
+    private Instant endedAtInstant;
+
+    /**
+     * @return the starting timestamp for returned reports
+     * @deprecated in favor of getStartedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getStartedAt() {
+        return Date.from(startedAtInstant);
+    }
+
+    /**
+     * @return the ending timestamp for returned reports
+     * @deprecated in favor of getEndedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getEndedAt() {
+        return Date.from(endedAtInstant);
+    }
 }

@@ -1,6 +1,8 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -51,8 +54,19 @@ public class Clip {
     private Integer viewCount;
 
     /** Date when the clip was created. */
-    private Date createdAt;
+    @JsonProperty("created_at")
+    private Instant createdAtInstant;
 
     /** URL of the clip thumbnail. */
     private String thumbnailUrl;
+
+    /**
+     * @return the timestamp for the clip's creation
+     * @deprecated in favor of getCreatedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getCreatedAt() {
+        return Date.from(createdAtInstant);
+    }
 }
