@@ -18,8 +18,7 @@ import com.netflix.hystrix.HystrixCommand;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -223,7 +222,7 @@ public class TwitchClientHelper implements AutoCloseable {
             HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channelId, null, MAX_LIMIT);
             try {
                 ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
-                LocalDateTime lastFollowDate = null;
+                Instant lastFollowDate = null;
 
                 boolean nextRequestCanBeImmediate = false;
 
@@ -239,12 +238,12 @@ public class TwitchClientHelper implements AutoCloseable {
                     }
                     for (Follow follow : followList) {
                         // update lastFollowDate
-                        if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
-                            lastFollowDate = follow.getFollowedAt();
+                        if (lastFollowDate == null || follow.getFollowedAtInstant().isAfter(lastFollowDate)) {
+                            lastFollowDate = follow.getFollowedAtInstant();
                         }
 
                         // is new follower?
-                        if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
+                        if (follow.getFollowedAtInstant().isAfter(currentChannelCache.getLastFollowCheck())) {
                             // dispatch event
                             FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
                             twitchClient.getEventManager().publish(event);
@@ -256,7 +255,7 @@ public class TwitchClientHelper implements AutoCloseable {
 
                 if (currentChannelCache.getLastFollowCheck() == null) {
                     // only happens if the user doesn't have any followers at all
-                    currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
+                    currentChannelCache.setLastFollowCheck(Instant.now());
                 } else {
                     // tracks the date of the latest follow to identify new ones later on
                     currentChannelCache.setLastFollowCheck(lastFollowDate);
