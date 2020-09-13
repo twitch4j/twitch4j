@@ -49,6 +49,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 public class TwitchChat implements AutoCloseable {
@@ -106,9 +107,26 @@ public class TwitchChat implements AutoCloseable {
     private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
 
     /**
-     * Channel Cache
+     * Channel Cache Lock
      */
-    protected final Set<String> channelCache = ConcurrentHashMap.newKeySet();
+    private final ReentrantLock channelCacheLock = new ReentrantLock();
+
+    /**
+     * Current Channels
+     */
+    protected final Set<String> currentChannels = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Cache: ChannelId to ChannelName
+     */
+    @Getter
+    protected final Map<String, String> channelIdToChannelName = new ConcurrentHashMap<>();
+
+    /**
+     * Cache: ChannelName to ChannelId
+     */
+    @Getter
+    protected final Map<String, String> channelNameToChannelId = new ConcurrentHashMap<>();
 
     /**
      * IRC Message Bucket
@@ -327,6 +345,23 @@ public class TwitchChat implements AutoCloseable {
 
         // register event handler
         eventManager.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent(IRCMessageEvent.class, event -> {
+            // we get at least one room state event with channel name + id when we join a channel, so we cache that to provide channel id + name for all events
+            if ("ROOMSTATE".equalsIgnoreCase(event.getCommandType())) {
+                // check that channel id / name are present and that we didn't leave the channel yet
+                if (event.getChannelId() != null) {
+                    channelCacheLock.lock();
+                    try {
+                        event.getChannelName().map(String::toLowerCase).filter(currentChannels::contains).ifPresent(name -> {
+                            channelNameToChannelId.put(name, event.getChannelId());
+                            channelIdToChannelName.put(event.getChannelId(), name);
+                        });
+                    } finally {
+                        channelCacheLock.unlock();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -422,13 +457,13 @@ public class TwitchChat implements AutoCloseable {
                     sendTextToWebSocket(String.format("nick %s", userName), true);
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
-                    for (String channel : channelCache) {
+                    for (String channel : currentChannels) {
                         sendCommand("join", '#' + channel);
                     }
 
                     // then join to own channel - required for sending or receiving whispers
-                    if (chatCredential != null && userName != null) {
-                        sendCommand("join", '#' + chatCredential.getUserName());
+                    if (chatCredential != null && chatCredential.getUserName() != null) {
+                        joinChannel(chatCredential.getUserName().toLowerCase());
                     } else {
                         log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
                     }
@@ -470,9 +505,9 @@ public class TwitchChat implements AutoCloseable {
                                 else
                                 {
                                     try {
-                                        IRCMessageEvent event = new IRCMessageEvent(message, botOwnerIds);
+                                        IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
-                                        if(event.isValid()) {
+                                        if (event.isValid()) {
                                             eventManager.publish(event);
                                         } else {
                                             log.trace("Can't parse {}", event.getRawMessage());
@@ -558,11 +593,17 @@ public class TwitchChat implements AutoCloseable {
      */
     public void joinChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
-        if (channelCache.add(lowerChannelName)) {
-            sendCommand("join", "#" + lowerChannelName);
-            log.debug("Joining Channel [{}].", lowerChannelName);
-        } else {
-            log.warn("Already joined channel {}", channelName);
+
+        channelCacheLock.lock();
+        try {
+            if (currentChannels.add(lowerChannelName)) {
+                sendCommand("join", "#" + lowerChannelName);
+                log.debug("Joining Channel [{}].", lowerChannelName);
+            } else {
+                log.warn("Already joined channel {}", channelName);
+            }
+        } finally {
+            channelCacheLock.unlock();
         }
     }
 
@@ -572,11 +613,21 @@ public class TwitchChat implements AutoCloseable {
      */
     public void leaveChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
-        if (channelCache.remove(lowerChannelName)) {
-            sendCommand("part", "#" + lowerChannelName);
-            log.debug("Leaving Channel [{}].", lowerChannelName);
-        } else {
-            log.warn("Already left channel {}", channelName);
+
+        channelCacheLock.lock();
+        try {
+            if (currentChannels.remove(lowerChannelName)) {
+                sendCommand("part", "#" + lowerChannelName);
+                log.debug("Leaving Channel [{}].", lowerChannelName);
+
+                // clear cache
+                String cachedId = channelNameToChannelId.remove(lowerChannelName);
+                if (cachedId != null) channelIdToChannelName.remove(cachedId);
+            } else {
+                log.warn("Already left channel {}", channelName);
+            }
+        } finally {
+            channelCacheLock.unlock();
         }
     }
 
@@ -728,11 +779,12 @@ public class TwitchChat implements AutoCloseable {
 
     /**
      * Check if Chat is currently in a channel
+     *
      * @param channelName channel to check (without # prefix)
      * @return boolean
      */
     public boolean isChannelJoined(String channelName) {
-        return channelCache.contains(channelName.toLowerCase());
+        return currentChannels.contains(channelName.toLowerCase());
     }
 
     /**
@@ -741,6 +793,6 @@ public class TwitchChat implements AutoCloseable {
      * @return List Channel Names
      */
     public List<String> getCurrentChannels() {
-        return Collections.unmodifiableList(new ArrayList<>(channelCache));
+        return Collections.unmodifiableList(new ArrayList<>(currentChannels));
     }
 }
