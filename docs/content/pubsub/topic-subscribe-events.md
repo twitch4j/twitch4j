@@ -15,8 +15,8 @@ This topic can be used to monitor whenever a specified channel receives a new su
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| credential | OAuth2Credential | User Auth Token for the target user id, with the scope `channel_subscriptions` |
-| userId | String | Target User Id |
+| credential | OAuth2Credential | User Auth Token for the target channel id, with the scope `channel_subscriptions` |
+| channelId | String | Target Channel Id |
 
 *Optional Parameters*
 

@@ -384,7 +384,7 @@ public class TwitchPubSub implements AutoCloseable {
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);
 
-                            } else if (topic.startsWith("community-points-channel-v1")) {
+                            } else if (topic.startsWith("community-points-channel-v1") || topic.startsWith("channel-points-channel-v1")) {
                                 String timestampText = msgData.path("timestamp").asText();
                                 Instant instant = Instant.parse(timestampText);
 
@@ -660,7 +660,7 @@ public class TwitchPubSub implements AutoCloseable {
     public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, List<String> topics) {
         PubSubRequest request = new PubSubRequest();
         request.setType(type);
-        request.setNonce(CryptoUtils.generateNonce(32));
+        request.setNonce(CryptoUtils.generateNonce(30));
         request.getData().put("auth_token", credential != null ? credential.getAccessToken() : "");
         request.getData().put("topics", topics);
 
@@ -709,46 +709,46 @@ public class TwitchPubSub implements AutoCloseable {
     /**
      * Event Listener: User earned a new Bits badge and shared the notification with chat
      *
-     * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId     Target User Id
+     * @param credential Credential (for target channel id, scope: bits:read)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + userId);
+    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + channelId);
     }
 
     /**
      * Event Listener: Anyone cheers on a specified channel.
      *
-     * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId     Target User Id
+     * @param credential Credential (for target channel id, scope: bits:read)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + userId);
+    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + channelId);
     }
 
     /**
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
      *
-     * @param credential Credential (for targetUserId, scope: channel_subscriptions)
-     * @param userId     Target User Id
+     * @param credential Credential (for targetChannelId, scope: channel_subscriptions)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + userId);
+    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + channelId);
     }
 
     /**
      * Event Listener: Anyone makes a purchase on a channel.
      *
      * @param credential Credential (any)
-     * @param userId     Target User Id
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
     @Deprecated
-    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + userId);
+    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + channelId);
     }
 
     /**
@@ -777,18 +777,19 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for userId, scope: channel:moderate)
+     * @param channelId  The user id associated with the target channel
      * @param userId     The user id associated with the credential
-     * @param roomId     The user id associated with the target channel
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String roomId) {
-        return listenForModerationEvents(credential, userId + "." + roomId);
+    @Unofficial
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId, String userId) {
+        return listenForModerationEvents(credential, channelId + "." + userId);
     }
 
     /**
      * Event Listener: Anyone makes a channel points redemption on a channel.
      *
-     * @param credential Credential (any)
+     * @param credential Credential (with the channel:read:redemptions scope for maximum information)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
@@ -802,14 +803,14 @@ public class TwitchPubSub implements AutoCloseable {
 
     @Unofficial
     @Deprecated
-    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ads." + userId);
+    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "ads." + channelId);
     }
 
     @Unofficial
     @Deprecated
-    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + userId);
+    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + channelId);
     }
 
     @Unofficial
@@ -986,6 +987,12 @@ public class TwitchPubSub implements AutoCloseable {
     @Deprecated
     public PubSubSubscription listenForUserCampaignEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "user-campaign-events." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
+    public PubSubSubscription listenForUserDropEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-drop-events." + userId);
     }
 
     @Unofficial
