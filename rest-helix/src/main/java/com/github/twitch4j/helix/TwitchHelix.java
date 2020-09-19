@@ -138,6 +138,38 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of entitlements for a given organization that have been granted to a game, user, or both.
+     * <p>
+     * Valid combinations of requests are:
+     * <ul>
+     *     <li>No fields - All entitlements with benefits owned by your organization.</li>
+     *     <li>Only userId - All entitlements for a user with benefits owned by your organization.</li>
+     *     <li>Only gameId - All entitlements for all users for a game. Your organization must own the game.</li>
+     *     <li>Both userId and gameId - All entitlements for the game granted to a user. Your organization must own the game.</li>
+     * </ul>
+     * <p>
+     * Pagination support: Forward only
+     *
+     * @param authToken Required: App Access OAuth Token. OAuth Token Client ID must have ownership of Game: Client ID {@literal >} RBAC Organization ID {@literal >} Game ID.
+     * @param id        Optional: Unique Identifier of the entitlement.
+     * @param userId    Optional: A Twitch User ID.
+     * @param gameId    Optional: A Twitch Game ID.
+     * @param after     Optional: The cursor used to fetch the next page of data.
+     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 100.
+     * @return DropsEntitlementList
+     */
+    @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<DropsEntitlementList> getDropsEntitlements(
+        @Param("token") String authToken,
+        @Param("id") String id,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
      * @param authToken App Access  OAuth Token
