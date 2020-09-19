@@ -12,6 +12,7 @@ import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,6 +63,12 @@ public class TwitchKrakenBuilder {
     private Integer uploadTimeout = 4 * 60 * 1000;
 
     /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level logLevel = Logger.Level.NONE;
+
+    /**
      * ProxyConfiguration
      */
     @With
@@ -108,7 +115,8 @@ public class TwitchKrakenBuilder {
             .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
-            .logger(new Logger.ErrorLogger())
+            .logger(new Slf4jLogger())
+            .logLevel(logLevel)
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
