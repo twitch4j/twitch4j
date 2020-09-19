@@ -3,7 +3,9 @@ package com.github.twitch4j.kraken.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Date;
@@ -25,6 +27,16 @@ public class KrakenUser {
     private String type;
 
     private String bio;
+
+    private String email;
+
+    private Boolean emailVerified;
+
+    private Notifications notifications;
+
+    private Boolean partnered;
+
+    private Boolean twitterConnected;
 
     @JsonProperty("updated_at")
     private Instant updatedAtInstant;
@@ -50,5 +62,13 @@ public class KrakenUser {
     @Deprecated
     public Date getUpdatedAt() {
         return Date.from(updatedAtInstant);
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Notifications {
+        private Boolean email;
+        private Boolean push;
     }
 }

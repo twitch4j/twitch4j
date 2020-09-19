@@ -25,6 +25,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class UsersServiceTest extends AbstractKrakenServiceTest {
 
     @Test
+    @DisplayName("getUser")
+    @Disabled
+    public void getUser() {
+        KrakenUser resultUser = getTwitchKrakenClient().getUser(getCredential().getAccessToken()).execute();
+        assertNotNull(resultUser);
+    }
+
+    @Test
+    @DisplayName("getUserById")
+    public void getUserById() {
+        KrakenUser resultUser = getTwitchKrakenClient().getUserById("149223493").execute();
+        assertNotNull(resultUser);
+        assertEquals(resultUser.getId(), "149223493");
+        assertEquals(resultUser.getName(), "twitch4j");
+    }
+
+    @Test
     @DisplayName("getUsers")
     @Disabled
     public void getUsers() {

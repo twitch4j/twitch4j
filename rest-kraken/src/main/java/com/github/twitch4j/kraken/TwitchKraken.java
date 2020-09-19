@@ -300,6 +300,18 @@ public interface TwitchKraken {
     HystrixCommand<KrakenIngestList> getIngestServers();
 
     /**
+     * Gets a list of teams to which a specified channel belongs.
+     *
+     * @param channelId Channel Id (Required)
+     * @return KrakenTeamList
+     */
+    @RequestLine("GET /channels/{channel_id}/teams")
+    @Headers("Accept: application/vnd.twitchtv.v5+json")
+    HystrixCommand<KrakenTeamList> getChannelTeams(
+        @Param("channel_id") String channelId
+    );
+
+    /**
      * Get All Teams
      * <p>
      * Gets all active teams.
@@ -327,6 +339,35 @@ public interface TwitchKraken {
     @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeam> getTeamByName(
         @Param("name") String name
+    );
+
+    /**
+     * Gets a user object based on the OAuth token provided.
+     * <p>
+     * Get User returns more data than Get User by ID, because Get User is privileged.
+     *
+     * @param authToken User access token with scope user_read (Required)
+     * @return KrakenUser
+     */
+    @RequestLine("GET /user")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json",
+    })
+    HystrixCommand<KrakenUser> getUser(
+        @Param("token") String authToken
+    );
+
+    /**
+     * Gets a specified user object.
+     *
+     * @param userId The id of the user being queried
+     * @return KrakenUser
+     */
+    @RequestLine("GET /users/{user_id}")
+    @Headers("Accept: application/vnd.twitchtv.v5+json")
+    HystrixCommand<KrakenUser> getUserById(
+        @Param("user_id") String userId
     );
 
     /**
