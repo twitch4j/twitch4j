@@ -3,6 +3,7 @@ package com.github.twitch4j.helix.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -22,13 +23,13 @@ public class DropsEntitlementList {
      */
     private List<DropsEntitlement> data;
 
-    /**
-     * If provided, is the key used to fetch the next page of data.
-     * If not provided, the current response is the last page of data available.
-     */
+    @Getter(AccessLevel.PRIVATE)
     private Object pagination;
 
     /**
+     * If present, is the key used to fetch the next page of data.
+     * If absent, the current response is the last page of data available.
+     *
      * @return the cursor from the pagination object, in an optional wrapper
      */
     public Optional<String> getPaginationCursor() {
