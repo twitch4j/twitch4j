@@ -3,6 +3,7 @@ package kraken.endpoints;
 import com.github.twitch4j.kraken.domain.KrakenChannel;
 import com.github.twitch4j.kraken.domain.KrakenFollow;
 import com.github.twitch4j.kraken.domain.KrakenSubscriptionList;
+import com.github.twitch4j.kraken.domain.KrakenTeamList;
 import com.github.twitch4j.kraken.domain.KrakenUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -54,6 +55,15 @@ public class ChannelServiceTest extends AbstractKrakenServiceTest {
         KrakenSubscriptionList resultList = getTwitchKrakenClient().getChannelSubscribers(AbstractKrakenServiceTest.getCredential().getAccessToken(), TWITCH_CHANNEL_ID, null, null, null).execute();
 
         assertTrue(resultList.getSubscriptions().size() > 0, "Didn't find any subscriptions!");
+    }
+
+    @Test
+    @DisplayName("getTeams")
+    @Disabled // test acc is not on any team
+    public void getTeams() {
+        KrakenTeamList resultList = getTwitchKrakenClient().getChannelTeams(TWITCH_CHANNEL_ID).execute();
+
+        assertFalse(resultList.getTeams().isEmpty(), "Didn't find any teams!");
     }
 
 }
