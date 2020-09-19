@@ -11,6 +11,7 @@ import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +62,12 @@ public class TwitchMessagingInterfaceBuilder {
     private Integer timeout = 5000;
 
     /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level logLevel = Logger.Level.NONE;
+
+    /**
      * Proxy Configuration
      */
     @With
@@ -99,9 +106,9 @@ public class TwitchMessagingInterfaceBuilder {
             .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder())
             .decoder(new JacksonDecoder())
-            .logger(new Logger.ErrorLogger())
+            .logger(new Slf4jLogger())
+            .logLevel(logLevel)
             .errorDecoder(new TwitchMessagingInterfaceErrorDecoder(new JacksonDecoder()))
-            .logLevel(Logger.Level.BASIC)
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .retryer(new Retryer.Default(1, 10000, 3))
             .options(new Request.Options(5000, TimeUnit.MILLISECONDS, 15000, TimeUnit.MILLISECONDS, true))
