@@ -128,7 +128,7 @@ public class TwitchClientHelper implements AutoCloseable {
         // Threads
         this.streamStatusEventTask = channels -> {
             // check go live / stream events
-            HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, channels.size(), null, null, null, channels, null);
+            HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, channels.size(), null, null, channels, null);
             try {
                 Map<String, Stream> streams = new HashMap<>();
                 channels.forEach(id -> streams.put(id, null));

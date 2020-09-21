@@ -37,7 +37,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch information about current live streams")
     public void getStreams() {
         // TestCase
-        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null, null).execute();
+        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null).execute();
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams method!");
