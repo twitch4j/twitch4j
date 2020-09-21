@@ -568,37 +568,6 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets metadata information about active streams playing Overwatch or Hearthstone. Streams are sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
-     * Using user-token or app-token to increase rate limits.
-     *
-     * @param authToken   User or App auth Token, for increased rate-limits
-     * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param before      Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
-     * @param gameIds     Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
-     * @param language    Stream language. You can specify up to 100 languages.
-     * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
-     * @param userLogins  Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
-     * @return StreamMetadataList
-     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-the-helix-get-streams-metadata-endpoint/26407">Expected to break on/after July 20, 2020</a>
-     */
-    @RequestLine("GET /streams/metadata?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
-    @Headers("Authorization: Bearer {token}")
-    @Deprecated
-    HystrixCommand<StreamMetadataList> getStreamsMetadata(
-        @Param("token") String authToken,
-        @Param("after") String after,
-        @Param("before") String before,
-        @Param("first") Integer limit,
-        @Param("community_id") List<UUID> communityId,
-        @Param("game_id") List<String> gameIds,
-        @Param("language") String language,
-        @Param("user_id") List<String> userIds,
-        @Param("user_login") List<String> userLogins
-    );
-
-    /**
      * Gets available Twitch stream tags.
      *
      * @param authToken User Token or App auth Token, for increased rate-limits

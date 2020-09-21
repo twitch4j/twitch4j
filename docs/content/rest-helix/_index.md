@@ -69,7 +69,6 @@ Games:
 Streams:
 
 - [Streams -> Search](./streams-get)
-- [Streams -> Get Metadata](./streams-getmetadata)
 - Create Stream Marker
 - [Streams -> Get Markers](./streams-markers-get)
 
