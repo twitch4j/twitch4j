@@ -119,13 +119,11 @@ public class TwitchChat implements AutoCloseable {
     /**
      * Cache: ChannelId to ChannelName
      */
-    @Getter
     protected final Map<String, String> channelIdToChannelName = new ConcurrentHashMap<>();
 
     /**
      * Cache: ChannelName to ChannelId
      */
-    @Getter
     protected final Map<String, String> channelNameToChannelId = new ConcurrentHashMap<>();
 
     /**
@@ -353,6 +351,10 @@ public class TwitchChat implements AutoCloseable {
                     channelCacheLock.lock();
                     try {
                         event.getChannelName().map(String::toLowerCase).filter(currentChannels::contains).ifPresent(name -> {
+                            // remove old name -> id mapping if present (name-change)
+                            Optional.ofNullable(channelIdToChannelName.get(event.getChannelId())).ifPresent(oldName -> channelNameToChannelId.remove(oldName));
+
+                            // store mapping
                             channelNameToChannelId.put(name, event.getChannelId());
                             channelIdToChannelName.put(event.getChannelId(), name);
                         });
@@ -788,11 +790,36 @@ public class TwitchChat implements AutoCloseable {
     }
 
     /**
-     * Returns a list of all channels currently joined (without # prefix)
+     * Returns a set of all currently joined channels (without # prefix)
      *
-     * @return List Channel Names
+     * @return a set of channel names
+     * @deprecated use getChannels() instead
      */
+    @Deprecated
     public List<String> getCurrentChannels() {
         return Collections.unmodifiableList(new ArrayList<>(currentChannels));
+    }
+
+    /**
+     * Returns a set of all currently joined channels (without # prefix)
+     *
+     * @return a set of channel names
+     */
+    public Set<String> getChannels() {
+        return Collections.unmodifiableSet(currentChannels);
+    }
+
+    /**
+     * @return the cached map used for channel id to name mapping
+     */
+    public Map<String, String> getChannelIdToChannelName() {
+        return Collections.unmodifiableMap(channelIdToChannelName);
+    }
+
+    /**
+     * @return the cached map sed for channel name to id mapping
+     */
+    public Map<String, String> getChannelNameToChannelId() {
+        return Collections.unmodifiableMap(channelNameToChannelId);
     }
 }
