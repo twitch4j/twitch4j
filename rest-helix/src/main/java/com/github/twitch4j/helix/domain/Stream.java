@@ -42,7 +42,7 @@ public class Stream {
     private String gameId;
 
     /** Array of community IDs. */
-    @NonNull
+    @Deprecated
     private List<UUID> communityIds;
 
     /** Stream type: "live" or "" (in case of error). */
