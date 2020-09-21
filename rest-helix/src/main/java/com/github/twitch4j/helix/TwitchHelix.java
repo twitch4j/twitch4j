@@ -7,6 +7,7 @@ import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -494,33 +495,63 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets information about active streams. Streams are returned sorted by number of current viewers, in descending order. Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
-     * Using user-token or app-token to increase rate limits.
+     * Gets information about active streams.
+     * <p>
+     * Streams are returned sorted by number of current viewers, in descending order.
+     * Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
-     * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param before      Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs.
-     * @param gameIds     Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
-     * @param language    Stream language. You can specify up to 100 languages.
-     * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
-     * @param userLogins  Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
+     * @param authToken  User or App Access Token
+     * @param after      Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before     Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit      Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param gameIds    Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
+     * @param language   Stream language. You can specify up to 100 languages.
+     * @param userIds    Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
+     * @param userLogins Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
      * @return StreamList
      */
-    @RequestLine("GET /streams?after={after}&before={before}&community_id={community_id}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
+    @RequestLine("GET /streams?after={after}&before={before}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamList> getStreams(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit,
-        @Param("community_id") List<UUID> communityId,
+        @Param("game_id") List<String> gameIds,
+        @Param("language") List<String> language,
+        @Param("user_id") List<String> userIds,
+        @Param("user_login") List<String> userLogins
+    );
+
+    /**
+     * Gets information about active streams.
+     *
+     * @param authToken   User or App Access Token
+     * @param after       Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before      Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param communityId Returns streams in a specified community ID. You can specify up to 100 IDs. No longer supported by twitch.
+     * @param gameIds     Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
+     * @param language    Stream language. You can specify up to 100 languages.
+     * @param userIds     Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
+     * @param userLogins  Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
+     * @return StreamList
+     * @deprecated in favor of getStreams(String, String, String, Integer, List, List, List, List); simply remove the argument for communityId to migrate
+     */
+    @Deprecated
+    default HystrixCommand<StreamList> getStreams(
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit,
+        @Param("community_id") List<UUID> communityId, // Now unsupported by twitch
         @Param("game_id") List<String> gameIds,
         @Param("language") String language,
         @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
-    );
+    ) {
+        return getStreams(authToken, after, before, limit, gameIds, Collections.singletonList(language), userIds, userLogins);
+    }
 
     /**
      * Gets the channel stream key for a user
