@@ -273,7 +273,7 @@ public interface TwitchExtensions {
      * @see Unofficial
      */
     @Unofficial
-    @RequestLine("GET /{client_id}")
+    @RequestLine("GET /{client_id}/") // Trailing slash allows for the interceptor to inject a missing client id
     @Headers("Client-Id: {client_id}")
     HystrixCommand<ExtensionInformation> getExtensionInformation(
         @Param("client_id") String clientId
