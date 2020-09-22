@@ -1,9 +1,11 @@
 package com.github.twitch4j.extensions;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.extensions.domain.ChannelList;
 import com.github.twitch4j.extensions.domain.ConfigurationSegment;
 import com.github.twitch4j.extensions.domain.ConfigurationSegmentType;
 import com.github.twitch4j.extensions.domain.ExtensionConfigurationSegment;
+import com.github.twitch4j.extensions.domain.ExtensionInformation;
 import com.github.twitch4j.extensions.domain.ExtensionSecretList;
 import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.netflix.hystrix.HystrixCommand;
@@ -261,6 +263,20 @@ public interface TwitchExtensions {
         @Param("extension_version") String extensionVersion,
         @Param("channel_id") String channelId,
         @Param(value = "text", expander = JsonStringExpander.class) String text
+    );
+
+    /**
+     * Get Extension Information
+     *
+     * @param clientId The client ID value assigned to the extension when it is created.
+     * @return ExtensionInformation
+     * @see Unofficial
+     */
+    @Unofficial
+    @RequestLine("GET /{client_id}")
+    @Headers("Client-Id: {client_id}")
+    HystrixCommand<ExtensionInformation> getExtensionInformation(
+        @Param("client_id") String clientId
     );
 
 }
