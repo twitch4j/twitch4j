@@ -1,7 +1,6 @@
 package com.github.twitch4j.tmi.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
@@ -15,17 +14,19 @@ import lombok.Setter;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Host {
-	
-	@JsonProperty("host_id")
-	private String hostId;
-	
-	@JsonProperty("host_login")
-	private String hostLogin;
-	
-	@JsonProperty("target_id")
-	private String targetId;
-	
-	@JsonProperty("target_login")
-	private String targetLogin;
-	
+
+    private String hostId;
+
+    private String hostLogin;
+
+    private String hostDisplayName;
+
+    private String targetId;
+
+    private String targetLogin;
+
+    private String targetDisplayName;
+
+    private Boolean hostPartnered;
+
 }
