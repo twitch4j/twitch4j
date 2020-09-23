@@ -350,13 +350,13 @@ public class TwitchChat implements AutoCloseable {
                 if (event.getChannelId() != null) {
                     channelCacheLock.lock();
                     try {
+                        // store mapping info into channelIdToChannelName / channelNameToChannelId
                         event.getChannelName().map(String::toLowerCase).filter(currentChannels::contains).ifPresent(name -> {
-                            // remove old name -> id mapping if present (name-change)
-                            Optional.ofNullable(channelIdToChannelName.get(event.getChannelId())).ifPresent(oldName -> channelNameToChannelId.remove(oldName));
-
-                            // store mapping
-                            channelNameToChannelId.put(name, event.getChannelId());
-                            channelIdToChannelName.put(event.getChannelId(), name);
+                            String oldName = channelIdToChannelName.put(event.getChannelId(), name);
+                            if (!name.equals(oldName)) {
+                                if (oldName != null) channelNameToChannelId.remove(oldName, event.getChannelId());
+                                channelNameToChannelId.put(name, event.getChannelId());
+                            }
                         });
                     } finally {
                         channelCacheLock.unlock();
