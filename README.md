@@ -33,6 +33,7 @@ Shared
 
 Project
 * Auth
+* API - Extensions
 * API - Kraken (Deprecated)
 * API - Helix
 * Chat
@@ -44,6 +45,13 @@ Project
 If you have problems using the *Twitch Java API*, then you are welcome to join the [discord server](https://discord.gg/FQ5vgW3) to talk about it.
 
 If you discover any issues/have feature requests, then please [open an issue here](https://github.com/twitch4j/twitch4j/issues/new).
+
+## Contributing
+
+We welcome contributions to the library, be it new features, bug fixes, or even small enhancements.
+Please do read the [contributing guide](https://twitch4j.gitlab.io/twitch4j/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
+By contributing, you are expected to abide by our [code of conduct](./CODE_OF_CONDUCT.md) and agree to the license below.
+Thank you again for your interest in improving Twitch4J!
 
 ## License
 
