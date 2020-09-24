@@ -495,10 +495,10 @@ public class IRCEventHandler {
     }
 
     public void onChannelState(IRCMessageEvent event) {
-        if(event.getCommandType().equals("ROOMSTATE")) {
+        if (event.getCommandType().equals("ROOMSTATE")) {
             // getting Status on channel
             EventChannel channel = event.getChannel();
-            Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<ChannelStateEvent.ChannelState, Object>();
+            Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<>();
             if (event.getTags().size() > 2) {
                 event.getTags().forEach((k, v) -> {
                     switch (k) {
