@@ -550,7 +550,7 @@ public interface TwitchHelix {
         @Param("user_id") List<String> userIds,
         @Param("user_login") List<String> userLogins
     ) {
-        return getStreams(authToken, after, before, limit, gameIds, Collections.singletonList(language), userIds, userLogins);
+        return getStreams(authToken, after, before, limit, gameIds, language != null ? Collections.singletonList(language) : null, userIds, userLogins);
     }
 
     /**
