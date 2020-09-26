@@ -23,6 +23,7 @@ import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.pubsub.TwitchPubSubBuilder;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
+import feign.Logger;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -209,6 +210,12 @@ public class TwitchClientBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level feignLogLevel = Logger.Level.NONE;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -299,6 +306,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -313,6 +321,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -326,6 +335,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -339,6 +349,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
