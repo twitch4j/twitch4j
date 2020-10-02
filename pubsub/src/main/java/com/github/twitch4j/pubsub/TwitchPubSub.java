@@ -536,6 +536,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("radio-events-v1")) {
+                                eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
                             } else if (topic.startsWith("channel-sub-gifts-v1")) {
                                 eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
                             } else if (topic.startsWith("channel-cheer-events-public-v1")) {
@@ -1043,6 +1045,11 @@ public class TwitchPubSub implements AutoCloseable {
     @Unofficial
     public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
 
     @Unofficial
