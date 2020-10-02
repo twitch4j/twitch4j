@@ -59,13 +59,13 @@ subprojects {
 			api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
 
 			// HTTP Client
-			api group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.6.0'
+			api group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
 
 			// Rate Limiting
 			api group: 'com.github.vladimir-bukhtoyarov', name: 'bucket4j-core', version: '4.7.0'
 
 			// Caching
-			api group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.2'
+			api group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.8.5'
 
 			// Http Client
 			api group: 'io.github.openfeign', name: 'feign-okhttp', version: '11.0'

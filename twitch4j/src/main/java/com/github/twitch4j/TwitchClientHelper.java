@@ -11,6 +11,7 @@ import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
 import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.*;
@@ -30,6 +31,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -140,7 +142,7 @@ public class TwitchClientHelper implements AutoCloseable {
                     if (!listenForGoLive.contains(userId))
                         return;
 
-                    ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null, null, null, null, null));
+                    ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache());
                     // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
                     if (stream != null && currentChannelCache.getUserName() == null)
                         currentChannelCache.setUserName(stream.getUserName());
@@ -221,21 +223,32 @@ public class TwitchClientHelper implements AutoCloseable {
             // check follow events
             HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channelId, null, MAX_LIMIT);
             try {
-                ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
+                ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache());
                 Instant lastFollowDate = null;
 
                 boolean nextRequestCanBeImmediate = false;
 
                 if (currentChannelCache.getLastFollowCheck() != null) {
-                    List<Follow> followList = commandGetFollowers.execute().getFollows();
+                    FollowList executionResult = commandGetFollowers.execute();
+                    List<Follow> followList = executionResult.getFollows();
                     followBackoff.get().reset(); // API call was successful
-                    EventChannel channel = null;
-                    if (!followList.isEmpty()) {
-                        // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
-                        if (currentChannelCache.getUserName() == null)
-                            currentChannelCache.setUserName(followList.get(0).getToName());
-                        channel = new EventChannel(channelId, currentChannelCache.getUserName());
+
+                    // Prepare EventChannel
+                    String channelName = currentChannelCache.getUserName(); // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                    if (channelName == null && !followList.isEmpty()) {
+                        channelName = followList.get(0).getToName();
+                        currentChannelCache.setUserName(channelName);
                     }
+                    EventChannel channel = new EventChannel(channelId, channelName);
+
+                    // Follow Count Event
+                    Integer followCount = executionResult.getTotal();
+                    Integer oldTotal = currentChannelCache.getFollowers().getAndSet(followCount);
+                    if (oldTotal != null && followCount != null && !followCount.equals(oldTotal)) {
+                        twitchClient.getEventManager().publish(new ChannelFollowCountUpdateEvent(channel, followCount, oldTotal));
+                    }
+
+                    // Individual Follow Events
                     for (Follow follow : followList) {
                         // update lastFollowDate
                         if (lastFollowDate == null || follow.getFollowedAtInstant().isAfter(lastFollowDate)) {
@@ -314,7 +327,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Stream Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+            channelInformation.get(channelId, s -> new ChannelCache().withUserName(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -405,7 +418,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Follow Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+            channelInformation.get(channelId, s -> new ChannelCache().withUserName(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
