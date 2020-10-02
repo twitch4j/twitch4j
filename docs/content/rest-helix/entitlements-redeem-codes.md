@@ -26,7 +26,7 @@ HystrixCommand<CodeStatusList> redeemCode(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| authToken     | string    | User Auth Token |
+| authToken     | string    | App Access Token |
 | code     | string    | The code to redeem to the authenticated user’s account. |
 | userId     | integer    | Represents a numeric Twitch user ID |
 

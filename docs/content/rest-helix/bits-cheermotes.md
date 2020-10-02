@@ -25,7 +25,7 @@ HystrixCommand<CheermoteList> getCheermotes(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| authToken     | string    | User Auth Token |
+| authToken     | string    | Auth Token |
 
 *Optional Query String Parameters*
 

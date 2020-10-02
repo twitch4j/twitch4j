@@ -26,7 +26,7 @@ HystrixCommand<CodeStatusList> getCodeStatus(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| authToken     | string    | User Auth Token |
+| authToken     | string    | App Access Token |
 | code     | string    | The code to get the status of. |
 | userId     | integer    | Represents a numeric Twitch user ID |
 
