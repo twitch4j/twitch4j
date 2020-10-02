@@ -97,6 +97,13 @@ public class TwitchUtils {
                 }
                 */
             }
+            // Hype Train Conductor
+            String hypeBadge = badges.get("hype-train");
+            if ("1".equals(hypeBadge)) {
+                permissionSet.add(CommandPermission.CURRENT_HYPE_TRAIN_CONDUCTOR);
+            } else if ("2".equals(hypeBadge)) {
+                permissionSet.add(CommandPermission.FORMER_HYPE_TRAIN_CONDUCTOR);
+            }
         }
 
         if (userId != null && botOwnerIds != null && botOwnerIds.contains(userId))
