@@ -51,6 +51,7 @@ Analytics:
 Bits:
 
 - [Bits -> Get Leaderboard](./bits-leaderboard)
+- [Bits -> Get Cheermotes](./bits-cheermotes)
 
 Clips:
 
@@ -90,3 +91,7 @@ Videos:
 
 - [Videos -> Search](./videos-get)
 - Get Webhook Subscriptions
+
+Entitlements:
+- [Entitlements -> Get Code Status](./entitlements-codes.md)
+- [Entitlements -> Redeem Code](./entitlements-redeem-codes.md)
