@@ -5,6 +5,7 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
@@ -151,7 +152,7 @@ public class TwitchClientBuilder {
      * EventManager
      */
     @With
-    private Class<? extends IEventHandler> defaultEventHandler = null;
+    private Class<? extends IEventHandler> defaultEventHandler = SimpleEventHandler.class;
 
     /**
      * Size of the ChatQueue
@@ -272,13 +273,15 @@ public class TwitchClientBuilder {
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
-        // Default EventManager
+        // Initialize/Check EventManager
         if (eventManager == null) {
             eventManager = new EventManager();
             eventManager.autoDiscovery();
-        }
-        if (defaultEventHandler != null) {
             eventManager.setDefaultEventHandler(defaultEventHandler);
+        } else {
+            if (eventManager.getDefaultEventHandler() == null) {
+                throw new RuntimeException("Fatal: Twitch4J will not be functional unless you set a defaultEventHandler that can be used for internal events (eventManager.setDefaultEventHandler)!");
+            }
         }
 
         // Determinate required threadPool size
