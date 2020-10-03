@@ -1,6 +1,6 @@
 package com.github.twitch4j.helix.webhooks.topics;
 
-import com.github.twitch4j.helix.domain.SubscriptionList;
+import com.github.twitch4j.helix.domain.SubscriptionEventList;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -15,7 +15,7 @@ import java.util.TreeMap;
  * </ul>
  */
 @Getter
-public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionList> {
+public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionEventList> {
 
     public static final String PATH = "/subscriptions/events";
 
@@ -78,7 +78,7 @@ public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionLis
     public ChannelSubscriptionTopic(@NonNull String broadcasterId, String userId, String gifterId, String gifterName) {
         super(
             PATH,
-            SubscriptionList.class,
+            SubscriptionEventList.class,
             mapParameters(broadcasterId, userId, gifterId, gifterName)
         );
         this.broadcasterId = broadcasterId;
