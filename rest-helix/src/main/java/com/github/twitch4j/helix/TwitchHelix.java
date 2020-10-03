@@ -699,6 +699,28 @@ public interface TwitchHelix {
     );
 
     /**
+     * Returns all subscription events for the past five days.
+     *
+     * @param authToken     Required: User Auth Token (scope: channel:read:subscriptions).
+     * @param broadcasterId Required: User ID of the broadcaster. Must match the User ID in the Bearer token.
+     * @param id            Optional: Retrieve a single event by the event ID.
+     * @param userId        Optional: ID of the subscribed user.
+     * @param after         Optional: Cursor for forward pagination; where to start fetching the next set of results in a multi-page response. This applies only to queries without user_id.
+     * @param limit         Optional: Limit the number of items in the response payload. Maximum: 100.
+     * @return SubscriptionEventList
+     */
+    @RequestLine("GET /subscriptions/events?broadcaster_id={broadcaster_id}&id={id}&user_id={user_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionEventList> getSubscriptionEvents(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String id,
+        @Param("user_id") String userId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
      * Get Users
      * <p>
      * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
