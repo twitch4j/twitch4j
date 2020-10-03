@@ -3,10 +3,8 @@ package com.github.twitch4j.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.With;
 
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -20,7 +18,6 @@ public class ChannelCache {
     /**
      * User Name
      */
-    @With
     private String userName;
 
     /**
@@ -47,5 +44,14 @@ public class ChannelCache {
      * Total Follow Count
      */
     private final AtomicReference<Integer> followers = new AtomicReference<>();
+
+    /**
+     * Construct Channel Cache
+     *
+     * @param userName the name of the channel.
+     */
+    public ChannelCache(String userName) {
+        this.userName = userName;
+    }
 
 }

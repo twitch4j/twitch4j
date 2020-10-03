@@ -327,7 +327,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Stream Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache().withUserName(channelName));
+            channelInformation.get(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -418,7 +418,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Follow Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache().withUserName(channelName));
+            channelInformation.get(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
