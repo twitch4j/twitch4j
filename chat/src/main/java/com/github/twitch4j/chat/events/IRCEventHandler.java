@@ -1,7 +1,6 @@
 package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
@@ -10,12 +9,15 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Month;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_CHEERER;
 import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
@@ -61,6 +63,8 @@ public class IRCEventHandler {
         eventManager.onEvent(IRCMessageEvent.class, this::onNoticeEvent);
         eventManager.onEvent(IRCMessageEvent.class, this::onHostOnEvent);
         eventManager.onEvent(IRCMessageEvent.class, this::onHostOffEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onListModsEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onListVipsEvent);
         eventManager.onEvent(IRCMessageEvent.class, this::onChannelState);
         eventManager.onEvent(IRCMessageEvent.class, this::onGiftReceived);
         eventManager.onEvent(IRCMessageEvent.class, this::onPayForward);
@@ -494,6 +498,20 @@ public class IRCEventHandler {
         }
     }
 
+    public void onListModsEvent(IRCMessageEvent event) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("room_mods") || s.equals("no_mods")).isPresent()) {
+            String[] names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
+            eventManager.publish(new ListModsEvent(event.getChannel(), names));
+        }
+    }
+
+    public void onListVipsEvent(IRCMessageEvent event) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("vips_success") || s.equals("no_vips")).isPresent()) {
+            String[] names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
+            eventManager.publish(new ListVipsEvent(event.getChannel(), names));
+        }
+    }
+
     public void onChannelState(IRCMessageEvent event) {
         if (event.getCommandType().equals("ROOMSTATE")) {
             // getting Status on channel
@@ -553,5 +571,15 @@ public class IRCEventHandler {
                 log.warn("Failed to delete a message in {}!", channel.getName());
             }
         }
+    }
+
+    @NonNull
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static String[] extractItemsFromDelimitedList(@NonNull Optional<String> message, @NonNull String prefix, @NonNull String delim) {
+        return message.filter(s -> s.startsWith(prefix))
+            .map(s -> s.substring(prefix.length()))
+            .map(s -> s.charAt(s.length() - 1) == '.' ? s.substring(0, s.length() - 1) : s) // remove trailing period if present
+            .map(s -> StringUtils.split(s, delim))
+            .orElse(new String[0]);
     }
 }

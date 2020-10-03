@@ -82,7 +82,7 @@ subprojects {
 			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.1'
 
 			// WebSocket
-			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.9'
+			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.10'
 
 			// Annotations
 			api group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
