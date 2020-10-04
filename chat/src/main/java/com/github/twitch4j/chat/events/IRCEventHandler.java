@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Month;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -559,15 +558,7 @@ public class IRCEventHandler {
 
     public void onUserState(IRCMessageEvent event) {
         if (event.getCommandType().equals("USERSTATE")) {
-            EventChannel channel = event.getChannel();
-
-            String displayName = event.getTagValue("display-name").orElse(null);
-            String color = event.getTagValue("color").orElse(null);
-
-            String[] emoteSets = event.getTagValue("emote-sets")
-                .map(emoteSetsStr -> emoteSetsStr.split(",")).orElse(new String[]{});
-
-            eventManager.publish(new UserStateEvent(channel, displayName, color, Arrays.asList(emoteSets), event.getBadges(), event.getBadgeInfo()));
+            eventManager.publish(new UserStateEvent(event));
         }
     }
 }

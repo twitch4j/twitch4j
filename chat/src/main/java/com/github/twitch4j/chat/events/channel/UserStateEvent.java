@@ -1,14 +1,15 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
-import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.enums.CommandPermission;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
@@ -20,14 +21,9 @@ import java.util.OptionalInt;
 public class UserStateEvent extends AbstractChannelEvent {
 
     /**
-     * Hexadecimal RGB color code, or null if it is never set.
+     * RAW Message Event
      */
-    private String color;
-
-    /**
-     * The user's display name, or null if it is never set.
-     */
-    private String displayName;
+    private IRCMessageEvent messageEvent;
 
     /**
      * List of emote sets.
@@ -35,97 +31,71 @@ public class UserStateEvent extends AbstractChannelEvent {
     private List<String> emoteSets;
 
     /**
-     * Badges map of tags to versions.
-     */
-    private Map<String, String> badges;
-
-    /**
-     * Metadata related to the chat badges.
-     */
-    private Map<String, String> badgeInfo;
-
-    /**
      * Event constructor
      *
-     * @param channel     The channel that this event originates from.
-     * @param displayName The display version of the user name
-     * @param color       Hexadecimal RGB color code of the user
-     * @param emoteSets   The emote sets the user is entitled to use.
-     * @param badges      Chat badges of the user and the version of each badge
-     * @param badgeInfo   Metadata related to the user chat badges
+     * @param messageEvent raw message event
      */
-    public UserStateEvent(EventChannel channel, String displayName, String color,
-                          List<String> emoteSets, Map<String, String> badges, Map<String, String> badgeInfo) {
-        super(channel);
-        this.displayName = displayName;
-        this.color = color;
-        this.emoteSets = Collections.unmodifiableList(emoteSets);
-        this.badges = Collections.unmodifiableMap(badges);
-        this.badgeInfo = Collections.unmodifiableMap(badgeInfo);
+    public UserStateEvent(IRCMessageEvent messageEvent) {
+        super(messageEvent.getChannel());
+        this.messageEvent = messageEvent;
+        String[] emoteSets = messageEvent.getTagValue("emote-sets")
+            .map(emoteSetsStr -> emoteSetsStr.split(",")).orElse(new String[]{});
+        this.emoteSets = Collections.unmodifiableList(Arrays.asList(emoteSets));
+    }
+
+    /**
+     * @return Hexadecimal RGB color code, or empty if it is never set
+     */
+    public Optional<String> getColor(){
+        return messageEvent.getTagValue("color");
+    }
+
+    /**
+     * @return The user's display name, or empty if it is never set
+     */
+    public Optional<String> getDisplayName(){
+        return messageEvent.getTagValue("display-name");
     }
 
     /**
      * @return true if user is subscribed, false otherwise
      */
     public boolean isSubscriber() {
-        return this.badges.containsKey("subscriber");
+        return this.messageEvent.getClientPermissions().contains(CommandPermission.SUBSCRIBER);
     }
 
     /**
      * @return number of months the user has been a subscriber, or empty if they are not subscribed
      */
     public OptionalInt getSubscriberMonth() {
-        final String subscriberMonthsStr = this.badgeInfo.get("subscriber");
-
-        if (subscriberMonthsStr != null) {
-            try {
-                return OptionalInt.of(Integer.parseInt(subscriberMonthsStr));
-            } catch (Exception ignored) {
-            }
-        }
-
-        return OptionalInt.empty();
-    }
-
-    /**
-     * @return true if user is admin, false otherwise
-     */
-    public boolean isAdmin() {
-        return this.badges.containsKey("admin");
+        return this.messageEvent.getSubscriberMonths();
     }
 
     /**
      * @return true if user is broadcaster, false otherwise
      */
     public boolean isBroadcaster() {
-        return this.badges.containsKey("broadcaster");
-    }
-
-    /**
-     * @return true if user is global mod, false otherwise
-     */
-    public boolean isGlobalMod() {
-        return this.badges.containsKey("global_mod");
+        return this.messageEvent.getClientPermissions().contains(CommandPermission.BROADCASTER);
     }
 
     /**
      * @return true if user is moderator, false otherwise
      */
     public boolean isModerator() {
-        return this.badges.containsKey("moderator");
+        return this.messageEvent.getClientPermissions().contains(CommandPermission.MODERATOR);
     }
 
     /**
      * @return true if user is staff, false otherwise
      */
     public boolean isStaff() {
-        return this.badges.containsKey("staff");
+        return this.messageEvent.getClientPermissions().contains(CommandPermission.TWITCHSTAFF);
     }
 
     /**
-     * @return true if user have turbo badge, false otherwise
+     * @return true if user have prime or turbo badge, false otherwise
      */
-    public boolean isTurbo() {
-        return this.badges.containsKey("turbo");
+    public boolean isPrimeOrTurbo() {
+        return this.messageEvent.getClientPermissions().contains(CommandPermission.PRIME_TURBO);
     }
 }
