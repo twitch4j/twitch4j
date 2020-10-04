@@ -13,7 +13,9 @@ public class EventManagerUtils {
      */
     public static EventManager validateOrInitializeEventManager(EventManager eventManager, @SuppressWarnings("rawtypes") Class defaultEventHandler) {
         if (eventManager == null) {
-            return initializeEventManager(defaultEventHandler);
+            EventManager newEM = initializeEventManager(defaultEventHandler);
+            validateEventManager(newEM);
+            return newEM;
         } else {
             validateEventManager(eventManager);
             return eventManager;
