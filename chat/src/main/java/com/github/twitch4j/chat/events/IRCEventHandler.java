@@ -14,7 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Month;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -500,14 +503,14 @@ public class IRCEventHandler {
 
     public void onListModsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("room_mods") || s.equals("no_mods")).isPresent()) {
-            String[] names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
+            List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
             eventManager.publish(new ListModsEvent(event.getChannel(), names));
         }
     }
 
     public void onListVipsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("vips_success") || s.equals("no_vips")).isPresent()) {
-            String[] names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
+            List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
             eventManager.publish(new ListVipsEvent(event.getChannel(), names));
         }
     }
@@ -575,11 +578,13 @@ public class IRCEventHandler {
 
     @NonNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static String[] extractItemsFromDelimitedList(@NonNull Optional<String> message, @NonNull String prefix, @NonNull String delim) {
+    private static List<String> extractItemsFromDelimitedList(@NonNull Optional<String> message, @NonNull String prefix, @NonNull String delim) {
         return message.filter(s -> s.startsWith(prefix))
             .map(s -> s.substring(prefix.length()))
             .map(s -> s.charAt(s.length() - 1) == '.' ? s.substring(0, s.length() - 1) : s) // remove trailing period if present
             .map(s -> StringUtils.split(s, delim))
-            .orElse(new String[0]);
+            .map(Arrays::asList)
+            .map(Collections::unmodifiableList)
+            .orElse(Collections.emptyList());
     }
 }
