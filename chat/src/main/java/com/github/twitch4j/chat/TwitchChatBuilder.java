@@ -8,6 +8,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
@@ -160,15 +161,7 @@ public class TwitchChatBuilder {
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-chat-"+ RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT);
 
         // Initialize/Check EventManager
-        if (eventManager == null) {
-            eventManager = new EventManager();
-            eventManager.autoDiscovery();
-            eventManager.setDefaultEventHandler(defaultEventHandler);
-        } else {
-            if (eventManager.getDefaultEventHandler() == null) {
-                throw new RuntimeException("Fatal: Twitch4J will not be functional unless you set a defaultEventHandler that can be used for internal events (eventManager.setDefaultEventHandler)!");
-            }
-        }
+        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
         log.debug("TwitchChat: Initializing Module ...");
         return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.botOwnerIds);

@@ -11,6 +11,7 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.extensions.TwitchExtensions;
 import com.github.twitch4j.extensions.TwitchExtensionsBuilder;
@@ -274,15 +275,7 @@ public class TwitchClientBuilder {
         TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
         // Initialize/Check EventManager
-        if (eventManager == null) {
-            eventManager = new EventManager();
-            eventManager.autoDiscovery();
-            eventManager.setDefaultEventHandler(defaultEventHandler);
-        } else {
-            if (eventManager.getDefaultEventHandler() == null) {
-                throw new RuntimeException("Fatal: Twitch4J will not be functional unless you set a defaultEventHandler that can be used for internal events (eventManager.setDefaultEventHandler)!");
-            }
-        }
+        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
         // Determinate required threadPool size
         int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;
