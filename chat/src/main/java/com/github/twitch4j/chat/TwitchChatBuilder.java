@@ -5,8 +5,10 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
@@ -60,7 +62,7 @@ public class TwitchChatBuilder {
      * EventManager
      */
     @With
-    private Class<? extends IEventHandler> defaultEventHandler = null;
+    private Class<? extends IEventHandler> defaultEventHandler = SimpleEventHandler.class;
 
     /**
      * Credential Manager
@@ -158,13 +160,8 @@ public class TwitchChatBuilder {
         if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-chat-"+ RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT);
 
-        if (eventManager == null) {
-            eventManager = new EventManager();
-            eventManager.autoDiscovery();
-        }
-        if (defaultEventHandler != null) {
-            eventManager.setDefaultEventHandler(defaultEventHandler);
-        }
+        // Initialize/Check EventManager
+        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
         log.debug("TwitchChat: Initializing Module ...");
         return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.chatRateLimit, this.whisperRateLimit, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.botOwnerIds);

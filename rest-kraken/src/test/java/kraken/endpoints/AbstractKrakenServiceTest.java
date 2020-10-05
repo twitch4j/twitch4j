@@ -29,9 +29,9 @@ abstract class AbstractKrakenServiceTest {
     }
 
     /**
-     * Gets a instance of the Helix Client
+     * Gets a instance of the Kraken Client
      *
-     * @return TwitchHelix
+     * @return TwitchKraken
      */
     public static TwitchKraken getTwitchKrakenClient() {
         TwitchKraken client = TwitchKrakenBuilder.builder().build();

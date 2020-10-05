@@ -536,6 +536,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("radio-events-v1")) {
+                                eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
                             } else if (topic.startsWith("channel-sub-gifts-v1")) {
                                 eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
                             } else if (topic.startsWith("channel-cheer-events-public-v1")) {
@@ -562,6 +564,31 @@ public class TwitchPubSub implements AutoCloseable {
                                 boolean hasId = topic.charAt(dot - 1) == 'd';
                                 VideoPlaybackData data = TypeConvert.jsonToObject(rawMessage, VideoPlaybackData.class);
                                 eventManager.publish(new VideoPlaybackEvent(hasId ? channel : null, hasId ? null : channel, data));
+                            } else if (topic.startsWith("channel-unban-requests")) {
+                                int firstDelim = topic.indexOf('.');
+                                int lastDelim = topic.lastIndexOf('.');
+                                String userId = topic.substring(firstDelim + 1, lastDelim);
+                                String channelId = topic.substring(lastDelim + 1);
+                                if ("create_unban_request".equals(type)) {
+                                    CreatedUnbanRequest request = TypeConvert.convertValue(msgData, CreatedUnbanRequest.class);
+                                    eventManager.publish(new ChannelUnbanRequestCreateEvent(userId, channelId, request));
+                                } else if ("update_unban_request".equals(type)) {
+                                    UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
+                                    eventManager.publish(new ChannelUnbanRequestUpdateEvent(userId, channelId, request));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
+                            } else if (topic.startsWith("user-unban-requests")) {
+                                int firstDelim = topic.indexOf('.');
+                                int lastDelim = topic.lastIndexOf('.');
+                                String userId = topic.substring(firstDelim + 1, lastDelim);
+                                String channelId = topic.substring(lastDelim + 1);
+                                if ("update_unban_request".equals(type)) {
+                                    UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
+                                    eventManager.publish(new UserUnbanRequestUpdateEvent(userId, channelId, request));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -909,6 +936,16 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    public PubSubSubscription listenForChannelUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-unban-requests." + userId + '.' + channelId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForUserUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-unban-requests." + userId + '.' + channelId);
+    }
+
+    @Unofficial
     @Deprecated
     public PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-ext-v1." + channelId);
@@ -1043,6 +1080,11 @@ public class TwitchPubSub implements AutoCloseable {
     @Unofficial
     public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
 
     @Unofficial

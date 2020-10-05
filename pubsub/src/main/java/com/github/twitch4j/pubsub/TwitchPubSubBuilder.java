@@ -2,7 +2,9 @@ package com.github.twitch4j.pubsub;
 
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -32,7 +34,7 @@ public class TwitchPubSubBuilder {
      * EventManager
      */
     @With
-    private Class<? extends IEventHandler> defaultEventHandler = null;
+    private Class<? extends IEventHandler> defaultEventHandler = SimpleEventHandler.class;
 
     /**
      * Scheduler Thread Pool Executor
@@ -72,13 +74,8 @@ public class TwitchPubSubBuilder {
         if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-pubsub-" + RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT);
 
-        if (eventManager == null) {
-            eventManager = new EventManager();
-            eventManager.autoDiscovery();
-        }
-        if (defaultEventHandler != null) {
-            eventManager.setDefaultEventHandler(defaultEventHandler);
-        }
+        // Initialize/Check EventManager
+        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
         return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds);
     }

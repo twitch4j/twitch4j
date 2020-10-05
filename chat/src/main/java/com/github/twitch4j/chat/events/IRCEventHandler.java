@@ -76,6 +76,7 @@ public class IRCEventHandler {
         eventManager.onEvent(IRCMessageEvent.class, this::onRewardGift);
         eventManager.onEvent(IRCMessageEvent.class, this::onRitual);
         eventManager.onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
+        eventManager.onEvent(IRCMessageEvent.class, this::onUserState);
     }
 
     /**
@@ -576,6 +577,12 @@ public class IRCEventHandler {
         }
     }
 
+    public void onUserState(IRCMessageEvent event) {
+        if (event.getCommandType().equals("USERSTATE")) {
+            eventManager.publish(new UserStateEvent(event));
+        }
+    }
+
     @NonNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static List<String> extractItemsFromDelimitedList(@NonNull Optional<String> message, @NonNull String prefix, @NonNull String delim) {
@@ -587,4 +594,5 @@ public class IRCEventHandler {
             .map(Collections::unmodifiableList)
             .orElse(Collections.emptyList());
     }
+
 }
