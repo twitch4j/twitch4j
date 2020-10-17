@@ -3,6 +3,7 @@ package com.github.twitch4j.tmi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.tmi.domain.TMIError;
 import feign.Request;
 import feign.Response;
@@ -24,7 +25,7 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
     final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
 
     // ObjectMapper
-    final ObjectMapper objectMapper = new ObjectMapper();
+    final ObjectMapper objectMapper = TypeConvert.getObjectMapper();
 
     /**
      * Constructor

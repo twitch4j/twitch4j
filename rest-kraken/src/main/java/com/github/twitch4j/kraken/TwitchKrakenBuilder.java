@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -101,9 +102,7 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#uploadVideoPart(URI,String,String,int,byte[]).execution.isolation.thread.timeoutInMilliseconds", uploadTimeout);
 
         // Jackson ObjectMapper
-        ObjectMapper mapper = new ObjectMapper();
-        // - Modules
-        mapper.findAndRegisterModules();
+        ObjectMapper mapper = TypeConvert.getObjectMapper();
 
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
