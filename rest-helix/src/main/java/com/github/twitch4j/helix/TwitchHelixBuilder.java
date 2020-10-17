@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
@@ -105,9 +106,7 @@ public class TwitchHelixBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
         // Jackson ObjectMapper
-        ObjectMapper mapper = new ObjectMapper();
-        // - Modules
-        mapper.findAndRegisterModules();
+        ObjectMapper mapper = TypeConvert.getObjectMapper();
 
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();

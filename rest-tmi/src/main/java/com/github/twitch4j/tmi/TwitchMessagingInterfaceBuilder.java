@@ -1,8 +1,10 @@
 package com.github.twitch4j.tmi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -101,11 +103,13 @@ public class TwitchMessagingInterfaceBuilder {
         if (proxyConfig != null)
             proxyConfig.apply(clientBuilder);
 
+        ObjectMapper mapper = TypeConvert.getObjectMapper();
+
         // Build
         TwitchMessagingInterface client = HystrixFeign.builder()
             .client(new OkHttpClient(clientBuilder.build()))
-            .encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder(mapper))
+            .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
             .errorDecoder(new TwitchMessagingInterfaceErrorDecoder(new JacksonDecoder()))

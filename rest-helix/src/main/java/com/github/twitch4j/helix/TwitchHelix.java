@@ -367,17 +367,17 @@ public interface TwitchHelix {
      * @param broadcasterId User ID of the broadcaster (required)
      * @param limit Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
      * @param id The id of the wanted event, if known. (optional)
-     * @param cursor Cursor for forward pagination (optional)
+     * @param after Cursor for forward pagination (optional)
      * @return HypeTrainEventList
      */
-    @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&id={id}&cursor={cursor}")
+    @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&id={id}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("first") Integer limit,
         @Param("id") String id,
-        @Param("cursor") String cursor
+        @Param("after") String after
     );
 
     /**
