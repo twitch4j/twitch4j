@@ -1,6 +1,8 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -36,10 +39,12 @@ public class Video {
     private String description;
 
     /** Date when the video was created. */
-    private Date createdAt;
+    @JsonProperty("created_at")
+    private Instant createdAtInstant;
 
     /** Date when the video was published. */
-    private Date publishedAt;
+    @JsonProperty("published_at")
+    private Instant publishedAtInstant;
 
     /** URL of the video. */
     private String url;
@@ -62,4 +67,23 @@ public class Video {
     /** Length of the video. */
     private String duration;
 
+    /**
+     * @return the timestamp when the video was created
+     * @deprecated in favor of getCreatedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getCreatedAt() {
+        return Date.from(createdAtInstant);
+    }
+
+    /**
+     * @return the timestamp when the video was published
+     * @deprecated in favor of getPublishedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getPublishedAt() {
+        return Date.from(publishedAtInstant);
+    }
 }

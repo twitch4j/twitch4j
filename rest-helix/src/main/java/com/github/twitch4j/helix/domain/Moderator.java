@@ -12,11 +12,11 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Moderator {
 
-    /** ID of the subscribed user. */
+    /** ID of the moderator. */
     @NonNull
     private String userId;
 
-    /** Login name of the subscribed user. */
+    /** Display name of the moderator. */
     @NonNull
     private String userName;
 

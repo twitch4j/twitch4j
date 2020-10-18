@@ -25,5 +25,5 @@ Subscribe to hype train rewards for channel `twitch4j` and register a listener t
 ```java
 twitchClient.getPubSub().listenForHypeTrainRewardEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(HypeTrainRewardsEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainRewardsEvent.class, System.out::println);
 ```

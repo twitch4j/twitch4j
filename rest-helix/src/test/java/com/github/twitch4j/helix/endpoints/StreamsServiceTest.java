@@ -37,7 +37,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch information about current live streams")
     public void getStreams() {
         // TestCase
-        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null, null).execute();
+        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null).execute();
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams method!");
@@ -55,48 +55,6 @@ public class StreamsServiceTest extends AbstractEndpointTest {
         List<StreamKey> resultList = TestUtils.getTwitchHelixClient().getStreamKey(TestUtils.getCredential().getAccessToken(), twitchUserId).execute().getKeys();
         Assertions.assertFalse(resultList.isEmpty());
         resultList.forEach(key -> Assertions.assertNotNull(key.getStreamKey()));
-    }
-
-    /**
-     * Get Stream Metadata (Hearthstone)
-     */
-    @Test
-    @DisplayName("Fetch meta-information (hearthstone) about live streams")
-    @Deprecated
-    public void getStreamMetadataForHearthstone() {
-        // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata(null, "", "", 5, null, Arrays.asList(hearthstoneGameId), null, null, null).execute();
-
-        // Test
-        assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
-        int foundMetadata = 0;
-        for (StreamMetadata stream : resultList.getStreams()) {
-            if (stream.getHearthstone() != null) {
-                foundMetadata++;
-            }
-        }
-        assertTrue(foundMetadata > 0, "Hearthstone Metadata should be provided!");
-    }
-
-    /**
-     * Get Stream Metadata (Overwatch)
-     */
-    @Test
-    @DisplayName("Fetch meta-information (overwatch) about live streams")
-    @Deprecated
-    public void getStreamMetadataForOverwatch() {
-        // TestCase
-        StreamMetadataList resultList = testUtils.getTwitchHelixClient().getStreamsMetadata(null, "", "", 5, null, Arrays.asList(overwatchGameId), null, null, null).execute();
-
-        // Test
-        assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams metadata method!");
-        int foundMetadata = 0;
-        for (StreamMetadata stream : resultList.getStreams()) {
-            if (stream.getOverwatch() != null) {
-                foundMetadata++;
-            }
-        }
-        assertTrue(foundMetadata > 0, "Overwatch Metadata should be provided!");
     }
 
     /**

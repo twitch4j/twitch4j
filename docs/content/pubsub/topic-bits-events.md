@@ -15,8 +15,8 @@ This topic can be used to monitor whenever bits are cheered in a specified chann
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| credential | OAuth2Credential | User Auth Token for the target user id, with the scope `bits:read` |
-| userId | String | Target User Id |
+| credential | OAuth2Credential | User Auth Token for the target channel id, with the scope `bits:read` |
+| channelId | String | Target Channel Id |
 
 *Optional Parameters*
 
@@ -29,5 +29,5 @@ Subscribe to all cheers to user twitch4j and register a listener that prints all
 ```java
 twitchClient.getPubSub().listenForCheerEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelBitsEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelBitsEvent.class, System.out::println);
 ```

@@ -51,6 +51,7 @@ Analytics:
 Bits:
 
 - [Bits -> Get Leaderboard](./bits-leaderboard)
+- [Bits -> Get Cheermotes](./bits-cheermotes)
 
 Clips:
 
@@ -60,6 +61,8 @@ Clips:
 Entitlements:
 
 - Create Entitlement Grants Upload URL
+- [Entitlements -> Get Code Status](./entitlements-codes)
+- [Entitlements -> Redeem Code](./entitlements-redeem-codes)
 
 Games:
 
@@ -69,7 +72,6 @@ Games:
 Streams:
 
 - [Streams -> Search](./streams-get)
-- [Streams -> Get Metadata](./streams-getmetadata)
 - Create Stream Marker
 - [Streams -> Get Markers](./streams-markers-get)
 
@@ -91,3 +93,4 @@ Videos:
 
 - [Videos -> Search](./videos-get)
 - Get Webhook Subscriptions
+

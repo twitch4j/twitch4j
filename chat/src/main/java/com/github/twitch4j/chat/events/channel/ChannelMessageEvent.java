@@ -1,13 +1,18 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
+import com.github.twitch4j.common.util.ChatReply;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -38,6 +43,30 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 	 */
 	private Set<CommandPermission> permissions;
 
+    /**
+     * The exact number of months the user has been a subscriber, or zero if not subscribed
+     */
+	private int subscriberMonths;
+
+    /**
+     * The tier at which the user is subscribed (prime is treated as 1), or zero if not subscribed
+     */
+	private int subscriptionTier;
+
+    /**
+     * Nonce
+     */
+    @Unofficial
+    @Getter(lazy = true)
+    private String nonce = getMessageEvent().getNonce().orElse(null);
+
+    /**
+     * Information regarding the parent message being replied to, if applicable.
+     */
+    @Unofficial
+    @Getter(lazy = true)
+    private ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
+
 	/**
 	 * Event Constructor
 	 *
@@ -53,5 +82,39 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;
+		this.subscriberMonths = messageEvent.getSubscriberMonths().orElse(0);
+		this.subscriptionTier = messageEvent.getSubscriptionTier().orElse(0);
 	}
+
+    /**
+     * @return whether "Highlight My Message" was redeemed for this event
+     */
+    @Unofficial
+    public boolean isHighlightedMessage() {
+        return "highlighted-message".equals(getMessageEvent().getTags().get("msg-id"));
+    }
+
+    /**
+     * @return whether "Send a Message in Sub-Only Mode" was redeemed for this event
+     */
+    @Unofficial
+    public boolean isSkipSubsModeMessage() {
+        return "skip-subs-mode-message".equals(getMessageEvent().getTags().get("msg-id"));
+    }
+
+    /**
+     * @return the id for the custom reward that was redeemed with this associated message, in an optional wrapper
+     */
+    @Unofficial
+    public Optional<String> getCustomRewardId() {
+        return getMessageEvent().getTagValue("custom-reward-id");
+    }
+
+    /**
+     * @return the regions of the message that were flagged by AutoMod.
+     */
+    @Unofficial
+    public List<AutoModFlag> getFlags() {
+        return this.messageEvent.getFlags();
+    }
 }

@@ -7,6 +7,8 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.enums.SubscriptionType;
 import lombok.Data;
 
+import java.time.Month;
+
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -91,6 +93,8 @@ public class SubscriptionData {
      */
     private CommerceMessage subMessage;
 
+    private Integer benefitEndMonth;
+
     private String recipientId;
 
     private String recipientUserName;
@@ -122,6 +126,14 @@ public class SubscriptionData {
      */
     public String getRecipientDisplayName() {
         return this.recipientDisplayName != null ? this.recipientDisplayName : this.displayName;
+    }
+
+    /**
+     * @return the new month the subscription will end on, in the case of an extendsub (otherwise null).
+     * @see <a href="https://discuss.dev.twitch.tv/t/ios-sub-tokens-launch/22794/3">Twitch Announcement</a> (but not present in the official documentation)
+     */
+    public Month getBenefitEndMonth() {
+        return benefitEndMonth != null && benefitEndMonth > 0 ? Month.of(benefitEndMonth) : null;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.twitch4j;
 
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,10 @@ public class TwitchClientTest {
     @Test
     @DisplayName("Tests the TwitchClientBuilder")
     public void buildTwitch4J() {
-        // external event manager (for shared module usage - streamlabs4j)
+        // external event manager
         EventManager eventManager = new EventManager();
+        eventManager.autoDiscovery();
+        eventManager.setDefaultEventHandler(SimpleEventHandler.class);
 
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
@@ -83,7 +86,7 @@ public class TwitchClientTest {
             .withDefaultAuthToken(TestUtils.getCredential())
             .withEnablePubSub(true)
             .withEnableGraphQL(false)
-            .withHelperThreadRate(10000L)
+            .withHelperThreadDelay(10000L)
             .build();
 
         // your code here

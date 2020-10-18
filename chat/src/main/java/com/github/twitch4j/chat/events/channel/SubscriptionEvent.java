@@ -1,6 +1,8 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -8,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -68,6 +71,12 @@ public class SubscriptionEvent extends AbstractChannelEvent {
     Integer giftMonths;
 
     /**
+     * The regions of {@link #getMessage()} that were flagged by AutoMod (Unofficial)
+     */
+    @Unofficial
+    List<AutoModFlag> flags;
+
+    /**
      * Event Constructor
      *
      * @param channel    ChatChannel the user subscribed to
@@ -79,8 +88,9 @@ public class SubscriptionEvent extends AbstractChannelEvent {
      * @param giftedBy   User that gifted the sub
      * @param subStreak  Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
      * @param giftMonths The number of months gifted as part of a single, multi-month gift
+     * @param flags      The regions of the message that were flagged by AutoMod.
      */
-    public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths) {
+    public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths, List<AutoModFlag> flags) {
         super(channel);
         this.user = user;
         this.subscriptionPlan = subPlan;
@@ -90,6 +100,7 @@ public class SubscriptionEvent extends AbstractChannelEvent {
         this.giftedBy = giftedBy;
         this.subStreak = subStreak;
         this.giftMonths = giftMonths;
+        this.flags = flags;
     }
 
     /**

@@ -1,19 +1,18 @@
 package com.github.twitch4j.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Channel Cache
  */
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ChannelCache {
 
     /**
@@ -39,5 +38,20 @@ public class ChannelCache {
     /**
      * Last Follow Check
      */
-    private LocalDateTime lastFollowCheck;
+    private Instant lastFollowCheck;
+
+    /**
+     * Total Follow Count
+     */
+    private final AtomicReference<Integer> followers = new AtomicReference<>();
+
+    /**
+     * Construct Channel Cache
+     *
+     * @param userName the name of the channel.
+     */
+    public ChannelCache(String userName) {
+        this.userName = userName;
+    }
+
 }

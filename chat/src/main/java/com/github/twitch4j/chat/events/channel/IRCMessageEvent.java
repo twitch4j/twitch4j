@@ -1,14 +1,19 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.TwitchEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.chat.flag.FlagParser;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
+import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +25,9 @@ import java.util.regex.Pattern;
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
+
+    @Unofficial
+    public static final String NONCE_TAG_NAME = "client-nonce";
 
 	/**
 	 * Tags
@@ -36,6 +44,11 @@ public class IRCMessageEvent extends TwitchEvent {
 	 */
 	private Map<String, String> badges = new HashMap<>();
 
+    /**
+     * Metadata related to the chat badges in the badges tag
+     */
+    private Map<String, String> badgeInfo = new HashMap<>();
+
 	/**
 	 * Client
 	 */
@@ -46,8 +59,13 @@ public class IRCMessageEvent extends TwitchEvent {
 	 */
 	private String commandType = "UNKNOWN";
 
+    /**
+     * Channel Id
+     */
+    private String channelId;
+
 	/**
-	 * Channel
+	 * Channel Name
 	 */
 	private Optional<String> channelName = Optional.empty();
 
@@ -66,23 +84,46 @@ public class IRCMessageEvent extends TwitchEvent {
 	 */
 	private final Set<CommandPermission> clientPermissions = EnumSet.noneOf(CommandPermission.class);
 
+    /**
+     * AutoMod Message Flag Indicators, relevant for PRIVMSG and USERNOTICE
+     */
+    @Unofficial
+    @Getter(lazy = true)
+    private final List<AutoModFlag> flags = FlagParser.parseFlags(this);
+
 	/**
 	 * RAW Message
 	 */
 	private final String rawMessage;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param rawMessage      The raw message.
-	 */
-	public IRCMessageEvent(String rawMessage) {
+    /**
+     * Event Constructor
+     *
+     * @param rawMessage  The raw message.
+     * @param channelIdToChannelName Mapping used to lookup a missing channel name in the event
+     * @param channelNameToChannelId Mapping used to lookup a missing channel id in the event
+     * @param botOwnerIds The bot owner ids.
+     */
+	public IRCMessageEvent(String rawMessage, Map<String, String> channelIdToChannelName, Map<String, String> channelNameToChannelId, Collection<String> botOwnerIds) {
 		this.rawMessage = rawMessage;
 
 		this.parseRawMessage();
 
-		// permissions
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags()));
+        // set channel id
+        if (tags.containsKey("room-id")) {
+            channelId = tags.get("room-id");
+        }
+
+        // provide channel id or name from cache if the event was missing one
+        if (!channelName.isPresent() && channelId != null) {
+            channelName = Optional.ofNullable(channelIdToChannelName.get(channelId));
+        } else if (channelName.isPresent() && channelId == null) {
+            channelId = channelNameToChannelId.get(channelName.get());
+        }
+
+        // permissions and badges
+		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
+		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
 	}
 
 	/**
@@ -101,32 +142,30 @@ public class IRCMessageEvent extends TwitchEvent {
 		// Parse Message
 		Pattern pattern = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
 		Matcher matcher = pattern.matcher(rawMessage);
-
-		if(matcher.matches()) {
+		if (matcher.matches()) {
 			// Parse Tags
-			setTags(parseTags(matcher.group("tags")));
-            setRawTags(parseTags(matcher.group("tags")));
-			setClientName(parseClientName(matcher.group("clientName")));
-			setCommandType(matcher.group("command"));
-			setChannelName(Optional.ofNullable(matcher.group("channel")));
-			setMessage(Optional.ofNullable(matcher.group("message")));
-			setPayload(Optional.ofNullable(matcher.group("payload")));
+			tags = parseTags(matcher.group("tags"));
+            rawTags = parseTags(matcher.group("tags"));
+			clientName = parseClientName(matcher.group("clientName"));
+			commandType = matcher.group("command");
+			channelName = Optional.ofNullable(matcher.group("channel"));
+			message = Optional.ofNullable(matcher.group("message"));
+			payload = Optional.ofNullable(matcher.group("payload"));
 			return;
 		}
 
 		// Parse Message - Whisper
 		Pattern patternPM = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
 		Matcher matcherPM = patternPM.matcher(rawMessage);
-
-		if(matcherPM.matches()) {
+		if (matcherPM.matches()) {
 			// Parse Tags
-			setTags(parseTags(matcherPM.group("tags")));
-			setRawTags(parseTags(matcherPM.group("tags")));
-			setClientName(parseClientName(matcherPM.group("clientName")));
-			setCommandType(matcherPM.group("command"));
-			setChannelName(Optional.ofNullable(matcherPM.group("channel")));
-			setMessage(Optional.ofNullable(matcherPM.group("message")));
-			setPayload(Optional.ofNullable(matcherPM.group("payload")));
+			tags = parseTags(matcherPM.group("tags"));
+			rawTags = parseTags(matcherPM.group("tags"));
+			clientName = parseClientName(matcherPM.group("clientName"));
+			commandType = matcherPM.group("command");
+			channelName = Optional.ofNullable(matcherPM.group("channel"));
+			message = Optional.ofNullable(matcherPM.group("message"));
+			payload = Optional.ofNullable(matcherPM.group("payload"));
 		}
 	}
 
@@ -171,26 +210,13 @@ public class IRCMessageEvent extends TwitchEvent {
 	}
 
 	/**
-	 * Gets the Channel Id (from Tags)
-     *
-     * @return Long channelId
-	 */
-	public String getChannelId() {
-		if(getTags().containsKey("room-id")) {
-			return getTags().get("room-id");
-		}
-
-		return null;
-	}
-
-	/**
 	 * Gets the User Id (from Tags)
      *
      * @return Long userId
 	 */
 	public String getUserId() {
-		if(getTags().containsKey("user-id")) {
-			return getTags().get("user-id");
+		if (tags.containsKey("user-id")) {
+			return tags.get("user-id");
 		}
 
 		return null;
@@ -202,8 +228,8 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String userName
 	 */
 	public String getUserName() {
-		if(getTags().containsKey("login")) {
-			return getTags().get("login");
+		if (tags.containsKey("login")) {
+			return tags.get("login");
 		}
 
 		return getClientName().orElse(null);
@@ -215,11 +241,60 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long targetUserId
      */
     public String getTargetUserId() {
-        if(getTags().containsKey("target-user-id")) {
-            return getTags().get("target-user-id");
+        if (tags.containsKey("target-user-id")) {
+            return tags.get("target-user-id");
         }
 
         return null;
+    }
+
+    /**
+     * The message UUID that is used for deletion by a moderator or a chat reply (from Tags)
+     *
+     * @return the unique ID for the message
+     */
+    public Optional<String> getMessageId() {
+        return getTagValue("id");
+    }
+
+    /**
+     * @return the client nonce for the message.
+     */
+    @Unofficial
+    public Optional<String> getNonce() {
+        return getTagValue(NONCE_TAG_NAME);
+    }
+
+    /**
+     * @return the exact number of months the user has been a subscriber, or empty if they are not subscribed
+     */
+    public OptionalInt getSubscriberMonths() {
+        final String monthsStr = badgeInfo.get("subscriber");
+
+        if (monthsStr != null) {
+            try {
+                return OptionalInt.of(Integer.parseInt(monthsStr));
+            } catch (Exception ignored) {
+            }
+        }
+
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return the tier at which the user is subscribed, or empty if they are not subscribed
+     */
+    public OptionalInt getSubscriptionTier() {
+        final String subscriber = badges.get("subscriber");
+
+        if (subscriber != null) {
+            try {
+                return OptionalInt.of(Math.max(Integer.parseInt(subscriber) / 1000, 1));
+            } catch (Exception ignored) {
+            }
+        }
+
+        return OptionalInt.empty();
     }
 
 	/**
@@ -229,15 +304,9 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String tagValue
 	 */
 	public Optional<String> getTagValue(String tagName) {
-		if(getTags().containsKey(tagName)) {
-			String value = getTags().get(tagName);
-			if(StringUtils.isBlank(value)) return Optional.empty();
-
-			value = value.replaceAll("\\\\s", " ");
-			return Optional.ofNullable(value);
-		}
-
-		return Optional.empty();
+	    return Optional.ofNullable(tags.get(tagName))
+            .filter(StringUtils::isNotBlank)
+            .map(EscapeUtils::unescapeTagValue);
 	}
 
 	/**

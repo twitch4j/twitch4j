@@ -2,7 +2,7 @@ package com.github.twitch4j.chat.events.roomstate;
 
 import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 import java.util.concurrent.TimeUnit;
@@ -11,11 +11,14 @@ import java.util.concurrent.TimeUnit;
  * Followers Only State Event
  */
 @Value
-@Getter
-@EqualsAndHashCode(callSuper = false)
-public class FollowersOnlyEvent extends ChannelStatesEvent{
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class FollowersOnlyEvent extends ChannelStatesEvent {
 
-	private final long time;
+    /**
+     * Time in  seconds
+     */
+    long time;
 
 	public FollowersOnlyEvent(EventChannel channel, long time, TimeUnit timeUnit) {
 		super(channel, time > -1);

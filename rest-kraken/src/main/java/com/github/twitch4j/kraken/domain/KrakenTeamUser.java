@@ -1,8 +1,10 @@
 package com.github.twitch4j.kraken.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -19,7 +21,7 @@ public class KrakenTeamUser {
     private String broadcasterLanguage;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private Instant createdAtInstant;
 
     @JsonProperty("display_name")
     private String displayName;
@@ -47,7 +49,7 @@ public class KrakenTeamUser {
     private String status;
 
     @JsonProperty("updated_at")
-    private Date updatedAt;
+    private Instant updatedAtInstant;
 
     private String url;
 
@@ -55,4 +57,24 @@ public class KrakenTeamUser {
     private Object videoBanner;
 
     private long views;
+
+    /**
+     * @return creation timestamp
+     * @deprecated in favor of getCreatedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getCreatedAt() {
+        return Date.from(createdAtInstant);
+    }
+
+    /**
+     * @return updated timestamp
+     * @deprecated in favor of getUpdatedAtInstant()
+     */
+    @JsonIgnore
+    @Deprecated
+    public Date getUpdatedAt() {
+        return Date.from(updatedAtInstant);
+    }
 }

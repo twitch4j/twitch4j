@@ -15,8 +15,8 @@ This topic is deprecated by Twitch, but it could be used to monitor purchases in
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| credential | OAuth2Credential | User Auth Token for the target user id, with any scope |
-| userId | String | Target User Id |
+| credential | OAuth2Credential | User Auth Token for the target channel id, with any scope |
+| channelId | String | Target Channel Id |
 
 *Optional Parameters*
 
@@ -29,5 +29,5 @@ Subscribe to all commerce purchases in the twitch4j channel and register a liste
 ```java
 twitchClient.getPubSub().listenForCommerceEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChannelCommerceEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChannelCommerceEvent.class, System.out::println);
 ```

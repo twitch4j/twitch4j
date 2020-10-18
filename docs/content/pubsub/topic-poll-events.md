@@ -32,5 +32,5 @@ Subscribe to all poll events in channel `twitch4j` and register a listener that 
 ```java
 twitchClient.getPubSub().listenForPollEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(PollsEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(PollsEvent.class, System.out::println);
 ```

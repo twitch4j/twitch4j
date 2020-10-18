@@ -3,13 +3,18 @@ package com.github.twitch4j;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
+import com.github.twitch4j.extensions.TwitchExtensions;
+import com.github.twitch4j.extensions.TwitchExtensionsBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -20,12 +25,15 @@ import com.github.twitch4j.pubsub.TwitchPubSub;
 import com.github.twitch4j.pubsub.TwitchPubSubBuilder;
 import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
+import feign.Logger;
 import io.github.bucket4j.Bandwidth;
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -76,6 +84,12 @@ public class TwitchClientBuilder {
     private Integer timeout = 5000;
 
     /**
+     * Enabled: Extensions
+     */
+    @With
+    private Boolean enableExtensions = false;
+
+    /**
      * Enabled: Helix
      */
     @With
@@ -98,6 +112,13 @@ public class TwitchClientBuilder {
      */
     @With
     private Boolean enableChat = false;
+
+    /**
+     * User IDs of Bot Owners for applying {@link com.github.twitch4j.common.enums.CommandPermission#OWNER}
+     */
+    @Setter
+    @Accessors(chain = true)
+    protected Collection<String> botOwnerIds = new HashSet<>();
 
     /**
      * IRC Command Handlers
@@ -127,6 +148,12 @@ public class TwitchClientBuilder {
      */
     @With
     private EventManager eventManager = null;
+
+    /**
+     * EventManager
+     */
+    @With
+    private Class<? extends IEventHandler> defaultEventHandler = SimpleEventHandler.class;
 
     /**
      * Size of the ChatQueue
@@ -170,7 +197,7 @@ public class TwitchClientBuilder {
      * Millisecond Delay for Client Helper Thread
      */
     @With
-    private long helperThreadRate = 10000L;
+    private long helperThreadDelay = 10000L;
 
     /**
      * Default Auth Token for API Requests
@@ -185,6 +212,23 @@ public class TwitchClientBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level feignLogLevel = Logger.Level.NONE;
+
+    /**
+     * With a Bot Owner's User ID
+     *
+     * @param userId the user id
+     * @return TwitchClientBuilder
+     */
+    public TwitchClientBuilder withBotOwnerId(String userId) {
+        this.botOwnerIds.add(userId);
+        return this;
+    }
+
+    /**
      * With a CommandTrigger
      *
      * @param commandTrigger Command Trigger (Prefix)
@@ -193,6 +237,21 @@ public class TwitchClientBuilder {
     public TwitchClientBuilder withCommandTrigger(String commandTrigger) {
         this.commandPrefixes.add(commandTrigger);
         return this;
+    }
+
+    /**
+     * With a base thread delay for API calls by {@link TwitchClientHelper}
+     * <p>
+     * Note: the method name has been a misnomer as it has always set the <i>delay</i> rather than a rate.
+     * One can change the <i>rate</i> at any time via {@link TwitchClientHelper#setThreadRate(long)}.
+     *
+     * @param helperThreadDelay TwitchClientHelper Base Thread Delay
+     * @return TwitchClientBuilder
+     * @deprecated in favor of withHelperThreadDelay
+     */
+    @Deprecated
+    public TwitchClientBuilder withHelperThreadRate(long helperThreadDelay) {
+        return this.withHelperThreadDelay(helperThreadDelay);
     }
 
     /**
@@ -215,11 +274,8 @@ public class TwitchClientBuilder {
         // Module: Auth (registers Twitch Identity Providers)
         TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
 
-        // Default EventManager
-        if (eventManager == null) {
-            eventManager = new EventManager();
-            eventManager.autoDiscovery();
-        }
+        // Initialize/Check EventManager
+        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
         // Determinate required threadPool size
         int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;
@@ -236,6 +292,20 @@ public class TwitchClientBuilder {
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-"+ RandomStringUtils.random(4, true, true), poolSize);
         }
 
+        // Module: Extensions
+        TwitchExtensions extensions = null;
+        if (this.enableExtensions) {
+            extensions = TwitchExtensionsBuilder.builder()
+                .withClientId(clientId)
+                .withClientSecret(clientSecret)
+                .withUserAgent(userAgent)
+                .withRequestQueueSize(requestQueueSize)
+                .withTimeout(timeout)
+                .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
+                .build();
+        }
+
         // Module: Helix
         TwitchHelix helix = null;
         if (this.enableHelix) {
@@ -247,6 +317,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -260,6 +331,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -273,6 +345,7 @@ public class TwitchClientBuilder {
                 .withRequestQueueSize(requestQueueSize)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
+                .withLogLevel(feignLogLevel)
                 .build();
         }
 
@@ -290,6 +363,7 @@ public class TwitchClientBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
+                .setBotOwnerIds(botOwnerIds)
                 .build();
         }
 
@@ -300,6 +374,7 @@ public class TwitchClientBuilder {
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
+                .setBotOwnerIds(botOwnerIds)
                 .build();
         }
 
@@ -315,8 +390,8 @@ public class TwitchClientBuilder {
         }
 
         // Module: TwitchClient & ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
-        client.getClientHelper().setThreadRate(helperThreadRate);
+        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
+        client.getClientHelper().setThreadDelay(helperThreadDelay);
 
         // Return new Client Instance
         return client;

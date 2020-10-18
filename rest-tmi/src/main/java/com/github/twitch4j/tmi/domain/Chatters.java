@@ -27,12 +27,18 @@ public class Chatters {
     @JsonIgnore
     private List<String> vips;
 
+    /** Broadcaster */
+    @JsonIgnore
+    private List<String> broadcaster;
+
     /** Staff */
     @JsonIgnore
+    @Deprecated
     private List<String> staff;
 
     /** Admins */
     @JsonIgnore
+    @Deprecated
     private List<String> admins;
 
     /** Moderators */
@@ -45,6 +51,7 @@ public class Chatters {
 
     @JsonProperty("chatters")
     private void unpackMessage(Map<String, List<String>> chatters) {
+        broadcaster = chatters.get("broadcaster");
         vips = chatters.get("vips");
         moderators = chatters.get("moderators");
         staff = chatters.get("staff");
@@ -58,7 +65,8 @@ public class Chatters {
      * @return all viewers (name)
      */
     public List<String> getAllViewers() {
-        List<String> newList = new ArrayList<String>();
+        List<String> newList = new ArrayList<>(viewerCount);
+        newList.addAll(broadcaster);
         newList.addAll(vips);
         newList.addAll(moderators);
         newList.addAll(staff);

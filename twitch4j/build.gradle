@@ -3,6 +3,7 @@ dependencies {
 	// Twitch4J Modules
 	api project(':' + rootProject.name + '-common')
 	api project(':' + rootProject.name + '-chat')
+	api project(':' + rootProject.name + '-rest-extensions')
 	api project(':' + rootProject.name + '-rest-helix')
 	api project(':' + rootProject.name + '-rest-kraken')
 	api project(':' + rootProject.name + '-rest-tmi')

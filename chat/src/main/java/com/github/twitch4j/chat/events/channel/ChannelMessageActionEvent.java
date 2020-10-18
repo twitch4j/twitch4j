@@ -1,6 +1,8 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -8,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,6 +41,16 @@ public class ChannelMessageActionEvent extends AbstractChannelEvent {
 	 */
 	private Set<CommandPermission> permissions;
 
+    /**
+     * The exact number of months the user has been a subscriber, or zero if not subscribed
+     */
+    private int subscriberMonths;
+
+    /**
+     * The tier at which the user is subscribed (prime is treated as 1), or zero if not subscribed
+     */
+    private int subscriptionTier;
+
 	/**
 	 * Event Constructor
 	 *
@@ -53,5 +66,15 @@ public class ChannelMessageActionEvent extends AbstractChannelEvent {
 		this.user = user;
 		this.message = message;
 		this.permissions = permissions;
+        this.subscriberMonths = messageEvent.getSubscriberMonths().orElse(0);
+        this.subscriptionTier = messageEvent.getSubscriptionTier().orElse(0);
 	}
+
+    /**
+     * @return the regions of the message that were flagged by AutoMod.
+     */
+	@Unofficial
+	public List<AutoModFlag> getFlags() {
+	    return this.messageEvent.getFlags();
+    }
 }

@@ -29,8 +29,6 @@ None
 
 ```java
 twitchClient.getPubSub().listenForChannelPointsRedemptionEvents(credential, "149223493");
-
-SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
 ```
 
 ### Listen for Custom Reward Redemptions
@@ -38,7 +36,7 @@ SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler
 Fired when a _custom_ reward is redeemed in the channel.
 
 ```java
-eventHandler.onEvent(RewardRedeemedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(RewardRedeemedEvent.class, System.out::println);
 ```
 
 ### Listen for Redemption Status Updates
@@ -50,7 +48,7 @@ Fired when the status of a redemption changes (e.g. completed or rejected).
 Note that, at the time of writing, the status is `ACTION_TAKEN` whether the reward was completed or rejected, rather than `FULFILLED` or `UNFULFILLED`.
 
 ```java
-eventHandler.onEvent(RedemptionStatusUpdateEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(RedemptionStatusUpdateEvent.class, System.out::println);
 ```
 
 ### Listen for Reward Creations
@@ -60,7 +58,7 @@ Not documented by Twitch.
 Fired when a _custom_ reward is **created**.
 
 ```java
-eventHandler.onEvent(CustomRewardCreatedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(CustomRewardCreatedEvent.class, System.out::println);
 ```
 
 ### Listen for Reward Updates
@@ -70,7 +68,7 @@ Not documented by Twitch.
 Fired when a _custom_ reward is **updated**.
 
 ```java
-eventHandler.onEvent(CustomRewardUpdatedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(CustomRewardUpdatedEvent.class, System.out::println);
 ```
 
 ### Listen for Reward Deletions
@@ -80,7 +78,7 @@ Not documented by Twitch.
 Fired when _custom_ reward is **deleted**.
 
 ```java
-eventHandler.onEvent(CustomRewardDeletedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(CustomRewardDeletedEvent.class, System.out::println);
 ```
 
 ### Listen for Update Redemption Status Progress
@@ -90,7 +88,7 @@ Not documented by Twitch.
 Fired when there is an update to the redemption progress.
 
 ```java
-eventHandler.onEvent(UpdateRedemptionProgressEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(UpdateRedemptionProgressEvent.class, System.out::println);
 ```
 
 ### Listen for Update Redemption Status Completion
@@ -100,5 +98,5 @@ Not documented by Twitch.
 Fired when the redemption progress has completed.
 
 ```java
-eventHandler.onEvent(UpdateRedemptionFinishedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(UpdateRedemptionFinishedEvent.class, System.out::println);
 ```

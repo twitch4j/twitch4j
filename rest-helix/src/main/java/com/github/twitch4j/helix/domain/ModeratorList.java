@@ -14,10 +14,17 @@ import java.util.List;
 public class ModeratorList {
 
     @JsonProperty("data")
-    private List<Moderator> subscriptions;
+    private List<Moderator> moderators;
 
     @JsonProperty("pagination")
     private HelixPagination pagination;
 
+    /**
+     * @return the moderators from this query
+     * @deprecated in favor of getModerators()
+     */
+    @Deprecated
+    public List<Moderator> getSubscriptions() {
+        return this.moderators;
+    }
 }
-

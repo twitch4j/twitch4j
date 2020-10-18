@@ -2,6 +2,7 @@ package com.github.twitch4j.common.util;
 
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -21,12 +22,18 @@ public class TwitchUtils {
     public static final EventUser ANONYMOUS_CHEERER = new EventUser("407665396", "ananonymouscheerer");
 
     public static Set<CommandPermission> getPermissionsFromTags(Map<String, Object> tags) {
+        return getPermissionsFromTags(tags, new HashMap<>());
+    }
+
+    public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges) {
+        return getPermissionsFromTags(tags, badges, null, null);
+    }
+
+    public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges, String userId, Collection<String> botOwnerIds) {
         Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
 
         // Check for Permissions
         if (tags.containsKey("badges")) {
-            final Map<String, Object> badges = new HashMap<>();
-
             if (tags.get("badges") instanceof String) {
                 // needed for irc
                 badges.putAll(parseBadges((String) tags.get("badges")));
@@ -90,7 +97,17 @@ public class TwitchUtils {
                 }
                 */
             }
+            // Hype Train Conductor
+            String hypeBadge = badges.get("hype-train");
+            if ("1".equals(hypeBadge)) {
+                permissionSet.add(CommandPermission.CURRENT_HYPE_TRAIN_CONDUCTOR);
+            } else if ("2".equals(hypeBadge)) {
+                permissionSet.add(CommandPermission.FORMER_HYPE_TRAIN_CONDUCTOR);
+            }
         }
+
+        if (userId != null && botOwnerIds != null && botOwnerIds.contains(userId))
+            permissionSet.add(CommandPermission.OWNER);
 
         return permissionSet;
     }
@@ -101,8 +118,8 @@ public class TwitchUtils {
      * @param raw The raw list of tags.
      * @return A key-value map of the tags.
      */
-    private static Map<String, Object> parseBadges(String raw) {
-        Map<String, Object> map = new HashMap<>();
+    public static Map<String, String> parseBadges(String raw) {
+        Map<String, String> map = new HashMap<>();
         if(StringUtils.isBlank(raw)) return map;
 
         // Fix Whitespaces

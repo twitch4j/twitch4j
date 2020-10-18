@@ -27,11 +27,11 @@ Subscribe to all raid events in channel `twitch4j` and register a listener that 
 twitchClient.getPubSub().listenForRaidEvents(credential, "149223493");
 
 // Listen for the channel executing a raid
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(RaidGoEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(RaidGoEvent.class, System.out::println);
 
 // Listen for raid progress (counting down until the raid can go through)
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(RaidUpdateEvent.class, System.out::println);
+twitchClient.getEventManager()onEvent(RaidUpdateEvent.class, System.out::println);
 
 // Listen for raid cancellations
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(RaidCancelEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(RaidCancelEvent.class, System.out::println);
 ```

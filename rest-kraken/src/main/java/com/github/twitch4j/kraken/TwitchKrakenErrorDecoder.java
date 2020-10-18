@@ -3,6 +3,7 @@ package com.github.twitch4j.kraken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.kraken.domain.TwitchKrakenError;
 import feign.Request;
 import feign.Response;
@@ -26,7 +27,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
     final ErrorDecoder defaultDecoder = new Default();
 
     // ObjectMapper
-    final ObjectMapper objectMapper = new ObjectMapper();
+    final ObjectMapper objectMapper = TypeConvert.getObjectMapper();
 
     /**
      * Constructor
@@ -76,7 +77,7 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
                 ex = new RetryableException(response.status(), "getting service unavailable, retrying ...", Request.HttpMethod.GET, null, response.request());
             } else {
                 TwitchKrakenError error = objectMapper.readValue(responseBody, TwitchKrakenError.class);
-                ex = new ContextedRuntimeException("Helix API Error")
+                ex = new ContextedRuntimeException("Kraken API Error")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("requestHeaders", response.request().headers().entrySet().toString())

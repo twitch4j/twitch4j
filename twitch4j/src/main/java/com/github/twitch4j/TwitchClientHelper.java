@@ -7,29 +7,36 @@ import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
+import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
 import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
-import lombok.Setter;
-import lombok.Synchronized;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * A helper class that covers a few basic use cases of most library users
@@ -61,23 +68,27 @@ public class TwitchClientHelper implements AutoCloseable {
 
     /**
      * Event Task - Stream Status
+     * <p>
+     * Accepts a list of channel ids not exceeding {@link TwitchClientHelper#MAX_LIMIT} in size as the input
      */
-    private final Runnable streamStatusEventTask;
+    private final Consumer<List<String>> streamStatusEventTask;
 
     /**
-     * The {@link ScheduledFuture} associated with streamStatusEventTask, in an atomic wrapper
+     * The {@link Future} associated with streamStatusEventTask, in an atomic wrapper
      */
-    private final AtomicReference<ScheduledFuture<?>> streamStatusEventFuture = new AtomicReference<>();
+    private final AtomicReference<Future<?>> streamStatusEventFuture = new AtomicReference<>();
 
     /**
      * Event Task - Followers
+     * <p>
+     * Accepts a channel id as the input; Yields true if the next call should not be delayed
      */
-    private final Runnable followerEventTask;
+    private final Function<String, Boolean> followerEventTask;
 
     /**
-     * The {@link ScheduledFuture} associated with followerEventTask, in an atomic wrapper
+     * The {@link Future} associated with followerEventTask, in an atomic wrapper
      */
-    private final AtomicReference<ScheduledFuture<?>> followerEventFuture = new AtomicReference<>();
+    private final AtomicReference<Future<?>> followerEventFuture = new AtomicReference<>();
 
     /**
      * Channel Information Cache
@@ -93,10 +104,14 @@ public class TwitchClientHelper implements AutoCloseable {
     private final ScheduledThreadPoolExecutor executor;
 
     /**
-     * Thread Rate
+     * Holds the {@link ExponentialBackoffStrategy} used for the stream status listener
      */
-    @Setter
-    private long threadRate;
+    private final AtomicReference<ExponentialBackoffStrategy> liveBackoff;
+
+    /**
+     * Holds the {@link ExponentialBackoffStrategy} used for the follow listener
+     */
+    private final AtomicReference<ExponentialBackoffStrategy> followBackoff;
 
     /**
      * Constructor
@@ -107,145 +122,166 @@ public class TwitchClientHelper implements AutoCloseable {
     public TwitchClientHelper(TwitchClient twitchClient, ScheduledThreadPoolExecutor executor) {
         this.twitchClient = twitchClient;
         this.executor = executor;
+
+        final ExponentialBackoffStrategy defaultBackoff = ExponentialBackoffStrategy.builder().immediateFirst(false).baseMillis(1000L).jitter(false).build();
+        liveBackoff = new AtomicReference<>(defaultBackoff);
+        followBackoff = new AtomicReference<>(defaultBackoff.copy());
+
         // Threads
-        this.streamStatusEventTask = () -> {
+        this.streamStatusEventTask = channels -> {
             // check go live / stream events
-            CollectionUtils.chunked(listenForGoLive, MAX_LIMIT).forEach(channels -> {
-                HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, channels.size(), null, null, null, channels, null);
-                try {
-                    Map<String, Stream> streams = new HashMap<>();
-                    channels.forEach(id -> streams.put(id, null));
-                    hystrixGetAllStreams.execute().getStreams().forEach(s -> streams.put(s.getUserId(), s));
+            HystrixCommand<StreamList> hystrixGetAllStreams = twitchClient.getHelix().getStreams(null, null, null, channels.size(), null, null, channels, null);
+            try {
+                Map<String, Stream> streams = new HashMap<>();
+                channels.forEach(id -> streams.put(id, null));
+                hystrixGetAllStreams.execute().getStreams().forEach(s -> streams.put(s.getUserId(), s));
+                liveBackoff.get().reset(); // API call was successful
 
-                    streams.forEach((userId, stream) -> {
-                        // Check if the channel's live status is still desired to be tracked
-                        if (!listenForGoLive.contains(userId))
-                            return;
+                streams.forEach((userId, stream) -> {
+                    // Check if the channel's live status is still desired to be tracked
+                    if (!listenForGoLive.contains(userId))
+                        return;
 
-                        ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache(null, null, null, null, null));
-                        // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
-                        if (stream != null && currentChannelCache.getUserName() == null)
-                            currentChannelCache.setUserName(stream.getUserName());
-                        final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
+                    ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache());
+                    // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
+                    if (stream != null && currentChannelCache.getUserName() == null)
+                        currentChannelCache.setUserName(stream.getUserName());
+                    final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
 
-                        boolean dispatchGoLiveEvent = false;
-                        boolean dispatchGoOfflineEvent = false;
-                        boolean dispatchTitleChangedEvent = false;
-                        boolean dispatchGameChangedEvent = false;
+                    boolean dispatchGoLiveEvent = false;
+                    boolean dispatchGoOfflineEvent = false;
+                    boolean dispatchTitleChangedEvent = false;
+                    boolean dispatchGameChangedEvent = false;
 
-                        if (stream != null && stream.getType().equalsIgnoreCase("live")) {
-                            // is live
-                            // - live status
-                            if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
-                                dispatchGoLiveEvent = true;
-                            }
-                            currentChannelCache.setIsLive(true);
-                            boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
-
-                            // - change stream title event
-                            if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
-                                dispatchTitleChangedEvent = true;
-                            }
-                            currentChannelCache.setTitle(stream.getTitle());
-
-                            // - change game event
-                            if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.getGameId())) {
-                                dispatchGameChangedEvent = true;
-                            }
-                            currentChannelCache.setGameId(stream.getGameId());
-                        } else {
-                            // was online previously?
-                            if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
-                                dispatchGoOfflineEvent = true;
-                            }
-
-                            // is offline
-                            currentChannelCache.setIsLive(false);
-                            currentChannelCache.setTitle(null);
-                            currentChannelCache.setGameId(null);
+                    if (stream != null && stream.getType().equalsIgnoreCase("live")) {
+                        // is live
+                        // - live status
+                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                            dispatchGoLiveEvent = true;
                         }
+                        currentChannelCache.setIsLive(true);
+                        boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
 
-                        // dispatch events
-                        // - go live event
-                        if (dispatchGoLiveEvent) {
-                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
-                            twitchClient.getEventManager().publish(event);
-                            twitchClient.getEventManager().publish(new ChannelGoLiveEvent(channel, stream));
+                        // - change stream title event
+                        if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
+                            dispatchTitleChangedEvent = true;
                         }
-                        // - go offline event
-                        if (dispatchGoOfflineEvent) {
-                            Event event = new com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent(channel);
-                            twitchClient.getEventManager().publish(event);
-                            twitchClient.getEventManager().publish(new ChannelGoOfflineEvent(channel));
-                        }
-                        // - title changed event
-                        if (dispatchTitleChangedEvent) {
-                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
-                            twitchClient.getEventManager().publish(event);
-                            twitchClient.getEventManager().publish(new ChannelChangeTitleEvent(channel, stream));
-                        }
-                        // - game changed event
-                        if (dispatchGameChangedEvent) {
-                            Event event = new com.github.twitch4j.common.events.channel.ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
-                            twitchClient.getEventManager().publish(event);
-                            twitchClient.getEventManager().publish(new ChannelChangeGameEvent(channel, stream));
-                        }
-                    });
-                } catch (Exception ex) {
-                    if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
-                        log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
-                    }
+                        currentChannelCache.setTitle(stream.getTitle());
 
-                    log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
-                }
-            });
-        };
-        this.followerEventTask = () -> {
-            // check follow events
-            for (String channelId : listenForFollow) {
-                HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channelId, null, MAX_LIMIT);
-                try {
-                    ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache(null, null, null, null, null));
-                    LocalDateTime lastFollowDate = null;
-
-                    if (currentChannelCache.getLastFollowCheck() != null) {
-                        List<Follow> followList = commandGetFollowers.execute().getFollows();
-                        EventChannel channel = null;
-                        if (!followList.isEmpty()) {
-                            // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
-                            if (currentChannelCache.getUserName() == null)
-                                currentChannelCache.setUserName(followList.get(0).getToName());
-                            channel = new EventChannel(channelId, currentChannelCache.getUserName());
+                        // - change game event
+                        if (wasAlreadyLive && currentChannelCache.getGameId() != null && !currentChannelCache.getGameId().equals(stream.getGameId())) {
+                            dispatchGameChangedEvent = true;
                         }
-                        for (Follow follow : followList) {
-                            // update lastFollowDate
-                            if (lastFollowDate == null || follow.getFollowedAt().compareTo(lastFollowDate) > 0) {
-                                lastFollowDate = follow.getFollowedAt();
-                            }
-
-                            // is new follower?
-                            if (follow.getFollowedAt().compareTo(currentChannelCache.getLastFollowCheck()) > 0) {
-                                // dispatch event
-                                FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                                twitchClient.getEventManager().publish(event);
-                            }
-                        }
-                    }
-
-                    if (currentChannelCache.getLastFollowCheck() == null) {
-                        // only happens if the user doesn't have any followers at all
-                        currentChannelCache.setLastFollowCheck(LocalDateTime.now(ZoneId.of("UTC")));
+                        currentChannelCache.setGameId(stream.getGameId());
                     } else {
-                        // tracks the date of the latest follow to identify new ones later on
-                        currentChannelCache.setLastFollowCheck(lastFollowDate);
-                    }
-                } catch (Exception ex) {
-                    if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                        log.trace(ex.getMessage(), ex);
+                        // was online previously?
+                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                            dispatchGoOfflineEvent = true;
+                        }
+
+                        // is offline
+                        currentChannelCache.setIsLive(false);
+                        currentChannelCache.setTitle(null);
+                        currentChannelCache.setGameId(null);
                     }
 
-                    log.error("Failed to check for Follow Events: " + ex.getMessage());
+                    // dispatch events
+                    // - go live event
+                    if (dispatchGoLiveEvent) {
+                        Event event = new com.github.twitch4j.common.events.channel.ChannelGoLiveEvent(channel, currentChannelCache.getTitle(), currentChannelCache.getGameId());
+                        twitchClient.getEventManager().publish(event);
+                        twitchClient.getEventManager().publish(new ChannelGoLiveEvent(channel, stream));
+                    }
+                    // - go offline event
+                    if (dispatchGoOfflineEvent) {
+                        Event event = new com.github.twitch4j.common.events.channel.ChannelGoOfflineEvent(channel);
+                        twitchClient.getEventManager().publish(event);
+                        twitchClient.getEventManager().publish(new ChannelGoOfflineEvent(channel));
+                    }
+                    // - title changed event
+                    if (dispatchTitleChangedEvent) {
+                        Event event = new com.github.twitch4j.common.events.channel.ChannelChangeTitleEvent(channel, currentChannelCache.getTitle());
+                        twitchClient.getEventManager().publish(event);
+                        twitchClient.getEventManager().publish(new ChannelChangeTitleEvent(channel, stream));
+                    }
+                    // - game changed event
+                    if (dispatchGameChangedEvent) {
+                        Event event = new com.github.twitch4j.common.events.channel.ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
+                        twitchClient.getEventManager().publish(event);
+                        twitchClient.getEventManager().publish(new ChannelChangeGameEvent(channel, stream));
+                    }
+                });
+            } catch (Exception ex) {
+                if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
+                    log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
                 }
+
+                log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
+            }
+        };
+        this.followerEventTask = channelId -> {
+            // check follow events
+            HystrixCommand<FollowList> commandGetFollowers = twitchClient.getHelix().getFollowers(null, null, channelId, null, MAX_LIMIT);
+            try {
+                ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache());
+                Instant lastFollowDate = null;
+
+                boolean nextRequestCanBeImmediate = false;
+
+                if (currentChannelCache.getLastFollowCheck() != null) {
+                    FollowList executionResult = commandGetFollowers.execute();
+                    List<Follow> followList = executionResult.getFollows();
+                    followBackoff.get().reset(); // API call was successful
+
+                    // Prepare EventChannel
+                    String channelName = currentChannelCache.getUserName(); // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                    if (channelName == null && !followList.isEmpty()) {
+                        channelName = followList.get(0).getToName();
+                        currentChannelCache.setUserName(channelName);
+                    }
+                    EventChannel channel = new EventChannel(channelId, channelName);
+
+                    // Follow Count Event
+                    Integer followCount = executionResult.getTotal();
+                    Integer oldTotal = currentChannelCache.getFollowers().getAndSet(followCount);
+                    if (oldTotal != null && followCount != null && !followCount.equals(oldTotal)) {
+                        twitchClient.getEventManager().publish(new ChannelFollowCountUpdateEvent(channel, followCount, oldTotal));
+                    }
+
+                    // Individual Follow Events
+                    for (Follow follow : followList) {
+                        // update lastFollowDate
+                        if (lastFollowDate == null || follow.getFollowedAtInstant().isAfter(lastFollowDate)) {
+                            lastFollowDate = follow.getFollowedAtInstant();
+                        }
+
+                        // is new follower?
+                        if (follow.getFollowedAtInstant().isAfter(currentChannelCache.getLastFollowCheck())) {
+                            // dispatch event
+                            FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
+                            twitchClient.getEventManager().publish(event);
+                        }
+                    }
+                } else {
+                    nextRequestCanBeImmediate = true; // No API call was made
+                }
+
+                if (currentChannelCache.getLastFollowCheck() == null) {
+                    // only happens if the user doesn't have any followers at all
+                    currentChannelCache.setLastFollowCheck(Instant.now());
+                } else {
+                    // tracks the date of the latest follow to identify new ones later on
+                    currentChannelCache.setLastFollowCheck(lastFollowDate);
+                }
+
+                return nextRequestCanBeImmediate;
+            } catch (Exception ex) {
+                if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
+                    log.trace(ex.getMessage(), ex);
+                }
+
+                log.error("Failed to check for Follow Events: " + ex.getMessage());
+                return false;
             }
         };
     }
@@ -291,7 +327,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Stream Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+            channelInformation.get(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -382,7 +418,7 @@ public class TwitchClientHelper implements AutoCloseable {
             log.info("Channel {} already added for Follow Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName, null, null, null, null));
+            channelInformation.get(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -435,43 +471,188 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Start or quit the thread, depending on usage
      */
-    @Synchronized
     private void startOrStopEventGenerationThread() {
         // stream status event thread
-        if (listenForGoLive.size() > 0) {
-            if (streamStatusEventFuture.get() == null)
-                streamStatusEventFuture.set(executor.scheduleAtFixedRate(this.streamStatusEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
-        } else {
-            final ScheduledFuture<?> scheduledFuture = streamStatusEventFuture.getAndSet(null);
-            if (scheduledFuture != null)
-                scheduledFuture.cancel(false);
-        }
+        updateListener(listenForGoLive::isEmpty, streamStatusEventFuture, this::runRecursiveStreamStatusCheck, liveBackoff);
 
         // follower event thread
-        if (listenForFollow.size() > 0) {
-            if (followerEventFuture.get() == null)
-                followerEventFuture.set(executor.scheduleAtFixedRate(this.followerEventTask, 1, threadRate, TimeUnit.MILLISECONDS));
+        updateListener(listenForFollow::isEmpty, followerEventFuture, this::runRecursiveFollowerCheck, followBackoff);
+    }
+
+    /**
+     * Performs the "heavy lifting" of starting or stopping a listener
+     *
+     * @param stopCondition   yields whether or not the listener should be running
+     * @param futureReference the current listener in an atomic wrapper
+     * @param startCommand    the command to start the listener
+     * @param backoff         the {@link ExponentialBackoffStrategy} for the listener
+     */
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter") // Acceptable as futureReference is only streamStatusEventFuture or followerEventFuture
+    private void updateListener(BooleanSupplier stopCondition, AtomicReference<Future<?>> futureReference, Runnable startCommand, AtomicReference<ExponentialBackoffStrategy> backoff) {
+        if (stopCondition.getAsBoolean()) {
+            // Optimization to avoid obtaining an unnecessary lock
+            if (futureReference.get() != null) {
+                Future<?> future = null;
+                synchronized (futureReference) {
+                    if (stopCondition.getAsBoolean()) // Ensure conditions haven't changed in the time it took to acquire this lock
+                        future = futureReference.getAndSet(null); // Clear out the listener future
+                }
+
+                // Cancel the future
+                if (future != null) {
+                    future.cancel(false);
+                    backoff.get().reset(); // Ideally we would decrement to zero over time rather than instantly resetting
+                }
+            }
         } else {
-            final ScheduledFuture<?> scheduledFuture = followerEventFuture.getAndSet(null);
-            if (scheduledFuture != null)
-                scheduledFuture.cancel(false);
+            // Optimization to avoid obtaining an unnecessary lock
+            if (futureReference.get() == null) {
+                // Must synchronize to prevent race condition where multiple threads could be created
+                synchronized (futureReference) {
+                    // Start if not already started
+                    if (!stopCondition.getAsBoolean() && futureReference.get() == null)
+                        futureReference.set(executor.schedule(startCommand, backoff.get().get(), TimeUnit.MILLISECONDS));
+                }
+            }
         }
+    }
+
+    /**
+     * Initiates the stream status listener execution
+     */
+    private void runRecursiveStreamStatusCheck() {
+        if (streamStatusEventFuture.get() != null)
+            synchronized (streamStatusEventFuture) {
+                if (cancel(streamStatusEventFuture))
+                    streamStatusEventFuture.set(
+                        executor.submit(
+                            new ListenerRunnable<>(
+                                executor,
+                                CollectionUtils.chunked(listenForGoLive, MAX_LIMIT),
+                                streamStatusEventFuture,
+                                liveBackoff,
+                                this::runRecursiveStreamStatusCheck,
+                                chunk -> {
+                                    streamStatusEventTask.accept(chunk);
+                                    return false; // treat as always consuming from the api rate-limit
+                                }
+                            )
+                        )
+                    );
+            }
+    }
+
+    /**
+     * Initiates the follower listener execution
+     */
+    private void runRecursiveFollowerCheck() {
+        if (followerEventFuture.get() != null)
+            synchronized (followerEventFuture) {
+                if (cancel(followerEventFuture))
+                    followerEventFuture.set(
+                        executor.submit(
+                            new ListenerRunnable<>(
+                                executor,
+                                new ArrayList<>(listenForFollow),
+                                followerEventFuture,
+                                followBackoff,
+                                this::runRecursiveFollowerCheck,
+                                followerEventTask
+                            )
+                        )
+                    );
+            }
+    }
+
+    /**
+     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
+     *
+     * @param threadRate the maximum <i>rate</i> of api calls per second
+     */
+    public void setThreadRate(long threadRate) {
+        this.setThreadDelay(1000 / threadRate);
+    }
+
+    /**
+     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
+     *
+     * @param threadDelay the minimum milliseconds <i>delay</i> between each api call
+     */
+    public void setThreadDelay(long threadDelay) {
+        final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
+            ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
+            next.setFailures(old.getFailures());
+            return next;
+        };
+
+        this.liveBackoff.getAndUpdate(updateBackoff);
+        this.followBackoff.getAndUpdate(updateBackoff);
     }
 
     /**
      * Close
      */
     public void close() {
-        final ScheduledFuture<?> streamStatusFuture = this.streamStatusEventFuture.get();
+        final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
         if (streamStatusFuture != null)
             streamStatusFuture.cancel(false);
 
-        final ScheduledFuture<?> followerFuture = this.followerEventFuture.get();
+        final Future<?> followerFuture = this.followerEventFuture.getAndSet(null);
         if (followerFuture != null)
             followerFuture.cancel(false);
 
-        streamStatusEventFuture.lazySet(null);
-        followerEventFuture.lazySet(null);
+        listenForGoLive.clear();
+        listenForFollow.clear();
+    }
+
+    @Value
+    private static class ListenerRunnable<T> implements Runnable {
+        ScheduledExecutorService executor;
+        List<T> channels;
+        AtomicReference<Future<?>> futureReference;
+        AtomicReference<ExponentialBackoffStrategy> backoff;
+        Runnable startCommand;
+        Function<T, Boolean> executeSingle;
+
+        @Override
+        public void run() {
+            if (channels.isEmpty()) {
+                // Try again later if the task wasn't cancelled
+                if (futureReference.get() != null)
+                    synchronized (futureReference) {
+                        if (cancel(futureReference)) {
+                            backoff.get().reset();
+                            futureReference.set(executor.schedule(startCommand, backoff.get().get(), TimeUnit.MILLISECONDS));
+                        }
+                    }
+            } else {
+                // Start execution from the first element
+                run(0);
+            }
+        }
+
+        private void run(final int index) {
+            // If no api call was made by executeSingle, it will return true. Then, we do not need to add any delay before checking the next channel.
+            Boolean skipDelay = executeSingle.apply(channels.get(index));
+
+            // Queue up the next check (if the task hasn't been cancelled)
+            if (futureReference.get() != null)
+                synchronized (futureReference) {
+                    if (cancel(futureReference))
+                        futureReference.set(
+                            executor.schedule(
+                                index + 1 < channels.size() ? () -> run(index + 1) : startCommand,
+                                skipDelay ? 0 : backoff.get().get(),
+                                TimeUnit.MILLISECONDS
+                            )
+                        );
+                }
+        }
+    }
+
+    private static boolean cancel(AtomicReference<Future<?>> futureRef) {
+        Future<?> future = futureRef.get();
+        return future != null && future.cancel(false);
     }
 
 }

@@ -2,7 +2,7 @@ package com.github.twitch4j.chat.events.roomstate;
 
 import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 import java.util.Locale;
@@ -11,14 +11,15 @@ import java.util.Locale;
  * Broadcaster Language Event
  */
 @Value
-@Getter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Deprecated
 public class BroadcasterLanguageEvent extends ChannelStatesEvent {
 
     /**
      * Language
      */
-	private final Locale language;
+    Locale language;
 
     /**
      * Constructor

@@ -24,42 +24,40 @@ With all undocumented topics, use at your own risk.
 
 ```java
 twitchClient.getPubSub().listenForHypeTrainEvents(credential, "149223493");
-
-SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
 ```
 
 ### Listen for Hype Train Starts
 
 ```java
-eventHandler.onEvent(HypeTrainStartEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainStartEvent.class, System.out::println);
 ```
 
 ### Listen for Hype Train Progression
 
 ```java
-eventHandler.onEvent(HypeTrainProgressionEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainProgressionEvent.class, System.out::println);
 ```
 
 ### Listen for Hype Train Level Ups
 
 ```java
-eventHandler.onEvent(HypeTrainLevelUpEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainLevelUpEvent.class, System.out::println);
 ```
 
 ### Listen for Hype Train Ends
 
 ```java
-eventHandler.onEvent(HypeTrainEndEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainEndEvent.class, System.out::println);
 ```
 
 ### Listen for Conductor Updates
 
 ```java
-eventHandler.onEvent(HypeTrainConductorUpdateEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainConductorUpdateEvent.class, System.out::println);
 ```
 
 ### Listen for Cooldown Expiration
 
 ```java
-eventHandler.onEvent(HypeTrainCooldownExpirationEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(HypeTrainCooldownExpirationEvent.class, System.out::println);
 ```

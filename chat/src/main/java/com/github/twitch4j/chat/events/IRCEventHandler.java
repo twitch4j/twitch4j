@@ -1,19 +1,26 @@
 package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.*;
+import com.github.twitch4j.chat.events.roomstate.*;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Month;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_CHEERER;
 import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
@@ -24,6 +31,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
  * Listens for any irc triggered events and created the corresponding events for the EventDispatcher.
  */
 @Getter
+@Slf4j
 public class IRCEventHandler {
 
     /**
@@ -46,25 +54,29 @@ public class IRCEventHandler {
         this.eventManager = twitchChat.getEventManager();
 
         // register event handlers
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelMessage);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onWhisper);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelCheer);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelSubscription);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onClearChat);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannnelClientJoinEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelModChange);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onNoticeEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOnEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onHostOffEvent);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onChannelState);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onGiftReceived);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onPayForward);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRaid);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onUnraid);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRewardGift);
-        eventManager.getEventHandler(SimpleEventHandler.class).onEvent(IRCMessageEvent.class, this::onRitual);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent(IRCMessageEvent.class, this::onWhisper);
+        eventManager.onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelCheer);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelSubscription);
+        eventManager.onEvent(IRCMessageEvent.class, this::onClearChat);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientJoinEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelModChange);
+        eventManager.onEvent(IRCMessageEvent.class, this::onNoticeEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onHostOnEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onHostOffEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onListModsEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onListVipsEvent);
+        eventManager.onEvent(IRCMessageEvent.class, this::onChannelState);
+        eventManager.onEvent(IRCMessageEvent.class, this::onGiftReceived);
+        eventManager.onEvent(IRCMessageEvent.class, this::onPayForward);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRaid);
+        eventManager.onEvent(IRCMessageEvent.class, this::onUnraid);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRewardGift);
+        eventManager.onEvent(IRCMessageEvent.class, this::onRitual);
+        eventManager.onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
+        eventManager.onEvent(IRCMessageEvent.class, this::onUserState);
     }
 
     /**
@@ -135,9 +147,11 @@ public class IRCEventHandler {
                 EventUser user = event.getUser();
                 String message = event.getMessage().orElse("");
                 Integer bits = Integer.parseInt(event.getTags().get("bits"));
+                int subMonths = event.getSubscriberMonths().orElse(0);
+                int subTier = event.getSubscriptionTier().orElse(0);
 
                 // Dispatch Event
-                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits));
+                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
         }
     }
@@ -170,7 +184,7 @@ public class IRCEventHandler {
                 Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, event.getFlags()));
             }
             // Receive Gifted Sub
             else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
@@ -190,7 +204,7 @@ public class IRCEventHandler {
                 int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, event.getFlags()));
             }
             // Gift X Subs
             else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
@@ -457,7 +471,7 @@ public class IRCEventHandler {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
             String messageId = event.getTagValue("msg-id").get();
-            String message = event.getMessage().get();
+            String message = event.getMessage().orElse(null); // can be null, ie. bad_delete_message_error
 
             eventManager.publish(new ChannelNoticeEvent(channel, messageId, message));
         }
@@ -488,31 +502,57 @@ public class IRCEventHandler {
         }
     }
 
+    public void onListModsEvent(IRCMessageEvent event) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("room_mods") || s.equals("no_mods")).isPresent()) {
+            List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
+            eventManager.publish(new ListModsEvent(event.getChannel(), names));
+        }
+    }
+
+    public void onListVipsEvent(IRCMessageEvent event) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("vips_success") || s.equals("no_vips")).isPresent()) {
+            List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
+            eventManager.publish(new ListVipsEvent(event.getChannel(), names));
+        }
+    }
+
     public void onChannelState(IRCMessageEvent event) {
-        if(event.getCommandType().equals("ROOMSTATE")) {
+        if (event.getCommandType().equals("ROOMSTATE")) {
             // getting Status on channel
             EventChannel channel = event.getChannel();
-            Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<ChannelStateEvent.ChannelState, Object>();
+            Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<>();
             if (event.getTags().size() > 2) {
                 event.getTags().forEach((k, v) -> {
                     switch (k) {
                         case "broadcaster-lang":
-                            states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, (v != null) ? Locale.forLanguageTag(v) : v);
+                            Locale locale = v != null ? Locale.forLanguageTag(v) : null;
+                            states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, locale);
+                            eventManager.publish(new BroadcasterLanguageEvent(channel, locale));
                             break;
                         case "emote-only":
-                            states.put(ChannelStateEvent.ChannelState.EMOTE, v.equals("1"));
+                            boolean eoActive = "1".equals(v);
+                            states.put(ChannelStateEvent.ChannelState.EMOTE, eoActive);
+                            eventManager.publish(new EmoteOnlyEvent(channel, eoActive));
                             break;
                         case "followers-only":
-                            states.put(ChannelStateEvent.ChannelState.FOLLOWERS, Long.parseLong(v));
+                            long followDelay = Long.parseLong(v);
+                            states.put(ChannelStateEvent.ChannelState.FOLLOWERS, followDelay);
+                            eventManager.publish(new FollowersOnlyEvent(channel, followDelay));
                             break;
                         case "r9k":
-                            states.put(ChannelStateEvent.ChannelState.R9K, v.equals("1"));
+                            boolean uniqActive = "1".equals(v);
+                            states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
+                            eventManager.publish(new Robot9000Event(channel, uniqActive));
                             break;
                         case "slow":
-                            states.put(ChannelStateEvent.ChannelState.SLOW, Long.parseLong(v));
+                            long slowDelay = Long.parseLong(v);
+                            states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
+                            eventManager.publish(new SlowModeEvent(channel, slowDelay));
                             break;
                         case "subs-only":
-                            states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, v.equals("1"));
+                            boolean subActive = "1".equals(v);
+                            states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, subActive);
+                            eventManager.publish(new SubscribersOnlyEvent(channel, subActive));
                             break;
                         default:
                             break;
@@ -522,4 +562,37 @@ public class IRCEventHandler {
             eventManager.publish(new ChannelStateEvent(channel, states));
         }
     }
+
+    public void onMessageDeleteResponse(IRCMessageEvent event) {
+        if (event.getCommandType().equals("NOTICE")) {
+            EventChannel channel = event.getChannel();
+            String messageId = event.getTagValue("msg-id").get();
+
+            if (messageId.equals("delete_message_success")) {
+                eventManager.publish(new MessageDeleteSuccess(channel));
+            } else if (messageId.equals("bad_delete_message_error")) {
+                eventManager.publish(new MessageDeleteError(channel));
+                log.warn("Failed to delete a message in {}!", channel.getName());
+            }
+        }
+    }
+
+    public void onUserState(IRCMessageEvent event) {
+        if (event.getCommandType().equals("USERSTATE")) {
+            eventManager.publish(new UserStateEvent(event));
+        }
+    }
+
+    @NonNull
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static List<String> extractItemsFromDelimitedList(@NonNull Optional<String> message, @NonNull String prefix, @NonNull String delim) {
+        return message.filter(s -> s.startsWith(prefix))
+            .map(s -> s.substring(prefix.length()))
+            .map(s -> s.charAt(s.length() - 1) == '.' ? s.substring(0, s.length() - 1) : s) // remove trailing period if present
+            .map(s -> StringUtils.split(s, delim))
+            .map(Arrays::asList)
+            .map(Collections::unmodifiableList)
+            .orElse(Collections.emptyList());
+    }
+
 }

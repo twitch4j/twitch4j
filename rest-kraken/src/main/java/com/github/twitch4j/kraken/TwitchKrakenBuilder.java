@@ -1,8 +1,10 @@
 package com.github.twitch4j.kraken;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -11,6 +13,7 @@ import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,6 +60,15 @@ public class TwitchKrakenBuilder {
     @With
     private Integer timeout = 5000;
 
+    @With
+    private Integer uploadTimeout = 4 * 60 * 1000;
+
+    /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level logLevel = Logger.Level.NONE;
+
     /**
      * ProxyConfiguration
      */
@@ -86,6 +98,12 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Hystrix: Timeout modification for file uploads
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#uploadVideoPart(URI,String,String,int,byte[]).execution.isolation.thread.timeoutInMilliseconds", uploadTimeout);
+
+        // Jackson ObjectMapper
+        ObjectMapper mapper = TypeConvert.getObjectMapper();
+
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
         if (proxyConfig != null)
@@ -94,9 +112,10 @@ public class TwitchKrakenBuilder {
         // Build
         TwitchKraken client = HystrixFeign.builder()
             .client(new OkHttpClient(clientBuilder.build()))
-            .encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
-            .logger(new Logger.ErrorLogger())
+            .encoder(new JacksonEncoder(mapper))
+            .decoder(new JacksonDecoder(mapper))
+            .logger(new Slf4jLogger())
+            .logLevel(logLevel)
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))

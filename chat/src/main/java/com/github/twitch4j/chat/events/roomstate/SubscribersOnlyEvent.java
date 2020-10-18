@@ -2,16 +2,16 @@ package com.github.twitch4j.chat.events.roomstate;
 
 import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 /**
  * Subscribers Only State Event
  */
 @Value
-@Getter
-@EqualsAndHashCode(callSuper = false)
-public class SubscribersOnlyEvent extends ChannelStatesEvent{
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class SubscribersOnlyEvent extends ChannelStatesEvent {
 
     /**
      * Constructor

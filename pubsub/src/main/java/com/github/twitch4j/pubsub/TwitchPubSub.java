@@ -10,6 +10,7 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.CryptoUtils;
+import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
@@ -27,13 +28,12 @@ import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Twitch PubSub
@@ -51,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TwitchPubSub implements AutoCloseable {
 
-    public static final int REQUIRED_THREAD_COUNT = 2;
+    public static final int REQUIRED_THREAD_COUNT = 1;
 
     /**
      * EventManager
@@ -75,6 +76,21 @@ public class TwitchPubSub implements AutoCloseable {
      * Default: ({@link TMIConnectionState#DISCONNECTED})
      */
     private volatile TMIConnectionState connectionState = TMIConnectionState.DISCONNECTED;
+
+    /**
+     * Whether {@link #flushCommand} is currently executing
+     */
+    private final AtomicBoolean flushing = new AtomicBoolean();
+
+    /**
+     * Whether an expedited flush has already been submitted
+     */
+    private final AtomicBoolean flushRequested = new AtomicBoolean();
+
+    /**
+     * The {@link Runnable} for flushing the {@link #commandQueue}
+     */
+    private final Runnable flushCommand;
 
     /**
      * Command Queue Thread
@@ -117,9 +133,40 @@ public class TwitchPubSub implements AutoCloseable {
     protected final ScheduledExecutorService taskExecutor;
 
     /**
+     * Bot Owner IDs
+     */
+    private final Collection<String> botOwnerIds;
+
+    /**
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
+
+    /**
+     * Helper class to compute delays between connection retries.
+     * <p>
+     * Configured to (approximately) emulate first-party clients:
+     * <ul>
+     *     <li>initially waits one second</li>
+     *     <li>plus a small random jitter</li>
+     *     <li>doubles the backoff period on subsequent failures</li>
+     *     <li>up to a maximum backoff threshold of 2 minutes</li>
+     * </ul>
+     *
+     * @see <a href="https://dev.twitch.tv/docs/pubsub#connection-management">Official documentation - Handling Connection Failures</a>
+     */
+    protected final ExponentialBackoffStrategy backoff = ExponentialBackoffStrategy.builder()
+        .immediateFirst(false)
+        .baseMillis(Duration.ofSeconds(1).toMillis())
+        .jitter(true)
+        .multiplier(2.0)
+        .maximumBackoff(Duration.ofMinutes(2).toMillis())
+        .build();
+
+    /**
+     * Calls {@link ExponentialBackoffStrategy#reset()} upon a successful websocket connection
+     */
+    private volatile Future<?> backoffClearer;
 
     /**
      * Constructor
@@ -127,9 +174,11 @@ public class TwitchPubSub implements AutoCloseable {
      * @param eventManager EventManager
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param proxyConfig  ProxyConfig
+     * @param botOwnerIds  Bot Owner IDs
      */
-    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig) {
+    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds) {
         this.taskExecutor = taskExecutor;
+        this.botOwnerIds = botOwnerIds;
         this.eventManager = eventManager;
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-pubsub", this);
@@ -155,30 +204,46 @@ public class TwitchPubSub implements AutoCloseable {
             lastPing = TimeUtils.getCurrentTimeInMillis();
         }, 0, 4L, TimeUnit.MINUTES);
 
-        // queue command worker
-        this.queueTask = taskExecutor.schedule(() -> {
+        // Runnable for flushing the command queue
+        this.flushCommand = () -> {
+            // Only allow a single thread to flush at a time
+            if (flushing.getAndSet(true))
+                return;
+
+            // Attempt to flush the queue
             while (!isClosed) {
                 try {
                     // check for missing pong response
-                    if (TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000 && lastPong < lastPing) {
+                    if (lastPong < lastPing && TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
                         reconnect();
                     }
 
                     // If connected, send one message from the queue
-                    String command = commandQueue.poll(1000L, TimeUnit.MILLISECONDS);
-                    if (command != null) {
-                        if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                    if (connectionState.equals(TMIConnectionState.CONNECTED)) {
+                        String command = commandQueue.poll();
+                        if (command != null) {
                             sendCommand(command);
                             // Logging
                             log.debug("Processed command from queue: [{}].", command);
+                        } else {
+                            break; // try again later
                         }
+                    } else {
+                        break; // try again later
                     }
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
                 }
             }
-        }, 1L, TimeUnit.MILLISECONDS);
+
+            // Indicate that flushing has completed
+            flushRequested.set(false);
+            flushing.set(false);
+        };
+
+        // queue command worker
+        this.queueTask = taskExecutor.scheduleWithFixedDelay(flushCommand, 0, 2500L, TimeUnit.MILLISECONDS);
 
         log.debug("PubSub: Started Queue Worker Thread");
     }
@@ -201,9 +266,9 @@ public class TwitchPubSub implements AutoCloseable {
             } catch (Exception ex) {
                 log.error("PubSub: Connection to Twitch PubSub failed: {} - Retrying ...", ex.getMessage());
 
-                // Sleep 1 second before trying to reconnect
+                // Sleep before trying to reconnect
                 try {
-                    TimeUnit.SECONDS.sleep(1L);
+                    backoff.sleep();
                 } catch (Exception ignored) {
 
                 } finally {
@@ -260,11 +325,23 @@ public class TwitchPubSub implements AutoCloseable {
 
                     // Connection Success
                     connectionState = TMIConnectionState.CONNECTED;
+                    backoffClearer = taskExecutor.schedule(() -> {
+                        if (connectionState == TMIConnectionState.CONNECTED)
+                            backoff.reset();
+                    }, 30, TimeUnit.SECONDS);
 
                     log.info("Connected to Twitch PubSub {}", WEB_SOCKET_SERVER);
 
                     // resubscribe to all topics after disconnect
-                    subscribedTopics.forEach(topic -> listenOnTopic(topic));
+                    // This involves nonce reuse, which is bad cryptography, but not a serious problem for this context
+                    // To avoid reuse, we can:
+                    // 0) stop other threads from updating subscribedTopics
+                    // 1) create a new PubSubRequest for each element of subscribedTopics (with a new nonce)
+                    // 2) clear subscribedTopics
+                    // 3) allow other threads to update subscribedTopics again
+                    // 4) send unlisten requests for the old elements of subscribedTopics (optional?)
+                    // 5) call listenOnTopic for each new PubSubRequest
+                    subscribedTopics.forEach(topic -> queueRequest(topic));
                 }
 
                 @Override
@@ -302,29 +379,23 @@ public class TwitchPubSub implements AutoCloseable {
 
                                 String body = msgDataParsed.get("body").asText();
 
-                                Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags);
+                                Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags, new HashMap<>(), fromId, botOwnerIds);
 
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);
 
-                            } else if (topic.startsWith("community-points-channel-v1")) {
+                            } else if (topic.startsWith("community-points-channel-v1") || topic.startsWith("channel-points-channel-v1")) {
                                 String timestampText = msgData.path("timestamp").asText();
                                 Instant instant = Instant.parse(timestampText);
-                                Calendar timestamp = GregorianCalendar.from(
-                                    ZonedDateTime.ofInstant(
-                                        instant,
-                                        ZoneId.systemDefault()
-                                    )
-                                );
 
                                 switch (type) {
                                     case "reward-redeemed":
                                         ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
+                                        eventManager.publish(new RewardRedeemedEvent(instant, redemption));
                                         break;
                                     case "redemption-status-update":
                                         ChannelPointsRedemption updatedRedemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RedemptionStatusUpdateEvent(timestamp, updatedRedemption));
+                                        eventManager.publish(new RedemptionStatusUpdateEvent(instant, updatedRedemption));
                                         break;
                                     case "custom-reward-created":
                                         ChannelPointsReward newReward = TypeConvert.convertValue(msgData.path("new_reward"), ChannelPointsReward.class);
@@ -426,9 +497,8 @@ public class TwitchPubSub implements AutoCloseable {
                                         eventManager.publish(new PointsSpentEvent(pointsSpent));
                                         break;
                                     case "reward-redeemed":
-                                        final Calendar timestamp = GregorianCalendar.from(ZonedDateTime.ofInstant(Instant.parse(msgData.path("timestamp").asText()), ZoneId.systemDefault()));
                                         final ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                                        eventManager.publish(new RewardRedeemedEvent(timestamp, redemption));
+                                        eventManager.publish(new RewardRedeemedEvent(Instant.parse(msgData.path("timestamp").asText()), redemption));
                                         break;
                                     case "global-last-viewed-content-updated":
                                     case "channel-last-viewed-content-updated":
@@ -466,6 +536,8 @@ public class TwitchPubSub implements AutoCloseable {
                                 } else {
                                     log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if (topic.startsWith("radio-events-v1")) {
+                                eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
                             } else if (topic.startsWith("channel-sub-gifts-v1")) {
                                 eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
                             } else if (topic.startsWith("channel-cheer-events-public-v1")) {
@@ -492,6 +564,31 @@ public class TwitchPubSub implements AutoCloseable {
                                 boolean hasId = topic.charAt(dot - 1) == 'd';
                                 VideoPlaybackData data = TypeConvert.jsonToObject(rawMessage, VideoPlaybackData.class);
                                 eventManager.publish(new VideoPlaybackEvent(hasId ? channel : null, hasId ? null : channel, data));
+                            } else if (topic.startsWith("channel-unban-requests")) {
+                                int firstDelim = topic.indexOf('.');
+                                int lastDelim = topic.lastIndexOf('.');
+                                String userId = topic.substring(firstDelim + 1, lastDelim);
+                                String channelId = topic.substring(lastDelim + 1);
+                                if ("create_unban_request".equals(type)) {
+                                    CreatedUnbanRequest request = TypeConvert.convertValue(msgData, CreatedUnbanRequest.class);
+                                    eventManager.publish(new ChannelUnbanRequestCreateEvent(userId, channelId, request));
+                                } else if ("update_unban_request".equals(type)) {
+                                    UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
+                                    eventManager.publish(new ChannelUnbanRequestUpdateEvent(userId, channelId, request));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
+                            } else if (topic.startsWith("user-unban-requests")) {
+                                int firstDelim = topic.indexOf('.');
+                                int lastDelim = topic.lastIndexOf('.');
+                                String userId = topic.substring(firstDelim + 1, lastDelim);
+                                String channelId = topic.substring(lastDelim + 1);
+                                if ("update_unban_request".equals(type)) {
+                                    UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
+                                    eventManager.publish(new UserUnbanRequestUpdateEvent(userId, channelId, request));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else {
                                 log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
                             }
@@ -528,10 +625,11 @@ public class TwitchPubSub implements AutoCloseable {
                                            WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame,
                                            boolean closedByServer) {
                     if (!connectionState.equals(TMIConnectionState.DISCONNECTING)) {
-                        log.info("Connection to Twitch PubSub lost (WebSocket)! Retrying ...");
+                        log.info("Connection to Twitch PubSub lost (WebSocket)! Retrying soon ...");
 
                         // connection lost - reconnecting
-                        reconnect();
+                        if (backoffClearer != null) backoffClearer.cancel(false);
+                        taskExecutor.schedule(() -> reconnect(), backoff.get(), TimeUnit.MILLISECONDS);
                     } else {
                         connectionState = TMIConnectionState.DISCONNECTED;
                         log.info("Disconnected from Twitch PubSub (WebSocket)!");
@@ -568,6 +666,10 @@ public class TwitchPubSub implements AutoCloseable {
      */
     private void queueRequest(PubSubRequest request) {
         commandQueue.add(TypeConvert.objectToJson(request));
+
+        // Expedite command execution if we aren't already flushing the queue and another expedition hasn't already been requested
+        if (!flushing.get() && !flushRequested.getAndSet(true))
+            taskExecutor.schedule(this.flushCommand, 50L, TimeUnit.MILLISECONDS); // allow for some accumulation of requests before flushing
     }
 
     /**
@@ -585,7 +687,7 @@ public class TwitchPubSub implements AutoCloseable {
     public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, List<String> topics) {
         PubSubRequest request = new PubSubRequest();
         request.setType(type);
-        request.setNonce(CryptoUtils.generateNonce(32));
+        request.setNonce(CryptoUtils.generateNonce(30));
         request.getData().put("auth_token", credential != null ? credential.getAccessToken() : "");
         request.getData().put("topics", topics);
 
@@ -634,46 +736,46 @@ public class TwitchPubSub implements AutoCloseable {
     /**
      * Event Listener: User earned a new Bits badge and shared the notification with chat
      *
-     * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId     Target User Id
+     * @param credential Credential (for target channel id, scope: bits:read)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + userId);
+    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + channelId);
     }
 
     /**
      * Event Listener: Anyone cheers on a specified channel.
      *
-     * @param credential Credential (for target user id, scope: bits:read)
-     * @param userId     Target User Id
+     * @param credential Credential (for target channel id, scope: bits:read)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + userId);
+    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + channelId);
     }
 
     /**
      * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
      *
-     * @param credential Credential (for targetUserId, scope: channel_subscriptions)
-     * @param userId     Target User Id
+     * @param credential Credential (for targetChannelId, scope: channel_subscriptions)
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + userId);
+    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + channelId);
     }
 
     /**
      * Event Listener: Anyone makes a purchase on a channel.
      *
      * @param credential Credential (any)
-     * @param userId     Target User Id
+     * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
     @Deprecated
-    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + userId);
+    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + channelId);
     }
 
     /**
@@ -702,18 +804,19 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for userId, scope: channel:moderate)
+     * @param channelId  The user id associated with the target channel
      * @param userId     The user id associated with the credential
-     * @param roomId     The user id associated with the target channel
      * @return PubSubSubscription
      */
-    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String roomId) {
-        return listenForModerationEvents(credential, userId + "." + roomId);
+    @Unofficial
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId, String userId) {
+        return listenForModerationEvents(credential, channelId + "." + userId);
     }
 
     /**
      * Event Listener: Anyone makes a channel points redemption on a channel.
      *
-     * @param credential Credential (any)
+     * @param credential Credential (with the channel:read:redemptions scope for maximum information)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
      */
@@ -727,14 +830,14 @@ public class TwitchPubSub implements AutoCloseable {
 
     @Unofficial
     @Deprecated
-    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ads." + userId);
+    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "ads." + channelId);
     }
 
     @Unofficial
     @Deprecated
-    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + userId);
+    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + channelId);
     }
 
     @Unofficial
@@ -833,6 +936,16 @@ public class TwitchPubSub implements AutoCloseable {
     }
 
     @Unofficial
+    public PubSubSubscription listenForChannelUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "channel-unban-requests." + userId + '.' + channelId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForUserUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-unban-requests." + userId + '.' + channelId);
+    }
+
+    @Unofficial
     @Deprecated
     public PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-ext-v1." + channelId);
@@ -915,6 +1028,12 @@ public class TwitchPubSub implements AutoCloseable {
 
     @Unofficial
     @Deprecated
+    public PubSubSubscription listenForUserDropEvents(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-drop-events." + userId);
+    }
+
+    @Unofficial
+    @Deprecated
     public PubSubSubscription listenForUserPropertiesUpdateEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "user-properties-update." + userId);
     }
@@ -961,6 +1080,11 @@ public class TwitchPubSub implements AutoCloseable {
     @Unofficial
     public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
+    }
+
+    @Unofficial
+    public PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
 
     @Unofficial

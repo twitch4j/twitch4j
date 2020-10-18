@@ -31,7 +31,7 @@ Subscribe to all moderation events in the twitch4j channel and register a listen
 ```java
 twitchClient.getPubSub().listenForModerationEvents(credential, "149223493");
 
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChatModerationEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ChatModerationEvent.class, System.out::println);
 ```
 
 ### Unofficial
@@ -44,5 +44,7 @@ As this is not officially documented by Twitch, it may break at any time (howeve
 Example: User `hexafice` subscribes to moderation events in channel `twitch4j`
 
 ```java
-twitchClient.getPubSub().listenForModerationEvents(credential, "149223493", "142621956");
+String broadcasterId = "149223493"; // channel id of twitch4j
+String userId = "142621956"; // user id of hexafice
+twitchClient.getPubSub().listenForModerationEvents(credential, broadcasterId, userId);
 ```

@@ -3,6 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.extensions.TwitchExtensions;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.kraken.TwitchKraken;
@@ -21,6 +22,11 @@ public class TwitchClient implements AutoCloseable {
      * Event Manager
      */
     private final EventManager eventManager;
+
+    /**
+     * API: Extensions
+     */
+    private final TwitchExtensions extensions;
 
     /**
      * API: Helix
@@ -73,6 +79,7 @@ public class TwitchClient implements AutoCloseable {
      * Constructor
      *
      * @param eventManager EventManager
+     * @param extensions TwitchExtensions
      * @param helix TwitchHelix
      * @param kraken TwitchKraken
      * @param messagingInterface TwitchMessagingInterface
@@ -81,8 +88,9 @@ public class TwitchClient implements AutoCloseable {
      * @param graphql TwitchGraphQL
      * @param threadPoolExecutor ScheduledThreadPoolExecutor
      */
-    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, ScheduledThreadPoolExecutor threadPoolExecutor) {
+    public TwitchClient(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, ScheduledThreadPoolExecutor threadPoolExecutor) {
         this.eventManager = eventManager;
+        this.extensions = extensions;
         this.helix = helix;
         this.kraken = kraken;
         this.messagingInterface = messagingInterface;
@@ -106,6 +114,19 @@ public class TwitchClient implements AutoCloseable {
      */
     public EventManager getEventManager() {
         return this.eventManager;
+    }
+
+    /**
+     * Get Extensions
+     *
+     * @return TwitchExtensions
+     */
+    public TwitchExtensions getExtensions() {
+        if (this.extensions == null) {
+            throw new RuntimeException("You have not enabled the Extensions Module! Please check out the documentation on Twitch4J -> Extensions.");
+        }
+
+        return this.extensions;
     }
 
     /**

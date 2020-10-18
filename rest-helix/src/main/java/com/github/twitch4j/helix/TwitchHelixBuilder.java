@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
@@ -13,6 +14,7 @@ import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
+import feign.slf4j.Slf4jLogger;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,6 +71,12 @@ public class TwitchHelixBuilder {
     private Integer timeout = 5000;
 
     /**
+     * you can overwrite the feign loglevel to print the full requests + responses if needed
+     */
+    @With
+    private Logger.Level logLevel = Logger.Level.NONE;
+
+    /**
      * Proxy Configuration
      */
     @With
@@ -98,9 +106,7 @@ public class TwitchHelixBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
         // Jackson ObjectMapper
-        ObjectMapper mapper = new ObjectMapper();
-        // - Modules
-        mapper.findAndRegisterModules();
+        ObjectMapper mapper = TypeConvert.getObjectMapper();
 
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
@@ -112,7 +118,8 @@ public class TwitchHelixBuilder {
             .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
-            .logger(new Logger.ErrorLogger())
+            .logger(new Slf4jLogger())
+            .logLevel(logLevel)
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchHelixClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))

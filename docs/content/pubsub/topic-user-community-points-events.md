@@ -29,10 +29,9 @@ Subscribe to all user community points events for `twitch4j` and register a list
 twitchClient.getPubSub().listenForUserChannelPointsEvents(credential, "149223493");
 
 // Register event listeners
-SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
-eventHandler.onEvent(PointsEarnedEvent.class, System.out::println);
-eventHandler.onEvent(ClaimAvailableEvent.class, System.out::println);
-eventHandler.onEvent(ClaimClaimedEvent.class, System.out::println);
-eventHandler.onEvent(PointsSpentEvent.class, System.out::println);
-eventHandler.onEvent(RewardRedeemedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(PointsEarnedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ClaimAvailableEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(ClaimClaimedEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(PointsSpentEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(RewardRedeemedEvent.class, System.out::println);
 ```

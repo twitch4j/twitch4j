@@ -20,20 +20,22 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WebhookSubscriptionList {
-    
+
     @JsonProperty("data")
     private List<WebhookSubscription> subscriptions;
-    
+
     /**
-     * Total number of items returned.
+     * A hint at the total number of results returned, on all pages.
      * <p>
-     * If only from_id was in the request, this is the total number of followed users.
-     * If only to_id was in the request, this is the total number of followers.
-     * If both from_id and to_id were in the request, this is 1 (if the "from" user follows the "to" user) or 0.
+     * Note this is an approximation: as you page through the list, some subscriptions may expire and others may be added.
      */
     private Integer total;
-    
+
+    /**
+     * A cursor value, to be used in a subsequent request to specify the starting point of the next set of results.
+     * If this is empty, you are at the last page.
+     */
     @JsonProperty("pagination")
     private HelixPagination pagination;
-    
+
 }

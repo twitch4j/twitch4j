@@ -21,13 +21,38 @@ eventManager.publish(object);
 
 ## Handle / Process Events
 
-By default Twitch4J uses the `SimpleHandler` which works on all platforms.
+Twitch4J uses the `SimpleHandler` by default which works on all platforms.
 
 Handlers:
 
 - SimpleHandler
 - ReactorHandler
 - SpringHandler
+
+You can register listeners directly on the eventManager, the call is forwarded and registered on the current `defaultEventHandler` set in the eventManager instance.
+
+##### Switch the default event handler
+
+If you want all your events to be processed by a specific eventHandler, then check out the following pages on all available eventHandlers:
+
+* [SimpleEventHandler (Default)](./ceventhandler-simple)
+* [ReactorEventHandler](./ceventhandler-reactor)
+
+##### Register your event listeners in a generic way
+
+Only the consumers registered with `eventManager.onEvent` will use the `defaultEventHandler`.
+
+```java
+// register handler
+IDisposable handlerReg = twitchClient.getEventManager().onEvent(ChannelMessageEvent.class, event -> {
+	System.out.println("[" + event.getChannel().getName() + "]["+event.getPermissions().toString()+"] " + event.getUser().getName() + ": " + event.getMessage());
+});
+
+// cancel handler (don't call the method for new events of the required type anymore)
+handlerReg.dispose();
+```
+
+This is the recommended method to register listeners, as you can switch between the different EventHandlers by chaning a single line of code.
 
 ### Simple Handler
 

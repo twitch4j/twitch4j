@@ -45,11 +45,11 @@ twitchClient.getPubSub().listenForLeaderboardMonthlyEvents(credential, "14922349
 ### Listen: Bits Leaderboard Update
 
 ```java
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(BitsLeaderboardEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(BitsLeaderboardEvent.class, System.out::println);
 ```
 
 ### Listen: Sub Gifts Leaderboard Update
 
 ```java
-twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(SubLeaderboardEvent.class, System.out::println);
+twitchClient.getEventManager().onEvent(SubLeaderboardEvent.class, System.out::println);
 ```

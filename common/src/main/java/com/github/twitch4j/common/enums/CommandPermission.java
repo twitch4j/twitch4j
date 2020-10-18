@@ -1,35 +1,45 @@
 package com.github.twitch4j.common.enums;
 
 public enum CommandPermission {
-	/**
-	 * Everyone
-	 */
-	EVERYONE,
+    /**
+     * Everyone
+     */
+    EVERYONE,
 
-	/**
-	 * Twitch Prime/Twitch Turbo User
-	 */
-	PRIME_TURBO,
+    /**
+     * Twitch Prime/Twitch Turbo User
+     */
+    PRIME_TURBO,
 
-	/**
-	 * Twitch Partners
-	 */
-	PARTNER,
+    /**
+     * Twitch Partners
+     */
+    PARTNER,
 
-	/**
-	 * Subscriber (any Tier)
-	 */
-	SUBSCRIBER,
+    /**
+     * Subscriber (any Tier)
+     */
+    SUBSCRIBER,
 
-	/**
-	 * Founder (first 10 subscribers of an Affiliate, or first 25 subscribers of a Partner)
-	 */
-	FOUNDER,
+    /**
+     * Founder (first 10 subscribers of an Affiliate, or first 25 subscribers of a Partner)
+     */
+    FOUNDER,
 
-	/**
-	 * Gifted a sub
-	 */
-	SUBGIFTER,
+    /**
+     * Gifted a sub
+     */
+    SUBGIFTER,
+
+    /**
+     * Was a conductor of the previous hype train
+     */
+    FORMER_HYPE_TRAIN_CONDUCTOR,
+
+    /**
+     * A conductor of the latest hype train
+     */
+    CURRENT_HYPE_TRAIN_CONDUCTOR,
 
     /**
      * VIP
@@ -42,17 +52,17 @@ public enum CommandPermission {
     TWITCHSTAFF,
 
     /**
-	 * Channel Moderator
-	 */
-	MODERATOR,
+     * Channel Moderator
+     */
+    MODERATOR,
 
-	/**
-	 * Broadcaster
-	 */
-	BROADCASTER,
+    /**
+     * Broadcaster
+     */
+    BROADCASTER,
 
-	/**
-	 * Bot Owner
-	 */
-	OWNER
+    /**
+     * Bot Owner
+     */
+    OWNER
 }
