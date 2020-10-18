@@ -106,7 +106,7 @@ TwitchPubSubConnectionPool pool = TwitchPubSubConnectionPool.builder()
 	.build();
 
 // Register our listener(s)
-pool.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(ChatModerationEvent.class, System.out::println);
+pool.getEventManager().onEvent(ChatModerationEvent.class, System.out::println);
 
 // Define our requests (that can exceed 50 in count)
 PubSubRequest req1 = ... ;
@@ -114,10 +114,12 @@ PubSubRequest req2 = ... ;
 PubSubRequest req3 = ... ;
 
 // Subscribe to topics
-pool.subscribe(req1);
-pool.subscribe(req2);
-pool.subscribe(req3);
+PubSubSubscription resp1 = pool.subscribe(req1);
+PubSubSubscription resp2 = pool.subscribe(req2);
+PubSubSubscription resp3 = pool.subscribe(req3);
 
 // Later, can unsubscribe from any
-pool.unsubscribe(req2);
+pool.unsubscribe(resp2);
 ```
+
+A more concrete example of this can be found [here](https://github.com/twitch4j/twitch4j/blob/master/pubsub/src/test/java/com/github/twitch4j/pubsub/PooledTwitchPubSubTest.java).

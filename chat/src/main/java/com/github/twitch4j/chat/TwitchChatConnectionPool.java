@@ -2,7 +2,6 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.events.ForwardingEventHandler;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import lombok.Builder;
@@ -136,8 +135,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
 
     @Override
     protected EventManager getDefaultConnectionEventManager() {
-        final EventManager em = new EventManager();
-        em.registerEventHandler(new SimpleEventHandler()); // necessary for IRCEventHandler
+        EventManager em = createEventManager();
         em.registerEventHandler(new ForwardingEventHandler(getEventManager())); // this is also problematic if there's a twitchchat actually running on the defaultEventManager
         return em;
     }
@@ -174,7 +172,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withEventManager(getConnectionEventManager())
                 .withScheduledThreadPoolExecutor(executor.get())
                 .withProxyConfig(proxyConfig.get())
-                .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers
+                .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
     }
 

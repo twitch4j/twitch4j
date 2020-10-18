@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A pool of connections for making subscriptions (and potentially unsubscribing from later).
@@ -124,25 +125,25 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
         // With unsubscriptions, the behavior is not as deterministic as the elements are not constantly reordered by to subscription count.
         // Lastly, if multiple threads attempt to make a subscription at the same time and there are no existing unsaturated connections,
         // this code may create a new connection for each of these threads, due to the lock-free approach. Synchronization would avoid this.
+        AtomicBoolean foundUnsaturated = new AtomicBoolean();
         for (C connection : unsaturatedConnections.keySet()) {
             // Try to increment this connection atomically
             final Integer computed = unsaturatedConnections.compute(connection, (c, n) -> {
                 if (n == null || n + 1 > max)
                     return null;
 
-                return n + 1;
+                foundUnsaturated.set(true);
+                final int n2 = n + 1;
+                return n2 < max ? n2 : null; // remove from unsaturated if at max capacity
             });
 
-            if (computed == null)
-                continue; // did not have headroom
+            if (foundUnsaturated.get()) {
+                // Check if the connection has further headroom or needs to be marked as saturated
+                if (computed == null)
+                    saturatedConnections.add(connection);
 
-            // Check if the connection has further headroom or needs to be marked as saturated
-            if (computed >= max) {
-                unsaturatedConnections.remove(connection);
-                saturatedConnections.add(connection);
+                return connection; // found a sufficient existing connection!
             }
-
-            return connection; // found a sufficient existing connection!
         }
 
         // Fallback to creating a new connection (and incrementing that)

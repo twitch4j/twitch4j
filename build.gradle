@@ -22,7 +22,6 @@ allprojects {
 	repositories {
 		jcenter()
 		maven { url "https://maven.google.com" }
-		maven { url 'https://projectlombok.org/edge-releases' }
 		mavenLocal()
 	}
 }
@@ -101,11 +100,10 @@ subprojects {
 	plugins.withType(JavaPlugin) {
 		dependencies {
 			// Annotation processors
-			// Need lombok 1.18.13+
-			compileOnly group: 'org.projectlombok', name: 'lombok', version: 'edge-SNAPSHOT'
-			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: 'edge-SNAPSHOT'
-			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: 'edge-SNAPSHOT'
-			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: 'edge-SNAPSHOT'
+			compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
 
 			// Apache Commons
 			api group: 'org.apache.commons', name: 'commons-lang3'
@@ -117,7 +115,7 @@ subprojects {
 
 			// Test
 			testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.7.0')
-			testImplementation 'org.junit.jupiter:junit-jupiter'
+			testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
 		}
 	}
 }
