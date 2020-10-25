@@ -69,9 +69,15 @@ Games:
 - [Games -> Search](./games-get)
 - [Games -> Top Games](./games-top)
 
+Moderators:
+
+- [Moderators -> Get](./moderators-get)
+- [Moderators -> Get Events](./moderators-get-events)
+
 Streams:
 
 - [Streams -> Search](./streams-get)
+- [Streams -> Get Key](./streams-get-key)
 - Create Stream Marker
 - [Streams -> Get Markers](./streams-markers-get)
 
