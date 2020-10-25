@@ -26,7 +26,7 @@ HystrixCommand<ModeratorEventList> getModeratorEvents(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| authToken     | string    | User Token for the broadcaster |
+| authToken     | string    | User Token for the broadcaster (scope: moderation:read) |
 | broadcasterId | string    | Provided broadcaster_id must match the user_id in the auth token. |
 
 *Optional Parameters*

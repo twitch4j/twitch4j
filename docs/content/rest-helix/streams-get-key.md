@@ -24,7 +24,7 @@ HystrixCommand<StreamKeyList> getStreamKey(
 
 | Name          | Type      | Description  |
 | ------------- |:---------:| -----------------:|
-| authToken     | string    | Auth Token (scope: channel:read:stream_key) |
+| authToken     | string    | User Access Token (scope: channel:read:stream_key) |
 | broadcasterId | string    | User ID of the broadcaster |
 
 *Optional Parameters*
