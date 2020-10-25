@@ -23,7 +23,8 @@ extensions.configure(JavaPluginExtension) {
  * set base name to lowercase for each jar file
  */
 tasks.withType(Jar).configureEach {
-	it.archiveBaseName.set(it.archiveBaseName.map { it.toLowerCase() })
+	def baseName = it.archiveBaseName.map { it.toLowerCase() }.get()
+	it.archiveBaseName.set(baseName)
 }
 
 /**
