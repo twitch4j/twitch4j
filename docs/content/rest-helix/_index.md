@@ -69,7 +69,7 @@ Games:
 - [Games -> Search](./games-get)
 - [Games -> Top Games](./games-top)
 
-Moderators:
+Moderation:
 
 - [Moderators -> Get](./moderators-get)
 - [Moderators -> Get Events](./moderators-get-events)
