@@ -53,14 +53,6 @@ javadoc {
 }
 
 /**
- * Artifacts
- */
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
-/**
  * Deployment
  */
 def pomConfig = {
@@ -88,8 +80,6 @@ publishing {
     publications {
         mainProject(MavenPublication) {
             from project.components.java
-            artifact sourcesJar
-            artifact javadocJar
             groupId project.group
             artifactId String.valueOf(project.artifactName).toLowerCase()
             version project.version
