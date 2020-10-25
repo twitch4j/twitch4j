@@ -11,10 +11,21 @@ version = project.artifactVersion
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+/**
+ * generate tasks sourcesJar and javadocJar
+ */
 extensions.configure(JavaPluginExtension) {
 	it.withSourcesJar()
 	it.withJavadocJar()
 }
+
+/**
+ * set base name to lowercase for each jar file
+ */
+tasks.withType(Jar).configureEach {
+	it.archiveBaseName.set(it.archiveBaseName.map { it.toLowerCase() })
+}
+
 /**
  * Testing
  */
