@@ -11,6 +11,10 @@ version = project.artifactVersion
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+extensions.configure(JavaPluginExtension) {
+	it.withSourcesJar()
+	it.withJavadocJar()
+}
 /**
  * Testing
  */
@@ -34,22 +38,6 @@ javadoc {
 	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
 		options.addBooleanOption('html5', true)
 	}
-}
-
-/**
- * Sources - build a jar with source files
- */
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
-    from sourceSets.main.allSource
-    baseName = baseName.toLowerCase()
-    classifier = 'sources'
-}
-
-// build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
-    classifier = 'javadoc'
-    baseName = baseName.toLowerCase()
-    from javadoc.destinationDir
 }
 
 /**
@@ -83,6 +71,7 @@ def pomConfig = {
 		url project.vcsUrl
 	}
 }
+
 publishing {
     publications {
         mainProject(MavenPublication) {
