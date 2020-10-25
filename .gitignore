@@ -48,7 +48,7 @@ config/*
 client.log
 
 # JavaDoc
-/docs/javadoc/*
+/docs/static/javadoc/*
 
 # Example Code
 src/*/java/twitch4j/example/*

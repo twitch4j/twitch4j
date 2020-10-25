@@ -1,5 +1,6 @@
 // Plugins
 plugins {
+	id 'io.freefair.lombok' version '5.2.1' apply false
 	id 'com.jfrog.bintray' version '1.8.5' apply false
 	id 'com.jfrog.artifactory' version '4.13.0' apply false
 }
@@ -35,6 +36,12 @@ subprojects {
 	apply plugin: 'maven-publish'
 	apply plugin: 'com.jfrog.bintray'
 	apply plugin: 'com.jfrog.artifactory'
+	apply plugin: 'io.freefair.lombok'
+	lombok {
+		version = "1.18.10"
+	}
+	// prevent to generate 'lombok.config' - more about: https://projectlombok.org/features/configuration
+	generateLombokConfig.enabled = false
 
 	// Source Compatibility
 	sourceCompatibility = 1.8
@@ -100,10 +107,11 @@ subprojects {
 	plugins.withType(JavaPlugin) {
 		dependencies {
 			// Annotation processors
-			compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+			// DEPRECATED: removal if 'io.freefair.lombok' has been applied
+//			compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+//			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+//			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
+//			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
 
 			// Apache Commons
 			api group: 'org.apache.commons', name: 'commons-lang3'
@@ -117,5 +125,23 @@ subprojects {
 			testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.7.0')
 			testImplementation 'org.junit.jupiter:junit-jupiter'
 		}
+	}
+}
+
+tasks.register("aggregateJavadoc", Javadoc) {
+	it.group = JavaBasePlugin.DOCUMENTATION_GROUP
+	it.options {
+		title = "${project.artifactName} (v${project.version})"
+		windowTitle = "${project.artifactName} (v${project.version})"
+		encoding = "UTF-8"
+	}
+
+	it.source(subprojects.collect { it.delombok })
+	it.classpath = files(subprojects.collect { it.sourceSets.main.compileClasspath })
+
+	destinationDir = file("${rootDir}/docs/static/javadoc")
+
+	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
+		it.options.addBooleanOption('html5', true)
 	}
 }
