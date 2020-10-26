@@ -38,7 +38,7 @@ subprojects {
 	apply plugin: 'com.jfrog.artifactory'
 	apply plugin: 'io.freefair.lombok'
 	lombok {
-		version = "1.18.10"
+		version = "1.18.16"
 	}
 	// prevent to generate 'lombok.config' - more about: https://projectlombok.org/features/configuration
 	generateLombokConfig.enabled = false
