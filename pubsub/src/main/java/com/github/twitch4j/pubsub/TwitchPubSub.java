@@ -594,6 +594,8 @@ public class TwitchPubSub implements AutoCloseable {
                             }
 
                         } else if (message.getType().equals(PubSubType.RESPONSE)) {
+                            eventManager.publish(new PubSubListenResponseEvent(message.getNonce(), message.getError()));
+
                             // topic subscription success or failed, response to listen command
                             // System.out.println(message.toString());
                             if (message.getError().length() > 0) {

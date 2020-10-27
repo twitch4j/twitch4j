@@ -73,9 +73,10 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
     @Override
     public U unsubscribe(T t) {
         final C connection = subscriptions.remove(getRequestFromSubscription(t));
+        final U u = handleUnsubscription(connection, t);
         if (connection != null)
             decrementSubscriptions(connection);
-        return handleUnsubscription(connection, t);
+        return u;
     }
 
     @Override
