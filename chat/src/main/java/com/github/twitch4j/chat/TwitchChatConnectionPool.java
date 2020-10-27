@@ -1,7 +1,6 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import lombok.Builder;
 import lombok.NonNull;
@@ -26,17 +25,11 @@ import java.util.function.Supplier;
  * its corePoolSize must be large enough for the threads required by connections made by this class.
  * <p>
  * Warning: If a chatAccount is to be shared across multiple connections and used to send messages,
- * you should use advancedConfiguration to ensure the two are using a shared {@link io.github.bucket4j.Bucket}.
+ * one should use advancedConfiguration to ensure the two are using a shared {@link io.github.bucket4j.Bucket}.
  * <p>
- * Warning: If whispers are to be sent using this pool, one must manually join the channel to send the whisper from first.
+ * Note: If whispers are to be sent using this pool, one must manually join the channel to send the whisper from first.
  * If chatAccount's are dynamically supplied such that no two connections are using the same account, one can set
  * twitchChatBuilder.withAutoJoinOwnChannel(true) via advancedConfiguration to avoid the manual join.
- * <p>
- * Warning: If one specifies an eventManager for this pool, it must not already be used by a {@link TwitchChat} instance,
- * or events could be duplicated. It is acceptable, however, to share the same {@link EventManager} across connection pools.
- * <p>
- * Warning: One should not naively override connectionEventManager to point to the pool's eventManager, as this can lead to
- * duplicated events. Instead, each connection uses its own event manager, and events are forwarded from that instance to the pool.
  */
 @SuperBuilder
 public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Class<Void>, TwitchChatBuilder> {
