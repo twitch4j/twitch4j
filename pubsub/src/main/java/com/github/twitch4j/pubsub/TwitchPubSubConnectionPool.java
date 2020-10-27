@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collection;
+import java.util.stream.StreamSupport;
 
 /**
  * A pool for PubSub connections to help navigate rate-limits.
@@ -21,8 +22,9 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
 
     @Override
     public PubSubSubscription subscribe(PubSubRequest pubSubRequest) {
-        if (getTopicCount(pubSubRequest) > 1)
-            throw new IllegalArgumentException("TwitchPubSubConnectionPool can only handle PubSubRequest's with a single topic subscription");
+        final int topics = getTopicCount(pubSubRequest);
+        if (topics <= 0) return null;
+        if (topics > 1) throw new IllegalArgumentException("TwitchPubSubConnectionPool can only handle PubSubRequest's with a single topic subscription");
         return super.subscribe(pubSubRequest);
     }
 
@@ -67,6 +69,10 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
         Object topics = req.getData().get("topics");
         if (topics instanceof Collection)
             return ((Collection<?>) topics).size();
+        else if (topics instanceof Iterable)
+            return (int) StreamSupport.stream(((Iterable<?>) topics).spliterator(), false).count();
+        else if (topics instanceof Object[])
+            return ((Object[]) topics).length;
         return -1;
     }
 
