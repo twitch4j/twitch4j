@@ -324,8 +324,8 @@ public class TwitchChat implements AutoCloseable {
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
 
         // register event handler
-        eventManager.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
-        eventManager.onEvent(IRCMessageEvent.class, event -> {
+        eventManager.onEvent("twitch4j-chat-command-trigger", ChannelMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent("twitch4j-chat-id-name-cache", IRCMessageEvent.class, event -> {
             // we get at least one room state event with channel name + id when we join a channel, so we cache that to provide channel id + name for all events
             if ("ROOMSTATE".equalsIgnoreCase(event.getCommandType())) {
                 // check that channel id / name are present and that we didn't leave the channel yet

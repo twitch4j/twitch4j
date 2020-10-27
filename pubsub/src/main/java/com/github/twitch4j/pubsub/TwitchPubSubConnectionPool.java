@@ -3,6 +3,9 @@ package com.github.twitch4j.pubsub;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.RandomStringUtils;
+
+import java.util.Collection;
 
 /**
  * A pool for PubSub connections to help navigate rate-limits.
@@ -12,15 +15,25 @@ import lombok.experimental.SuperBuilder;
  * at will. If enough connections are made, this could pollute one's runtime environment.
  */
 @SuperBuilder
-public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Class<Void>> {
+public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Class<Void>, TwitchPubSubBuilder> {
+
+    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
+
+    @Override
+    public PubSubSubscription subscribe(PubSubRequest pubSubRequest) {
+        if (getTopicCount(pubSubRequest) > 1)
+            throw new IllegalArgumentException("TwitchPubSubConnectionPool can only handle PubSubRequest's with a single topic subscription");
+        return super.subscribe(pubSubRequest);
+    }
 
     @Override
     protected TwitchPubSub createConnection() {
-        return TwitchPubSubBuilder.builder()
-            .withEventManager(getConnectionEventManager())
-            .withScheduledThreadPoolExecutor(executor.get())
-            .withProxyConfig(proxyConfig.get())
-            .build();
+        return advancedConfiguration.apply(
+            TwitchPubSubBuilder.builder()
+                .withEventManager(getConnectionEventManager())
+                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT))
+                .withProxyConfig(proxyConfig.get())
+        ).build();
     }
 
     @Override
@@ -48,6 +61,13 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected PubSubRequest getRequestFromSubscription(PubSubSubscription subscription) {
         return subscription.getRequest();
+    }
+
+    private static int getTopicCount(PubSubRequest req) {
+        Object topics = req.getData().get("topics");
+        if (topics instanceof Collection)
+            return ((Collection<?>) topics).size();
+        return -1;
     }
 
 }

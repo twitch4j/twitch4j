@@ -2,13 +2,12 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.events.ForwardingEventHandler;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -40,7 +39,9 @@ import java.util.function.Supplier;
  * duplicated events. Instead, each connection uses its own event manager, and events are forwarded from that instance to the pool.
  */
 @SuperBuilder
-public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Class<Void>> {
+public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Class<Void>, TwitchChatBuilder> {
+
+    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
 
     /**
      * Provides a chat account to be used when constructing a new {@link TwitchChat} instance.
@@ -49,14 +50,6 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @NonNull
     @Builder.Default
     protected final Supplier<OAuth2Credential> chatAccount = () -> null;
-
-    /**
-     * Further configuration that should be applied to {@link TwitchChatBuilder} when creating new connections.
-     * Can specify custom rate limits, command triggers, and so on here.
-     */
-    @NonNull
-    @Builder.Default
-    protected final Function<@NonNull TwitchChatBuilder, @NonNull TwitchChatBuilder> advancedConfiguration = Function.identity();
 
     /**
      * Sends the specified message to the channel, if it has been subscribed to.
@@ -134,13 +127,6 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     }
 
     @Override
-    protected EventManager getDefaultConnectionEventManager() {
-        EventManager em = createEventManager();
-        em.registerEventHandler(new ForwardingEventHandler(getEventManager())); // this is also problematic if there's a twitchchat actually running on the defaultEventManager
-        return em;
-    }
-
-    @Override
     protected String handleSubscription(TwitchChat twitchChat, String s) {
         if (twitchChat == null) return null;
         twitchChat.joinChannel(s);
@@ -170,7 +156,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
             TwitchChatBuilder.builder()
                 .withChatAccount(chatAccount.get())
                 .withEventManager(getConnectionEventManager())
-                .withScheduledThreadPoolExecutor(executor.get())
+                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
