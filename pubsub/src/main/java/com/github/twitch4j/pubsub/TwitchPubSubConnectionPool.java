@@ -16,7 +16,7 @@ import java.util.stream.StreamSupport;
  * at will. If enough connections are made, this could pollute one's runtime environment.
  */
 @SuperBuilder
-public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Class<Void>, TwitchPubSubBuilder> {
+public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
 
@@ -40,7 +40,7 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
 
     @Override
     protected void disposeConnection(TwitchPubSub connection) {
-        connection.disconnect();
+        connection.close();
     }
 
     @Override
@@ -54,10 +54,8 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     }
 
     @Override
-    protected Class<Void> handleUnsubscription(TwitchPubSub twitchPubSub, PubSubSubscription pubSubSubscription) {
-        if (twitchPubSub == null) return null;
-        twitchPubSub.unsubscribeFromTopic(pubSubSubscription);
-        return Void.TYPE;
+    protected Boolean handleUnsubscription(TwitchPubSub twitchPubSub, PubSubSubscription pubSubSubscription) {
+        return twitchPubSub != null ? twitchPubSub.unsubscribeFromTopic(pubSubSubscription) : null;
     }
 
     @Override

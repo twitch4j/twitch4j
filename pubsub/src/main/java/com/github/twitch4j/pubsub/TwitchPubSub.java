@@ -713,16 +713,16 @@ public class TwitchPubSub implements AutoCloseable {
      *
      * @param subscription Subscription
      */
-    public void unsubscribeFromTopic(PubSubSubscription subscription) {
+    public boolean unsubscribeFromTopic(PubSubSubscription subscription) {
         PubSubRequest request = subscription.getRequest();
         if (request.getType() != PubSubType.LISTEN) {
             log.warn("Cannot unsubscribe using request with unexpected type: {}", request.getType());
-            return;
+            return false;
         }
         boolean removed = subscribedTopics.remove(request);
         if (!removed) {
             log.warn("Not subscribed to topic: {}", request);
-            return;
+            return false;
         }
 
         // use data from original request and send UNLISTEN
@@ -731,6 +731,7 @@ public class TwitchPubSub implements AutoCloseable {
         unlistenRequest.setNonce(CryptoUtils.generateNonce(32));
         unlistenRequest.setData(request.getData());
         queueRequest(unlistenRequest);
+        return true;
     }
 
     /**

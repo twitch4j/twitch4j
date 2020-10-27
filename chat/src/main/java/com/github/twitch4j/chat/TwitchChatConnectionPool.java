@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  * twitchChatBuilder.withAutoJoinOwnChannel(true) via advancedConfiguration to avoid the manual join.
  */
 @SuperBuilder
-public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Class<Void>, TwitchChatBuilder> {
+public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
 
@@ -115,7 +115,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * @return a non-null class if able to part, null otherwise
      */
     @Override
-    public Class<Void> unsubscribe(String s) {
+    public Boolean unsubscribe(String s) {
         return super.unsubscribe(s != null ? s.toLowerCase() : null);
     }
 
@@ -132,10 +132,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     }
 
     @Override
-    protected Class<Void> handleUnsubscription(TwitchChat twitchChat, String s) {
-        if (twitchChat == null) return null;
-        twitchChat.leaveChannel(s);
-        return Void.TYPE;
+    protected Boolean handleUnsubscription(TwitchChat twitchChat, String s) {
+        return twitchChat != null ? twitchChat.leaveChannel(s) : null;
     }
 
     @Override

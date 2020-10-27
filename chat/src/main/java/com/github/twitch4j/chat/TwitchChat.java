@@ -596,7 +596,7 @@ public class TwitchChat implements AutoCloseable {
      * leaving the channel
      * @param channelName channel name
      */
-    public void leaveChannel(String channelName) {
+    public boolean leaveChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
 
         channelCacheLock.lock();
@@ -608,8 +608,11 @@ public class TwitchChat implements AutoCloseable {
                 // clear cache
                 String cachedId = channelNameToChannelId.remove(lowerChannelName);
                 if (cachedId != null) channelIdToChannelName.remove(cachedId);
+
+                return true;
             } else {
                 log.warn("Already left channel {}", channelName);
+                return false;
             }
         } finally {
             channelCacheLock.unlock();
