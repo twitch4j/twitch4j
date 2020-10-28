@@ -32,4 +32,6 @@ TwitchHelix client = TwitchMessagingInterfaceBuilder.builder()
 
 ## API Methods
 
-- [TMI -> Get Viewers](./get-viewers)
+- [TMI -> Get Chatters](./get-chatters)
+- [TMI -> Get Hosts](./get-hosts)
+- [TMI -> Get Hosts Of](./get-hosts-of)

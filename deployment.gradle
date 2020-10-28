@@ -12,6 +12,22 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 /**
+ * generate tasks sourcesJar and javadocJar
+ */
+extensions.configure(JavaPluginExtension) {
+	it.withSourcesJar()
+	it.withJavadocJar()
+}
+
+/**
+ * set base name to lowercase for each jar file
+ */
+tasks.withType(Jar).configureEach {
+	def baseName = it.archiveBaseName.map { it.toLowerCase() }.get()
+	it.archiveBaseName.set(baseName)
+}
+
+/**
  * Testing
  */
 test {
@@ -25,6 +41,8 @@ test {
  * Javadoc
  */
 javadoc {
+	dependsOn(delombok)
+	source delombok
     options {
         title = "${project.artifactName} (v${project.version})"
         windowTitle = "${project.artifactName} (v${project.version})"
@@ -34,30 +52,6 @@ javadoc {
 	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
 		options.addBooleanOption('html5', true)
 	}
-}
-
-/**
- * Sources - build a jar with source files
- */
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Builds the sourcesJar.', group: 'build') {
-    from sourceSets.main.allSource
-    baseName = baseName.toLowerCase()
-    classifier = 'sources'
-}
-
-// build a jar with javadoc
-task javadocJar(type: Jar, dependsOn: javadoc, description: 'Builds the javadocJar.', group: 'build') {
-    classifier = 'javadoc'
-    baseName = baseName.toLowerCase()
-    from javadoc.destinationDir
-}
-
-/**
- * Artifacts
- */
-artifacts {
-    archives sourcesJar
-    archives javadocJar
 }
 
 /**
@@ -83,12 +77,11 @@ def pomConfig = {
 		url project.vcsUrl
 	}
 }
+
 publishing {
     publications {
         mainProject(MavenPublication) {
             from project.components.java
-            artifact sourcesJar
-            artifact javadocJar
             groupId project.group
             artifactId String.valueOf(project.artifactName).toLowerCase()
             version project.version
