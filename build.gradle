@@ -106,13 +106,6 @@ subprojects {
 	// Common Dependencies
 	plugins.withType(JavaPlugin) {
 		dependencies {
-			// Annotation processors
-			// DEPRECATED: removal if 'io.freefair.lombok' has been applied
-//			compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-//			annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-//			testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-//			testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.10'
-
 			// Apache Commons
 			api group: 'org.apache.commons', name: 'commons-lang3'
 			api group: 'commons-io', name: 'commons-io'
