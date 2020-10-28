@@ -41,6 +41,8 @@ test {
  * Javadoc
  */
 javadoc {
+	dependsOn(delombok)
+	source delombok
     options {
         title = "${project.artifactName} (v${project.version})"
         windowTitle = "${project.artifactName} (v${project.version})"
