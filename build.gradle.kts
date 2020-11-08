@@ -9,18 +9,6 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
-// Artifact Info
-//project.ext {
-//	groupId = "com.github.twitch4j"
-//	artifactNamespace = "twitch4j"
-//	artifactName = "Twitch4J"
-//	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
-//	artifactDescription = "Twitch4J"
-//	websiteUrl = "https://github.com/twitch4j/twitch4j"
-//	issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
-//	vcsUrl = "https://github.com/twitch4j/twitch4j.git"
-//}
-
 // All-Projects
 allprojects {
 	// Repositories
@@ -50,9 +38,10 @@ subprojects {
 	apply(plugin = "com.jfrog.bintray")
 	apply(plugin = "io.freefair.lombok")
 	apply(plugin = "com.github.johnrengelman.shadow")
-//	lombok {
-//		version = "1.18.16"
-//	}
+
+	lombok {
+		setVersion("1.18.16")
+	}
 
 	// Source Compatibility
 	java {
@@ -136,23 +125,26 @@ subprojects {
 			archiveBaseName.set(artifactId)
 		}
 
-//		javadoc {
-//			dependsOn(tasks.delombok)
-//			source(tasks.delombok)
-//			options {
-//				title = "${project.artifactName} (v${project.version})"
-//				windowTitle = "${project.artifactName} (v${project.version})"
-//				encoding = "UTF-8"
-//			}
-//
-//			if (JavaVersion.current() != JavaVersion.VERSION_1_8){
-//				(options as StandardJavadocDocletOptions).addBooleanOption('html5', true)
-//			}
-//		}
+		val delombok by getting(io.freefair.gradle.plugins.lombok.tasks.Delombok::class)
+		val jar by getting(Jar::class)
+
+		javadoc {
+			dependsOn(delombok)
+			source(delombok)
+			options {
+				title = "${project.artifactId} (v${project.version})"
+				windowTitle = "${project.artifactId} (v${project.version})"
+				encoding = "UTF-8"
+			}
+
+			if (JavaVersion.current() != JavaVersion.VERSION_1_8){
+				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+			}
+		}
 
 		shadowJar {
 			archiveClassifier.set("shaded")
-//			manifest.inheritFrom(tasks.jar.get().manifest)
+			manifest.inheritFrom(jar.manifest)
 		}
 
 		test {
@@ -204,7 +196,7 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 	source(subprojects.map { it.tasks.delombok.get() })
 	classpath = files(subprojects.map { it.sourceSets["main"].compileClasspath })
 
-	destinationDir = file("${rootDir}/docs/static/javadoc")
+	setDestinationDir(file("${rootDir}/docs/static/javadoc"))
 
 	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
 		(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
