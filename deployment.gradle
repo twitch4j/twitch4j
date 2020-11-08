@@ -19,6 +19,14 @@ extensions.configure(JavaPluginExtension) {
 	it.withJavadocJar()
 }
 
+// Shadow Jar
+shadowJar {
+	archiveClassifier.set('shaded')
+	manifest {
+		inheritFrom jar.manifest
+	}
+}
+
 /**
  * set base name to lowercase for each jar file
  */
