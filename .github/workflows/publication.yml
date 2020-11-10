@@ -1,0 +1,12 @@
+on:
+  release:
+    types: published
+
+jobs:
+  webhook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: joelwmale/webhook-action@2.0.2
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK }}
+          body: '{"content":"Twitch4J has new release: **${{ release. }}**","username":"Release Notification","embeds":[{"title":"${{ steps.release.outputs.name }}","url":"${{ steps.release.outputs.html_url }}","description":"${{ steps.release.outputs.body }}"}]}'

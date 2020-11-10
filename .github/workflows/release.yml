@@ -1,0 +1,98 @@
+name: Release
+on:
+  push:
+    branches: master
+    tags: v*
+
+jobs:
+  prepare:
+    name: Prepare release ${{ github.event.release.tag_name }}
+    runs-on: ubuntu-latest
+    env:
+      TAG_VERSION: ${{ github.event.release.tag_name }}
+      RELEASE_VERSION: ${{ github.event.release.tag_name.substring(1) }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: chmod +x ./gradlew
+  test:
+    needs: prepare
+    name: Finalize test ${{ github.event.release.tag_name }} before deploy
+    strategy:
+      matrix:
+        jvm: [ 8, 11, 14, 15 ]
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: JDK${{ matrix.jvm }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            JDK${{ matrix.jvm }}-gradle-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.jvm }}
+      - run: ./gradlew test
+  javadoc:
+    needs: test
+    name: Release Javadoc ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: JDK11-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            JDK11-gradle-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: actions/checkout@v2
+        with:
+          repository: https://github.com/twitch4j/twitch4j.github.io.git
+          path: ${GITHUB_WORKSPACE}/docs
+          fetch-depth: 0
+          refs: master
+      - run: |
+          rm -rf ${GITHUB_WORKSPACE}/docs/static/javadoc
+          ./gradlew aggregateJavadoc
+          cd ${GITHUB_WORKSPACE}/docs
+          git add .
+          git commit -m "release: deploy javadoc for ${{ github.event.release.tag_name }}"
+          git push origin master
+  release:
+    needs: test
+    name: Draft release notes ${{ github.event.release.tag_name }}
+    steps:
+      - uses: release-drafter/release-drafter@v5
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: $TAG_VERSION
+          version: $RELEASE_VERSION
+          publish: true
+          prerelease: false
+  upload:
+    needs: test
+    name: Upload release ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: JDK8-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            JDK8-gradle-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - run: ./gradlew bintrayUpload
+        env:
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+

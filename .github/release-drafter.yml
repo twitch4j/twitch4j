@@ -1,0 +1,30 @@
+name-template: Twitch4J v$RESOLVED_VERSION
+categories:
+  - title: New Features
+    labels:
+      - feature
+      - enhancement
+  - title: Bugs Fixed
+    labels:
+      - 'bug/minor'
+      - 'bug/major'
+      - bugfix
+  - title: Deprecations
+    label: deprecated
+exclude-labels:
+  - wontfix
+replacers:
+  - search: '/CVE-(\d{4})-(\d+)/g' # CVE Security
+    replace: '[CVE-$1-$2](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-$1-$2)'
+  - search: '/\s+@(PhilippHeuer|iProdigy)/gi' # Skip maintainers
+    replace: ''
+  - search: '/^\[NEW\]/g' # NEW tag (better add them into prefix title)
+    replace: '[**NEW**]'
+template: |
+  [![Discord](https://img.shields.io/discord/143001431388061696?style=flat-square)](https://discord.gg/FQ5vgW3)
+  [![Downloads](https://img.shields.io/bintray/dt/twitch4j/maven/twitch4j/$RESOLVED_VERSION?style=flat-square)](https://bintray.com/twitch4j/maven/twitch4j/$RESOLVED_VERSION)
+  [![Javadoc](https://img.shields.io/static/v1?message=Javadoc&color=brightgreen&style=flat-square)](https://twitch4j.github.io/javadoc)
+
+  # Changelog
+
+  $CHANGES

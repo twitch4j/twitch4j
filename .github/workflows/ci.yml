@@ -1,0 +1,31 @@
+name: CI
+on: [ push, pull_request ]
+
+jobs:
+  ci:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        jvm: [ 8, 11, 14, 15 ]
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        with:
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+      - name: Prepare cache builds
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: JDK${{ matrix.jvm }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: JDK${{ matrix.jvm }}-gradle-
+      - uses: actions/setup-java@v1
+        name: Setup JDK ${{ matrix.jvm }}
+        with:
+          java-version: ${{ matrix.jvm }}
+      - name: Prepare to Test
+        run: chmod +x ./gradlew
+      - name: Test Unit
+        run: ./gradlew test
