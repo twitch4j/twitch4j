@@ -7,6 +7,7 @@ import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -100,6 +101,129 @@ public interface TwitchHelix {
         @Param("period") String period,
         @Param("started_at") String startedAt,
         @Param("user_id") String userId
+    );
+
+    /**
+     * Creates a Custom Reward on a channel.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param newReward     The Custom Reward to be created.
+     * @return CustomRewardList
+     */
+    @RequestLine("POST /channel_points/custom_rewards?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<CustomRewardList> createCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        CustomReward newReward
+    );
+
+    /**
+     * Deletes a Custom Reward on a channel.
+     * <p>
+     * Only rewards created by the same client_id can be deleted.
+     * Any UNFULFILLED Custom Reward Redemptions of the deleted Custom Reward will be updated to the FULFILLED status.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward to delete, must match a Custom Reward on broadcaster_id’s channel.
+     * @return 204 No Content upon a successful deletion
+     */
+    @RequestLine("DELETE /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String rewardId
+    );
+
+    /**
+     * Returns a list of Custom Reward objects for the Custom Rewards on a channel.
+     * <p>
+     * Developers only have access to update and delete rewards that the same/calling client_id created.
+     * <p>
+     * There is a limit of 50 Custom Rewards on a channel at a time. This includes both enabled and disabled Custom Rewards.
+     *
+     * @param authToken             User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId         Required: The id of the target channel, which must match the token user id.
+     * @param rewardIds             Optional: Filters the results to only returns reward objects for the Custom Rewards with matching ID. Maximum: 50.
+     * @param onlyManageableRewards Optional: When set to true, only returns custom rewards that the calling client_id can manage. Default: false.
+     * @return CustomRewardList
+     */
+    @RequestLine("GET /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}&only_manageable_rewards={only_manageable_rewards}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CustomRewardList> getCustomRewards(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") Collection<String> rewardIds,
+        @Param("only_manageable_rewards") Boolean onlyManageableRewards
+    );
+
+    /**
+     * Returns Custom Reward Redemption objects for a Custom Reward on a channel that was created by the same client_id.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      When ID is not provided, this parameter returns paginated Custom Reward Redemption objects for redemptions of the Custom Reward with ID reward_id.
+     * @param redemptionIds When used, this param filters the results and only returns Custom Reward Redemption objects for the redemptions with matching ID. Maximum: 50.
+     * @param status        When id is not provided, this param is required and filters the paginated Custom Reward Redemption objects for redemptions with the matching status.
+     * @param sort          Sort order of redemptions returned when getting the paginated Custom Reward Redemption objects for a reward. One of: OLDEST, NEWEST. Default: OLDEST.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. This applies only to queries without ID.
+     * @param limit         Number of results to be returned when getting the paginated Custom Reward Redemption objects for a reward. Maximum: 50. Default: 20.
+     * @return CustomRewardRedemptionList
+     */
+    @RequestLine("GET /channel_points/custom_rewards/redemptions?broadcaster_id={broadcaster_id}&reward_id={reward_id}&id={id}&status={status}&sort={sort}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CustomRewardRedemptionList> getCustomRewardRedemption(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("reward_id") String rewardId,
+        @Param("id") Collection<String> redemptionIds,
+        @Param("status") CustomRewardRedemption.Status status,
+        @Param("sort") String sort,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Updates a Custom Reward created on a channel.
+     * <p>
+     * Only rewards created by the same client_id can be updated.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward to delete, must match a Custom Reward on broadcaster_id’s channel.
+     * @param updatedReward A CustomReward object with specific field(s) updated.
+     * @return CustomRewardList
+     */
+    @RequestLine("PATCH /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<CustomRewardList> updateCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String rewardId,
+        CustomReward updatedReward
+    );
+
+    @RequestLine("PATCH /channel_points/custom_rewards/redemptions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"status\":\"{status}\"%7D")
+    HystrixCommand<CustomRewardRedemptionList> updateRedemptionStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("reward_id") String rewardId,
+        @Param("id") Collection<String> redemptionIds,
+        @Param("status") CustomRewardRedemption.Status newStatus
     );
 
     /**
