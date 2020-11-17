@@ -2,6 +2,7 @@ package com.github.twitch4j.helix;
 
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.eventsub.domain.EventSubSubscriptionStatus;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
@@ -292,6 +293,51 @@ public interface TwitchHelix {
         @Param("game_id") String gameId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Creates an EventSub subscription.
+     *
+     * @param authToken    Required: App access token.
+     * @param subscription Required: The subscription that is being created. Must include type, version, condition, and transport.
+     * @return EventSubSubscriptionList
+     */
+    @RequestLine("POST /eventsub/subscriptions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<EventSubSubscriptionList> createEventSubSubscription(
+        @Param("token") String authToken,
+        EventSubSubscription subscription
+    );
+
+    /**
+     * Delete an EventSub subscription.
+     *
+     * @param authToken      Required: App Access Token.
+     * @param subscriptionId Required: The subscription ID for the subscription you want to delete.
+     * @return 204 No Content upon a successful deletion
+     */
+    @RequestLine("DELETE /eventsub/subscriptions?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteEventSubSubscription(
+        @Param("token") String authToken,
+        @Param("id") String subscriptionId
+    );
+
+    /**
+     * Get a list of your EventSub subscriptions.
+     *
+     * @param authToken Required: App Access Token.
+     * @param status    Optional: Include this parameter to filter subscriptions by their status.
+     * @return EventSubSubscriptionList
+     */
+    @RequestLine("GET /eventsub/subscriptions?status={status}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+        @Param("token") String authToken,
+        @Param("status") EventSubSubscriptionStatus status
     );
 
     /**
