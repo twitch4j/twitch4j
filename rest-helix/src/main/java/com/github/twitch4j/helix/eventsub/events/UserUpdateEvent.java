@@ -16,7 +16,7 @@ public class UserUpdateEvent extends EventSubUserEvent {
 
     /**
      * The user’s email.
-     * Only included if you have the user:read:emailscope for the user.
+     * Only included if you have the user:read:email scope for the user.
      */
     private String email;
 

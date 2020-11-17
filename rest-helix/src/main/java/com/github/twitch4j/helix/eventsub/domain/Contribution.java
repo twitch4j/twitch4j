@@ -20,14 +20,17 @@ public class Contribution {
      * The ID of the user.
      */
     private String userId;
+
     /**
      * The name of the user.
      */
     private String userName;
+
     /**
      * Type of contribution.
      */
     private Type type;
+
     /**
      * The total contributed.
      */
