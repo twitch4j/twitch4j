@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.helix.eventsub.domain.EventSubSubscriptionStatus;
 import com.github.twitch4j.helix.eventsub.domain.EventSubTransport;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Map;
 @Builder
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EventSubSubscription {

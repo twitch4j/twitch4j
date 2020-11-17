@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -68,7 +69,9 @@ public class CustomRewardRedemption {
     public enum Status {
         UNFULFILLED,
         FULFILLED,
-        CANCELED
+        CANCELED,
+        @JsonEnumDefaultValue
+        UNKNOWN
     }
 
 }
