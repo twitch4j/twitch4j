@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import lombok.Builder;
 import lombok.NonNull;
@@ -43,6 +44,14 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @NonNull
     @Builder.Default
     protected final Supplier<OAuth2Credential> chatAccount = () -> null;
+
+    /**
+     * Whether chat connections should automatically part from channels they have been banned from.
+     * This is useful for reclaiming subscription headroom so a minimal number of chat instances are running.
+     * By default false so that a chat instance can (eventually) reconnect if a unban occurs.
+     */
+    @Builder.Default
+    protected final boolean automaticallyPartOnBan = false;
 
     /**
      * Sends the specified message to the channel, if it has been subscribed to.
@@ -143,7 +152,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
 
     @Override
     protected TwitchChat createConnection() {
-        return advancedConfiguration.apply(
+        // Instantiate with configuration
+        TwitchChat chat = advancedConfiguration.apply(
             TwitchChatBuilder.builder()
                 .withChatAccount(chatAccount.get())
                 .withEventManager(getConnectionEventManager())
@@ -151,6 +161,16 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withProxyConfig(proxyConfig.get())
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
+
+        // Reclaim channel headroom upon a ban
+        chat.getEventManager().onEvent("twitch4j-chat-pool-ban-tracker", ChannelNoticeEvent.class, e -> {
+            if (automaticallyPartOnBan && "msg_banned".equals(e.getMsgId())) {
+                unsubscribe(e.getChannel().getName());
+            }
+        });
+
+        // Return chat client
+        return chat;
     }
 
     @Override

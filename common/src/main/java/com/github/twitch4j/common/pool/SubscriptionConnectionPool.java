@@ -160,12 +160,15 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
     }
 
     private void decrementSubscriptions(C connection) {
-        // Can no longer be saturated
-        saturatedConnections.remove(connection);
-
         // Decrement subscriptions atomically
         Integer newSubs = unsaturatedConnections.compute(connection, (c, n) -> {
-            final int prev = n != null ? n : maxSubscriptionsPerConnection;
+            final int prev;
+            if (n != null) {
+                prev = n;
+            } else {
+                prev = maxSubscriptionsPerConnection;
+                saturatedConnections.remove(connection); // Can no longer be saturated
+            }
             final int next = prev - 1;
             if (next <= 0 && this.disposeUnusedConnections) {
                 return null; // remove
