@@ -798,7 +798,10 @@ public class TwitchPubSub implements AutoCloseable {
      * @param credential Credential (for channelId, scope: channel:moderate)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
+     * @deprecated in favor of listenForModerationEvents(OAuth2Credential, String, String)
      */
+    @Deprecated
+    @Unofficial
     public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "chat_moderator_actions." + channelId);
     }
@@ -807,13 +810,13 @@ public class TwitchPubSub implements AutoCloseable {
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for userId, scope: channel:moderate)
-     * @param channelId  The user id associated with the target channel
      * @param userId     The user id associated with the credential
+     * @param channelId  The user id associated with the target channel
      * @return PubSubSubscription
      */
-    @Unofficial
-    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId, String userId) {
-        return listenForModerationEvents(credential, channelId + "." + userId);
+    @SuppressWarnings("deprecated")
+    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenForModerationEvents(credential, userId + "." + channelId);
     }
 
     /**
