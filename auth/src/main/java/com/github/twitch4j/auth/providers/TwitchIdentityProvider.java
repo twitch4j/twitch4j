@@ -57,7 +57,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
             if (response.isSuccessful()) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 HashMap<String, Object> tokenInfo = objectMapper.readValue(responseBody, new TypeReference<HashMap<String, Object>>() {});
-                String userId = (String) tokenInfo.get("user_id");
+                String userId = (String) tokenInfo.get("client_id");
                 String userName = (String) tokenInfo.get("login");
                 List<String> scopes = (List<String>) tokenInfo.get("scopes");
                 int expiresIn = (int) tokenInfo.get("expires_in");
