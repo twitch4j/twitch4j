@@ -1,4 +1,4 @@
-<p align="center"><img src=".github/logo.png?raw=true" width="150"></p>
+<p align="center"><a href="https://twitch4j.github.io/"><img src=".github/logo.png?raw=true" width="150"></a></p>
 
 # Java API for [Twitch](https://www.twitch.tv/)
 
@@ -11,7 +11,7 @@ Badges:
 
 ![Latest](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flat-square&label=latest)
 [![pipeline status](https://gitlab.com/twitch4j/twitch4j/badges/master/pipeline.svg)](https://gitlab.com/twitch4j/twitch4j/commits/master)
-[![Docs](https://img.shields.io/badge/WIKI-Latest-green.svg?style=flat-square)](https://twitch4j.gitlab.io/twitch4j/)
+[![Docs](https://img.shields.io/badge/WIKI-Latest-green.svg?style=flat-square)](https://twitch4j.github.io/docs/)
 
 --------
 
@@ -21,7 +21,7 @@ This project provides multiple standalone modules you can use to interact with t
 
 ## Quick Start
 
-Check out the [Documentation](https://twitch4j.gitlab.io/twitch4j/getting-started/installation/)!
+Check out the [Documentation](https://twitch4j.github.io/docs/getting-started/installation/)!
 
 --------
 
@@ -49,7 +49,7 @@ If you discover any issues/have feature requests, then please [open an issue her
 ## Contributing
 
 We welcome contributions to the library, be it new features, bug fixes, or even small enhancements.
-Please do read the [contributing guide](https://twitch4j.gitlab.io/twitch4j/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
+Please do read the [contributing guide](https://twitch4j.github.io/docs/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
 By contributing, you are expected to abide by our [code of conduct](./CODE_OF_CONDUCT.md) and agree to the license below.
 Thank you again for your interest in improving Twitch4J!
 
