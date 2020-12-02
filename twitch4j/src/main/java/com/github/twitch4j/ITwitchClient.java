@@ -90,11 +90,19 @@ public interface ITwitchClient extends AutoCloseable {
 
     @Override
     default void close() {
-        ITwitchChat chat = getChat();
+        ITwitchChat chat = null;
+        try {
+            chat = getChat();
+        } catch (Exception ignored) {
+        }
         if (chat != null)
             chat.close();
 
-        ITwitchPubSub pubsub = getPubSub();
+        ITwitchPubSub pubsub = null;
+        try {
+            pubsub = getPubSub();
+        } catch (Exception ignored) {
+        }
         if (pubsub != null)
             pubsub.close();
 
