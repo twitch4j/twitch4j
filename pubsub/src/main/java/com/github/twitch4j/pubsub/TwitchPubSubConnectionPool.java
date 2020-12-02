@@ -22,13 +22,23 @@ import java.util.stream.StreamSupport;
  * at will. If enough connections are made, this could pollute one's runtime environment.
  */
 @SuperBuilder
-public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> {
+public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> implements ITwitchPubSub {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
 
     private final Cache<String, PubSubSubscription> subscriptionsByNonce = Caffeine.newBuilder()
         .expireAfterWrite(30, TimeUnit.SECONDS)
         .build();
+
+    @Override
+    public PubSubSubscription listenOnTopic(PubSubRequest request) {
+        return this.subscribe(request);
+    }
+
+    @Override
+    public boolean unsubscribeFromTopic(PubSubSubscription subscription) {
+        return this.unsubscribe(subscription);
+    }
 
     @Override
     public PubSubSubscription subscribe(PubSubRequest pubSubRequest) {

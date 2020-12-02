@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  * twitchChatBuilder.withAutoJoinOwnChannel(true) via advancedConfiguration to avoid the manual join.
  */
 @SuperBuilder
-public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> {
+public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> implements ITwitchChat {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
 
@@ -60,6 +60,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * @param message the message to send
      * @return whether a {@link TwitchChat} instance subscribed to that channel was identified and used
      */
+    @Override
     public boolean sendMessage(final String channel, final String message) {
         return this.sendMessage(channel, channel, message);
     }
@@ -117,6 +118,11 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         return super.subscribe(s != null ? s.toLowerCase() : null);
     }
 
+    @Override
+    public void joinChannel(String channelName) {
+        this.subscribe(channelName);
+    }
+
     /**
      * Parts from a channel.
      *
@@ -126,6 +132,12 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     public Boolean unsubscribe(String s) {
         return super.unsubscribe(s != null ? s.toLowerCase() : null);
+    }
+
+    @Override
+    public boolean leaveChannel(String channelName) {
+        final Boolean b = this.unsubscribe(channelName);
+        return b != null && b;
     }
 
     @Override

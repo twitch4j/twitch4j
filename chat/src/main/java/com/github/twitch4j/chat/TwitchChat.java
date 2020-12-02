@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
-public class TwitchChat implements AutoCloseable {
+public class TwitchChat implements ITwitchChat {
 
     public static final int REQUIRED_THREAD_COUNT = 2;
 
@@ -325,7 +325,7 @@ public class TwitchChat implements AutoCloseable {
 
         // register event handler
         eventManager.onEvent("twitch4j-chat-command-trigger", ChannelMessageEvent.class, this::onChannelMessage);
-        eventManager.onEvent("twitch4j-chat-id-name-cache", IRCMessageEvent.class, event -> {
+        eventManager.onEvent(IRCMessageEvent.class, event -> {
             // we get at least one room state event with channel name + id when we join a channel, so we cache that to provide channel id + name for all events
             if ("ROOMSTATE".equalsIgnoreCase(event.getCommandType())) {
                 // check that channel id / name are present and that we didn't leave the channel yet
@@ -576,6 +576,7 @@ public class TwitchChat implements AutoCloseable {
      * Joining the channel
      * @param channelName channel name
      */
+    @Override
     public void joinChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
 
@@ -596,6 +597,7 @@ public class TwitchChat implements AutoCloseable {
      * leaving the channel
      * @param channelName channel name
      */
+    @Override
     public boolean leaveChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
 
@@ -624,8 +626,9 @@ public class TwitchChat implements AutoCloseable {
      * @param channel channel name
      * @param message message
      */
-    public void sendMessage(String channel, String message) {
-        this.sendMessage(channel, message, null);
+    @Override
+    public boolean sendMessage(String channel, String message) {
+        return this.sendMessage(channel, message, null);
     }
 
     /**
@@ -637,11 +640,11 @@ public class TwitchChat implements AutoCloseable {
      * @param replyMsgId the msgId of the parent message being replied to (optional).
      */
     @Unofficial
-    public void sendMessage(String channel, String message, String nonce, String replyMsgId) {
+    public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
         final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
         if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
         if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
-        this.sendMessage(channel, message, tags);
+        return this.sendMessage(channel, message, tags);
     }
 
     /**
@@ -651,7 +654,7 @@ public class TwitchChat implements AutoCloseable {
      * @param message the message to be sent.
      * @param tags    the message tags (unofficial).
      */
-    public void sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
+    public boolean sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {
             sb.append('@');
@@ -661,7 +664,7 @@ public class TwitchChat implements AutoCloseable {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        ircCommandQueue.offer(sb.toString());
+        return ircCommandQueue.offer(sb.toString());
     }
 
     /**
@@ -759,6 +762,7 @@ public class TwitchChat implements AutoCloseable {
     /**
      * Close
      */
+    @Override
     public void close() {
         this.stopQueueThread = true;
         queueThread.cancel(false);

@@ -1,6 +1,6 @@
 package com.github.twitch4j.modules;
 
-import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.modules.event.ModuleDisabledEvent;
 import com.github.twitch4j.modules.event.ModuleEnabledEvent;
 import lombok.Getter;
@@ -51,9 +51,9 @@ public class ModuleLoader {
 		}
 	}
 
-	private final TwitchClient client;
+	private final ITwitchClient client;
 
-	public ModuleLoader(TwitchClient client) {
+	public ModuleLoader(ITwitchClient client) {
 		this.client = client;
 
 		loadClassModules(false);

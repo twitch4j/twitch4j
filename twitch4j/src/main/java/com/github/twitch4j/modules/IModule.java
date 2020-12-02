@@ -1,6 +1,6 @@
 package com.github.twitch4j.modules;
 
-import com.github.twitch4j.TwitchClient;
+import com.github.twitch4j.ITwitchClient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ public abstract class IModule {
 	private final String name;
 	private final String author;
 	private final String version;
-	public abstract void enable(TwitchClient client);
+	public abstract void enable(ITwitchClient client);
 	public abstract void disable();
 	// String getMinimumTwitch4JVersion(); TODO: version implementing?
 
