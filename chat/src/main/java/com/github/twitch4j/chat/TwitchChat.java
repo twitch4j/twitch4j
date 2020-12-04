@@ -679,60 +679,6 @@ public class TwitchChat implements ITwitchChat {
     }
 
     /**
-     * Deletes a message.
-     *
-     * @param channel     the name of the channel to delete the message from.
-     * @param targetMsgId the unique id of the message to be deleted.
-     * @see IRCMessageEvent#getMessageId()
-     */
-    public void delete(String channel, String targetMsgId) {
-        sendMessage(channel, String.format("/delete %s", targetMsgId));
-    }
-
-    /**
-     * Timeout a user
-     *
-     * @param channel channel
-     * @param user username
-     * @param duration duration
-     * @param reason reason
-     */
-    public void timeout(String channel, String user, Duration duration, String reason) {
-        StringBuilder sb = new StringBuilder(user).append(' ').append(duration.getSeconds());
-        if (reason != null) {
-            sb.append(" ").append(reason);
-        }
-
-        sendMessage(channel, String.format("/timeout %s", sb.toString()));
-    }
-
-    /**
-     * Ban a user
-     *
-     * @param channel channel
-     * @param user username
-     * @param reason reason
-     */
-    public void ban(String channel, String user, String reason) {
-        StringBuilder sb = new StringBuilder(user);
-        if (reason != null) {
-            sb.append(" ").append(reason);
-        }
-
-        sendMessage(channel, String.format("/ban %s", sb.toString()));
-    }
-
-    /**
-     * Unban a user
-     *
-     * @param channel channel
-     * @param user username
-     */
-    public void unban(String channel, String user) {
-        sendMessage(channel, String.format("/unban %s", user));
-    }
-
-    /**
      * On Channel Message
      *
      * @param event ChannelMessageEvent
@@ -769,12 +715,7 @@ public class TwitchChat implements ITwitchChat {
         this.disconnect();
     }
 
-    /**
-     * Check if Chat is currently in a channel
-     *
-     * @param channelName channel to check (without # prefix)
-     * @return boolean
-     */
+    @Override
     public boolean isChannelJoined(String channelName) {
         return currentChannels.contains(channelName.toLowerCase());
     }
@@ -790,11 +731,7 @@ public class TwitchChat implements ITwitchChat {
         return Collections.unmodifiableList(new ArrayList<>(currentChannels));
     }
 
-    /**
-     * Returns a set of all currently joined channels (without # prefix)
-     *
-     * @return a set of channel names
-     */
+    @Override
     public Set<String> getChannels() {
         return Collections.unmodifiableSet(currentChannels);
     }

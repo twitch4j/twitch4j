@@ -8,6 +8,8 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -138,6 +140,16 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     public boolean leaveChannel(String channelName) {
         final Boolean b = this.unsubscribe(channelName);
         return b != null && b;
+    }
+
+    @Override
+    public boolean isChannelJoined(String channelName) {
+        return this.subscriptions.containsKey(channelName.toLowerCase());
+    }
+
+    @Override
+    public Set<String> getChannels() {
+        return Collections.unmodifiableSet(subscriptions.keySet());
     }
 
     @Override
