@@ -117,7 +117,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Override
     public String subscribe(String s) {
-        return super.subscribe(s != null ? s.toLowerCase() : null);
+        return s != null ? super.subscribe(s.toLowerCase()) : null;
     }
 
     @Override
@@ -160,8 +160,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     }
 
     @Override
-    protected String handleDuplicateSubscription(TwitchChat twitchChat, String s) {
-        return null;
+    protected String handleDuplicateSubscription(TwitchChat twitchChat, TwitchChat old, String s) {
+        return twitchChat != null && twitchChat != old && twitchChat.leaveChannel(s) ? s : null;
     }
 
     @Override
@@ -172,6 +172,11 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected String getRequestFromSubscription(String s) {
         return s;
+    }
+
+    @Override
+    protected int getSubscriptionSize(String s) {
+        return 1;
     }
 
     @Override

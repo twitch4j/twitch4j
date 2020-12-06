@@ -44,7 +44,6 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     public PubSubSubscription subscribe(PubSubRequest pubSubRequest) {
         final int topics = getTopicCount(pubSubRequest);
         if (topics <= 0) return null;
-        if (topics > 1) throw new IllegalArgumentException("TwitchPubSubConnectionPool can only handle PubSubRequest's with a single topic subscription");
         final String nonce = injectNonce(pubSubRequest);
         final PubSubSubscription subscription = super.subscribe(pubSubRequest);
         subscriptionsByNonce.put(nonce, subscription);
@@ -85,8 +84,9 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     }
 
     @Override
-    protected PubSubSubscription handleDuplicateSubscription(TwitchPubSub twitchPubSub, PubSubRequest pubSubRequest) {
-        return null;
+    protected PubSubSubscription handleDuplicateSubscription(TwitchPubSub twitchPubSub, TwitchPubSub old, PubSubRequest pubSubRequest) {
+        final PubSubSubscription subscription = new PubSubSubscription(pubSubRequest);
+        return twitchPubSub != null && twitchPubSub != old && twitchPubSub.unsubscribeFromTopic(subscription) ? subscription : null;
     }
 
     @Override
@@ -97,6 +97,11 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected PubSubRequest getRequestFromSubscription(PubSubSubscription subscription) {
         return subscription.getRequest();
+    }
+
+    @Override
+    protected int getSubscriptionSize(PubSubRequest pubSubRequest) {
+        return getTopicCount(pubSubRequest);
     }
 
     private static String injectNonce(PubSubRequest req) {

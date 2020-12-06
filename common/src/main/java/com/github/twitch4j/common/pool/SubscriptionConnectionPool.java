@@ -62,20 +62,29 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
 
     @Override
     public T subscribe(S s) {
-        final C connection = getOrCreateConnectionWithHeadroomAndIncrement();
-        if (connection != null && subscriptions.putIfAbsent(s, connection) != null) {
-            decrementSubscriptions(connection);
-            return handleDuplicateSubscription(connection, s);
+        C prevConnection = subscriptions.get(s);
+        if (prevConnection != null) return handleDuplicateSubscription(null, prevConnection, s);
+        final int size = getSubscriptionSize(s);
+        if (size > maxSubscriptionsPerConnection) throw new IllegalArgumentException("Subscription is too large for a single connection");
+        final C connection = getOrCreateConnectionWithHeadroomAndIncrement(size);
+        if (connection != null) {
+            prevConnection = subscriptions.putIfAbsent(s, connection);
+            if (prevConnection != null) {
+                T dupeResponse = handleDuplicateSubscription(connection, prevConnection, s);
+                decrementSubscriptions(connection, size);
+                return dupeResponse;
+            }
         }
         return handleSubscription(connection, s);
     }
 
     @Override
     public U unsubscribe(T t) {
-        final C connection = subscriptions.remove(getRequestFromSubscription(t));
+        final S request = getRequestFromSubscription(t);
+        final C connection = subscriptions.remove(request);
         final U u = handleUnsubscription(connection, t);
         if (connection != null)
-            decrementSubscriptions(connection);
+            decrementSubscriptions(connection, getSubscriptionSize(request));
         return u;
     }
 
@@ -109,13 +118,15 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
 
     protected abstract T handleSubscription(C c, S s);
 
-    protected abstract T handleDuplicateSubscription(C c, S s);
+    protected abstract T handleDuplicateSubscription(C c, C old, S s);
 
     protected abstract U handleUnsubscription(C c, T t);
 
     protected abstract S getRequestFromSubscription(T t);
 
-    private C getOrCreateConnectionWithHeadroomAndIncrement() {
+    protected abstract int getSubscriptionSize(S s);
+
+    private C getOrCreateConnectionWithHeadroomAndIncrement(int increment) {
         final int max = this.maxSubscriptionsPerConnection;
 
         // Attempt to find an existing unsaturated connection
@@ -131,10 +142,12 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
             // Try to increment this connection atomically
             final Integer computed = unsaturatedConnections.compute(connection, (c, n) -> {
                 if (n == null || n + 1 > max)
-                    return null;
+                    return null; // didn't have headroom to begin with
+
+                final int n2 = n + increment;
+                if (n2 > max) return n; // not enough headroom
 
                 foundUnsaturated.set(true);
-                final int n2 = n + 1;
                 return n2 < max ? n2 : null; // remove from unsaturated if at max capacity
             });
 
@@ -150,16 +163,15 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
         // Fallback to creating a new connection (and incrementing that)
         final C c = createConnection();
         if (c != null) {
-            // noinspection ConstantConditions (SuperBuilder related)
-            if (1 < max)
-                unsaturatedConnections.putIfAbsent(c, 1);
+            if (increment < max)
+                unsaturatedConnections.putIfAbsent(c, increment);
             else
                 saturatedConnections.add(c);
         }
         return c;
     }
 
-    private void decrementSubscriptions(C connection) {
+    private void decrementSubscriptions(C connection, int decrement) {
         // Decrement subscriptions atomically
         Integer newSubs = unsaturatedConnections.compute(connection, (c, n) -> {
             final int prev;
@@ -169,7 +181,7 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
                 prev = maxSubscriptionsPerConnection;
                 saturatedConnections.remove(connection); // Can no longer be saturated
             }
-            final int next = prev - 1;
+            final int next = prev - decrement;
             if (next <= 0 && this.disposeUnusedConnections) {
                 return null; // remove
             }

@@ -12,7 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,31 +39,31 @@ public class PooledTwitchPubSubTest {
         assertEquals(0, pool.numConnections());
         assertEquals(0, pool.numSubscriptions());
 
-        PubSubSubscription f1 = pool.subscribe(createListenToFollowsReq("207813352"));
+        PubSubSubscription f1 = pool.listenForFollowingEvents(null, "207813352");
         assertEquals(1, pool.numConnections());
         assertEquals(1, pool.numSubscriptions());
 
-        PubSubSubscription f2 = pool.subscribe(createListenToFollowsReq("22025290"));
+        PubSubSubscription f2 = pool.listenForFollowingEvents(null, "22025290");
         assertEquals(1, pool.numConnections());
         assertEquals(2, pool.numSubscriptions());
 
-        PubSubSubscription f3 = pool.subscribe(createListenToFollowsReq("35759863"));
+        PubSubSubscription f3 = pool.listenForFollowingEvents(null, "35759863");
         assertEquals(1, pool.numConnections());
         assertEquals(3, pool.numSubscriptions());
 
-        PubSubSubscription f4 = pool.subscribe(createListenToFollowsReq("468488256"));
+        PubSubSubscription f4 = pool.listenForFollowingEvents(null, "468488256");
         assertEquals(2, pool.numConnections());
         assertEquals(4, pool.numSubscriptions());
 
-        PubSubSubscription f5 = pool.subscribe(createListenToFollowsReq("269275547"));
+        PubSubSubscription f5 = pool.listenForFollowingEvents(null, "269275547");
         assertEquals(2, pool.numConnections());
         assertEquals(5, pool.numSubscriptions());
 
-        PubSubSubscription f6 = pool.subscribe(createListenToFollowsReq("450107466"));
+        PubSubSubscription f6 = pool.listenForFollowingEvents(null, "450107466");
         assertEquals(2, pool.numConnections());
         assertEquals(6, pool.numSubscriptions());
 
-        PubSubSubscription f7 = pool.subscribe(createListenToFollowsReq("40197643"));
+        PubSubSubscription f7 = pool.listenForFollowingEvents(null, "40197643");
         assertEquals(3, pool.numConnections());
         assertEquals(7, pool.numSubscriptions());
 
@@ -96,14 +97,24 @@ public class PooledTwitchPubSubTest {
         assertEquals(0, pool.numConnections());
         assertEquals(0, pool.numSubscriptions());
 
+        PubSubSubscription f8 = pool.subscribe(createListenToFollowsReq("134214675", "91693482"));
+        assertEquals(1, pool.numConnections());
+        assertEquals(2, pool.numSubscriptions());
+
+        TestUtils.sleepFor(5000);
+
+        assertNotNull(pool.unsubscribe(f8));
+        assertEquals(0, pool.numConnections());
+        assertEquals(0, pool.numSubscriptions());
+
         TestUtils.sleepFor(5000);
     }
 
-    private static PubSubRequest createListenToFollowsReq(String channelId) {
+    private static PubSubRequest createListenToFollowsReq(String... channelIds) {
         PubSubRequest req = new PubSubRequest();
         req.setType(PubSubType.LISTEN);
-        req.setNonce(CryptoUtils.generateNonce(32));
-        req.getData().put("topics", Collections.singletonList("following." + channelId));
+        req.setNonce(CryptoUtils.generateNonce(30));
+        req.getData().put("topics", Arrays.stream(channelIds).map(id -> "following." + id).collect(Collectors.toList()));
         return req;
     }
 
