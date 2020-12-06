@@ -558,17 +558,41 @@ public interface TwitchHelix {
      * @param userId        Optional: Filters the results for only those with a matching user_id. Maximum: 100.
      * @param after         Optional: Cursor for forward pagination.
      * @param before        Optional: Cursor for backward pagination.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return BannedUserList
      */
-    @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}")
+    @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<BannedUserList> getBannedUsers(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userId,
         @Param("after") String after,
-        @Param("before") String before
+        @Param("before") String before,
+        @Param("first") Integer limit
     );
+
+    /**
+     * Returns all banned and timed-out users in a channel.
+     *
+     * @param authToken     Auth Token (scope: moderation:read)
+     * @param broadcasterId Required: Provided broadcaster_id must match the user_id in the auth token.
+     * @param userId        Optional: Filters the results for only those with a matching user_id. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination.
+     * @param before        Optional: Cursor for backward pagination.
+     * @return BannedUserList
+     * @deprecated in favor of getBannedUsers(String, String, List, String, String, Integer) where the last param is the number of objects to retrieve.
+     */
+    @Deprecated
+    default HystrixCommand<BannedUserList> getBannedUsers(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userId,
+        @Param("after") String after,
+        @Param("before") String before
+    ) {
+        return this.getBannedUsers(authToken, broadcasterId, userId, after, before, 20);
+    }
 
     /**
      * Returns all user bans and un-bans in a channel.
@@ -616,15 +640,57 @@ public interface TwitchHelix {
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
      * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
      * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return ModeratorList
      */
-    @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}", collectionFormat = CollectionFormat.CSV)
+    @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ModeratorList> getModerators(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Returns all moderators in a channel.
+     *
+     * @param authToken User Token for the broadcaster
+     * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
+     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @return ModeratorList
+     * @deprecated in favor of getModerators(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
+     */
+    @Deprecated
+    default HystrixCommand<ModeratorList> getModerators(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds,
         @Param("after") String after
+    ) {
+        return this.getModerators(authToken, broadcasterId, userIds, after, 20);
+    }
+
+    /**
+     * Returns a list of moderators or users added and removed as moderators from a channel.
+     *
+     * @param authToken User Token for the broadcaster
+     * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
+     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return ModeratorList
+     */
+    @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ModeratorEventList> getModeratorEvents(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
     );
 
     /**
@@ -635,15 +701,17 @@ public interface TwitchHelix {
      * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
      * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @return ModeratorList
+     * @deprecated in favor of getModeratorEvents(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
-    @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}", collectionFormat = CollectionFormat.CSV)
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ModeratorEventList> getModeratorEvents(
+    @Deprecated
+    default HystrixCommand<ModeratorEventList> getModeratorEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
         @Param("after") String after
-    );
+    ) {
+        return this.getModeratorEvents(authToken, broadcasterId, userIds, after, 20);
+    }
 
     /**
      * Gets games sorted by number of current viewers on Twitch, most popular first.
@@ -675,7 +743,7 @@ public interface TwitchHelix {
      * @param before     Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param limit      Maximum number of objects to return. Maximum: 100. Default: 20.
      * @param gameIds    Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
-     * @param language   Stream language. You can specify up to 100 languages.
+     * @param language   Stream language. You can specify up to 100 languages. A language value must be either the ISO 639-1 two-letter code for a supported stream language or "other".
      * @param userIds    Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
      * @param userLogins Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
      * @return StreamList
@@ -895,7 +963,7 @@ public interface TwitchHelix {
      * <p>
      * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
      *
-     * @param authToken Auth Token, optional, will include the users email address
+     * @param authToken Auth Token (optionally with the user:read:email scope)
      * @param userIds   User ID. Multiple user IDs can be specified. Limit: 100.
      * @param userNames User login name. Multiple login names can be specified. Limit: 100.
      * @return HelixUser
