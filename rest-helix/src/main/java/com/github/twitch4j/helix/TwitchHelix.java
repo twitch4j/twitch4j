@@ -2,7 +2,7 @@ package com.github.twitch4j.helix;
 
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.helix.domain.*;
-import com.github.twitch4j.helix.eventsub.domain.EventSubSubscriptionStatus;
+import com.github.twitch4j.helix.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
