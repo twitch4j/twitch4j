@@ -213,6 +213,18 @@ public interface TwitchHelix {
         CustomReward updatedReward
     );
 
+    /**
+     * Updates the status of Custom Reward Redemption objects on a channel that are in the UNFULFILLED status.
+     * <p>
+     * Only redemptions for a reward created by the same client_id as attached to the access token can be updated.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward the redemptions to be updated are for.
+     * @param redemptionIds ID of the Custom Reward Redemption to update, must match a Custom Reward Redemption on broadcaster_id’s channel. Max: 50.
+     * @param newStatus     The new status to set redemptions to. Can be either FULFILLED or CANCELED. Updating to CANCELED will refund the user their points.
+     * @return CustomRewardRedemptionList
+     */
     @RequestLine("PATCH /channel_points/custom_rewards/redemptions")
     @Headers({
         "Authorization: Bearer {token}",

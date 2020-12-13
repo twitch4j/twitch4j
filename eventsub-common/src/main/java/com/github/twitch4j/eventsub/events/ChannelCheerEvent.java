@@ -1,8 +1,10 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.twitch4j.common.util.TwitchUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,5 +33,17 @@ public class ChannelCheerEvent extends EventSubUserChannelEvent {
      * The number of bits cheered.
      */
     private Integer bits;
+
+    @Override
+    @JsonIgnore
+    public String getUserId() {
+        return isAnonymous ? TwitchUtils.ANONYMOUS_CHEERER.getId() : super.getUserId();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getUserName() {
+        return isAnonymous ? TwitchUtils.ANONYMOUS_CHEERER.getName() : super.getUserName();
+    }
 
 }
