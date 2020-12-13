@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
+import lombok.extern.jackson.Jacksonized;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ import java.time.Instant;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomReward {
