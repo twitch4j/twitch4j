@@ -2,13 +2,16 @@ package com.github.twitch4j.eventsub.util;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.twitch4j.common.util.CryptoUtils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
@@ -31,11 +34,6 @@ public class EventSubVerifier {
     private final Cache<String, Boolean> RECENT_MESSAGE_IDS = Caffeine.newBuilder().expireAfterWrite(RECENT_EVENT).build();
 
     /**
-     * @see #bytesToHex(byte[])
-     */
-    private final byte[] HEX_ARRAY = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
-
-    /**
      * Twitch's prefix for Twitch-Eventsub-Message-Signature
      */
     private final String SIGNATURE_HASH_PREFIX = "sha256=";
@@ -44,6 +42,11 @@ public class EventSubVerifier {
      * Java algorithm name that corresponds to {@link #SIGNATURE_HASH_PREFIX}
      */
     private final String JAVA_HASH_ALGORITHM = "HmacSHA256";
+
+    /**
+     * The number of characters in hashes produced by {@link #JAVA_HASH_ALGORITHM}
+     */
+    private final int HASH_LENGTH = 256 / 4;
 
     /**
      * A thread-local {@link Mac} instance of {@link #JAVA_HASH_ALGORITHM}
@@ -97,7 +100,7 @@ public class EventSubVerifier {
             return false;
         }
 
-        if (!expectedSignature.startsWith(SIGNATURE_HASH_PREFIX)) {
+        if (expectedSignature.length() - SIGNATURE_HASH_PREFIX.length() != HASH_LENGTH || !StringUtils.startsWithIgnoreCase(expectedSignature, SIGNATURE_HASH_PREFIX)) {
             log.warn("Could not verify unknown eventsub signature hash scheme");
             return false;
         }
@@ -121,9 +124,10 @@ public class EventSubVerifier {
         System.arraycopy(id, 0, message, 0, id.length);
         System.arraycopy(timestamp, 0, message, id.length, timestamp.length);
         System.arraycopy(requestBody, 0, message, id.length + timestamp.length, requestBody.length);
-        final String computedSignature = SIGNATURE_HASH_PREFIX + bytesToHex(mac.doFinal(message));
+        final byte[] computedHmac = mac.doFinal(message);
         mac.reset(); // Clean-up
-        return expectedSignature.equalsIgnoreCase(computedSignature);
+        final byte[] expectedHmac = CryptoUtils.hexToBytes(expectedSignature.substring(SIGNATURE_HASH_PREFIX.length()));
+        return MessageDigest.isEqual(computedHmac, expectedHmac); // constant-time comparison
     }
 
     /**
@@ -138,19 +142,6 @@ public class EventSubVerifier {
      */
     public boolean verifySignature(String secret, String messageId, String messageTimestamp, byte[] requestBody, String expectedSignature) {
         return verifySignature(secret.getBytes(StandardCharsets.UTF_8), messageId, messageTimestamp, requestBody, expectedSignature);
-    }
-
-    /*
-     * https://stackoverflow.com/a/9855338
-     */
-    private String bytesToHex(byte[] bytes) {
-        byte[] hexChars = new byte[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
 }

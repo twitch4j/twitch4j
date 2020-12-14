@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.util;
 
+import com.github.twitch4j.common.util.CryptoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -48,12 +49,15 @@ public class EventSubVerifierTest {
         final byte[] body = ("{\"hello\":\"world\"}").getBytes(StandardCharsets.UTF_8);
 
         assertTrue(EventSubVerifier.verifySignature(secret, id, time, body, expect));
+        assertTrue(EventSubVerifier.verifySignature(secret, id, time, body, expect.toUpperCase()));
         assertFalse(EventSubVerifier.verifySignature("s3cRe7", id, time, body, expect));
         assertFalse(EventSubVerifier.verifySignature(secret, UUID.randomUUID().toString(), time, body, expect));
         assertFalse(EventSubVerifier.verifySignature(secret, id, Instant.now().toString(), body, expect));
         assertFalse(EventSubVerifier.verifySignature(secret, id, time, null, expect));
         assertFalse(EventSubVerifier.verifySignature(secret, id, time, "Hello World".getBytes(StandardCharsets.UTF_8), expect));
         assertFalse(EventSubVerifier.verifySignature(secret, id, time, body, "sha256=f56bf6ce06a1adf46fa27831d7d15d"));
+        assertFalse(EventSubVerifier.verifySignature(secret, id, time, body, "sha256=" + CryptoUtils.generateNonce(64)));
+        assertFalse(EventSubVerifier.verifySignature(secret, id, time, body, "sha256=" + CryptoUtils.generateNonce(60) + "zÉñü"));
     }
 
 }
