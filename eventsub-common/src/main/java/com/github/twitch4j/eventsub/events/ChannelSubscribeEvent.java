@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -30,6 +32,8 @@ public class ChannelSubscribeEvent extends EventSubUserChannelEvent {
     /**
      * Whether the subscription is a gift.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_gift")
     private Boolean isGift;
 
 }

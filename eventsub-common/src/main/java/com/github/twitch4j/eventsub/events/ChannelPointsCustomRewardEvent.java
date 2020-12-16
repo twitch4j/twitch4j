@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.helix.domain.CustomReward;
@@ -13,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.time.Instant;
 
@@ -33,16 +35,22 @@ public abstract class ChannelPointsCustomRewardEvent extends EventSubChannelEven
     /**
      * Whether the reward is currently enabled. If false, the reward won’t show up to viewers.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_enabled")
     private Boolean isEnabled;
 
     /**
      * Whether the reward is currently paused. If true, viewers can’t redeem.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_paused")
     private Boolean isPaused;
 
     /**
      * Whether the reward is currently in stock. If false, viewers can’t redeem.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_in_stock")
     private Boolean isInStock;
 
     /**
@@ -63,6 +71,8 @@ public abstract class ChannelPointsCustomRewardEvent extends EventSubChannelEven
     /**
      * Whether the viewer needs to enter information when redeeming the reward.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_user_input_required")
     private Boolean isUserInputRequired;
 
     /**

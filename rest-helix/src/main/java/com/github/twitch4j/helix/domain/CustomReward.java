@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
+import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,6 +75,8 @@ public class CustomReward {
      * Whether the reward currently enabled; if false the reward won’t show up to viewers.
      * Default: true.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_enabled")
     private Boolean isEnabled;
 
     /**
@@ -87,6 +90,8 @@ public class CustomReward {
      * Does the user need to enter information when redeeming the reward.
      * Default: false.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_user_input_required")
     private Boolean isUserInputRequired;
 
     /**
@@ -107,11 +112,15 @@ public class CustomReward {
     /**
      * Whether the reward is currently paused; if true viewers can’t redeem.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_paused")
     private Boolean isPaused;
 
     /**
      * Whether the reward is currently in stock; if false viewers can’t redeem.
      */
+    @Accessors(fluent = true)
+    @JsonProperty("is_in_stock")
     private Boolean isInStock;
 
     /**
@@ -183,6 +192,8 @@ public class CustomReward {
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Setting {
+        @Accessors(fluent = true)
+        @JsonProperty("is_enabled")
         private Boolean isEnabled;
     }
 
