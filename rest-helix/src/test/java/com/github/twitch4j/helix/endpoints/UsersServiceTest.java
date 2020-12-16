@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +40,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
             assertEquals(user.getType(), "", "Type should be empty!");
             assertEquals(user.getBroadcasterType(), "", "broadcaster-type should be empty!");
             assertTrue(user.getViewCount() > 0, "Views should be grater than 0!");
+            assertEquals(Instant.parse("2017-03-02T12:09:38.184103Z"), user.getCreatedAt());
         });
     }
 

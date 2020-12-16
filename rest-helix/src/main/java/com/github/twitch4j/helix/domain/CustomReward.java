@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -11,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
@@ -27,6 +29,7 @@ import java.time.Instant;
 @Jacksonized
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomReward {
 
     /**
@@ -82,7 +85,7 @@ public class CustomReward {
     /**
      * Custom background color for the reward.
      * <p>
-     * Format: Hex with {@literal #} prefix.
+     * Format: Hex with {@literal #} prefix, ideally in ALL CAPS.
      */
     private String backgroundColor;
 
@@ -160,6 +163,7 @@ public class CustomReward {
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MaxPerStreamSetting extends Setting {
@@ -170,6 +174,7 @@ public class CustomReward {
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MaxPerUserPerStreamSetting extends Setting {
@@ -180,6 +185,7 @@ public class CustomReward {
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class GlobalCooldownSetting extends Setting {
