@@ -25,6 +25,11 @@ public interface SubscriptionType<C extends EventSubCondition, B> {
      */
     B getConditionBuilder();
 
+    @SuppressWarnings("unchecked")
+    default Class<C> getConditionClass() {
+        return (Class<C>) getConditionBuilder().getClass().getEnclosingClass();
+    }
+
     default EventSubSubscription prepareSubscription(Function<B, C> conditions, EventSubTransport transport) {
         return EventSubSubscription.builder()
             .type(getName())
