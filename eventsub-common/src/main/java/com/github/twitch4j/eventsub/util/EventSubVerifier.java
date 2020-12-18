@@ -79,7 +79,7 @@ public class EventSubVerifier {
         try {
             timestamp = Instant.parse(messageTimestamp);
         } catch (DateTimeParseException e) {
-            log.warn("Failed to parse timestamp: " + messageTimestamp, e);
+            log.debug("Failed to parse timestamp: " + messageTimestamp, e);
             return false;
         }
 
@@ -101,13 +101,13 @@ public class EventSubVerifier {
         }
 
         if (expectedSignature.length() - SIGNATURE_HASH_PREFIX.length() != HASH_LENGTH || !StringUtils.startsWithIgnoreCase(expectedSignature, SIGNATURE_HASH_PREFIX)) {
-            log.warn("Could not verify unknown eventsub signature hash scheme");
+            log.debug("Could not verify unknown eventsub signature hash scheme; " + expectedSignature);
             return false;
         }
 
         final Mac mac = HASH_FUNCTION.get();
         if (mac == null) {
-            log.warn("Unable to prepare hash function for eventsub signature verification!");
+            log.error("Unable to prepare hash function for eventsub signature verification!");
             return false;
         }
 
