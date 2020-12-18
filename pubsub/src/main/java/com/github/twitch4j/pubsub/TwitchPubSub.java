@@ -520,6 +520,22 @@ public class TwitchPubSub implements ITwitchPubSub {
                             } else if (topic.startsWith("polls")) {
                                 PollData pollData = TypeConvert.convertValue(msgData.path("poll"), PollData.class);
                                 eventManager.publish(new PollsEvent(type, pollData));
+                            } else if (topic.startsWith("predictions-channel-v1")) {
+                                if ("event-created".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, PredictionCreatedEvent.class));
+                                } else if ("event-updated".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, PredictionUpdatedEvent.class));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
+                            } else if (topic.startsWith("predictions-user-v1")) {
+                                if ("prediction-made".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, UserPredictionMadeEvent.class));
+                                } else if ("prediction-result".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, UserPredictionResultEvent.class));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("friendship")) {
                                 eventManager.publish(new FriendshipEvent(TypeConvert.jsonToObject(rawMessage, FriendshipData.class)));
                             } else if (topic.startsWith("presence")) {
