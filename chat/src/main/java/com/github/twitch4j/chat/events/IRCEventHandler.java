@@ -54,29 +54,29 @@ public class IRCEventHandler {
         this.eventManager = twitchChat.getEventManager();
 
         // register event handlers
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannelMessage);
-        eventManager.onEvent(IRCMessageEvent.class, this::onWhisper);
-        eventManager.onEvent(IRCMessageEvent.class, this::onBitsBadgeTier);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannelCheer);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannelSubscription);
-        eventManager.onEvent(IRCMessageEvent.class, this::onClearChat);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientJoinEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannelModChange);
-        eventManager.onEvent(IRCMessageEvent.class, this::onNoticeEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onHostOnEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onHostOffEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onListModsEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onListVipsEvent);
-        eventManager.onEvent(IRCMessageEvent.class, this::onChannelState);
-        eventManager.onEvent(IRCMessageEvent.class, this::onGiftReceived);
-        eventManager.onEvent(IRCMessageEvent.class, this::onPayForward);
-        eventManager.onEvent(IRCMessageEvent.class, this::onRaid);
-        eventManager.onEvent(IRCMessageEvent.class, this::onUnraid);
-        eventManager.onEvent(IRCMessageEvent.class, this::onRewardGift);
-        eventManager.onEvent(IRCMessageEvent.class, this::onRitual);
-        eventManager.onEvent(IRCMessageEvent.class, this::onMessageDeleteResponse);
-        eventManager.onEvent(IRCMessageEvent.class, this::onUserState);
+        eventManager.onEvent("twitch4j-chat-message-trigger", IRCMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent("twitch4j-chat-whisper-trigger", IRCMessageEvent.class, this::onWhisper);
+        eventManager.onEvent("twitch4j-chat-bits-badge-trigger", IRCMessageEvent.class, this::onBitsBadgeTier);
+        eventManager.onEvent("twitch4j-chat-cheer-trigger", IRCMessageEvent.class, this::onChannelCheer);
+        eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
+        eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
+        eventManager.onEvent("twitch4j-chat-join-trigger", IRCMessageEvent.class, this::onChannnelClientJoinEvent);
+        eventManager.onEvent("twitch4j-chat-leave-trigger", IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
+        eventManager.onEvent("twitch4j-chat-mod-trigger", IRCMessageEvent.class, this::onChannelModChange);
+        eventManager.onEvent("twitch4j-chat-notice-trigger", IRCMessageEvent.class, this::onNoticeEvent);
+        eventManager.onEvent("twitch4j-chat-host-on-trigger", IRCMessageEvent.class, this::onHostOnEvent);
+        eventManager.onEvent("twitch4j-chat-host-off-trigger", IRCMessageEvent.class, this::onHostOffEvent);
+        eventManager.onEvent("twitch4j-chat-list-mods-trigger", IRCMessageEvent.class, this::onListModsEvent);
+        eventManager.onEvent("twitch4j-chat-list-vips-trigger", IRCMessageEvent.class, this::onListVipsEvent);
+        eventManager.onEvent("twitch4j-chat-roomstate-trigger", IRCMessageEvent.class, this::onChannelState);
+        eventManager.onEvent("twitch4j-chat-gift-trigger", IRCMessageEvent.class, this::onGiftReceived);
+        eventManager.onEvent("twitch4j-chat-payforward-trigger", IRCMessageEvent.class, this::onPayForward);
+        eventManager.onEvent("twitch4j-chat-raid-trigger", IRCMessageEvent.class, this::onRaid);
+        eventManager.onEvent("twitch4j-chat-unraid-trigger", IRCMessageEvent.class, this::onUnraid);
+        eventManager.onEvent("twitch4j-chat-rewardgift-trigger", IRCMessageEvent.class, this::onRewardGift);
+        eventManager.onEvent("twitch4j-chat-ritual-trigger", IRCMessageEvent.class, this::onRitual);
+        eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
+        eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
     }
 
     /**

@@ -96,3 +96,30 @@ This yields another reason to unsubscribe from irrelevant topics; it creates hea
 
 If still more headroom is needed, one can construct additional `TwitchPubSub` instances, each with a limit of 50 topics.
 Twitch _recommends_ no greater than 10 pubsub connections be made from a single IP (each `TwitchPubSub` instance is equivalent to a single connection), but this is not a hard limit.
+
+To simplify this, we offer `TwitchPubSubConnectionPool` as a class that can abstract away the creation/deletion of additional PubSub connections for you:
+
+```java
+// Create a dynamically-sized connection pool
+TwitchPubSubConnectionPool pool = TwitchPubSubConnectionPool.builder()
+	.maxSubscriptionsPerConnection(50)
+	.build();
+
+// Register our listener(s)
+pool.getEventManager().onEvent(ChatModerationEvent.class, System.out::println);
+
+// Define our requests (that can exceed 50 in count)
+PubSubRequest req1 = ... ;
+PubSubRequest req2 = ... ;
+PubSubRequest req3 = ... ;
+
+// Subscribe to topics
+PubSubSubscription resp1 = pool.subscribe(req1);
+PubSubSubscription resp2 = pool.subscribe(req2);
+PubSubSubscription resp3 = pool.subscribe(req3);
+
+// Later, can unsubscribe from any
+pool.unsubscribe(resp2);
+```
+
+A more concrete example of this can be found [here](https://github.com/twitch4j/twitch4j/blob/master/pubsub/src/test/java/com/github/twitch4j/pubsub/PooledTwitchPubSubTest.java).
