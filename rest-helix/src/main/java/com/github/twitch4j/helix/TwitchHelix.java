@@ -343,13 +343,17 @@ public interface TwitchHelix {
      *
      * @param authToken Required: App Access Token.
      * @param status    Optional: Include this parameter to filter subscriptions by their status.
+     * @param after     Optional: Cursor for forward pagination.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Minimum: 10.
      * @return EventSubSubscriptionList
      */
-    @RequestLine("GET /eventsub/subscriptions?status={status}")
+    @RequestLine("GET /eventsub/subscriptions?status={status}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
         @Param("token") String authToken,
-        @Param("status") EventSubSubscriptionStatus status
+        @Param("status") EventSubSubscriptionStatus status,
+        @Param("after") String after,
+        @Param("first") Integer limit
     );
 
     /**
