@@ -154,6 +154,12 @@ public class TwitchChatBuilder {
     private boolean autoJoinOwnChannel = true;
 
     /**
+     * Whether JOIN/PART events should be enabled for the {@link TwitchChat} instance.
+     */
+    @With
+    private boolean enableMembershipEvents = true;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Chat Builder
@@ -183,7 +189,7 @@ public class TwitchChatBuilder {
             ircWhisperBucket = TwitchChatLimitHelper.createBucket(this.whisperRateLimit);
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.botOwnerIds);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);
     }
 
     /**

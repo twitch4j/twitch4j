@@ -184,6 +184,11 @@ public class TwitchChat implements ITwitchChat {
     protected final boolean autoJoinOwnChannel;
 
     /**
+     * Whether JOIN/PART events should be enabled
+     */
+    protected final boolean enableMembershipEvents;
+
+    /**
      * Helper class to compute delays between connection retries.
      *
      * @see <a href="https://dev.twitch.tv/docs/irc/guide#re-connecting-to-twitch-irc">Official suggestion</a>
@@ -217,9 +222,10 @@ public class TwitchChat implements ITwitchChat {
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      * @param proxyConfig Proxy Configuration
      * @param autoJoinOwnChannel Whether one's own channel should automatically be joined
+     * @param enableMembershipEvents Whether JOIN/PART events should be enabled
      * @param botOwnerIds Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -234,6 +240,7 @@ public class TwitchChat implements ITwitchChat {
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
+        this.enableMembershipEvents = enableMembershipEvents;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -424,7 +431,7 @@ public class TwitchChat implements ITwitchChat {
                     log.info("Connecting to Twitch IRC {}", baseUrl);
 
                     // acquire capabilities
-                    sendTextToWebSocket("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership", true);
+                    sendTextToWebSocket("CAP REQ :twitch.tv/tags twitch.tv/commands" + (enableMembershipEvents ? " twitch.tv/membership" : ""), true);
                     sendTextToWebSocket("CAP END", true);
 
                     // sign in

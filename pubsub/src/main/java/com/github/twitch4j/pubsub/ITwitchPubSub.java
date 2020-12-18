@@ -33,6 +33,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      * </pre>
      *
      * @param subscription PubSubSubscription to be unlistened from
+     * @return whether the subscription was previously subscribed to
      */
     boolean unsubscribeFromTopic(PubSubSubscription subscription);
 
