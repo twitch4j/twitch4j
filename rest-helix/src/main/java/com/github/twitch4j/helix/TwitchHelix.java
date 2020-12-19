@@ -7,16 +7,30 @@ import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Twitch - Helix API
  */
 public interface TwitchHelix {
+
+    /**
+     * The default baseUrl to pass to {@link #getIngestServers(URI)}.
+     */
+    URI INGESTS_BASE_URL = ((Supplier<URI>) () -> {
+        // Not pretty but needed for "Overriding the Request Line" - see: https://github.com/OpenFeign/feign/blob/master/README.md#interface-annotations
+        try {
+            return new URI("https://ingest.twitch.tv/");
+        } catch (Exception e) {
+            return null;
+        }
+    }).get();
 
     /**
      * Gets a URL that extension developers can use to download analytics reports (CSV files) for their extensions. The URL is valid for 5 minutes.
@@ -565,6 +579,18 @@ public interface TwitchHelix {
         @Param("id") String id,
         @Param("after") String after
     );
+
+    @RequestLine("GET /ingests")
+    HystrixCommand<IngestServerList> getIngestServers(URI baseUrl);
+
+    /**
+     * Get Ingest Servers returns a list of endpoints for ingesting live video into Twitch.
+     *
+     * @return IngestServerList
+     */
+    default HystrixCommand<IngestServerList> getIngestServers() {
+        return getIngestServers(INGESTS_BASE_URL);
+    }
 
     /**
      * Returns all banned and timed-out users in a channel.
