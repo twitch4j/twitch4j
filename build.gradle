@@ -54,7 +54,7 @@ subprojects {
 			api group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
 			// Apache Commons
-			api group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+			api group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
 			api group: 'commons-io', name: 'commons-io', version: '2.6'
 			api group: 'commons-configuration', name: 'commons-configuration', version: '1.10'
 
