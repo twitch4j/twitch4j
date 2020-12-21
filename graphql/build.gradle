@@ -5,7 +5,7 @@ buildscript {
 		maven { url "https://maven.google.com" }
 	}
 	dependencies {
-		classpath 'com.apollographql.apollo:apollo-gradle-plugin:1.2.2'
+		classpath 'com.apollographql.apollo:apollo-gradle-plugin:2.4.6'
 	}
 }
 
