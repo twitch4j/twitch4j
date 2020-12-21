@@ -94,7 +94,7 @@ subprojects {
 			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.10'
 
 			// Annotations
-			api group: 'org.jetbrains', name: 'annotations', version: '18.0.0'
+			api group: 'org.jetbrains', name: 'annotations', version: '20.1.0'
 		}
 	}
 
