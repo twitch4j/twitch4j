@@ -47,9 +47,6 @@ gradle.properties
 config/*
 client.log
 
-# JavaDoc
-/docs/static/javadoc/*
-
 # Example Code
 src/*/java/twitch4j/example/*
 
@@ -59,8 +56,8 @@ src/*/java/twitch4j/example/*
 # Visual Studio Code
 .vscode/
 
-# Hugo
-**/public/*
+# Documentation
+docs/
 
 # Pipeline
 dist/*
