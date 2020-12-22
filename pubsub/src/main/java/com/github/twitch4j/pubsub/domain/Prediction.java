@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -22,6 +23,7 @@ public class Prediction {
     private Instant predictedAt;
     private Instant updatedAt;
     private String userId;
-    private PredictionResult result; // can be null
+    @Nullable
+    private PredictionResult result;
     private String userDisplayName;
 }

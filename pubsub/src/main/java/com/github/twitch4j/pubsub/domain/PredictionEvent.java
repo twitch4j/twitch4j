@@ -25,7 +25,10 @@ public class PredictionEvent {
     private PredictionTrigger lockedBy;
     private List<PredictionOutcome> outcomes;
     private Integer predictionWindowSeconds;
-    private String status; // e.g. ACTIVE or LOCKED or RESOLVE_PENDING or RESOLVED
+    /**
+     * The status of the prediction (e.g., "ACTIVE", "LOCKED", "RESOLVE_PENDING", "RESOLVED")
+     */
+    private String status;
     private String title;
     private String winningOutcomeId;
 }
