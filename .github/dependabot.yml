@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5 # Daily limits PR
+    target-branch: "develop" # Without that will checks default branch setted in repository: `master`
+    pull-request-branch-name:
+      separator: "/" # it will be `dependabot/gradle/<branch>/<group>-<artifact>-<version>`
+    reviewers: # Added maintainer only - of course we can remove this to auto-merge
+      - "PhilippHeuer"
+      - "iProdigy"
