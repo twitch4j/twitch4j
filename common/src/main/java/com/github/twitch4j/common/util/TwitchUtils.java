@@ -104,6 +104,17 @@ public class TwitchUtils {
             } else if ("2".equals(hypeBadge)) {
                 permissionSet.add(CommandPermission.FORMER_HYPE_TRAIN_CONDUCTOR);
             }
+            // Predictions Participation
+            String predictionBadge = badges.get("predictions");
+            if (StringUtils.isNotEmpty(predictionBadge)) {
+                char first = predictionBadge.charAt(0);
+                char last = predictionBadge.charAt(predictionBadge.length() - 1);
+                if (first == 'b' || last == '1') {
+                    permissionSet.add(CommandPermission.PREDICTIONS_BLUE);
+                } else if (first == 'p' || last == '2') {
+                    permissionSet.add(CommandPermission.PREDICTIONS_PINK);
+                }
+            }
         }
 
         if (userId != null && botOwnerIds != null && botOwnerIds.contains(userId))
