@@ -26,7 +26,7 @@ public class PredictionEvent {
     private List<PredictionOutcome> outcomes;
     private Integer predictionWindowSeconds;
     /**
-     * The status of the prediction (e.g., "ACTIVE", "LOCKED", "RESOLVE_PENDING", "RESOLVED")
+     * The status of the prediction (e.g., "ACTIVE", "CANCELED", "CANCEL_PENDING", "LOCKED", "RESOLVE_PENDING", "RESOLVED")
      */
     private String status;
     private String title;
