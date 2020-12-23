@@ -1,16 +1,16 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @UtilityClass
 public class SubscriptionTypes {
-    private final Map<String, Class<? extends EventSubCondition>> CONDITION_BY_TYPE;
+    private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
@@ -30,12 +30,12 @@ public class SubscriptionTypes {
     public final UserAuthorizationRevokeType USER_AUTHORIZATION_REVOKE;
     public final UserUpdateType USER_UPDATE;
 
-    public Class<? extends EventSubCondition> getConditionByType(String subTypeName, String subTypeVersion) {
-        return CONDITION_BY_TYPE.get(subTypeName + ':' + subTypeVersion);
+    public SubscriptionType<?, ?, ?> getSubscriptionType(String subTypeName, String subTypeVersion) {
+        return SUBSCRIPTION_TYPES.get(subTypeName + ':' + subTypeVersion);
     }
 
     static {
-        CONDITION_BY_TYPE = Collections.unmodifiableMap(
+        SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
@@ -55,7 +55,7 @@ public class SubscriptionTypes {
                 STREAM_ONLINE = new StreamOnlineType(),
                 USER_AUTHORIZATION_REVOKE = new UserAuthorizationRevokeType(),
                 USER_UPDATE = new UserUpdateType()
-            ).collect(Collectors.toMap(type -> type.getName() + ':' + type.getVersion(), SubscriptionType::getConditionClass))
+            ).collect(Collectors.toMap(type -> type.getName() + ':' + type.getVersion(), Function.identity()))
         );
     }
 }

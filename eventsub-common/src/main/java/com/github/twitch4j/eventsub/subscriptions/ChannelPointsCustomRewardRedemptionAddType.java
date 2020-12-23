@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelPointsCustomRewardRedemptionAddCondition;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 /**
  * A viewer has redeemed a custom channel points reward on the specified channel.
@@ -8,7 +9,7 @@ import com.github.twitch4j.eventsub.condition.ChannelPointsCustomRewardRedemptio
  * Must have channel:read:redemptions scope.
  */
 public class ChannelPointsCustomRewardRedemptionAddType implements SubscriptionType<ChannelPointsCustomRewardRedemptionAddCondition,
-    ChannelPointsCustomRewardRedemptionAddCondition.ChannelPointsCustomRewardRedemptionAddConditionBuilder<?, ?>> {
+    ChannelPointsCustomRewardRedemptionAddCondition.ChannelPointsCustomRewardRedemptionAddConditionBuilder<?, ?>, CustomRewardRedemptionAddEvent> {
 
     @Override
     public String getName() {
@@ -23,6 +24,11 @@ public class ChannelPointsCustomRewardRedemptionAddType implements SubscriptionT
     @Override
     public ChannelPointsCustomRewardRedemptionAddCondition.ChannelPointsCustomRewardRedemptionAddConditionBuilder<?, ?> getConditionBuilder() {
         return ChannelPointsCustomRewardRedemptionAddCondition.builder();
+    }
+
+    @Override
+    public Class<CustomRewardRedemptionAddEvent> getEventClass() {
+        return CustomRewardRedemptionAddEvent.class;
     }
 
 }

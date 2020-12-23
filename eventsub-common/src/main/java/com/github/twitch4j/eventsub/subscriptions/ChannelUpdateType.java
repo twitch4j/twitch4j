@@ -1,13 +1,14 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelUpdateCondition;
+import com.github.twitch4j.eventsub.events.ChannelUpdateEvent;
 
 /**
  * A broadcaster updates their channel properties e.g., category, title, mature flag, broadcast, or language.
  * <p>
  * No authorization required.
  */
-public class ChannelUpdateType implements SubscriptionType<ChannelUpdateCondition, ChannelUpdateCondition.ChannelUpdateConditionBuilder<?, ?>> {
+public class ChannelUpdateType implements SubscriptionType<ChannelUpdateCondition, ChannelUpdateCondition.ChannelUpdateConditionBuilder<?, ?>, ChannelUpdateEvent> {
 
     @Override
     public String getName() {
@@ -22,6 +23,11 @@ public class ChannelUpdateType implements SubscriptionType<ChannelUpdateConditio
     @Override
     public ChannelUpdateCondition.ChannelUpdateConditionBuilder<?, ?> getConditionBuilder() {
         return ChannelUpdateCondition.builder();
+    }
+
+    @Override
+    public Class<ChannelUpdateEvent> getEventClass() {
+        return ChannelUpdateEvent.class;
     }
 
 }

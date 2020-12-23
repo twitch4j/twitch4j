@@ -1,13 +1,14 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelCheerCondition;
+import com.github.twitch4j.eventsub.events.ChannelCheerEvent;
 
 /**
  * A user cheers on the specified channel.
  * <p>
  * Must have bits:read scope.
  */
-public class ChannelCheerType implements SubscriptionType<ChannelCheerCondition, ChannelCheerCondition.ChannelCheerConditionBuilder<?, ?>> {
+public class ChannelCheerType implements SubscriptionType<ChannelCheerCondition, ChannelCheerCondition.ChannelCheerConditionBuilder<?, ?>, ChannelCheerEvent> {
 
     @Override
     public String getName() {
@@ -22,6 +23,11 @@ public class ChannelCheerType implements SubscriptionType<ChannelCheerCondition,
     @Override
     public ChannelCheerCondition.ChannelCheerConditionBuilder<?, ?> getConditionBuilder() {
         return ChannelCheerCondition.builder();
+    }
+
+    @Override
+    public Class<ChannelCheerEvent> getEventClass() {
+        return ChannelCheerEvent.class;
     }
 
 }

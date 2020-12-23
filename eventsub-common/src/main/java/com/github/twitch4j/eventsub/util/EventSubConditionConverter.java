@@ -17,10 +17,10 @@ public class EventSubConditionConverter {
     }
 
     public EventSubCondition getCondition(String type, String version, Map<String, Object> condition) {
-        return getCondition(SubscriptionTypes.getConditionByType(type, version), condition);
+        return getCondition(SubscriptionTypes.getSubscriptionType(type, version), condition);
     }
 
-    public EventSubCondition getCondition(SubscriptionType<?, ?> type, Map<String, Object> condition) {
+    public EventSubCondition getCondition(SubscriptionType<?, ?, ?> type, Map<String, Object> condition) {
         return getCondition(type.getConditionClass(), condition);
     }
 

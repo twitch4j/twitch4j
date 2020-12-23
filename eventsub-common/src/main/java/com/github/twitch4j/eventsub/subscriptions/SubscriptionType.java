@@ -1,12 +1,13 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
+import com.github.twitch4j.eventsub.events.EventSubEvent;
 import com.github.twitch4j.helix.domain.EventSubSubscription;
 import com.github.twitch4j.helix.eventsub.EventSubTransport;
 
 import java.util.function.Function;
 
-public interface SubscriptionType<C extends EventSubCondition, B> {
+public interface SubscriptionType<C extends EventSubCondition, B, E extends EventSubEvent> {
 
     /**
      * @return the subscription type name.
@@ -24,6 +25,11 @@ public interface SubscriptionType<C extends EventSubCondition, B> {
      * @return Subscription-specific parameter builder.
      */
     B getConditionBuilder();
+
+    /**
+     * @return the associated event class for this subscription type.
+     */
+    Class<E> getEventClass();
 
     @SuppressWarnings("unchecked")
     default Class<C> getConditionClass() {

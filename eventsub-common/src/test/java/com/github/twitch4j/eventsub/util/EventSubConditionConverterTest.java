@@ -57,7 +57,7 @@ public class EventSubConditionConverterTest {
         test(type, condition);
     }
 
-    private static void test(SubscriptionType<?, ?> type, EventSubCondition condition) {
+    private static void test(SubscriptionType<?, ?, ?> type, EventSubCondition condition) {
         Assertions.assertEquals(condition, EventSubConditionConverter.getCondition(type, condition.toMap()));
     }
 
