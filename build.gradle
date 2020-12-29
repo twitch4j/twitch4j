@@ -2,7 +2,7 @@
 plugins {
 	id 'io.freefair.lombok' version '5.2.1' apply false
 	id 'com.jfrog.bintray' version '1.8.5' apply false
-	id 'com.jfrog.artifactory' version '4.13.0' apply false
+	id 'com.jfrog.artifactory' version '4.18.3' apply false
 }
 
 // Artifact Info
