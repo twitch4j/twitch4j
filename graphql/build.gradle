@@ -17,6 +17,12 @@ dependencies {
 	api project(':' + rootProject.name + '-auth')
 }
 
+// Javadoc
+javadoc {
+	// Ignore auto-generated files from apollo graphql
+	exclude 'com/github/twitch4j/graphql/internal/**'
+}
+
 // Artifact Info
 project.ext {
 	groupId = 'com.github.twitch4j'
