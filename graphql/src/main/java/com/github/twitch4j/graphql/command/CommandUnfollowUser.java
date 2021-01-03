@@ -18,8 +18,8 @@ public class CommandUnfollowUser extends BaseCommand<UnfollowMutation.Data> {
     }
 
     @Override
-    protected ApolloCall getGraphQLCall() {
-        ApolloCall apolloCall = apolloClient.mutate(
+    protected ApolloCall<UnfollowMutation.Data> getGraphQLCall() {
+        ApolloCall<UnfollowMutation.Data> apolloCall = apolloClient.mutate(
             UnfollowMutation.builder()
                 .unfollowUserInput(
                     UnfollowUserInput.builder()
