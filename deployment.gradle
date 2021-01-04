@@ -19,14 +19,19 @@ extensions.configure(JavaPluginExtension) {
 	it.withJavadocJar()
 }
 
+task shadowJarRelocate(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
+	target = shadowJar
+	prefix = "com.github.twitch4j.deps.v${version.toString().replace(".", "_")}" // example result: twitch4j.v1_2_0
+}
+
 // Shadow Jar
 shadowJar {
+	dependsOn shadowJarRelocate
 	archiveClassifier.set('shaded')
 	manifest {
 		inheritFrom jar.manifest
 	}
 }
-
 /**
  * set base name to lowercase for each jar file
  */
