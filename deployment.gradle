@@ -28,17 +28,19 @@ shadowJar {
 	def packages = [] as Set<String>
 	configurations.each { configuration ->
 		configuration.files.each { jar ->
-			JarFile jf = new JarFile(jar)
-			jf.entries().each { entry ->
-				if (entry.name.endsWith(".class")) {
-					packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
+			if (jar.exists()) {
+				JarFile jf = new JarFile(jar)
+				jf.entries().each { entry ->
+					if (entry.name.endsWith(".class")) {
+						packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
+					}
 				}
+				jf.close()
 			}
-			jf.close()
 		}
 	}
 	packages.each {
-		relocate(it, "com.github.twitch4j.shaded.${version.toString().replace(".", "_")}.${it}") {
+		relocate(it, "com.github.twitch4j.shaded.${archiveVersion.toString().replace(".", "_")}.${it}") {
 			exclude 'com.github.twitch4j'
 		}
 	}
