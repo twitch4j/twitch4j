@@ -40,7 +40,7 @@ shadowJar {
 		}
 	}
 	packages.each {
-		relocate(it, "com.github.twitch4j.shaded.${archiveVersion.toString().replace(".", "_")}.${it}") {
+		relocate(it, "com.github.twitch4j.shaded.${archiveVersion.get().replace(".", "_")}.${it}") {
 			exclude 'com.github.twitch4j'
 		}
 	}
