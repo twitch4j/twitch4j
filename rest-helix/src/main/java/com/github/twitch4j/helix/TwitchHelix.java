@@ -106,17 +106,39 @@ public interface TwitchHelix {
      * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
      * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".
      * @param userId    ID of the user whose results are returned; i.e., the person who paid for the Bits.
-     * @return StreamList
+     * @return BitsLeaderboard
      */
     @RequestLine("GET /bits/leaderboard?count={count}&period={period}&started_at={started_at}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
         @Param("token") String authToken,
-        @Param("count") String count,
+        @Param("count") Integer count,
         @Param("period") String period,
         @Param("started_at") String startedAt,
         @Param("user_id") String userId
     );
+
+    /**
+     * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
+     *
+     * @param authToken Auth Token
+     * @param count     Number of results to be returned. Maximum: 100. Default: 10.
+     * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
+     * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".
+     * @param userId    ID of the user whose results are returned; i.e., the person who paid for the Bits.
+     * @return BitsLeaderboard
+     * @deprecated utilize getBitsLeaderboard where count is an Integer
+     */
+    @Deprecated
+    default HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
+        String authToken,
+        String count,
+        String period,
+        String startedAt,
+        String userId
+    ) {
+        return getBitsLeaderboard(authToken, count == null || count.isEmpty() ? null : Integer.parseInt(count), period, startedAt, userId);
+    }
 
     /**
      * Creates a Custom Reward on a channel.

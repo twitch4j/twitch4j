@@ -27,4 +27,9 @@ public class EventSubUserEvent extends EventSubEvent {
      */
     private String userName;
 
+    /**
+     * The user's login name.
+     */
+    private String userLogin;
+
 }

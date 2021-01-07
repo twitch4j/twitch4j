@@ -27,6 +27,11 @@ public class Contribution {
     private String userName;
 
     /**
+     * The user's login name.
+     */
+    private String userLogin;
+
+    /**
      * Type of contribution.
      */
     private Type type;
