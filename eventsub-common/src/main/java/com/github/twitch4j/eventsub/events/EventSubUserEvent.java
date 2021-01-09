@@ -23,7 +23,7 @@ public class EventSubUserEvent extends EventSubEvent {
     private String userId;
 
     /**
-     * The user’s user name.
+     * The user’s display name.
      */
     private String userName;
 

@@ -22,12 +22,12 @@ public class Contribution {
     private String userId;
 
     /**
-     * The name of the user.
+     * The display name of the user.
      */
     private String userName;
 
     /**
-     * The user's login name.
+     * The login name of the user.
      */
     private String userLogin;
 

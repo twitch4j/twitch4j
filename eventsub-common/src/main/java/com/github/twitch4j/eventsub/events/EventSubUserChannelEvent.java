@@ -23,9 +23,14 @@ public class EventSubUserChannelEvent extends EventSubEvent {
     private String broadcasterUserId;
 
     /**
-     * The requested broadcaster name.
+     * The requested broadcaster display name.
      */
     private String broadcasterUserName;
+
+    /**
+     * The requested broadcaster login name.
+     */
+    private String broadcasterUserLogin;
 
     /**
      * The user’s user id.
@@ -33,7 +38,7 @@ public class EventSubUserChannelEvent extends EventSubEvent {
     private String userId;
 
     /**
-     * The user’s user name.
+     * The user’s display name.
      */
     private String userName;
 
