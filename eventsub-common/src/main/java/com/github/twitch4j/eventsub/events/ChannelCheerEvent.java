@@ -49,4 +49,9 @@ public class ChannelCheerEvent extends EventSubUserChannelEvent {
         return isAnonymous ? TwitchUtils.ANONYMOUS_CHEERER.getName() : super.getUserName();
     }
 
+    @Override
+    public String getUserLogin() {
+        return isAnonymous ? TwitchUtils.ANONYMOUS_CHEERER.getName().toLowerCase() : super.getUserLogin();
+    }
+
 }
