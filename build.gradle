@@ -91,7 +91,7 @@ subprojects {
 			// Jackson (JSON)
 			api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.1'
 			api group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.3'
-			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
+			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
 
 			// WebSocket
 			api group: 'com.neovisionaries', name: 'nv-websocket-client', version: '2.10'
