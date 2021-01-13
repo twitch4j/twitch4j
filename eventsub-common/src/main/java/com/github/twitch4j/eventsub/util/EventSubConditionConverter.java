@@ -4,7 +4,6 @@ import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.helix.domain.EventSubSubscription;
 import lombok.experimental.UtilityClass;
 
 import java.util.Map;
@@ -22,10 +21,6 @@ public class EventSubConditionConverter {
 
     public EventSubCondition getCondition(SubscriptionType<?, ?, ?> type, Map<String, Object> condition) {
         return getCondition(type.getConditionClass(), condition);
-    }
-
-    public EventSubCondition getCondition(EventSubSubscription subscription) {
-        return getCondition(subscription.getType(), subscription.getVersion(), subscription.getCondition());
     }
 
 }

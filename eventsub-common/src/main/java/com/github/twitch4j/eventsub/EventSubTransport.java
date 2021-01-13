@@ -1,4 +1,4 @@
-package com.github.twitch4j.helix.eventsub;
+package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;

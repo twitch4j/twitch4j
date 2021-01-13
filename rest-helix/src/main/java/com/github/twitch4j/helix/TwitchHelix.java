@@ -1,8 +1,10 @@
 package com.github.twitch4j.helix;
 
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
+import com.github.twitch4j.eventsub.EventSubSubscription;
+import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.helix.domain.*;
-import com.github.twitch4j.helix.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
@@ -220,7 +222,7 @@ public interface TwitchHelix {
         @Param("broadcaster_id") String broadcasterId,
         @Param("reward_id") String rewardId,
         @Param("id") Collection<String> redemptionIds,
-        @Param("status") CustomRewardRedemption.Status status,
+        @Param("status") RedemptionStatus status,
         @Param("sort") String sort,
         @Param("after") String after,
         @Param("first") Integer limit
@@ -272,7 +274,7 @@ public interface TwitchHelix {
         @Param("broadcaster_id") String broadcasterId,
         @Param("reward_id") String rewardId,
         @Param("id") Collection<String> redemptionIds,
-        @Param("status") CustomRewardRedemption.Status newStatus
+        @Param("status") RedemptionStatus newStatus
     );
 
     /**

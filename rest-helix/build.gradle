@@ -16,6 +16,7 @@ dependencies {
 	// Twitch4J Modules
 	api project(':' + rootProject.name + '-common')
 	api project(':' + rootProject.name + '-auth')
+	api project(':' + rootProject.name + '-eventsub-common')
 }
 
 // Artifact Info

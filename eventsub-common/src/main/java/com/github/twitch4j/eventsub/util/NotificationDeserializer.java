@@ -7,11 +7,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.twitch4j.eventsub.EventSubNotification;
-import com.github.twitch4j.eventsub.condition.EventSubCondition;
+import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
-import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.helix.domain.EventSubSubscription;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -21,24 +19,13 @@ public class NotificationDeserializer extends JsonDeserializer<EventSubNotificat
     @Override
     public EventSubNotification deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         final JsonNode root = p.getCodec().readTree(p);
-        if (root == null) return null;
-
         final EventSubSubscription sub = getObject(p.getCodec(), root, "subscription", EventSubSubscription.class);
         if (sub == null) return null;
 
-        final SubscriptionType<?, ?, ?> type = SubscriptionTypes.getSubscriptionType(sub.getType(), sub.getVersion());
+        final SubscriptionType<?, ?, ?> type = sub.getType();
+        final EventSubEvent event = type != null ? getObject(p.getCodec(), root, "event", type.getEventClass()) : null;
 
-        final EventSubCondition condition;
-        final EventSubEvent event;
-        if (type != null) {
-            condition = EventSubConditionConverter.getCondition(type, sub.getCondition());
-            event = getObject(p.getCodec(), root, "event", type.getEventClass());
-        } else {
-            condition = null;
-            event = null;
-        }
-
-        return new EventSubNotification(sub, type, condition, event);
+        return new EventSubNotification(sub, event);
     }
 
     private static <T> T getObject(ObjectCodec codec, JsonNode parent, String field, Class<T> clazz) {

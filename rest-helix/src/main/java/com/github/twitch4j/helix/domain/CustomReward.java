@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.twitch4j.eventsub.domain.Reward;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,12 +68,12 @@ public class CustomReward {
      * Can be null if no images have been uploaded.
      */
     @Nullable
-    private Image image;
+    private Reward.Image image;
 
     /**
      * Set of default images of 1x, 2x and 4x sizes for the reward
      */
-    private Image defaultImage;
+    private Reward.Image defaultImage;
 
     /**
      * Whether the reward currently enabled; if false the reward won’t show up to viewers.
@@ -145,19 +146,6 @@ public class CustomReward {
      */
     @Nullable
     private Instant cooldownExpiresAt;
-
-    @Data
-    @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Image {
-        @JsonProperty("url_1x")
-        private String url1x;
-        @JsonProperty("url_2x")
-        private String url2x;
-        @JsonProperty("url_4x")
-        private String url4x;
-    }
 
     @Data
     @Setter(AccessLevel.PRIVATE)

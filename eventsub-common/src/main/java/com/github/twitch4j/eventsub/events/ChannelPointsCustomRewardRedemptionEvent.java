@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.github.twitch4j.helix.domain.CustomRewardRedemption;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.Reward;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -39,7 +39,7 @@ public abstract class ChannelPointsCustomRewardRedemptionEvent extends EventSubU
      * Defaults to unfulfilled. Possible values are unknown, unfulfilled, fulfilled, and canceled.
      */
     @JsonIgnore
-    private CustomRewardRedemption.Status status;
+    private RedemptionStatus status;
 
     /**
      * Basic information about the reward that was redeemed, at the time it was redeemed.
@@ -54,9 +54,9 @@ public abstract class ChannelPointsCustomRewardRedemptionEvent extends EventSubU
     @JsonProperty("status")
     private void unpackStatus(String status) {
         try {
-            this.status = CustomRewardRedemption.Status.valueOf(status.toUpperCase());
+            this.status = RedemptionStatus.valueOf(status.toUpperCase());
         } catch (Exception e) {
-            this.status = CustomRewardRedemption.Status.UNKNOWN;
+            this.status = RedemptionStatus.UNKNOWN;
         }
     }
 

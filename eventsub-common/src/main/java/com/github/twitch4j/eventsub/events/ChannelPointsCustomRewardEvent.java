@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.eventsub.domain.GlobalCooldown;
 import com.github.twitch4j.eventsub.domain.MaxPerStream;
 import com.github.twitch4j.eventsub.domain.MaxPerUserPerStream;
+import com.github.twitch4j.eventsub.domain.Reward;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -98,12 +98,12 @@ public abstract class ChannelPointsCustomRewardEvent extends EventSubChannelEven
     /**
      * Set of custom images of 1x, 2x and 4x sizes for the reward. Can be null if no images have been uploaded.
      */
-    private CustomReward.Image image;
+    private Reward.Image image;
 
     /**
      * Set of default images of 1x, 2x and 4x sizes for the reward.
      */
-    private CustomReward.Image defaultImage;
+    private Reward.Image defaultImage;
 
     /**
      * Whether a cooldown is enabled and what the cooldown is in seconds.

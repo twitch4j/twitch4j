@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-@Tag("integration")
+@Tag("unittest")
 public class EventSubConditionConverterTest {
 
     @Test

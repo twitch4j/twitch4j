@@ -1,16 +1,12 @@
 package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
-import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.eventsub.util.NotificationDeserializer;
-import com.github.twitch4j.helix.domain.EventSubSubscription;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Setter;
-import lombok.ToString;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -18,14 +14,14 @@ import lombok.ToString;
 @JsonDeserialize(using = NotificationDeserializer.class)
 public class EventSubNotification {
 
+    /**
+     * Metadata about the subscription.
+     */
     private EventSubSubscription subscription;
 
-    @ToString.Exclude
-    private SubscriptionType<?, ?, ?> subscriptionType;
-
-    @ToString.Exclude
-    private EventSubCondition condition;
-
+    /**
+     * The event information. The fields inside this object differ by subscription type.
+     */
     private EventSubEvent event;
 
 }

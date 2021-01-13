@@ -4,8 +4,6 @@ import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.condition.ChannelFollowCondition;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.helix.eventsub.EventSubSubscriptionStatus;
-import com.github.twitch4j.helix.eventsub.EventSubTransportMethod;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Tag("integration")
+@Tag("unittest")
 public class EventSubNotificationTest {
 
     @Test
@@ -30,8 +28,8 @@ public class EventSubNotificationTest {
         assertNotNull(notif.getSubscription());
         assertEquals("f1c2a387-161a-49f9-a165-0f21d7a4e1c4", notif.getSubscription().getId());
         assertEquals(EventSubSubscriptionStatus.AUTHORIZATION_REVOKED, notif.getSubscription().getStatus());
-        assertEquals(SubscriptionTypes.CHANNEL_FOLLOW, notif.getSubscriptionType());
-        assertEquals(ChannelFollowCondition.builder().broadcasterUserId("12826").build(), notif.getCondition());
+        assertEquals(SubscriptionTypes.CHANNEL_FOLLOW, notif.getSubscription().getType());
+        assertEquals(ChannelFollowCondition.builder().broadcasterUserId("12826").build(), notif.getSubscription().getCondition());
         assertNotNull(notif.getSubscription().getTransport());
         assertEquals(EventSubTransportMethod.WEBHOOK, notif.getSubscription().getTransport().getMethod());
         assertEquals("https://example.com/webhooks/callback", notif.getSubscription().getTransport().getCallback());

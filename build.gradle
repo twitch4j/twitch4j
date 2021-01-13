@@ -101,6 +101,7 @@ subprojects {
 	// Source encoding
 	tasks.withType(JavaCompile) {
 		options.encoding = 'UTF-8'
+		options.compilerArgs << '-parameters' // jackson-module-parameter-names
 	}
 
 	// Common Dependencies

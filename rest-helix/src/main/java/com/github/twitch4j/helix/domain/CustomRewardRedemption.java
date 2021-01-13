@@ -1,10 +1,10 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -59,19 +59,11 @@ public class CustomRewardRedemption {
     /**
      * The redemption status.
      */
-    private Status status;
+    private RedemptionStatus status;
 
     /**
      * RFC3339 timestamp of when the reward was redeemed.
      */
     private Instant redeemedAt;
-
-    public enum Status {
-        UNFULFILLED,
-        FULFILLED,
-        CANCELED,
-        @JsonEnumDefaultValue
-        UNKNOWN
-    }
 
 }

@@ -2,8 +2,8 @@ package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.Contribution;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.StreamType;
-import com.github.twitch4j.helix.domain.CustomRewardRedemption;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@Tag("integration")
+@Tag("unittest")
 public class EventSubEventTest {
 
     @Test
@@ -143,7 +143,7 @@ public class EventSubEventTest {
         assertEquals("1234", event.getId());
         assertEquals("1337", event.getBroadcasterUserId());
         assertEquals("cool_user", event.getBroadcasterUserName());
-        assertEquals(CustomRewardRedemption.Status.FULFILLED, event.getStatus());
+        assertEquals(RedemptionStatus.FULFILLED, event.getStatus());
         assertNotNull(event.getReward());
         assertEquals("9001", event.getReward().getId());
         assertEquals(100, event.getReward().getCost());

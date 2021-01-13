@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@Tag("integration")
+@Tag("unittest")
 public class EventSubVerifierTest {
 
     @Test
