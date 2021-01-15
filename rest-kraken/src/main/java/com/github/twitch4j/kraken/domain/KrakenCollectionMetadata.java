@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Data
+@Setter(AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenCollectionMetadata {
 
@@ -16,7 +17,7 @@ public class KrakenCollectionMetadata {
     private String id;
 
     @JsonProperty("created_at")
-    private Instant createdAtInstant;
+    private Instant createdAt;
 
     @JsonProperty("items_count")
     private Integer itemsCount;
@@ -44,7 +45,7 @@ public class KrakenCollectionMetadata {
     private Integer totalDuration;
 
     @JsonProperty("updated_at")
-    private Instant updatedAtInstant;
+    private Instant updatedAt;
 
     @JsonProperty("views")
     private Integer views;

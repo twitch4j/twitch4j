@@ -10,14 +10,14 @@ import java.time.Instant;
 import java.util.List;
 
 @Data
+@Setter(AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenCollection {
 
     @JsonProperty("_id")
-    public String id;
+    private String id;
 
-    @JsonProperty("items")
-    public List<Video> items;
+    private List<Video> items;
 
     @Data
     @Setter(AccessLevel.PRIVATE)
@@ -40,7 +40,7 @@ public class KrakenCollection {
         private KrakenUser owner;
 
         @JsonProperty("published_at")
-        private Instant publishedAtInstant;
+        private Instant publishedAt;
 
         private Thumbnails thumbnails;
         private String title;
