@@ -181,6 +181,200 @@ public interface TwitchKraken {
     );
 
     /**
+     * Get Collection Metadata
+     * <p>
+     * Gets summary information about a specified collection.
+     *
+     * @param collectionID The ID of the collection. (Required)
+     * @return {@link KrakenCollectionMetadata}
+     */
+    @RequestLine("GET /collections/{collection_id}")
+    @Headers({
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<KrakenCollectionMetadata> getCollectionMetadata(
+        @Param("collection_id") String collectionID
+    );
+
+    /**
+     * Get Collection
+     * <p>
+     * Gets all items (videos) in a specified collection.
+     *
+     * @param collectionID The ID of the collection. (Required)
+     * @param includeAllItems If true, unwatchable VODs (private and/or in-process) are included in the response. (Optional)
+     * @return {@link KrakenCollection}
+     */
+    @RequestLine("GET /collections/{collection_id}/items?include_all_items={include_all_items}")
+    @Headers({
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<KrakenCollection> getCollection(
+        @Param("collection_id") String collectionID,
+        @Param("include_all_items") Boolean includeAllItems
+    );
+
+    /**
+     * Get Collections by Channel
+     * <p>
+     * Gets all collections owned by a specified channel.
+     *
+     * @param channelID The ID of the channel. (Required)
+     * @param limit Maximum number of most-recent objects to return. (Optional)
+     * @param cursor Tells the server where to start fetching the next set of results in a multi-page response. (Optional)
+     * @param videoID Returns only collections containing the specified video. (Optional)
+     * @return {@link KrakenCollectionList}
+     */
+    @RequestLine("GET /channels/{channel_id}/collections?limit={limit}&cursor={cursor}&containing_item={containing_item}")
+    @Headers({
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<KrakenCollectionList> getCollectionsByChannel(
+        @Param("channel_id") String channelID,
+        @Param("limit") Long limit,
+        @Param("cursor") String cursor,
+        @Param("containing_item") String videoID
+    );
+
+    /**
+     * Create Collection
+     * <p>
+     * Creates a new collection owned by a specified channel.
+     *
+     * @param channelID The ID of the channel. (Required)
+     * @param title The title of the collection. (Required)
+     * @return {@link KrakenCollectionList}
+     */
+    @RequestLine("POST /channels/{channel_id}/collections")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    @Body("%7B\"title\":\"{title}\"%7D")
+    HystrixCommand<KrakenCollectionMetadata> createCollection(
+        @Param("channel_id") String channelID,
+        @Param("title") String title
+    );
+
+    /**
+     * Update Collection
+     * <p>
+     * Updates the title of a specified collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @param title The new title of the collection. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("PUT /collections/{collection_id}")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    @Body("%7B\"title\":\"{title}\"%7D")
+    HystrixCommand<Void> updateCollection(
+        @Param("collection_id") String collectionID,
+        @Param("title") String title
+    );
+
+    /**
+     * Create Collection Thumbnail
+     * <p>
+     * Adds the thumbnail of a specified collection item as the thumbnail for the specified collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @param itemID The id of a video which must already be in the collection. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("PUT /collections/{collection_id}/thumbnail")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    @Body("%7B\"item_id\":\"{item_id}\"%7D")
+    HystrixCommand<Void> createCollectionThumbnail(
+        @Param("collection_id") String collectionID,
+        @Param("item_id") String itemID
+    );
+
+    /**
+     * Delete Collection
+     * <p>
+     * Deletes a specified collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("DELETE /collections/{collection_id}")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<Void> deleteCollection(
+        @Param("collection_id") String collectionID
+    );
+
+    /**
+     * Add Item to Collection
+     * <p>
+     * Adds a specified video to a specified collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @param itemID The id of a video. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("POST /collections/{collection_id}/items")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    @Body("%7B\"item_id\":\"{item_id}\"%7D, %7B\"type\":\"video\"%7D")
+    HystrixCommand<KrakenVideo> addItemToCollection(
+        @Param("collection_id") String collectionID,
+        @Param("item_id") String itemID
+    );
+
+    /**
+     * Delete Item from Collection
+     * <p>
+     * Deletes a specified collection item from a specified collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @param collectionItemID The id of a collection item. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("DELETE /collections/{collection_id}/items/{collection_item_id}")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    HystrixCommand<Void> deleteItemFromCollection(
+        @Param("collection_id") String collectionID,
+        @Param("collection_item_id") String collectionItemID
+    );
+
+    /**
+     * Move Item within Collection
+     * <p>
+     * Moves a specified collection item to a different position within a collection.
+     *
+     * @param collectionID The id of tne collection. (Required)
+     * @param collectionItemID The id of a collection item. (Required)
+     * @param position The new position of the item. (Required)
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("PUT /collections/{collection_id}/items/{collection_item_id}")
+    @Headers({
+        "Authorization: OAuth {token}",
+        "Accept: application/vnd.twitchtv.v5+json"
+    })
+    @Body("%7B\"position\":\"{position}\"%7D")
+    HystrixCommand<Void> moveItemWithinCollection(
+        @Param("collection_id") String collectionID,
+        @Param("collection_item_id") String collectionItemID,
+        @Param("position") Integer position
+    );
+
+    /**
      * Get User Block List
      * <p>
      * Gets a specified user’s block list. List sorted by recency, newest first.
