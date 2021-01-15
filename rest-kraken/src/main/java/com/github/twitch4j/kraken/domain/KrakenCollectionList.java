@@ -11,5 +11,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenCollectionList extends AbstractResultList {
-    private List<KrakenCollection> collections;
+    private List<KrakenCollectionMetadata> collections;
 }

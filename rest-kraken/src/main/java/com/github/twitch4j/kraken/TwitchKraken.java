@@ -252,6 +252,7 @@ public interface TwitchKraken {
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<KrakenCollectionMetadata> createCollection(
+        @Param("token") String token,
         @Param("channel_id") String channelID,
         @Param("title") String title
     );
@@ -272,6 +273,7 @@ public interface TwitchKraken {
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<Void> updateCollection(
+        @Param("token") String token,
         @Param("collection_id") String collectionID,
         @Param("title") String title
     );
@@ -292,6 +294,7 @@ public interface TwitchKraken {
     })
     @Body("%7B\"item_id\":\"{item_id}\"%7D")
     HystrixCommand<Void> createCollectionThumbnail(
+        @Param("token") String token,
         @Param("collection_id") String collectionID,
         @Param("item_id") String itemID
     );
@@ -310,6 +313,7 @@ public interface TwitchKraken {
         "Accept: application/vnd.twitchtv.v5+json"
     })
     HystrixCommand<Void> deleteCollection(
+        @Param("token") String token,
         @Param("collection_id") String collectionID
     );
 
@@ -329,6 +333,7 @@ public interface TwitchKraken {
     })
     @Body("%7B\"item_id\":\"{item_id}\"%7D, %7B\"type\":\"video\"%7D")
     HystrixCommand<KrakenVideo> addItemToCollection(
+        @Param("token") String token,
         @Param("collection_id") String collectionID,
         @Param("item_id") String itemID
     );
@@ -348,6 +353,7 @@ public interface TwitchKraken {
         "Accept: application/vnd.twitchtv.v5+json"
     })
     HystrixCommand<Void> deleteItemFromCollection(
+        @Param("token") String token,
         @Param("collection_id") String collectionID,
         @Param("collection_item_id") String collectionItemID
     );
@@ -369,6 +375,7 @@ public interface TwitchKraken {
     })
     @Body("%7B\"position\":\"{position}\"%7D")
     HystrixCommand<Void> moveItemWithinCollection(
+        @Param("token") String token,
         @Param("collection_id") String collectionID,
         @Param("collection_item_id") String collectionItemID,
         @Param("position") Integer position
