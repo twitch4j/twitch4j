@@ -201,17 +201,15 @@ public interface TwitchKraken {
      * <p>
      * Gets all items (videos) in a specified collection.
      *
-     * @param collectionID The ID of the collection. (Required)
-     * @param includeAllItems If true, unwatchable VODs (private and/or in-process) are included in the response. (Optional)
+     * @param collectionId The ID of the collection. (Required)
      * @return {@link KrakenCollection}
      */
-    @RequestLine("GET /collections/{collection_id}/items?include_all_items={include_all_items}")
+    @RequestLine("GET /collections/{collection_id}/items")
     @Headers({
         "Accept: application/vnd.twitchtv.v5+json"
     })
     HystrixCommand<KrakenCollection> getCollection(
-        @Param("collection_id") String collectionID,
-        @Param("include_all_items") Boolean includeAllItems
+        @Param("collection_id") String collectionId
     );
 
     /**
@@ -222,7 +220,7 @@ public interface TwitchKraken {
      * @param channelId The ID of the channel. (Required)
      * @param limit Maximum number of most-recent objects to return. (Optional)
      * @param cursor Tells the server where to start fetching the next set of results in a multi-page response. (Optional)
-     * @param videoId Returns only collections containing the specified video. (Optional)
+     * @param videoId Returns only collections containing the specified video. Example: "video:89917098". (Optional)
      * @return {@link KrakenCollectionList}
      */
     @RequestLine("GET /channels/{channel_id}/collections?limit={limit}&cursor={cursor}&containing_item={containing_item}")
@@ -249,7 +247,8 @@ public interface TwitchKraken {
     @RequestLine("POST /channels/{channel_id}/collections")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<KrakenCollectionMetadata> createCollection(
@@ -271,7 +270,8 @@ public interface TwitchKraken {
     @RequestLine("PUT /collections/{collection_id}")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<Void> updateCollection(
@@ -293,7 +293,8 @@ public interface TwitchKraken {
     @RequestLine("PUT /collections/{collection_id}/thumbnail")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
     })
     @Body("%7B\"item_id\":\"{item_id}\"%7D")
     HystrixCommand<Void> createCollectionThumbnail(
@@ -334,10 +335,11 @@ public interface TwitchKraken {
     @RequestLine("POST /collections/{collection_id}/items")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
     })
-    @Body("%7B\"id\":\"{id}\"%7D, %7B\"type\":\"video\"%7D")
-    HystrixCommand<KrakenVideo> addItemToCollection(
+    @Body("%7B\"id\":\"{id}\",\"type\":\"video\"%7D")
+    HystrixCommand<KrakenCollection.Video> addItemToCollection(
         @Param("token") String token,
         @Param("collection_id") String collectionId,
         @Param("id") String videoId
@@ -378,7 +380,8 @@ public interface TwitchKraken {
     @RequestLine("PUT /collections/{collection_id}/items/{collection_item_id}")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Accept: application/vnd.twitchtv.v5+json",
+        "Content-Type: application/json"
     })
     @Body("%7B\"position\":\"{position}\"%7D")
     HystrixCommand<Void> moveItemWithinCollection(
