@@ -1,11 +1,13 @@
 package com.github.twitch4j.helix.endpoints;
 
 import com.github.twitch4j.helix.TestUtils;
+import com.github.twitch4j.helix.domain.BlockedUserList;
 import com.github.twitch4j.helix.domain.ExtensionActiveList;
 import com.github.twitch4j.helix.domain.ExtensionList;
 import com.github.twitch4j.helix.domain.FollowList;
 import com.github.twitch4j.helix.domain.UserList;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -119,5 +121,31 @@ public class UsersServiceTest extends AbstractEndpointTest {
         assertTrue(resultList.getData().getOverlays().size() == 1, "Should always get 1 overlay!");
         assertTrue(resultList.getData().getComponents().size() == 2, "Should always get 2 components!");
     }
-}
 
+    @Test
+    @DisplayName("Get user block list")
+    public void getUserBlockList() {
+        BlockedUserList resultList = TestUtils.getTwitchHelixClient().getUserBlockList(TestUtils.getCredential().getAccessToken(), twitchUserId, null, null).execute();
+        assertNotNull(resultList);
+        assertNotNull(resultList.getBlocks());
+    }
+
+    @Test
+    @DisplayName("Block user")
+    @Disabled
+    public void blockUser() {
+        assertDoesNotThrow(() -> {
+            TestUtils.getTwitchHelixClient().blockUser(TestUtils.getCredential().getAccessToken(), "12427", null, null).execute();
+        });
+    }
+
+    @Test
+    @DisplayName("Unblock user")
+    @Disabled
+    public void unblockUser() {
+        assertDoesNotThrow(() -> {
+            TestUtils.getTwitchHelixClient().unblockUser(TestUtils.getCredential().getAccessToken(), "12427").execute();
+        });
+    }
+
+}
