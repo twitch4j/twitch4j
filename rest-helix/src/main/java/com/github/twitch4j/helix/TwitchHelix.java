@@ -506,6 +506,21 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of users who have editor permissions for a specific channel.
+     *
+     * @param authToken     Required: User access token of the broadcaster with the channel:read:editors scope.
+     * @param broadcasterId Required: Broadcaster’s user ID associated with the channel.
+     * @return ChannelEditorList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_EDITORS_READ
+     */
+    @RequestLine("GET /channels/editors?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChannelEditorList> getChannelEditors(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Creates a clip programmatically. This returns both an ID and an edit URL for the new clip.
      *
      * @param authToken     Auth Token
@@ -1043,6 +1058,61 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a specified user’s block list.
+     * <p>
+     * The list is sorted by when the block occurred in descending order (i.e. most recent block first).
+     *
+     * @param authToken Required: User Access Token with the user:read:blocked_users scope.
+     * @param userId    Required: User ID for a Twitch user.
+     * @param after     Optional: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return BlockedUserList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_READ
+     */
+    @RequestLine("GET /users/blocks?broadcaster_id={broadcaster_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BlockedUserList> getUserBlockList(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String userId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Blocks the specified user on behalf of the authenticated user.
+     *
+     * @param authToken     Required: User Access Token with the user:manage:blocked_users scope.
+     * @param targetUserId  Required: User ID of the user to be blocked.
+     * @param sourceContext Optional: Source context for blocking the user. Valid values: "chat", "whisper".
+     * @param reason        Optional: Reason for blocking the user. Valid values: "spam", "harassment", or "other".
+     * @return 204 No Content upon a successful call.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_MANAGE
+     */
+    @RequestLine("PUT /users/blocks?target_user_id={target_user_id}&source_context={source_context}&reason={reason}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> blockUser(
+        @Param("token") String authToken,
+        @Param("target_user_id") String targetUserId,
+        @Param("source_context") String sourceContext,
+        @Param("reason") String reason
+    );
+
+    /**
+     * Unblocks the specified user on behalf of the authenticated user.
+     *
+     * @param authToken    Required: User Access Token with the user:manage:blocked_users scope.
+     * @param targetUserId Required: User ID of the user to be unblocked.
+     * @return 204 No Content upon a successful call.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_MANAGE
+     */
+    @RequestLine("DELETE /users/blocks?target_user_id={target_user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> unblockUser(
+        @Param("token") String authToken,
+        @Param("target_user_id") String targetUserId
+    );
+
+    /**
      * Get Followers
      * <p>
      * Gets information on follow relationships between two Twitch users. Information returned is sorted in order, most recent follow first. This can return information like “who is lirik following,” “who is following lirik,” or “is user X following user Y.”
@@ -1204,6 +1274,24 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Deletes one or more videos. Videos are past broadcasts, Highlights, or uploads.
+     * <p>
+     * Invalid Video IDs will be ignored (i.e. IDs provided that do not have a video associated with it).
+     * If the OAuth user token does not have permission to delete even one of the valid Video IDs, no videos will be deleted and the response will return a 401.
+     *
+     * @param authToken Required: User OAuth token with the channel:manage:videos scope.
+     * @param ids       Required: ID of the video(s) to be deleted. Limit: 5.
+     * @return DeletedVideoList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIDEOS_MANAGE
+     */
+    @RequestLine("DELETE /videos?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<DeletedVideoList> deleteVideos(
+        @Param("token") String authToken,
+        @Param("id") List<String> ids
     );
 
     /**
