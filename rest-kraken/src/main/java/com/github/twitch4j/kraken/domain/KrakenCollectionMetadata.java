@@ -22,23 +22,10 @@ public class KrakenCollectionMetadata {
     @JsonProperty("items_count")
     private Integer itemsCount;
 
-    @JsonProperty("owner")
     private KrakenUser owner;
 
-    @JsonProperty("thumbnails")
-    private Thumbnail thumbnail;
+    private KrakenCollectionThumbnails thumbnails;
 
-    @Data
-    @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Thumbnail {
-        private String large;
-        private String medium;
-        private String small;
-        private String template;
-    }
-
-    @JsonProperty("title")
     private String title;
 
     @JsonProperty("total_duration")
@@ -47,6 +34,5 @@ public class KrakenCollectionMetadata {
     @JsonProperty("updated_at")
     private Instant updatedAt;
 
-    @JsonProperty("views")
     private Integer views;
 }

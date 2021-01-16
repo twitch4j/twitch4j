@@ -330,7 +330,7 @@ public interface TwitchKraken {
      * @param token User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
      * @param videoId The id of a video. (Required)
-     * @return {@link KrakenVideo}
+     * @return {@link KrakenCollectionItem}
      */
     @RequestLine("POST /collections/{collection_id}/items")
     @Headers({
@@ -339,7 +339,7 @@ public interface TwitchKraken {
         "Content-Type: application/json"
     })
     @Body("%7B\"id\":\"{id}\",\"type\":\"video\"%7D")
-    HystrixCommand<KrakenCollection.Video> addItemToCollection(
+    HystrixCommand<KrakenCollectionItem> addItemToCollection(
         @Param("token") String token,
         @Param("collection_id") String collectionId,
         @Param("id") String videoId
