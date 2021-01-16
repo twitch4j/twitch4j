@@ -2,12 +2,16 @@ package com.github.twitch4j.graphql.command;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.api.Error;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * GraphQL Base HystrixCommand
@@ -39,7 +43,7 @@ public abstract class BaseCommand<T extends Operation.Data> extends HystrixComma
      *
      * @return ApolloCall
      */
-    protected abstract ApolloCall getGraphQLCall();
+    protected abstract ApolloCall<T> getGraphQLCall();
 
     /**
      * Run Command
@@ -48,42 +52,38 @@ public abstract class BaseCommand<T extends Operation.Data> extends HystrixComma
      */
     @Override
     protected T run() {
+        CountDownLatch latch = new CountDownLatch(1);
+
         // Run GraphQL Call
         getGraphQLCall().enqueue(new ApolloCall.Callback<T>() {
             @Override
             public void onResponse(@NotNull Response<T> response) {
-                if (response.errors().size() > 0) {
-                    throw new RuntimeException("GraphQL API: " + response.errors().toString());
+                List<Error> errors = response.getErrors();
+                if (errors != null && errors.size() > 0) {
+                    throw new RuntimeException("GraphQL API: " + errors.toString());
                 }
 
-                resultData = response.data();
+                resultData = response.getData();
+                latch.countDown();
             }
 
             @Override
             public void onFailure(@NotNull ApolloException e) {
-                throw new RuntimeException(e);
+                try {
+                    throw new RuntimeException(e);
+                } finally {
+                    latch.countDown();
+                }
             }
         });
 
         // block until we've got a result
-        block();
+        try {
+            latch.await();
+        } catch (Exception ex) {
+            // nothing
+        }
+
         return resultData;
-    }
-
-    /**
-     * Block until we get a result
-     */
-    private void block() {
-        do {
-            if (resultData != null) {
-                return;
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (Exception ex) {
-                // nothing
-            }
-        } while (true);
     }
 }

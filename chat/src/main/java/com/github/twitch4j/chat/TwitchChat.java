@@ -3,7 +3,6 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
@@ -21,10 +20,7 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
-import io.github.bucket4j.local.LocalBucketBuilder;
 import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
-public class TwitchChat implements AutoCloseable {
+public class TwitchChat implements ITwitchChat {
 
     public static final int REQUIRED_THREAD_COUNT = 2;
 
@@ -147,16 +143,6 @@ public class TwitchChat implements AutoCloseable {
     protected final BlockingQueue<String> whisperCommandQueue;
 
     /**
-     * Custom RateLimit for ChatMessages
-     */
-    protected final Bandwidth chatRateLimit;
-
-    /**
-     * Custom RateLimit for Whispers
-     */
-    protected final Bandwidth[] whisperRateLimit;
-
-    /**
      * IRC Command Queue Thread
      */
     protected final ScheduledFuture<?> queueThread;
@@ -193,6 +179,16 @@ public class TwitchChat implements AutoCloseable {
     protected final WebSocketFactory webSocketFactory;
 
     /**
+     * Whether one's own channel should automatically be joined
+     */
+    protected final boolean autoJoinOwnChannel;
+
+    /**
+     * Whether JOIN/PART events should be enabled
+     */
+    protected final boolean enableMembershipEvents;
+
+    /**
      * Helper class to compute delays between connection retries.
      *
      * @see <a href="https://dev.twitch.tv/docs/irc/guide#re-connecting-to-twitch-irc">Official suggestion</a>
@@ -220,14 +216,16 @@ public class TwitchChat implements AutoCloseable {
      * @param sendCredentialToThirdPartyHost Whether the password should be sent when the baseUrl is not official
      * @param commandPrefixes Command Prefixes
      * @param chatQueueSize Chat Queue Size
-     * @param chatRateLimit Bandwidth / Bucket for chat
-     * @param whisperRateLimit Bandwidth / Buckets for whispers
+     * @param ircMessageBucket Bucket for chat
+     * @param ircWhisperBucket Bucket for whispers
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param chatQueueTimeout Timeout to wait for events in Chat Queue
      * @param proxyConfig Proxy Configuration
+     * @param autoJoinOwnChannel Whether one's own channel should automatically be joined
+     * @param enableMembershipEvents Whether JOIN/PART events should be enabled
      * @param botOwnerIds Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bandwidth chatRateLimit, Bandwidth[] whisperRateLimit, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -237,10 +235,12 @@ public class TwitchChat implements AutoCloseable {
         this.botOwnerIds = botOwnerIds;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.whisperCommandQueue = new LinkedBlockingQueue<>();
-        this.chatRateLimit = chatRateLimit;
-        this.whisperRateLimit = whisperRateLimit;
+        this.ircMessageBucket = ircMessageBucket;
+        this.ircWhisperBucket = ircWhisperBucket;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
+        this.autoJoinOwnChannel = autoJoinOwnChannel;
+        this.enableMembershipEvents = enableMembershipEvents;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -269,17 +269,6 @@ public class TwitchChat implements AutoCloseable {
 
         // register event listeners
         IRCEventHandler ircEventHandler = new IRCEventHandler(this);
-
-        // initialize rate-limiting
-        this.ircMessageBucket = Bucket4j.builder()
-            .addLimit(this.chatRateLimit)
-            .build();
-
-        final LocalBucketBuilder whisperBucketBuilder = Bucket4j.builder();
-        for (Bandwidth bandwidth : whisperRateLimit) {
-            whisperBucketBuilder.addLimit(bandwidth);
-        }
-        this.ircWhisperBucket = whisperBucketBuilder.build();
 
         // connect to irc
         this.connect();
@@ -342,7 +331,7 @@ public class TwitchChat implements AutoCloseable {
         log.debug("Registering the following command triggers: " + commandPrefixes.toString());
 
         // register event handler
-        eventManager.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
+        eventManager.onEvent("twitch4j-chat-command-trigger", ChannelMessageEvent.class, this::onChannelMessage);
         eventManager.onEvent(IRCMessageEvent.class, event -> {
             // we get at least one room state event with channel name + id when we join a channel, so we cache that to provide channel id + name for all events
             if ("ROOMSTATE".equalsIgnoreCase(event.getCommandType())) {
@@ -442,7 +431,7 @@ public class TwitchChat implements AutoCloseable {
                     log.info("Connecting to Twitch IRC {}", baseUrl);
 
                     // acquire capabilities
-                    sendTextToWebSocket("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership", true);
+                    sendTextToWebSocket("CAP REQ :twitch.tv/tags twitch.tv/commands" + (enableMembershipEvents ? " twitch.tv/membership" : ""), true);
                     sendTextToWebSocket("CAP END", true);
 
                     // sign in
@@ -465,7 +454,8 @@ public class TwitchChat implements AutoCloseable {
 
                     // then join to own channel - required for sending or receiving whispers
                     if (chatCredential != null && chatCredential.getUserName() != null) {
-                        joinChannel(chatCredential.getUserName().toLowerCase());
+                        if (autoJoinOwnChannel)
+                            joinChannel(chatCredential.getUserName().toLowerCase());
                     } else {
                         log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
                     }
@@ -593,6 +583,7 @@ public class TwitchChat implements AutoCloseable {
      * Joining the channel
      * @param channelName channel name
      */
+    @Override
     public void joinChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
 
@@ -613,7 +604,8 @@ public class TwitchChat implements AutoCloseable {
      * leaving the channel
      * @param channelName channel name
      */
-    public void leaveChannel(String channelName) {
+    @Override
+    public boolean leaveChannel(String channelName) {
         String lowerChannelName = channelName.toLowerCase();
 
         channelCacheLock.lock();
@@ -625,8 +617,11 @@ public class TwitchChat implements AutoCloseable {
                 // clear cache
                 String cachedId = channelNameToChannelId.remove(lowerChannelName);
                 if (cachedId != null) channelIdToChannelName.remove(cachedId);
+
+                return true;
             } else {
                 log.warn("Already left channel {}", channelName);
+                return false;
             }
         } finally {
             channelCacheLock.unlock();
@@ -638,8 +633,9 @@ public class TwitchChat implements AutoCloseable {
      * @param channel channel name
      * @param message message
      */
-    public void sendMessage(String channel, String message) {
-        this.sendMessage(channel, message, null);
+    @Override
+    public boolean sendMessage(String channel, String message) {
+        return this.sendMessage(channel, message, null);
     }
 
     /**
@@ -651,11 +647,11 @@ public class TwitchChat implements AutoCloseable {
      * @param replyMsgId the msgId of the parent message being replied to (optional).
      */
     @Unofficial
-    public void sendMessage(String channel, String message, String nonce, String replyMsgId) {
+    public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
         final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
         if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
         if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
-        this.sendMessage(channel, message, tags);
+        return this.sendMessage(channel, message, tags);
     }
 
     /**
@@ -665,7 +661,7 @@ public class TwitchChat implements AutoCloseable {
      * @param message the message to be sent.
      * @param tags    the message tags (unofficial).
      */
-    public void sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
+    public boolean sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {
             sb.append('@');
@@ -675,7 +671,7 @@ public class TwitchChat implements AutoCloseable {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        ircCommandQueue.offer(sb.toString());
+        return ircCommandQueue.offer(sb.toString());
     }
 
     /**
@@ -687,60 +683,6 @@ public class TwitchChat implements AutoCloseable {
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
         whisperCommandQueue.offer(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message));
-    }
-
-    /**
-     * Deletes a message.
-     *
-     * @param channel     the name of the channel to delete the message from.
-     * @param targetMsgId the unique id of the message to be deleted.
-     * @see IRCMessageEvent#getMessageId()
-     */
-    public void delete(String channel, String targetMsgId) {
-        sendMessage(channel, String.format("/delete %s", targetMsgId));
-    }
-
-    /**
-     * Timeout a user
-     *
-     * @param channel channel
-     * @param user username
-     * @param duration duration
-     * @param reason reason
-     */
-    public void timeout(String channel, String user, Duration duration, String reason) {
-        StringBuilder sb = new StringBuilder(user).append(' ').append(duration.getSeconds());
-        if (reason != null) {
-            sb.append(" ").append(reason);
-        }
-
-        sendMessage(channel, String.format("/timeout %s", sb.toString()));
-    }
-
-    /**
-     * Ban a user
-     *
-     * @param channel channel
-     * @param user username
-     * @param reason reason
-     */
-    public void ban(String channel, String user, String reason) {
-        StringBuilder sb = new StringBuilder(user);
-        if (reason != null) {
-            sb.append(" ").append(reason);
-        }
-
-        sendMessage(channel, String.format("/ban %s", sb.toString()));
-    }
-
-    /**
-     * Unban a user
-     *
-     * @param channel channel
-     * @param user username
-     */
-    public void unban(String channel, String user) {
-        sendMessage(channel, String.format("/unban %s", user));
     }
 
     /**
@@ -773,18 +715,14 @@ public class TwitchChat implements AutoCloseable {
     /**
      * Close
      */
+    @Override
     public void close() {
         this.stopQueueThread = true;
         queueThread.cancel(false);
         this.disconnect();
     }
 
-    /**
-     * Check if Chat is currently in a channel
-     *
-     * @param channelName channel to check (without # prefix)
-     * @return boolean
-     */
+    @Override
     public boolean isChannelJoined(String channelName) {
         return currentChannels.contains(channelName.toLowerCase());
     }
@@ -800,11 +738,7 @@ public class TwitchChat implements AutoCloseable {
         return Collections.unmodifiableList(new ArrayList<>(currentChannels));
     }
 
-    /**
-     * Returns a set of all currently joined channels (without # prefix)
-     *
-     * @return a set of channel names
-     */
+    @Override
     public Set<String> getChannels() {
         return Collections.unmodifiableSet(currentChannels);
     }

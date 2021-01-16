@@ -2,9 +2,7 @@ package com.github.twitch4j.pubsub;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -30,9 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Twitch PubSub
  */
 @Slf4j
-public class TwitchPubSub implements AutoCloseable {
+public class TwitchPubSub implements ITwitchPubSub {
 
     public static final int REQUIRED_THREAD_COUNT = 1;
 
@@ -524,6 +520,22 @@ public class TwitchPubSub implements AutoCloseable {
                             } else if (topic.startsWith("polls")) {
                                 PollData pollData = TypeConvert.convertValue(msgData.path("poll"), PollData.class);
                                 eventManager.publish(new PollsEvent(type, pollData));
+                            } else if (topic.startsWith("predictions-channel-v1")) {
+                                if ("event-created".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, PredictionCreatedEvent.class));
+                                } else if ("event-updated".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, PredictionUpdatedEvent.class));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
+                            } else if (topic.startsWith("predictions-user-v1")) {
+                                if ("prediction-made".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, UserPredictionMadeEvent.class));
+                                } else if ("prediction-result".equals(type)) {
+                                    eventManager.publish(TypeConvert.convertValue(msgData, UserPredictionResultEvent.class));
+                                } else {
+                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("friendship")) {
                                 eventManager.publish(new FriendshipEvent(TypeConvert.jsonToObject(rawMessage, FriendshipData.class)));
                             } else if (topic.startsWith("presence")) {
@@ -594,6 +606,8 @@ public class TwitchPubSub implements AutoCloseable {
                             }
 
                         } else if (message.getType().equals(PubSubType.RESPONSE)) {
+                            eventManager.publish(new PubSubListenResponseEvent(message.getNonce(), message.getError()));
+
                             // topic subscription success or failed, response to listen command
                             // System.out.println(message.toString());
                             if (message.getError().length() > 0) {
@@ -672,440 +686,39 @@ public class TwitchPubSub implements AutoCloseable {
             taskExecutor.schedule(this.flushCommand, 50L, TimeUnit.MILLISECONDS); // allow for some accumulation of requests before flushing
     }
 
-    /**
-     * Send WS Message to subscribe to a topic
-     *
-     * @param request Topic
-     * @return PubSubSubscription
-     */
+    @Override
     public PubSubSubscription listenOnTopic(PubSubRequest request) {
         if (subscribedTopics.add(request))
             queueRequest(request);
         return new PubSubSubscription(request);
     }
 
-    public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, List<String> topics) {
-        PubSubRequest request = new PubSubRequest();
-        request.setType(type);
-        request.setNonce(CryptoUtils.generateNonce(30));
-        request.getData().put("auth_token", credential != null ? credential.getAccessToken() : "");
-        request.getData().put("topics", topics);
-
-        return listenOnTopic(request);
-    }
-
-    public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, String topic) {
-        return listenOnTopic(type, credential, Collections.singletonList(topic));
-    }
-
-    public PubSubSubscription listenOnTopic(PubSubType type, OAuth2Credential credential, String... topics) {
-        return listenOnTopic(type, credential, Arrays.asList(topics));
-    }
-
-    /**
-     * Unsubscribe from a topic.
-     * Usage example:
-     * <pre>
-     *      PubSubSubscription subscription = twitchPubSub.listenForCheerEvents(...);
-     *      // ...
-     *      twitchPubSub.unsubscribeFromTopic(subscription);
-     * </pre>
-     *
-     * @param subscription Subscription
-     */
-    public void unsubscribeFromTopic(PubSubSubscription subscription) {
+    @Override
+    public boolean unsubscribeFromTopic(PubSubSubscription subscription) {
         PubSubRequest request = subscription.getRequest();
         if (request.getType() != PubSubType.LISTEN) {
             log.warn("Cannot unsubscribe using request with unexpected type: {}", request.getType());
-            return;
+            return false;
         }
         boolean removed = subscribedTopics.remove(request);
         if (!removed) {
             log.warn("Not subscribed to topic: {}", request);
-            return;
+            return false;
         }
 
         // use data from original request and send UNLISTEN
         PubSubRequest unlistenRequest = new PubSubRequest();
         unlistenRequest.setType(PubSubType.UNLISTEN);
-        unlistenRequest.setNonce(CryptoUtils.generateNonce(32));
+        unlistenRequest.setNonce(CryptoUtils.generateNonce(30));
         unlistenRequest.setData(request.getData());
         queueRequest(unlistenRequest);
-    }
-
-    /**
-     * Event Listener: User earned a new Bits badge and shared the notification with chat
-     *
-     * @param credential Credential (for target channel id, scope: bits:read)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + channelId);
-    }
-
-    /**
-     * Event Listener: Anyone cheers on a specified channel.
-     *
-     * @param credential Credential (for target channel id, scope: bits:read)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + channelId);
-    }
-
-    /**
-     * Event Listener: Anyone subscribes (first month), resubscribes (subsequent months), or gifts a subscription to a channel.
-     *
-     * @param credential Credential (for targetChannelId, scope: channel_subscriptions)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + channelId);
-    }
-
-    /**
-     * Event Listener: Anyone makes a purchase on a channel.
-     *
-     * @param credential Credential (any)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    @Deprecated
-    public PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + channelId);
-    }
-
-    /**
-     * Event Listener: Anyone whispers the specified user.
-     *
-     * @param credential Credential (for targetUserId, scope: whispers:read)
-     * @param userId     Target User Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForWhisperEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "whispers." + userId);
-    }
-
-    /**
-     * Event Listener: A moderator performs an action in the channel
-     *
-     * @param credential Credential (for channelId, scope: channel:moderate)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "chat_moderator_actions." + channelId);
-    }
-
-    /**
-     * Event Listener: A moderator performs an action in the channel
-     *
-     * @param credential Credential (for userId, scope: channel:moderate)
-     * @param channelId  The user id associated with the target channel
-     * @param userId     The user id associated with the credential
-     * @return PubSubSubscription
-     */
-    @Unofficial
-    public PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String channelId, String userId) {
-        return listenForModerationEvents(credential, channelId + "." + userId);
-    }
-
-    /**
-     * Event Listener: Anyone makes a channel points redemption on a channel.
-     *
-     * @param credential Credential (with the channel:read:redemptions scope for maximum information)
-     * @param channelId  Target Channel Id
-     * @return PubSubSubscription
-     */
-    public PubSubSubscription listenForChannelPointsRedemptionEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "community-points-channel-v1." + channelId);
-    }
-
-    /*
-     * Undocumented topics - Use at your own risk
-     */
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ads." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForAdPropertyRefreshEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "ad-property-refresh." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForBountyBoardEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bounty-board-events.cta." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForDashboardActivityFeedEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "dashboard-activity-feed." + userId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForUserChannelPointsEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "community-points-user-v1." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForChannelDropEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-drop-events." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenForChannelBitsLeaderboardEvents(credential, channelId, "WEEK");
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelBitsLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
-        return listenForChannelBitsLeaderboardEvents(credential, channelId, "MONTH");
-    }
-
-    @Unofficial
-    private PubSubSubscription listenForChannelBitsLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForChannelPrimeGiftStatusEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-prime-gifting-status." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenForChannelSubLeaderboardEvents(credential, channelId, "WEEK");
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelSubLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
-        return listenForChannelSubLeaderboardEvents(credential, channelId, "MONTH");
-    }
-
-    @Unofficial
-    private PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForLeaderboardEvents(OAuth2Credential credential, String channelId) {
-        return listenForLeaderboardEvents(credential, channelId, "WEEK");
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForLeaderboardMonthlyEvents(OAuth2Credential credential, String channelId) {
-        return listenForLeaderboardEvents(credential, channelId, "MONTH");
-    }
-
-    @Unofficial
-    private PubSubSubscription listenForLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
-        return listenOnTopic(
-            PubSubType.LISTEN,
-            credential,
-            "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit,
-            "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit
-        );
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelSubGiftsEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-sub-gifts-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForChannelSquadEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-squad-updates." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForRaidEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "raid." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForChannelUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-unban-requests." + userId + '.' + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForUserUnbanRequestEvents(OAuth2Credential credential, String userId, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-unban-requests." + userId + '.' + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-ext-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForExtensionControlEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "extension-control." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForHypeTrainEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForHypeTrainRewardEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1.rewards." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForBroadcastSettingUpdateEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "broadcast-settings-update." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForCelebrationEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "celebration-events-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForPublicBitEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-bit-events-public." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForPublicCheerEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "channel-cheer-events-public-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForStreamChangeEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "stream-change-by-channel." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForStreamChatRoomEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "stream-chat-room-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForChannelChatroomEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-channel-v1." + channelId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserChatroomEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-user-v1." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserBitsUpdateEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-bits-updates-v1." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserCampaignEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-campaign-events." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserDropEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-drop-events." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserPropertiesUpdateEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-properties-update." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserSubscribeEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-subscribe-events-v1." + userId);
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForUserImageUpdateEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-image-update." + userId);
-    }
-
-    /**
-     * Event Listener: Anyone follows the specified channel.
-     *
-     * @param credential {@link OAuth2Credential}
-     * @param channelId  the id for the channel
-     * @return PubSubSubscription
-     */
-    @Unofficial
-    public PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "following." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForFriendshipEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "friendship." + userId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForOnsiteNotificationEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "onsite-notifications." + userId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForPollEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "polls." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForVideoPlaybackEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "video-playback-by-id." + channelId);
-    }
-
-    @Unofficial
-    public PubSubSubscription listenForVideoPlaybackByNameEvents(OAuth2Credential credential, String channelName) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "video-playback." + channelName.toLowerCase());
-    }
-
-    @Unofficial
-    @Deprecated
-    public PubSubSubscription listenForWatchPartyEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "pv-watch-party-events." + channelId);
+        return true;
     }
 
     /**
      * Close
      */
+    @Override
     public void close() {
         if (!isClosed) {
             isClosed = true;

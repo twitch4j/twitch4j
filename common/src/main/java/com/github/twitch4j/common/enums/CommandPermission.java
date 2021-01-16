@@ -42,6 +42,16 @@ public enum CommandPermission {
     CURRENT_HYPE_TRAIN_CONDUCTOR,
 
     /**
+     * Participated in the most recent predictions event for the blue/first option
+     */
+    PREDICTIONS_BLUE,
+
+    /**
+     * Participated in the most recent predictions event for the pink/second option
+     */
+    PREDICTIONS_PINK,
+
+    /**
      * VIP
      */
     VIP,
