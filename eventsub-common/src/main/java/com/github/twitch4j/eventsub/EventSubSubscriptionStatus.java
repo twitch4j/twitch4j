@@ -1,8 +1,7 @@
 package com.github.twitch4j.eventsub;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 public enum EventSubSubscriptionStatus {
+
     /**
      * Designates that the subscription is in an operable state and is valid.
      */
@@ -31,21 +30,6 @@ public enum EventSubSubscriptionStatus {
     @Override
     public String toString() {
         return this.name().toLowerCase();
-    }
-
-    private static final EventSubSubscriptionStatus[] STATUSES = values();
-
-    @JsonCreator
-    public static EventSubSubscriptionStatus fromString(String str) {
-        if (str != null) {
-            final String upper = str.toUpperCase();
-            for (EventSubSubscriptionStatus status : STATUSES) {
-                if (upper.equals(status.name()))
-                    return status;
-            }
-        }
-
-        return null;
     }
 
 }

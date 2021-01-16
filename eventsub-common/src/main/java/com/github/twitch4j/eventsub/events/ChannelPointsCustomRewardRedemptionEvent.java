@@ -1,8 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
@@ -38,7 +36,6 @@ public abstract class ChannelPointsCustomRewardRedemptionEvent extends EventSubU
     /**
      * Defaults to unfulfilled. Possible values are unknown, unfulfilled, fulfilled, and canceled.
      */
-    @JsonIgnore
     private RedemptionStatus status;
 
     /**
@@ -50,14 +47,5 @@ public abstract class ChannelPointsCustomRewardRedemptionEvent extends EventSubU
      * RFC3339 timestamp of when the reward was redeemed.
      */
     private Instant redeemedAt;
-
-    @JsonProperty("status")
-    private void unpackStatus(String status) {
-        try {
-            this.status = RedemptionStatus.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            this.status = RedemptionStatus.UNKNOWN;
-        }
-    }
 
 }

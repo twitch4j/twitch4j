@@ -1,9 +1,11 @@
 package com.github.twitch4j.common.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import lombok.Getter;
 
 public class TypeConvert {
@@ -12,9 +14,12 @@ public class TypeConvert {
      * ObjectMapper
      */
     @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new ParameterNamesModule())
-        .registerModule(new JavaTimeModule());
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
+        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+        .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .addModule(new JavaTimeModule())
+        .build();
 
     public static String objectToJson(Object object) {
         try {

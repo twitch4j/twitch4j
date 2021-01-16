@@ -87,7 +87,6 @@ subprojects {
 
 			// Jackson (JSON)
 			api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
-			api group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.11.3'
 			api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.11.3'
 
 			// WebSocket
@@ -101,7 +100,6 @@ subprojects {
 	// Source encoding
 	tasks.withType(JavaCompile) {
 		options.encoding = 'UTF-8'
-		options.compilerArgs << '-parameters' // jackson-module-parameter-names
 	}
 
 	// Common Dependencies

@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
@@ -45,6 +46,7 @@ public class EventSubSubscription {
      */
     @JsonIgnore
     @ToString.Exclude
+    @Getter(onMethod_ = { @JsonIgnore })
     private SubscriptionType<?, ?, ?> type;
 
     /**
@@ -75,7 +77,8 @@ public class EventSubSubscription {
     private String rawVersion;
 
     @JsonCreator
-    public EventSubSubscription(String id, EventSubSubscriptionStatus status, String type, String version, Map<String, Object> condition, Instant createdAt, EventSubTransport transport) {
+    public EventSubSubscription(@JsonProperty("id") String id, @JsonProperty("status") EventSubSubscriptionStatus status, @JsonProperty("type") String type, @JsonProperty("version") String version,
+                                @JsonProperty("condition") Map<String, Object> condition, @JsonProperty("created_at") Instant createdAt, @JsonProperty("transport") EventSubTransport transport) {
         this.id = id;
         this.status = status;
         this.rawType = type;
