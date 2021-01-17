@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
@@ -19,7 +19,7 @@ public class TypeConvert {
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+        .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
         .addModule(new JavaTimeModule())
         .build();
 
