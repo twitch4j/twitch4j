@@ -164,7 +164,7 @@ public interface TwitchHelix {
     /**
      * Deletes a Custom Reward on a channel.
      * <p>
-     * Only rewards created by the same client_id can be deleted.
+     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be deleted.
      * Any UNFULFILLED Custom Reward Redemptions of the deleted Custom Reward will be updated to the FULFILLED status.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
@@ -183,7 +183,7 @@ public interface TwitchHelix {
     /**
      * Returns a list of Custom Reward objects for the Custom Rewards on a channel.
      * <p>
-     * Developers only have access to update and delete rewards that the same/calling client_id created.
+     * Developers only have access to update and delete rewards that were created manually by a broadcaster in the Creator Dashboard or created programmatically by the same/calling client_id.
      * <p>
      * There is a limit of 50 Custom Rewards on a channel at a time. This includes both enabled and disabled Custom Rewards.
      *
@@ -204,6 +204,8 @@ public interface TwitchHelix {
 
     /**
      * Returns Custom Reward Redemption objects for a Custom Reward on a channel that was created by the same client_id.
+     * <p>
+     * Developers only have access to get and update redemptions for the rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -231,7 +233,7 @@ public interface TwitchHelix {
     /**
      * Updates a Custom Reward created on a channel.
      * <p>
-     * Only rewards created by the same client_id can be updated.
+     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be updated.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -254,7 +256,7 @@ public interface TwitchHelix {
     /**
      * Updates the status of Custom Reward Redemption objects on a channel that are in the UNFULFILLED status.
      * <p>
-     * Only redemptions for a reward created by the same client_id as attached to the access token can be updated.
+     * Only redemptions for a reward created manually by a broadcaster in the Creator Dashboard, or created programmatically by the same client_id as attached to the access token can be updated.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
