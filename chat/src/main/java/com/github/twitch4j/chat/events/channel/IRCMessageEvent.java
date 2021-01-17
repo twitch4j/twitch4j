@@ -13,7 +13,6 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +24,10 @@ import java.util.regex.Pattern;
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
+
+    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
+    private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
+    private static final Pattern CLIENT_PATTERN = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
 
     @Unofficial
     public static final String NONCE_TAG_NAME = "client-nonce";
@@ -140,8 +143,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	@SuppressWarnings("unchecked")
 	private void parseRawMessage() {
 		// Parse Message
-		Pattern pattern = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
-		Matcher matcher = pattern.matcher(rawMessage);
+		Matcher matcher = MESSAGE_PATTERN.matcher(rawMessage);
 		if (matcher.matches()) {
 			// Parse Tags
 			tags = parseTags(matcher.group("tags"));
@@ -155,8 +157,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		}
 
 		// Parse Message - Whisper
-		Pattern patternPM = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
-		Matcher matcherPM = patternPM.matcher(rawMessage);
+		Matcher matcherPM = WHISPER_PATTERN.matcher(rawMessage);
 		if (matcherPM.matches()) {
 			// Parse Tags
 			tags = parseTags(matcherPM.group("tags"));
@@ -200,8 +201,7 @@ public class IRCMessageEvent extends TwitchEvent {
 			return Optional.empty();
 		}
 
-		Pattern pattern = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
-		Matcher matcher = pattern.matcher(raw);
+		Matcher matcher = CLIENT_PATTERN.matcher(raw);
 		if(matcher.matches()) {
 			return Optional.ofNullable(matcher.group(1));
 		}

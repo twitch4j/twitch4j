@@ -41,6 +41,9 @@ public class Stream {
     /** ID of the game being played on the stream. */
     private String gameId;
 
+    /** Name of the game being played. */
+    private String gameName;
+
     /** Array of community IDs. */
     @Deprecated
     private List<UUID> communityIds;

@@ -1,3 +1,5 @@
+import java.util.jar.JarFile
+
 /**
  * Artifact
  */
@@ -17,6 +19,35 @@ targetCompatibility = 1.8
 extensions.configure(JavaPluginExtension) {
 	it.withSourcesJar()
 	it.withJavadocJar()
+}
+
+// Shadow Jar
+shadowJar {
+	archiveClassifier.set('shaded')
+
+	def packages = [] as Set<String>
+	configurations.each { configuration ->
+		configuration.files.each { jar ->
+			if (jar.exists()) {
+				JarFile jf = new JarFile(jar)
+				jf.entries().each { entry ->
+					if (entry.name.endsWith(".class")) {
+						packages << entry.name[0..entry.name.lastIndexOf('/')-1].replaceAll('/', '.')
+					}
+				}
+				jf.close()
+			}
+		}
+	}
+	packages.each {
+		relocate(it, "com.github.twitch4j.shaded.${archiveVersion.get().replace(".", "_")}.${it}") {
+			exclude 'com.github.twitch4j'
+		}
+	}
+
+	manifest {
+		inheritFrom jar.manifest
+	}
 }
 
 /**

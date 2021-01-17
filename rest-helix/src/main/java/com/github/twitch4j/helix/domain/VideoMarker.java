@@ -41,6 +41,7 @@ public class VideoMarker {
     private String position_seconds;
 
     /** A link to the stream with a query parameter that is a timestamp of the marker’s location. */
+    @JsonProperty("URL")
     private String url;
 
     /**

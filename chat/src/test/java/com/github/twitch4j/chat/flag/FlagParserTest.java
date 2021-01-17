@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@Tag("integration")
+@Tag("unittest")
 public class FlagParserTest {
 
     @Test
