@@ -27,15 +27,14 @@ public class ChannelInformation {
     private String broadcasterId;
 
     /**
-     * Twitch User Name of this channel owner
-     * <p>
-     * Note: Not adequately documented by Twitch, yet is available in {@link TwitchHelix#getChannelInformation(String, List)}.
-     * Note: Appears to return the display_name instead of login
+     * Twitch User Display Name of this channel owner
      */
     private String broadcasterName;
 
     /**
      * Language of the channel
+     * <p>
+     * A language value is either the ISO 639-1 two-letter code for a supported stream language or “other”
      */
     private String broadcasterLanguage;
 

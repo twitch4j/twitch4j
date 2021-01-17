@@ -9,6 +9,9 @@ dependencies {
 	// Cache
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
+	// Cache
+	api(group = "org.jetbrains", name = "annotations")
+
 	// Twitch4J Modules
 	api(project(":common"))
 	api(project(":auth"))

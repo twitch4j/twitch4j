@@ -21,8 +21,8 @@ public class CommandFollowUser extends BaseCommand<FollowMutation.Data> {
     }
 
     @Override
-    protected ApolloCall getGraphQLCall() {
-        ApolloCall apolloCall = apolloClient.mutate(
+    protected ApolloCall<FollowMutation.Data> getGraphQLCall() {
+        ApolloCall<FollowMutation.Data> apolloCall = apolloClient.mutate(
             FollowMutation.builder()
                 .followUserInput(
                     FollowUserInput.builder()

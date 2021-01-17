@@ -1,21 +1,11 @@
-// Buildscript
-buildscript {
-	repositories {
-		jcenter()
-		maven("https://maven.google.com")
-	}
-	dependencies {
-		classpath("com.apollographql.apollo:apollo-gradle-plugin:1.2.2")
-	}
-}
-
 // Plugins
-apply(plugin = "com.apollographql.android")
-
+plugins {
+	id("com.apollographql.apollo") version "2.5.2"
+}
 // Dependencies
 dependencies {
 	// GraphQL
-	api(group = "com.apollographql.apollo", name = "apollo-runtime", version = "1.2.2")
+	api(group = "com.apollographql.apollo", name = "apollo-runtime")
 	api(group = "org.jetbrains", name = "annotations")
 
 	// Hystrix
@@ -24,6 +14,11 @@ dependencies {
 	// Twitch4J Modules
 	api(project(":common"))
 	api(project(":auth"))
+}
+
+tasks.withType<Javadoc> {
+	// Ignore auto-generated files from apollo graphql
+	exclude("com/github/twitch4j/graphql/internal/**")
 }
 
 publishing.publications.withType<MavenPublication> {

@@ -1,12 +1,15 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.enums.SubscriptionType;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.Month;
 
 @Data
@@ -42,7 +45,8 @@ public class SubscriptionData {
     /**
      * RFC 3339 timestamp of when the subscription took place
      */
-    private String time;
+    @JsonProperty("time")
+    private Instant timestamp;
 
     /**
      * The type of subscription plan that was purchased
@@ -134,6 +138,16 @@ public class SubscriptionData {
      */
     public Month getBenefitEndMonth() {
         return benefitEndMonth != null && benefitEndMonth > 0 ? Month.of(benefitEndMonth) : null;
+    }
+
+    /**
+     * @return RFC 3339 timestamp of when the subscription took place
+     * @deprecated in favor of getTimestamp()
+     */
+    @JsonIgnore
+    @Deprecated
+    public String getTime() {
+        return timestamp.toString();
     }
 
 }

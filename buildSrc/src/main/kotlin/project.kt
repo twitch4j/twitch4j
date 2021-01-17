@@ -16,7 +16,7 @@ fun MavenPom.default() {
 		license {
 			name.set("MIT Licence")
 			distribution.set("repo")
-			url.set("https://github.com/twitch4j/twitch4j/blob/master/LICENSE")
+			url.set("https://opensource.org/licenses/MIT")
 		}
 	}
 	scm {

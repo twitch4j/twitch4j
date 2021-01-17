@@ -1,4 +1,5 @@
 import java.util.Date
+import java.util.jar.JarFile
 
 // Plugins
 plugins {
@@ -14,13 +15,12 @@ allprojects {
 	// Repositories
 	repositories {
 		jcenter()
-		maven("https://maven.google.com")
-		mavenLocal()
+//		mavenLocal()
 	}
 
 	tasks {
 		withType<Javadoc> {
-			if (JavaVersion.current() != JavaVersion.VERSION_1_8){
+			if (JavaVersion.current().isJava9Compatible) { // to use HTML5 javadoc must be compatible to JDK9+
 				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
 			}
 		}
@@ -43,8 +43,11 @@ subprojects {
 		setVersion("1.18.16")
 	}
 
-	// Source Compatibility
-	java {
+	/*
+	 * java version requirements and
+	 * generate tasks sourcesJar and javadocJar
+	 */
+	extensions.configure<JavaPluginExtension> {
 		sourceCompatibility = JavaVersion.VERSION_1_8
 		targetCompatibility = JavaVersion.VERSION_1_8
 		withSourcesJar()
@@ -59,8 +62,8 @@ subprojects {
 			api(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 
 			// Apache Commons
-			api(group = "org.apache.commons", name = "commons-lang3", version = "3.10")
-			api(group = "commons-io", name = "commons-io", version = "2.6")
+			api(group = "org.apache.commons", name = "commons-lang3", version = "3.11")
+			api(group = "commons-io", name = "commons-io", version = "2.8.0")
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Event Dispatcher
@@ -91,15 +94,15 @@ subprojects {
 			api(group = "com.netflix.hystrix", name = "hystrix-core", version = "1.5.18")
 
 			// Jackson (JSON)
-			api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.11.3")
-			api(group = "com.fasterxml.jackson.module", name = "jackson-module-parameter-names", version = "2.11.3")
-			api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version = "2.11.3")
+			api(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.12.1")
+			api(group = "com.fasterxml.jackson.module", name = "jackson-module-parameter-names", version = "2.12.1")
+			api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version = "2.12.1")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.10")
 
 			// Annotations
-			api(group = "org.jetbrains", name = "annotations", version = "18.0.0")
+			api(group = "org.jetbrains", name = "annotations", version = "20.1.0")
 		}
 
 		// Apache Commons
@@ -136,15 +139,21 @@ subprojects {
 				windowTitle = "${project.artifactId} (v${project.version})"
 				encoding = "UTF-8"
 			}
-
-			if (JavaVersion.current() != JavaVersion.VERSION_1_8){
-				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-			}
 		}
 
 		shadowJar {
 			archiveClassifier.set("shaded")
 			manifest.inheritFrom(jar.manifest)
+
+			configurations.filter { it.isCanBeResolved }.flatMap {
+				it.files.filter { it.exists() }
+					.flatMap { JarFile(it).use { it.entries().toList().filter { it.name.endsWith(".class") && it.name != "module-info.class" }.toSet() } }
+					.map { it.name.substringBeforeLast('/').replace('/', '.') }
+			}.forEach {
+				relocate(it, "com.github.twitch4j.shaded.${archiveVersion.map { it.replace(".", "_") }.get()}.$it") {
+					exclude("com.github.twitch4j")
+				}
+			}
 		}
 
 		test {
@@ -168,7 +177,7 @@ subprojects {
 	bintray {
 		user = bintrayUser
 		key = bintrayApiKey
-//		setPublications(publishing.publications.filterInstance<MavenPublication>().map { it.name })
+		setPublications(*publishing.publications.filterIsInstance<MavenPublication>().map { it.name }.toTypedArray())
 		dryRun = false
 		publish = true
 		override = false
@@ -176,6 +185,10 @@ subprojects {
 			userOrg = "Twitch4J"
 			repo = "maven"
 			name = "Twitch4J"
+			websiteUrl = "https://twitch4j.github.io/"
+			issueTrackerUrl = "https://github.com/twitch4j/twitch4j/issues"
+			vcsUrl = "https://github.com/twitch4j/twitch4j.git"
+			publicDownloadNumbers = true
 			version.apply {
 				name = "${project.version}"
 				vcsTag = "v${project.version}"
@@ -188,17 +201,13 @@ subprojects {
 tasks.register<Javadoc>("aggregateJavadoc") {
 	group = JavaBasePlugin.DOCUMENTATION_GROUP
 	options {
-		title = "${rootProject.name} (v${project.version})"
-		windowTitle = "${rootProject.name} (v${project.version})"
+		title = "${rootProject.name} (v${rootProject.version})"
+		windowTitle = "${rootProject.name} (v${rootProject.version})"
 		encoding = "UTF-8"
 	}
 
 	source(subprojects.map { it.tasks.delombok.get() })
-	classpath = files(subprojects.map { it.sourceSets["main"].compileClasspath })
+	classpath = files(subprojects.flatMap { it.sourceSets["main"].compileClasspath.files })
 
 	setDestinationDir(file("${rootDir}/docs/static/javadoc"))
-
-	if (JavaVersion.current() != JavaVersion.VERSION_1_8){
-		(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-	}
 }

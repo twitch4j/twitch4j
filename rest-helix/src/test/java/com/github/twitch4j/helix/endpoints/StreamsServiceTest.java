@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -127,5 +127,14 @@ public class StreamsServiceTest extends AbstractEndpointTest {
         testUtils.getTwitchHelixClient().replaceStreamTags(testUtils.getCredential().getAccessToken(), twitchUserId, tagIds).execute();
     }
 
-}
+    @Test
+    @DisplayName("getIngestServers")
+    public void getIngestServers() {
+        IngestServerList serverList = TestUtils.getTwitchHelixClient().getIngestServers().execute();
+        assertNotNull(serverList.getIngests());
+        assertFalse(serverList.getIngests().isEmpty());
+        assertNotNull(serverList.getIngests().get(0).getName());
+        assertNotNull(serverList.getIngests().get(0).getUrlTemplate());
+    }
 
+}

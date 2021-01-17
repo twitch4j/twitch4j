@@ -36,7 +36,7 @@ public class FriendshipData {
 
         private static final Map<String, Change> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(Enum::toString, Function.identity()));
 
-        @JsonCreator
+        @Deprecated
         public static Change fromString(String change) {
             return MAPPINGS.get(change);
         }

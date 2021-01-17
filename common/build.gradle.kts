@@ -11,7 +11,6 @@ dependencies {
 	compileOnly(group = "io.github.openfeign", name = "feign-hystrix")
 
 	// Jackson (JSON)
-	api(group = "com.fasterxml.jackson.module", name = "jackson-module-parameter-names")
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Websocket (for common proxy settings)
