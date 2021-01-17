@@ -68,7 +68,7 @@ public class Cheermote {
 
         private static final Map<String, Type> MAPPINGS = Arrays.stream(Type.values()).collect(Collectors.toMap(Type::toString, Function.identity()));
 
-        @JsonCreator
+        @Deprecated
         public static Type fromString(String type) {
             return MAPPINGS.get(type);
         }

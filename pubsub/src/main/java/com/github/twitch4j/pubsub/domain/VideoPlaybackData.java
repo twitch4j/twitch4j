@@ -50,7 +50,7 @@ public class VideoPlaybackData {
             return this.type;
         }
 
-        @JsonCreator
+        @Deprecated
         public static Type fromString(String type) {
             for (Type t : Type.values()) {
                 if (t.type.equalsIgnoreCase(type))

@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix.endpoints;
 
 import com.github.twitch4j.helix.TestUtils;
+import com.github.twitch4j.helix.domain.ChannelEditorList;
 import com.github.twitch4j.helix.domain.ChannelInformation;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +18,14 @@ import java.util.List;
 public class ChannelServiceTest {
 
     private static final String TWITCH_USER_ID = "149223493";
+
+    @Test
+    @DisplayName("Get channel editors")
+    public void getChannelEditors() {
+        ChannelEditorList resultList = TestUtils.getTwitchHelixClient().getChannelEditors(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID).execute();
+        Assertions.assertNotNull(resultList);
+        Assertions.assertNotNull(resultList.getEditors());
+    }
 
     @Test
     @DisplayName("Gets channel information")

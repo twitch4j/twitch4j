@@ -1,20 +1,38 @@
 package com.github.twitch4j.helix;
 
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
+import com.github.twitch4j.eventsub.EventSubSubscription;
+import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Twitch - Helix API
  */
 public interface TwitchHelix {
+
+    /**
+     * The default baseUrl to pass to {@link #getIngestServers(URI)}.
+     */
+    URI INGESTS_BASE_URL = ((Supplier<URI>) () -> {
+        // Not pretty but needed for "Overriding the Request Line" - see: https://github.com/OpenFeign/feign/blob/master/README.md#interface-annotations
+        try {
+            return new URI("https://ingest.twitch.tv/");
+        } catch (Exception e) {
+            return null;
+        }
+    }).get();
 
     /**
      * Gets a URL that extension developers can use to download analytics reports (CSV files) for their extensions. The URL is valid for 5 minutes.
@@ -90,16 +108,175 @@ public interface TwitchHelix {
      * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
      * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".
      * @param userId    ID of the user whose results are returned; i.e., the person who paid for the Bits.
-     * @return StreamList
+     * @return BitsLeaderboard
      */
     @RequestLine("GET /bits/leaderboard?count={count}&period={period}&started_at={started_at}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
         @Param("token") String authToken,
-        @Param("count") String count,
+        @Param("count") Integer count,
         @Param("period") String period,
         @Param("started_at") String startedAt,
         @Param("user_id") String userId
+    );
+
+    /**
+     * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
+     *
+     * @param authToken Auth Token
+     * @param count     Number of results to be returned. Maximum: 100. Default: 10.
+     * @param period    Time period over which data is aggregated (PST time zone). This parameter interacts with started_at. Valid values are given below. Default: "all".
+     * @param startedAt Timestamp for the period over which the returned data is aggregated. Must be in RFC 3339 format. If this is not provided, data is aggregated over the current period; e.g., the current day/week/month/year. This value is ignored if period is "all".
+     * @param userId    ID of the user whose results are returned; i.e., the person who paid for the Bits.
+     * @return BitsLeaderboard
+     * @deprecated utilize getBitsLeaderboard where count is an Integer
+     */
+    @Deprecated
+    default HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
+        String authToken,
+        String count,
+        String period,
+        String startedAt,
+        String userId
+    ) {
+        return getBitsLeaderboard(authToken, count == null || count.isEmpty() ? null : Integer.parseInt(count), period, startedAt, userId);
+    }
+
+    /**
+     * Creates a Custom Reward on a channel.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param newReward     The Custom Reward to be created.
+     * @return CustomRewardList
+     */
+    @RequestLine("POST /channel_points/custom_rewards?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<CustomRewardList> createCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        CustomReward newReward
+    );
+
+    /**
+     * Deletes a Custom Reward on a channel.
+     * <p>
+     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be deleted.
+     * Any UNFULFILLED Custom Reward Redemptions of the deleted Custom Reward will be updated to the FULFILLED status.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward to delete, must match a Custom Reward on broadcaster_id’s channel.
+     * @return 204 No Content upon a successful deletion
+     */
+    @RequestLine("DELETE /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String rewardId
+    );
+
+    /**
+     * Returns a list of Custom Reward objects for the Custom Rewards on a channel.
+     * <p>
+     * Developers only have access to update and delete rewards that were created manually by a broadcaster in the Creator Dashboard or created programmatically by the same/calling client_id.
+     * <p>
+     * There is a limit of 50 Custom Rewards on a channel at a time. This includes both enabled and disabled Custom Rewards.
+     *
+     * @param authToken             User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId         Required: The id of the target channel, which must match the token user id.
+     * @param rewardIds             Optional: Filters the results to only returns reward objects for the Custom Rewards with matching ID. Maximum: 50.
+     * @param onlyManageableRewards Optional: When set to true, only returns custom rewards that the calling client_id can manage. Default: false.
+     * @return CustomRewardList
+     */
+    @RequestLine("GET /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}&only_manageable_rewards={only_manageable_rewards}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CustomRewardList> getCustomRewards(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") Collection<String> rewardIds,
+        @Param("only_manageable_rewards") Boolean onlyManageableRewards
+    );
+
+    /**
+     * Returns Custom Reward Redemption objects for a Custom Reward on a channel that was created by the same client_id.
+     * <p>
+     * Developers only have access to get and update redemptions for the rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      When ID is not provided, this parameter returns paginated Custom Reward Redemption objects for redemptions of the Custom Reward with ID reward_id.
+     * @param redemptionIds When used, this param filters the results and only returns Custom Reward Redemption objects for the redemptions with matching ID. Maximum: 50.
+     * @param status        When id is not provided, this param is required and filters the paginated Custom Reward Redemption objects for redemptions with the matching status.
+     * @param sort          Sort order of redemptions returned when getting the paginated Custom Reward Redemption objects for a reward. One of: OLDEST, NEWEST. Default: OLDEST.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. This applies only to queries without ID.
+     * @param limit         Number of results to be returned when getting the paginated Custom Reward Redemption objects for a reward. Maximum: 50. Default: 20.
+     * @return CustomRewardRedemptionList
+     */
+    @RequestLine("GET /channel_points/custom_rewards/redemptions?broadcaster_id={broadcaster_id}&reward_id={reward_id}&id={id}&status={status}&sort={sort}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CustomRewardRedemptionList> getCustomRewardRedemption(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("reward_id") String rewardId,
+        @Param("id") Collection<String> redemptionIds,
+        @Param("status") RedemptionStatus status,
+        @Param("sort") String sort,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Updates a Custom Reward created on a channel.
+     * <p>
+     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be updated.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward to delete, must match a Custom Reward on broadcaster_id’s channel.
+     * @param updatedReward A CustomReward object with specific field(s) updated.
+     * @return CustomRewardList
+     */
+    @RequestLine("PATCH /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<CustomRewardList> updateCustomReward(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String rewardId,
+        CustomReward updatedReward
+    );
+
+    /**
+     * Updates the status of Custom Reward Redemption objects on a channel that are in the UNFULFILLED status.
+     * <p>
+     * Only redemptions for a reward created manually by a broadcaster in the Creator Dashboard, or created programmatically by the same client_id as attached to the access token can be updated.
+     *
+     * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
+     * @param broadcasterId The id of the target channel, which must match the token user id.
+     * @param rewardId      ID of the Custom Reward the redemptions to be updated are for.
+     * @param redemptionIds ID of the Custom Reward Redemption to update, must match a Custom Reward Redemption on broadcaster_id’s channel. Max: 50.
+     * @param newStatus     The new status to set redemptions to. Can be either FULFILLED or CANCELED. Updating to CANCELED will refund the user their points.
+     * @return CustomRewardRedemptionList
+     */
+    @RequestLine("PATCH /channel_points/custom_rewards/redemptions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"status\":\"{status}\"%7D")
+    HystrixCommand<CustomRewardRedemptionList> updateRedemptionStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("reward_id") String rewardId,
+        @Param("id") Collection<String> redemptionIds,
+        @Param("status") RedemptionStatus newStatus
     );
 
     /**
@@ -166,6 +343,55 @@ public interface TwitchHelix {
         @Param("id") String id,
         @Param("user_id") String userId,
         @Param("game_id") String gameId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Creates an EventSub subscription.
+     *
+     * @param authToken    Required: App access token.
+     * @param subscription Required: The subscription that is being created. Must include type, version, condition, and transport.
+     * @return EventSubSubscriptionList
+     */
+    @RequestLine("POST /eventsub/subscriptions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<EventSubSubscriptionList> createEventSubSubscription(
+        @Param("token") String authToken,
+        EventSubSubscription subscription
+    );
+
+    /**
+     * Delete an EventSub subscription.
+     *
+     * @param authToken      Required: App Access Token.
+     * @param subscriptionId Required: The subscription ID for the subscription you want to delete.
+     * @return 204 No Content upon a successful deletion
+     */
+    @RequestLine("DELETE /eventsub/subscriptions?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteEventSubSubscription(
+        @Param("token") String authToken,
+        @Param("id") String subscriptionId
+    );
+
+    /**
+     * Get a list of your EventSub subscriptions.
+     *
+     * @param authToken Required: App Access Token.
+     * @param status    Optional: Include this parameter to filter subscriptions by their status.
+     * @param after     Optional: Cursor for forward pagination.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Minimum: 10.
+     * @return EventSubSubscriptionList
+     */
+    @RequestLine("GET /eventsub/subscriptions?status={status}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+        @Param("token") String authToken,
+        @Param("status") EventSubSubscriptionStatus status,
         @Param("after") String after,
         @Param("first") Integer limit
     );
@@ -282,6 +508,21 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of users who have editor permissions for a specific channel.
+     *
+     * @param authToken     Required: User access token of the broadcaster with the channel:read:editors scope.
+     * @param broadcasterId Required: Broadcaster’s user ID associated with the channel.
+     * @return ChannelEditorList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_EDITORS_READ
+     */
+    @RequestLine("GET /channels/editors?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChannelEditorList> getChannelEditors(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Creates a clip programmatically. This returns both an ID and an edit URL for the new clip.
      *
      * @param authToken     Auth Token
@@ -380,6 +621,40 @@ public interface TwitchHelix {
         @Param("after") String after
     );
 
+    @RequestLine("GET /ingests")
+    HystrixCommand<IngestServerList> getIngestServers(URI baseUrl);
+
+    /**
+     * Get Ingest Servers returns a list of endpoints for ingesting live video into Twitch.
+     *
+     * @return IngestServerList
+     */
+    default HystrixCommand<IngestServerList> getIngestServers() {
+        return getIngestServers(INGESTS_BASE_URL);
+    }
+
+    /**
+     * Returns all banned and timed-out users in a channel.
+     *
+     * @param authToken     Auth Token (scope: moderation:read)
+     * @param broadcasterId Required: Provided broadcaster_id must match the user_id in the auth token.
+     * @param userId        Optional: Filters the results for only those with a matching user_id. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination.
+     * @param before        Optional: Cursor for backward pagination.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return BannedUserList
+     */
+    @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BannedUserList> getBannedUsers(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userId,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit
+    );
+
     /**
      * Returns all banned and timed-out users in a channel.
      *
@@ -389,16 +664,18 @@ public interface TwitchHelix {
      * @param after         Optional: Cursor for forward pagination.
      * @param before        Optional: Cursor for backward pagination.
      * @return BannedUserList
+     * @deprecated in favor of getBannedUsers(String, String, List, String, String, Integer) where the last param is the number of objects to retrieve.
      */
-    @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}")
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BannedUserList> getBannedUsers(
+    @Deprecated
+    default HystrixCommand<BannedUserList> getBannedUsers(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userId,
         @Param("after") String after,
         @Param("before") String before
-    );
+    ) {
+        return this.getBannedUsers(authToken, broadcasterId, userId, after, before, 20);
+    }
 
     /**
      * Returns all user bans and un-bans in a channel.
@@ -446,15 +723,57 @@ public interface TwitchHelix {
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
      * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
      * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return ModeratorList
      */
-    @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}", collectionFormat = CollectionFormat.CSV)
+    @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ModeratorList> getModerators(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Returns all moderators in a channel.
+     *
+     * @param authToken User Token for the broadcaster
+     * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
+     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @return ModeratorList
+     * @deprecated in favor of getModerators(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
+     */
+    @Deprecated
+    default HystrixCommand<ModeratorList> getModerators(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds,
         @Param("after") String after
+    ) {
+        return this.getModerators(authToken, broadcasterId, userIds, after, 20);
+    }
+
+    /**
+     * Returns a list of moderators or users added and removed as moderators from a channel.
+     *
+     * @param authToken User Token for the broadcaster
+     * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
+     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return ModeratorList
+     */
+    @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ModeratorEventList> getModeratorEvents(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") List<String> userIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
     );
 
     /**
@@ -465,15 +784,17 @@ public interface TwitchHelix {
      * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
      * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @return ModeratorList
+     * @deprecated in favor of getModeratorEvents(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
-    @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}", collectionFormat = CollectionFormat.CSV)
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ModeratorEventList> getModeratorEvents(
+    @Deprecated
+    default HystrixCommand<ModeratorEventList> getModeratorEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
         @Param("after") String after
-    );
+    ) {
+        return this.getModeratorEvents(authToken, broadcasterId, userIds, after, 20);
+    }
 
     /**
      * Gets games sorted by number of current viewers on Twitch, most popular first.
@@ -505,7 +826,7 @@ public interface TwitchHelix {
      * @param before     Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @param limit      Maximum number of objects to return. Maximum: 100. Default: 20.
      * @param gameIds    Returns streams broadcasting a specified game ID. You can specify up to 100 IDs.
-     * @param language   Stream language. You can specify up to 100 languages.
+     * @param language   Stream language. You can specify up to 100 languages. A language value must be either the ISO 639-1 two-letter code for a supported stream language or "other".
      * @param userIds    Returns streams broadcast by one or more specified user IDs. You can specify up to 100 IDs.
      * @param userLogins Returns streams broadcast by one or more specified user login names. You can specify up to 100 names.
      * @return StreamList
@@ -725,7 +1046,7 @@ public interface TwitchHelix {
      * <p>
      * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
      *
-     * @param authToken Auth Token, optional, will include the users email address
+     * @param authToken Auth Token (optionally with the user:read:email scope)
      * @param userIds   User ID. Multiple user IDs can be specified. Limit: 100.
      * @param userNames User login name. Multiple login names can be specified. Limit: 100.
      * @return HelixUser
@@ -736,6 +1057,61 @@ public interface TwitchHelix {
         @Param("token") String authToken,
         @Param("id") List<String> userIds,
         @Param("login") List<String> userNames
+    );
+
+    /**
+     * Gets a specified user’s block list.
+     * <p>
+     * The list is sorted by when the block occurred in descending order (i.e. most recent block first).
+     *
+     * @param authToken Required: User Access Token with the user:read:blocked_users scope.
+     * @param userId    Required: User ID for a Twitch user.
+     * @param after     Optional: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @return BlockedUserList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_READ
+     */
+    @RequestLine("GET /users/blocks?broadcaster_id={broadcaster_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BlockedUserList> getUserBlockList(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String userId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Blocks the specified user on behalf of the authenticated user.
+     *
+     * @param authToken     Required: User Access Token with the user:manage:blocked_users scope.
+     * @param targetUserId  Required: User ID of the user to be blocked.
+     * @param sourceContext Optional: Source context for blocking the user. Valid values: "chat", "whisper".
+     * @param reason        Optional: Reason for blocking the user. Valid values: "spam", "harassment", or "other".
+     * @return 204 No Content upon a successful call.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_MANAGE
+     */
+    @RequestLine("PUT /users/blocks?target_user_id={target_user_id}&source_context={source_context}&reason={reason}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> blockUser(
+        @Param("token") String authToken,
+        @Param("target_user_id") String targetUserId,
+        @Param("source_context") String sourceContext,
+        @Param("reason") String reason
+    );
+
+    /**
+     * Unblocks the specified user on behalf of the authenticated user.
+     *
+     * @param authToken    Required: User Access Token with the user:manage:blocked_users scope.
+     * @param targetUserId Required: User ID of the user to be unblocked.
+     * @return 204 No Content upon a successful call.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_BLOCKS_MANAGE
+     */
+    @RequestLine("DELETE /users/blocks?target_user_id={target_user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> unblockUser(
+        @Param("token") String authToken,
+        @Param("target_user_id") String targetUserId
     );
 
     /**
@@ -900,6 +1276,24 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Deletes one or more videos. Videos are past broadcasts, Highlights, or uploads.
+     * <p>
+     * Invalid Video IDs will be ignored (i.e. IDs provided that do not have a video associated with it).
+     * If the OAuth user token does not have permission to delete even one of the valid Video IDs, no videos will be deleted and the response will return a 401.
+     *
+     * @param authToken Required: User OAuth token with the channel:manage:videos scope.
+     * @param ids       Required: ID of the video(s) to be deleted. Limit: 5.
+     * @return DeletedVideoList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIDEOS_MANAGE
+     */
+    @RequestLine("DELETE /videos?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<DeletedVideoList> deleteVideos(
+        @Param("token") String authToken,
+        @Param("id") List<String> ids
     );
 
     /**

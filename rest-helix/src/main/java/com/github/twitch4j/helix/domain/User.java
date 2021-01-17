@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 /**
  * User
  */
@@ -47,5 +49,8 @@ public class User {
 
     /** User’s email address. Returned if the request includes the user:read:email scope. */
     private String email;
+
+    /** Date when the user was created. */
+    private Instant createdAt;
 
 }
