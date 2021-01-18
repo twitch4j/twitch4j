@@ -1,16 +1,11 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OnsiteNotification {
     private String userId;
     private String id;
@@ -26,8 +21,6 @@ public class OnsiteNotification {
     private List<Creator> creators;
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Action {
         private String id;
         private String type;
@@ -38,8 +31,6 @@ public class OnsiteNotification {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Creator {
         private String userId;
         private String userName;

@@ -1,7 +1,6 @@
 package com.github.twitch4j.kraken.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -11,7 +10,6 @@ import java.time.Instant;
 import java.util.Date;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenUser {
 
     @JsonProperty("_id")
@@ -66,7 +64,6 @@ public class KrakenUser {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Notifications {
         private Boolean email;
         private Boolean push;

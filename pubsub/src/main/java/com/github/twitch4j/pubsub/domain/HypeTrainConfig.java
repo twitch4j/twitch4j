@@ -1,16 +1,11 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class HypeTrainConfig {
     private String channelId;
     private Boolean isEnabled;
@@ -30,8 +25,6 @@ public class HypeTrainConfig {
     private Boolean hasConductorBadges;
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class HypeTrainKickoff {
         private Integer numOfEvents;
         private Integer minPoints;
@@ -39,7 +32,6 @@ public class HypeTrainConfig {
     }
 
     @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ConductorRewards {
         @JsonProperty("BITS")
         private ConductorReward bits;
@@ -48,7 +40,6 @@ public class HypeTrainConfig {
         private ConductorReward subs;
 
         @Data
-        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ConductorReward {
             @JsonProperty("CURRENT")
             private List<RewardType> current;
@@ -57,8 +48,6 @@ public class HypeTrainConfig {
             private List<RewardType> former;
 
             @Data
-            @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class RewardType {
                 private String type;
                 private String id;
@@ -71,7 +60,6 @@ public class HypeTrainConfig {
     }
 
     @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DifficultySettings {
         @JsonProperty("EASY")
         private List<DifficultySetting> easy;
@@ -89,8 +77,6 @@ public class HypeTrainConfig {
         private List<DifficultySetting> insane;
 
         @Data
-        @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DifficultySetting {
             private Integer value;
             private Integer goal;

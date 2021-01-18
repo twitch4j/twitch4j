@@ -1,14 +1,11 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import java.util.UUID;
 
 @Value
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @AllArgsConstructor
 public class AutomodEnforceCheck {
     /**

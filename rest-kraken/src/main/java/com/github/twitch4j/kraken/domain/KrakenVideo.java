@@ -1,9 +1,6 @@
 package com.github.twitch4j.kraken.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -14,8 +11,6 @@ import java.util.Map;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenVideo {
     @JsonProperty("_id")
     private String id;
@@ -50,7 +45,6 @@ public class KrakenVideo {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Preview {
         private String small;
         private String medium;
@@ -60,7 +54,6 @@ public class KrakenVideo {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Thumbnail {
         private String type;
         private String url;
@@ -68,7 +61,6 @@ public class KrakenVideo {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Thumbnails {
         private List<Thumbnail> small;
         private List<Thumbnail> medium;
@@ -78,8 +70,6 @@ public class KrakenVideo {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Channel {
         @JsonProperty("_id")
         private String id;
