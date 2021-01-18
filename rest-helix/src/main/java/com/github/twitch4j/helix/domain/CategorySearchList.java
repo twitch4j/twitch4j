@@ -19,7 +19,6 @@ public class CategorySearchList {
     @JsonProperty("data")
     private List<Game> results;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

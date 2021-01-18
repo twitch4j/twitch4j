@@ -16,7 +16,6 @@ public class StreamList {
     @JsonProperty("data")
     private List<Stream> streams;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

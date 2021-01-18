@@ -18,7 +18,6 @@ public class BannedUserList {
     @JsonProperty("data")
     private List<BannedUser> results;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

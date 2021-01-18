@@ -21,7 +21,6 @@ public class HypeTrainEventList {
     @JsonProperty("data")
     private List<HypeTrainEvent> events;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

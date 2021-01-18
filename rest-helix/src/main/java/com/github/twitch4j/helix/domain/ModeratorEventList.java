@@ -11,7 +11,6 @@ public class ModeratorEventList {
     @JsonProperty("data")
     private List<ModeratorEvent> events;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
     /**

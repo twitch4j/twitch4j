@@ -19,7 +19,6 @@ public class UserList {
     @JsonProperty("data")
     private List<User> users;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

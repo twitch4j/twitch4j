@@ -1,6 +1,5 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +13,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateClip {
 
+    /**
+     * ID of the clip that was created.
+     */
     private String id;
 
-    @JsonProperty("edit_url")
+    /**
+     * URL of the edit page for the clip.
+     */
     private String editUrl;
+
 }

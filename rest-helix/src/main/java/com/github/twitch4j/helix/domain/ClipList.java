@@ -1,6 +1,5 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,6 @@ public class ClipList {
 
     private List<Clip> data;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

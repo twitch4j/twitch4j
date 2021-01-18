@@ -10,7 +10,6 @@ public class SubscriptionList {
     @JsonProperty("data")
     private List<Subscription> subscriptions;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

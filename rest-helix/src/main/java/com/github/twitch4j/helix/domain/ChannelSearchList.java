@@ -21,7 +21,6 @@ public class ChannelSearchList {
     @JsonProperty("data")
     private List<ChannelSearchResult> results;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

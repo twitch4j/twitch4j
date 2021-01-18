@@ -19,7 +19,6 @@ public class SubscriptionEventList {
     /**
      * A cursor value, to be used in a subsequent request to specify the starting point of the next set of results.
      */
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

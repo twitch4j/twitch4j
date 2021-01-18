@@ -24,7 +24,6 @@ public class ExtensionActiveList {
     @JsonProperty("data")
     private ActiveExtensions data;
 
-    @JsonProperty("pagination")
     @Deprecated
     private HelixPagination pagination;
 

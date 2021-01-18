@@ -18,7 +18,6 @@ public class BannedEventList {
     @JsonProperty("data")
     private List<BannedEvent> events;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

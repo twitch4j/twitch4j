@@ -30,7 +30,6 @@ public class WebhookSubscriptionList {
      * A cursor value, to be used in a subsequent request to specify the starting point of the next set of results.
      * If this is empty, you are at the last page.
      */
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }

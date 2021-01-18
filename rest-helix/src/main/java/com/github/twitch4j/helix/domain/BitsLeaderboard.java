@@ -17,7 +17,6 @@ public class BitsLeaderboard {
     @JsonProperty("data")
     private List<BitsLeaderboardEntry> entries;
 
-    @JsonProperty("pagination")
     private HelixPagination pagination;
 
 }
