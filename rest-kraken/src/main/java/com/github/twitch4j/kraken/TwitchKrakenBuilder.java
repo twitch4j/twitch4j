@@ -3,6 +3,7 @@ package com.github.twitch4j.kraken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.feign.interceptor.JsonContentTypeHeaderInterceptor;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
@@ -21,10 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -83,11 +81,6 @@ public class TwitchKrakenBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
-     * Holds all http methods that transmit a body (to set the content-type)
-     */
-    private static final Set<String> methodsWithBody = Stream.of(Request.HttpMethod.POST.name(), Request.HttpMethod.PATCH.name(), Request.HttpMethod.PUT.name()).collect(Collectors.toSet());
-
-    /**
      * Initialize the builder
      *
      * @return Twitch Kraken Builder
@@ -130,14 +123,8 @@ public class TwitchKrakenBuilder {
             .logLevel(logLevel)
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
-            .requestInterceptor(t -> {
-                t.header("Accept", "application/vnd.twitchtv.v5+json");
-
-                // set content-type if not specified in the TwitchKraken interface for POST, PATCH, PUT requests
-                if (!t.headers().containsKey("Content-Type") && !t.headers().containsKey("content-type") && methodsWithBody.contains(t.method())) {
-                    t.header("Content-Type", "application/json");
-                }
-            })
+            .requestInterceptor(t -> t.header("Accept", "application/vnd.twitchtv.v5+json"))
+            .requestInterceptor(new JsonContentTypeHeaderInterceptor())
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchKraken.class, baseUrl);
