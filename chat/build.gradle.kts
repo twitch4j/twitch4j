@@ -1,10 +1,10 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// WebSocket
-	api(group = "com.neovisionaries", name = "nv-websocket-client")
+	api(NV_WEBSOCKET)
 
 	// Rate Limiting
-	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
+	api(BUCKET4J)
 
 	// Twitch4J Modules
 	api(project(":common"))

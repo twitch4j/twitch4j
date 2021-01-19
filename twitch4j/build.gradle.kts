@@ -7,7 +7,7 @@ dependencies {
 	}
 
 	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+	api(CAFFEINE)
 }
 
 publishing.publications.withType<MavenPublication> {

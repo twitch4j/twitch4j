@@ -1,14 +1,13 @@
-// In this section you declare the dependencies for your production and test code
 dependencies {
 	// Credential Manager
-	api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager")
-	//testImplementation(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager-ews")
+	api(CREDENTIAL_MANAGER)
+	//testImplementation(CREDENTIAL_MANAGER_EWS)
 
 	// Http Client
-	api(group = "com.squareup.okhttp3", name = "okhttp")
+	api(OKHTTP3)
 
 	// Jackson
-	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
+	api(JACKSON_DATABIND)
 }
 
 publishing.publications.withType<MavenPublication> {

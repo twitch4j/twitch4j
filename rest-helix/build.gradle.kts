@@ -1,19 +1,20 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// HTTP Client
-	api(group = "io.github.openfeign", name = "feign-okhttp")
-	api(group = "io.github.openfeign", name = "feign-jackson")
-	api(group = "io.github.openfeign", name = "feign-slf4j")
-	api(group = "io.github.openfeign", name = "feign-hystrix")
-	api(group = "commons-configuration", name = "commons-configuration")
+	api(FEIGN_OKHTTP)
+	api(FEIGN_JACKSON)
+	api(FEIGN_SLF4J)
+	api(FEIGN_HYSTRIX)
+	api(COMMONS_CONFIGURATION)
 
 	// Jackson (JSON)
-	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
+	api(JACKSON_DATABIND)
 
 	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+	api(CAFFEINE)
 
 	// Twitch4J Modules
+	api(project(":eventsub-common"))
 	api(project(":common"))
 	api(project(":auth"))
 }
