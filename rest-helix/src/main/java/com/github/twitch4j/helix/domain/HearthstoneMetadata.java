@@ -1,9 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 /**
@@ -12,8 +9,6 @@ import lombok.*;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class HearthstoneMetadata {
 
     /** The Broadcaster */
@@ -30,8 +25,6 @@ public class HearthstoneMetadata {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     static class HearthstonePlayer {
 
         /** Hero Type */
@@ -45,8 +38,6 @@ public class HearthstoneMetadata {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     static class HearthstoneHero {
 
         /** Name of the Hearthstone hero. */

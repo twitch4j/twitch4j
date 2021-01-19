@@ -1,8 +1,5 @@
 package com.github.twitch4j.eventsub.condition;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,8 +14,6 @@ import lombok.extern.jackson.Jacksonized;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Jacksonized
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomRewardEventSubCondition extends ChannelEventSubCondition {
 
     /**

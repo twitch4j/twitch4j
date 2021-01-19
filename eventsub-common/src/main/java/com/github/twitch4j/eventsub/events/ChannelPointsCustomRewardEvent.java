@@ -1,9 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.eventsub.domain.GlobalCooldown;
 import com.github.twitch4j.eventsub.domain.MaxPerStream;
 import com.github.twitch4j.eventsub.domain.MaxPerUserPerStream;
@@ -23,8 +20,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ChannelPointsCustomRewardEvent extends EventSubChannelEvent {
 
     /**

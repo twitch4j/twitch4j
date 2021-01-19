@@ -117,9 +117,9 @@ public class UsersServiceTest extends AbstractEndpointTest {
         ExtensionActiveList resultList = testUtils.getTwitchHelixClient().getUserActiveExtensions(testUtils.getCredential().getAccessToken(), twitchUserId).execute();
 
         // Test
-        assertTrue(resultList.getData().getPanels().size() == 3, "Should always get 3 panels!");
-        assertTrue(resultList.getData().getOverlays().size() == 1, "Should always get 1 overlay!");
-        assertTrue(resultList.getData().getComponents().size() == 2, "Should always get 2 components!");
+        assertTrue(resultList.getData().getActivePanels().size() == 3, "Should always get 3 panels!");
+        assertTrue(resultList.getData().getActiveOverlays().size() == 1, "Should always get 1 overlay!");
+        assertTrue(resultList.getData().getActiveComponents().size() == 2, "Should always get 2 components!");
     }
 
     @Test

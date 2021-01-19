@@ -1,6 +1,5 @@
 package com.github.twitch4j.extensions.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChannelList extends ExtensionsPagination {
 
     private List<Channel> channels;

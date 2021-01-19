@@ -1,6 +1,5 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -10,7 +9,6 @@ import java.util.List;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class RadioTrack {
 
     private String asin;
@@ -25,7 +23,6 @@ public class RadioTrack {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Artist {
         private String asin;
         private String name;
@@ -33,7 +30,6 @@ public class RadioTrack {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AlbumInfo {
         private String asin;
         private String name;

@@ -1,10 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,8 +17,6 @@ import java.util.stream.Collectors;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Cheermote {
     /**
      * The name of the Cheermote (e.g., "Cheer", "PogChamp", "Kappa")
@@ -77,8 +71,6 @@ public class Cheermote {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Tier {
         /**
          * ID of the emote tier. Possible tiers are: 1, 100, 500, 1000, 5000, 10k, or 100k
@@ -114,8 +106,6 @@ public class Cheermote {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ThemedImages {
         private ImageSet dark;
         private ImageSet light;
@@ -123,8 +113,6 @@ public class Cheermote {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImageSet {
         @JsonProperty("animated")
         private SizedImages animatedImages;
@@ -135,8 +123,6 @@ public class Cheermote {
 
     @Data
     @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SizedImages {
         /**
          * Image at 1.0x

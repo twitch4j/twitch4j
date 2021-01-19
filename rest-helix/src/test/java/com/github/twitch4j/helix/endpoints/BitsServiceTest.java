@@ -24,7 +24,7 @@ public class BitsServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch the bits leaderboard")
     public void getBitsLeaderboard() {
         // TestCase
-        BitsLeaderboard resultList = testUtils.getTwitchHelixClient().getBitsLeaderboard(testUtils.getCredential().getAccessToken(), "10", "all", null, null).execute();
+        BitsLeaderboard resultList = testUtils.getTwitchHelixClient().getBitsLeaderboard(testUtils.getCredential().getAccessToken(), 10, "all", null, null).execute();
 
         // Test
         assertTrue(resultList.getEntries().size() == 0, "That account can't get bits, so it's always a empty list");

@@ -17,13 +17,11 @@ public class KrakenTeamUser {
     @JsonProperty("_id")
     private long id;
 
-    @JsonProperty("broadcaster_language")
     private String broadcasterLanguage;
 
     @JsonProperty("created_at")
     private Instant createdAtInstant;
 
-    @JsonProperty("display_name")
     private String displayName;
 
     private long followers;
@@ -40,10 +38,8 @@ public class KrakenTeamUser {
 
     private Boolean partner;
 
-    @JsonProperty("profile_banner")
     private String profileBanner;
 
-    @JsonProperty("profile_banner_background_color")
     private Object profileBannerBackgroundColor;
 
     private String status;
@@ -53,7 +49,6 @@ public class KrakenTeamUser {
 
     private String url;
 
-    @JsonProperty("video_banner")
     private Object videoBanner;
 
     private long views;
