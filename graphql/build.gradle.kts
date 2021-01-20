@@ -1,15 +1,15 @@
 // Plugins
 plugins {
-	apollo
+	id("com.apollographql.apollo") version "2.5.2"
 }
 // Dependencies
 dependencies {
 	// GraphQL
-	api(APOLLO_RUNTIME)
-	api(ANNOTATIONS)
+	api(group = "com.apollographql.apollo", name = "apollo-runtime", version = "2.5.2")
+	api(group = "org.jetbrains", name = "annotations")
 
 	// Hystrix
-	api(HYSTRIX)
+	api(group = "com.netflix.hystrix", name = "hystrix-core")
 
 	// Twitch4J Modules
 	api(project(":common"))

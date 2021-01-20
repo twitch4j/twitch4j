@@ -1,13 +1,13 @@
 dependencies {
 	// Credential Manager
-	api(CREDENTIAL_MANAGER)
-	//testImplementation(CREDENTIAL_MANAGER_EWS)
+	api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager")
+	//testImplementation(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager-ews", version = "0.1.1")
 
 	// Http Client
-	api(OKHTTP3)
+	api(group = "com.squareup.okhttp3", name = "okhttp")
 
 	// Jackson
-	api(JACKSON_DATABIND)
+	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
 }
 
 publishing.publications.withType<MavenPublication> {

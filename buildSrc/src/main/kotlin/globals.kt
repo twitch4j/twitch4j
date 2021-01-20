@@ -16,7 +16,10 @@ val Project.isSnapshot: Boolean
 
 val Project.artifactId: String
 	get() = (this as DefaultProject).identityPath.path.replace(Path.SEPARATOR, "-").let {
-		if (rootProject.name.equals(it.substring(1), true)) rootProject.name else (rootProject.name + if (it.startsWith("-") && it.length > 1) it else "")
+		if (rootProject.name.equals(it.substring(1), true)) rootProject.name else (rootProject.name + if (it.startsWith(
+				"-"
+			) && it.length > 1
+		) it else "")
 	}.toLowerCase()
 
 enum class VersionType(private val pattern: Regex) {

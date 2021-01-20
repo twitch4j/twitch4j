@@ -1,20 +1,20 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Event Manager
-	api(EVENTS_CORE)
-	api(EVENTS_SIMPLE)
+	api(group = "com.github.philippheuer.events4j", name = "events4j-core")
+	api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple")
 
 	// HTTP Client (for common feign extensions/interceptors/...)
-	compileOnly(FEIGN_OKHTTP)
-	compileOnly(FEIGN_JACKSON)
-	compileOnly(FEIGN_SLF4J)
-	compileOnly(FEIGN_HYSTRIX)
+	compileOnly(group = "io.github.openfeign", name = "feign-okhttp")
+	compileOnly(group = "io.github.openfeign", name = "feign-jackson")
+	compileOnly(group = "io.github.openfeign", name = "feign-slf4j")
+	compileOnly(group = "io.github.openfeign", name = "feign-hystrix")
 
 	// Jackson (JSON)
-	api(JACKSON_DATATYPE_JSR310)
+	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Websocket (for common proxy settings)
-	compileOnly(NV_WEBSOCKET)
+	compileOnly(group = "com.neovisionaries", name = "nv-websocket-client")
 
 	// Twitch4J Modules
 	api(project(":auth"))

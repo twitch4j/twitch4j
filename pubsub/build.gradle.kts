@@ -1,16 +1,16 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// WebSocket
-	api(NV_WEBSOCKET)
+	api(group = "com.neovisionaries", name = "nv-websocket-client")
 
 	// Jackson (JSON)
-	api(JACKSON_DATATYPE_JSR310)
+	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Cache
-	api(CAFFEINE)
+	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
 	// Annotations
-	api(ANNOTATIONS)
+	api(group = "org.jetbrains", name = "annotations")
 
 	// Twitch4J Modules
 	api(project(":common"))
