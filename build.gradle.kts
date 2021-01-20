@@ -28,6 +28,10 @@ allprojects {
 		withType<io.freefair.gradle.plugins.lombok.tasks.GenerateLombokConfig> {
 			enabled = false
 		}
+		// prevent to generate 'lombok.config' - more about: https://projectlombok.org/features/configuration
+		withType<Jar> {
+			archiveVersion.set("${project.version}")
+		}
 	}
 }
 
@@ -40,7 +44,7 @@ subprojects {
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	lombok {
-		setVersion("1.18.16")
+		version.set("1.18.16")
 	}
 
 	// Source Compatibility
