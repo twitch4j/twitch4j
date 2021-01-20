@@ -25,7 +25,8 @@ public class NotificationDeserializer extends JsonDeserializer<EventSubNotificat
         final SubscriptionType<?, ?, ?> type = sub.getType();
         final EventSubEvent event = type != null ? getObject(p.getCodec(), root, "event", type.getEventClass()) : null;
 
-        return new EventSubNotification(sub, event);
+        final String challenge = root.path("challenge").asText(null);
+        return new EventSubNotification(sub, event, challenge);
     }
 
     private static <T> T getObject(ObjectCodec codec, JsonNode parent, String field, Class<T> clazz) {
