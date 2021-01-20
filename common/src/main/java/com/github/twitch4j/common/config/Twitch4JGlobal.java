@@ -15,6 +15,6 @@ public class Twitch4JGlobal {
     /**
      * Default UserAgent
      */
-    public static String userAgent = "Twitch4J/1.0.0";
+    public static String userAgent = "Twitch4J/1.2.0";
 
 }

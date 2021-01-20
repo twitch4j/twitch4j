@@ -1,6 +1,5 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import lombok.AccessLevel;
@@ -13,7 +12,6 @@ import java.util.List;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventSubSubscriptionList {
 
     /**

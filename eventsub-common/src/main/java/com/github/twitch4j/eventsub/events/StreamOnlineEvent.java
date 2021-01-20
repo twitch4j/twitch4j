@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.twitch4j.eventsub.domain.StreamType;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -14,7 +13,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamOnlineEvent extends EventSubChannelEvent {
 
     /**

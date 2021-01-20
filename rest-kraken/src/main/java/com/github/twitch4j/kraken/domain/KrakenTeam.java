@@ -19,7 +19,6 @@ public class KrakenTeam {
 
     private String name;
 
-    @JsonProperty("display_name")
     private String displayName;
 
     private String info;

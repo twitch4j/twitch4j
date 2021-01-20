@@ -23,7 +23,7 @@ public class ModerationServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("Get Banned Users")
     public void getBannedUsers() {
-        List<BannedUser> results = TestUtils.getTwitchHelixClient().getBannedUsers(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null)
+        List<BannedUser> results = TestUtils.getTwitchHelixClient().getBannedUsers(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null, null)
             .execute()
             .getResults();
 
