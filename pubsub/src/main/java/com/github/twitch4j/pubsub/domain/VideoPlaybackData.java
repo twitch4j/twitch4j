@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +45,7 @@ public class VideoPlaybackData {
             return this.type;
         }
 
-        @Deprecated
+        @JsonCreator
         public static Type fromString(String type) {
             for (Type t : Type.values()) {
                 if (t.type.equalsIgnoreCase(type))
