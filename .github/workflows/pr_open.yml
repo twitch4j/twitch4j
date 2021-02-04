@@ -1,0 +1,47 @@
+on:
+  pull_request_target:
+    types: [ opened ]
+
+jobs:
+  pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vsoch/pull-request-action@1.0.13
+        if: ${{ github.event.pull_request.base.ref != 'develop' }} # switch branch to develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_BRANCH: "develop"
+      - uses: kentaro-m/auto-assign-action@v1.1.2 # assign reviewer
+        with:
+          configuration-path: ".github/pr_review.yml"
+      - uses: amannn/action-semantic-pull-request@v3
+        if: ${{ !github.event.pull_request.pull_request.title.startsWith('deps:') && !['philippheuer', 'iprodigy', 'dependabot[bot]', 'dependabot-preview[bot]'].includes(github.event.pull_request.sender.login.toLowerCase()) }} # skip for maintainer and dependabot
+        with:
+          types: |
+            feat
+            feature
+            fix
+            bugfix
+            deps
+            build
+            chore
+            perf
+            refactor
+          scopes: |
+            ci
+            gradle
+            common
+            kraken
+            helix
+            chat
+            pubsub
+            websub
+            gql
+            eventsub
+            core
+          requiredScope: true
+          subjectPatternError: |
+            Thank you for your contribiution. Unfortunate your title doesn't contain a proper title format.
+            The title must be: `<type>(<scope>): {title}`, when [`type`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-types)
+            and [`scope`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-scopes) **MUST** be defined in the sample title.
+            For more details about sending pull request, please refer to our [documentation](https://twitch4j.github.io/docs/contributing/pull-request-guide)

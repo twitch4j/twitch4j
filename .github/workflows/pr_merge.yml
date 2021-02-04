@@ -1,0 +1,17 @@
+on:
+  pull_request_review:
+    types: [ submitted ]
+  check_suite:
+    types: [ completed ]
+
+jobs:
+  auto_merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pascalgn/automerge-action@v0.13.0
+        if: ${{ github.event.pull_request_review.review.state == 'approved' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: squash
+          MERGE_COMMIT_MESSAGE: pull-request-title-and-description
+
