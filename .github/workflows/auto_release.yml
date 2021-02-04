@@ -1,0 +1,15 @@
+name: Automatically Release
+on:
+  schedule:
+    - cron: 0 22 * * 4/2 # deploy release every second friday on 10PM UTC
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+          ref: develop
+      - run: git push origin main # push to main repo
+
