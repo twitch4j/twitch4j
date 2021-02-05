@@ -171,7 +171,7 @@ publishing {
 				packaging 'jar'
 				scm {
 					connection = 'scm:git:' + project.vcsUrl
-					developerConnection = 'scm:git:git@github.com/tiwtch4j/twitch4j.git'
+					developerConnection = 'scm:git:git@github.com/twitch4j/twitch4j.git'
 					url = project.gitUrl
 				}
 				licenses {
