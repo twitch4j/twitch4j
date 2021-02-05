@@ -109,55 +109,20 @@ def pomConfig = {
 	}
 }
 
-//signing {
-//	sign configurations.archives
-//}
-
 publishing {
 	repositories {
 		maven {
-			name = "SonatypeRelease"
-			url 'https://oss.sonatype.org/content/repositories/releases'
+			name = "Nexus"
+			def releaseUri = "https://oss.sonatype.org/content/repositories/releases"
+			def snapshotUri = "https://oss.sonatype.org/content/repositories/releases"
+			url ("${project.version}".endsWith("SNAPSHOT")) ? snapshotUri : releaseUri
 			credentials {
 				username = nexusUserName
 				password = nexusPassword
-			}
-			authentication {
-				basic BasicAuthentication
-			}
-			mavenContent {
-				releasesOnly()
-			}
-		}
-		maven {
-			name = "SonatypeSnapshots"
-			url 'https://oss.sonatype.org/content/repositories/snapshots'
-			credentials {
-				username = nexusUserName
-				password = nexusPassword
-			}
-			authentication {
-				basic BasicAuthentication
-			}
-			mavenContent {
-				snapshotsOnly()
-			}
-		}
-		maven {
-			name = "GitHubPackages"
-			url 'https://maven.pkg.github.com/twitch4j/twitch4j'
-			credentials {
-				username = System.getenv("GITHUB_USER")
-				password = System.getenv("GITHUB_USER_TOKEN")
-			}
-			authentication {
-				basic BasicAuthentication
-			}
-			mavenContent {
-				snapshotsOnly()
 			}
 		}
 	}
+
     publications {
         mainProject(MavenPublication) {
             from project.components.java
@@ -198,60 +163,6 @@ publishing {
     }
 }
 
-/**
- * Artifactory Upload
- */
-//artifactory {
-//    contextUrl = 'https://oss.jfrog.org'
-//    publish {
-//        repository {
-//            repoKey = 'oss-release-local'
-//            username = System.getenv("ARTIFACTORY_USER")
-//            password = System.getenv("ARTIFACTORY_API_KEY")
-//        }
-//        defaults {
-//            publications('mainProject')
-//            publishArtifacts = true
-//            publishPom = true
-//            properties = [
-//                    'build.number': String.valueOf(System.getenv("CI_PIPELINE_IID")),
-//                    'build.name'  : String.valueOf(project.artifactName).toLowerCase()
-//            ]
-//        }
-//    }
-//    resolve {
-//        repoKey = 'jcenter'
-//    }
-//	clientConfig.info.setBuildName(String.valueOf(project.name).toLowerCase())
-//    clientConfig.info.setBuildNumber(String.valueOf(System.getenv("CI_PIPELINE_IID")))
-//}
-
-/**
- * Bintray Upload
- */
-//bintray {
-//    user = System.getenv("BINTRAY_USER")
-//    key = System.getenv("BINTRAY_API_KEY")
-//    publications = ['mainProject']
-//    dryRun = false
-//	publish = true
-//	override = false
-//    pkg {
-//        // jcenter repository namespace and name
-//        userOrg = String.valueOf(project.artifactNamespace).toLowerCase()
-//        repo = 'maven'
-//        name = String.valueOf(project.artifactName).toLowerCase()
-//        desc = project.description
-//        licenses = ['MIT']
-//        websiteUrl = project.websiteUrl
-//        issueTrackerUrl = project.issueTrackerUrl
-//        vcsUrl = project.vcsUrl
-//        labels = []
-//        publicDownloadNumbers = true
-//        version {
-//            name = project.version
-//            vcsTag = project.version
-//            released = new Date()
-//        }
-//    }
-//}
+signing {
+	sign publishing.publications.mainProject
+}

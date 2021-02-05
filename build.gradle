@@ -16,8 +16,8 @@ project.ext {
 	issueTrackerUrl = gitUrl + '/issues'
 	vcsUrl = gitUrl + '.git'
 	// sonatype
-	nexusUserName = System.getenv("SONATYPE_USER")
-	nexusPassword = System.getenv("SONATYPE_PASSWORD")
+	nexusUserName = String.valueOf(System.getenv("SONATYPE_USER"))
+	nexusPassword = String.valueOf(System.getenv("SONATYPE_PASSWORD"))
 }
 
 // All-Projects
@@ -36,10 +36,8 @@ subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-//	apply plugin: 'signing'
+	apply plugin: 'signing'
 	apply plugin: 'maven-publish'
-//	apply plugin: 'com.jfrog.bintray'
-//	apply plugin: 'com.jfrog.artifactory'
 	apply plugin: 'io.freefair.lombok'
 	apply plugin: 'com.github.johnrengelman.shadow'
 
