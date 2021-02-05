@@ -109,64 +109,90 @@ def pomConfig = {
 	}
 }
 
-signing {
-	sign configurations.archives
-}
+//signing {
+//	sign configurations.archives
+//}
 
-uploadArchives {
+publishing {
 	repositories {
-		mavenDeployer {
-			beforeDeployment { signing.signPom(it) }
-			repository(url: 'https://oss.sonatype.org/content/repositories/releases') {
-				authentication(userName: nexusUserName, password: nexusPassword)
+		maven {
+			name = "SonatypeRelease"
+			url 'https://oss.sonatype.org/content/repositories/releases'
+			credentials {
+				username = nexusUserName
+				password = nexusPassword
 			}
-			snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-				authentication(userName: nexusUserName, password: nexusPassword)
+			authentication {
+				basic BasicAuthentication
 			}
-
-			pom.project {
-				name = String.valueOf(project.artifactName)
-				packaging 'jar'
-				description project.artifactDescription
-				url String.valueOf(project.websiteUrl)
-				scm {
-					connection 'scm:git:' + vcsUrl
-					developerConnection 'scm:git:git@github.com/tiwtch4j/twitch4j.git'
-					url gitUrl
-				}
-				licenses {
-					license {
-						name 'MIT Licence'
-						distribution 'repo'
-						url 'https://opensource.org/licenses/MIT'
-					}
-				}
-				developers {
-					developer {
-						id 'PhilippHeuer'
-						name 'Philipp Heuer'
-						email 'git@philippheuer.me'
-						roles 'creator', 'developer', 'owner'
-					}
-				}
+			mavenContent {
+				releasesOnly()
+			}
+		}
+		maven {
+			name = "SonatypeSnapshots"
+			url 'https://oss.sonatype.org/content/repositories/snapshots'
+			credentials {
+				username = nexusUserName
+				password = nexusPassword
+			}
+			authentication {
+				basic BasicAuthentication
+			}
+			mavenContent {
+				snapshotsOnly()
+			}
+		}
+		maven {
+			name = "GitHubPackages"
+			url 'https://maven.pkg.github.com/twitch4j/twitch4j'
+			credentials {
+				username = System.getenv("GITHUB_USER")
+				password = System.getenv("GITHUB_USER_TOKEN")
+			}
+			authentication {
+				basic BasicAuthentication
+			}
+			mavenContent {
+				snapshotsOnly()
 			}
 		}
 	}
-}
-
-publishing {
     publications {
         mainProject(MavenPublication) {
             from project.components.java
             groupId project.group
             artifactId String.valueOf(project.artifactName).toLowerCase()
             version project.version
-			pom.withXml {
-				def root = asNode()
-				root.appendNode('description', project.artifactDescription)
-				root.appendNode('name', String.valueOf(project.artifactName))
-				root.appendNode('url', String.valueOf(project.websiteUrl))
-				root.children().last() + pomConfig
+			pom {
+				name = String.valueOf(project.artifactName)
+				url = String.valueOf(project.websiteUrl)
+				description = project.artifactDescription
+				packaging 'jar'
+				scm {
+					connection = 'scm:git:' + project.vcsUrl
+					developerConnection = 'scm:git:git@github.com/tiwtch4j/twitch4j.git'
+					url = project.gitUrl
+				}
+				licenses {
+					license {
+						name = 'MIT Licence'
+						distribution = 'repo'
+						url = 'https://opensource.org/licenses/MIT'
+					}
+				}
+				issueManagement {
+					system = 'GitHub'
+					url = project.issueTrackerUrl
+				}
+				developers {
+					developer {
+						id = 'PhilippHeuer'
+						name = 'Philipp Heuer'
+						email = 'git@philippheuer.me'
+						roles = ['creator', 'developer', 'owner']
+					}
+				}
 			}
         }
     }
