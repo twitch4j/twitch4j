@@ -1,12 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
-import java.util.*
-
 // Plugins
 plugins {
+	signing
 	`java-library`
 	`maven-publish`
-	id("com.jfrog.bintray") version "1.8.5"
 	id("io.freefair.lombok") version "5.3.0"
 	id("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -15,6 +13,8 @@ plugins {
 allprojects {
 	// Repositories
 	repositories {
+		mavenCentral()
+		mavenLocal()
 		jcenter()
 	}
 
@@ -37,9 +37,9 @@ allprojects {
 
 // Subprojects
 subprojects {
+	apply(plugin = "signing")
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
-	apply(plugin = "com.jfrog.bintray")
 	apply(plugin = "io.freefair.lombok")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
@@ -109,6 +109,29 @@ subprojects {
 	}
 
 	publishing {
+		repositories {
+			maven {
+				val releaseUri = uri("https://oss.sonatype.org/content/repositories/releases")
+				val snapshotUri = uri("https://oss.sonatype.org/content/repositories/releases")
+				name = "Nexus"
+				url = if (project.isSnapshot) snapshotUri else releaseUri
+				credentials {
+					username = project.nexusUser
+					password = project.nexusPassword
+				}
+			}
+			maven {
+				name = "GitHubPackages"
+				url = uri("https://maven.pkg.github.com/twitch4j/twitch4j")
+				credentials {
+					username = project.githubRepoUser
+					password = project.githubRepoToken
+				}
+				mavenContent {
+					releasesOnly()
+				}
+			}
+		}
 		publications {
 			create<MavenPublication>("main") {
 				from(components["java"])
@@ -116,6 +139,10 @@ subprojects {
 				pom.default()
 			}
 		}
+	}
+
+	signing {
+		sign(publishing.publications["main"])
 	}
 
 	// Source encoding
@@ -159,24 +186,24 @@ subprojects {
 		}
 	}
 
-	bintray {
-		user = bintrayUser
-		key = bintrayApiKey
-		setPublications(*publishing.publications.filterIsInstance<MavenPublication>().map { it.name }.toTypedArray())
-		dryRun = false
-		publish = true
-		override = false
-		pkg.apply {
-			userOrg = "Twitch4J"
-			repo = "maven"
-			name = "Twitch4J"
-			version.apply {
-				name = "${project.version}"
-				vcsTag = "v${project.version}"
-				released = "${Date()}"
-			}
-		}
-	}
+//	bintray {
+//		user = bintrayUser
+//		key = bintrayApiKey
+//		setPublications(*publishing.publications.filterIsInstance<MavenPublication>().map { it.name }.toTypedArray())
+//		dryRun = false
+//		publish = true
+//		override = false
+//		pkg.apply {
+//			userOrg = "Twitch4J"
+//			repo = "maven"
+//			name = "Twitch4J"
+//			version.apply {
+//				name = "${project.version}"
+//				vcsTag = "v${project.version}"
+//				released = "${Date()}"
+//			}
+//		}
+//	}
 }
 
 tasks.register<Javadoc>("aggregateJavadoc") {

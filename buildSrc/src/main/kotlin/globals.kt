@@ -2,14 +2,20 @@ import org.gradle.api.Project
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.util.Path
 
-val Project.bintrayUser: String?
-	get() = System.getenv("BINTRAY_USER") ?: findProperty("bintray.user")?.toString()
+val Project.nexusUser: String?
+	get() = System.getenv("SONATYPE_USER") ?: findProperty("nexus.user")?.toString()
 
-val Project.bintrayApiKey: String?
-	get() = System.getenv("BINTRAY_API_KEY") ?: findProperty("bintray.api_key")?.toString()
+val Project.nexusPassword: String?
+	get() = System.getenv("SONATYPE_PASSOWRD") ?: findProperty("nexus.passowrd")?.toString()
 
 val Project.githubToken: String?
 	get() = System.getenv("GITHUB_TOKEN") ?: findProperty("github.token")?.toString()
+
+val Project.githubRepoUser: String?
+	get() = System.getenv("GITHUB_REPO_USER") ?: findProperty("github.repo.user")?.toString()
+
+val Project.githubRepoToken: String?
+	get() = System.getenv("GITHUB_REPO_TOKEN") ?: findProperty("github.repo.token")?.toString()
 
 val Project.isSnapshot: Boolean
 	get() = (rootProject.version as String).endsWith("-SNAPSHOT")

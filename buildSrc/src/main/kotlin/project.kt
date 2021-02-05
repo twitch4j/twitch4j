@@ -5,6 +5,7 @@ import java.util.*
 fun MavenPom.default() {
 	url.set("https://twitch4j.github.io/")
 	issueManagement {
+		system.set("GitHub")
 		url.set("https://github.com/twitch4j/twitch4j/issues")
 	}
 	ciManagement {
@@ -23,9 +24,6 @@ fun MavenPom.default() {
 		connection.set("scm:git:https://github.com/twitch4j/twitch4j.git")
 		developerConnection.set("scm:git:git@github.com:twitch4j/twitch4j.git")
 		url.set("https://github.com/twitch4j/twitch4j")
-	}
-	distributionManagement {
-		downloadUrl.set("https://bintray.com/twitch4j/maven/twitch4j/_latestVersion")
 	}
 }
 
