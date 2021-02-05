@@ -1,8 +1,6 @@
 // Plugins
 plugins {
 	id 'io.freefair.lombok' version '5.3.0' apply false
-	id 'com.jfrog.bintray' version '1.8.5' apply false
-	id 'com.jfrog.artifactory' version '4.13.0' apply false
 	id 'com.github.johnrengelman.shadow' version '6.1.0' apply false
 }
 
@@ -13,9 +11,13 @@ project.ext {
 	artifactName = 'Twitch4J'
 	artifactVersion = String.valueOf(System.getenv("CI_COMMIT_REF_NAME")).replace("v", "")
 	artifactDescription = 'Twitch4J'
-	websiteUrl = 'https://github.com/twitch4j/twitch4j'
-	issueTrackerUrl = 'https://github.com/twitch4j/twitch4j/issues'
-	vcsUrl = 'https://github.com/twitch4j/twitch4j.git'
+	websiteUrl = 'https://twitch4j.github.io/'
+	gitUrl = 'https://github.com/twitch4j/twitch4j'
+	issueTrackerUrl = gitUrl + '/issues'
+	vcsUrl = gitUrl + '.git'
+	// sonatype
+	nexusUserName = System.getenv("SONATYPE_USER")
+	nexusPassword = System.getenv("SONATYPE_PASSWORD")
 }
 
 // All-Projects
@@ -34,9 +36,11 @@ subprojects {
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
+	apply plugin: 'signing'
+	apply plugin: 'maven'
 	apply plugin: 'maven-publish'
-	apply plugin: 'com.jfrog.bintray'
-	apply plugin: 'com.jfrog.artifactory'
+//	apply plugin: 'com.jfrog.bintray'
+//	apply plugin: 'com.jfrog.artifactory'
 	apply plugin: 'io.freefair.lombok'
 	apply plugin: 'com.github.johnrengelman.shadow'
 
