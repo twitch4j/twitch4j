@@ -2356,11 +2356,11 @@
 	  {
 		"kind": "OBJECT",
 		"name": "AutomodContentResponse",
-		"description": "AutomodContentResponse is the automod response for the text evaluated.",
+		"description": "AutomodContentResponse is the automod response for the text evaulated.",
 		"fields": [
 		  {
 			"name": "content",
-			"description": "content are pieces of the content evaluated by automod.",
+			"description": "content are pieces of the content evaulated by automod.",
 			"args": [],
 			"type": {
 			  "kind": "OBJECT",
@@ -3670,7 +3670,7 @@
 		  },
 		  {
 			"name": "eventLeaves",
-			"description": "Paginated list of leaf events that will or have run on theis user's channel.\nThis selects *all* leaves of all collections that this user might have associated as well.\nAn optional criteria object can be given to specify the relevant time window that events should fall within, and\nhow the events are sorted.\nNOTE: If no time window is given, this field will only contain upcoming events.",
+			"description": "Paginated list of leaf events that will or have run on theis user's channel.\nThis selects *all* leaves of all collections that this user might have assocated as well.\nAn optional criteria object can be given to specify the relevant time window that events should fall within, and\nhow the events are sorted.\nNOTE: If no time window is given, this field will only contain upcoming events.",
 			"args": [
 			  {
 				"name": "first",
@@ -4518,7 +4518,7 @@
 		  },
 		  {
 			"name": "isSiteAdmin",
-			"description": "Whether or not the user is a site administrator.",
+			"description": "Whether or not the user is a site admininistrator.",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
@@ -6028,7 +6028,7 @@
 		  },
 		  {
 			"name": "facebook",
-			"description": "Connection information about a user's Facebook account.",
+			"description": "Connection infromation about a user's Facebook account.",
 			"args": [],
 			"type": {
 			  "kind": "OBJECT",
@@ -6723,7 +6723,7 @@
 		  },
 		  {
 			"name": "isPayoutEnabled",
-			"description": "Whether the owner of this store is enabled to receive payments.",
+			"description": "Whether the owner of this store is enabled to recieve payments.",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
@@ -9982,7 +9982,7 @@
 		  },
 		  {
 			"name": "tags",
-			"description": "List of recommended tags in the corresponding category.",
+			"description": "List of recommeded tags in the corresponding category.",
 			"args": [
 			  {
 				"name": "limit",
@@ -10761,7 +10761,7 @@
 		  },
 		  {
 			"name": "language",
-			"description": "The language setting of the streaming user.",
+			"description": "The lanugage setting of the streaming user.",
 			"args": [],
 			"type": {
 			  "kind": "ENUM",
@@ -11591,7 +11591,7 @@
 		  },
 		  {
 			"name": "viewCount",
-			"description": "The number of views this video has. Can be delayed by up to 15 minutes.",
+			"description": "The numer of views this video has. Can be delayed by up to 15 minutes.",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
@@ -15241,7 +15241,7 @@
 		  },
 		  {
 			"name": "parentKey",
-			"description": "parentKey is an optional pointer to specify the key of the parent attribute.",
+			"description": "parentKey is an optional pointer to specifiy the key of the parent attribute.",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
@@ -15985,7 +15985,7 @@
 		  },
 		  {
 			"name": "thirdPartyTemplateSKU",
-			"description": "ThirdPartytemplateSKU is used by the frontend to retrieve third party product information such\nas price. templateSKU is exposed separately from purchaseSKU since retrieving purchaseSKU is a\nmore expensive operation. A user may not be able to purchase the templateSKU. Use purchaseSKU\nwhen the user has indicated they want to purchase.\nUses Client-ID to determine platform information and IP address to determine location.",
+			"description": "ThirdPartytemplateSKU is used by the frontend to retrieve third party product information such\nas price. templateSKU is exposed separately from purchaseSKU since retrieving purchaseSKU is a\nmore expensive operation. A user may not be able to purchase the templateSKU. Use purchaseSKU\nwhen the user has indiciated they want to purchase.\nUses Client-ID to determine platform information and IP address to determine location.",
 			"args": [
 			  {
 				"name": "platform",
@@ -18944,7 +18944,7 @@
 		  },
 		  {
 			"name": "gifts",
-			"description": "The occurrences where the user has gifted the offer to someone else. A user is limited to 10 of these,\nso there will not be more than 10 in this list.",
+			"description": "The occurences where the user has gifted the offer to someone else. A user is limited to 10 of these,\nso there will not be more than 10 in this list.",
 			"args": [],
 			"type": {
 			  "kind": "LIST",
@@ -21502,7 +21502,7 @@
 		  },
 		  {
 			"name": "premiere",
-			"description": "The premiere that this event is scheduling if one is associated.",
+			"description": "The premiere that this event is scheduling if one is assocated.",
 			"args": [],
 			"type": {
 			  "kind": "OBJECT",
@@ -40064,7 +40064,7 @@
 		  },
 		  {
 			"name": "PAYOUT_METHOD_NOT_STARTED",
-			"description": "User needs to setup how they want to get paid out.",
+			"description": "User neeeds to setup how they want to get paid out.",
 			"isDeprecated": false,
 			"deprecationReason": null
 		  },
@@ -40386,7 +40386,7 @@
 		  },
 		  {
 			"name": "locale",
-			"description": "The preferred locale for user in the accepted format to initiate the Amazon tax interview (e.g. \"en_US\").",
+			"description": "The preferred locale for user in the accepted format to initate the Amazon tax interview (e.g. \"en_US\").",
 			"args": [],
 			"type": {
 			  "kind": "NON_NULL",
@@ -40464,7 +40464,7 @@
 		"enumValues": [
 		  {
 			"name": "NAME",
-			"description": "Applied when the user submits a name that does not match the name on their registration.\nIf provided, the company name will be compared instead of the user's full legal name.",
+			"description": "Applied when the user submits a name that does not match the name on their registration.\nIf provided, the company name will be compared intead of the user's full legal name.",
 			"isDeprecated": false,
 			"deprecationReason": null
 		  },
@@ -42116,7 +42116,7 @@
 		  },
 		  {
 			"name": "isSiteAdmin",
-			"description": "Whether or not the user is a site administrator.",
+			"description": "Whether or not the user is a site admininistrator.",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
@@ -50009,7 +50009,7 @@
 		  },
 		  {
 			"name": "acceptSquadStreamInvitation",
-			"description": "acceptSquadStreamInvitation allows a user that has received a squad stream invitation to accept and join\nthe squad stream.",
+			"description": "acceptSquadStreamInvitation allows a user that has recieved a squad stream invitation to accept and join\nthe squad stream.",
 			"args": [
 			  {
 				"name": "input",
@@ -55545,7 +55545,7 @@
 		"fields": [
 		  {
 			"name": "error",
-			"description": "Describes error that occurred while accepting a program agreement.",
+			"description": "Describes error that occured while accepting a program agreement.",
 			"args": [],
 			"type": {
 			  "kind": "ENUM",
@@ -56440,7 +56440,7 @@
 	  {
 		"kind": "OBJECT",
 		"name": "AddEditorPayload",
-		"description": "AddEditorPayload is the response after attempting to add an editor.",
+		"description": "AddEditorPayload is the response after attemping to add an editor.",
 		"fields": [
 		  {
 			"name": "channel",
@@ -63649,7 +63649,7 @@
 		  },
 		  {
 			"name": "isDelete",
-			"description": "Permanently delete account.\nfalse means account will be disabled and can be re-enabled in the future.\ntrue means the account will be disabled and will be permanently deleted after a period of time.\ndefault is false.",
+			"description": "Permanently delete account.\nfalse means account will be disabled and can be reenabled in the future.\ntrue means the account will be disabled and will be permanently deleted after a period of time.\ndefault is false.",
 			"type": {
 			  "kind": "SCALAR",
 			  "name": "Boolean",
@@ -64770,7 +64770,7 @@
 	  {
 		"kind": "OBJECT",
 		"name": "GrantVIPPayload",
-		"description": "GrantVIPPayload is the response after attempting to grant the VIP status to a user.",
+		"description": "GrantVIPPayload is the response after attemping to grant the VIP status to a user.",
 		"fields": [
 		  {
 			"name": "channel",
@@ -66739,7 +66739,7 @@
 		"fields": [
 		  {
 			"name": "error",
-			"description": "Describes error that occurred when registering payout information.",
+			"description": "Describes error that occured when registering payout information.",
 			"args": [],
 			"type": {
 			  "kind": "OBJECT",
@@ -66770,7 +66770,7 @@
 	  {
 		"kind": "OBJECT",
 		"name": "RegisterPayoutInformationError",
-		"description": "RegisterPayoutInformationError describes the error that occurred when registering a user's payout information during payout onboarding.",
+		"description": "RegisterPayoutInformationError describes the error that occured when registering a user's payout information during payout onboarding.",
 		"fields": [
 		  {
 			"name": "code",
@@ -66852,7 +66852,7 @@
 	  {
 		"kind": "ENUM",
 		"name": "RegisterPayoutInformationFieldName",
-		"description": "Enumerates void field names when registering payout information.",
+		"description": "Enumerates vaid field names when registering payout information.",
 		"fields": null,
 		"inputFields": null,
 		"interfaces": null,
@@ -70055,7 +70055,7 @@
 	  {
 		"kind": "INPUT_OBJECT",
 		"name": "SpendSubscriptionCreditInput",
-		"description": "Input requires the broadcaster to be paid and user to deduct credit.",
+		"description": "Input requires the broadcaster to be payed and user to deduct credit.",
 		"fields": null,
 		"inputFields": [
 		  {
@@ -70149,7 +70149,7 @@
 		"fields": [
 		  {
 			"name": "code",
-			"description": "Error code for error that occurred while attempting to spend subscription credit.",
+			"description": "Error code for error that occured while attempting to spend subscription credit.",
 			"args": [],
 			"type": {
 			  "kind": "NON_NULL",
@@ -71668,7 +71668,7 @@
 		"fields": [
 		  {
 			"name": "isSuccess",
-			"description": "Whether or not the unlink operation was successful. Only reports if the underlying call was successful, as such will return true even if no unlinking occurred (such as when as user doesn't have a linked amazon account, for instance).",
+			"description": "Whether or not the unlink operation was successful. Only reports if the underlying call was successful, as such will return true even if no unlinking occured (such as when as user doesn't have a linked amazon account, for instance).",
 			"args": [],
 			"type": {
 			  "kind": "SCALAR",
