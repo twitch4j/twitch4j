@@ -9,7 +9,7 @@ public class EscapeUtils {
      *
      * @param value the unescaped message tag value
      * @return the escaped tag value
-     * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Offical spec</a>
+     * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Official spec</a>
      */
     public static String escapeTagValue(Object value) {
         final String unescapedString;
@@ -65,7 +65,7 @@ public class EscapeUtils {
      *
      * @param value the escaped message tag value
      * @return the unescaped value
-     * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Offical spec</a>
+     * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Official spec</a>
      */
     public static String unescapeTagValue(String value) {
         return StringUtils.replaceEach(

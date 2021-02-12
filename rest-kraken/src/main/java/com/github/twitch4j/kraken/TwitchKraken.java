@@ -96,7 +96,7 @@ public interface TwitchKraken {
      * Gets a list of users subscribed to a specified channel, sorted by the date when they subscribed.
      *
      * @param authToken Auth Token
-     * @param channelId Channnel Id
+     * @param channelId Channel Id
      * @param limit     Maximum number of objects to return. Default: 25. Maximum: 100.
      * @param offset    Object offset for pagination of results. Default: 0.
      * @param direction Sorting direction. Valid values: asc, desc. Default: asc (oldest first).

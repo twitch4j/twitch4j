@@ -142,7 +142,7 @@ public class TwitchChatBuilder {
     private long chatQueueTimeout = 1000L;
 
     /**
-     * Proxy Configuraiton
+     * Proxy Configuration
      */
     @With
     private ProxyConfig proxyConfig = null;

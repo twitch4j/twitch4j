@@ -16,7 +16,7 @@ public interface TwitchMessagingInterface {
     /**
      * Get Chatters
      * <p>
-     * This endpoint returns all chatters in a channnel. It's not official, bot pretty much every single bot depends on this so i doubt that they will ever remove it.
+     * This endpoint returns all chatters in a channel. It's not official, bot pretty much every single bot depends on this so i doubt that they will ever remove it.
      *
      * @param channelName Channel Name
      * @return List of all Viewers/mods/...
