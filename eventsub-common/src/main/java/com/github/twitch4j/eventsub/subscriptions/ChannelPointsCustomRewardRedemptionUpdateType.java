@@ -6,7 +6,7 @@ import com.github.twitch4j.eventsub.events.CustomRewardRedemptionUpdateEvent;
 /**
  * A redemption of a channel points custom reward has been updated for the specified channel.
  * <p>
- * Must have channel:read:redemptions scope.
+ * Must have channel:read:redemptions or channel:manage:redemptions scope.
  */
 public class ChannelPointsCustomRewardRedemptionUpdateType implements SubscriptionType<ChannelPointsCustomRewardRedemptionUpdateCondition,
     ChannelPointsCustomRewardRedemptionUpdateCondition.ChannelPointsCustomRewardRedemptionUpdateConditionBuilder<?, ?>, CustomRewardRedemptionUpdateEvent> {
