@@ -189,7 +189,7 @@ public class TwitchPubSub implements ITwitchPubSub {
 
         // Run heartbeat every 4 minutes
         heartbeatTask = taskExecutor.scheduleAtFixedRate(() -> {
-            if (isClosed)
+            if (isClosed || connectionState != TMIConnectionState.CONNECTED)
                 return;
 
             PubSubRequest request = new PubSubRequest();
@@ -213,6 +213,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                     if (lastPong < lastPing && TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
                         reconnect();
+                        break;
                     }
 
                     // If connected, send one message from the queue
@@ -230,6 +231,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                     }
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
+                    break;
                 }
             }
 
@@ -262,6 +264,13 @@ public class TwitchPubSub implements ITwitchPubSub {
             } catch (Exception ex) {
                 log.error("PubSub: Connection to Twitch PubSub failed: {} - Retrying ...", ex.getMessage());
 
+                if (backoffClearer != null) {
+                    try {
+                        backoffClearer.cancel(false);
+                    } catch (Exception ignored) {
+                    }
+                }
+
                 // Sleep before trying to reconnect
                 try {
                     backoff.sleep();
@@ -287,9 +296,15 @@ public class TwitchPubSub implements ITwitchPubSub {
         connectionState = TMIConnectionState.DISCONNECTED;
 
         // CleanUp
-        this.webSocket.clearListeners();
-        this.webSocket.disconnect();
-        this.webSocket = null;
+        if (webSocket != null) {
+            this.webSocket.clearListeners();
+            this.webSocket.disconnect();
+            this.webSocket = null;
+        }
+
+        if (backoffClearer != null) {
+            backoffClearer.cancel(false);
+        }
     }
 
     /**
