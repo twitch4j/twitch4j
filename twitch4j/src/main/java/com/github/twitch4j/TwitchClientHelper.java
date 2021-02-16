@@ -390,8 +390,16 @@ public class TwitchClientHelper implements AutoCloseable {
         boolean remove = listenForGoLive.remove(channelId);
 
         // invalidate cache
-        if (!listenForFollow.contains(channelId))
+        if (!listenForFollow.contains(channelId)) {
             channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.setIsLive(null);
+                info.setGameId(null);
+                info.setTitle(null);
+            }
+        }
 
         startOrStopEventGenerationThread();
         return remove;
@@ -490,8 +498,15 @@ public class TwitchClientHelper implements AutoCloseable {
         boolean remove = listenForFollow.remove(channelId);
 
         // invalidate cache
-        if (!listenForGoLive.contains(channelId))
+        if (!listenForGoLive.contains(channelId)) {
             channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.setLastFollowCheck(null);
+                info.getFollowers().set(null);
+            }
+        }
 
         startOrStopEventGenerationThread();
         return remove;
