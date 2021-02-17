@@ -20,13 +20,16 @@ import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -38,6 +41,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
@@ -101,7 +105,6 @@ public class TwitchClientHelper implements AutoCloseable {
      */
     private final Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
-        .maximumSize(10_000)
         .build();
 
     /**
@@ -299,14 +302,19 @@ public class TwitchClientHelper implements AutoCloseable {
      *
      * @param channelName Channel Name
      */
-    public void enableStreamEventListener(String channelName) {
+    @Nullable
+    public User enableStreamEventListener(String channelName) {
         UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> enableStreamEventListener(user.getId(), user.getLogin()));
+            User user = users.getUsers().get(0);
+            if (enableStreamEventListener(user.getId(), user.getLogin()))
+                return user;
         } else {
             log.error("Failed to add channel {} to stream event listener!", channelName);
         }
+
+        return null;
     }
 
     /**
@@ -314,11 +322,14 @@ public class TwitchClientHelper implements AutoCloseable {
      *
      * @param channelNames the channel names to be added
      */
-    public void enableStreamEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> enableStreamEventListener(user.getId(), user.getLogin()));
-        });
+    public Collection<User> enableStreamEventListener(Iterable<String> channelNames) {
+        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
+            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
+            .map(UserList::getUsers)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(user -> enableStreamEventListener(user.getId(), user.getLogin()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -379,7 +390,16 @@ public class TwitchClientHelper implements AutoCloseable {
         boolean remove = listenForGoLive.remove(channelId);
 
         // invalidate cache
-        channelInformation.invalidate(channelId);
+        if (!listenForFollow.contains(channelId)) {
+            channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.setIsLive(null);
+                info.setGameId(null);
+                info.setTitle(null);
+            }
+        }
 
         startOrStopEventGenerationThread();
         return remove;
@@ -390,14 +410,19 @@ public class TwitchClientHelper implements AutoCloseable {
      *
      * @param channelName Channel Name
      */
-    public void enableFollowEventListener(String channelName) {
+    @Nullable
+    public User enableFollowEventListener(String channelName) {
         UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
 
         if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> enableFollowEventListener(user.getId(), user.getLogin()));
+            User user = users.getUsers().get(0);
+            if (enableFollowEventListener(user.getId(), user.getLogin()))
+                return user;
         } else {
             log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
         }
+
+        return null;
     }
 
     /**
@@ -405,11 +430,14 @@ public class TwitchClientHelper implements AutoCloseable {
      *
      * @param channelNames the channel names to be added
      */
-    public void enableFollowEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> enableFollowEventListener(user.getId(), user.getLogin()));
-        });
+    public Collection<User> enableFollowEventListener(Iterable<String> channelNames) {
+        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
+            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
+            .map(UserList::getUsers)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(user -> enableFollowEventListener(user.getId(), user.getLogin()))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -470,7 +498,15 @@ public class TwitchClientHelper implements AutoCloseable {
         boolean remove = listenForFollow.remove(channelId);
 
         // invalidate cache
-        channelInformation.invalidate(channelId);
+        if (!listenForGoLive.contains(channelId)) {
+            channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.setLastFollowCheck(null);
+                info.getFollowers().set(null);
+            }
+        }
 
         startOrStopEventGenerationThread();
         return remove;
