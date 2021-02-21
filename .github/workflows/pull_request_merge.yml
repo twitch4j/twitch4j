@@ -8,7 +8,7 @@ on:
 jobs:
   auto_merge:
     runs-on: ubuntu-latest
-    if: ${{ github.event.review.state == 'approved' && github.event.pull_request_review.pull_request }}
+    if: ${{ github.event.review.state == 'approved' }}
     steps:
       - uses: actions/script@v3
         id: script-check
