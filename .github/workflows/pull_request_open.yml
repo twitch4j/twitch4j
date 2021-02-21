@@ -1,9 +1,8 @@
 on:
   pull_request_target:
     types: [ opened ]
-
 jobs:
-  pull_request:
+  branch_check:
     runs-on: ubuntu-latest
     steps:
       - uses: vsoch/pull-request-action@1.0.13
@@ -11,9 +10,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PULL_REQUEST_BRANCH: "develop"
+  reviewer_assign:
+    runs-on: ubuntu-latest
+    steps:
       - uses: kentaro-m/auto-assign-action@v1.1.2 # assign reviewer
         with:
           configuration-path: ".github/pr_review.yml"
+  title_check:
+    runs-on: ubuntu-latest
+    steps:
       - uses: amannn/action-semantic-pull-request@v3
         if: ${{ !github.event.pull_request.pull_request.title.startsWith('deps:') && !['philippheuer', 'iprodigy', 'dependabot[bot]', 'dependabot-preview[bot]'].includes(github.event.pull_request.sender.login.toLowerCase()) }} # skip for maintainer and dependabot
         with:

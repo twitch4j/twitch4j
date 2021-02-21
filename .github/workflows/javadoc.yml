@@ -1,0 +1,31 @@
+name: Javadoc
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  javadoc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: JDK15-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: JDK15-gradle-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 15
+    - uses: actions/checkout@v2
+      with:
+        repository: https://github.com/twitch4j/twitch4j.github.io.git
+        path: $GITHUB_WORKSPACE/docs
+    - run: |
+        chmod +x ./gradlew
+        ./gradlew aggregateJavadoc
+        cd ./docs
+        git add .
+        git commit -m "docs(javadoc): release javadoc ${{ github.event.release.tag_name }}"
+        git push origin main
