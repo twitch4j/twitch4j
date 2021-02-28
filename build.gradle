@@ -68,7 +68,7 @@ subprojects {
 			api group: 'com.github.philippheuer.events4j', name: 'events4j-handler-spring', version: '0.9.5'
 
 			// Credential Manager
-			api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.1'
+			api group: 'com.github.philippheuer.credentialmanager', name: 'credentialmanager', version: '0.1.2'
 
 			// HTTP Client
 			api group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.1'

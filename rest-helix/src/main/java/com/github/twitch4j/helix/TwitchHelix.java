@@ -453,7 +453,7 @@ public interface TwitchHelix {
     /**
      * Modifies channel information for users
      *
-     * @param authToken Auth Token (scope: user:edit:broadcast)
+     * @param authToken Auth Token (scope: channel:manage:broadcast or user:edit:broadcast)
      * @param broadcasterId ID of the channel to be updated (required)
      * @param channelInformation {@link ChannelInformation} (at least one parameter must be provided)
      * @return 204 No Content upon a successful update
@@ -924,7 +924,7 @@ public interface TwitchHelix {
 
     /**
      * Replaces the active stream tags on the specified stream with the specified tags (or clears all tags, if no new tags are specified).
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream to replace tags for
@@ -947,7 +947,7 @@ public interface TwitchHelix {
      * Creates a marker at the current time during a live stream. A marker is a temporal indicator that appears on the Twitch web UI for highlight creation and can also be retrieved with
      * {@link #getStreamMarkers(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String) getStreamMarkers}. Markers are meant to remind streamers and their video editors of important moments during a stream.
      * Markers can be created only if the broadcast identified by the specified {@code userId} is live and has enabled VOD (past broadcast) storage. Marker creation will fail if the broadcaster is airing a premiere or a rerun.
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param highlight     User id and optional description for the marker
