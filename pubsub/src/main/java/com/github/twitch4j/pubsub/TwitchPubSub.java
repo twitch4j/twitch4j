@@ -462,6 +462,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                             } else if (topic.startsWith("hype-train-events-v1")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 switch (type) {
+                                    case "hype-train-approaching":
+                                        final HypeTrainApproaching approachData = TypeConvert.convertValue(msgData, HypeTrainApproaching.class);
+                                        eventManager.publish(new HypeTrainApproachingEvent(approachData));
+                                        break;
                                     case "hype-train-start":
                                         final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
                                         eventManager.publish(new HypeTrainStartEvent(startData));
