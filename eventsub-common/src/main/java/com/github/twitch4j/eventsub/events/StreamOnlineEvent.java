@@ -18,7 +18,7 @@ import java.time.Instant;
 public class StreamOnlineEvent extends EventSubChannelEvent {
 
     /**
-     * The event id.
+     * The id of the stream.
      */
     private String id;
 
