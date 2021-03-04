@@ -20,6 +20,11 @@ public class CustomRewardRedemption {
     private String broadcasterId;
 
     /**
+     * Broadcaster’s user login name.
+     */
+    private String broadcasterLogin;
+
+    /**
      * The display name of the broadcaster that the reward belongs to.
      */
     private String broadcasterName;
@@ -34,6 +39,11 @@ public class CustomRewardRedemption {
      * The ID of the user that redeemed the reward.
      */
     private String userId;
+
+    /**
+     * The login of the user who redeemed the reward.
+     */
+    private String userLogin;
 
     /**
      * The display name of the user that redeemed the reward.

@@ -33,6 +33,10 @@ public class Stream {
     @NonNull
     private String userId;
 
+    /** Login of the user who is streaming. */
+    @NonNull
+    private String userLogin;
+
     /** Display name of the user who is streaming */
     @NonNull
     private String userName;

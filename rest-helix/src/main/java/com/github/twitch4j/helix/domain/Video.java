@@ -24,6 +24,9 @@ public class Video {
     /** ID of the user who owns the video. */
     private String userId;
 
+    /** Login of the user who owns the video. */
+    private String userLogin;
+
     /** Login name corresponding to user_id. */
     private String userName;
 

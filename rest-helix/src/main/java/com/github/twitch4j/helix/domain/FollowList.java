@@ -28,6 +28,9 @@ public class FollowList {
      */
     private Integer total;
 
+    /**
+     * A cursor value, to be used in a subsequent request to specify the starting point of the next set of results.
+     */
     private HelixPagination pagination;
 
 }

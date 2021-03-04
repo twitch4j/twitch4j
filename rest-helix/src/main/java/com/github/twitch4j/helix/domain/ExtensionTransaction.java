@@ -27,6 +27,11 @@ public class ExtensionTransaction {
     private String broadcasterId;
 
     /**
+     * Login name of the broadcaster.
+     */
+    private String broadcasterLogin;
+
+    /**
      * Twitch Display Name of the broadcaster.
      */
     private String broadcasterName;
@@ -35,6 +40,11 @@ public class ExtensionTransaction {
      * Twitch User ID of the user who generated the transaction.
      */
     private String userId;
+
+    /**
+     * Login name of the user who generated the transaction.
+     */
+    private String userLogin;
 
     /**
      * Twitch Display Name of the user who generated the transaction.
