@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ChannelRaidCondition;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 
@@ -8,11 +7,8 @@ import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
  * A broadcaster raids another broadcaster’s channel.
  * <p>
  * No authorization required.
- * <p>
- * This {@link SubscriptionType} is marked as {@link Unofficial} due to Twitch indicating that it is not intended for use in production environments.
  */
-@Unofficial
-public class BetaChannelRaidType implements SubscriptionType<ChannelRaidCondition, ChannelRaidCondition.ChannelRaidConditionBuilder<?, ?>, ChannelRaidEvent> {
+public class ChannelRaidType implements SubscriptionType<ChannelRaidCondition, ChannelRaidCondition.ChannelRaidConditionBuilder<?, ?>, ChannelRaidEvent> {
 
     @Override
     public String getName() {
@@ -21,7 +17,7 @@ public class BetaChannelRaidType implements SubscriptionType<ChannelRaidConditio
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override

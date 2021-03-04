@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
@@ -12,8 +11,6 @@ import java.util.stream.Stream;
 @UtilityClass
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
-    @Unofficial
-    public final BetaChannelRaidType CHANNEL_RAID_BETA;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
@@ -22,6 +19,7 @@ public class SubscriptionTypes {
     public final ChannelPointsCustomRewardRedemptionUpdateType CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_UPDATE;
     public final ChannelPointsCustomRewardRemoveType CHANNEL_POINTS_CUSTOM_REWARD_REMOVE;
     public final ChannelPointsCustomRewardUpdateType CHANNEL_POINTS_CUSTOM_REWARD_UPDATE;
+    public final ChannelRaidType CHANNEL_RAID;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
@@ -40,7 +38,6 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
-                CHANNEL_RAID_BETA = new BetaChannelRaidType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
@@ -49,6 +46,7 @@ public class SubscriptionTypes {
                 CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_UPDATE = new ChannelPointsCustomRewardRedemptionUpdateType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_REMOVE = new ChannelPointsCustomRewardRemoveType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_UPDATE = new ChannelPointsCustomRewardUpdateType(),
+                CHANNEL_RAID = new ChannelRaidType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
