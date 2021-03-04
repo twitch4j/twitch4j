@@ -12,24 +12,67 @@ import java.time.Instant;
 
 import static com.github.twitch4j.common.util.TypeConvert.jsonToObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("unittest")
 public class EventSubEventTest {
 
     @Test
-    @DisplayName("Deserialize ChannelBanEvent")
-    public void deserializeSimpleUserChannelEvent() {
+    @DisplayName("Deserialize ChannelBanEvent: Timeout")
+    public void deserializeModerationEvent() {
         ChannelBanEvent event = jsonToObject(
-            "{\"user_id\":\"1234\",\"user_name\":\"cool_user\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_name\":\"cooler_user\"}",
+            "{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\",\"moderator_user_id\":\"1339\"," +
+                "\"moderator_user_login\":\"mod_user\",\"moderator_user_name\":\"Mod_User\",\"reason\":\"Offensive language\",\"ends_at\":\"2020-07-15T18:16:11.17106713Z\",\"is_permanent\":false}",
             ChannelBanEvent.class
         );
 
         assertEquals("1234", event.getUserId());
-        assertEquals("cool_user", event.getUserName());
+        assertEquals("cool_user", event.getUserLogin());
+        assertEquals("Cool_User", event.getUserName());
+
         assertEquals("1337", event.getBroadcasterUserId());
-        assertEquals("cooler_user", event.getBroadcasterUserName());
+        assertEquals("cooler_user", event.getBroadcasterUserLogin());
+        assertEquals("Cooler_User", event.getBroadcasterUserName());
+
+        assertEquals("1339", event.getModeratorUserId());
+        assertEquals("mod_user", event.getModeratorUserLogin());
+        assertEquals("Mod_User", event.getModeratorUserName());
+
+        assertEquals("Offensive language", event.getReason());
+        assertEquals(Instant.parse("2020-07-15T18:16:11.17106713Z"), event.getEndsAt());
+        assertFalse(event.isPermanent());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelBanEvent: Ban")
+    public void deserializeModerationEvent2() {
+        ChannelBanEvent event = jsonToObject(
+            "{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\",\"moderator_user_id\":\"1339\"," +
+                "\"moderator_user_login\":\"mod_user\",\"moderator_user_name\":\"Mod_User\",\"reason\":\"Offensive language\",\"ends_at\":null,\"is_permanent\":true}",
+            ChannelBanEvent.class
+        );
+
+        assertTrue(event.isPermanent());
+        assertNull(event.getEndsAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelFollowEvent")
+    public void deserializeSimpleUserChannelEvent() {
+        ChannelFollowEvent event = jsonToObject(
+            "{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\"}",
+            ChannelFollowEvent.class
+        );
+
+        assertEquals("1234", event.getUserId());
+        assertEquals("cool_user", event.getUserLogin());
+        assertEquals("Cool_User", event.getUserName());
+        assertEquals("1337", event.getBroadcasterUserId());
+        assertEquals("cooler_user", event.getBroadcasterUserLogin());
+        assertEquals("Cooler_User", event.getBroadcasterUserName());
     }
 
     @Test

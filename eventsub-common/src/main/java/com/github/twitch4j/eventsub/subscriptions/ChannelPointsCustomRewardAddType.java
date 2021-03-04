@@ -6,7 +6,7 @@ import com.github.twitch4j.eventsub.events.CustomRewardAddEvent;
 /**
  * A custom channel points reward has been created for the specified channel.
  * <p>
- * Must have channel:read:redemptions scope.
+ * Must have channel:read:redemptions or channel:manage:redemptions scope.
  */
 public class ChannelPointsCustomRewardAddType implements SubscriptionType<ChannelPointsCustomRewardAddCondition,
     ChannelPointsCustomRewardAddCondition.ChannelPointsCustomRewardAddConditionBuilder<?, ?>, CustomRewardAddEvent> {
