@@ -26,6 +26,16 @@ public class EventSubSubscriptionList {
     private Integer total;
 
     /**
+     * The total cost of all of your subscriptions for your application.
+     */
+    private Integer totalCost;
+
+    /**
+     * The maximum value of Total Cost allowed for your application.
+     */
+    private Integer maxTotalCost;
+
+    /**
      * Subscription limit for client id that made the subscription creation request.
      */
     private Integer limit;

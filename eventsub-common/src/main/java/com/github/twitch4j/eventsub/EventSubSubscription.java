@@ -55,9 +55,15 @@ public class EventSubSubscription {
     private Instant createdAt;
 
     /**
-     * Object indicating the notification delivery specific information
+     * Object indicating the notification delivery specific information.
      */
     private EventSubTransport transport;
+
+    /**
+     * How much the subscription counts against your limit.
+     * Subscriptions cost 0 if the user has authorized your application; otherwise they cost 1.
+     */
+    private Integer cost;
 
     /**
      * The category of the subscription.
@@ -73,7 +79,7 @@ public class EventSubSubscription {
 
     @JsonCreator
     public EventSubSubscription(@JsonProperty("id") String id, @JsonProperty("status") EventSubSubscriptionStatus status, @JsonProperty("type") String type, @JsonProperty("version") String version,
-                                @JsonProperty("condition") Map<String, Object> condition, @JsonProperty("created_at") Instant createdAt, @JsonProperty("transport") EventSubTransport transport) {
+                                @JsonProperty("condition") Map<String, Object> condition, @JsonProperty("created_at") Instant createdAt, @JsonProperty("transport") EventSubTransport transport, @JsonProperty("cost") Integer cost) {
         this.id = id;
         this.status = status;
         this.rawType = type;
@@ -82,6 +88,7 @@ public class EventSubSubscription {
         this.condition = EventSubConditionConverter.getCondition(this.type, condition);
         this.createdAt = createdAt;
         this.transport = transport;
+        this.cost = cost;
     }
 
 }
