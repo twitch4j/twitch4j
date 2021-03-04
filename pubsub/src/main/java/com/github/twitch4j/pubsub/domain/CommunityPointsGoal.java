@@ -21,7 +21,7 @@ public class CommunityPointsGoal {
     private Integer pointsContributed;
     private Integer smallContribution;
     private Integer perStreamMaximumUserContribution;
-    private String durationDays;
+    private Integer durationDays;
     private Instant startedAt;
     private Instant endedAt;
     private String backgroundColor;
