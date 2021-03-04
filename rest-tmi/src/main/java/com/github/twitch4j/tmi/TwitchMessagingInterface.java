@@ -25,7 +25,7 @@ public interface TwitchMessagingInterface {
     HystrixCommand<Chatters> getChatters(
         @Param("channel") String channelName
     );
-    
+
     /**
      * Get Hosts
      * <p>
@@ -42,7 +42,7 @@ public interface TwitchMessagingInterface {
     HystrixCommand<HostList> getHosts(
         @Param("id") List<String> channelIds
     );
-    
+
     /**
      * Get Hosts of target channel
      * <p>
@@ -54,7 +54,9 @@ public interface TwitchMessagingInterface {
      *
      * @param targetId The user ID of the channel for which to get host information.
      * @return List of hosts of the target channel.
+     * @deprecated no longer functioning, so TwitchKraken#getHostsOf should be used
      */
+    @Deprecated
     @RequestLine("GET /hosts?include_logins=1&target={id}")
     HystrixCommand<HostList> getHostsOf(
         @Param("id") String targetId
