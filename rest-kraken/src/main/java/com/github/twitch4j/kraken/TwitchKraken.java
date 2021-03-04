@@ -234,6 +234,20 @@ public interface TwitchKraken {
     );
 
     /**
+     * Get Hosts of a Target Channel
+     * <p>
+     * This endpoint returns a "host" record for each channel hosting the channel with the provided targetId.
+     *
+     * @param channelId The user ID of the channel for which to get host information.
+     * @return KrakenHostList
+     */
+    @Unofficial
+    @RequestLine("GET /channels/{channel_id}/hosts")
+    HystrixCommand<KrakenHostList> getHostsOf(
+        @Param("channel_id") String channelId
+    );
+
+    /**
      * Update Collection
      * <p>
      * Updates the title of a specified collection.
