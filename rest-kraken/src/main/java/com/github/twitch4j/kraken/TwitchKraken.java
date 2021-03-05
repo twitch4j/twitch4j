@@ -489,7 +489,9 @@ public interface TwitchKraken {
      *
      * @param channelId Channel Id (Required)
      * @return KrakenTeamList
+     * @deprecated in favor of TwitchHelix#getChannelTeams
      */
+    @Deprecated
     @RequestLine("GET /channels/{channel_id}/teams")
     HystrixCommand<KrakenTeamList> getChannelTeams(
         @Param("channel_id") String channelId
@@ -517,7 +519,9 @@ public interface TwitchKraken {
      *
      * @param name team name
      * @return KrakenTeam
+     * @deprecated in favor of TwitchHelix#getTeams
      */
+    @Deprecated
     @RequestLine("GET /teams/{name}")
     HystrixCommand<KrakenTeam> getTeamByName(
         @Param("name") String name
