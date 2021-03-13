@@ -26,18 +26,22 @@ public class EventSubSubscriptionList {
     private Integer total;
 
     /**
-     * The total cost of all of your subscriptions for your application.
+     * Total cost of all the subscriptions for the client ID that made the subscription creation request.
      */
     private Integer totalCost;
 
     /**
-     * The maximum value of Total Cost allowed for your application.
+     * The maximum total cost allowed for all of the subscriptions for the client ID that made the subscription creation request.
      */
     private Integer maxTotalCost;
 
     /**
      * Subscription limit for client id that made the subscription creation request.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/eventsub/#subscription-limits">Limit Docs</a>
+     * @deprecated no longer enforced in favor of #getMaxTotalCost
      */
+    @Deprecated
     private Integer limit;
 
     /**

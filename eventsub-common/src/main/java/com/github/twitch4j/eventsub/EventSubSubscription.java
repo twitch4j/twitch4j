@@ -62,6 +62,8 @@ public class EventSubSubscription {
     /**
      * How much the subscription counts against your limit.
      * Subscriptions cost 0 if the user has authorized your application; otherwise they cost 1.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/eventsub/#subscription-limits">Limit Docs</a>
      */
     private Integer cost;
 
