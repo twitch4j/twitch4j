@@ -1,5 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.twitch4j.common.util.AlternativeInstantDeserializer;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,11 +36,13 @@ public class Team {
     /**
      * Date and time the Team was created.
      */
+    @JsonDeserialize(using = AlternativeInstantDeserializer.class)
     private Instant createdAt;
 
     /**
      * Date and time the Team was last updated.
      */
+    @JsonDeserialize(using = AlternativeInstantDeserializer.class)
     private Instant updatedAt;
 
     /**
