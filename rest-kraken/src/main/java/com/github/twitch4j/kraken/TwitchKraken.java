@@ -11,6 +11,7 @@ import feign.RequestLine;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -113,6 +114,48 @@ public interface TwitchKraken {
         @Param("offset") Integer offset,
         @Param("direction") String direction
     );
+
+    /**
+     * Gets a list of badges that can be used in chat for a specified channel.
+     *
+     * @param channelId The ID for the specific channel.
+     * @return ChatBadges
+     */
+    @RequestLine("GET /chat/{channel_id}/badges")
+    HystrixCommand<ChatBadges> getChatBadgesByChannel(
+        @Param("channel_id") String channelId
+    );
+
+    /**
+     * Gets all chat emoticons (not including their images).
+     * <p>
+     * Caution: this endpoint returns a large amount of data.
+     *
+     * @return SimpleEmoticonList
+     */
+    @RequestLine("GET /chat/emoticon_images")
+    HystrixCommand<SimpleEmoticonList> getChatEmoticons();
+
+    /**
+     * Gets all chat emoticons (not including their images) in one or more specified sets.
+     *
+     * @param emoteSets Specifies the set(s) of emoticons to retrieve.
+     * @return EmoticonSetList
+     */
+    @RequestLine("GET /chat/emoticon_images?emotesets={emotesets}")
+    HystrixCommand<EmoticonSetList> getChatEmoticonsBySet(
+        @Param("emotesets") Collection<Integer> emoteSets
+    );
+
+    /**
+     * Gets all chat emoticons (including their images).
+     * <p>
+     * Caution: This endpoint returns a large amount of data.
+     *
+     * @return EmoticonList
+     */
+    @RequestLine("GET /chat/emoticons")
+    HystrixCommand<EmoticonList> getAllChatEmoticons();
 
     /**
      * Approve Automod
