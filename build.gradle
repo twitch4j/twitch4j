@@ -81,7 +81,7 @@ subprojects {
 
 			// Http Client
 			api group: 'io.github.openfeign', name: 'feign-okhttp', version: '11.1'
-			api group: 'io.github.openfeign', name: 'feign-jackson', version: '11.0'
+			api group: 'io.github.openfeign', name: 'feign-jackson', version: '11.1'
 			api group: 'io.github.openfeign', name: 'feign-slf4j', version: '11.1'
 			api group: 'io.github.openfeign', name: 'feign-hystrix', version: '11.0'
 
