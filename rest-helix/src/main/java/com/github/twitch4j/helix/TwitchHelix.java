@@ -335,7 +335,7 @@ public interface TwitchHelix {
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
      * @param after     Optional: The cursor used to fetch the next page of data.
-     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 100.
+     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
     @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
