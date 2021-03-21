@@ -1060,6 +1060,38 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information for a specific Twitch Team.
+     * <p>
+     * One of the two optional query parameters must be specified to return Team information.
+     *
+     * @param authToken User OAuth Token or App Access Token.
+     * @param name      Team name.
+     * @param id        Team ID.
+     * @return TeamList
+     */
+    @RequestLine("GET /teams?name={name}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamList> getTeams(
+        @Param("token") String authToken,
+        @Param("name") String name,
+        @Param("id") String id
+    );
+
+    /**
+     * Retrieves a list of Twitch Teams of which the specified channel/broadcaster is a member.
+     *
+     * @param authToken     User OAuth Token or App Access Token
+     * @param broadcasterId User ID for a Twitch user.
+     * @return TeamMembershipList
+     */
+    @RequestLine("GET /teams/channel?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamMembershipList> getChannelTeams(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Get Users
      * <p>
      * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
