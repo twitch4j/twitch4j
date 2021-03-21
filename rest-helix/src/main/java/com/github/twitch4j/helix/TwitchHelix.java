@@ -335,7 +335,7 @@ public interface TwitchHelix {
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
      * @param after     Optional: The cursor used to fetch the next page of data.
-     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 100.
+     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
     @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
@@ -1041,6 +1041,22 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Checks if a specific user (user_id) is subscribed to a specific channel (broadcaster_id).
+     *
+     * @param authToken     Token with the user:read:subscriptions scope. App access works if the user has authorized your application.
+     * @param broadcasterId User ID of an Affiliate or Partner broadcaster.
+     * @param userId        User ID of a Twitch viewer.
+     * @return SubscriptionList on success, error 404 if not subscribed
+     */
+    @RequestLine("GET /subscriptions/user?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionList> checkUserSubscription(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
     );
 
     /**
