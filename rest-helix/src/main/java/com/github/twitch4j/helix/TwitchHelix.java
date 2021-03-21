@@ -1044,6 +1044,22 @@ public interface TwitchHelix {
     );
 
     /**
+     * Checks if a specific user (user_id) is subscribed to a specific channel (broadcaster_id).
+     *
+     * @param authToken     Token with the user:read:subscriptions scope. App access works if the user has authorized your application.
+     * @param broadcasterId User ID of an Affiliate or Partner broadcaster.
+     * @param userId        User ID of a Twitch viewer.
+     * @return SubscriptionList on success, error 404 if not subscribed
+     */
+    @RequestLine("GET /subscriptions/user?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionList> checkUserSubscription(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
+    );
+
+    /**
      * Get Users
      * <p>
      * Gets information about one or more specified Twitch users. Users are identified by optional user IDs and/or login name. If neither a user ID nor a login name is specified, the user is looked up by Bearer token.
