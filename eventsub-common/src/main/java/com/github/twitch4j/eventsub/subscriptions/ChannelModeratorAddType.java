@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ChannelModeratorAddCondition;
 import com.github.twitch4j.eventsub.events.ChannelModeratorAddEvent;
 
@@ -9,8 +8,7 @@ import com.github.twitch4j.eventsub.events.ChannelModeratorAddEvent;
  * <p>
  * Must have moderation:read scope.
  */
-@Unofficial
-public class BetaChannelModeratorAddType implements SubscriptionType<ChannelModeratorAddCondition, ChannelModeratorAddCondition.ChannelModeratorAddConditionBuilder<?, ?>, ChannelModeratorAddEvent> {
+public class ChannelModeratorAddType implements SubscriptionType<ChannelModeratorAddCondition, ChannelModeratorAddCondition.ChannelModeratorAddConditionBuilder<?, ?>, ChannelModeratorAddEvent> {
 
     @Override
     public String getName() {
@@ -19,7 +17,7 @@ public class BetaChannelModeratorAddType implements SubscriptionType<ChannelMode
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override

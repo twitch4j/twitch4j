@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
@@ -12,13 +11,11 @@ import java.util.stream.Stream;
 @UtilityClass
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
-    @Unofficial
-    public final BetaChannelModeratorAddType BETA_CHANNEL_MODERATOR_ADD;
-    @Unofficial
-    public final BetaChannelModeratorRemoveType BETA_CHANNEL_MODERATOR_REMOVE;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
+    public final ChannelModeratorAddType CHANNEL_MODERATOR_ADD;
+    public final ChannelModeratorRemoveType CHANNEL_MODERATOR_REMOVE;
     public final ChannelPointsCustomRewardAddType CHANNEL_POINTS_CUSTOM_REWARD_ADD;
     public final ChannelPointsCustomRewardRedemptionAddType CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD;
     public final ChannelPointsCustomRewardRedemptionUpdateType CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_UPDATE;
@@ -43,11 +40,11 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
-                BETA_CHANNEL_MODERATOR_ADD = new BetaChannelModeratorAddType(),
-                BETA_CHANNEL_MODERATOR_REMOVE = new BetaChannelModeratorRemoveType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
+                CHANNEL_MODERATOR_ADD = new ChannelModeratorAddType(),
+                CHANNEL_MODERATOR_REMOVE = new ChannelModeratorRemoveType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_ADD = new ChannelPointsCustomRewardAddType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD = new ChannelPointsCustomRewardRedemptionAddType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_UPDATE = new ChannelPointsCustomRewardRedemptionUpdateType(),

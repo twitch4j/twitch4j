@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ChannelModeratorRemoveCondition;
 import com.github.twitch4j.eventsub.events.ChannelModeratorRemoveEvent;
 
@@ -9,8 +8,7 @@ import com.github.twitch4j.eventsub.events.ChannelModeratorRemoveEvent;
  * <p>
  * Must have moderation:read scope.
  */
-@Unofficial
-public class BetaChannelModeratorRemoveType implements SubscriptionType<ChannelModeratorRemoveCondition, ChannelModeratorRemoveCondition.ChannelModeratorRemoveConditionBuilder<?, ?>, ChannelModeratorRemoveEvent> {
+public class ChannelModeratorRemoveType implements SubscriptionType<ChannelModeratorRemoveCondition, ChannelModeratorRemoveCondition.ChannelModeratorRemoveConditionBuilder<?, ?>, ChannelModeratorRemoveEvent> {
 
     @Override
     public String getName() {
@@ -19,7 +17,7 @@ public class BetaChannelModeratorRemoveType implements SubscriptionType<ChannelM
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
