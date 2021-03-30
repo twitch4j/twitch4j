@@ -34,56 +34,6 @@ public interface TwitchKraken {
     }).get();
 
     /**
-     * The default baseUrl to pass to {@link #getGlobalBadges(URI, String)} and {@link #getChannelBadges(URI, String, String)}
-     */
-    @Unofficial
-    URI BADGES_BASE_URL = ((Supplier<URI>) () -> {
-        try {
-            return new URI("https://badges.twitch.tv/v1");
-        } catch (Exception e) {
-            return null;
-        }
-    }).get();
-
-    @Unofficial
-    @RequestLine("GET /badges/global/display?language={language}")
-    HystrixCommand<BadgeSets> getGlobalBadges(
-        URI baseUrl,
-        @Param("language") String language
-    );
-
-    /**
-     * Get the chat badges that are globally available in chat.
-     *
-     * @param language Two-letter language code. Default: en.
-     * @return BadgeSets
-     */
-    @Unofficial
-    default HystrixCommand<BadgeSets> getGlobalBadges(String language) {
-        return getGlobalBadges(BADGES_BASE_URL, language);
-    }
-
-    @Unofficial
-    @RequestLine("GET /badges/channels/{channel_id}/display?language={language}")
-    HystrixCommand<BadgeSets> getChannelBadges(
-        URI baseUrl,
-        @Param("channel_id") String channelId,
-        @Param("language") String language
-    );
-
-    /**
-     * Get the chat badges that are specific for the given channel.
-     *
-     * @param channelId The ID of the channel to query the badges of.
-     * @param language  Two-letter language code. Default: en.
-     * @return BadgeSets
-     */
-    @Unofficial
-    default HystrixCommand<BadgeSets> getChannelBadges(String channelId, String language) {
-        return getChannelBadges(BADGES_BASE_URL, channelId, language);
-    }
-
-    /**
      * Get Channel Editors
      * <p>
      * Gets a list of users who are editors for a specified channel.

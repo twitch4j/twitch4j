@@ -1,4 +1,4 @@
-package com.github.twitch4j.kraken.domain;
+package com.github.twitch4j.tmi.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
