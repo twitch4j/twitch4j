@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      name: Checkout
     - uses: actions/cache@v2
+      name: Cache JDK15
       with:
         path: |
           ~/.gradle/caches
@@ -16,15 +18,22 @@ jobs:
         key: JDK15-gradle-${{ hashFiles('**/*.gradle*') }}
         restore-keys: JDK15-gradle-
     - uses: actions/setup-java@v1
+      name: Setup JDK15
       with:
         java-version: 15
     - uses: actions/checkout@v2
+      name: Checkout Documentation
       with:
         repository: https://github.com/twitch4j/twitch4j.github.io.git
         path: $GITHUB_WORKSPACE/docs
-    - run: |
-        chmod +x ./gradlew
-        ./gradlew aggregateJavadoc
+    - name: Clear old Javadoc
+      run: rm -rf $GITHUB_WORKSPACE/docs/static/javadoc
+    - name: Create new Javadoc
+      uses: eskatos/gradle-command-action@v1.3.3
+      with:
+        arguments: aggregateJavadoc
+    - name: Push new Javadoc update
+      run: |
         cd ./docs
         git add .
         git commit -m "docs(javadoc): release javadoc ${{ github.event.release.tag_name }}"

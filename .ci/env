@@ -1,5 +1,0 @@
-# project
-PROJECT_TYPE=java
-
-# publish
-PUBLISH_TYPE=bintray
