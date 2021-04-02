@@ -38,7 +38,6 @@ local.properties
 #Gradle
 .gradletasknamecache
 .gradle/
-gradle.properties
 
 # Exceptions
 !gradle/wrapper/*.jar
