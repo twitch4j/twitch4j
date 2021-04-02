@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    open-pull-requests-limit: 3
+    schedule:
+      interval: "daily"
+    pull-request-branch-name:
+      separator: "/"
+    reviewers:
+      - "PhilippHeuer"
+      - "iProdigy"
+    commit-message:
+      prefix: "deps:"
+  - package-ecosystem: "gradle"
+    directory: "/"
+    open-pull-requests-limit: 3
+    schedule:
+      interval: "daily"
+    pull-request-branch-name:
+      separator: "/"
+    reviewers:
+      - "PhilippHeuer"
+      - "iProdigy"
+    commit-message:
+      prefix: "deps:"
