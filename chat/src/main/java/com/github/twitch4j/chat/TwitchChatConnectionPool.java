@@ -2,6 +2,7 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import lombok.Builder;
 import lombok.NonNull;
@@ -9,7 +10,11 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -68,6 +73,20 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     }
 
     /**
+     * Sends the specified message to the channel, if it has been subscribed to, with the specified nonce or reply parent.
+     *
+     * @param channel    the name of the channel to send the message to.
+     * @param message    the message to be sent.
+     * @param nonce      the cryptographic nonce (optional).
+     * @param replyMsgId the msgId of the parent message being replied to (optional).
+     * @return whether a {@link TwitchChat} instance subscribed to that channel was identified and used
+     */
+    @Override
+    public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
+        return this.sendMessage(channel, channel, message, nonce, replyMsgId);
+    }
+
+    /**
      * Sends a message from the {@link TwitchChat} identified either to a channel or directly on the socket.
      *
      * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
@@ -76,6 +95,21 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * @return whether a {@link TwitchChat} instance was found and used to send the message
      */
     public boolean sendMessage(final String channelToIdentifyChatInstance, final String targetChannel, final String message) {
+        return this.sendMessage(channelToIdentifyChatInstance, targetChannel, message, null, null);
+    }
+
+    /**
+     * Sends a message from the identified {@link TwitchChat} instance with an optional nonce or reply parent.
+     *
+     * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
+     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket)
+     * @param message                       the message to be sent
+     * @param nonce                         the cryptographic nonce (optional).
+     * @param replyMsgId                    the msgId of the parent message being replied to (optional).
+     * @return whether a {@link TwitchChat} instance was found and used to send the message
+     */
+    @Unofficial
+    public boolean sendMessage(final String channelToIdentifyChatInstance, final String targetChannel, final String message, final String nonce, final String replyMsgId) {
         if (channelToIdentifyChatInstance == null)
             return false;
 
@@ -83,10 +117,14 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         if (chat == null)
             return false;
 
-        if (targetChannel != null)
-            chat.sendMessage(targetChannel, message);
-        else
+        if (targetChannel != null) {
+            if (nonce == null && replyMsgId == null)
+                chat.sendMessage(targetChannel, message);
+            else
+                chat.sendMessage(targetChannel, message, nonce, replyMsgId);
+        } else {
             chat.sendRaw(message);
+        }
 
         return true;
     }
@@ -205,6 +243,35 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected void disposeConnection(TwitchChat connection) {
         connection.close();
+    }
+
+    /**
+     * Note: this map does not dynamically update unlike {@link TwitchChat#getChannelIdToChannelName()}
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getChannelIdToChannelName() {
+        return collectMapsFromConnections(TwitchChat::getChannelIdToChannelName);
+    }
+
+    /**
+     * Note: this map does not dynamically update unlike {@link TwitchChat#getChannelNameToChannelId()}
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getChannelNameToChannelId() {
+        return collectMapsFromConnections(TwitchChat::getChannelNameToChannelId);
+    }
+
+    private <K, V> Map<K, V> collectMapsFromConnections(final Function<TwitchChat, Map<K, V>> mapRetriever) {
+        final Map<K, V> aggregated = new HashMap<>(numConnections() * maxSubscriptionsPerConnection);
+        final Consumer<TwitchChat> retrieve = chat -> aggregated.putAll(mapRetriever.apply(chat));
+        // Note: if connections are changing in saturation concurrently, this lock-free approach could skip over those instances
+        saturatedConnections.forEach(retrieve);
+        unsaturatedConnections.keySet().forEach(retrieve);
+        return Collections.unmodifiableMap(aggregated);
     }
 
 }

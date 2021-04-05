@@ -2,8 +2,10 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -36,6 +38,18 @@ public interface ITwitchChat extends AutoCloseable {
     boolean sendMessage(String channel, String message);
 
     /**
+     * Sends a message to the channel while including an optional nonce and/or reply parent.
+     *
+     * @param channel    the name of the channel to send the message to.
+     * @param message    the message to be sent.
+     * @param nonce      the cryptographic nonce (optional).
+     * @param replyMsgId the msgId of the parent message being replied to (optional).
+     * @return whether the message was added to the queue
+     */
+    @Unofficial
+    boolean sendMessage(String channel, String message, String nonce, String replyMsgId);
+
+    /**
      * Returns a set of all currently joined channels (without # prefix)
      *
      * @return a set of channel names
@@ -44,6 +58,16 @@ public interface ITwitchChat extends AutoCloseable {
 
     @Override
     void close();
+
+    /**
+     * @return cached mappings of channel ids to names
+     */
+    Map<String, String> getChannelIdToChannelName();
+
+    /**
+     * @return cached mappings of channel names to ids
+     */
+    Map<String, String> getChannelNameToChannelId();
 
     /**
      * Check if Chat is currently in a channel
