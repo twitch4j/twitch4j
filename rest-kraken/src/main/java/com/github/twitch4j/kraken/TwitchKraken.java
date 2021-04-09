@@ -283,9 +283,11 @@ public interface TwitchKraken {
      *
      * @param channelId The user ID of the channel for which to get host information.
      * @return KrakenHostList
+     * @deprecated Decommissioned by Twitch.
      */
     @Unofficial
     @RequestLine("GET /channels/{channel_id}/hosts")
+    @Deprecated
     HystrixCommand<KrakenHostList> getHostsOf(
         @Param("channel_id") String channelId
     );
