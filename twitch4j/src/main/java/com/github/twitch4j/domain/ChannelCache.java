@@ -36,6 +36,11 @@ public class ChannelCache {
     private String gameId;
 
     /**
+     * Current Viewer Count
+     */
+    private final AtomicReference<Integer> viewerCount = new AtomicReference<>();
+
+    /**
      * Last Follow Check
      */
     private Instant lastFollowCheck;
