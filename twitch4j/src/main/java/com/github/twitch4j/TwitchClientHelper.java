@@ -15,6 +15,7 @@ import com.github.twitch4j.events.ChannelChangeTitleEvent;
 import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
+import com.github.twitch4j.events.ChannelViewerCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.domain.*;
 import com.netflix.hystrix.HystrixCommand;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -163,6 +165,7 @@ public class TwitchClientHelper implements AutoCloseable {
                     boolean dispatchGoOfflineEvent = false;
                     boolean dispatchTitleChangedEvent = false;
                     boolean dispatchGameChangedEvent = false;
+                    boolean dispatchViewersChangedEvent = false;
 
                     if (stream != null && stream.getType().equalsIgnoreCase("live")) {
                         // is live
@@ -184,6 +187,11 @@ public class TwitchClientHelper implements AutoCloseable {
                             dispatchGameChangedEvent = true;
                         }
                         currentChannelCache.setGameId(stream.getGameId());
+
+                        // - change viewer count event
+                        if (stream.getViewerCount() != null && !stream.getViewerCount().equals(currentChannelCache.getViewerCount().getAndSet(stream.getViewerCount())) && wasAlreadyLive) {
+                            dispatchViewersChangedEvent = true;
+                        }
                     } else {
                         // was online previously?
                         if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
@@ -194,6 +202,7 @@ public class TwitchClientHelper implements AutoCloseable {
                         currentChannelCache.setIsLive(false);
                         currentChannelCache.setTitle(null);
                         currentChannelCache.setGameId(null);
+                        currentChannelCache.getViewerCount().lazySet(null);
                     }
 
                     // dispatch events
@@ -220,6 +229,10 @@ public class TwitchClientHelper implements AutoCloseable {
                         Event event = new com.github.twitch4j.common.events.channel.ChannelChangeGameEvent(channel, currentChannelCache.getGameId());
                         eventManager.publish(event);
                         eventManager.publish(new ChannelChangeGameEvent(channel, stream));
+                    }
+                    // - viewer count changed event
+                    if (dispatchViewersChangedEvent) {
+                        eventManager.publish(new ChannelViewerCountUpdateEvent(channel, stream));
                     }
                 });
             } catch (Exception ex) {
@@ -634,6 +647,20 @@ public class TwitchClientHelper implements AutoCloseable {
     }
 
     /**
+     * Get cached information for a channel's stream status and follower count.
+     * <p>
+     * For this information to be valid, the respective event listeners need to be enabled for the channel.
+     * <p>
+     * For thread safety, the setters on this object should not be used; only getters.
+     *
+     * @param channelId The ID of the channel whose cache is to be retrieved.
+     * @return ChannelCache in an optional wrapper.
+     */
+    public Optional<ChannelCache> getCachedInformation(String channelId) {
+        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
+    }
+
+    /**
      * Close
      */
     public void close() {
@@ -647,6 +674,7 @@ public class TwitchClientHelper implements AutoCloseable {
 
         listenForGoLive.clear();
         listenForFollow.clear();
+        channelInformation.invalidateAll();
     }
 
     @Value
