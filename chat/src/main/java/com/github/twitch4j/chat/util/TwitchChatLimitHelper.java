@@ -69,6 +69,26 @@ public class TwitchChatLimitHelper {
         )
     );
 
+    /**
+     * Join rate for users
+     */
+    public final Bandwidth USER_JOIN_LIMIT = Bandwidth.simple(20, Duration.ofSeconds(10));
+
+    /**
+     * Join rate for verified bots
+     */
+    public final Bandwidth VERIFIED_JOIN_LIMIT = Bandwidth.simple(2000, Duration.ofSeconds(10));
+
+    /**
+     * Authentication rate for users
+     */
+    public final Bandwidth USER_AUTH_LIMIT = Bandwidth.simple(20, Duration.ofSeconds(10));
+
+    /**
+     * Authentication rate for verified bots
+     */
+    public final Bandwidth VERIFIED_AUTH_LIMIT = Bandwidth.simple(200, Duration.ofSeconds(10));
+
     public Bucket createBucket(Bandwidth limit) {
         return Bucket4j.builder().addLimit(limit).build();
     }

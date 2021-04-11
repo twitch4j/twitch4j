@@ -133,6 +133,11 @@ public class TwitchChat implements ITwitchChat {
     protected final Bucket ircWhisperBucket;
 
     /**
+     * IRC Join Bucket
+     */
+    protected final Bucket ircJoinBucket;
+
+    /**
      * IRC Command Queue
      */
     protected final BlockingQueue<String> ircCommandQueue;
@@ -228,6 +233,7 @@ public class TwitchChat implements ITwitchChat {
      * @param chatQueueSize                  Chat Queue Size
      * @param ircMessageBucket               Bucket for chat
      * @param ircWhisperBucket               Bucket for whispers
+     * @param ircJoinBucket                  Bucket for joins
      * @param taskExecutor                   ScheduledThreadPoolExecutor
      * @param chatQueueTimeout               Timeout to wait for events in Chat Queue
      * @param proxyConfig                    Proxy Configuration
@@ -235,7 +241,7 @@ public class TwitchChat implements ITwitchChat {
      * @param enableMembershipEvents         Whether JOIN/PART events should be enabled
      * @param botOwnerIds                    Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -246,6 +252,7 @@ public class TwitchChat implements ITwitchChat {
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.ircMessageBucket = ircMessageBucket;
         this.ircWhisperBucket = ircWhisperBucket;
+        this.ircJoinBucket = ircJoinBucket;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
@@ -442,7 +449,7 @@ public class TwitchChat implements ITwitchChat {
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
                     for (String channel : currentChannels) {
-                        sendCommand("join", '#' + channel);
+                        issueJoin(channel);
                     }
 
                     // then join to own channel - required for sending or receiving whispers
@@ -605,7 +612,7 @@ public class TwitchChat implements ITwitchChat {
         channelCacheLock.lock();
         try {
             if (currentChannels.add(lowerChannelName)) {
-                sendCommand("join", "#" + lowerChannelName);
+                issueJoin(lowerChannelName);
                 log.debug("Joining Channel [{}].", lowerChannelName);
             } else {
                 log.warn("Already joined channel {}", channelName);
@@ -613,6 +620,13 @@ public class TwitchChat implements ITwitchChat {
         } finally {
             channelCacheLock.unlock();
         }
+    }
+
+    private void issueJoin(String channelName) {
+        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+            () -> queueCommand("JOIN #" + channelName.toLowerCase()),
+            taskExecutor
+        );
     }
 
     /**
@@ -627,7 +641,7 @@ public class TwitchChat implements ITwitchChat {
         channelCacheLock.lock();
         try {
             if (currentChannels.remove(lowerChannelName)) {
-                sendCommand("part", "#" + lowerChannelName);
+                issuePart(lowerChannelName);
                 log.debug("Leaving Channel [{}].", lowerChannelName);
 
                 // clear cache
@@ -642,6 +656,13 @@ public class TwitchChat implements ITwitchChat {
         } finally {
             channelCacheLock.unlock();
         }
+    }
+
+    private void issuePart(String channelName) {
+        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+            () -> queueCommand("PART #" + channelName.toLowerCase()),
+            taskExecutor
+        );
     }
 
     /**
