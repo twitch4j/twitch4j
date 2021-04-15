@@ -50,7 +50,7 @@ public class TwitchUtils {
                 permissionSet.add(CommandPermission.MODERATOR);
             }
             // Twitch Prime
-            if (badges.containsKey("premium")) {
+            if (badges.containsKey("premium") || badges.containsKey("turbo")) {
                 permissionSet.add(CommandPermission.PRIME_TURBO);
             }
             // Moderator
@@ -74,15 +74,19 @@ public class TwitchUtils {
                 permissionSet.add(CommandPermission.TWITCHSTAFF);
             }
             // Subscriber
-            if(badges.containsKey("subscriber")) {
+            if (badges.containsKey("subscriber")) {
                 permissionSet.add(CommandPermission.SUBSCRIBER);
             }
             // SubGifter
-            if(badges.containsKey("sub-gifter")) {
+            if (badges.containsKey("sub-gifter")) {
                 permissionSet.add(CommandPermission.SUBGIFTER);
             }
+            // Cheerer
+            if (badges.containsKey("bits")) {
+                permissionSet.add(CommandPermission.BITS_CHEERER);
+            }
             // Founder
-            if(badges.containsKey("founder")) {
+            if (badges.containsKey("founder")) {
                 permissionSet.add(CommandPermission.FOUNDER);
                 permissionSet.add(CommandPermission.SUBSCRIBER);
 
@@ -131,12 +135,12 @@ public class TwitchUtils {
      */
     public static Map<String, String> parseBadges(String raw) {
         Map<String, String> map = new HashMap<>();
-        if(StringUtils.isBlank(raw)) return map;
+        if (StringUtils.isBlank(raw)) return map;
 
         // Fix Whitespaces
         raw = raw.replace("\\s", " ");
 
-        for (String tag: raw.split(",")) {
+        for (String tag : raw.split(",")) {
             String[] val = tag.split("/");
             final String key = val[0];
             String value = (val.length > 1) ? val[1] : null;
