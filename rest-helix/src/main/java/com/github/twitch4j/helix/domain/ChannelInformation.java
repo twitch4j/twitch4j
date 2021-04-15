@@ -46,4 +46,11 @@ public class ChannelInformation {
      */
     private String title;
 
+    /**
+     * Stream delay in seconds.
+     * <p>
+     * Stream delay is a Twitch Partner feature; trying to set this value for other account types will return a 400 error.
+     */
+    private Integer delay;
+
 }

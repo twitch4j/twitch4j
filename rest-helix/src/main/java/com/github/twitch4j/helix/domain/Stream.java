@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -70,6 +71,11 @@ public class Stream {
 
     /** Ids of active tags on the stream */
     private List<UUID> tagIds = new ArrayList<>();
+
+    /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */
+    @Accessors(fluent = true)
+    @JsonProperty("is_mature")
+    private Boolean isMature;
 
     /** Stream language. */
     @NonNull
