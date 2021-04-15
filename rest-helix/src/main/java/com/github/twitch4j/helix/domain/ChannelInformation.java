@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 @With
@@ -50,7 +51,10 @@ public class ChannelInformation {
      * Stream delay in seconds.
      * <p>
      * Stream delay is a Twitch Partner feature; trying to set this value for other account types will return a 400 error.
+     * <p>
+     * Note: this is currently used for <i>only</i> {@link com.github.twitch4j.helix.TwitchHelix#updateChannelInformation(String, String, ChannelInformation)}
      */
+    @Nullable
     private Integer delay;
 
 }
