@@ -189,7 +189,7 @@ public class TwitchPubSub implements ITwitchPubSub {
 
         // Run heartbeat every 4 minutes
         heartbeatTask = taskExecutor.scheduleAtFixedRate(() -> {
-            if (isClosed)
+            if (isClosed || connectionState != TMIConnectionState.CONNECTED)
                 return;
 
             PubSubRequest request = new PubSubRequest();
@@ -213,6 +213,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                     if (lastPong < lastPing && TimeUtils.getCurrentTimeInMillis() >= lastPing + 10000) {
                         log.warn("PubSub: Didn't receive a PONG response in time, reconnecting to obtain a connection to a different server.");
                         reconnect();
+                        break;
                     }
 
                     // If connected, send one message from the queue
@@ -230,6 +231,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                     }
                 } catch (Exception ex) {
                     log.error("PubSub: Unexpected error in worker thread", ex);
+                    break;
                 }
             }
 
@@ -257,10 +259,20 @@ public class TwitchPubSub implements ITwitchPubSub {
                 // Recreate Socket if state does not equal CREATED
                 createWebSocket();
 
+                // Reset last ping to avoid edge case loop where reconnect occurred after sending PING but before receiving PONG
+                this.lastPing = TimeUtils.getCurrentTimeInMillis() - 4 * 60 * 1000;
+
                 // Connect to IRC WebSocket
                 this.webSocket.connect();
             } catch (Exception ex) {
                 log.error("PubSub: Connection to Twitch PubSub failed: {} - Retrying ...", ex.getMessage());
+
+                if (backoffClearer != null) {
+                    try {
+                        backoffClearer.cancel(false);
+                    } catch (Exception ignored) {
+                    }
+                }
 
                 // Sleep before trying to reconnect
                 try {
@@ -287,9 +299,15 @@ public class TwitchPubSub implements ITwitchPubSub {
         connectionState = TMIConnectionState.DISCONNECTED;
 
         // CleanUp
-        this.webSocket.clearListeners();
-        this.webSocket.disconnect();
-        this.webSocket = null;
+        if (webSocket != null) {
+            this.webSocket.clearListeners();
+            this.webSocket.disconnect();
+            this.webSocket = null;
+        }
+
+        if (backoffClearer != null) {
+            backoffClearer.cancel(false);
+        }
     }
 
     /**
@@ -414,7 +432,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         eventManager.publish(new UpdateRedemptionFinishedEvent(instant, redemptionFinished));
                                         break;
                                     default:
-                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
 
@@ -430,7 +448,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         eventManager.publish(TypeConvert.jsonToObject(rawMessage, RaidCancelEvent.class));
                                         break;
                                     default:
-                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
 
@@ -447,6 +465,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                             } else if (topic.startsWith("hype-train-events-v1")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 switch (type) {
+                                    case "hype-train-approaching":
+                                        final HypeTrainApproaching approachData = TypeConvert.convertValue(msgData, HypeTrainApproaching.class);
+                                        eventManager.publish(new HypeTrainApproachingEvent(approachData));
+                                        break;
                                     case "hype-train-start":
                                         final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
                                         eventManager.publish(new HypeTrainStartEvent(startData));
@@ -471,7 +493,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         eventManager.publish(new HypeTrainCooldownExpirationEvent(channelId));
                                         break;
                                     default:
-                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
                             } else if (topic.startsWith("community-points-user-v1")) {
@@ -501,7 +523,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         // unimportant
                                         break;
                                     default:
-                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
                             } else if (topic.startsWith("leaderboard-events-v1")) {
@@ -514,7 +536,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         eventManager.publish(new SubLeaderboardEvent(leaderboard));
                                         break;
                                     default:
-                                        log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
                             } else if (topic.startsWith("polls")) {
@@ -526,7 +548,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 } else if ("event-updated".equals(type)) {
                                     eventManager.publish(TypeConvert.convertValue(msgData, PredictionUpdatedEvent.class));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("predictions-user-v1")) {
                                 if ("prediction-made".equals(type)) {
@@ -534,7 +556,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 } else if ("prediction-result".equals(type)) {
                                     eventManager.publish(TypeConvert.convertValue(msgData, UserPredictionResultEvent.class));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("friendship")) {
                                 eventManager.publish(new FriendshipEvent(TypeConvert.jsonToObject(rawMessage, FriendshipData.class)));
@@ -546,7 +568,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     PresenceSettings presenceSettings = TypeConvert.convertValue(msgData, PresenceSettings.class);
                                     eventManager.publish(new PresenceSettingsEvent(userId, presenceSettings));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("radio-events-v1")) {
                                 eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
@@ -558,7 +580,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     CheerbombData cheerbomb = TypeConvert.convertValue(msgData, CheerbombData.class);
                                     eventManager.publish(new CheerbombEvent(channelId, cheerbomb));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("onsite-notifications")) {
                                 if ("create-notification".equalsIgnoreCase(type)) {
@@ -568,7 +590,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     UpdateSummaryData data = TypeConvert.convertValue(msgData, UpdateSummaryData.class);
                                     eventManager.publish(new UpdateOnsiteNotificationSummaryEvent(id, data));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("video-playback")) {
                                 int dot = topic.indexOf('.');
@@ -588,7 +610,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
                                     eventManager.publish(new ChannelUnbanRequestUpdateEvent(userId, channelId, request));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else if (topic.startsWith("user-unban-requests")) {
                                 int firstDelim = topic.indexOf('.');
@@ -599,10 +621,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     UpdatedUnbanRequest request = TypeConvert.convertValue(msgData, UpdatedUnbanRequest.class);
                                     eventManager.publish(new UserUnbanRequestUpdateEvent(userId, channelId, request));
                                 } else {
-                                    log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
                             } else {
-                                log.warn("Unparseable Message: " + message.getType() + "|" + message.getData());
+                                log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                             }
 
                         } else if (message.getType().equals(PubSubType.RESPONSE)) {

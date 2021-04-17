@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class HypeTrainReward {
-    private String type;
+    private String type; // e.g. "EMOTE"
     private String id;
     private String groupId;
     private Integer rewardLevel;

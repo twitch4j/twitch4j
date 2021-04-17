@@ -50,7 +50,12 @@ public class BannedEvent {
         private String broadcasterId;
 
         /**
-         * The name of the broadcaster where the event took place
+         * The login name of the broadcaster where the event took place
+         */
+        private String broadcasterLogin;
+
+        /**
+         * The display name of the broadcaster where the event took place
          */
         private String broadcasterName;
 
@@ -61,7 +66,12 @@ public class BannedEvent {
         private String userId;
 
         /**
-         * The name of the user that was banned/unbanned
+         * The login name of the user that was banned/unbanned
+         */
+        private String userLogin;
+
+        /**
+         * The display name of the user that was banned/unbanned
          */
         private String userName;
 

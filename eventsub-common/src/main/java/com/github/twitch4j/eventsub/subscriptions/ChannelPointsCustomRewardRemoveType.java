@@ -6,7 +6,7 @@ import com.github.twitch4j.eventsub.events.CustomRewardRemoveEvent;
 /**
  * A custom channel points reward has been removed from the specified channel.
  * <p>
- * Must have channel:read:redemptions scope.
+ * Must have channel:read:redemptions or channel:manage:redemptions scope.
  */
 public class ChannelPointsCustomRewardRemoveType implements SubscriptionType<ChannelPointsCustomRewardRemoveCondition,
     ChannelPointsCustomRewardRemoveCondition.ChannelPointsCustomRewardRemoveConditionBuilder<?, ?>, CustomRewardRemoveEvent> {

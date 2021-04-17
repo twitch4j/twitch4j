@@ -66,6 +66,12 @@ public class ModeratorEvent {
         private String broadcasterId;
 
         /**
+         * Login of the broadcaster.
+         */
+        @NonNull
+        private String broadcasterLogin;
+
+        /**
          * The (display) name of the channel where the event took place
          */
         @NonNull
@@ -76,6 +82,12 @@ public class ModeratorEvent {
          */
         @NonNull
         private String userId;
+
+        /**
+         * Login of the user.
+         */
+        @NonNull
+        private String userLogin;
 
         /**
          * The (display) name of the moderator being added/removed

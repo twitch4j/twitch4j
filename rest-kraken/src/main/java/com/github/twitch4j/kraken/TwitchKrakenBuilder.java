@@ -106,6 +106,11 @@ public class TwitchKrakenBuilder {
         // Hystrix: Timeout modification for file uploads
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#uploadVideoPart(URI,String,String,int,byte[]).execution.isolation.thread.timeoutInMilliseconds", uploadTimeout);
 
+        // Hystrix: Timeout modification for emote endpoints with large amount of data
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getChatEmoticonsBySet(Collection).execution.isolation.thread.timeoutInMilliseconds", timeout * 2);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 4);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getAllChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 8);
+
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
 

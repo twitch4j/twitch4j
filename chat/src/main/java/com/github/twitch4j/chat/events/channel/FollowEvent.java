@@ -4,15 +4,13 @@ import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Value;
 
 /**
  * This event gets called when a user gets a new followers
  */
 @Value
-@Getter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class FollowEvent extends AbstractChannelEvent {
 
 	/**

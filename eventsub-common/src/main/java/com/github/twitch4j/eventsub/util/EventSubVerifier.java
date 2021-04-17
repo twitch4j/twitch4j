@@ -41,19 +41,19 @@ public class EventSubVerifier {
     /**
      * Java algorithm name that corresponds to {@link #SIGNATURE_HASH_PREFIX}
      */
-    private final String JAVA_HASH_ALGORITHM = "HmacSHA256";
+    public final String JAVA_HMAC_ALGORITHM = "HmacSHA256";
 
     /**
-     * The number of characters in hashes produced by {@link #JAVA_HASH_ALGORITHM}
+     * The number of characters in hashes produced by {@link #JAVA_HMAC_ALGORITHM}
      */
     private final int HASH_LENGTH = 256 / 4;
 
     /**
-     * A thread-local {@link Mac} instance of {@link #JAVA_HASH_ALGORITHM}
+     * A thread-local {@link Mac} instance of {@link #JAVA_HMAC_ALGORITHM}
      */
-    private final ThreadLocal<Mac> HASH_FUNCTION = ThreadLocal.withInitial(() -> {
+    private final ThreadLocal<Mac> HMAC_FUNCTION = ThreadLocal.withInitial(() -> {
         try {
-            return Mac.getInstance(JAVA_HASH_ALGORITHM);
+            return Mac.getInstance(JAVA_HMAC_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
             return null;
         }
@@ -105,7 +105,7 @@ public class EventSubVerifier {
             return false;
         }
 
-        final Mac mac = HASH_FUNCTION.get();
+        final Mac mac = HMAC_FUNCTION.get();
         if (mac == null) {
             log.error("Unable to prepare hash function for eventsub signature verification!");
             return false;
@@ -134,7 +134,7 @@ public class EventSubVerifier {
      * @see #verifySignature(SecretKeySpec, String, String, byte[], String)
      */
     public boolean verifySignature(byte[] secret, String messageId, String messageTimestamp, byte[] requestBody, String expectedSignature) {
-        return verifySignature(new SecretKeySpec(secret, JAVA_HASH_ALGORITHM), messageId, messageTimestamp, requestBody, expectedSignature);
+        return verifySignature(new SecretKeySpec(secret, JAVA_HMAC_ALGORITHM), messageId, messageTimestamp, requestBody, expectedSignature);
     }
 
     /**

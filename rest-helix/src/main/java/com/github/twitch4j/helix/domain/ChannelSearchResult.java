@@ -20,6 +20,11 @@ public class ChannelSearchResult {
     private String id;
 
     /**
+     * Login of the broadcaster.
+     */
+    private String broadcasterLogin;
+
+    /**
      * Display name corresponding to the channel
      */
     @NonNull

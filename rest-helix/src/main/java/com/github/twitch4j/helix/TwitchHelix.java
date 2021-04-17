@@ -144,6 +144,8 @@ public interface TwitchHelix {
 
     /**
      * Creates a Custom Reward on a channel.
+     * <p>
+     * Query parameter broadcaster_id must match the user_id in the User-Access token.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -164,7 +166,7 @@ public interface TwitchHelix {
     /**
      * Deletes a Custom Reward on a channel.
      * <p>
-     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be deleted.
+     * Only rewards created programmatically by the same client_id can be deleted.
      * Any UNFULFILLED Custom Reward Redemptions of the deleted Custom Reward will be updated to the FULFILLED status.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
@@ -183,7 +185,7 @@ public interface TwitchHelix {
     /**
      * Returns a list of Custom Reward objects for the Custom Rewards on a channel.
      * <p>
-     * Developers only have access to update and delete rewards that were created manually by a broadcaster in the Creator Dashboard or created programmatically by the same/calling client_id.
+     * Developers only have access to update and delete rewards that were created programmatically by the same/calling client_id.
      * <p>
      * There is a limit of 50 Custom Rewards on a channel at a time. This includes both enabled and disabled Custom Rewards.
      *
@@ -205,7 +207,7 @@ public interface TwitchHelix {
     /**
      * Returns Custom Reward Redemption objects for a Custom Reward on a channel that was created by the same client_id.
      * <p>
-     * Developers only have access to get and update redemptions for the rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id.
+     * Developers only have access to get and update redemptions for the rewards created programmatically by the same client_id.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -233,7 +235,7 @@ public interface TwitchHelix {
     /**
      * Updates a Custom Reward created on a channel.
      * <p>
-     * Only rewards created manually by a broadcaster in the Creator Dashboard or created programmatically by the same client_id can be updated.
+     * Only rewards created programmatically by the same client_id can be updated.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -256,7 +258,7 @@ public interface TwitchHelix {
     /**
      * Updates the status of Custom Reward Redemption objects on a channel that are in the UNFULFILLED status.
      * <p>
-     * Only redemptions for a reward created manually by a broadcaster in the Creator Dashboard, or created programmatically by the same client_id as attached to the access token can be updated.
+     * Only redemptions for a reward created programmatically by the same client_id as attached to the access token can be updated.
      *
      * @param authToken     User access token for the broadcaster (scope: channel:manage:redemptions).
      * @param broadcasterId The id of the target channel, which must match the token user id.
@@ -333,7 +335,7 @@ public interface TwitchHelix {
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
      * @param after     Optional: The cursor used to fetch the next page of data.
-     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 100.
+     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
     @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
@@ -451,7 +453,7 @@ public interface TwitchHelix {
     /**
      * Modifies channel information for users
      *
-     * @param authToken Auth Token (scope: user:edit:broadcast)
+     * @param authToken Auth Token (scope: channel:manage:broadcast or user:edit:broadcast)
      * @param broadcasterId ID of the channel to be updated (required)
      * @param channelInformation {@link ChannelInformation} (at least one parameter must be provided)
      * @return 204 No Content upon a successful update
@@ -922,7 +924,7 @@ public interface TwitchHelix {
 
     /**
      * Replaces the active stream tags on the specified stream with the specified tags (or clears all tags, if no new tags are specified).
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream to replace tags for
@@ -945,7 +947,7 @@ public interface TwitchHelix {
      * Creates a marker at the current time during a live stream. A marker is a temporal indicator that appears on the Twitch web UI for highlight creation and can also be retrieved with
      * {@link #getStreamMarkers(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String) getStreamMarkers}. Markers are meant to remind streamers and their video editors of important moments during a stream.
      * Markers can be created only if the broadcast identified by the specified {@code userId} is live and has enabled VOD (past broadcast) storage. Marker creation will fail if the broadcaster is airing a premiere or a rerun.
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param highlight     User id and optional description for the marker
@@ -1039,6 +1041,54 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Checks if a specific user (user_id) is subscribed to a specific channel (broadcaster_id).
+     *
+     * @param authToken     Token with the user:read:subscriptions scope. App access works if the user has authorized your application.
+     * @param broadcasterId User ID of an Affiliate or Partner broadcaster.
+     * @param userId        User ID of a Twitch viewer.
+     * @return SubscriptionList on success, error 404 if not subscribed
+     */
+    @RequestLine("GET /subscriptions/user?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionList> checkUserSubscription(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
+    );
+
+    /**
+     * Gets information for a specific Twitch Team.
+     * <p>
+     * One of the two optional query parameters must be specified to return Team information.
+     *
+     * @param authToken User OAuth Token or App Access Token.
+     * @param name      Team name.
+     * @param id        Team ID.
+     * @return TeamList
+     */
+    @RequestLine("GET /teams?name={name}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamList> getTeams(
+        @Param("token") String authToken,
+        @Param("name") String name,
+        @Param("id") String id
+    );
+
+    /**
+     * Retrieves a list of Twitch Teams of which the specified channel/broadcaster is a member.
+     *
+     * @param authToken     User OAuth Token or App Access Token
+     * @param broadcasterId User ID for a Twitch user.
+     * @return TeamMembershipList
+     */
+    @RequestLine("GET /teams/channel?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamMembershipList> getChannelTeams(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
