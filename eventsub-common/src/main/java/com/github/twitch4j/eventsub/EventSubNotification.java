@@ -24,4 +24,9 @@ public class EventSubNotification {
      */
     private EventSubEvent event;
 
+    /**
+     * The value of challenge from the callback verification request must be returned to complete the verification process.
+     */
+    private String challenge;
+
 }

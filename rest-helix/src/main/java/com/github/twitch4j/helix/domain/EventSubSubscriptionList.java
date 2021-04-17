@@ -1,6 +1,5 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import lombok.AccessLevel;
@@ -13,7 +12,6 @@ import java.util.List;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventSubSubscriptionList {
 
     /**
@@ -28,8 +26,22 @@ public class EventSubSubscriptionList {
     private Integer total;
 
     /**
-     * Subscription limit for client id that made the subscription creation request.
+     * Total cost of all the subscriptions for the client ID that made the subscription creation request.
      */
+    private Integer totalCost;
+
+    /**
+     * The maximum total cost allowed for all of the subscriptions for the client ID that made the subscription creation request.
+     */
+    private Integer maxTotalCost;
+
+    /**
+     * Subscription limit for client id that made the subscription creation request.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/eventsub/#subscription-limits">Limit Docs</a>
+     * @deprecated no longer enforced in favor of #getMaxTotalCost
+     */
+    @Deprecated
     private Integer limit;
 
     /**

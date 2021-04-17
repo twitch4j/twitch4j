@@ -1,9 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +12,6 @@ import java.time.Instant;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class BannedEvent {
     /**
      * Event ID.
@@ -47,8 +42,6 @@ public class BannedEvent {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class EventData {
         /**
          * The id of the broadcaster where the event took place
@@ -57,7 +50,12 @@ public class BannedEvent {
         private String broadcasterId;
 
         /**
-         * The name of the broadcaster where the event took place
+         * The login name of the broadcaster where the event took place
+         */
+        private String broadcasterLogin;
+
+        /**
+         * The display name of the broadcaster where the event took place
          */
         private String broadcasterName;
 
@@ -68,7 +66,12 @@ public class BannedEvent {
         private String userId;
 
         /**
-         * The name of the user that was banned/unbanned
+         * The login name of the user that was banned/unbanned
+         */
+        private String userLogin;
+
+        /**
+         * The display name of the user that was banned/unbanned
          */
         private String userName;
 

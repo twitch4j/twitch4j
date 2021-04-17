@@ -1,14 +1,12 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.Date;
@@ -19,8 +17,6 @@ import java.util.Date;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Video {
 
     /** ID of the video. */
@@ -28,6 +24,9 @@ public class Video {
 
     /** ID of the user who owns the video. */
     private String userId;
+
+    /** Login of the user who owns the video. */
+    private String userLogin;
 
     /** Login name corresponding to user_id. */
     private String userName;
@@ -66,6 +65,21 @@ public class Video {
 
     /** Length of the video. */
     private String duration;
+
+    /**
+     * Gets the thumbnail url for specific dimensions.
+     *
+     * @param width  Thumbnail width.
+     * @param height Thumbnail height.
+     * @return String
+     */
+    public String getThumbnailUrl(int width, int height) {
+        return StringUtils.replaceEach(
+            this.getThumbnailUrl(),
+            new String[] { "%{width}", "%{height}" },
+            new String[] { String.valueOf(width), String.valueOf(height) }
+        );
+    }
 
     /**
      * @return the timestamp when the video was created

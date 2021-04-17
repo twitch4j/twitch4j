@@ -11,6 +11,7 @@ import feign.RequestLine;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -45,7 +46,6 @@ public interface TwitchKraken {
     @RequestLine("GET /channels/{channelId}/editors")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
     })
     HystrixCommand<KrakenUserList> getChannelEditors(
         @Param("token") String authToken,
@@ -65,9 +65,6 @@ public interface TwitchKraken {
      * @return {@link KrakenFollowList}
      */
     @RequestLine("GET /channels/{channelId}/follows?limit={limit}&offset={offset}&cursor={cursor}&direction={direction}")
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenFollowList> getChannelFollowers(
         @Param("channelId") String channelId,
         @Param("limit") Integer limit,
@@ -87,8 +84,7 @@ public interface TwitchKraken {
      */
     @RequestLine("DELETE /channels/{channelId}/stream_key")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenChannel> resetChannelStreamKey(
         @Param("token") String authToken,
@@ -101,7 +97,7 @@ public interface TwitchKraken {
      * Gets a list of users subscribed to a specified channel, sorted by the date when they subscribed.
      *
      * @param authToken Auth Token
-     * @param channelId Channnel Id
+     * @param channelId Channel Id
      * @param limit     Maximum number of objects to return. Default: 25. Maximum: 100.
      * @param offset    Object offset for pagination of results. Default: 0.
      * @param direction Sorting direction. Valid values: asc, desc. Default: asc (oldest first).
@@ -109,8 +105,7 @@ public interface TwitchKraken {
      */
     @RequestLine("GET /channels/{channelId}/subscriptions?limit={limit}&offset={offset}&direction={direction}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenSubscriptionList> getChannelSubscribers(
         @Param("token") String authToken,
@@ -119,6 +114,48 @@ public interface TwitchKraken {
         @Param("offset") Integer offset,
         @Param("direction") String direction
     );
+
+    /**
+     * Gets a list of badges that can be used in chat for a specified channel.
+     *
+     * @param channelId The ID for the specific channel.
+     * @return ChatBadges
+     */
+    @RequestLine("GET /chat/{channel_id}/badges")
+    HystrixCommand<ChatBadges> getChatBadgesByChannel(
+        @Param("channel_id") String channelId
+    );
+
+    /**
+     * Gets all chat emoticons (not including their images).
+     * <p>
+     * Caution: this endpoint returns a large amount of data.
+     *
+     * @return SimpleEmoticonList
+     */
+    @RequestLine("GET /chat/emoticon_images")
+    HystrixCommand<SimpleEmoticonList> getChatEmoticons();
+
+    /**
+     * Gets all chat emoticons (not including their images) in one or more specified sets.
+     *
+     * @param emoteSets Specifies the set(s) of emoticons to retrieve.
+     * @return EmoticonSetList
+     */
+    @RequestLine("GET /chat/emoticon_images?emotesets={emotesets}")
+    HystrixCommand<EmoticonSetList> getChatEmoticonsBySet(
+        @Param("emotesets") Collection<Integer> emoteSets
+    );
+
+    /**
+     * Gets all chat emoticons (including their images).
+     * <p>
+     * Caution: This endpoint returns a large amount of data.
+     *
+     * @return EmoticonList
+     */
+    @RequestLine("GET /chat/emoticons")
+    HystrixCommand<EmoticonList> getAllChatEmoticons();
 
     /**
      * Approve Automod
@@ -132,9 +169,7 @@ public interface TwitchKraken {
     @Unofficial
     @RequestLine("POST /chat/twitchbot/approve")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
+        "Authorization: OAuth {token}"
     })
     @Body("%7B\"msg_id\":\"{msg_id}\"%7D")
     HystrixCommand<Void> approveAutomodMessage(
@@ -154,9 +189,7 @@ public interface TwitchKraken {
     @Unofficial
     @RequestLine("POST /chat/twitchbot/deny")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
+        "Authorization: OAuth {token}"
     })
     @Body("%7B\"msg_id\":\"{msg_id}\"%7D")
     HystrixCommand<Void> denyAutomodMessage(
@@ -173,9 +206,6 @@ public interface TwitchKraken {
      * @return {@link KrakenClip}
      */
     @RequestLine("GET /clips/{slug}")
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenClip> getClip(
         @Param("slug") String slug
     );
@@ -189,9 +219,6 @@ public interface TwitchKraken {
      * @return {@link KrakenCollectionMetadata}
      */
     @RequestLine("GET /collections/{collection_id}")
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenCollectionMetadata> getCollectionMetadata(
         @Param("collection_id") String collectionId
     );
@@ -205,9 +232,6 @@ public interface TwitchKraken {
      * @return {@link KrakenCollection}
      */
     @RequestLine("GET /collections/{collection_id}/items")
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenCollection> getCollection(
         @Param("collection_id") String collectionId
     );
@@ -224,9 +248,6 @@ public interface TwitchKraken {
      * @return {@link KrakenCollectionList}
      */
     @RequestLine("GET /channels/{channel_id}/collections?limit={limit}&cursor={cursor}&containing_item={containing_item}")
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenCollectionList> getCollectionsByChannel(
         @Param("channel_id") String channelId,
         @Param("limit") Integer limit,
@@ -246,15 +267,27 @@ public interface TwitchKraken {
      */
     @RequestLine("POST /channels/{channel_id}/collections")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
+        "Authorization: OAuth {token}"
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<KrakenCollectionMetadata> createCollection(
         @Param("token") String token,
         @Param("channel_id") String channelId,
         @Param("title") String title
+    );
+
+    /**
+     * Get Hosts of a Target Channel
+     * <p>
+     * This endpoint returns a "host" record for each channel hosting the channel with the provided targetId.
+     *
+     * @param channelId The user ID of the channel for which to get host information.
+     * @return KrakenHostList
+     */
+    @Unofficial
+    @RequestLine("GET /channels/{channel_id}/hosts")
+    HystrixCommand<KrakenHostList> getHostsOf(
+        @Param("channel_id") String channelId
     );
 
     /**
@@ -269,9 +302,7 @@ public interface TwitchKraken {
      */
     @RequestLine("PUT /collections/{collection_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
+        "Authorization: OAuth {token}"
     })
     @Body("%7B\"title\":\"{title}\"%7D")
     HystrixCommand<Void> updateCollection(
@@ -293,8 +324,6 @@ public interface TwitchKraken {
     @RequestLine("PUT /collections/{collection_id}/thumbnail")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
     })
     @Body("%7B\"item_id\":\"{item_id}\"%7D")
     HystrixCommand<Void> createCollectionThumbnail(
@@ -314,8 +343,7 @@ public interface TwitchKraken {
      */
     @RequestLine("DELETE /collections/{collection_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<Void> deleteCollection(
         @Param("token") String token,
@@ -335,8 +363,6 @@ public interface TwitchKraken {
     @RequestLine("POST /collections/{collection_id}/items")
     @Headers({
         "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
     })
     @Body("%7B\"id\":\"{id}\",\"type\":\"video\"%7D")
     HystrixCommand<KrakenCollectionItem> addItemToCollection(
@@ -357,8 +383,7 @@ public interface TwitchKraken {
      */
     @RequestLine("DELETE /collections/{collection_id}/items/{collection_item_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<Void> deleteItemFromCollection(
         @Param("token") String token,
@@ -379,9 +404,7 @@ public interface TwitchKraken {
      */
     @RequestLine("PUT /collections/{collection_id}/items/{collection_item_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
-        "Content-Type: application/json"
+        "Authorization: OAuth {token}"
     })
     @Body("%7B\"position\":\"{position}\"%7D")
     HystrixCommand<Void> moveItemWithinCollection(
@@ -404,8 +427,7 @@ public interface TwitchKraken {
      */
     @RequestLine("GET /users/{user}/blocks?limit={limit}&offset={offset}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenBlockList> getUserBlockList(
         @Param("token") String authToken,
@@ -426,8 +448,7 @@ public interface TwitchKraken {
      */
     @RequestLine("PUT /users/{from_id}/blocks/{to_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenBlockTransaction> blockUser(
         @Param("token") String authToken,
@@ -447,8 +468,7 @@ public interface TwitchKraken {
      */
     @RequestLine("DELETE /users/{from_id}/blocks/{to_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<Void> unblockUser(
         @Param("token") String authToken,
@@ -468,8 +488,7 @@ public interface TwitchKraken {
      */
     @RequestLine("GET /users/{user}/emotes")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenEmoticonSetList> getUserEmotes(
         @Param("token") String authToken,
@@ -490,8 +509,7 @@ public interface TwitchKraken {
     @Deprecated
     @RequestLine("PUT /users/{user}/follows/channels/{targetUser}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<Object> addFollow(
         @Param("token") String authToken,
@@ -507,7 +525,6 @@ public interface TwitchKraken {
      * @return KrakenIngestList
      */
     @RequestLine("GET /ingests")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenIngestList> getIngestServers();
 
     /**
@@ -515,9 +532,10 @@ public interface TwitchKraken {
      *
      * @param channelId Channel Id (Required)
      * @return KrakenTeamList
+     * @deprecated in favor of TwitchHelix#getChannelTeams
      */
+    @Deprecated
     @RequestLine("GET /channels/{channel_id}/teams")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeamList> getChannelTeams(
         @Param("channel_id") String channelId
     );
@@ -532,7 +550,6 @@ public interface TwitchKraken {
      * @return KrakenTeamList
      */
     @RequestLine("GET /teams?limit={limit}&offset={offset}")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeamList> getAllTeams(
         @Param("limit") Integer limit,
         @Param("offset") Integer offset
@@ -545,9 +562,10 @@ public interface TwitchKraken {
      *
      * @param name team name
      * @return KrakenTeam
+     * @deprecated in favor of TwitchHelix#getTeams
      */
+    @Deprecated
     @RequestLine("GET /teams/{name}")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenTeam> getTeamByName(
         @Param("name") String name
     );
@@ -562,8 +580,7 @@ public interface TwitchKraken {
      */
     @RequestLine("GET /user")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenUser> getUser(
         @Param("token") String authToken
@@ -576,7 +593,6 @@ public interface TwitchKraken {
      * @return KrakenUser
      */
     @RequestLine("GET /users/{user_id}")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<KrakenUser> getUserById(
         @Param("user_id") String userId
     );
@@ -590,9 +606,6 @@ public interface TwitchKraken {
      * @return KrakenUser
      */
     @RequestLine(value = "GET /users?login={logins}", collectionFormat = CollectionFormat.CSV)
-    @Headers({
-        "Accept: application/vnd.twitchtv.v5+json"
-    })
     HystrixCommand<KrakenUserList> getUsersByLogin(
     	@Param("logins") List<String> logins
     );
@@ -610,8 +623,7 @@ public interface TwitchKraken {
      */
     @Deprecated
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json",
+        "Authorization: OAuth {token}"
     })
     @RequestLine("PUT /channels/{channelId}?channel[status]={title}")
     HystrixCommand<Object> updateTitle(
@@ -651,8 +663,7 @@ public interface TwitchKraken {
         collectionFormat = CollectionFormat.CSV
     )
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenCreatedVideo> createVideo(
         @Param("token") String authToken,
@@ -668,7 +679,6 @@ public interface TwitchKraken {
 
     @RequestLine("PUT /upload/{video_id}?part={part}&upload_token={upload_token}")
     @Headers({
-        "Accept: application/vnd.twitchtv.v5+json",
         "Content-Type: application/x-www-form-urlencoded"
     })
     HystrixCommand<Void> uploadVideoPart(
@@ -695,7 +705,6 @@ public interface TwitchKraken {
     }
 
     @RequestLine("POST /upload/{video_id}/complete?upload_token={upload_token}")
-    @Headers("Accept: application/vnd.twitchtv.v5+json")
     HystrixCommand<Void> completeVideoUpload(
         URI baseUrl,
         @Param("video_id") String videoId,
@@ -734,8 +743,7 @@ public interface TwitchKraken {
         collectionFormat = CollectionFormat.CSV
     )
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<KrakenVideo> updateVideo(
         @Param("token") String authToken,
@@ -758,8 +766,7 @@ public interface TwitchKraken {
      */
     @RequestLine("DELETE /videos/{video_id}")
     @Headers({
-        "Authorization: OAuth {token}",
-        "Accept: application/vnd.twitchtv.v5+json"
+        "Authorization: OAuth {token}"
     })
     HystrixCommand<Void> deleteVideo(
         @Param("token") String authToken,

@@ -1,16 +1,11 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class PollData {
     private String pollId;
     private String ownedBy;
@@ -32,8 +27,6 @@ public class PollData {
     private Contributor topChannelPointsContributor;
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PollSettings {
         private Setting multiChoice;
         private Setting subscriberOnly;
@@ -42,8 +35,6 @@ public class PollData {
         private Setting channelPointsVotes;
 
         @Data
-        @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Setting {
             private Boolean isEnabled;
             private Long cost;
@@ -51,8 +42,6 @@ public class PollData {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PollChoice {
         private String choiceId;
         private String title;
@@ -62,8 +51,6 @@ public class PollData {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Votes {
         private Long total;
         private Long bits;
@@ -72,16 +59,12 @@ public class PollData {
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Tokens {
         private Long bits;
         private Long channelPoints;
     }
 
     @Data
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Contributor {
         private String userId;
         private String displayName;

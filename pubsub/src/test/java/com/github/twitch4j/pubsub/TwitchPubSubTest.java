@@ -31,7 +31,6 @@ public class TwitchPubSubTest {
     public void localTestRun() {
         // listen for events in channel
         twitchPubSub.listenForCheerEvents(TestUtils.getCredential(), "149223493");
-        twitchPubSub.listenForCommerceEvents(TestUtils.getCredential(), "149223493");
         twitchPubSub.listenForSubscriptionEvents(TestUtils.getCredential(), "149223493");
         twitchPubSub.listenForWhisperEvents(TestUtils.getCredential(), "149223493");
 

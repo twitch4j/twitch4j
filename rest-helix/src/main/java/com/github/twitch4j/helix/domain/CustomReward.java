@@ -1,10 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.eventsub.domain.Reward;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,8 +25,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Jacksonized
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomReward {
 
@@ -37,6 +32,11 @@ public class CustomReward {
      * ID of the channel the reward is for.
      */
     private String broadcasterId;
+
+    /**
+     * Login of the channel the reward is for.
+     */
+    private String broadcasterLogin;
 
     /**
      * Display name of the channel the reward is for.
@@ -152,8 +152,6 @@ public class CustomReward {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MaxPerStreamSetting extends Setting {
         private Integer maxPerStream;
     }
@@ -163,8 +161,6 @@ public class CustomReward {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MaxPerUserPerStreamSetting extends Setting {
         private Integer maxPerUserPerStream;
     }
@@ -174,8 +170,6 @@ public class CustomReward {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class GlobalCooldownSetting extends Setting {
         private Integer globalCooldownSeconds;
     }
@@ -183,8 +177,6 @@ public class CustomReward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Setting {
         @Accessors(fluent = true)
         @JsonProperty("is_enabled")

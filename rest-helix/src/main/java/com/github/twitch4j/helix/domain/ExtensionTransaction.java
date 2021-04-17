@@ -1,9 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +9,6 @@ import lombok.Setter;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ExtensionTransaction {
 
     /**
@@ -32,6 +27,11 @@ public class ExtensionTransaction {
     private String broadcasterId;
 
     /**
+     * Login name of the broadcaster.
+     */
+    private String broadcasterLogin;
+
+    /**
      * Twitch Display Name of the broadcaster.
      */
     private String broadcasterName;
@@ -40,6 +40,11 @@ public class ExtensionTransaction {
      * Twitch User ID of the user who generated the transaction.
      */
     private String userId;
+
+    /**
+     * Login name of the user who generated the transaction.
+     */
+    private String userLogin;
 
     /**
      * Twitch Display Name of the user who generated the transaction.
@@ -67,7 +72,6 @@ public class ExtensionTransaction {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProductData {
 
         /**
@@ -95,7 +99,6 @@ public class ExtensionTransaction {
         @Data
         @Setter(AccessLevel.PRIVATE)
         @NoArgsConstructor
-        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Cost {
 
             /**

@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.Setter;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Reward {
 
     /**
@@ -36,7 +34,6 @@ public class Reward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Image {
         @JsonProperty("url_1x")
         private String url1x;

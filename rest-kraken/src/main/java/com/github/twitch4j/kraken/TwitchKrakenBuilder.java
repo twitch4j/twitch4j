@@ -3,6 +3,7 @@ package com.github.twitch4j.kraken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.feign.interceptor.JsonContentTypeHeaderInterceptor;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
@@ -14,7 +15,11 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -101,6 +106,11 @@ public class TwitchKrakenBuilder {
         // Hystrix: Timeout modification for file uploads
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#uploadVideoPart(URI,String,String,int,byte[]).execution.isolation.thread.timeoutInMilliseconds", uploadTimeout);
 
+        // Hystrix: Timeout modification for emote endpoints with large amount of data
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getChatEmoticonsBySet(Collection).execution.isolation.thread.timeoutInMilliseconds", timeout * 2);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 4);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getAllChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 8);
+
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
 
@@ -110,7 +120,7 @@ public class TwitchKrakenBuilder {
             proxyConfig.apply(clientBuilder);
 
         // Build
-        TwitchKraken client = HystrixFeign.builder()
+        return HystrixFeign.builder()
             .client(new OkHttpClient(clientBuilder.build()))
             .encoder(new JacksonEncoder(mapper))
             .decoder(new JacksonDecoder(mapper))
@@ -118,10 +128,10 @@ public class TwitchKrakenBuilder {
             .logLevel(logLevel)
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
+            .requestInterceptor(t -> t.header("Accept", "application/vnd.twitchtv.v5+json"))
+            .requestInterceptor(new JsonContentTypeHeaderInterceptor())
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchKraken.class, baseUrl);
-
-        return client;
     }
 }

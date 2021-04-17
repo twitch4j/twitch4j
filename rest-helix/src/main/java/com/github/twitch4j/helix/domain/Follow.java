@@ -1,10 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,18 +17,22 @@ import java.time.ZoneOffset;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Follow {
 
     /** ID of the user following the to_id user. */
     private String fromId;
+
+    /** Login of the user following the to_id user. */
+    private String fromLogin;
 
     /** Login name corresponding to from_id. */
     private String fromName;
 
     /** ID of the user being followed by the from_id user. */
     private String toId;
+
+    /** Login of the user being followed by the from_id user. */
+    private String toLogin;
 
     /** Login name corresponding to to_id. */
     private String toName;

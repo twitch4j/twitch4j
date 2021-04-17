@@ -1,8 +1,5 @@
 package com.github.twitch4j.extensions.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -15,8 +12,6 @@ import java.util.Map;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Unofficial
 public class ExtensionInformation {
 

@@ -1,8 +1,5 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 /**
@@ -11,13 +8,21 @@ import lombok.*;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class BitsLeaderboardEntry {
 
     /** ID of the user (viewer) in the leaderboard entry. */
     @NonNull
     private String userId;
+
+    /**
+     * User login name.
+     */
+    private String userLogin;
+
+    /**
+     * Display name corresponding to user_id.
+     */
+    private String userName;
 
     /** Leaderboard rank of the user. */
     private Integer rank;

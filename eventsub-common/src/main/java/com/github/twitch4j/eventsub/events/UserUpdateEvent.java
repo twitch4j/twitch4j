@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +12,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserUpdateEvent extends EventSubUserEvent {
 
     /**

@@ -2,10 +2,7 @@ package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
@@ -18,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.With;
 
 import java.time.Instant;
 import java.util.Map;
@@ -27,8 +25,6 @@ import java.util.Map;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventSubSubscription {
 
     /**
@@ -60,9 +56,18 @@ public class EventSubSubscription {
     private Instant createdAt;
 
     /**
-     * Object indicating the notification delivery specific information
+     * Object indicating the notification delivery specific information.
      */
+    @With
     private EventSubTransport transport;
+
+    /**
+     * How much the subscription counts against your limit.
+     * Subscriptions cost 0 if the user has authorized your application; otherwise they cost 1.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/eventsub/#subscription-limits">Limit Docs</a>
+     */
+    private Integer cost;
 
     /**
      * The category of the subscription.
@@ -78,7 +83,7 @@ public class EventSubSubscription {
 
     @JsonCreator
     public EventSubSubscription(@JsonProperty("id") String id, @JsonProperty("status") EventSubSubscriptionStatus status, @JsonProperty("type") String type, @JsonProperty("version") String version,
-                                @JsonProperty("condition") Map<String, Object> condition, @JsonProperty("created_at") Instant createdAt, @JsonProperty("transport") EventSubTransport transport) {
+                                @JsonProperty("condition") Map<String, Object> condition, @JsonProperty("created_at") Instant createdAt, @JsonProperty("transport") EventSubTransport transport, @JsonProperty("cost") Integer cost) {
         this.id = id;
         this.status = status;
         this.rawType = type;
@@ -87,6 +92,7 @@ public class EventSubSubscription {
         this.condition = EventSubConditionConverter.getCondition(this.type, condition);
         this.createdAt = createdAt;
         this.transport = transport;
+        this.cost = cost;
     }
 
 }

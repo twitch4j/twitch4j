@@ -1,23 +1,22 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Subscription {
 
     /** User ID of the broadcaster. */
     @NonNull
     private String broadcasterId;
 
-    /** Username of the broadcaster. */
+    /** Login name of the broadcaster. */
+    @NonNull
+    private String broadcasterLogin;
+
+    /** Display name of the broadcaster. */
     @NonNull
     private String broadcasterName;
 
@@ -26,6 +25,9 @@ public class Subscription {
 
     /** ID of the user who gifted the sub. */
     private String gifterId;
+
+    /** If the subscription was gifted, this is the login of the gifter. */
+    private String gifterLogin;
 
     /** Display name of the user who gifted the sub. */
     private String gifterName;
@@ -42,7 +44,11 @@ public class Subscription {
     @NonNull
     private String userId;
 
-    /** Login name of the subscribed user. */
+    /** Login of the subscribed user. */
+    @NonNull
+    private String userLogin;
+
+    /** Display name of the subscribed user. */
     @NonNull
     private String userName;
 

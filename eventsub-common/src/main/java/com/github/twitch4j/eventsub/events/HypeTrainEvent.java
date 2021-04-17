@@ -1,8 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.twitch4j.eventsub.domain.Contribution;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -19,8 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class HypeTrainEvent extends EventSubChannelEvent {
 
     /**

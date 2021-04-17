@@ -455,7 +455,7 @@ public class IRCEventHandler {
      */
     public void onChannelModChange(IRCMessageEvent event) {
         if(event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
-            // Recieving Mod Status
+            // Receiving Mod Status
             if(event.getPayload().get().substring(1).startsWith("o")) {
                 // Load Info
                 EventChannel channel = event.getChannel();

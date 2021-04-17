@@ -21,6 +21,8 @@ import java.util.Optional;
 @Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
+    private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+
     /**
      * Constructor
      *
@@ -42,7 +44,6 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @param credential OAuth2 Credential
      */
     public Optional<OAuth2Credential> getAdditionalCredentialInformation(OAuth2Credential credential) {
-        OkHttpClient client = new OkHttpClient();
         try {
             // api call
             Request request = new Request.Builder()
@@ -50,7 +51,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
                 .header("Authorization", "OAuth " + credential.getAccessToken())
                 .build();
 
-            Response response = client.newCall(request).execute();
+            Response response = HTTP_CLIENT.newCall(request).execute();
             String responseBody = response.body().string();
 
             // parse response
@@ -66,27 +67,15 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
                 OAuth2Credential newCredential = new OAuth2Credential(credential.getIdentityProvider(), credential.getAccessToken(), credential.getRefreshToken(), userId, userName, expiresIn, scopes);
 
                 // inject credential context
-                newCredential.getContext().put("client_id", (String) tokenInfo.get("client_id"));
+                newCredential.getContext().put("client_id", tokenInfo.get("client_id"));
 
-                return Optional.ofNullable(newCredential);
+                return Optional.of(newCredential);
             } else {
                 throw new RuntimeException("Request Failed! Code: " + response.code() + " - " + responseBody);
             }
 
         } catch (Exception ex) {
             // ignore, invalid token
-        } finally {
-            client.dispatcher().executorService().shutdown();
-            client.connectionPool().evictAll();
-
-            if (client.cache() != null && !client.cache().isClosed()) {
-                try {
-                    client.cache().close();
-                } catch (Exception ex) {
-                    log.warn("Failed to close OkHttp Client Cache ... [{}]", ex.getMessage());
-                }
-
-            }
         }
 
         return Optional.empty();
@@ -102,7 +91,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      */
     public boolean revokeCredential(OAuth2Credential credential) {
         HttpUrl url = HttpUrl.parse("https://id.twitch.tv/oauth2/revoke").newBuilder()
-            .addQueryParameter("client_id", clientId)
+            .addQueryParameter("client_id", (String) credential.getContext().getOrDefault("client_id", clientId))
             .addQueryParameter("token", credential.getAccessToken())
             .build();
 
@@ -111,18 +100,14 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
             .post(RequestBody.create("", null))
             .build();
 
-        final OkHttpClient client = new OkHttpClient();
         try {
-            Response response = client.newCall(request).execute();
+            Response response = HTTP_CLIENT.newCall(request).execute();
             if (response.isSuccessful()) {
                 return true;
             } else {
                 log.warn("Unable to revoke access token! Code: " + response.code() + " - " + response.body().string());
             }
         } catch (Exception ignored) {
-        } finally {
-            client.dispatcher().executorService().shutdown();
-            client.connectionPool().evictAll();
         }
 
         return false;

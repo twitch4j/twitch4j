@@ -1,6 +1,5 @@
 package com.github.twitch4j.kraken.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +12,6 @@ import java.util.List;
 @ToString(callSuper = true)
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class KrakenBlockList extends AbstractResultList {
     private List<KrakenBlock> blocks;
 }

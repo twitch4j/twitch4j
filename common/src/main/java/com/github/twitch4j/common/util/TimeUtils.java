@@ -14,7 +14,7 @@ public class TimeUtils {
      * @return long
      */
     public static long getCurrentTimeInMillis() {
-        return Calendar.getInstance().getTimeInMillis();
+        return Instant.now().toEpochMilli();
     }
 
     /**

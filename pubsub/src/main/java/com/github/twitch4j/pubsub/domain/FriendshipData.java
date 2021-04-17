@@ -1,9 +1,5 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -12,8 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FriendshipData {
     private String userId;
     private String targetUserId;

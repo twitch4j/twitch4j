@@ -1,10 +1,9 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -12,16 +11,28 @@ import java.util.List;
  * Bits Leaderboard
  */
 @Data
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class BitsLeaderboard {
+
     /**
      * Data
      */
     @JsonProperty("data")
     private List<BitsLeaderboardEntry> entries;
 
-    @JsonProperty("pagination")
+    /**
+     * Date range of the returned data.
+     */
+    @Setter(AccessLevel.PRIVATE)
+    private DateRange dateRange;
+
+    /**
+     * Total number of results (users) returned.
+     * This is count or the total number of entries in the leaderboard, whichever is less.
+     */
+    @Setter(AccessLevel.PRIVATE)
+    private Integer total;
+
+    @Deprecated
     private HelixPagination pagination;
 
 }

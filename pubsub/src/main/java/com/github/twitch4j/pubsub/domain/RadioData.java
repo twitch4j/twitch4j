@@ -1,6 +1,5 @@
 package com.github.twitch4j.pubsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.twitch4j.common.util.NanoInstantDeserializer;
@@ -12,7 +11,6 @@ import java.time.Instant;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class RadioData {
 
     @JsonProperty("userID")
