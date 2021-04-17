@@ -259,6 +259,9 @@ public class TwitchPubSub implements ITwitchPubSub {
                 // Recreate Socket if state does not equal CREATED
                 createWebSocket();
 
+                // Reset last ping to avoid edge case loop where reconnect occurred after sending PING but before receiving PONG
+                this.lastPing = TimeUtils.getCurrentTimeInMillis() - 4 * 60 * 1000;
+
                 // Connect to IRC WebSocket
                 this.webSocket.connect();
             } catch (Exception ex) {
