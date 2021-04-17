@@ -14,6 +14,16 @@ public class BitsLeaderboardEntry {
     @NonNull
     private String userId;
 
+    /**
+     * User login name.
+     */
+    private String userLogin;
+
+    /**
+     * Display name corresponding to user_id.
+     */
+    private String userName;
+
     /** Leaderboard rank of the user. */
     private Integer rank;
 

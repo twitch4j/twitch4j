@@ -19,6 +19,11 @@ public class BannedUser {
     private String userId;
 
     /**
+     * Login of a user who has been banned.
+     */
+    private String userLogin;
+
+    /**
      * Display name of a user who has been banned.
      */
     private String userName;

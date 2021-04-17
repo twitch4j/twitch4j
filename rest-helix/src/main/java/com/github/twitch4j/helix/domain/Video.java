@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.Date;
@@ -23,6 +24,9 @@ public class Video {
 
     /** ID of the user who owns the video. */
     private String userId;
+
+    /** Login of the user who owns the video. */
+    private String userLogin;
 
     /** Login name corresponding to user_id. */
     private String userName;
@@ -61,6 +65,21 @@ public class Video {
 
     /** Length of the video. */
     private String duration;
+
+    /**
+     * Gets the thumbnail url for specific dimensions.
+     *
+     * @param width  Thumbnail width.
+     * @param height Thumbnail height.
+     * @return String
+     */
+    public String getThumbnailUrl(int width, int height) {
+        return StringUtils.replaceEach(
+            this.getThumbnailUrl(),
+            new String[] { "%{width}", "%{height}" },
+            new String[] { String.valueOf(width), String.valueOf(height) }
+        );
+    }
 
     /**
      * @return the timestamp when the video was created

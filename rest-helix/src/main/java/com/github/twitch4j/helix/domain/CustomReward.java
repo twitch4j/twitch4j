@@ -34,6 +34,11 @@ public class CustomReward {
     private String broadcasterId;
 
     /**
+     * Login of the channel the reward is for.
+     */
+    private String broadcasterLogin;
+
+    /**
      * Display name of the channel the reward is for.
      */
     private String broadcasterName;

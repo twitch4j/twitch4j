@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -16,7 +18,7 @@ import lombok.ToString;
 public class StreamOnlineEvent extends EventSubChannelEvent {
 
     /**
-     * The event id.
+     * The id of the stream.
      */
     private String id;
 
@@ -24,5 +26,10 @@ public class StreamOnlineEvent extends EventSubChannelEvent {
      * The stream type.
      */
     private StreamType type;
+
+    /**
+     * The timestamp at which the stream went online at.
+     */
+    private Instant startedAt;
 
 }

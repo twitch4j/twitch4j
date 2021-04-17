@@ -335,7 +335,7 @@ public interface TwitchHelix {
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
      * @param after     Optional: The cursor used to fetch the next page of data.
-     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 100.
+     * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
     @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
@@ -453,7 +453,7 @@ public interface TwitchHelix {
     /**
      * Modifies channel information for users
      *
-     * @param authToken Auth Token (scope: user:edit:broadcast)
+     * @param authToken Auth Token (scope: channel:manage:broadcast or user:edit:broadcast)
      * @param broadcasterId ID of the channel to be updated (required)
      * @param channelInformation {@link ChannelInformation} (at least one parameter must be provided)
      * @return 204 No Content upon a successful update
@@ -924,7 +924,7 @@ public interface TwitchHelix {
 
     /**
      * Replaces the active stream tags on the specified stream with the specified tags (or clears all tags, if no new tags are specified).
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream to replace tags for
@@ -947,7 +947,7 @@ public interface TwitchHelix {
      * Creates a marker at the current time during a live stream. A marker is a temporal indicator that appears on the Twitch web UI for highlight creation and can also be retrieved with
      * {@link #getStreamMarkers(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.String, java.lang.String) getStreamMarkers}. Markers are meant to remind streamers and their video editors of important moments during a stream.
      * Markers can be created only if the broadcast identified by the specified {@code userId} is live and has enabled VOD (past broadcast) storage. Marker creation will fail if the broadcaster is airing a premiere or a rerun.
-     * Requires scope: user:edit:broadcast
+     * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
      * @param authToken     Auth Token
      * @param highlight     User id and optional description for the marker
@@ -1041,6 +1041,54 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Checks if a specific user (user_id) is subscribed to a specific channel (broadcaster_id).
+     *
+     * @param authToken     Token with the user:read:subscriptions scope. App access works if the user has authorized your application.
+     * @param broadcasterId User ID of an Affiliate or Partner broadcaster.
+     * @param userId        User ID of a Twitch viewer.
+     * @return SubscriptionList on success, error 404 if not subscribed
+     */
+    @RequestLine("GET /subscriptions/user?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SubscriptionList> checkUserSubscription(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
+    );
+
+    /**
+     * Gets information for a specific Twitch Team.
+     * <p>
+     * One of the two optional query parameters must be specified to return Team information.
+     *
+     * @param authToken User OAuth Token or App Access Token.
+     * @param name      Team name.
+     * @param id        Team ID.
+     * @return TeamList
+     */
+    @RequestLine("GET /teams?name={name}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamList> getTeams(
+        @Param("token") String authToken,
+        @Param("name") String name,
+        @Param("id") String id
+    );
+
+    /**
+     * Retrieves a list of Twitch Teams of which the specified channel/broadcaster is a member.
+     *
+     * @param authToken     User OAuth Token or App Access Token
+     * @param broadcasterId User ID for a Twitch user.
+     * @return TeamMembershipList
+     */
+    @RequestLine("GET /teams/channel?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<TeamMembershipList> getChannelTeams(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**

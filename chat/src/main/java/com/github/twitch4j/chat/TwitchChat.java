@@ -638,14 +638,7 @@ public class TwitchChat implements ITwitchChat {
         return this.sendMessage(channel, message, null);
     }
 
-    /**
-     * Sends a message to the channel while including an optional nonce and/or reply parent.
-     *
-     * @param channel    the name of the channel to send the message to.
-     * @param message    the message to be sent.
-     * @param nonce      the cryptographic nonce (optional).
-     * @param replyMsgId the msgId of the parent message being replied to (optional).
-     */
+    @Override
     @Unofficial
     public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
         final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
@@ -746,14 +739,17 @@ public class TwitchChat implements ITwitchChat {
     /**
      * @return the cached map used for channel id to name mapping
      */
+    @Override
     public Map<String, String> getChannelIdToChannelName() {
         return Collections.unmodifiableMap(channelIdToChannelName);
     }
 
     /**
-     * @return the cached map sed for channel name to id mapping
+     * @return the cached map used for channel name to id mapping
      */
+    @Override
     public Map<String, String> getChannelNameToChannelId() {
         return Collections.unmodifiableMap(channelNameToChannelId);
     }
+
 }

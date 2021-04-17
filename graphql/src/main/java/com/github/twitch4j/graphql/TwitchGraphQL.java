@@ -88,7 +88,7 @@ public class TwitchGraphQL {
      *
      * @param auth               Credential
      * @param targetUserId       target user, that the user the auth token was provided for will follow
-     * @param goLiveNotification should the follower be notified everytime a streamer goes live?
+     * @param goLiveNotification should the follower be notified every time a streamer goes live?
      * @return CommandFollowUser
      */
     public CommandFollowUser followUser(OAuth2Credential auth, Long targetUserId, Boolean goLiveNotification) {
