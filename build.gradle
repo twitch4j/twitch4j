@@ -1,13 +1,13 @@
 // Plugins
 plugins {
 	id 'io.freefair.lombok' version '5.3.0' apply false
-	id 'com.jfrog.bintray' version '1.8.5' apply false
-	id 'com.jfrog.artifactory' version '4.13.0' apply false
+	id 'com.jfrog.bintray' version '1.8.5' apply false // TODO update gradle build in https://github.com/twitch4j/twitch4j/pull/270
+	id 'com.jfrog.artifactory' version '4.13.0' apply false // TODO update gradle build in https://github.com/twitch4j/twitch4j/pull/270
 	id 'com.github.johnrengelman.shadow' version '6.1.0' apply false
 }
 
 // Artifact Info
-project.ext {
+project.ext { // extra properties merge to gradle.properties and some parts are be include in publications
 	groupId = 'com.github.twitch4j'
 	artifactNamespace = 'twitch4j'
 	artifactName = 'Twitch4J'
@@ -22,8 +22,8 @@ project.ext {
 allprojects {
 	// Repositories
 	repositories {
-		jcenter()
-		maven { url "https://maven.google.com" }
+		jcenter() // TODO update gradle build in https://github.com/twitch4j/twitch4j/pull/270
+		maven { url "https://maven.google.com" } // TODO remove when apollo pulling in central
 		mavenLocal()
 	}
 }
@@ -124,6 +124,7 @@ subprojects {
 }
 
 tasks.register("aggregateJavadoc", Javadoc) {
+// javadoc aggregation should be automatically generates while release
 	it.group = JavaBasePlugin.DOCUMENTATION_GROUP
 	it.options {
 		title = "${project.artifactName} (v${project.version})"

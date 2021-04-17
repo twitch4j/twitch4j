@@ -1,7 +1,7 @@
 name: Gradle Wrapper Update
 on:
   schedule:
-    - cron : "0 0 * * *" # Check updates each day on 12AM UTC
+    - cron: 0 6 * * * # Check updates each day on 6AM UTC
 
 jobs:
   gradle_update:
@@ -17,5 +17,4 @@ jobs:
         with:
           reviewers: PhilippHeuer, iProdigy
           labels: dependencies
-          base-branch: deps/gradle-updates
           target-branch: develop

@@ -1,4 +1,4 @@
-name: Javadoc
+name: Build Javadoc
 on:
   release:
     types: [ published ]

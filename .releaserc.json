@@ -21,25 +21,25 @@
           },
           {
             "type": "refactor",
-            "release": "patch"
+            "release": "major"
           },
           {
             "type": "deps",
             "release": "patch"
           },
-          {
-            "type": "build",
-            "release": "patch"
-          },
+		  {
+			"type": "build",
+			"release": "patch"
+		  },
           {
             "type": "chore",
             "release": "patch"
           },
-          {
-            "type": "docs",
-            "scope": "README",
-            "release": "patch"
-          },
+		  {
+			"type": "docs",
+			"scope": "README",
+			"release": "patch"
+		  },
           {
             "type": "style",
             "release": "patch"
@@ -64,51 +64,57 @@
             "BREAKING"
           ]
         },
+		"writerOpts": {
+		  "mainTemplate": ".github/release/template.hbs",
+		  "commitPartial": ".github/release/commit.hbs"
+		},
         "presetConfig": {
-          "header": "Changelog",
           "releaseCommitMessageFormat": "release: {{currentTag}}",
           "types": [
             {
               "type": "feat",
-              "section": "Features",
+              "section": "🧰 Features",
               "hidden": false
             },
             {
               "type": "pref",
-              "section": "Performance",
+              "section": "⚙ Performance",
               "hidden": false
             },
             {
               "type": "fix",
-              "section": "Bugs fixed",
+              "section": "🐛 Bugs fixed",
               "hidden": false
             },
             {
               "type": "refactor",
-              "section": "Refactor",
+              "section": "✏ Refactor",
               "hidden": false
             },
             {
               "type": "deps",
-              "section": "Dependency Updates",
+              "section": "📥 Dependency Updates",
               "hidden": false
             },
             {
               "type": "chore",
-              "section": "Conventional Changes",
+              "section": "📡 Conventional Changes",
               "hidden": false
             },
             {
               "type": "build",
-              "hidden": true
+			  "section": "⚒ Build Updates",
+              "hidden": false
             },
             {
               "type": "docs",
-              "hidden": true
+			  "section": "📖 Documentation",
+              "hidden": false
             },
             {
               "type": "style",
-              "hidden": true
+			  "section": "📜 Styling updates",
+			  "hidden": false
             }
           ]
         }

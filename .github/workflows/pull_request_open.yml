@@ -9,7 +9,7 @@ jobs:
         if: ${{ github.event.pull_request.base.ref != 'develop' }} # switch branch to develop
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PULL_REQUEST_BRANCH: "develop"
+          PULL_REQUEST_BRANCH: develop
   reviewer_assign:
     runs-on: ubuntu-latest
     steps:
@@ -32,21 +32,8 @@ jobs:
             chore
             perf
             refactor
-          scopes: |
-            ci
-            gradle
-            common
-            kraken
-            helix
-            chat
-            pubsub
-            websub
-            gql
-            eventsub
-            core
           requiredScope: true
           subjectPatternError: |
             Thank you for your contribiution. Unfortunate your title doesn't contain a proper title format.
-            The title must be: `<type>(<scope>): {title}`, when [`type`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-types)
-            and [`scope`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-scopes) **MUST** be defined in the sample title.
+            The title must be: `<type>: {title}`, when [`type`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-types) **MUST** be defined in the sample title.
             For more details about sending pull request, please refer to our [documentation](https://twitch4j.github.io/docs/contributing/pull-request-guide)
