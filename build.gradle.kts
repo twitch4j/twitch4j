@@ -1,36 +1,26 @@
-@file:Suppress("UnstableApiUsage")
-
 // Plugins
 plugins {
-	signing
+	`signing`
 	`java-library`
 	`maven-publish`
 	id("io.freefair.lombok") version "5.3.3.3"
 	id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
+group = group
+version = version
+
 // All-Projects
 allprojects {
 	// Repositories
 	repositories {
 		mavenCentral()
-		mavenLocal()
-		jcenter()
 	}
 
 	tasks {
-		withType<Javadoc> {
-			if (JavaVersion.current().isJava9Compatible) {
-				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-			}
-		}
-		// prevent to generate 'lombok.config' - more about: https://projectlombok.org/features/configuration
+		// disable 'lombok.config' generation
 		withType<io.freefair.gradle.plugins.lombok.tasks.GenerateLombokConfig> {
 			enabled = false
-		}
-		// prevent to generate 'lombok.config' - more about: https://projectlombok.org/features/configuration
-		withType<Jar> {
-			archiveVersion.set("${project.version}")
 		}
 	}
 }
@@ -44,7 +34,7 @@ subprojects {
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	lombok {
-		version.set("1.18.16")
+		version.set("1.18.18")
 	}
 
 	// Source Compatibility
@@ -114,24 +104,11 @@ subprojects {
 	publishing {
 		repositories {
 			maven {
-				val releaseUri = uri("https://oss.sonatype.org/content/repositories/releases")
-				val snapshotUri = uri("https://oss.sonatype.org/content/repositories/releases")
-				name = "Nexus"
-				url = if (project.isSnapshot) snapshotUri else releaseUri
+				name = "maven"
+				url = uri(project.mavenRepositoryUrl)
 				credentials {
-					username = project.nexusUser
-					password = project.nexusPassword
-				}
-			}
-			maven {
-				name = "GitHubPackages"
-				url = uri("https://maven.pkg.github.com/twitch4j/twitch4j")
-				credentials {
-					username = project.githubRepoUser
-					password = project.githubRepoToken
-				}
-				mavenContent {
-					releasesOnly()
+					username = project.mavenRepositoryUsername
+					password = project.mavenRepositoryPassword
 				}
 			}
 		}
@@ -145,26 +122,32 @@ subprojects {
 	}
 
 	signing {
+		useGpgCmd()
 		sign(publishing.publications["main"])
 	}
 
 	// Source encoding
 	tasks {
+		// javadoc / html5 support
+		withType<Javadoc> {
+			if (JavaVersion.current().isJava9Compatible) {
+				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
+			}
+		}
+
+		// jar artifact id and version
+		withType<Jar> {
+			archiveBaseName.set(project.artifactId)
+			archiveVersion.set("${project.version}")
+		}
+
+		// compile options
 		withType<JavaCompile> {
 			options.encoding = "UTF-8"
 		}
 
-		withType<Jar> {
-			archiveBaseName.set(artifactId)
-		}
-
+		// javadoc & delombok
 		val delombok by getting(io.freefair.gradle.plugins.lombok.tasks.Delombok::class)
-		val jar by getting(Jar::class)
-		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
-			target = shadowJar.get()
-			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
-		}
-
 		javadoc {
 			dependsOn(delombok)
 			source(delombok)
@@ -175,12 +158,19 @@ subprojects {
 			}
 		}
 
+		// shadowjar & relocation
+		val jar by getting(Jar::class)
+		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
+			target = shadowJar.get()
+			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
+		}
 		shadowJar {
 			dependsOn(relocateShadowJar)
 			archiveClassifier.set("shaded")
 			manifest.inheritFrom(jar.manifest)
 		}
 
+		// test
 		test {
 			useJUnitPlatform {
 				includeTags("unittest")
@@ -188,25 +178,6 @@ subprojects {
 			}
 		}
 	}
-
-//	bintray {
-//		user = bintrayUser
-//		key = bintrayApiKey
-//		setPublications(*publishing.publications.filterIsInstance<MavenPublication>().map { it.name }.toTypedArray())
-//		dryRun = false
-//		publish = true
-//		override = false
-//		pkg.apply {
-//			userOrg = "Twitch4J"
-//			repo = "maven"
-//			name = "Twitch4J"
-//			version.apply {
-//				name = "${project.version}"
-//				vcsTag = "v${project.version}"
-//				released = "${Date()}"
-//			}
-//		}
-//	}
 }
 
 tasks.register<Javadoc>("aggregateJavadoc") {

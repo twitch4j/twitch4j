@@ -2,23 +2,14 @@ import org.gradle.api.Project
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.util.Path
 
-val Project.nexusUser: String?
-	get() = System.getenv("SONATYPE_USER") ?: findProperty("nexus.user")?.toString()
+val Project.mavenRepositoryUrl: String
+	get() = System.getenv("MAVEN_REPO_URL") ?: findProperty("maven.repository.url").toString()
 
-val Project.nexusPassword: String?
-	get() = System.getenv("SONATYPE_PASSOWRD") ?: findProperty("nexus.passowrd")?.toString()
+val Project.mavenRepositoryUsername: String
+	get() = System.getenv("MAVEN_REPO_USERNAME") ?: findProperty("maven.repository.username").toString()
 
-val Project.githubToken: String?
-	get() = System.getenv("GITHUB_TOKEN") ?: findProperty("github.token")?.toString()
-
-val Project.githubRepoUser: String?
-	get() = System.getenv("GITHUB_REPO_USER") ?: findProperty("github.repo.user")?.toString()
-
-val Project.githubRepoToken: String?
-	get() = System.getenv("GITHUB_REPO_TOKEN") ?: findProperty("github.repo.token")?.toString()
-
-val Project.isSnapshot: Boolean
-	get() = (rootProject.version as String).endsWith("-SNAPSHOT")
+val Project.mavenRepositoryPassword: String
+	get() = System.getenv("MAVEN_REPO_PASSWORD") ?: findProperty("maven.repository.password").toString()
 
 val Project.artifactId: String
 	get() = (this as DefaultProject).identityPath.path.replace(Path.SEPARATOR, "-").let {
@@ -27,14 +18,3 @@ val Project.artifactId: String
 			) && it.length > 1
 		) it else "")
 	}.toLowerCase()
-
-enum class VersionType(private val pattern: Regex) {
-	MAJOR(Regex("(\\d+).\\d+.\\d+-.*")),
-	MINOR(Regex("\\d+.(\\d+).\\d+-.*")),
-	PATCH(Regex("\\d+.\\d+.(\\d+)-.*"));
-
-	internal fun replace(version: String) = version.replace(pattern, "${"$1".toInt() + 1}")
-}
-
-fun nextIterable(version: String, type: VersionType, snapshot: Boolean = true) =
-	type.replace(version) + (if (snapshot) "-SNAPSHOT" else "")

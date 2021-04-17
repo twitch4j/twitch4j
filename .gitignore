@@ -39,6 +39,7 @@ local.properties
 .gradletasknamecache
 .gradle/
 !gradle/wrapper/*.jar
+gradle.properties
 
 # Logs / Save Files
 config/*

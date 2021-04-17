@@ -1,6 +1,0 @@
-####
-# Central CI Pipeline
-####
-
-include:
-- remote: 'https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/src/libexec/mpi/resources/gitlab/AutoDevOps.gitlab-ci.yml'

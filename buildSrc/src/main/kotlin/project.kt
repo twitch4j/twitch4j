@@ -1,9 +1,8 @@
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPomDeveloperSpec
-import java.util.*
 
 fun MavenPom.default() {
-	url.set("https://twitch4j.github.io/")
+	url.set("https://twitch4j.github.io")
 	issueManagement {
 		system.set("GitHub")
 		url.set("https://github.com/twitch4j/twitch4j/issues")
@@ -11,7 +10,7 @@ fun MavenPom.default() {
 	ciManagement {
 		url.set("https://github.com/twitch4j/twitch4j/actions")
 	}
-	inceptionYear.set(Calendar.getInstance().get(Calendar.YEAR).toString())
+	inceptionYear.set("2017")
 	developers { all }
 	licenses {
 		license {
@@ -30,6 +29,7 @@ fun MavenPom.default() {
 val MavenPomDeveloperSpec.all: Unit
 	get() {
 		PhilippHeuer()
+		iProdigy()
 	}
 
 fun MavenPomDeveloperSpec.PhilippHeuer() {
@@ -37,6 +37,14 @@ fun MavenPomDeveloperSpec.PhilippHeuer() {
 		id.set("PhilippHeuer")
 		name.set("Philipp Heuer")
 		email.set("git@philippheuer.me")
-		roles.addAll("creator", "developer", "owner")
+		roles.addAll("maintainer")
+	}
+}
+
+fun MavenPomDeveloperSpec.iProdigy() {
+	developer {
+		id.set("iProdigy")
+		name.set("Sidd")
+		roles.addAll("maintainer")
 	}
 }
