@@ -431,6 +431,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         RedemptionProgress redemptionFinished = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
                                         eventManager.publish(new UpdateRedemptionFinishedEvent(instant, redemptionFinished));
                                         break;
+                                    case "community-goal-contribution":
+                                        CommunityGoalContribution contribution = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
+                                        eventManager.publish(new CommunityGoalContributionEvent(instant, contribution));
+                                        break;
                                     default:
                                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
