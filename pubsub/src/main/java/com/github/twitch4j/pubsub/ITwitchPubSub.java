@@ -224,7 +224,7 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     default PubSubSubscription listenForChannelSubLeaderboardEvents(OAuth2Credential credential, String channelId, String timeAggregationUnit) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit);
+        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.sub-gifts-sent-" + channelId + "-" + timeAggregationUnit);
     }
 
     @Unofficial
@@ -243,7 +243,7 @@ public interface ITwitchPubSub extends AutoCloseable {
             PubSubType.LISTEN,
             credential,
             "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit,
-            "leaderboard-events-v1.sub-gift-sent-" + channelId + "-" + timeAggregationUnit
+            "leaderboard-events-v1.sub-gifts-sent-" + channelId + "-" + timeAggregationUnit
         );
     }
 
