@@ -77,6 +77,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-ritual-trigger", IRCMessageEvent.class, this::onRitual);
         eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
         eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
+        eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
     }
 
     /**
@@ -580,6 +581,12 @@ public class IRCEventHandler {
     public void onUserState(IRCMessageEvent event) {
         if (event.getCommandType().equals("USERSTATE")) {
             eventManager.publish(new UserStateEvent(event));
+        }
+    }
+
+    public void onGlobalUserState(IRCMessageEvent event) {
+        if ("GLOBALUSERSTATE".equals(event.getCommandType())) {
+            eventManager.publish(new GlobalUserStateEvent(event));
         }
     }
 

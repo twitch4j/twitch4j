@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
 
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
-    private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
+    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>.+?)\\s)?(?<clientName>.+?)\\s(?<command>[A-Z0-9]+)\\s?(?:#(?<channel>.*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
+    private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>.+?)\\s)?:(?<clientName>.+?)!.+?\\s(?<command>[A-Z0-9]+)\\s(?:(?<channel>.*?)\\s?)??(?<payload>[:\\-+](?<message>.+))$");
     private static final Pattern CLIENT_PATTERN = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
 
     @Unofficial
