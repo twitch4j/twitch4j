@@ -32,6 +32,11 @@ public enum CommandPermission {
     SUBGIFTER,
 
     /**
+     * Cheered bits
+     */
+    BITS_CHEERER,
+
+    /**
      * Was a conductor of the previous hype train
      */
     FORMER_HYPE_TRAIN_CONDUCTOR,

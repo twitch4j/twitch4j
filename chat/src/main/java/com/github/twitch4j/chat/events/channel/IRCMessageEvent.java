@@ -297,6 +297,22 @@ public class IRCMessageEvent extends TwitchEvent {
         return OptionalInt.empty();
     }
 
+    /**
+     * @return the tier of the bits badge of the user, or empty if there is no bits badge present
+     */
+    public OptionalInt getCheererTier() {
+        final String bits = badges.get("bits");
+
+        if (bits != null) {
+            try {
+                return OptionalInt.of(Integer.parseInt(bits));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return OptionalInt.empty();
+    }
+
 	/**
 	 * Gets a optional tag from the irc message
      *
