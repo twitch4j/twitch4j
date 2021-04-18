@@ -55,6 +55,9 @@ public class Clip {
     /** URL of the clip thumbnail. */
     private String thumbnailUrl;
 
+    /** Duration of the Clip in seconds (up to 0.1 precision). */
+    private Float duration;
+
     /**
      * @return the timestamp for the clip's creation
      * @deprecated in favor of getCreatedAtInstant()
