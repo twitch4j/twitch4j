@@ -1,6 +1,6 @@
 // Plugins
 plugins {
-	`signing`
+	signing
 	`java-library`
 	`maven-publish`
 	id("io.freefair.lombok") version "5.3.3.3"
