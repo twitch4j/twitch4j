@@ -1,7 +1,7 @@
 name: Gradle Wrapper Update
 on:
   schedule:
-    - cron: 0 6 * * * # Check updates each day on 6AM UTC
+    - cron: 0 6 */14 * TUE # Check updates every 2nd Tuesdays on 6AM UTC
 
 jobs:
   gradle_update:

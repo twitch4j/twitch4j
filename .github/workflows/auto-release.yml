@@ -1,7 +1,7 @@
 name: Auto-Release by Cronjob
 on:
   schedule:
-    - cron: '0 22 * * 4/2' # deploy release every second friday on 10PM UTC
+    - cron: '0 22 */1 * FRI' # deploy release each first fridays on the month on 10PM UTC
 
 jobs:
   push:
