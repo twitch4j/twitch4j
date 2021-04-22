@@ -877,6 +877,28 @@ public interface TwitchHelix {
     }
 
     /**
+     * Gets information about active streams belonging to channels that the authenticated user follows.
+     * <p>
+     * Streams are returned sorted by number of current viewers, in descending order.
+     * Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
+     *
+     * @param authToken Required: OAuth user token with the user:read:follows scope.
+     * @param after     Optional: Cursor for forward pagination.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Default: 100.
+     * @param userId    Required: Results will only include active streams from the channels that this Twitch user follows. This must match the User ID in the bearer token.
+     * @return StreamList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_FOLLOWS_READ
+     */
+    @RequestLine("GET /streams/followed?after={after}&first={first}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamList> getFollowedStreams(
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit,
+        @Param("user_id") String userId
+    );
+
+    /**
      * Gets the channel stream key for a user
      *
      * @param authToken Auth Token (scope: channel:read:stream_key)
