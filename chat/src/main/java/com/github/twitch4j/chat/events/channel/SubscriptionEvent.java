@@ -8,7 +8,9 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,11 +19,12 @@ import java.util.Optional;
  * This event gets called when a user gets a new subscriber or a user resubscribes.
  * <p>
  * This event will be called simultaneously with the chat announcement,
- * not when the user presses his subscription button.
+ * not necessary when the user presses the subscription button.
  */
 @Value
 @Getter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SubscriptionEvent extends AbstractChannelEvent {
 
     /**
@@ -71,6 +74,19 @@ public class SubscriptionEvent extends AbstractChannelEvent {
     Integer giftMonths;
 
     /**
+     * The number of subscription months just purchased. (Unofficial)
+     */
+    @Unofficial
+    Integer multiMonthDuration;
+
+    /**
+     * The length of multi-month subscription tenure that has already been served. Can be null for gifts. (Unofficial)
+     */
+    @Nullable
+    @Unofficial
+    Integer multiMonthTenure;
+
+    /**
      * The regions of {@link #getMessage()} that were flagged by AutoMod (Unofficial)
      */
     @Unofficial
@@ -79,18 +95,20 @@ public class SubscriptionEvent extends AbstractChannelEvent {
     /**
      * Event Constructor
      *
-     * @param channel    ChatChannel the user subscribed to
-     * @param user       User that subscribed
-     * @param subPlan    Sub Plan
-     * @param message    Sub Message
-     * @param months     Cumulative number of months user has been subscribed (not consecutive)
-     * @param gifted     Is gifted?
-     * @param giftedBy   User that gifted the sub
-     * @param subStreak  Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
-     * @param giftMonths The number of months gifted as part of a single, multi-month gift
-     * @param flags      The regions of the message that were flagged by AutoMod.
+     * @param channel            ChatChannel the user subscribed to
+     * @param user               User that subscribed
+     * @param subPlan            Sub Plan
+     * @param message            Sub Message
+     * @param months             Cumulative number of months user has been subscribed (not consecutive)
+     * @param gifted             Is gifted?
+     * @param giftedBy           User that gifted the sub
+     * @param subStreak          Consecutive number of months user has been subscribed (not cumulative); 0 if no streak or user chooses not to share their streak
+     * @param giftMonths         The number of months gifted as part of a single, multi-month gift
+     * @param multiMonthDuration The number of subscription months just purchased
+     * @param multiMonthTenure   The length of multi-month subscription tenure that has already been served
+     * @param flags              The regions of the message that were flagged by AutoMod.
      */
-    public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths, List<AutoModFlag> flags) {
+    public SubscriptionEvent(EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths, Integer multiMonthDuration, Integer multiMonthTenure, List<AutoModFlag> flags) {
         super(channel);
         this.user = user;
         this.subscriptionPlan = subPlan;
@@ -100,6 +118,8 @@ public class SubscriptionEvent extends AbstractChannelEvent {
         this.giftedBy = giftedBy;
         this.subStreak = subStreak;
         this.giftMonths = giftMonths;
+        this.multiMonthDuration = multiMonthDuration;
+        this.multiMonthTenure = multiMonthTenure;
         this.flags = flags;
     }
 

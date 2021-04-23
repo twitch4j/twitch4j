@@ -82,7 +82,7 @@ public class TwitchUtils {
                 permissionSet.add(CommandPermission.SUBGIFTER);
             }
             // Cheerer
-            if (badges.containsKey("bits")) {
+            if (badges.containsKey("bits") || badges.containsKey("bits-leader")) {
                 permissionSet.add(CommandPermission.BITS_CHEERER);
             }
             // Founder
