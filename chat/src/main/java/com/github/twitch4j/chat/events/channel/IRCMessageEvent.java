@@ -298,7 +298,7 @@ public class IRCMessageEvent extends TwitchEvent {
     }
 
     /**
-     * @return the tier of the bits badge of the user, or empty if there is no bits badge present
+     * @return the tier of the bits badge of the user, or empty if there is no bits badge present (which can also occur for bits leaders)
      */
     public OptionalInt getCheererTier() {
         final String bits = badges.get("bits");
