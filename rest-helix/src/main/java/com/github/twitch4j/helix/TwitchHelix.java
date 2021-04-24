@@ -883,9 +883,9 @@ public interface TwitchHelix {
      * Across multiple pages of results, there may be duplicate or missing streams, as viewers join and leave streams.
      *
      * @param authToken Required: OAuth user token with the user:read:follows scope.
+     * @param userId    Required: Results will only include active streams from the channels that this Twitch user follows. This must match the User ID in the bearer token.
      * @param after     Optional: Cursor for forward pagination.
      * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Default: 100.
-     * @param userId    Required: Results will only include active streams from the channels that this Twitch user follows. This must match the User ID in the bearer token.
      * @return StreamList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_FOLLOWS_READ
      */
@@ -893,9 +893,9 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamList> getFollowedStreams(
         @Param("token") String authToken,
+        @Param("user_id") String userId,
         @Param("after") String after,
-        @Param("first") Integer limit,
-        @Param("user_id") String userId
+        @Param("first") Integer limit
     );
 
     /**
