@@ -39,12 +39,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
@@ -133,14 +133,14 @@ public class TwitchChat implements ITwitchChat {
     protected final Bucket ircWhisperBucket;
 
     /**
+     * IRC Join Bucket
+     */
+    protected final Bucket ircJoinBucket;
+
+    /**
      * IRC Command Queue
      */
     protected final BlockingQueue<String> ircCommandQueue;
-
-    /**
-     * Whisper-specific Command Queue
-     */
-    protected final BlockingQueue<String> whisperCommandQueue;
 
     /**
      * IRC Command Queue Thread
@@ -148,9 +148,24 @@ public class TwitchChat implements ITwitchChat {
     protected final ScheduledFuture<?> queueThread;
 
     /**
+     * Whether {@link #flushCommand} is currently executing
+     */
+    private final AtomicBoolean flushing = new AtomicBoolean();
+
+    /**
+     * Whether an expedited flush has already been submitted
+     */
+    private final AtomicBoolean flushRequested = new AtomicBoolean();
+
+    /**
+     * The {@link Runnable} for flushing the {@link #ircCommandQueue}
+     */
+    private final Runnable flushCommand;
+
+    /**
      * Command Queue Thread stop flag
      */
-    protected volatile Boolean stopQueueThread = false;
+    protected volatile boolean stopQueueThread = false;
 
     /**
      * Bot Owner IDs
@@ -209,23 +224,24 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Constructor
      *
-     * @param eventManager EventManager
-     * @param credentialManager CredentialManager
-     * @param chatCredential Chat Credential
-     * @param baseUrl The websocket url for the chat client to connect to
+     * @param eventManager                   EventManager
+     * @param credentialManager              CredentialManager
+     * @param chatCredential                 Chat Credential
+     * @param baseUrl                        The websocket url for the chat client to connect to
      * @param sendCredentialToThirdPartyHost Whether the password should be sent when the baseUrl is not official
-     * @param commandPrefixes Command Prefixes
-     * @param chatQueueSize Chat Queue Size
-     * @param ircMessageBucket Bucket for chat
-     * @param ircWhisperBucket Bucket for whispers
-     * @param taskExecutor ScheduledThreadPoolExecutor
-     * @param chatQueueTimeout Timeout to wait for events in Chat Queue
-     * @param proxyConfig Proxy Configuration
-     * @param autoJoinOwnChannel Whether one's own channel should automatically be joined
-     * @param enableMembershipEvents Whether JOIN/PART events should be enabled
-     * @param botOwnerIds Bot Owner IDs
+     * @param commandPrefixes                Command Prefixes
+     * @param chatQueueSize                  Chat Queue Size
+     * @param ircMessageBucket               Bucket for chat
+     * @param ircWhisperBucket               Bucket for whispers
+     * @param ircJoinBucket                  Bucket for joins
+     * @param taskExecutor                   ScheduledThreadPoolExecutor
+     * @param chatQueueTimeout               Timeout to wait for events in Chat Queue
+     * @param proxyConfig                    Proxy Configuration
+     * @param autoJoinOwnChannel             Whether one's own channel should automatically be joined
+     * @param enableMembershipEvents         Whether JOIN/PART events should be enabled
+     * @param botOwnerIds                    Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -234,9 +250,9 @@ public class TwitchChat implements ITwitchChat {
         this.commandPrefixes = commandPrefixes;
         this.botOwnerIds = botOwnerIds;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
-        this.whisperCommandQueue = new LinkedBlockingQueue<>();
         this.ircMessageBucket = ircMessageBucket;
         this.ircWhisperBucket = ircWhisperBucket;
+        this.ircJoinBucket = ircJoinBucket;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
@@ -274,57 +290,41 @@ public class TwitchChat implements ITwitchChat {
         this.connect();
 
         // queue command worker
-        Runnable queueTask = () -> {
-            while (!stopQueueThread) {
+        this.flushCommand = () -> {
+            if (flushing.getAndSet(true)) return;
+
+            while (!stopQueueThread && connectionState == TMIConnectionState.CONNECTED) {
                 String command = null;
-                Bucket bucket;
                 try {
-                    // wait for queue, only have a timeout set to allow multiple loops to check stopQueueThread
-                    // attempt to grab command from whisper queue before falling back to the general queue
-                    if (!whisperCommandQueue.isEmpty() && ircWhisperBucket.tryConsume(1L)) {
-                        ircWhisperBucket.addTokens(1L);
-                        command = whisperCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
-                        bucket = ircWhisperBucket;
-                    } else {
-                        command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
-                        bucket = ircMessageBucket;
-                    }
+                    // Send the command
+                    command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                    if (command == null) break;
+                    sendTextToWebSocket(command, false);
 
-                    if (command != null) {
-                        // Send the message, retrying forever until we are connected.
-                        while (!stopQueueThread) {
-                            if (connectionState.equals(TMIConnectionState.CONNECTED)) {
-                                // block thread, until we can continue
-                                bucket.asScheduler().consume(1);
-
-                                sendTextToWebSocket(command, false);
-                                break;
-                            }
-                            // Sleep for 25 milliseconds to wait for reconnection
-                            TimeUnit.MILLISECONDS.sleep(25L);
-                        }
-                        // Logging
-                        log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
-                        log.debug("{} messages left before hitting the rate-limit!", ircMessageBucket.getAvailableTokens());
-                    }
+                    // Logging
+                    log.debug("Processed command from queue: [{}].", command.startsWith("PASS") ? "***OAUTH TOKEN HIDDEN***" : command);
                 } catch (Exception ex) {
-                    log.error("Failed to process message from command queue", ex);
+                    log.error("Chat: Unexpected error in worker thread", ex);
 
                     // Reschedule command for processing
                     if (command != null) {
                         try {
-                            ircCommandQueue.put(command);
-                        } catch (InterruptedException e) {
+                            ircCommandQueue.offer(command, this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                        } catch (Exception e) {
                             log.error("Failed to reschedule command", e);
                         }
                     }
 
+                    break;
                 }
             }
+
+            flushRequested.set(false);
+            flushing.set(false);
         };
 
         // Thread will start right now
-        this.queueThread = taskExecutor.schedule(queueTask, 1L, TimeUnit.MILLISECONDS);
+        this.queueThread = taskExecutor.scheduleAtFixedRate(flushCommand, 0, this.chatQueueTimeout, TimeUnit.MILLISECONDS);
         log.debug("Started IRC Queue Worker");
 
         // Event Handlers
@@ -449,7 +449,7 @@ public class TwitchChat implements ITwitchChat {
 
                     // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
                     for (String channel : currentChannels) {
-                        sendCommand("join", '#' + channel);
+                        issueJoin(channel);
                     }
 
                     // then join to own channel - required for sending or receiving whispers
@@ -480,22 +480,22 @@ public class TwitchChat implements ITwitchChat {
                                 if (message.contains(":req Invalid CAP command")) {
                                     log.error("Failed to acquire requested IRC capabilities!");
                                 }
+                                // - CAP ACK
                                 else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
                                     List<String> capabilities = Arrays.asList(message.replace(":tmi.twitch.tv CAP * ACK :", "").split(" "));
-                                    capabilities.forEach(cap -> log.debug("Acquired chat capability: " + cap ));
+                                    capabilities.forEach(cap -> log.debug("Acquired chat capability: " + cap));
                                 }
                                 // - Ping
-                                else if(message.contains("PING :tmi.twitch.tv")) {
+                                else if (message.contains("PING :tmi.twitch.tv")) {
                                     sendTextToWebSocket("PONG :tmi.twitch.tv", true);
                                     log.debug("Responding to PING request!");
                                 }
                                 // - Login failed.
-                                else if(message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+                                else if (message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
                                     log.error("Invalid IRC Credentials. Login failed!");
                                 }
                                 // - Parse IRC Message
-                                else
-                                {
+                                else {
                                     try {
                                         IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
@@ -539,10 +539,10 @@ public class TwitchChat implements ITwitchChat {
      * Send IRC Command
      *
      * @param command IRC Command
-     * @param args command arguments
+     * @param args    command arguments
      */
     protected void sendCommand(String command, String... args) {
-        ircCommandQueue.offer(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
+        sendRaw(String.format("%s %s", command.toUpperCase(), String.join(" ", args)));
     }
 
     /**
@@ -550,8 +550,29 @@ public class TwitchChat implements ITwitchChat {
      *
      * @param command raw irc command
      */
-    public void sendRaw(String command) {
-        ircCommandQueue.offer(command);
+    public boolean sendRaw(String command) {
+        return ircMessageBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(() -> queueCommand(command), taskExecutor) != null;
+    }
+
+    /**
+     * Adds a raw irc command to the queue without checking bucket headroom.
+     *
+     * @param command Raw IRC command to be queued.
+     */
+    private void queueCommand(String command) {
+        // Add command to the queue, waiting for a period of time if necessary
+        if (!ircCommandQueue.offer(command)) {
+            try {
+                ircCommandQueue.offer(command, chatQueueTimeout, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                log.warn("Chat: unable to add command to full queue", e);
+                return;
+            }
+        }
+
+        // Expedite command execution if we aren't already flushing the queue and another expedition hasn't already been requested
+        if (!flushing.get() && !flushRequested.getAndSet(true))
+            taskExecutor.schedule(flushCommand, chatQueueTimeout / 20, TimeUnit.MILLISECONDS); // allow for some accumulation of requests before flushing
     }
 
     /**
@@ -560,7 +581,7 @@ public class TwitchChat implements ITwitchChat {
      * Sends important irc commands for login / capabilities and similar.
      * Will consume tokens to respect the ratelimit, but will bypass the limit if the bucket is empty.
      *
-     * @param command IRC Command
+     * @param command      IRC Command
      * @param consumeToken should a token be consumed when sending this text?
      */
     private boolean sendTextToWebSocket(String command, Boolean consumeToken) {
@@ -581,6 +602,7 @@ public class TwitchChat implements ITwitchChat {
 
     /**
      * Joining the channel
+     *
      * @param channelName channel name
      */
     @Override
@@ -590,7 +612,7 @@ public class TwitchChat implements ITwitchChat {
         channelCacheLock.lock();
         try {
             if (currentChannels.add(lowerChannelName)) {
-                sendCommand("join", "#" + lowerChannelName);
+                issueJoin(lowerChannelName);
                 log.debug("Joining Channel [{}].", lowerChannelName);
             } else {
                 log.warn("Already joined channel {}", channelName);
@@ -600,8 +622,16 @@ public class TwitchChat implements ITwitchChat {
         }
     }
 
+    private void issueJoin(String channelName) {
+        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+            () -> queueCommand("JOIN #" + channelName.toLowerCase()),
+            taskExecutor
+        );
+    }
+
     /**
      * leaving the channel
+     *
      * @param channelName channel name
      */
     @Override
@@ -611,7 +641,7 @@ public class TwitchChat implements ITwitchChat {
         channelCacheLock.lock();
         try {
             if (currentChannels.remove(lowerChannelName)) {
-                sendCommand("part", "#" + lowerChannelName);
+                issuePart(lowerChannelName);
                 log.debug("Leaving Channel [{}].", lowerChannelName);
 
                 // clear cache
@@ -628,8 +658,16 @@ public class TwitchChat implements ITwitchChat {
         }
     }
 
+    private void issuePart(String channelName) {
+        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+            () -> queueCommand("PART #" + channelName.toLowerCase()),
+            taskExecutor
+        );
+    }
+
     /**
      * Sending message to the joined channel
+     *
      * @param channel channel name
      * @param message message
      */
@@ -664,18 +702,21 @@ public class TwitchChat implements ITwitchChat {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        return ircCommandQueue.offer(sb.toString());
+        return sendRaw(sb.toString());
     }
 
     /**
      * Sends a user a private message
      *
      * @param targetUser username
-     * @param message message
+     * @param message    message
      */
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
-        whisperCommandQueue.offer(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message));
+        ircWhisperBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+            () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message)),
+            taskExecutor
+        );
     }
 
     /**
