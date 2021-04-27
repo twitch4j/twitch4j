@@ -1,9 +1,10 @@
 // Plugins
 plugins {
-	`signing`
+	signing
 	`java-library`
 	`maven-publish`
 	id("io.freefair.lombok") version "5.3.3.3"
+	id("com.coditory.manifest") version "0.1.14"
 	id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
@@ -31,10 +32,15 @@ subprojects {
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
 	apply(plugin = "io.freefair.lombok")
+	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
+	base {
+		archivesBaseName = artifactId
+	}
+
 	lombok {
-		version.set("1.18.18")
+		version.set("1.18.20")
 	}
 
 	// Source Compatibility
@@ -135,10 +141,20 @@ subprojects {
 			}
 		}
 
+		// shadowjar & relocation
+		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
+			target = shadowJar.get()
+			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
+		}
+
 		// jar artifact id and version
 		withType<Jar> {
-			archiveBaseName.set(project.artifactId)
-			archiveVersion.set("${project.version}")
+			if (this is com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+				dependsOn(relocateShadowJar)
+				archiveClassifier.set("shaded")
+			}
+			dependsOn(project.tasks.manifest)
+			manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
 		}
 
 		// compile options
@@ -156,18 +172,6 @@ subprojects {
 				windowTitle = "${project.artifactId} (v${project.version})"
 				encoding = "UTF-8"
 			}
-		}
-
-		// shadowjar & relocation
-		val jar by getting(Jar::class)
-		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
-			target = shadowJar.get()
-			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
-		}
-		shadowJar {
-			dependsOn(relocateShadowJar)
-			archiveClassifier.set("shaded")
-			manifest.inheritFrom(jar.manifest)
 		}
 
 		// test

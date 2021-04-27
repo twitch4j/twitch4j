@@ -7,8 +7,9 @@ fun MavenPom.default() {
 		system.set("GitHub")
 		url.set("https://github.com/twitch4j/twitch4j/issues")
 	}
-	ciManagement {
-		url.set("https://github.com/twitch4j/twitch4j/actions")
+	ciManagement { // TODO PR#229
+		system.set("GitLab Pipelines")
+		url.set("https://gitlab.com/twitch4j/twitch4j/-/pipelines")
 	}
 	inceptionYear.set("2017")
 	developers { all }
