@@ -8,7 +8,7 @@ dependencies {
 	api(group = "commons-configuration", name = "commons-configuration")
 
 	// Rate Limiting
-	api(group = 'com.github.vladimir-bukhtoyarov', name = 'bucket4j-core')
+	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
