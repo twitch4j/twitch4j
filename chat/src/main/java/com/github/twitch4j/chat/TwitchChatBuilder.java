@@ -123,11 +123,29 @@ public class TwitchChatBuilder {
     @With
     protected Bandwidth[] whisperRateLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
 
+    /**
+     * Custom RateLimit for JOIN/PART
+     */
+    @With
+    protected Bandwidth joinRateLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
+
+    /**
+     * Shared bucket for messages
+     */
     @With
     protected Bucket ircMessageBucket = null;
 
+    /**
+     * Shared bucket for whispers
+     */
     @With
     protected Bucket ircWhisperBucket = null;
+
+    /**
+     * Shared bucket for joins
+     */
+    @With
+    protected Bucket ircJoinBucket = null;
 
     /**
      * Scheduler Thread Pool Executor
@@ -188,8 +206,11 @@ public class TwitchChatBuilder {
         if (ircWhisperBucket == null)
             ircWhisperBucket = TwitchChatLimitHelper.createBucket(this.whisperRateLimit);
 
+        if (ircJoinBucket == null)
+            ircJoinBucket = TwitchChatLimitHelper.createBucket(this.joinRateLimit);
+
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);
     }
 
     /**

@@ -111,7 +111,7 @@ public interface TwitchMessagingInterface {
      *
      * @param targetId The user ID of the channel for which to get host information.
      * @return List of hosts of the target channel.
-     * @deprecated no longer functioning, so TwitchKraken#getHostsOf should be used
+     * @deprecated Decommissioned by Twitch.
      */
     @Deprecated
     @RequestLine("GET /hosts?include_logins=1&target={id}")

@@ -7,10 +7,16 @@ import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bucket4j;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +25,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
+
+    public static final String AUTH_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer ";
+
+    /**
+     * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
+     */
+    private static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
 
     /**
      * Reference to the Client Builder
@@ -34,9 +48,17 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * Access token cache
      */
+    @Getter(value = AccessLevel.PROTECTED)
     private final Cache<String, OAuth2Credential> accessTokenCache = Caffeine.newBuilder()
-        .expireAfterWrite(15, TimeUnit.MINUTES)
+        .expireAfterAccess(15, TimeUnit.MINUTES)
         .maximumSize(10_000)
+        .build();
+
+    /**
+     * Rate limit buckets by user/app
+     */
+    private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
+        .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
 
     /**
@@ -47,7 +69,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * The default client id, typically associated with {@link TwitchHelixClientIdInterceptor#defaultAuthToken}
      */
-    private String defaultClientId;
+    private volatile String defaultClientId;
 
     /**
      * Constructor
@@ -60,8 +82,10 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         this.defaultClientId = twitchAPIBuilder.getClientId();
         this.defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
         if (defaultAuthToken != null)
-            twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken)
-                .ifPresent(oauth -> this.defaultClientId = (String) oauth.getContext().get("client_id"));
+            twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken).ifPresent(oauth -> {
+                this.defaultClientId = (String) oauth.getContext().get("client_id");
+                accessTokenCache.put(oauth.getAccessToken(), oauth);
+            });
     }
 
     /**
@@ -74,8 +98,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         String clientId = this.defaultClientId;
 
         // if a oauth token is passed is has to match that client id, default to global client id otherwise (for ie. token verification)
-        if (template.headers().containsKey("Authorization")) {
-            String oauthToken = template.headers().get("Authorization").iterator().next().substring("Bearer ".length());
+        if (template.headers().containsKey(AUTH_HEADER)) {
+            String oauthToken = template.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
 
             if (oauthToken.isEmpty()) {
                 String clientSecret = twitchAPIBuilder.getClientSecret();
@@ -88,8 +112,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
                     throw new RuntimeException("Failed to generate an app access token as no oauth token was passed to this Helix call", e);
                 }
 
-                template.removeHeader("Authorization");
-                template.header("Authorization", "Bearer " + oauthToken);
+                template.removeHeader(AUTH_HEADER);
+                template.header(AUTH_HEADER, BEARER_PREFIX + oauthToken);
             } else {
                 OAuth2Credential verifiedCredential = accessTokenCache.getIfPresent(oauthToken);
                 if (verifiedCredential == null) {
@@ -115,11 +139,43 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         template.header("User-Agent", twitchAPIBuilder.getUserAgent());
     }
 
+    public void updateRemaining(String token, int remaining) {
+        OAuth2Credential credential = accessTokenCache.getIfPresent(token);
+        if (credential == null) return;
+
+        String key = getKey(credential);
+        if (key == null) return;
+
+        Bucket bucket = getOrInitializeBucket(key);
+        long diff = bucket.getAvailableTokens() - remaining;
+        if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
+    }
+
+    public void clearDefaultToken() {
+        this.defaultAuthToken = null;
+    }
+
+    protected String getKey(OAuth2Credential credential) {
+        String clientId = (String) credential.getContext().get("client_id");
+        return clientId == null ? null : credential.getUserId() == null ? clientId : clientId + "-" + credential.getUserId();
+    }
+
+    protected Bucket getOrInitializeBucket(String key) {
+        return buckets.get(key, k -> Bucket4j.builder().addLimit(DEFAULT_BANDWIDTH).build());
+    }
+
     private OAuth2Credential getOrCreateAuthToken() {
         if (defaultAuthToken == null)
             synchronized (this) {
-                if (defaultAuthToken == null)
-                    return (this.defaultAuthToken = twitchIdentityProvider.getAppAccessToken());
+                if (defaultAuthToken == null) {
+                    String clientId = twitchAPIBuilder.getClientId();
+                    OAuth2Credential token = twitchIdentityProvider.getAppAccessToken();
+                    token.getContext().put("client_id", clientId);
+                    getOrInitializeBucket(clientId);
+                    accessTokenCache.put(token.getAccessToken(), token);
+                    this.defaultClientId = clientId;
+                    return this.defaultAuthToken = token;
+                }
             }
 
         return this.defaultAuthToken;
