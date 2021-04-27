@@ -315,6 +315,7 @@ public class TwitchClientBuilder {
                 .withUserAgent(userAgent)
                 .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
+                .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
                 .withLogLevel(feignLogLevel)
