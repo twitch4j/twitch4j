@@ -5,7 +5,7 @@ plugins {
 	`maven-publish`
 	id("io.freefair.lombok") version "5.3.3.3"
 	id("com.coditory.manifest") version "0.1.14"
-	id("com.github.johnrengelman.shadow") version "6.1.0"
+	id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = group
