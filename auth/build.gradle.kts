@@ -11,6 +11,7 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
+	artifactId = "twitch4j-auth"
 	pom {
 		name.set("Twitch4J Auth Module")
 		description.set("Authentication dependency")

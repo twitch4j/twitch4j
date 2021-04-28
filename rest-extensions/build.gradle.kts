@@ -16,6 +16,7 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
+	artifactId = "twitch4j-extensions"
 	pom {
 		name.set("Twitch4J API - Extensions Module")
 		description.set("Extensions API dependency")
