@@ -20,19 +20,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v3
-        if: ${{ !github.event.pull_request.pull_request.title.startsWith('deps:') && !['philippheuer', 'iprodigy', 'dependabot[bot]', 'dependabot-preview[bot]'].includes(github.event.pull_request.sender.login.toLowerCase()) }} # skip for maintainer and dependabot
+        if: ${{ !['philippheuer', 'iprodigy', 'dependabot[bot]', 'dependabot-preview[bot]'].includes(github.event.pull_request.sender.login.toLowerCase()) }} # skip for maintainer and dependabot
         with:
           types: |
             feat
-            feature
             fix
-            bugfix
             deps
             build
             chore
             perf
             refactor
-          requiredScope: true
+          requiredScope: false
           subjectPatternError: |
             Thank you for your contribiution. Unfortunate your title doesn't contain a proper title format.
             The title must be: `<type>: {title}`, when [`type`](https://twitch4j.github.io/docs/contributing/pull-request-guide#supported-types) **MUST** be defined in the sample title.
