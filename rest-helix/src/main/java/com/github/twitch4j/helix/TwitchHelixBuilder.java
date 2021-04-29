@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
+import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
+import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -17,7 +20,9 @@ import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -83,6 +88,12 @@ public class TwitchHelixBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * Scheduler Thread Pool Executor
+     */
+    @With
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -113,19 +124,22 @@ public class TwitchHelixBuilder {
         if (proxyConfig != null)
             proxyConfig.apply(clientBuilder);
 
+        // Executor for rate limiting
+        if (scheduledThreadPoolExecutor == null)
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 1);
+
         // Feign
-        TwitchHelix client = HystrixFeign.builder()
-            .client(new OkHttpClient(clientBuilder.build()))
+        TwitchHelixClientIdInterceptor interceptor = new TwitchHelixClientIdInterceptor(this);
+        return HystrixFeign.builder()
+            .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, interceptor, timeout))
             .encoder(new JacksonEncoder(mapper))
-            .decoder(new JacksonDecoder(mapper))
+            .decoder(new TwitchHelixDecoder(mapper, interceptor))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
-            .requestInterceptor(new TwitchHelixClientIdInterceptor(this))
+            .requestInterceptor(interceptor)
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);
-
-        return client;
     }
 }

@@ -7,9 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Follow
@@ -21,6 +23,10 @@ public class Video {
 
     /** ID of the video. */
     private String id;
+
+    /** ID of the stream that the video originated from if the type is "archive". Otherwise set to null. */
+    @Nullable
+    private String streamId;
 
     /** ID of the user who owns the video. */
     private String userId;
@@ -66,6 +72,10 @@ public class Video {
     /** Length of the video. */
     private String duration;
 
+    /** Array of muted segments in the video. If there are no muted segments, the value will be null. */
+    @Nullable
+    private List<MutedSegment> mutedSegments;
+
     /**
      * Gets the thumbnail url for specific dimensions.
      *
@@ -100,4 +110,20 @@ public class Video {
     public Date getPublishedAt() {
         return Date.from(publishedAtInstant);
     }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    public static class MutedSegment {
+        /**
+         * Duration of the muted segment.
+         */
+        Integer duration;
+
+        /**
+         * Offset in the video at which the muted segment begins.
+         */
+        Integer offset;
+    }
+
 }

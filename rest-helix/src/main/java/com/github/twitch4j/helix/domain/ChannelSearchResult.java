@@ -41,6 +41,11 @@ public class ChannelSearchResult {
     private String gameId;
 
     /**
+     * Name of the game being played on the stream.
+     */
+    private String gameName;
+
+    /**
      * Live status
      */
     private Boolean isLive;

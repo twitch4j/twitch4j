@@ -12,11 +12,11 @@ import lombok.Value;
  * This event gets called when a user gifts x subscriptions to *random* users in chat.
  * <p>
  * This event will be called simultaneously with the chat announcement,
- * not when the user presses his subscription button.
+ * not necessarily when the user presses the subscription button.
  */
 @Value
 @Getter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class GiftSubscriptionsEvent extends AbstractChannelEvent {
 

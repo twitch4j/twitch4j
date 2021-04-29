@@ -77,6 +77,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-ritual-trigger", IRCMessageEvent.class, this::onRitual);
         eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
         eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
+        eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
     }
 
     /**
@@ -183,8 +184,12 @@ public class IRCEventHandler {
                 // Twitch API specifies that 0 is returned if the user chooses not to share their streak
                 Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
 
+                // unofficial: multi month tags
+                Integer multiMonthDuration = Math.max(Integer.parseInt(event.getTags().getOrDefault("msg-param-multimonth-duration", "1")), 1);
+                Integer multiMonthTenure = Integer.parseInt(event.getTags().getOrDefault("msg-param-multimonth-tenure", "0"));
+
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
             }
             // Receive Gifted Sub
             else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
@@ -202,9 +207,12 @@ public class IRCEventHandler {
                 // Handle multi-month gifts
                 String giftMonthsParam = event.getTags().get("msg-param-gift-months");
                 int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
+                // unofficial: plausible, but hasn't been observed in the wild for this msg-id
+                String multiTenureParam = event.getTags().get("msg-param-multimonth-tenure");
+                Integer multiMonthTenure = StringUtils.isEmpty(multiTenureParam) ? null : Integer.parseInt(multiTenureParam);
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
             }
             // Gift X Subs
             else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
@@ -580,6 +588,12 @@ public class IRCEventHandler {
     public void onUserState(IRCMessageEvent event) {
         if (event.getCommandType().equals("USERSTATE")) {
             eventManager.publish(new UserStateEvent(event));
+        }
+    }
+
+    public void onGlobalUserState(IRCMessageEvent event) {
+        if ("GLOBALUSERSTATE".equals(event.getCommandType())) {
+            eventManager.publish(new GlobalUserStateEvent(event));
         }
     }
 

@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
 
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?(?<clientName>.+?)(?: (?<command>[A-Z0-9]+) )(?:#(?<channel>.*?) ?)?(?<payload>[:\\-\\+](?<message>.+))?$");
-    private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>.+?) )?:(?<clientName>.+?)!.+?(?: (?<command>[A-Z0-9]+) )(?:(?<channel>.*?) ?)??(?<payload>[:\\-\\+](?<message>.+))$");
+    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>.+?)\\s)?(?<clientName>.+?)\\s(?<command>[A-Z0-9]+)\\s?(?:#(?<channel>.*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
+    private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>.+?)\\s)?:(?<clientName>.+?)!.+?\\s(?<command>[A-Z0-9]+)\\s(?:(?<channel>.*?)\\s?)??(?<payload>[:\\-+](?<message>.+))$");
     private static final Pattern CLIENT_PATTERN = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
 
     @Unofficial
@@ -291,6 +291,22 @@ public class IRCMessageEvent extends TwitchEvent {
             try {
                 return OptionalInt.of(Math.max(Integer.parseInt(subscriber) / 1000, 1));
             } catch (Exception ignored) {
+            }
+        }
+
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return the tier of the bits badge of the user, or empty if there is no bits badge present (which can also occur for bits leaders)
+     */
+    public OptionalInt getCheererTier() {
+        final String bits = badges.get("bits");
+
+        if (bits != null) {
+            try {
+                return OptionalInt.of(Integer.parseInt(bits));
+            } catch (NumberFormatException ignored) {
             }
         }
 

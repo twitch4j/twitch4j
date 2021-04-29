@@ -13,7 +13,8 @@ public enum SubscriptionType {
     SUB_GIFT,
     ANON_SUB_GIFT,
     RESUB_GIFT,
-    ANON_RESUB_GIFT;
+    ANON_RESUB_GIFT,
+    EXTEND_SUB;
 
     @Getter
     @Accessors(fluent = true)

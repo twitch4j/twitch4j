@@ -259,6 +259,9 @@ public class TwitchPubSub implements ITwitchPubSub {
                 // Recreate Socket if state does not equal CREATED
                 createWebSocket();
 
+                // Reset last ping to avoid edge case loop where reconnect occurred after sending PING but before receiving PONG
+                this.lastPing = TimeUtils.getCurrentTimeInMillis() - 4 * 60 * 1000;
+
                 // Connect to IRC WebSocket
                 this.webSocket.connect();
             } catch (Exception ex) {
@@ -395,6 +398,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);
 
+                            } else if (topic.startsWith("community-boost-events-v1")) {
+                                if ("community-boost-progression".equals(type)) {
+                                    CommunityBoostProgression progression = TypeConvert.convertValue(msgData, CommunityBoostProgression.class);
+                                    eventManager.publish(new CommunityBoostProgressionEvent(progression));
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("community-points-channel-v1") || topic.startsWith("channel-points-channel-v1")) {
                                 String timestampText = msgData.path("timestamp").asText();
                                 Instant instant = Instant.parse(timestampText);
@@ -427,6 +437,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     case "update-redemption-statuses-finished":
                                         RedemptionProgress redemptionFinished = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
                                         eventManager.publish(new UpdateRedemptionFinishedEvent(instant, redemptionFinished));
+                                        break;
+                                    case "community-goal-contribution":
+                                        CommunityGoalContribution contribution = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
+                                        eventManager.publish(new CommunityGoalContributionEvent(instant, contribution));
                                         break;
                                     default:
                                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());

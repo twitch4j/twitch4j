@@ -3,6 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     open-pull-requests-limit: 3
+    target-branch: "develop"
     schedule:
       interval: "daily"
     pull-request-branch-name:
@@ -14,7 +15,8 @@ updates:
       prefix: "deps:"
   - package-ecosystem: "gradle"
     directory: "/"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 10
+    target-branch: "develop"
     schedule:
       interval: "daily"
     pull-request-branch-name:
