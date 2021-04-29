@@ -12,8 +12,8 @@
             "release": "minor"
           },
           {
-            "type": "pref",
-            "release": "minor"
+            "type": "perf",
+            "release": "patch"
           },
           {
             "type": "fix",
@@ -21,25 +21,25 @@
           },
           {
             "type": "refactor",
-            "release": "major"
+            "release": "patch"
           },
           {
             "type": "deps",
             "release": "patch"
           },
-		  {
-			"type": "build",
-			"release": "patch"
-		  },
+          {
+            "type": "build",
+            "release": "patch"
+          },
           {
             "type": "chore",
             "release": "patch"
           },
-		  {
-			"type": "docs",
-			"scope": "README",
-			"release": "patch"
-		  },
+          {
+            "type": "docs",
+            "scope": "README",
+            "release": "patch"
+          },
           {
             "type": "style",
             "release": "patch"
@@ -64,10 +64,10 @@
             "BREAKING"
           ]
         },
-		"writerOpts": {
-		  "mainTemplate": ".github/release/template.hbs",
-		  "commitPartial": ".github/release/commit.hbs"
-		},
+        "writerOpts": {
+          "mainTemplate": ".github/release/template.hbs",
+          "commitPartial": ".github/release/commit.hbs"
+        },
         "presetConfig": {
           "releaseCommitMessageFormat": "release: {{currentTag}}",
           "types": [
@@ -77,7 +77,7 @@
               "hidden": false
             },
             {
-              "type": "pref",
+              "type": "perf",
               "section": "⚙ Performance",
               "hidden": false
             },
@@ -103,27 +103,30 @@
             },
             {
               "type": "build",
-			  "section": "⚒ Build Updates",
+              "section": "⚒ Build Updates",
               "hidden": false
             },
             {
               "type": "docs",
-			  "section": "📖 Documentation",
+              "section": "📖 Documentation",
               "hidden": false
             },
             {
               "type": "style",
-			  "section": "📜 Styling updates",
-			  "hidden": false
+              "section": "📜 Styling updates",
+              "hidden": false
             }
           ]
         }
       }
     ],
-    ["@semantic-release/exec", {
-	  "verifyConditionsCmd": "./gradlew check",
-	  "publishCmd": "./gradlew -Pversion=${nextRelease.version} publish"
-	}],
+    [
+      "@semantic-release/exec",
+      {
+        "verifyConditionsCmd": "./gradlew check",
+        "publishCmd": "./gradlew -Pversion=${nextRelease.version} publish"
+      }
+    ],
     [
       "@semantic-release/git",
       {
