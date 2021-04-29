@@ -12,7 +12,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-chat"
 	pom {
 		name.set("Twitch4J Chat Module")
 		description.set("Chat dependency")

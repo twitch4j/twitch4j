@@ -21,7 +21,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-common"
 	pom {
 		name.set("Twitch4J API - Common Module")
 		description.set("Common API dependency")

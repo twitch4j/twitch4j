@@ -16,7 +16,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-messaginginterface"
 	pom {
 		name.set("Twitch4J API - Message Interface Module")
 		description.set("Twitch Message Interface API dependency")

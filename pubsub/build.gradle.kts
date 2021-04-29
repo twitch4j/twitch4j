@@ -18,7 +18,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-pubsub"
 	pom {
 		name.set("Twitch4J API - PubSub Module")
 		description.set("PubSub API dependency")

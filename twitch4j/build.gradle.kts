@@ -11,7 +11,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j"
 	pom {
 		name.set("Twitch4J")
 		description.set("Core dependency")

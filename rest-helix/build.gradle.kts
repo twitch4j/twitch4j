@@ -23,7 +23,6 @@ dependencies {
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-helix"
 	pom {
 		name.set("Twitch4J API - Helix Module")
 		description.set("Helix API dependency")
