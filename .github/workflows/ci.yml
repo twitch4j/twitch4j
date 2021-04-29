@@ -17,7 +17,6 @@ on:
 
 env:
   RELEASE: false
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   test:
