@@ -35,12 +35,11 @@ local.properties
 *.iws
 .idea/
 
-#Gradle
+# Gradle
 .gradletasknamecache
 .gradle/
-
-# Exceptions
 !gradle/wrapper/*.jar
+gradle.properties
 
 # Logs / Save Files
 config/*
