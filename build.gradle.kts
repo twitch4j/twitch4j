@@ -8,6 +8,9 @@ plugins {
 	id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
+group = group
+version = version
+
 // All-Projects
 allprojects {
 	// Repositories
@@ -108,7 +111,7 @@ subprojects {
 		repositories {
 			maven {
 				name = "maven"
-				setUrl(project.mavenRepositoryUrl)
+				url = uri(project.mavenRepositoryUrl)
 				credentials {
 					username = project.mavenRepositoryUsername
 					password = project.mavenRepositoryPassword

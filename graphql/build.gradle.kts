@@ -22,6 +22,7 @@ tasks.withType<Javadoc> {
 }
 
 publishing.publications.withType<MavenPublication> {
+	artifactId = "twitch4j-graphql"
 	pom {
 		name.set("Twitch4J GraphQL Module")
 		description.set("GraphQL dependency")
