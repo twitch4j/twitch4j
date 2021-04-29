@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    # schedule to check dependencies
+    schedule:
+      interval: "daily"
+    # limit pr's per day
+    open-pull-requests-limit: 10
+    # target branch for merge requests
+    target-branch: "develop"
+    # pr naming, `dependabot/gradle/<branch>/<group>-<artifact>-<version>`
+    pull-request-branch-name:
+      separator: "/"
+    # default reviewers for new merge requests
+    reviewers:
+      - "PhilippHeuer"
+      - "iProdigy"

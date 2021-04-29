@@ -1,6 +1,0 @@
-include 'common', 'auth', 'chat', 'rest-extensions', 'rest-helix', 'rest-kraken', 'rest-tmi', 'eventsub-common', 'pubsub', 'graphql', 'twitch4j'
-
-rootProject.name = 'twitch4j'
-rootProject.children.each {
-	it.name = rootProject.name + "-" + it.name
-}

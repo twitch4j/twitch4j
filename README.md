@@ -9,9 +9,10 @@ Support:
 
 Badges:
 
-![Latest](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flat-square&label=latest)
+[![Latest](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flate&label=latest)](https://search.maven.org/search?q=g:com.github.twitch4j)
 [![pipeline status](https://gitlab.com/twitch4j/twitch4j/badges/master/pipeline.svg)](https://gitlab.com/twitch4j/twitch4j/commits/master)
-[![Docs](https://img.shields.io/badge/WIKI-Latest-green.svg?style=flat-square)](https://twitch4j.github.io/docs/)
+[![Docs](https://img.shields.io/badge/documentation-grey.svg?style=flat)](https://twitch4j.github.io/docs/)
+[![Docs](https://img.shields.io/badge/javadoc-brightgreen.svg?style=flat)](https://twitch4j.github.io/javadoc/)
 
 --------
 
@@ -50,7 +51,7 @@ If you discover any issues/have feature requests, then please [open an issue her
 
 We welcome contributions to the library, be it new features, bug fixes, or even small enhancements.
 Please do read the [contributing guide](https://twitch4j.github.io/docs/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
-By contributing, you are expected to abide by our [code of conduct](./CODE_OF_CONDUCT.md) and agree to the license below.
+By contributing, you are expected to abide by our [code of conduct](https://github.com/twitch4j/.github/blob/main/CODE_OF_CONDUCT.md) and agree to the license below.
 Thank you again for your interest in improving Twitch4J!
 
 ## License
