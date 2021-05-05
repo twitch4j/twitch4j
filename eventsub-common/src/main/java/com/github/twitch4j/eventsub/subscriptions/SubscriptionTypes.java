@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
@@ -11,6 +12,13 @@ import java.util.stream.Stream;
 @UtilityClass
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
+    @Unofficial public final BetaPollBeginType BETA_POLL_BEGIN;
+    @Unofficial public final BetaPollProgressType BETA_POLL_PROGRESS;
+    @Unofficial public final BetaPollEndType BETA_POLL_END;
+    @Unofficial public final BetaPredictionBeginType BETA_PREDICTION_BEGIN;
+    @Unofficial public final BetaPredictionProgressType BETA_PREDICTION_PROGRESS;
+    @Unofficial public final BetaPredictionLockType BETA_PREDICTION_LOCK;
+    @Unofficial public final BetaPredictionEndType BETA_PREDICTION_END;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
@@ -40,6 +48,13 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
+                BETA_POLL_BEGIN = new BetaPollBeginType(),
+                BETA_POLL_PROGRESS = new BetaPollProgressType(),
+                BETA_POLL_END = new BetaPollEndType(),
+                BETA_PREDICTION_BEGIN = new BetaPredictionBeginType(),
+                BETA_PREDICTION_PROGRESS = new BetaPredictionProgressType(),
+                BETA_PREDICTION_LOCK = new BetaPredictionLockType(),
+                BETA_PREDICTION_END = new BetaPredictionEndType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
