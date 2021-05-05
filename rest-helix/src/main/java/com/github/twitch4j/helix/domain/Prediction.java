@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 import org.jetbrains.annotations.Nullable;
@@ -64,6 +65,7 @@ public class Prediction {
     /**
      * The possible outcomes for the Prediction. Size must be 2.
      */
+    @Singular
     private List<PredictionOutcome> outcomes;
 
     /**

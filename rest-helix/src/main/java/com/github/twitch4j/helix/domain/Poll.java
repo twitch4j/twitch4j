@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.jackson.Jacksonized;
@@ -58,6 +59,7 @@ public class Poll {
     /**
      * The poll choices. Minimum: 2 choices. Maximum: 5 choices.
      */
+    @Singular
     private List<PollChoice> choices;
 
     /**

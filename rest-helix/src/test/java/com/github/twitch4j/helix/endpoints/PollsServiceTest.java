@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.Arrays;
 
 import static com.github.twitch4j.common.util.TypeConvert.jsonToObject;
 import static com.github.twitch4j.common.util.TypeConvert.objectToJson;
@@ -71,12 +70,8 @@ public class PollsServiceTest extends AbstractEndpointTest {
             .isChannelPointsVotingEnabled(true)
             .channelPointsPerVote(100)
             .durationSeconds(1800)
-            .choices(
-                Arrays.asList(
-                    PollChoice.builder().title("Heads").build(),
-                    PollChoice.builder().title("Tails").build()
-                )
-            )
+            .choice(PollChoice.builder().title("Heads").build())
+            .choice(PollChoice.builder().title("Tails").build())
             .build();
 
         assertEquals(poll, jsonToObject(objectToJson(poll), Poll.class));
