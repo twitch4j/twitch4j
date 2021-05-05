@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @With
 @Data
@@ -100,6 +101,20 @@ public class Prediction {
     @JsonIgnore
     public Duration getPredictionWindow() {
         return predictionWindowSeconds != null ? Duration.ofSeconds(predictionWindowSeconds.longValue()) : null;
+    }
+
+    /**
+     * @return the winning PredictionOutcome, in an optional wrapper
+     */
+    @JsonIgnore
+    public Optional<PredictionOutcome> getWinningOutcome() {
+        if (winningOutcomeId != null) {
+            for (PredictionOutcome outcome : getOutcomes()) {
+                if (outcome != null && winningOutcomeId.equals(outcome.getId()))
+                    return Optional.of(outcome);
+            }
+        }
+        return Optional.empty();
     }
 
 }

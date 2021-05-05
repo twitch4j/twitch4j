@@ -2,6 +2,10 @@ package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.Contribution;
+import com.github.twitch4j.eventsub.domain.PollStatus;
+import com.github.twitch4j.eventsub.domain.PredictionColor;
+import com.github.twitch4j.eventsub.domain.PredictionOutcome;
+import com.github.twitch4j.eventsub.domain.PredictionStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.StreamType;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +61,159 @@ public class EventSubEventTest {
 
         assertTrue(event.isPermanent());
         assertNull(event.getEndsAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPollBeginEvent")
+    public void deserializePollBeginEvent() {
+        ChannelPollBeginEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"choices\":[{\"id\":\"123\",\"title\":\"Yeah!\"}," +
+                "{\"id\":\"124\",\"title\":\"No!\"},{\"id\":\"125\",\"title\":\"Maybe!\"}],\"bits_voting\":{\"is_enabled\":true,\"amount_per_vote\":10},\"channel_points_voting\":{\"is_enabled\":true,\"amount_per_vote\":10}," +
+                "\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"ends_at\":\"2020-07-15T17:16:08.17106713Z\"}",
+            ChannelPollBeginEvent.class
+        );
+
+        assertNotNull(event);
+        assertEquals("1243456", event.getPollId());
+        assertEquals("Aren’t shoes just really hard socks?", event.getTitle());
+        assertNotNull(event.getChoices());
+        assertEquals(3, event.getChoices().size());
+        assertEquals("123", event.getChoices().get(0).getId());
+        assertEquals("Maybe!", event.getChoices().get(2).getTitle());
+        assertNotNull(event.getBitsVoting());
+        assertTrue(event.getBitsVoting().isEnabled());
+        assertNotNull(event.getChannelPointsVoting());
+        assertEquals(10, event.getChannelPointsVoting().getAmountPerVote());
+        assertEquals(Instant.parse("2020-07-15T17:16:03.17106713Z"), event.getStartedAt());
+        assertEquals(Instant.parse("2020-07-15T17:16:08.17106713Z"), event.getEndsAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPollProgressEvent")
+    public void deserializePollProgressEvent() {
+        ChannelPollProgressEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"choices\":[{\"id\":\"123\",\"title\":\"Yeah!\"," +
+                "\"bits_votes\":5,\"channel_points_votes\":7,\"votes\":12},{\"id\":\"124\",\"title\":\"No!\",\"bits_votes\":10,\"channel_points_votes\":4,\"votes\":14},{\"id\":\"125\",\"title\":\"Maybe!\",\"bits_votes\":0,\"channel_points_votes\":7," +
+                "\"votes\":7}],\"bits_voting\":{\"is_enabled\":true,\"amount_per_vote\":10},\"channel_points_voting\":{\"is_enabled\":true,\"amount_per_vote\":10},\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"ends_at\":\"2020-07-15T17:16:08" +
+                ".17106713Z\"}",
+            ChannelPollProgressEvent.class
+        );
+
+        assertNotNull(event);
+        assertNotNull(event.getChoices());
+        assertEquals(3, event.getChoices().size());
+        assertNotNull(event.getChoices().get(0));
+        assertEquals(5, event.getChoices().get(0).getBitsVotes());
+        assertNotNull(event.getChoices().get(1));
+        assertEquals(4, event.getChoices().get(1).getChannelPointsVotes());
+        assertNotNull(event.getChoices().get(2));
+        assertEquals(7, event.getChoices().get(2).getVotes());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPollEndEvent")
+    public void deserializePollEndEvent() {
+        ChannelPollEndEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"choices\":[{\"id\":\"123\",\"title\":\"Blue\"," +
+                "\"bits_votes\":50,\"channel_points_votes\":70,\"votes\":120},{\"id\":\"124\",\"title\":\"Yellow\",\"bits_votes\":100,\"channel_points_votes\":40,\"votes\":140},{\"id\":\"125\",\"title\":\"Green\",\"bits_votes\":10," +
+                "\"channel_points_votes\":70,\"votes\":80}],\"bits_voting\":{\"is_enabled\":true,\"amount_per_vote\":10},\"channel_points_voting\":{\"is_enabled\":true,\"amount_per_vote\":10},\"status\":\"completed\",\"started_at\":\"2020-07-15T17:16:03" +
+                ".17106713Z\",\"ended_at\":\"2020-07-15T17:16:11.17106713Z\"}",
+            ChannelPollEndEvent.class
+        );
+
+        assertNotNull(event);
+        assertEquals(PollStatus.COMPLETED, event.getStatus());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPredictionBeginEvent")
+    public void deserializePredictionBeginEvent() {
+        ChannelPredictionBeginEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"outcomes\":[{\"id\":\"1243456\",\"title\":\"Yeah!\"," +
+                "\"color\":\"blue\"},{\"id\":\"2243456\",\"title\":\"No!\",\"color\":\"pink\"}],\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"locks_at\":\"2020-07-15T17:21:03.17106713Z\"}",
+            ChannelPredictionBeginEvent.class
+        );
+
+        assertNotNull(event);
+        assertEquals("1243456", event.getPredictionId());
+        assertEquals("Aren’t shoes just really hard socks?", event.getTitle());
+        assertNotNull(event.getOutcomes());
+        assertEquals(2, event.getOutcomes().size());
+        assertNotNull(event.getOutcomes().get(0));
+        assertEquals("1243456", event.getOutcomes().get(0).getId());
+        assertEquals("Yeah!", event.getOutcomes().get(0).getTitle());
+        assertEquals(PredictionColor.BLUE, event.getOutcomes().get(0).getColor());
+        assertNotNull(event.getOutcomes().get(1));
+        assertEquals(PredictionColor.PINK, event.getOutcomes().get(1).getColor());
+        assertEquals(Instant.parse("2020-07-15T17:16:03.17106713Z"), event.getStartedAt());
+        assertEquals(Instant.parse("2020-07-15T17:21:03.17106713Z"), event.getLocksAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPredictionProgressEvent")
+    public void deserializePredictionProgressEvent() {
+        ChannelPredictionProgressEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"outcomes\":[{\"id\":\"1243456\",\"title\":\"Yeah!\"," +
+                "\"color\":\"blue\",\"users\":10,\"channel_points\":15000,\"top_predictors\":[{\"user_name\":\"Cool_User\",\"user_login\":\"cool_user\",\"user_id\":1234,\"channel_points_won\":null,\"channel_points_used\":500}," +
+                "{\"user_name\":\"Coolest_User\",\"user_login\":\"coolest_user\",\"user_id\":1236,\"channel_points_won\":null,\"channel_points_used\":200}]},{\"id\":\"2243456\",\"title\":\"No!\",\"color\":\"pink\"," +
+                "\"top_predictors\":[{\"user_name\":\"Cooler_User\",\"user_login\":\"cooler_user\",\"user_id\":12345,\"channel_points_won\":null,\"channel_points_used\":5000}]}],\"started_at\":\"2020-07-15T17:16:03.17106713Z\"," +
+                "\"locks_at\":\"2020-07-15T17:21:03.17106713Z\"}",
+            ChannelPredictionProgressEvent.class
+        );
+
+        assertNotNull(event);
+        assertNotNull(event.getOutcomes());
+        assertEquals(2, event.getOutcomes().size());
+
+        PredictionOutcome blue = event.getOutcomes().get(0);
+        assertNotNull(blue);
+        assertEquals(10, blue.getUsers());
+        assertEquals(15000, blue.getChannelPoints());
+        assertNotNull(blue.getTopPredictors());
+        assertNotNull(blue.getTopPredictors().get(0));
+        assertEquals("1234", blue.getTopPredictors().get(0).getUserId());
+        assertNotNull(blue.getTopPredictors().get(1));
+        assertEquals(200, blue.getTopPredictors().get(1).getChannelPointsUsed());
+
+        PredictionOutcome pink = event.getOutcomes().get(1);
+        assertNotNull(pink);
+        assertNotNull(pink.getTopPredictors());
+        assertEquals(1, pink.getTopPredictors().size());
+        assertNotNull(pink.getTopPredictors().get(0));
+        assertEquals("cooler_user", pink.getTopPredictors().get(0).getUserLogin());
+        assertEquals("Cooler_User", pink.getTopPredictors().get(0).getUserName());
+        assertNull(pink.getTopPredictors().get(0).getChannelPointsWon());
+
+        assertNotNull(event.getLocksAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelPredictionEndEvent")
+    @SuppressWarnings("ConstantConditions")
+    public void deserializePredictionEndEvent() {
+        ChannelPredictionEndEvent event = jsonToObject(
+            "{\"id\":\"1243456\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\",\"title\":\"Aren’t shoes just really hard socks?\",\"winning_outcome_id\":\"12345\"," +
+                "\"outcomes\":[{\"id\":\"12345\",\"title\":\"Yeah!\",\"color\":\"blue\",\"users\":2,\"channel_points\":15000,\"top_predictors\":[{\"user_name\":\"Cool_User\",\"user_login\":\"cool_user\",\"user_id\":1234,\"channel_points_won\":10000," +
+                "\"channel_points_used\":500},{\"user_name\":\"Coolest_User\",\"user_login\":\"coolest_user\",\"user_id\":1236,\"channel_points_won\":5000,\"channel_points_used\":100}]},{\"id\":\"22435\",\"title\":\"No!\",\"users\":2," +
+                "\"channel_points\":200,\"color\":\"pink\",\"top_predictors\":[{\"user_name\":\"Cooler_User\",\"user_login\":\"cooler_user\",\"user_id\":12345,\"channel_points_won\":null,\"channel_points_used\":100},{\"user_name\":\"Elite_User\"," +
+                "\"user_login\":\"elite_user\",\"user_id\":1337,\"channel_points_won\":null,\"channel_points_used\":100}]}],\"status\":\"resolved\",\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"locked_at\":\"2020-07-15T17:16:11.17106713Z\"," +
+                "\"ended_at\":\"2020-07-15T17:16:11.17106713Z\"}",
+            ChannelPredictionEndEvent.class
+        );
+
+        assertNotNull(event);
+        assertEquals("12345", event.getWinningOutcomeId());
+        assertTrue(event.getWinningOutcome().isPresent());
+        assertNotNull(event.getOutcomes());
+        assertEquals(2, event.getOutcomes().size());
+        assertNotNull(event.getOutcomes().get(0));
+        assertNotNull(event.getOutcomes().get(0).getTopPredictors());
+        assertEquals(2, event.getOutcomes().get(0).getTopPredictors().size());
+        assertNotNull(event.getOutcomes().get(0).getTopPredictors().get(0));
+        assertEquals(10000, event.getOutcomes().get(0).getTopPredictors().get(0).getChannelPointsWon());
+        assertEquals(PredictionStatus.RESOLVED, event.getStatus());
+        assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getLockedAt());
+        assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getEndedAt());
     }
 
     @Test

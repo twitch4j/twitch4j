@@ -1,5 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.twitch4j.eventsub.domain.PredictionOutcome;
 import com.github.twitch4j.eventsub.domain.PredictionStatus;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -9,6 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -36,5 +39,19 @@ public class ChannelPredictionEndEvent extends ChannelPredictionEvent {
      * The time the Channel Points Prediction ended.
      */
     private Instant endedAt;
+
+    /**
+     * @return the winning PredictionOutcome, in an optional wrapper
+     */
+    @JsonIgnore
+    public Optional<PredictionOutcome> getWinningOutcome() {
+        if (winningOutcomeId != null) {
+            for (PredictionOutcome outcome : getOutcomes()) {
+                if (outcome != null && winningOutcomeId.equals(outcome.getId()))
+                    return Optional.of(outcome);
+            }
+        }
+        return Optional.empty();
+    }
 
 }
