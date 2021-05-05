@@ -1,5 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.PredictionOutcome;
 import com.github.twitch4j.eventsub.domain.PredictionStatus;
@@ -24,6 +26,7 @@ import java.util.List;
 @Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Prediction {
 
     /**
@@ -94,6 +97,7 @@ public class Prediction {
      * @return the total duration for the Prediction.
      */
     @Nullable
+    @JsonIgnore
     public Duration getPredictionWindow() {
         return predictionWindowSeconds != null ? Duration.ofSeconds(predictionWindowSeconds.longValue()) : null;
     }

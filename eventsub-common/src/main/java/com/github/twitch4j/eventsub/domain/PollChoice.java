@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PollChoice {
 
     /**

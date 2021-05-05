@@ -1,5 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.PollChoice;
 import com.github.twitch4j.eventsub.domain.PollStatus;
@@ -25,6 +27,7 @@ import java.util.List;
 @Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Poll {
 
     /**
@@ -107,6 +110,7 @@ public class Poll {
      * @return the total duration for the poll.
      */
     @Nullable
+    @JsonIgnore
     public Duration getDuration() {
         return durationSeconds != null ? Duration.ofSeconds(durationSeconds.longValue()) : null;
     }
