@@ -807,11 +807,11 @@ public interface TwitchHelix {
      * <p>
      * This endpoint is currently available as part of a public beta and should not be used in production environments.
      *
-     * @param authToken     User OAuth token from the broadcaster with the channel:read:polls scope.
-     * @param broadcasterId The broadcaster running polls. Provided broadcaster_id must match the user_id in the user OAuth token.
-     * @param pollIds       ID of a poll. Filters results to one or more specific polls. Not providing one or more IDs will return the full list of polls for the authenticated channel. Maximum: 100.
-     * @param after         Cursor for forward pagination: The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit         Maximum number of objects to return. Maximum: 20. Default: 20.
+     * @param authToken     Required: User OAuth token from the broadcaster with the channel:read:polls scope.
+     * @param broadcasterId Required: The broadcaster running polls. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param pollIds       Optional: ID of a poll. Filters results to one or more specific polls. Not providing one or more IDs will return the full list of polls for the authenticated channel. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Optional: Maximum number of objects to return. Maximum: 20. Default: 20.
      * @return PollsList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_POLLS_READ
      */
@@ -873,11 +873,11 @@ public interface TwitchHelix {
      * <p>
      * This endpoint is currently available as part of a public beta and should not be used in production environments.
      *
-     * @param authToken     User OAuth token from the broadcaster with the channel:read:predictions scope.
-     * @param broadcasterId The broadcaster running Predictions. Provided broadcaster_id must match the user_id in the user OAuth token.
-     * @param predictionId  ID of a Prediction. Filters results to one or more specific Predictions. Not providing one or more IDs will return the full list of Predictions for the authenticated channel. Maximum: 100
-     * @param after         The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit         Maximum number of objects to return. Maximum: 20. Default: 20.
+     * @param authToken     Required: User OAuth token from the broadcaster with the channel:read:predictions scope.
+     * @param broadcasterId Required: The broadcaster running Predictions. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param predictionId  Optional: ID of a Prediction. Filters results to one or more specific Predictions. Not providing one or more IDs will return the full list of Predictions for the authenticated channel. Maximum: 100
+     * @param after         Optional: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Optional: Maximum number of objects to return. Maximum: 20. Default: 20.
      * @return PredictionsList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_PREDICTIONS_READ
      */
