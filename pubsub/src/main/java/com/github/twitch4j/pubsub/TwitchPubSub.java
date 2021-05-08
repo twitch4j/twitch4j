@@ -557,6 +557,16 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
+                            } else if (topic.startsWith("user-moderation-notifications")) {
+                                int lastPeriod = topic.lastIndexOf('.');
+                                String userId = topic.substring(topic.indexOf('.') + 1, lastPeriod);
+                                String channelId = topic.substring(lastPeriod + 1);
+                                if ("automod_caught_message".equalsIgnoreCase(type)) {
+                                    UserAutomodCaughtMessage data = TypeConvert.convertValue(msgData, UserAutomodCaughtMessage.class);
+                                    eventManager.publish(new UserAutomodCaughtMessageEvent(userId, channelId, data));
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("polls")) {
                                 PollData pollData = TypeConvert.convertValue(msgData.path("poll"), PollData.class);
                                 eventManager.publish(new PollsEvent(type, pollData));

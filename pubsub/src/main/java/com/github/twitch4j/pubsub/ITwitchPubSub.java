@@ -258,6 +258,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForUserModerationNotificationEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-moderation-notifications." + userId + "." + channelId);
+    }
+
+    @Unofficial
     default PubSubSubscription listenForChannelPredictionsEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "predictions-channel-v1." + channelId);
     }
