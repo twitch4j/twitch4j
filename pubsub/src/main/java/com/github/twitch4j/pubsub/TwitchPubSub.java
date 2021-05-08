@@ -465,8 +465,15 @@ public class TwitchPubSub implements ITwitchPubSub {
 
                             } else if (topic.startsWith("chat_moderator_actions")) {
                                 String channelId = topic.substring(topic.lastIndexOf('.') + 1);
-                                ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
-                                eventManager.publish(new ChatModerationEvent(channelId, data));
+                                if ("moderation_action".equalsIgnoreCase(type)) {
+                                    ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
+                                    eventManager.publish(new ChatModerationEvent(channelId, data));
+                                } else if ("channel_terms_action".equalsIgnoreCase(type)) {
+                                    ChannelTermsAction data = TypeConvert.convertValue(msgData, ChannelTermsAction.class);
+                                    eventManager.publish(new ChannelTermsEvent(channelId, data));
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("following")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
                                 final FollowingData data = TypeConvert.jsonToObject(rawMessage, FollowingData.class);

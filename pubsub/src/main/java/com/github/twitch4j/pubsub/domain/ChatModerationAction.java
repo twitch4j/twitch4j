@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ChatModerationAction {
 
     /**
-     * The raw string for the class of moderation action. Can be "chat_channel_moderation" or "chat_login_moderation"
+     * The raw string for the class of moderation action. Can be "chat_channel_moderation" or "chat_login_moderation" or "chat_targeted_login_moderation"
      *
      * @see ChatModerationAction#getModType()
      */
@@ -170,7 +170,7 @@ public class ChatModerationAction {
             if ("chat_channel_moderation".equals(twitchString))
                 return CHANNEL;
 
-            if ("chat_login_moderation".equals(twitchString))
+            if ("chat_login_moderation".equals(twitchString) || "chat_targeted_login_moderation".equals(twitchString))
                 return LOGIN;
 
             // API inconsistency documented here https://github.com/twitchdev/issues/issues/99
@@ -276,25 +276,22 @@ public class ChatModerationAction {
          */
         UNRAID,
         /**
-         * The message was flagged by AutoMod for manual review
+         * A user's message was flagged by AutoMod for manual review.
+         */
+        AUTOMOD_MESSAGE_REJECTED("automod_message_rejected"),
+        /**
+         * The user's message was manually approved by a moderator after being flagged by Automod.
+         */
+        AUTOMOD_MESSAGE_APPROVED("automod_message_approved"),
+        /**
+         * The user's message was denied by a moderator after being flagged by Automod.
+         */
+        AUTOMOD_MESSAGE_DENIED("automod_message_denied"),
+        /**
+         * The message was flagged by AutoMod for manual review.
+         * This action is sent to moderators, rather than the user with the offending message.
          */
         AUTOMOD_REJECTED("automod_rejected"),
-        /**
-         * Moderator added a permitted term to AutoMod
-         */
-        ADD_PERMITTED_TERM("add_permitted_term"),
-        /**
-         * Moderator added a blocked term to AutoMod
-         */
-        ADD_BLOCKED_TERM("add_blocked_term"),
-        /**
-         * Moderator deleted a permitted term from AutoMod
-         */
-        DELETE_PERMITTED_TERM("delete_permitted_term"),
-        /**
-         * Moderator deleted a blocked term from AutoMod
-         */
-        DELETE_BLOCKED_TERM("delete_blocked_term"),
         /**
          * Moderator approved a message that was flagged by AutoMod
          */
@@ -304,8 +301,39 @@ public class ChatModerationAction {
          */
         DENIED_AUTOMOD_MESSAGE("denied_automod_message"),
         /**
-         * AutoMod settings were modified
+         * Moderator added a permitted term to AutoMod
+         *
+         * @deprecated use {@link com.github.twitch4j.pubsub.events.ChannelTermsEvent}
          */
+        @Deprecated
+        ADD_PERMITTED_TERM("add_permitted_term"),
+        /**
+         * Moderator added a blocked term to AutoMod
+         *
+         * @deprecated use {@link com.github.twitch4j.pubsub.events.ChannelTermsEvent}
+         */
+        @Deprecated
+        ADD_BLOCKED_TERM("add_blocked_term"),
+        /**
+         * Moderator deleted a permitted term from AutoMod
+         *
+         * @deprecated use {@link com.github.twitch4j.pubsub.events.ChannelTermsEvent}
+         */
+        @Deprecated
+        DELETE_PERMITTED_TERM("delete_permitted_term"),
+        /**
+         * Moderator deleted a blocked term from AutoMod
+         *
+         * @deprecated use {@link com.github.twitch4j.pubsub.events.ChannelTermsEvent}
+         */
+        @Deprecated
+        DELETE_BLOCKED_TERM("delete_blocked_term"),
+        /**
+         * AutoMod settings were modified
+         *
+         * @deprecated this action is no longer sent over this topic
+         */
+        @Deprecated
         MODIFIED_AUTOMOD_PROPERTIES("modified_automod_properties");
 
         @Getter
