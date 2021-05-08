@@ -169,6 +169,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForAutomodQueueEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "automod-queue." + userId + "." + channelId);
+    }
+
+    @Unofficial
     @Deprecated
     default PubSubSubscription listenForBountyBoardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-bounty-board-events.cta." + channelId);
