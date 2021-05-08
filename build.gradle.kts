@@ -136,6 +136,9 @@ subprojects {
 	tasks {
 		// javadoc / html5 support
 		withType<Javadoc> {
+			// hide javadoc warnings (a lot from delombok)
+			(options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+
 			if (JavaVersion.current().isJava9Compatible) {
 				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
 			}
