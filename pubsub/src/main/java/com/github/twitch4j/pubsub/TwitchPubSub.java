@@ -398,6 +398,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
                                 eventManager.publish(privateMessageEvent);
 
+                            } else if (topic.startsWith("automod-queue")) {
+                                if ("automod_caught_message".equalsIgnoreCase(type)) {
+                                    AutomodCaughtMessageData data = TypeConvert.convertValue(msgData, AutomodCaughtMessageData.class);
+                                    eventManager.publish(new AutomodCaughtMessageEvent(data));
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("community-boost-events-v1")) {
                                 if ("community-boost-progression".equals(type)) {
                                     CommunityBoostProgression progression = TypeConvert.convertValue(msgData, CommunityBoostProgression.class);
