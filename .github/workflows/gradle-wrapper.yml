@@ -1,0 +1,23 @@
+name: Update - Gradle Wrapper
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs at 06:00 UTC on the 1, 15 and 29th of every month
+    - cron: 0 6 */14 * *
+
+jobs:
+  gradle_update:
+    name: Gradle Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+        with:
+          ref: develop
+      - name: Gradle Wrapper Check
+        uses: gradle-update/update-gradle-wrapper-action@v1.0.13
+        with:
+          reviewers: PhilippHeuer, iProdigy
+          labels: dependencies
+          base-branch: develop
+          target-branch: develop
