@@ -79,10 +79,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.1")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.1")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.1")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.1")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.2")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.2")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.2")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.2")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -136,6 +136,9 @@ subprojects {
 	tasks {
 		// javadoc / html5 support
 		withType<Javadoc> {
+			// hide javadoc warnings (a lot from delombok)
+			(options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+
 			if (JavaVersion.current().isJava9Compatible) {
 				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
 			}

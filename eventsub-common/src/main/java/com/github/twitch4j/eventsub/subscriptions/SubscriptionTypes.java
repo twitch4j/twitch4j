@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
@@ -23,6 +24,7 @@ public class SubscriptionTypes {
     public final ChannelPointsCustomRewardUpdateType CHANNEL_POINTS_CUSTOM_REWARD_UPDATE;
     public final ChannelRaidType CHANNEL_RAID;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
+    @Unofficial public final BetaChannelUnsubscribeType BETA_CHANNEL_UNSUBSCRIBE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
@@ -52,6 +54,7 @@ public class SubscriptionTypes {
                 CHANNEL_POINTS_CUSTOM_REWARD_UPDATE = new ChannelPointsCustomRewardUpdateType(),
                 CHANNEL_RAID = new ChannelRaidType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
+                BETA_CHANNEL_UNSUBSCRIBE = new BetaChannelUnsubscribeType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
