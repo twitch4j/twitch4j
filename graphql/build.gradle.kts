@@ -2,6 +2,7 @@
 plugins {
 	id("com.apollographql.apollo") version "2.5.6"
 }
+
 // Dependencies
 dependencies {
 	// GraphQL
@@ -14,6 +15,10 @@ dependencies {
 	// Twitch4J Modules
 	api(project(":common"))
 	api(project(":auth"))
+}
+
+tasks.withType<io.freefair.gradle.plugins.lombok.tasks.Delombok> {
+	dependsOn("generateMainServiceApolloSources")
 }
 
 tasks.withType<Javadoc> {

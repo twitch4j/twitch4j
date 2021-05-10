@@ -441,7 +441,7 @@ public class TwitchChat implements ITwitchChat {
                             || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER) // check whether the url is exactly the official one
                             || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER.substring(0, TWITCH_WEB_SOCKET_SERVER.length() - 4)); // check whether the url matches without the port
                         sendTextToWebSocket(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)), true);
-                        userName = chatCredential.getUserName();
+                        userName = String.valueOf(chatCredential.getUserName()).toLowerCase();
                     } else {
                         userName = "justinfan" + ThreadLocalRandom.current().nextInt(100000);
                     }
@@ -454,8 +454,8 @@ public class TwitchChat implements ITwitchChat {
 
                     // then join to own channel - required for sending or receiving whispers
                     if (chatCredential != null && chatCredential.getUserName() != null) {
-                        if (autoJoinOwnChannel)
-                            joinChannel(chatCredential.getUserName().toLowerCase());
+                        if (autoJoinOwnChannel && !currentChannels.contains(userName))
+                            joinChannel(userName);
                     } else {
                         log.warn("Chat: The whispers feature is currently not available because the provided credential does not hold information about the user. Please check the documentation on how to pass the token to the credentialManager where it will be enriched with the required information.");
                     }
