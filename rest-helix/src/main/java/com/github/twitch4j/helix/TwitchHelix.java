@@ -636,6 +636,33 @@ public interface TwitchHelix {
     }
 
     /**
+     * Allow or deny a message that was held for review by AutoMod.
+     * <p>
+     * In order to retrieve messages held for review, use ITwitchPubsub#listenForModerationEvents(OAuth2Credential, String, String) and ChatModerationEvent.
+     * <p>
+     * Note that the scope allows this endpoint to be used for any channel that the authenticated user is a moderator, including their own channel.
+     *
+     * @param authToken   User OAuth token from a moderator with the moderator:manage:automod scope.
+     * @param moderatorId The moderator who is approving or rejecting the held message. Must match the user_id in the user OAuth token.
+     * @param messageId   ID of the message to be allowed or denied. These message IDs are retrieved from IRC or PubSub.
+     * @param action      The action to take for the message.
+     * @return 204 No Content upon a successful request.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_MANAGE
+     */
+    @RequestLine("POST /moderation/automod/message")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"user_id\":\"{user_id}\",\"msg_id\":\"{msg_id}\",\"action\":\"{action}\"%7D")
+    HystrixCommand<Void> manageAutoModHeldMessage(
+        @Param("token") String authToken,
+        @Param("user_id") String moderatorId,
+        @Param("msg_id") String messageId,
+        @Param("action") AutoModHeldMessageAction action
+    );
+
+    /**
      * Returns all banned and timed-out users in a channel.
      *
      * @param authToken     Auth Token (scope: moderation:read)

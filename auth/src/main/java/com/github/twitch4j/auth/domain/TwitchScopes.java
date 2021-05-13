@@ -28,6 +28,7 @@ public enum TwitchScopes {
     HELIX_CHANNEL_SUBSCRIPTIONS_READ("channel:read:subscriptions"),
     HELIX_CHANNEL_VIDEOS_MANAGE("channel:manage:videos"),
     HELIX_MODERATION_READ("moderation:read"),
+    HELIX_AUTOMOD_MANAGE("moderator:manage:automod"),
     HELIX_USER_EDIT("user:edit"),
     HELIX_USER_EDIT_BROADCAST("user:edit:broadcast"),
     HELIX_USER_EDIT_FOLLOWS("user:edit:follows"),

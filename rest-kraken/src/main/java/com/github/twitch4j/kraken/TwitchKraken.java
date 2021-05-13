@@ -165,8 +165,10 @@ public interface TwitchKraken {
      * @param authToken Auth Token
      * @param msgId unique id for the message
      * @return no content for a successful call
+     * @deprecated in favor of TwitchHelix#manageAutoModHeldMessage
      */
     @Unofficial
+    @Deprecated
     @RequestLine("POST /chat/twitchbot/approve")
     @Headers({
         "Authorization: OAuth {token}"
@@ -185,8 +187,10 @@ public interface TwitchKraken {
      * @param authToken Auth Token
      * @param msgId unique id for the message
      * @return no content for a successful call
+     * @deprecated in favor of TwitchHelix#manageAutoModHeldMessage
      */
     @Unofficial
+    @Deprecated
     @RequestLine("POST /chat/twitchbot/deny")
     @Headers({
         "Authorization: OAuth {token}"
