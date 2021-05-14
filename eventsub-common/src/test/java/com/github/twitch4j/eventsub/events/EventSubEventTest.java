@@ -196,8 +196,7 @@ public class EventSubEventTest {
                 "\"outcomes\":[{\"id\":\"12345\",\"title\":\"Yeah!\",\"color\":\"blue\",\"users\":2,\"channel_points\":15000,\"top_predictors\":[{\"user_name\":\"Cool_User\",\"user_login\":\"cool_user\",\"user_id\":1234,\"channel_points_won\":10000," +
                 "\"channel_points_used\":500},{\"user_name\":\"Coolest_User\",\"user_login\":\"coolest_user\",\"user_id\":1236,\"channel_points_won\":5000,\"channel_points_used\":100}]},{\"id\":\"22435\",\"title\":\"No!\",\"users\":2," +
                 "\"channel_points\":200,\"color\":\"pink\",\"top_predictors\":[{\"user_name\":\"Cooler_User\",\"user_login\":\"cooler_user\",\"user_id\":12345,\"channel_points_won\":null,\"channel_points_used\":100},{\"user_name\":\"Elite_User\"," +
-                "\"user_login\":\"elite_user\",\"user_id\":1337,\"channel_points_won\":null,\"channel_points_used\":100}]}],\"status\":\"resolved\",\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"locked_at\":\"2020-07-15T17:16:11.17106713Z\"," +
-                "\"ended_at\":\"2020-07-15T17:16:11.17106713Z\"}",
+                "\"user_login\":\"elite_user\",\"user_id\":1337,\"channel_points_won\":null,\"channel_points_used\":100}]}],\"status\":\"resolved\",\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"ended_at\":\"2020-07-15T17:16:11.17106713Z\"}",
             ChannelPredictionEndEvent.class
         );
 
@@ -212,7 +211,6 @@ public class EventSubEventTest {
         assertNotNull(event.getOutcomes().get(0).getTopPredictors().get(0));
         assertEquals(10000, event.getOutcomes().get(0).getTopPredictors().get(0).getChannelPointsWon());
         assertEquals(PredictionStatus.RESOLVED, event.getStatus());
-        assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getLockedAt());
         assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getEndedAt());
     }
 
