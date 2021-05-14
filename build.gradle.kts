@@ -58,7 +58,7 @@ subprojects {
 			api(group = "org.jetbrains", name = "annotations", version = "20.1.0")
 
 			// Caching
-			api(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "2.9.0")
+			api(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "2.9.1")
 
 			// Apache Commons
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
