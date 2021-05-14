@@ -1,8 +1,10 @@
 package com.github.twitch4j.helix;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
+import com.github.twitch4j.eventsub.domain.PollStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
@@ -824,6 +826,143 @@ public interface TwitchHelix {
     ) {
         return this.getModeratorEvents(authToken, broadcasterId, userIds, after, 20);
     }
+
+    /**
+     * Get information about all polls or specific polls for a Twitch channel.
+     * <p>
+     * Poll information is available for 90 days.
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken     Required: User OAuth token from the broadcaster with the channel:read:polls scope.
+     * @param broadcasterId Required: The broadcaster running polls. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param pollIds       Optional: ID of a poll. Filters results to one or more specific polls. Not providing one or more IDs will return the full list of polls for the authenticated channel. Maximum: 100.
+     * @param after         Optional: Cursor for forward pagination: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Optional: Maximum number of objects to return. Maximum: 20. Default: 20.
+     * @return PollsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_POLLS_READ
+     */
+    @Unofficial
+    @RequestLine("GET /polls?broadcaster_id={broadcaster_id}&id={id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<PollsList> getPolls(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") List<String> pollIds,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Create a poll for a specific Twitch channel.
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken User OAuth token from the broadcaster with the channel:manage:polls scope.
+     * @param poll      The new poll to be created. Required: broadcaster_id, title, choices, choice.title, duration. Optional: bits_voting_enabled, bits_per_vote, channel_points_voting_enabled, channel_points_per_vote.
+     * @return PollsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_POLLS_MANAGE
+     */
+    @Unofficial
+    @RequestLine("POST /polls")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<PollsList> createPoll(
+        @Param("token") String authToken,
+        Poll poll
+    );
+
+    /**
+     * End a poll that is currently active.
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken User OAuth token from the broadcaster with the channel:manage:polls scope.
+     * @param poll      The poll to be ended. Required: broadcaster_id, id, status (must be TERMINATED or ARCHIVED, depending on whether it should be viewed publicly).
+     * @return PollsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_POLLS_MANAGE
+     */
+    @Unofficial
+    @RequestLine("PATCH /polls")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<PollsList> endPoll(
+        @Param("token") String authToken,
+        Poll poll
+    );
+
+    /**
+     * Get information about all Channel Points Predictions or specific Channel Points Predictions for a Twitch channel.
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken     Required: User OAuth token from the broadcaster with the channel:read:predictions scope.
+     * @param broadcasterId Required: The broadcaster running Predictions. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param predictionId  Optional: ID of a Prediction. Filters results to one or more specific Predictions. Not providing one or more IDs will return the full list of Predictions for the authenticated channel. Maximum: 100
+     * @param after         Optional: The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Optional: Maximum number of objects to return. Maximum: 20. Default: 20.
+     * @return PredictionsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_PREDICTIONS_READ
+     */
+    @Unofficial
+    @RequestLine("GET /predictions?broadcaster_id={broadcaster_id}&id={id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<PredictionsList> getPredictions(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") List<String> predictionId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Create a Channel Points Prediction for a specific Twitch channel.
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken  User OAuth token from the broadcaster with the channel:manage:predictions scope.
+     * @param prediction The prediction to be created. Required: broadcaster_id, title, outcomes, outcome.title, prediction_window.
+     * @return PredictionsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_PREDICTIONS_MANAGE
+     */
+    @Unofficial
+    @RequestLine("POST /predictions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<PredictionsList> createPrediction(
+        @Param("token") String authToken,
+        Prediction prediction
+    );
+
+    /**
+     * Lock, resolve, or cancel a Channel Points Prediction.
+     * <p>
+     * Active Predictions can be updated to be "locked," "resolved," or "canceled."
+     * Locked Predictions can be updated to be "resolved" or "canceled."
+     * <p>
+     * This endpoint is currently available as part of a public beta and should not be used in production environments.
+     *
+     * @param authToken  User OAuth token from the broadcaster with the channel:manage:predictions scope.
+     * @param prediction The prediction to be ended. Required: broadcaster_id, id, status (RESOLVED or CANCELED or LOCKED). Optional: winning_outcome_id (must be present for RESOLVED status).
+     * @return PredictionsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_PREDICTIONS_MANAGE
+     */
+    @Unofficial
+    @RequestLine("PATCH /predictions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<PredictionsList> endPrediction(
+        @Param("token") String authToken,
+        Prediction prediction
+    );
 
     /**
      * Gets games sorted by number of current viewers on Twitch, most popular first.
