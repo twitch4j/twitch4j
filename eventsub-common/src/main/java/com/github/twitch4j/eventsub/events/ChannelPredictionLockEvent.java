@@ -19,6 +19,6 @@ public class ChannelPredictionLockEvent extends ChannelPredictionEvent {
     /**
      * The time the Channel Points Prediction will automatically lock.
      */
-    private Instant locksAt;
+    private Instant lockedAt;
 
 }

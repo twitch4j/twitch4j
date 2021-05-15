@@ -31,11 +31,6 @@ public class ChannelPredictionEndEvent extends ChannelPredictionEvent {
     private PredictionStatus status;
 
     /**
-     * The time the Channel Points Prediction locked.
-     */
-    private Instant lockedAt;
-
-    /**
      * The time the Channel Points Prediction ended.
      */
     private Instant endedAt;
