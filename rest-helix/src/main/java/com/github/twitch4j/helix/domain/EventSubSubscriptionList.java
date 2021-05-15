@@ -38,8 +38,8 @@ public class EventSubSubscriptionList {
     /**
      * Subscription limit for client id that made the subscription creation request.
      *
-     * @see <a href="https://dev.twitch.tv/docs/eventsub/#subscription-limits">Limit Docs</a>
-     * @deprecated no longer enforced in favor of #getMaxTotalCost
+     * @see <a href="https://discuss.dev.twitch.tv/t/eventsub-subscription-limit-cost-based-system-and-limit-field-deprecation/31377">Cost-Based Limit Docs</a>
+     * @deprecated removed in favor of #getMaxTotalCost
      */
     @Deprecated
     private Integer limit;
