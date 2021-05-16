@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,6 +58,7 @@ public class ChannelSearchResult {
      *
      * @see <a href="https://www.twitch.tv/directory/all/tags">Tag types</a>
      */
+    @JsonProperty("tag_ids")
     private List<String> tagsIds;
 
     /**
