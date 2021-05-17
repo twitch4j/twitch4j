@@ -102,7 +102,7 @@ subprojects {
 		implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.7.1"))
+		testImplementation(platform("org.junit:junit-bom:5.7.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
 	}
