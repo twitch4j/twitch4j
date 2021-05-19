@@ -196,6 +196,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForCrowdChantEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "crowd-chant-channel-v1." + channelId);
+    }
+
+    @Unofficial
     default PubSubSubscription listenForUserChannelPointsEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "community-points-user-v1." + userId);
     }

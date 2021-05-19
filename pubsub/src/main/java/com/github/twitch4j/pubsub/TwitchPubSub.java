@@ -461,6 +461,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         break;
                                 }
 
+                            } else if (topic.startsWith("crowd-chant-channel-v1")) {
+                                if ("crowd-chant-created".equals(type)) {
+                                    CrowdChantCreatedEvent event = TypeConvert.convertValue(msgData, CrowdChantCreatedEvent.class);
+                                    eventManager.publish(event);
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if (topic.startsWith("raid")) {
                                 switch (type) {
                                     case "raid_go_v2":
