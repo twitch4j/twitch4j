@@ -1,6 +1,6 @@
 package com.github.twitch4j.chat.util;
 
-import com.github.twitch4j.chat.TwitchChat;
+import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.CryptoUtils;
@@ -53,7 +53,7 @@ public class ChatCrowdChant {
      * @param chat an authenticated TwitchChat instance.
      */
     @Unofficial
-    public void participate(TwitchChat chat) {
+    public void participate(ITwitchChat chat) {
         Map<String, Object> tags = new LinkedHashMap<>();
         tags.put(NONCE_TAG_NAME, CryptoUtils.generateNonce(32));
         tags.put(CHANT_MSG_ID_TAG_NAME, getMessageId());

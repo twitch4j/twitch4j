@@ -665,33 +665,7 @@ public class TwitchChat implements ITwitchChat {
         );
     }
 
-    /**
-     * Sending message to the joined channel
-     *
-     * @param channel channel name
-     * @param message message
-     */
     @Override
-    public boolean sendMessage(String channel, String message) {
-        return this.sendMessage(channel, message, null);
-    }
-
-    @Override
-    @Unofficial
-    public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
-        final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
-        if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
-        if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
-        return this.sendMessage(channel, message, tags);
-    }
-
-    /**
-     * Sends a message to the channel while including the specified message tags.
-     *
-     * @param channel the name of the channel to send the message to.
-     * @param message the message to be sent.
-     * @param tags    the message tags (unofficial).
-     */
     public boolean sendMessage(String channel, String message, @Unofficial Map<String, Object> tags) {
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {

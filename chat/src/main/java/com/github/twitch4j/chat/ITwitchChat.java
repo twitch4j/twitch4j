@@ -3,8 +3,11 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.util.ChatReply;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +38,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param message The message to be sent.
      * @return whether the message was added to the queue
      */
-    boolean sendMessage(String channel, String message);
+    default boolean sendMessage(String channel, String message) {
+        return this.sendMessage(channel, message, null);
+    }
 
     /**
      * Sends a message to the channel while including an optional nonce and/or reply parent.
@@ -47,7 +52,23 @@ public interface ITwitchChat extends AutoCloseable {
      * @return whether the message was added to the queue
      */
     @Unofficial
-    boolean sendMessage(String channel, String message, String nonce, String replyMsgId);
+    default boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
+        final Map<String, Object> tags = new LinkedHashMap<>(); // maintain insertion order
+        if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
+        if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
+        return this.sendMessage(channel, message, tags);
+    }
+
+    /**
+     * Sends a message to the channel while including the specified message tags.
+     *
+     * @param channel the name of the channel to send the message to.
+     * @param message the message to be sent.
+     * @param tags    the message tags (unofficial).
+     * @return whether the message was added to the queue
+     */
+    @Unofficial
+    boolean sendMessage(String channel, String message, @Unofficial @Nullable Map<String, Object> tags);
 
     /**
      * Returns a set of all currently joined channels (without # prefix)
