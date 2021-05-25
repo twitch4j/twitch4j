@@ -408,10 +408,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 } else {
                                     log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
-                            } else if (topic.startsWith("automod-queue")) {
-                                if ("automod_caught_message".equalsIgnoreCase(type)) {
+                            } else if ("automod-queue".equals(topicName)) {
+                                if (topicParts.length == 3 && "automod_caught_message".equalsIgnoreCase(type)) {
                                     AutomodCaughtMessageData data = TypeConvert.convertValue(msgData, AutomodCaughtMessageData.class);
-                                    eventManager.publish(new AutomodCaughtMessageEvent(data));
+                                    eventManager.publish(new AutomodCaughtMessageEvent(topicParts[2], data));
                                 } else {
                                     log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }

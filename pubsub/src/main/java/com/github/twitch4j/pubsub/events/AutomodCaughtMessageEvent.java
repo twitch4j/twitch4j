@@ -8,5 +8,6 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class AutomodCaughtMessageEvent extends TwitchEvent {
+    String channelId;
     AutomodCaughtMessageData data;
 }

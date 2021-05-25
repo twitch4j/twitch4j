@@ -59,6 +59,18 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     /**
+     * Event Listener: AutoMod flags a message as potentially inappropriate, and when a moderator takes action on a message.
+     *
+     * @param credential Credential (for userId, scope: channel:moderate)
+     * @param userId     The moderator's user id associated with the credential
+     * @param channelId  The user id associated with the target channel
+     * @return PubSubSubscription
+     */
+    default PubSubSubscription listenForAutomodQueueEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "automod-queue." + userId + "." + channelId);
+    }
+
+    /**
      * Event Listener: User earned a new Bits badge and shared the notification with chat
      *
      * @param credential Credential (for target channel id, scope: bits:read)
@@ -142,6 +154,18 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     /**
+     * Event Listener: A user’s message held by AutoMod has been approved or denied.
+     *
+     * @param credential Credential (for userId, scope: chat:read)
+     * @param userId     The user id associated with the credential
+     * @param channelId  The user id associated with the target channel
+     * @return PubSubSubscription
+     */
+    default PubSubSubscription listenForUserModerationNotificationEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "user-moderation-notifications." + userId + "." + channelId);
+    }
+
+    /**
      * Event Listener: Anyone makes a channel points redemption on a channel.
      *
      * @param credential Credential (with the channel:read:redemptions scope for maximum information)
@@ -171,11 +195,6 @@ public interface ITwitchPubSub extends AutoCloseable {
     @Unofficial
     default PubSubSubscription listenForAutomodLevelsModificationEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "automod-levels-modification." + userId + "." + channelId);
-    }
-
-    @Unofficial
-    default PubSubSubscription listenForAutomodQueueEvents(OAuth2Credential credential, String userId, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "automod-queue." + userId + "." + channelId);
     }
 
     @Unofficial
@@ -260,11 +279,6 @@ public interface ITwitchPubSub extends AutoCloseable {
             "leaderboard-events-v1.bits-usage-by-channel-v1-" + channelId + "-" + timeAggregationUnit,
             "leaderboard-events-v1.sub-gifts-sent-" + channelId + "-" + timeAggregationUnit
         );
-    }
-
-    @Unofficial
-    default PubSubSubscription listenForUserModerationNotificationEvents(OAuth2Credential credential, String userId, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "user-moderation-notifications." + userId + "." + channelId);
     }
 
     @Unofficial
