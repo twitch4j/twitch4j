@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -367,6 +368,8 @@ public class TwitchPubSub implements ITwitchPubSub {
                         PubSubResponse message = TypeConvert.jsonToObject(text, PubSubResponse.class);
                         if (message.getType().equals(PubSubType.MESSAGE)) {
                             String topic = message.getData().getTopic();
+                            String[] topicParts = StringUtils.split(topic, '.');
+                            String topicName = topicParts[0];
                             String type = message.getData().getMessage().getType();
                             JsonNode msgData = message.getData().getMessage().getMessageData();
                             String rawMessage = message.getData().getMessage().getRawMessage();
@@ -564,13 +567,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
-                            } else if (topic.startsWith("user-moderation-notifications")) {
-                                int lastPeriod = topic.lastIndexOf('.');
-                                String userId = topic.substring(topic.indexOf('.') + 1, lastPeriod);
-                                String channelId = topic.substring(lastPeriod + 1);
-                                if ("automod_caught_message".equalsIgnoreCase(type)) {
+                            } else if ("user-moderation-notifications".equals(topicName)) {
+                                if (topicParts.length == 3 && "automod_caught_message".equalsIgnoreCase(type)) {
                                     UserAutomodCaughtMessage data = TypeConvert.convertValue(msgData, UserAutomodCaughtMessage.class);
-                                    eventManager.publish(new UserAutomodCaughtMessageEvent(userId, channelId, data));
+                                    eventManager.publish(new UserAutomodCaughtMessageEvent(topicParts[1], topicParts[2], data));
                                 } else {
                                     log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
