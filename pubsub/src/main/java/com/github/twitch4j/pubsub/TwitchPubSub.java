@@ -479,14 +479,26 @@ public class TwitchPubSub implements ITwitchPubSub {
 
                             } else if (topic.startsWith("chat_moderator_actions")) {
                                 String channelId = topic.substring(topic.lastIndexOf('.') + 1);
-                                if ("moderation_action".equalsIgnoreCase(type)) {
-                                    ChatModerationAction data = TypeConvert.convertValue(msgData, ChatModerationAction.class);
-                                    eventManager.publish(new ChatModerationEvent(channelId, data));
-                                } else if ("channel_terms_action".equalsIgnoreCase(type)) {
-                                    ChannelTermsAction data = TypeConvert.convertValue(msgData, ChannelTermsAction.class);
-                                    eventManager.publish(new ChannelTermsEvent(channelId, data));
-                                } else {
-                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                switch (type) {
+                                    case "moderation_action":
+                                        ChatModerationAction modAction = TypeConvert.convertValue(msgData, ChatModerationAction.class);
+                                        eventManager.publish(new ChatModerationEvent(channelId, modAction));
+                                        break;
+
+                                    case "channel_terms_action":
+                                        ChannelTermsAction termsAction = TypeConvert.convertValue(msgData, ChannelTermsAction.class);
+                                        eventManager.publish(new ChannelTermsEvent(channelId, termsAction));
+                                        break;
+
+                                    case "approve_unban_request":
+                                    case "deny_unban_request":
+                                        ModeratorUnbanRequestAction unbanRequestAction = TypeConvert.convertValue(msgData, ModeratorUnbanRequestAction.class);
+                                        eventManager.publish(new ModUnbanRequestActionEvent(channelId, unbanRequestAction));
+                                        break;
+
+                                    default:
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                        break;
                                 }
                             } else if (topic.startsWith("following")) {
                                 final String channelId = topic.substring(topic.lastIndexOf('.') + 1);
