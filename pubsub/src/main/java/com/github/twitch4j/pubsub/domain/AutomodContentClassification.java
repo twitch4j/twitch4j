@@ -29,6 +29,12 @@ public class AutomodContentClassification {
         SEXUALITY_SEX_OR_GENDER,
         SEX_BASED_TERMS,
         SWEARING,
+        // Possible Categories
+        ABLEISM,
+        HOMOPHOBIA,
+        NAMECALLING,
+        RACISM,
+        SEXUALITY,
         // Old Categories
         AGGRESSIVE,
         IDENTITY,
