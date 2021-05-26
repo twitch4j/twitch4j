@@ -66,6 +66,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-notice-trigger", IRCMessageEvent.class, this::onNoticeEvent);
         eventManager.onEvent("twitch4j-chat-host-on-trigger", IRCMessageEvent.class, this::onHostOnEvent);
         eventManager.onEvent("twitch4j-chat-host-off-trigger", IRCMessageEvent.class, this::onHostOffEvent);
+        eventManager.onEvent("twitch4j-chat-inbound-host-trigger", IRCMessageEvent.class, this::onInboundHostEvent);
         eventManager.onEvent("twitch4j-chat-list-mods-trigger", IRCMessageEvent.class, this::onListModsEvent);
         eventManager.onEvent("twitch4j-chat-list-vips-trigger", IRCMessageEvent.class, this::onListVipsEvent);
         eventManager.onEvent("twitch4j-chat-roomstate-trigger", IRCMessageEvent.class, this::onChannelState);
@@ -507,6 +508,17 @@ public class IRCEventHandler {
             if(messageId.equals("host_off")) {
                 eventManager.publish(new HostOffEvent(channel));
             }
+        }
+    }
+
+    public void onInboundHostEvent(IRCMessageEvent event) {
+        if ("PRIVMSG".equals(event.getCommandType()) && "jtv".equals(event.getClientName().orElse(null)) && event.getChannelName().isPresent() && event.getRawTags().isEmpty()) {
+            final String hostMessageSuffix = " is now hosting you.";
+            event.getMessage()
+                .map(String::trim)
+                .filter(msg -> msg.endsWith(hostMessageSuffix))
+                .map(msg -> msg.substring(0, msg.length() - hostMessageSuffix.length()))
+                .ifPresent(hostName -> eventManager.publish(new InboundHostEvent(event.getChannelName().get(), hostName)));
         }
     }
 
