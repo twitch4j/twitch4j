@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -19,5 +21,10 @@ public class ChannelPollEndEvent extends ChannelPollEvent {
      * The status of the poll. Valid values are completed, archived, and terminated.
      */
     private PollStatus status;
+
+    /**
+     * The time the poll ended.
+     */
+    private Instant endedAt;
 
 }

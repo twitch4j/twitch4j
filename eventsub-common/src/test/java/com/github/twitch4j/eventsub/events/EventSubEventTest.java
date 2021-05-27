@@ -123,6 +123,7 @@ public class EventSubEventTest {
 
         assertNotNull(event);
         assertEquals(PollStatus.COMPLETED, event.getStatus());
+        assertNotNull(event.getEndedAt());
     }
 
     @Test
