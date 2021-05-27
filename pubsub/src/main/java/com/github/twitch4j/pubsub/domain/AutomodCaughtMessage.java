@@ -1,6 +1,8 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.util.TypeConvert;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -63,9 +65,7 @@ public class AutomodCaughtMessage {
         private Map<String, Integer> topics;
 
         public Map<AutomodContentClassification.Category, Integer> getParsedTopics() {
-            Map<AutomodContentClassification.Category, Integer> map = new EnumMap<>(AutomodContentClassification.Category.class);
-            topics.forEach((topic, level) -> map.merge(AutomodContentClassification.Category.valueOf(topic), level, Math::max));
-            return map;
+            return TypeConvert.convertValue(topics, new TypeReference<EnumMap<AutomodContentClassification.Category, Integer>>() {});
         }
     }
 

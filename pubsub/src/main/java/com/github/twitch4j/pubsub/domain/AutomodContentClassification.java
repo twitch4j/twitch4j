@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -20,39 +21,24 @@ public class AutomodContentClassification {
     private Integer level;
 
     public enum Category {
-        // New Categories
-        AGGRESSION,
-        BULLYING,
-        DISABILITY,
-        MISOGYNY,
-        RACE_ETHNICITY_OR_RELIGION,
-        SEXUALITY_SEX_OR_GENDER,
-        SEX_BASED_TERMS,
-        SWEARING,
-        // Possible Categories
-        ABLEISM,
-        HOMOPHOBIA,
-        NAMECALLING,
-        RACISM,
-        SEXUALITY,
-        // Old Categories
+        @JsonAlias("aggression")
         AGGRESSIVE,
+        @JsonAlias("namecalling")
+        BULLYING,
+        @JsonAlias("ableism")
+        DISABILITY,
+        @JsonAlias({ "sexuality", "homophobia" })
+        SEXUALITY_SEX_OR_GENDER,
+        MISOGYNY,
+        @JsonAlias("racism")
+        RACE_ETHNICITY_OR_RELIGION,
         IDENTITY,
-        PROFANITY,
+        @JsonAlias("sex_based_terms")
         SEXUAL,
-        // Other
-        @JsonEnumDefaultValue UNKNOWN;
-
-        private static final Category[] VALUES = values();
-
-        public static Category fromString(String category) {
-            for (Category cat : VALUES) {
-                if (cat.name().equalsIgnoreCase(category))
-                    return cat;
-            }
-
-            return UNKNOWN;
-        }
+        @JsonAlias("swearing")
+        PROFANITY,
+        @JsonEnumDefaultValue
+        UNKNOWN
     }
 
 }
