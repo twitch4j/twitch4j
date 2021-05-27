@@ -52,9 +52,4 @@ public abstract class ChannelPollEvent extends EventSubChannelEvent {
      */
     private Instant startedAt;
 
-    /**
-     * The time the poll will end.
-     */
-    private Instant endsAt;
-
 }

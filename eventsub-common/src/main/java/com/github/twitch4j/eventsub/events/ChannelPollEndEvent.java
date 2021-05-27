@@ -27,9 +27,4 @@ public class ChannelPollEndEvent extends ChannelPollEvent {
      */
     private Instant endedAt;
 
-    @Override
-    public Instant getEndsAt() {
-        return this.endedAt;
-    }
-
 }
