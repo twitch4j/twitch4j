@@ -64,6 +64,7 @@ public class AutomodCaughtMessage {
     public static class FragmentFlags {
         private Map<String, Integer> topics;
 
+        @Unofficial
         public Map<AutomodContentClassification.Category, Integer> getParsedTopics() {
             return TypeConvert.convertValue(topics, new TypeReference<EnumMap<AutomodContentClassification.Category, Integer>>() {});
         }
