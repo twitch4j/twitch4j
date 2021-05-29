@@ -269,7 +269,7 @@ public interface TwitchHelix {
      * @param newStatus     The new status to set redemptions to. Can be either FULFILLED or CANCELED. Updating to CANCELED will refund the user their points.
      * @return CustomRewardRedemptionList
      */
-    @RequestLine("PATCH /channel_points/custom_rewards/redemptions")
+    @RequestLine("PATCH /channel_points/custom_rewards/redemptions?broadcaster_id={broadcaster_id}&reward_id={reward_id}&id={id}")
     @Headers({
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
