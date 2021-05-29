@@ -1,10 +1,8 @@
 package com.github.twitch4j.helix;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
-import com.github.twitch4j.eventsub.domain.PollStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
@@ -281,6 +279,33 @@ public interface TwitchHelix {
         @Param("reward_id") String rewardId,
         @Param("id") Collection<String> redemptionIds,
         @Param("status") RedemptionStatus newStatus
+    );
+
+    /**
+     * Gets a list of custom chat badges that can be used in chat for the specified channel.
+     * This includes <a href="https://help.twitch.tv/s/article/subscriber-badge-guide">subscriber badges</a> and <a href="https://help.twitch.tv/s/article/custom-bit-badges-guide">Bit badges</a>.
+     *
+     * @param authToken     User OAuth Token from the broadcaster.
+     * @param broadcasterId The id of the broadcaster whose chat badges are being requested. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @return ChatBadgeSetList
+     */
+    @RequestLine("GET /chat/badges?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChatBadgeSetList> getChannelChatBadges(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Gets a list of chat badges that can be used in chat for any channel.
+     *
+     * @param authToken User OAuth Token or App Access Token.
+     * @return ChatBadgeSetList
+     */
+    @RequestLine("GET /chat/badges/global")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChatBadgeSetList> getGlobalChatBadges(
+        @Param("token") String authToken
     );
 
     /**
