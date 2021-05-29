@@ -25,6 +25,7 @@ public class SubscriptionTypes {
     public final ChannelRaidType CHANNEL_RAID;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
     @Unofficial public final BetaChannelUnsubscribeType BETA_CHANNEL_UNSUBSCRIBE;
+    @Unofficial public final BetaChannelSubscriptionGiftType BETA_CHANNEL_SUBSCRIPTION_GIFT;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
@@ -62,6 +63,7 @@ public class SubscriptionTypes {
                 CHANNEL_RAID = new ChannelRaidType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
                 BETA_CHANNEL_UNSUBSCRIBE = new BetaChannelUnsubscribeType(),
+                BETA_CHANNEL_SUBSCRIPTION_GIFT = new BetaChannelSubscriptionGiftType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
