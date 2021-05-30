@@ -24,7 +24,7 @@ public class SubscriptionTypes {
     public final ChannelPointsCustomRewardUpdateType CHANNEL_POINTS_CUSTOM_REWARD_UPDATE;
     public final ChannelRaidType CHANNEL_RAID;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
-    @Unofficial public final BetaChannelUnsubscribeType BETA_CHANNEL_UNSUBSCRIBE;
+    public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
@@ -61,7 +61,7 @@ public class SubscriptionTypes {
                 CHANNEL_POINTS_CUSTOM_REWARD_UPDATE = new ChannelPointsCustomRewardUpdateType(),
                 CHANNEL_RAID = new ChannelRaidType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
-                BETA_CHANNEL_UNSUBSCRIBE = new BetaChannelUnsubscribeType(),
+                CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
