@@ -2,6 +2,7 @@ package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.chat.util.ChatCrowdChant;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
@@ -10,6 +11,7 @@ import com.github.twitch4j.common.util.ChatReply;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,9 +65,18 @@ public class ChannelMessageEvent extends AbstractChannelEvent {
     /**
      * Information regarding the parent message being replied to, if applicable.
      */
+    @Nullable
     @Unofficial
     @Getter(lazy = true)
     private ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
+
+    /**
+     * Information regarding any associated Crowd Chant for this message, if applicable.
+     */
+    @Nullable
+    @Unofficial
+    @Getter(lazy = true)
+    ChatCrowdChant chantInfo = ChatCrowdChant.parse(getMessageEvent());
 
 	/**
 	 * Event Constructor

@@ -2,15 +2,19 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
+import com.github.twitch4j.common.util.ChatReply;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -60,56 +64,51 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Builder.Default
     protected final boolean automaticallyPartOnBan = false;
 
-    /**
-     * Sends the specified message to the channel, if it has been subscribed to.
-     *
-     * @param channel the channel to send the message to
-     * @param message the message to send
-     * @return whether a {@link TwitchChat} instance subscribed to that channel was identified and used
-     */
     @Override
-    public boolean sendMessage(final String channel, final String message) {
-        return this.sendMessage(channel, channel, message);
-    }
-
-    /**
-     * Sends the specified message to the channel, if it has been subscribed to, with the specified nonce or reply parent.
-     *
-     * @param channel    the name of the channel to send the message to.
-     * @param message    the message to be sent.
-     * @param nonce      the cryptographic nonce (optional).
-     * @param replyMsgId the msgId of the parent message being replied to (optional).
-     * @return whether a {@link TwitchChat} instance subscribed to that channel was identified and used
-     */
-    @Override
-    public boolean sendMessage(String channel, String message, String nonce, String replyMsgId) {
-        return this.sendMessage(channel, channel, message, nonce, replyMsgId);
+    public boolean sendMessage(String channel, String message, @Unofficial @Nullable Map<String, Object> tags) {
+        return this.sendMessage(channel, channel, message, tags);
     }
 
     /**
      * Sends a message from the {@link TwitchChat} identified either to a channel or directly on the socket.
      *
      * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
-     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket)
-     * @param message                       the message to be sent
+     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket).
+     * @param message                       the message to be sent.
      * @return whether a {@link TwitchChat} instance was found and used to send the message
      */
     public boolean sendMessage(final String channelToIdentifyChatInstance, final String targetChannel, final String message) {
-        return this.sendMessage(channelToIdentifyChatInstance, targetChannel, message, null, null);
+        return this.sendMessage(channelToIdentifyChatInstance, targetChannel, message, Collections.emptyMap());
     }
 
     /**
      * Sends a message from the identified {@link TwitchChat} instance with an optional nonce or reply parent.
      *
      * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
-     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket)
-     * @param message                       the message to be sent
+     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket).
+     * @param message                       the message to be sent.
      * @param nonce                         the cryptographic nonce (optional).
      * @param replyMsgId                    the msgId of the parent message being replied to (optional).
      * @return whether a {@link TwitchChat} instance was found and used to send the message
      */
     @Unofficial
     public boolean sendMessage(final String channelToIdentifyChatInstance, final String targetChannel, final String message, final String nonce, final String replyMsgId) {
+        final Map<String, Object> tags = new LinkedHashMap<>();
+        if (nonce != null) tags.put(IRCMessageEvent.NONCE_TAG_NAME, nonce);
+        if (replyMsgId != null) tags.put(ChatReply.REPLY_MSG_ID_TAG_NAME, replyMsgId);
+        return this.sendMessage(channelToIdentifyChatInstance, targetChannel, message, tags);
+    }
+
+    /**
+     * Sends a message from the identified {@link TwitchChat} instance with the specified tags.
+     *
+     * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
+     * @param targetChannel                 the channel to send the message to, if not null (otherwise it is sent directly on the socket).
+     * @param message                       the message to be sent.
+     * @param tags                          the message tags (unofficial).
+     * @return whether a {@link TwitchChat} instance was found and used to send the message
+     */
+    public boolean sendMessage(String channelToIdentifyChatInstance, String targetChannel, String message, @Unofficial @Nullable Map<String, Object> tags) {
         if (channelToIdentifyChatInstance == null)
             return false;
 
@@ -118,10 +117,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
             return false;
 
         if (targetChannel != null) {
-            if (nonce == null && replyMsgId == null)
-                chat.sendMessage(targetChannel, message);
-            else
-                chat.sendMessage(targetChannel, message, nonce, replyMsgId);
+            chat.sendMessage(targetChannel, message, tags);
         } else {
             chat.sendRaw(message);
         }
@@ -133,9 +129,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * Sends a whisper.
      *
      * @param channelToIdentifyChatInstance the channel used to identify which {@link TwitchChat} instance should be used to send the message; the instance must be subscribed to this channel.
-     * @param toChannel                     the channel to send the whisper to
-     * @param message                       the message to send in the whisper
-     * @return whether a {@link TwitchChat} instance was identified to send the message from
+     * @param toChannel                     the channel to send the whisper to.
+     * @param message                       the message to send in the whisper.
+     * @return whether a {@link TwitchChat} instance was identified to send the message from.
      * @throws NullPointerException if the identified {@link TwitchChat} does not have a valid chatCredential
      */
     public boolean sendPrivateMessage(final String channelToIdentifyChatInstance, final String toChannel, final String message) {
