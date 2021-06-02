@@ -1,11 +1,13 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.TypeConvert;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.EnumMap;
@@ -17,7 +19,7 @@ import java.util.Map;
 public class AutomodCaughtMessage {
 
     /**
-     * Object containing details about the message
+     * Object containing details about the message.
      */
     private Content content;
 
@@ -55,8 +57,43 @@ public class AutomodCaughtMessage {
     @Data
     @Setter(AccessLevel.PRIVATE)
     public static class Fragment {
+
         private String text;
+
+        @Nullable
         private FragmentFlags automod;
+
+        @Nullable
+        @Unofficial
+        private FragmentLink link;
+
+        @Nullable
+        @Unofficial
+        private FragmentMention userMention;
+
+        /**
+         * @return whether this fragment of the message was flagged by AutoMod.
+         */
+        public boolean isFragmentFlagged() {
+            return getAutomod() != null && getAutomod().getTopics() != null && !getAutomod().getTopics().isEmpty();
+        }
+
+        /**
+         * @return whether this fragment of the message is a link.
+         */
+        @Unofficial
+        public boolean isFragmentLink() {
+            return getLink() != null && getLink().getHost() != null;
+        }
+
+        /**
+         * @return whether this fragment of the message is simply a user mention.
+         */
+        @Unofficial
+        public boolean isFragmentMention() {
+            return getUserMention() != null && getUserMention().getUserId() != null;
+        }
+
     }
 
     @Data
@@ -68,6 +105,21 @@ public class AutomodCaughtMessage {
         public Map<AutomodContentClassification.Category, Integer> getParsedTopics() {
             return TypeConvert.convertValue(topics, new TypeReference<EnumMap<AutomodContentClassification.Category, Integer>>() {});
         }
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    public static class FragmentLink {
+        private String host;
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    public static class FragmentMention {
+        @JsonProperty("userID")
+        String userId;
+        String login;
+        String displayName;
     }
 
     @Data
