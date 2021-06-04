@@ -101,6 +101,7 @@ public class SubscriptionEvent extends AbstractChannelEvent implements Replyable
     /**
      * Event Constructor
      *
+     * @param event              The raw message event.
      * @param channel            ChatChannel the user subscribed to
      * @param user               User that subscribed
      * @param subPlan            Sub Plan

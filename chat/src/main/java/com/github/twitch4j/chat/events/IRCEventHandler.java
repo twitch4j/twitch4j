@@ -153,7 +153,7 @@ public class IRCEventHandler {
                 int subTier = event.getSubscriptionTier().orElse(0);
 
                 // Dispatch Event
-                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
+                eventManager.publish(new CheerEvent(event, channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
         }
     }
