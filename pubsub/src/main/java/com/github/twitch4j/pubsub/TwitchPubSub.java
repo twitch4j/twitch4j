@@ -227,11 +227,11 @@ public class TwitchPubSub implements ITwitchPubSub {
                         if (command != null) {
                             sendCommand(command);
                             // Logging
-                            Matcher matcher = LISTEN_AUTH_TOKEN.matcher(command);
-                            if (matcher.find()) {
-                                command = matcher.group(1) + "auth token was automatically censored from the log" + matcher.group(2);
+                            if (log.isDebugEnabled()) {
+                                Matcher matcher = LISTEN_AUTH_TOKEN.matcher(command);
+                                String cmd = matcher.find() ? matcher.group(1) + "\u2022\u2022\u2022" + matcher.group(2) : command;
+                                log.debug("Processed command from queue: [{}].", cmd);
                             }
-                            log.debug("Processed command from queue: [{}].", command);
                         } else {
                             break; // try again later
                         }
@@ -705,7 +705,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                             reconnect();
                         } else {
                             // unknown message
-                            log.debug("PubSub: Unknown Message Type: " + message.toString());
+                            log.debug("PubSub: Unknown Message Type: " + message);
                         }
                     } catch (Exception ex) {
                         log.warn("PubSub: Unparsable Message: " + text + " - [" + ex.getMessage() + "]");
