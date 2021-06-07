@@ -244,12 +244,12 @@ public enum NoticeTag {
     EMOTE_ONLY_ON,
 
     /**
-     * This room is no longer in followers-only mode.Note: The followers tags are broadcast to a channel when a moderator makes changes.
+     * This room is no longer in followers-only mode. Note: The followers tags are broadcast to a channel when a moderator makes changes.
      */
     FOLLOWERS_OFF,
 
     /**
-     * This room is now in &lt;duration&gt; followers-only mode.Examples: “This room is now in 2 week followers-only mode.” or “This room is now in 1 minute followers-only mode.”
+     * This room is now in &lt;duration&gt; followers-only mode. Examples: “This room is now in 2 week followers-only mode.” or “This room is now in 1 minute followers-only mode.”
      */
     FOLLOWERS_ON,
 
@@ -334,7 +334,7 @@ public enum NoticeTag {
     MSG_FACEBOOK,
 
     /**
-     * This room is in &lt;duration&gt; followers-only mode. Follow &lt;channel&gt; to join the community!Note: These msg_followers tags are kickbacks to a user who does not meet the criteria; that is, does not follow or has not followed long enough.
+     * This room is in &lt;duration&gt; followers-only mode. Follow &lt;channel&gt; to join the community!Note: These msg_followers tags are kickbacks to a user who does not meet the criteria; that is, does not follow or has not followed long enough.
      */
     MSG_FOLLOWERSONLY,
 
@@ -559,139 +559,138 @@ public enum NoticeTag {
     USAGE_BAN,
 
     /**
-     * Usage: “/clear”Clear chat history for all users in this room.
+     * Usage: “/clear” Clear chat history for all users in this room.
      */
     USAGE_CLEAR,
 
     /**
-     * Usage: “/color” &lt;color&gt;Change your username color. Color must be in hex (#000000) or one of the following: Blue, BlueViolet, CadetBlue, Chocolate, Coral, DodgerBlue, Firebrick, GoldenRod, Green, HotPink, OrangeRed, Red, SeaGreen,
-     * SpringGreen, YellowGreen.
+     * Usage: “/color &lt;color&gt;” Change your username color. Color must be in hex (#000000) or one of the following: Blue, BlueViolet, CadetBlue, Chocolate, Coral, DodgerBlue, Firebrick, GoldenRod, Green, HotPink, OrangeRed, Red, SeaGreen, SpringGreen, YellowGreen.
      */
     USAGE_COLOR,
 
     /**
-     * Usage: “/commercial [length]”Triggers a commercial. Length (optional) must be a positive number of seconds.
+     * Usage: “/commercial [length]” Triggers a commercial. Length (optional) must be a positive number of seconds.
      */
     USAGE_COMMERCIAL,
 
     /**
-     * Usage: “/disconnect”Reconnects to chat.
+     * Usage: “/disconnect” Reconnects to chat.
      */
     USAGE_DISCONNECT,
 
     /**
-     * Usage: /emoteonlyoff”Disables emote-only mode.
+     * Usage: “/emoteonlyoff” Disables emote-only mode.
      */
     USAGE_EMOTE_ONLY_OFF,
 
     /**
-     * Usage: “/emoteonly”Enables emote-only mode (only emoticons may be used in chat). Use /emoteonlyoff to disable.
+     * Usage: “/emoteonly” Enables emote-only mode (only emoticons may be used in chat). Use /emoteonlyoff to disable.
      */
     USAGE_EMOTE_ONLY_ON,
 
     /**
-     * Usage: /followersoff”Disables followers-only mode.
+     * Usage: “/followersoff” Disables followers-only mode.
      */
     USAGE_FOLLOWERS_OFF,
 
     /**
-     * Usage: “/followersEnables followers-only mode (only users who have followed for “duration” may chat). Examples: “30m”, “1 week”, “5 days 12 hours”. Must be less than 3 months.
+     * Usage: “/followers” Enables followers-only mode (only users who have followed for “duration” may chat). Examples: “30m”, “1 week”, “5 days 12 hours”. Must be less than 3 months.
      */
     USAGE_FOLLOWERS_ON,
 
     /**
-     * Usage: “/help”Lists the commands available to you in this room.
+     * Usage: “/help” Lists the commands available to you in this room.
      */
     USAGE_HELP,
 
     /**
-     * Usage: “/host &lt;channel&gt;”Host another channel. Use “/unhost” to unset host mode.
+     * Usage: “/host &lt;channel&gt;” Host another channel. Use “/unhost” to unset host mode.
      */
     USAGE_HOST,
 
     /**
-     * Usage: “/marker &lt;optional comment&gt;”Adds a stream marker (with an optional comment, max 140 characters) at the current timestamp. You can use markers in the Highlighter for easier editing.
+     * Usage: “/marker &lt;optional comment&gt;” Adds a stream marker (with an optional comment, max 140 characters) at the current timestamp. You can use markers in the Highlighter for easier editing.
      */
     USAGE_MARKER,
 
     /**
-     * Usage: “/me &lt;message&gt;”Send an “emote” message in the third person.
+     * Usage: “/me &lt;message&gt;” Send an “emote” message in the third person.
      */
     USAGE_ME,
 
     /**
-     * Usage: “/mod &lt;username&gt;”Grant mod status to a user. Use “/mods” to list the moderators of this channel.
+     * Usage: “/mod &lt;username&gt;” Grant mod status to a user. Use “/mods” to list the moderators of this channel.
      */
     USAGE_MOD,
 
     /**
-     * Usage: “/mods”Lists the moderators of this channel.
+     * Usage: “/mods” Lists the moderators of this channel.
      */
     USAGE_MODS,
 
     /**
-     * Usage: “/r9kbetaoff”Disables r9k mode.
+     * Usage: “/r9kbetaoff” Disables r9k mode.
      */
     USAGE_R9K_OFF,
 
     /**
-     * Usage: “/r9kbeta”Enables r9k mode.Use “/r9kbetaoff“ to disable.
+     * Usage: “/r9kbeta” Enables r9k mode. Use “/r9kbetaoff“ to disable.
      */
     USAGE_R9K_ON,
 
     /**
-     * Usage: “/raid &lt;channel&gt;”Raid another channel.Use “/unraid” to cancel the Raid.
+     * Usage: “/raid &lt;channel&gt;” Raid another channel. Use “/unraid” to cancel the Raid.
      */
     USAGE_RAID,
 
     /**
-     * Usage: “/slowoff”Disables slow mode.
+     * Usage: “/slowoff” Disables slow mode.
      */
     USAGE_SLOW_OFF,
 
     /**
-     * Usage: “/slow” [duration]Enables slow mode (limit how often users may send messages). Duration (optional, default=&lt;number&gt;) must be a positive integer number of seconds.Use “/slowoff” to disable.
+     * Usage: “/slow [duration]” Enables slow mode (limit how often users may send messages). Duration (optional, default=&lt;number&gt;) must be a positive integer number of seconds. Use “/slowoff” to disable.
      */
     USAGE_SLOW_ON,
 
     /**
-     * Usage: “/subscribersoff”Disables subscribers-only mode.
+     * Usage: “/subscribersoff” Disables subscribers-only mode.
      */
     USAGE_SUBS_OFF,
 
     /**
-     * Usage: “/subscribers”Enables subscribers-only mode (only subscribers may chat in this channel).Use “/subscribersoff” to disable.
+     * Usage: “/subscribers” Enables subscribers-only mode (only subscribers may chat in this channel). Use “/subscribersoff” to disable.
      */
     USAGE_SUBS_ON,
 
     /**
      * Usage: “/timeout &lt;username&gt; [duration][time unit] [reason]&quot;Temporarily prevent a user from chatting. Duration (optional, default=10 minutes) must be a positive integer; time unit (optional, default=s) must be one of s, m, h, d, w;
-     * maximum duration is 2 weeks. Combinations like 1d2h are also allowed. Reason is optional and will be shown to the target user and other moderators.Use “untimeout” to remove a timeout.
+     * maximum duration is 2 weeks. Combinations like 1d2h are also allowed. Reason is optional and will be shown to the target user and other moderators. Use “untimeout” to remove a timeout.
      */
     USAGE_TIMEOUT,
 
     /**
-     * Usage: “/unban &lt;username&gt;”Removes a ban on a user.
+     * Usage: “/unban &lt;username&gt;” Removes a ban on a user.
      */
     USAGE_UNBAN,
 
     /**
-     * Usage: “/unhost”Stop hosting another channel.
+     * Usage: “/unhost” Stop hosting another channel.
      */
     USAGE_UNHOST,
 
     /**
-     * Usage: “/unmod &lt;username&gt;”Revoke mod status from a user. Use “/mods” to list the moderators of this channel.
+     * Usage: “/unmod &lt;username&gt;” Revoke mod status from a user. Use “/mods” to list the moderators of this channel.
      */
     USAGE_UNMOD,
 
     /**
-     * Usage: “/unraid”Cancel the Raid.
+     * Usage: “/unraid” Cancel the Raid.
      */
     USAGE_UNRAID,
 
     /**
-     * Usage: “/untimeout &lt;username&gt;”Removes a timeout on a user.
+     * Usage: “/untimeout &lt;username&gt;” Removes a timeout on a user.
      */
     USAGE_UNTIMEOUT,
 
