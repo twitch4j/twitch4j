@@ -35,8 +35,6 @@ public class Emote {
      * <p>
      * This is <i>not</i> present for {@link TwitchHelix#getGlobalEmotes(String)}.
      * This <i>is</i> present for {@link TwitchHelix#getChannelEmotes(String, String)} and {@link TwitchHelix#getEmoteSets(String, Collection)}.
-     * <p>
-     * Note: at the time of writing, this is <a href="https://github.com/twitchdev/issues/issues/413">broken</a> on Twitch's end.
      */
     @Nullable
     private String emoteSetId;
