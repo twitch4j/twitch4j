@@ -52,13 +52,11 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
                 throw new UnauthorizedException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 404) {
                 throw new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
@@ -71,7 +69,6 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
             return new ContextedRuntimeException("TMI API Error")
                 .addContextValue("requestUrl", response.request().url())
                 .addContextValue("requestMethod", response.request().httpMethod())
-                .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                 .addContextValue("responseBody", responseBody)
                 .addContextValue("errorType", error.getError())
                 .addContextValue("errorStatus", error.getStatus())

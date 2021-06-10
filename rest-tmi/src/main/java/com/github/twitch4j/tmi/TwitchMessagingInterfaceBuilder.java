@@ -98,6 +98,11 @@ public class TwitchMessagingInterfaceBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Warning
+        if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
+            log.warn("TMI: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
+        }
+
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
         if (proxyConfig != null)

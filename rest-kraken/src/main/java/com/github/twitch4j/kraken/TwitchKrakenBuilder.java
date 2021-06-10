@@ -111,6 +111,11 @@ public class TwitchKrakenBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 4);
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchKraken#getAllChatEmoticons().execution.isolation.thread.timeoutInMilliseconds", timeout * 8);
 
+        // Warning
+        if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
+            log.warn("Kraken: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
+        }
+
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
 
