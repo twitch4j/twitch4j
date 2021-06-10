@@ -26,6 +26,7 @@ public class SubscriptionTypes {
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     @Unofficial public final BetaChannelSubscriptionGiftType BETA_CHANNEL_SUBSCRIPTION_GIFT;
+    @Unofficial public final BetaChannelSubscriptionMessageType BETA_CHANNEL_SUBSCRIPTION_MESSAGE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
     @Unofficial public final BetaExtensionBitsTransactionCreateType BETA_EXTENSION_BITS_TRANSACTION_CREATE;
@@ -65,6 +66,7 @@ public class SubscriptionTypes {
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 BETA_CHANNEL_SUBSCRIPTION_GIFT = new BetaChannelSubscriptionGiftType(),
+                BETA_CHANNEL_SUBSCRIPTION_MESSAGE = new BetaChannelSubscriptionMessageType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 BETA_EXTENSION_BITS_TRANSACTION_CREATE = new BetaExtensionBitsTransactionCreateType(),
