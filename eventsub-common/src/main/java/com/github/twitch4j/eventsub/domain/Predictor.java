@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,16 +15,19 @@ public class Predictor {
     /**
      * The ID of the user.
      */
+    @JsonAlias("id")
     private String userId;
 
     /**
      * The login name of the user.
      */
+    @JsonAlias("login")
     private String userLogin;
 
     /**
      * The display name of the user.
      */
+    @JsonAlias("name")
     private String userName;
 
     /**

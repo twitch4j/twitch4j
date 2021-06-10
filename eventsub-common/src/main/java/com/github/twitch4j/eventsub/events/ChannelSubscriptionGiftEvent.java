@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 @Data
@@ -32,5 +34,12 @@ public class ChannelSubscriptionGiftEvent extends EventSubUserChannelEvent {
      */
     @Nullable
     private Integer cumulativeTotal;
+
+    /**
+     * Whether the subscription gift was anonymous.
+     */
+    @Accessors(fluent = true)
+    @JsonProperty("is_anonymous")
+    private Boolean isAnonymous;
 
 }
