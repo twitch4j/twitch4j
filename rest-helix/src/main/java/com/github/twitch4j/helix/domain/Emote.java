@@ -109,10 +109,29 @@ public class Emote {
         GLOBALS,
 
         /**
+         * Indicates a limited time emote.
+         */
+        @Unofficial
+        @JsonProperty("limitedtime")
+        LIMITED_TIME,
+
+        /**
+         * Indicates a prime emote.
+         */
+        @Unofficial
+        PRIME,
+
+        /**
          * Indicates a rewards emote.
          */
         @Unofficial
         REWARDS,
+
+        /**
+         * Indicates a smiley emote.
+         */
+        @Unofficial
+        SMILIES,
 
         /**
          * Indicates a custom subscriber emote.
