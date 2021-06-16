@@ -342,7 +342,7 @@ public interface TwitchHelix {
      * Gets all Twitch emotes for one or more specific emote sets.
      *
      * @param authToken Any User OAuth Token or App Access Token.
-     * @param ids       IDs of the emote sets. Minimum: 1. Maximum: 25.
+     * @param ids       IDs of the emote sets. Minimum: 1. Maximum: 25. Warning: at the time of writing, the enforced maximum is actually 10.
      * @return EmoteList
      */
     @RequestLine("GET /chat/emotes/set?emote_set_id={emote_set_id}")

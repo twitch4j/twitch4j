@@ -1,16 +1,19 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.helix.TwitchHelix;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -54,7 +57,7 @@ public class Emote {
      * This is <i>only</i> present for {@link TwitchHelix#getChannelEmotes(String, String)} and {@link TwitchHelix#getEmoteSets(String, Collection)}.
      */
     @Nullable
-    private Type emoteType;
+    private String emoteType;
 
     /**
      * The subscriber tier at which the emote is unlocked.
@@ -64,6 +67,17 @@ public class Emote {
      */
     @Nullable
     private SubscriptionPlan tier;
+
+    /**
+     * Attempts to parse this emoteType to a known {@link Type}.
+     *
+     * @return the parsed {@link Type}.
+     * @see #getEmoteType()
+     */
+    @NonNull
+    public Type getParsedEmoteType() {
+        return Type.parseEmoteType(emoteType != null ? emoteType : "");
+    }
 
     @Data
     @Setter(AccessLevel.PRIVATE)
@@ -94,7 +108,6 @@ public class Emote {
         /**
          * Indicates a custom Bits tier emote.
          */
-        @JsonProperty("bitstier")
         BITS_TIER,
 
         /**
@@ -112,7 +125,6 @@ public class Emote {
          * Indicates a limited time emote.
          */
         @Unofficial
-        @JsonProperty("limitedtime")
         LIMITED_TIME,
 
         /**
@@ -125,7 +137,7 @@ public class Emote {
          * Indicates a rewards emote.
          */
         @Unofficial
-        REWARDS,
+        REWARDS("rewards", "owl2019"),
 
         /**
          * Indicates a smiley emote.
@@ -139,10 +151,45 @@ public class Emote {
         SUBSCRIPTIONS,
 
         /**
+         * Indicates a two-factor emote.
+         */
+        @Unofficial
+        TWO_FACTOR,
+
+        /**
          * The channel emote type was unknown; please report on our Discord or Github!
          */
-        @JsonEnumDefaultValue
-        OTHER
+        OTHER;
+
+        @NonNull
+        private final String[] twitchStrings;
+
+        Type() {
+            this.twitchStrings = new String[] { this.name().toLowerCase().replace("_", "") };
+        }
+
+        Type(String... names) {
+            this.twitchStrings = names;
+        }
+
+        private static final Map<String, Type> MAPPINGS;
+
+        @NonNull
+        public static Type parseEmoteType(String emoteType) {
+            return MAPPINGS.getOrDefault(emoteType, OTHER);
+        }
+
+        static {
+            final Map<String, Type> map = new HashMap<>();
+
+            for (Type emoteType : values()) {
+                for (String twitchString : emoteType.twitchStrings) {
+                    map.put(twitchString, emoteType);
+                }
+            }
+
+            MAPPINGS = Collections.unmodifiableMap(map);
+        }
 
     }
 
