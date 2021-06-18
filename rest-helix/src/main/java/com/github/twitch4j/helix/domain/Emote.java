@@ -106,9 +106,21 @@ public class Emote {
     public enum Type {
 
         /**
+         * Indicates a library-archived emote.
+         */
+        @Unofficial
+        ARCHIVE,
+
+        /**
          * Indicates a custom Bits tier emote.
          */
         BITS_TIER,
+
+        /**
+         * Indicates a channel points reward emote.
+         */
+        @Unofficial
+        CHANNEL_POINTS,
 
         /**
          * Indicates a custom follower emote.
@@ -122,22 +134,28 @@ public class Emote {
         GLOBALS,
 
         /**
+         * Indicates a hype train emote.
+         */
+        @Unofficial
+        HYPE_TRAIN,
+
+        /**
          * Indicates a limited time emote.
          */
         @Unofficial
         LIMITED_TIME,
 
         /**
-         * Indicates a prime emote.
+         * Indicates a prime or turbo emote.
          */
         @Unofficial
-        PRIME,
+        PRIME("prime", "turbo"),
 
         /**
          * Indicates a rewards emote.
          */
         @Unofficial
-        REWARDS("rewards", "owl2019"),
+        REWARDS("rewards", "megacommerce", "megacheer", "owl2019"),
 
         /**
          * Indicates a smiley emote.
