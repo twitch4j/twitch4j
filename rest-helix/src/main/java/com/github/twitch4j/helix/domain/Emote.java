@@ -143,7 +143,7 @@ public class Emote {
          * Indicates a limited time emote.
          */
         @Unofficial
-        LIMITED_TIME,
+        LIMITED_TIME("limitedtime", "owl2019"),
 
         /**
          * Indicates a prime or turbo emote.
@@ -155,7 +155,7 @@ public class Emote {
          * Indicates a rewards emote.
          */
         @Unofficial
-        REWARDS("rewards", "megacommerce", "megacheer", "owl2019"),
+        REWARDS("rewards", "megacommerce", "megacheer"),
 
         /**
          * Indicates a smiley emote.
