@@ -995,11 +995,11 @@ public interface TwitchHelix {
      *
      * @param authToken     User OAuth Token or App Access Token.
      * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule.
-     * @param ids           The ID of the stream segment to return.Maximum: 100.
+     * @param ids           The ID of the stream segment to return. Maximum: 100.
      * @param startTime     A timestamp in RFC3339 format to start returning stream segments from. If not specified, the current date and time is used.
      * @param utcOffset     A timezone offset for the requester specified in minutes. For example, a timezone that is +4 hours from GMT would be “240.” If not specified, “0” is used for GMT.
      * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit         Maximum number of stream segments to return.Maximum: 25. Default: 20.
+     * @param limit         Maximum number of stream segments to return. Maximum: 25. Default: 20.
      * @return StreamScheduleResponse
      */
     @RequestLine("GET /schedule?broadcaster_id={broadcaster_id}&id={id}&start_time={start_time}&utc_offset={utc_offset}&first={first}&after={after}")
