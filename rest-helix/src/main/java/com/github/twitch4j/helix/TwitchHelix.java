@@ -8,7 +8,10 @@ import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
@@ -1014,16 +1017,25 @@ public interface TwitchHelix {
         @Param("first") Integer limit
     );
 
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @RequestLine("GET /schedule/icalendar?broadcaster_id={broadcaster_id}")
+    HystrixCommand<Response> getChannelInternetCalendarResponse(
+        @Param("broadcaster_id") String broadcasterId
+    );
+
     /**
      * Gets all scheduled broadcasts from a channel’s stream schedule as an iCalendar.
      *
      * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule.
-     * @return iCalendar data is returned according to RFC5545. The expected MIME type is text/calendar.
+     * @return iCalendar data is returned according to RFC5545, in a multi-line String.
      */
-    @RequestLine("GET /schedule/icalendar?broadcaster_id={broadcaster_id}")
-    HystrixCommand<Response> getChannelInternetCalendar(
-        @Param("broadcaster_id") String broadcasterId
-    );
+    default String getChannelInternetCalendar(String broadcasterId) throws IOException {
+        Response response = getChannelInternetCalendarResponse(broadcasterId).execute();
+        try (InputStream is = response.body().asInputStream()) {
+            return IOUtils.toString(is, response.charset());
+        }
+    }
 
     /**
      * Update the settings for a channel’s stream schedule.
