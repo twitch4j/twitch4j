@@ -66,7 +66,6 @@ public class ChannelMessageEvent extends AbstractChannelEvent implements Replyab
      * Information regarding the parent message being replied to, if applicable.
      */
     @Nullable
-    @Unofficial
     @Getter(lazy = true)
     private ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
 
