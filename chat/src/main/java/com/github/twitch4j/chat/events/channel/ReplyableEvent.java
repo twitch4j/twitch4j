@@ -1,7 +1,6 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.ITwitchChat;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.util.CryptoUtils;
 
@@ -20,7 +19,6 @@ public interface ReplyableEvent {
      * @param chat    the {@link ITwitchChat} instance to send the message from.
      * @param message the message to be sent.
      */
-    @Unofficial
     default void reply(ITwitchChat chat, String message) {
         chat.sendMessage(getChannel().getName(), message, CryptoUtils.generateNonce(32), getMessageEvent().getMessageId().orElse(null));
     }
