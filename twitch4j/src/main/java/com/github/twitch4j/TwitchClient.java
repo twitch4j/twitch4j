@@ -227,7 +227,8 @@ public class TwitchClient implements ITwitchClient {
         if (scheduledThreadPoolExecutor.getThreadFactory() instanceof BasicThreadFactory) {
             BasicThreadFactory threadFactory = (BasicThreadFactory) scheduledThreadPoolExecutor.getThreadFactory();
 
-            if (threadFactory.getNamingPattern().equalsIgnoreCase("twitch4j-%d")) {
+            String pattern = threadFactory.getNamingPattern();
+            if (pattern != null && pattern.startsWith("twitch4j-") && pattern.endsWith("-%d")) {
                 scheduledThreadPoolExecutor.shutdownNow();
             }
         }
