@@ -68,7 +68,7 @@ public class AutomodContentClassification {
         /**
          * Sexual acts, anatomy.
          */
-        @JsonAlias({ "sex_based_terms", "anatomy" })
+        @JsonAlias({ "sexwords", "sex_based_terms", "anatomy" })
         SEXUAL,
 
         /**
