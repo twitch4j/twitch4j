@@ -77,7 +77,7 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.2")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.5")
 			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.2")
 			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.2")
 			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.2")
