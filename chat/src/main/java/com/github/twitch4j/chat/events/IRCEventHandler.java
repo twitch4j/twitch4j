@@ -513,11 +513,12 @@ public class IRCEventHandler {
 
     public void onInboundHostEvent(IRCMessageEvent event) {
         if ("PRIVMSG".equals(event.getCommandType()) && "jtv".equals(event.getClientName().orElse(null)) && event.getChannelName().isPresent() && event.getRawTags().isEmpty()) {
-            final String hostMessageSuffix = " is now hosting you.";
+            final String hostMessage = " is now hosting you";
             event.getMessage()
+                .map(msg -> msg.indexOf(hostMessage))
+                .filter(index -> index > 0)
+                .map(index -> event.getMessage().get().substring(0, index))
                 .map(String::trim)
-                .filter(msg -> msg.endsWith(hostMessageSuffix))
-                .map(msg -> msg.substring(0, msg.length() - hostMessageSuffix.length()))
                 .ifPresent(hostName -> eventManager.publish(new InboundHostEvent(event.getChannelName().get(), hostName)));
         }
     }
