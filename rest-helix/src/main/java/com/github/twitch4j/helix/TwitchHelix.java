@@ -1390,6 +1390,7 @@ public interface TwitchHelix {
      * @param toId ID of the channel to be followed by the user
      * @param allowNotifications Whether the user gets email or push notifications (depending on the user’s notification settings) when the channel goes live. Default value is false
      * @return 204 No Content upon a successfully created follow
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
     @RequestLine("POST /users/follows")
     @Headers({
@@ -1397,6 +1398,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":{allow_notifications}%7D")
+    @Deprecated
     HystrixCommand<Void> createFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
@@ -1411,9 +1413,11 @@ public interface TwitchHelix {
      * @param fromId User ID of the follower
      * @param toId Channel to be unfollowed by the user
      * @return 204 No Content upon a successful deletion from the list of channel followers
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
     @RequestLine("DELETE /users/follows?from_id={from_id}&to_id={to_id}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<Void> deleteFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,

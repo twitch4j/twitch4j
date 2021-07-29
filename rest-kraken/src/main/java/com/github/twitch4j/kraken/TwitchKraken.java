@@ -510,7 +510,7 @@ public interface TwitchKraken {
      * @param userId       User Id
      * @param targetUserId Target User Id (the Channel the user will follow)
      * @return Object
-     * @deprecated in favor of TwitchHelix#createFollow
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
     @Deprecated
     @RequestLine("PUT /users/{user}/follows/channels/{targetUser}")
