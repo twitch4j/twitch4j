@@ -30,7 +30,9 @@ public class ExtensionTransactionsTopic extends TwitchWebhookTopic<ExtensionTran
      * Sends a notification when a new transaction is created for an extension.
      *
      * @param extensionId Required. The ID of the extension to listen to for transactions.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public ExtensionTransactionsTopic(@NonNull String extensionId) {
         super(
             PATH,

@@ -38,7 +38,9 @@ public class ModeratorChangeTopic extends TwitchWebhookTopic<ModeratorEventList>
      *
      * @param broadcasterId Required. Specifies the user ID of the broadcaster.
      * @param userId Optional. Specifies the user ID of the moderator added or removed.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public ModeratorChangeTopic(@NonNull String broadcasterId, String userId) {
         super(
             PATH,

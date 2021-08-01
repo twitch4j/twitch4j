@@ -29,7 +29,9 @@ public class StreamsTopic extends TwitchWebhookTopic<StreamList> {
      * Notifies when a stream changes; e.g., stream goes online or offline, the stream title changes, or the game changes.
      *
      * @param userId Specifies the user whose stream is monitored.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public StreamsTopic(@NonNull String userId) {
         super(
             PATH,

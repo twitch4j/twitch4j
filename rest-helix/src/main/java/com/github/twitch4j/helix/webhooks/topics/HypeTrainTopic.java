@@ -23,7 +23,9 @@ public class HypeTrainTopic extends TwitchWebhookTopic<HypeTrainEventList> {
      * Notifies upon active hype train events
      *
      * @param broadcasterId User ID of the broadcaster
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public HypeTrainTopic(@NonNull String broadcasterId) {
         super(PATH, HypeTrainEventList.class, mapParameters(broadcasterId));
         this.broadcasterId = broadcasterId;

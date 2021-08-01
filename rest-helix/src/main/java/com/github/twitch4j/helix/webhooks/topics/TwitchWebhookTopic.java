@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Deprecated
 @EqualsAndHashCode
 public abstract class TwitchWebhookTopic<T> {
 
