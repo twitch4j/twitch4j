@@ -3,9 +3,12 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -15,8 +18,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -63,6 +68,38 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Builder.Default
     protected final boolean automaticallyPartOnBan = false;
+
+    /**
+     * Whether chat connections should share rate limit buckets based on their respective bandwidth specifications.
+     * In particular, this results in a single message bucket, single whisper bucket, and a single join bucket being shared.
+     * This should be enabled when not using the connection pool in anonymous mode (i.e., a chatAccount is specified).
+     */
+    @Builder.Default
+    protected final boolean shareRateLimitBuckets = false;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    @Builder.Default
+    protected List<Bandwidth> chatRateLimit = Collections.singletonList(TwitchChatLimitHelper.USER_MESSAGE_LIMIT);
+
+    /**
+     * Custom RateLimit for Whispers
+     */
+    @Builder.Default
+    protected List<Bandwidth> whisperRateLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT;
+
+    /**
+     * Custom RateLimit for JOIN/PART
+     */
+    @Builder.Default
+    protected List<Bandwidth> joinRateLimit = Collections.singletonList(TwitchChatLimitHelper.USER_JOIN_LIMIT);
+
+    private final AtomicReference<Bucket> ircMessageBucket = new AtomicReference<>();
+
+    private final AtomicReference<Bucket> ircWhisperBucket = new AtomicReference<>();
+
+    private final AtomicReference<Bucket> ircJoinBucket = new AtomicReference<>();
 
     @Override
     public boolean sendMessage(String channel, String message, @Unofficial @Nullable Map<String, Object> tags) {
@@ -222,6 +259,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withEventManager(getConnectionEventManager())
                 .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
+                .withIrcMessageBucket(getBucket(ircMessageBucket, chatRateLimit, shareRateLimitBuckets))
+                .withIrcWhisperBucket(getBucket(ircWhisperBucket, whisperRateLimit, shareRateLimitBuckets))
+                .withIrcJoinBucket(getBucket(ircJoinBucket, joinRateLimit, shareRateLimitBuckets))
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
 
@@ -268,6 +308,11 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         saturatedConnections.forEach(retrieve);
         unsaturatedConnections.keySet().forEach(retrieve);
         return Collections.unmodifiableMap(aggregated);
+    }
+
+    private static Bucket getBucket(AtomicReference<Bucket> storedBucket, Iterable<Bandwidth> limits, boolean share) {
+        if (!share) return TwitchChatLimitHelper.createBucket(limits);
+        return storedBucket.updateAndGet(bucket -> bucket != null ? bucket : TwitchChatLimitHelper.createBucket(limits));
     }
 
 }
