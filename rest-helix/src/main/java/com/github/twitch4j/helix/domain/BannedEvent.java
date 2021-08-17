@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -79,6 +80,27 @@ public class BannedEvent {
          * When the timeout expires, if applicable
          */
         private Instant expiresAt;
+
+        /**
+         * The reason for the ban if provided by the moderator.
+         */
+        @Nullable
+        private String reason;
+
+        /**
+         * User ID of the moderator who initiated the ban.
+         */
+        private String moderatorId;
+
+        /**
+         * Login name of the moderator who initiated the ban.
+         */
+        private String moderatorLogin;
+
+        /**
+         * Display name of the moderator who initiated the ban.
+         */
+        private String moderatorName;
     }
 
     public enum EventType {
