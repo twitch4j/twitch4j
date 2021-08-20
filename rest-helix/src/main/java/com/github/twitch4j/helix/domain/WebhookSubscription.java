@@ -13,6 +13,7 @@ import java.time.Instant;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class WebhookSubscription {
 
     /**

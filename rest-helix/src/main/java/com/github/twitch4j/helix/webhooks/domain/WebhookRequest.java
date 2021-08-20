@@ -8,6 +8,7 @@ import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
+@Deprecated
 public class WebhookRequest {
 
     public static final String MODE_SUBSCRIBE = "subscribe";

@@ -90,6 +90,11 @@ public class TwitchExtensionsBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Warning
+        if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
+            log.warn("Extensions: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
+        }
+        
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
 

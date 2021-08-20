@@ -55,10 +55,10 @@ subprojects {
 	dependencies {
 		constraints {
 			// Annotations
-			api(group = "org.jetbrains", name = "annotations", version = "21.0.1")
+			api(group = "org.jetbrains", name = "annotations", version = "22.0.0")
 
 			// Caching
-			api(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "2.9.1")
+			api(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "2.9.2")
 
 			// Apache Commons
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
@@ -77,10 +77,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.2")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.2")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.2")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.2")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.6")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.6")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.6")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.6")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -90,14 +90,14 @@ subprojects {
 		}
 
 		// Apache Commons
-		api(group = "commons-io", name = "commons-io", version = "2.9.0")
+		api(group = "commons-io", name = "commons-io", version = "2.11.0")
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Logging
-		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.30")
+		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
 
 		// Jackson BOM
-		implementation(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.7.2"))

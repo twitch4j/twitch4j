@@ -38,7 +38,9 @@ public class ChannelBanTopic extends TwitchWebhookTopic<ModeratorEventList> {
      *
      * @param broadcasterId Required. The ID of the channel for which to monitor ban events.
      * @param userId Optional. Specifies the user ID of the moderator added or removed.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public ChannelBanTopic(@NonNull String broadcasterId, String userId) {
         super(
             PATH,

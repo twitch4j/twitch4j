@@ -46,19 +46,16 @@ public class TwitchExtensionsErrorDecoder implements ErrorDecoder {
                 ex = new UnauthorizedException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 404) {
                 ex = new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 429) {
                 ex = new ContextedRuntimeException("To many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
@@ -70,7 +67,6 @@ public class TwitchExtensionsErrorDecoder implements ErrorDecoder {
                 ex = new ContextedRuntimeException("Extensions API Error")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("requestHeaders", response.request().headers().entrySet().toString())
                     .addContextValue("responseBody", responseBody)
                     .addContextValue("errorType", error.getError())
                     .addContextValue("errorStatus", error.getStatus())

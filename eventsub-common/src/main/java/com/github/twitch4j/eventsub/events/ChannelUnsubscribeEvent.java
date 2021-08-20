@@ -19,6 +19,8 @@ public class ChannelUnsubscribeEvent extends EventSubUserChannelEvent {
 
     /**
      * The tier of the subscription that ended.
+     * <p>
+     * Prime is treated as 1000, at the time of writing.
      */
     private SubscriptionPlan tier;
 
