@@ -1719,9 +1719,11 @@ public interface TwitchHelix {
      * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return WebhookSubscriptionList
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("GET /webhooks/subscriptions?after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<WebhookSubscriptionList> getWebhookSubscriptions(
         @Param("token") String authToken,
         @Param("after") String after,
@@ -1747,9 +1749,11 @@ public interface TwitchHelix {
      *
      * @see <a href="https://dev.twitch.tv/docs/api/webhooks-guid/">Twitch Webhooks Guide</a>
      * @return The response from the server
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("POST /webhooks/hub")
     @Headers({"Authorization: Bearer {token}", "content-type: application/json"})
+    @Deprecated
     HystrixCommand<Response> requestWebhookSubscription(
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
         @Param("token") String authToken
