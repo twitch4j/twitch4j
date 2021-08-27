@@ -172,7 +172,7 @@ public class TwitchClientBuilder {
      * Custom RateLimit for Whispers
      */
     @With
-    protected List<Bandwidth> chatWhisperLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT;
+    protected Bandwidth[] chatWhisperLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
 
     /**
      * Custom RateLimit for JOIN/PART
@@ -372,7 +372,7 @@ public class TwitchClientBuilder {
                 .withChatAccount(chatAccount)
                 .withChatQueueSize(chatQueueSize)
                 .withChatRateLimit(chatRateLimit)
-                .withWhisperRateLimit(chatWhisperLimit.toArray(new Bandwidth[0]))
+                .withWhisperRateLimit(chatWhisperLimit)
                 .withJoinRateLimit(chatJoinLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
