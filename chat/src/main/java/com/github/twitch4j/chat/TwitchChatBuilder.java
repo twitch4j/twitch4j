@@ -5,21 +5,27 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.enums.TwitchLimitType;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
+import com.github.twitch4j.common.util.TwitchLimitRegistry;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -200,14 +206,27 @@ public class TwitchChatBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
+        // Register rate limits across the user id contained within the chat token
+        final String userId;
+        if (chatAccount == null) {
+            userId = null;
+        } else {
+            if (StringUtils.isEmpty(chatAccount.getUserId())) {
+                chatAccount = credentialManager.getOAuth2IdentityProviderByName("twitch")
+                    .orElse(new TwitchIdentityProvider(null, null, null))
+                    .getAdditionalCredentialInformation(chatAccount).orElse(chatAccount);
+            }
+            userId = StringUtils.defaultIfEmpty(chatAccount.getUserId(), null);
+        }
+
         if (ircMessageBucket == null)
-            ircMessageBucket = TwitchChatLimitHelper.createBucket(this.chatRateLimit);
+            ircMessageBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.chatRateLimit) : TwitchLimitRegistry.INSTANCE.getOrInitializeBucket(userId, TwitchLimitType.CHAT_MESSAGE_LIMIT, Collections.singletonList(chatRateLimit));
 
         if (ircWhisperBucket == null)
-            ircWhisperBucket = TwitchChatLimitHelper.createBucket(this.whisperRateLimit);
+            ircWhisperBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.whisperRateLimit) : TwitchLimitRegistry.INSTANCE.getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, Arrays.asList(whisperRateLimit));
 
         if (ircJoinBucket == null)
-            ircJoinBucket = TwitchChatLimitHelper.createBucket(this.joinRateLimit);
+            ircJoinBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.joinRateLimit) : TwitchLimitRegistry.INSTANCE.getOrInitializeBucket(userId, TwitchLimitType.CHAT_JOIN_LIMIT, Collections.singletonList(joinRateLimit));
 
         log.debug("TwitchChat: Initializing Module ...");
         return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);

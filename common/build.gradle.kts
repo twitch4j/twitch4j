@@ -16,6 +16,9 @@ dependencies {
 	// Websocket (for common proxy settings)
 	compileOnly(group = "com.neovisionaries", name = "nv-websocket-client")
 
+	// Rate-limit buckets for registry
+	compileOnly(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
+
 	// Twitch4J Modules
 	api(project(":auth"))
 }
