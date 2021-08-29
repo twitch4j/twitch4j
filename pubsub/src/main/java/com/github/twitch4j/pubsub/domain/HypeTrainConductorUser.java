@@ -5,4 +5,7 @@ import lombok.Data;
 @Data
 public class HypeTrainConductorUser {
     private String id;
+    private String login;
+    private String displayName;
+    private String profileImageUrl;
 }
