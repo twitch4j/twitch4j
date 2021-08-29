@@ -565,6 +565,10 @@ public class IRCEventHandler {
                             states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
                             eventManager.publish(new Robot9000Event(channel, uniqActive));
                             break;
+                        case "rituals":
+                            boolean ritualsActive = "1".equals(v);
+                            states.put(ChannelStateEvent.ChannelState.RITUALS, ritualsActive);
+                            break;
                         case "slow":
                             long slowDelay = Long.parseLong(v);
                             states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
