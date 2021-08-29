@@ -8,7 +8,9 @@ public class SubGiftData {
     private Integer count;
     private SubscriptionPlan tier;
     private String userId;
+    private String userName;
+    private String displayName;
     private String channelId;
     private String uuid;
-    private String type;
+    private String type; // e.g., "mystery-gift-purchase"
 }
