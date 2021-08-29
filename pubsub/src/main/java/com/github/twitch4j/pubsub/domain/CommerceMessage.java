@@ -1,5 +1,7 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -32,7 +34,22 @@ public class CommerceMessage {
         /**
          * The id for the emote being used
          */
-        private Integer id;
+        @JsonProperty("id")
+        private String emoteId;
+
+        /**
+         * @return the emote id as an integer, or null.
+         * @deprecated in favor of {@link #getEmoteId()}
+         */
+        @JsonIgnore
+        @Deprecated
+        public Integer getId() {
+            try {
+                return Integer.parseInt(getEmoteId());
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
 }
