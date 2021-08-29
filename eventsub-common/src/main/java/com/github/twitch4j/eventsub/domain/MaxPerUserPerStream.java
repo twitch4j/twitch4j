@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class MaxPerUserPerStream {
     /**
      * The max per user per stream limit.
      */
+    @JsonAlias("max_per_user_per_stream")
     private Integer value;
 
 }
