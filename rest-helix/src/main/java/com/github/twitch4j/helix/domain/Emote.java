@@ -271,8 +271,8 @@ public class Emote {
         /**
          * A large version (112px x 112px) of the emote.
          */
-        @JsonProperty("2.0")
-        LARGE("2.0");
+        @JsonProperty("3.0")
+        LARGE("3.0");
 
         @Getter
         private final String twitchString;
