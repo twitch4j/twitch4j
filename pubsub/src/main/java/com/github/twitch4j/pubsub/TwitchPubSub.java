@@ -473,6 +473,9 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         break;
                                 }
 
+                            } else if ("creator-goals-events-v1".equals(topicName)) {
+                                CreatorGoal creatorGoal = TypeConvert.convertValue(msgData.path("goal"), CreatorGoal.class);
+                                eventManager.publish(new CreatorGoalEvent(lastTopicIdentifier, type, creatorGoal));
                             } else if ("crowd-chant-channel-v1".equals(topicName)) {
                                 if ("crowd-chant-created".equals(type)) {
                                     CrowdChantCreatedEvent event = TypeConvert.convertValue(msgData, CrowdChantCreatedEvent.class);
