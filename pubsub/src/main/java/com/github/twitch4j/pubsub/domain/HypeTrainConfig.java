@@ -22,6 +22,9 @@ public class HypeTrainConfig {
     private String calloutEmoteId;
     private String calloutEmoteToken;
     private String themeColor;
+    private Boolean useCreatorColor;
+    private String primaryHexColor;
+    private Boolean usePersonalizedSettings;
     private Boolean hasConductorBadges;
 
     @Data
