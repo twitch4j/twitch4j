@@ -97,7 +97,7 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.12.5"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.7.2"))
