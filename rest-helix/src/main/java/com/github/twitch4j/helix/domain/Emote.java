@@ -1,18 +1,22 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.helix.TwitchHelix;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -42,6 +46,24 @@ public class Emote {
      */
     @Nullable
     private String emoteSetId;
+
+    /**
+     * The formats that the emote is available in.
+     * <p>
+     * For example, if the emote is available only as a static PNG, the collection contains only {@link Format#STATIC}.
+     * But if it’s available as a static PNG and an animated GIF, the collection contains both {@link Format#STATIC} and {@link Format#ANIMATED}.
+     */
+    private List<Format> format;
+
+    /**
+     * The sizes that the emote is available in.
+     */
+    private List<Scale> scale;
+
+    /**
+     * The background themes that the emote is available in.
+     */
+    private List<Theme> themeMode;
 
     /**
      * User ID of the broadcaster who owns the emote.
@@ -209,6 +231,57 @@ public class Emote {
             MAPPINGS = Collections.unmodifiableMap(map);
         }
 
+    }
+
+    public enum Format {
+
+        /**
+         * Returns an animated GIF if available, otherwise, returns the static PNG.
+         */
+        @JsonEnumDefaultValue
+        DEFAULT,
+
+        /**
+         * Indicates a static PNG file is available for this emote.
+         */
+        STATIC,
+
+        /**
+         * Indicates an animated GIF is available for this emote.
+         */
+        ANIMATED
+
+    }
+
+    @RequiredArgsConstructor
+    public enum Scale {
+
+        /**
+         * A small version (28px x 28px) of the emote.
+         */
+        @JsonProperty("1.0")
+        SMALL("1.0"),
+
+        /**
+         * A medium version (56px x 56px) of the emote.
+         */
+        @JsonProperty("2.0")
+        MEDIUM("2.0"),
+
+        /**
+         * A large version (112px x 112px) of the emote.
+         */
+        @JsonProperty("3.0")
+        LARGE("3.0");
+
+        @Getter
+        private final String twitchString;
+
+    }
+
+    public enum Theme {
+        DARK,
+        LIGHT
     }
 
 }
