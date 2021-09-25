@@ -677,6 +677,25 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the broadcaster’s list of active goals.
+     * <p>
+     * Use this to get the current progress of each goal.
+     * <p>
+     * NOTE: Although the API currently supports only one goal, you should write your application to support one or more goals.
+     *
+     * @param authToken     User access token from the broadcaster with the channel:read:goals scope.
+     * @param broadcasterId The ID of the broadcaster that created the goals.
+     * @return CreatorGoalsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GOALS_READ
+     */
+    @RequestLine("GET /goals?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CreatorGoalsList> getCreatorGoals(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response
      *
