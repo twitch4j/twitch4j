@@ -18,6 +18,7 @@ public enum TwitchScopes {
     HELIX_CHANNEL_COMMERCIALS_EDIT("channel:edit:commercial"),
     HELIX_CHANNEL_EXTENSION_MANAGE("channel:manage:extensions"),
     HELIX_CHANNEL_EDITORS_READ("channel:read:editors"),
+    HELIX_CHANNEL_GOALS_READ("channel:read:goals"),
     HELIX_CHANNEL_HYPE_TRAIN_READ("channel:read:hype_train"),
     HELIX_CHANNEL_POLLS_MANAGE("channel:manage:polls"),
     HELIX_CHANNEL_POLLS_READ("channel:read:polls"),
