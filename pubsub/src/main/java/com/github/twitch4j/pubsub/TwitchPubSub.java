@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -512,6 +513,23 @@ public class TwitchPubSub implements ITwitchPubSub {
                                     case "deny_unban_request":
                                         ModeratorUnbanRequestAction unbanRequestAction = TypeConvert.convertValue(msgData, ModeratorUnbanRequestAction.class);
                                         eventManager.publish(new ModUnbanRequestActionEvent(lastTopicIdentifier, unbanRequestAction));
+                                        break;
+
+                                    case "moderator_added":
+                                    case "moderator_removed":
+                                    case "vip_added":
+                                    case "vip_removed":
+                                        ChatModerationAction.ModerationAction act = "moderator_added".equals(type) ? ChatModerationAction.ModerationAction.MOD
+                                            : "moderator_removed".equals(type) ? ChatModerationAction.ModerationAction.UNMOD
+                                            : "vip_added".equals(type) ? ChatModerationAction.ModerationAction.VIP
+                                            : ChatModerationAction.ModerationAction.UNVIP;
+
+                                        String targetUserId = msgData.path("target_user_id").asText();
+                                        String targetUserName = msgData.path("target_user_login").asText();
+                                        String createdByUserId = msgData.path("created_by_user_id").asText();
+                                        String createdBy = msgData.path("created_by").asText();
+                                        ChatModerationAction action = new ChatModerationAction("chat_login_moderation", act, Collections.singletonList(targetUserName), createdBy, createdByUserId, "", targetUserId, targetUserName, false);
+                                        eventManager.publish(new ChatModerationEvent(lastTopicIdentifier, action));
                                         break;
 
                                     default:
