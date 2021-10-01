@@ -77,6 +77,7 @@ public enum NoticeTag {
     /**
      * You cannot ban global moderator &lt;user&gt;. Please email support@twitch.tv if a global moderator is being abusive.
      */
+    @Deprecated
     BAD_BAN_GLOBAL_MOD,
 
     /**
@@ -103,6 +104,12 @@ public enum NoticeTag {
      * You cannot delete the broadcaster&#039;s messages.
      */
     BAD_DELETE_MESSAGE_BROADCASTER,
+
+    /**
+     * Failed to delete message.
+     */
+    @Unofficial
+    BAD_DELETE_MESSAGE_ERROR,
 
     /**
      * You cannot delete messages from another moderator &lt;user&gt;.
@@ -177,6 +184,7 @@ public enum NoticeTag {
     /**
      * You cannot timeout global moderator &lt;user&gt;. Please email support@twitch.tv if a global moderator is being abusive.
      */
+    @Deprecated
     BAD_TIMEOUT_GLOBAL_MOD,
 
     /**
@@ -208,6 +216,36 @@ public enum NoticeTag {
      * &lt;user&gt; is not a moderator of this channel.
      */
     BAD_UNMOD_MOD,
+
+    /**
+     * &lt;user&gt; is not a VIP of this channel.
+     */
+    @Unofficial
+    BAD_UNVIP_GRANTEE_NOT_VIP,
+
+    /**
+     * Unable to add VIP. Visit the Achievements page on your dashboard to learn how to unlock this feature.
+     */
+    @Unofficial
+    BAD_VIP_ACHIEVEMENT_INCOMPLETE,
+
+    /**
+     * &lt;user&gt; is already a VIP of this channel.
+     */
+    @Unofficial
+    BAD_VIP_GRANTEE_ALREADY_VIP,
+
+    /**
+     * &lt;user&gt; is banned in this channel. You must unban this user before granting VIP status.
+     */
+    @Unofficial
+    BAD_VIP_GRANTEE_BANNED,
+
+    /**
+     * Unable to add VIP. Visit the Achievements page on your dashboard to learn how to unlock additional VIP slots.
+     */
+    @Unofficial
+    BAD_VIP_MAX_VIPS_REACHED,
 
     /**
      * &lt;user&gt; is now banned from this channel.
@@ -432,6 +470,12 @@ public enum NoticeTag {
     NO_PERMISSION,
 
     /**
+     * This channel does not have any VIPs.
+     */
+    @Unofficial
+    NO_VIPS,
+
+    /**
      * This room is no longer in r9k mode.
      */
     R9K_OFF,
@@ -565,6 +609,12 @@ public enum NoticeTag {
      * &lt;user&gt; is no longer timed out in this channel.
      */
     UNTIMEOUT_SUCCESS,
+
+    /**
+     * You have removed &lt;user&gt; as a VIP of this channel.
+     */
+    @Unofficial
+    UNVIP_SUCCESS,
 
     /**
      * Usage: “/ban &lt;username&gt; [reason]” Permanently prevent a user from chatting. Reason is optional and will be shown to the target and other moderators. Use “/unban” to remove a ban.
@@ -706,6 +756,30 @@ public enum NoticeTag {
      * Usage: “/untimeout &lt;username&gt;” Removes a timeout on a user.
      */
     USAGE_UNTIMEOUT,
+
+    /**
+     * Usage: “/vip &lt;username&gt;” Grant VIP status to a user. Use “/vips” to list the moderators of this channel.
+     */
+    @Unofficial
+    USAGE_VIP,
+
+    /**
+     * Usage: “/vips” Lists the VIPs of this channel.
+     */
+    @Unofficial
+    USAGE_VIPS,
+
+    /**
+     * You have added &lt;user&gt; as a VIP of this channel.
+     */
+    @Unofficial
+    VIP_SUCCESS,
+
+    /**
+     * The VIPs of this channel are: &lt;list of users&gt;.
+     */
+    @Unofficial
+    VIPS_SUCCESS,
 
     /**
      * You have been banned from sending whispers.
