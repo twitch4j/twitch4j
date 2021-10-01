@@ -66,7 +66,7 @@ public class Stream {
 
     /** UTC timestamp on when the stream started */
     @NonNull
-    @JsonProperty("started_at")
+    @JsonProperty("startedAt")
     private Instant startedAtInstant;
 
     /** Ids of active tags on the stream */
@@ -74,7 +74,7 @@ public class Stream {
 
     /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */
     @Accessors(fluent = true)
-    @JsonProperty("is_mature")
+    @JsonProperty("isMature")
     private Boolean isMature;
 
     /** Stream language. */
