@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.enums;
 
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -309,6 +310,12 @@ public enum NoticeTag {
     MSG_BAD_CHARACTERS,
 
     /**
+     * Your message was not sent because your email address is banned from this channel.
+     */
+    @Unofficial
+    MSG_BANNED_EMAIL_ALIAS,
+
+    /**
      * Your message was not sent because your account is not in good standing in this channel.
      */
     MSG_CHANNEL_BLOCKED,
@@ -367,6 +374,12 @@ public enum NoticeTag {
      * Your message wasn&#039;t posted due to conflicts with the channel&#039;s moderation settings.
      */
     MSG_REJECTED_MANDATORY,
+
+    /**
+     * A verified phone number is required to chat in this channel. Please visit https://www.twitch.tv/settings/security to verify your phone number.
+     */
+    @Unofficial
+    MSG_REQUIRES_VERIFIED_PHONE_NUMBER,
 
     /**
      * The room was not found.
