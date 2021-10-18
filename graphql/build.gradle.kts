@@ -1,6 +1,6 @@
 // Plugins
 plugins {
-	id("com.apollographql.apollo") version "2.5.9"
+	id("com.apollographql.apollo") version "2.5.10"
 }
 
 // Dependencies
