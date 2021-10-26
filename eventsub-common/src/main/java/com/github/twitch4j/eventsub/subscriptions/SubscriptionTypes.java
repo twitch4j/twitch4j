@@ -15,6 +15,9 @@ public class SubscriptionTypes {
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
+    public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
+    public final ChannelGoalProgressType CHANNEL_GOAL_PROGRESS;
+    public final ChannelGoalEndType CHANNEL_GOAL_END;
     public final ChannelModeratorAddType CHANNEL_MODERATOR_ADD;
     public final ChannelModeratorRemoveType CHANNEL_MODERATOR_REMOVE;
     public final ChannelPointsCustomRewardAddType CHANNEL_POINTS_CUSTOM_REWARD_ADD;
@@ -56,6 +59,9 @@ public class SubscriptionTypes {
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
+                CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
+                CHANNEL_GOAL_PROGRESS = new ChannelGoalProgressType(),
+                CHANNEL_GOAL_END = new ChannelGoalEndType(),
                 CHANNEL_MODERATOR_ADD = new ChannelModeratorAddType(),
                 CHANNEL_MODERATOR_REMOVE = new ChannelModeratorRemoveType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_ADD = new ChannelPointsCustomRewardAddType(),
