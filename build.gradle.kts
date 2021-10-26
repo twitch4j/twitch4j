@@ -67,7 +67,7 @@ subprojects {
 			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "4.7.0")
 
 			// HTTP
-			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.1")
+			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.2")
 
 			// Event Dispatcher
 			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.9.8")
