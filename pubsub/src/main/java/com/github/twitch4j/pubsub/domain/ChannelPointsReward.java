@@ -1,7 +1,11 @@
 package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.eventsub.domain.GlobalCooldown;
+import com.github.twitch4j.eventsub.domain.MaxPerUserPerStream;
 import lombok.Data;
+
+import java.time.Instant;
 
 @Data
 public class ChannelPointsReward {
@@ -22,6 +26,10 @@ public class ChannelPointsReward {
 	private MaxPerStream maxPerStream;
 	private Boolean shouldRedemptionsSkipRequestQueue;
 	private String updatedForIndicatorAt;
+	private MaxPerUserPerStream maxPerUserPerStream;
+	private GlobalCooldown globalCooldown;
+	private Integer redemptionsRedeemedCurrentStream;
+	private Instant cooldownExpiresAt;
 
 	@Data
 	public static class Image {

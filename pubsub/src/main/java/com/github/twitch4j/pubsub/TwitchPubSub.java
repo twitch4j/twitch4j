@@ -596,6 +596,11 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         final ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
                                         eventManager.publish(new RewardRedeemedEvent(Instant.parse(msgData.path("timestamp").asText()), redemption));
                                         break;
+                                    case "community-goal-contribution":
+                                        CommunityGoalContribution goal = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
+                                        Instant instant = Instant.parse(msgData.path("timestamp").textValue());
+                                        eventManager.publish(new UserCommunityGoalContributionEvent(lastTopicIdentifier, instant, goal));
+                                        break;
                                     case "global-last-viewed-content-updated":
                                     case "channel-last-viewed-content-updated":
                                         // unimportant
