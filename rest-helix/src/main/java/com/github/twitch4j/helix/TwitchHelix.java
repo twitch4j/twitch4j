@@ -408,19 +408,50 @@ public interface TwitchHelix {
      * @param id        Optional: Unique Identifier of the entitlement.
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
+     * @param status    Optional: Fulfillment status used to filter entitlements.
      * @param after     Optional: The cursor used to fetch the next page of data.
      * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
-    @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
+    @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&fulfillment_status={fulfillment_status}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<DropsEntitlementList> getDropsEntitlements(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
         @Param("game_id") String gameId,
+        @Param("fulfillment_status") DropFulfillmentStatus status,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    @Deprecated
+    default HystrixCommand<DropsEntitlementList> getDropsEntitlements(
+        @Param("token") String authToken,
+        @Param("id") String id,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    ) {
+        return getDropsEntitlements(authToken, id, userId, gameId, null, after, limit);
+    }
+
+    /**
+     * Updates the fulfillment status on a set of Drops entitlements, specified by their entitlement IDs.
+     *
+     * @param authToken User OAuth Token or App Access Token where the client ID associated with the access token must have ownership of the game.
+     * @param input     The fulfillment_status to assign to each of the entitlement_ids.
+     * @return UpdatedDropEntitlementsList
+     */
+    @RequestLine("PATCH /entitlements/drops")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<UpdatedDropEntitlementsList> updateDropsEntitlements(
+        @Param("token") String authToken,
+        UpdateDropEntitlementInput input
     );
 
     /**
