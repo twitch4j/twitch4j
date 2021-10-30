@@ -203,14 +203,6 @@ public class TwitchClientPoolBuilder {
     protected Bandwidth chatJoinLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
 
     /**
-     * Whether chat connections should share rate limit buckets based on their respective bandwidth specifications.
-     * In particular, this results in a single message bucket, single whisper bucket, and a single join bucket being shared.
-     * This should be enabled when the pools is not used in anonymous mode (i.e., a chatAccount is specified).
-     */
-    @With
-    protected boolean shareChatRateLimitBuckets = false;
-
-    /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
      */
     @With
