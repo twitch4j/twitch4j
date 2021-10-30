@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -8,7 +9,6 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
 import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -18,10 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -252,8 +250,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         ).build();
 
         // Reclaim channel headroom upon a ban
-        chat.getEventManager().onEvent("twitch4j-chat-pool-ban-tracker", ChannelNoticeEvent.class, e -> {
-            if (automaticallyPartOnBan && "msg_banned".equals(e.getMsgId())) {
+        chat.getEventManager().onEvent(threadPrefix + "ban-tracker", ChannelNoticeEvent.class, e -> {
+            if (automaticallyPartOnBan && NoticeTag.MSG_BANNED.toString().equals(e.getMsgId())) {
                 unsubscribe(e.getChannel().getName());
             }
         });
