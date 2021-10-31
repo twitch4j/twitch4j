@@ -30,8 +30,14 @@ public class Clip {
     /** User ID of the stream from which the clip was created. */
     private String broadcasterId;
 
-    /** ID of the user who created the clip. */
+    /** User display name of the stream from which the clip was created. */
+    private String broadcasterName;
+
+    /** Display name of the user who created the clip. */
     private String creatorId;
+
+    /** Display name of the user who created the clip. */
+    private String creatorName;
 
     /** ID of the video from which the clip was created. */
     private String videoId;
