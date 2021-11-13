@@ -56,6 +56,12 @@ public class TwitchGraphQLBuilder {
     private boolean enableBatching = false;
 
     /**
+     * Default Timeout
+     */
+    @With
+    private Integer timeout = 5000;
+
+    /**
      * User Agent
      */
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
@@ -82,7 +88,7 @@ public class TwitchGraphQLBuilder {
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
-        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig, enableBatching);
+        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig, enableBatching, timeout);
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);

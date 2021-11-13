@@ -57,6 +57,11 @@ public class TwitchGraphQL {
     private final boolean batchingEnabled;
 
     /**
+     * Timeout
+     */
+    private final Integer timeout;
+
+    /**
      * Caches an {@link ApolloClient} instance for various access tokens
      */
     private final Cache<String, ApolloClient> clientsByCredential;
@@ -70,14 +75,16 @@ public class TwitchGraphQL {
      * @param clientId        Client Id
      * @param proxyConfig     Proxy Config
      * @param batchingEnabled Query Batching
+     * @param timeout         Query Timeout
      */
-    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, ProxyConfig proxyConfig, boolean batchingEnabled) {
+    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout) {
         this.baseUrl = baseUrl;
         this.userAgent = userAgent;
         this.eventManager = eventManager;
         this.clientId = clientId;
         this.proxyConfig = proxyConfig;
         this.batchingEnabled = batchingEnabled;
+        this.timeout = timeout;
         this.clientsByCredential = Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
     }
 
@@ -92,6 +99,8 @@ public class TwitchGraphQL {
         return clientsByCredential.get(accessToken, s -> {
             // Http Client
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+                .callTimeout(timeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(timeout / 3, TimeUnit.MILLISECONDS)
                 .addInterceptor(chain -> {
                     Request original = chain.request();
 

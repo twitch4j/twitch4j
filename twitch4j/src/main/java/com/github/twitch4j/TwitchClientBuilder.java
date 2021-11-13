@@ -385,6 +385,7 @@ public class TwitchClientBuilder {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
                 .withProxyConfig(proxyConfig)
+                .withTimeout(timeout)
                 .build();
         }
 
