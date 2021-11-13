@@ -50,6 +50,12 @@ public class TwitchGraphQLBuilder {
     private String clientSecret = "**SECRET**";
 
     /**
+     * Whether GraphQL Queries should be batched
+     */
+    @With
+    private boolean enableBatching = false;
+
+    /**
      * User Agent
      */
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
@@ -76,7 +82,7 @@ public class TwitchGraphQLBuilder {
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
-        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig);
+        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig, enableBatching);
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);

@@ -1,6 +1,7 @@
 package com.github.twitch4j.graphql;
 
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.internal.batch.BatchConfig;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
@@ -51,6 +52,11 @@ public class TwitchGraphQL {
     private final ProxyConfig proxyConfig;
 
     /**
+     * Whether GraphQL Queries should be batched
+     */
+    private final boolean batchingEnabled;
+
+    /**
      * Caches an {@link ApolloClient} instance for various access tokens
      */
     private final Cache<String, ApolloClient> clientsByCredential;
@@ -58,18 +64,20 @@ public class TwitchGraphQL {
     /**
      * Constructor
      *
-     * @param baseUrl      Base Url
-     * @param userAgent    User Agent
-     * @param eventManager Event Manager
-     * @param clientId     Client Id
-     * @param proxyConfig  Proxy Config
+     * @param baseUrl         Base Url
+     * @param userAgent       User Agent
+     * @param eventManager    Event Manager
+     * @param clientId        Client Id
+     * @param proxyConfig     Proxy Config
+     * @param batchingEnabled Query Batching
      */
-    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, ProxyConfig proxyConfig) {
+    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, ProxyConfig proxyConfig, boolean batchingEnabled) {
         this.baseUrl = baseUrl;
         this.userAgent = userAgent;
         this.eventManager = eventManager;
         this.clientId = clientId;
         this.proxyConfig = proxyConfig;
+        this.batchingEnabled = batchingEnabled;
         this.clientsByCredential = Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
     }
 
@@ -110,6 +118,7 @@ public class TwitchGraphQL {
             return ApolloClient.builder()
                 .serverUrl(baseUrl)
                 .okHttpClient(clientBuilder.build())
+                .batchingConfiguration(new BatchConfig(batchingEnabled, 10L, 10))
                 .build();
         });
     }
