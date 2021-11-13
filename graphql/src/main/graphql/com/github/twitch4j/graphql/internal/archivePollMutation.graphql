@@ -2,6 +2,7 @@ mutation archivePoll($input: ArchivePollInput!) {
 	archivePoll(input: $input) {
 		poll {
 			id
+			status
 		}
 	}
 }

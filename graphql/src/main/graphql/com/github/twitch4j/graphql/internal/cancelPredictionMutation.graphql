@@ -5,6 +5,7 @@ mutation cancelPredictionEvent($input: CancelPredictionEventInput!) {
 				id
 			}
 			id
+			status
 		}
 	}
 }

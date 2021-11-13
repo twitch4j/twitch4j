@@ -4,10 +4,11 @@ query fetchSquadStream($id: ID!) {
 		members {
 			id
 			login
-			subscriptionProducts {
-				id
-				name
-			}
+			displayName
+			profileImageURL(width: 150)
+		}
+		owner {
+			id
 		}
 		status
 	}
