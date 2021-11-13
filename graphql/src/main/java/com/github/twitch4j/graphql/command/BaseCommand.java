@@ -60,7 +60,11 @@ public abstract class BaseCommand<T extends Operation.Data> extends HystrixComma
             public void onResponse(@NotNull Response<T> response) {
                 List<Error> errors = response.getErrors();
                 if (errors != null && errors.size() > 0) {
-                    throw new RuntimeException("GraphQL API: " + errors.toString());
+                    try {
+                        throw new RuntimeException("GraphQL API: " + errors);
+                    } finally {
+                        latch.countDown();
+                    }
                 }
 
                 resultData = response.getData();
