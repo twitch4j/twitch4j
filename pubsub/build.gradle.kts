@@ -13,6 +13,7 @@ dependencies {
 	api(group = "org.jetbrains", name = "annotations")
 
 	// Twitch4J Modules
+	api(project(":eventsub-common"))
 	api(project(":common"))
 	api(project(":auth"))
 }

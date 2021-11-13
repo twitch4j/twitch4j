@@ -8,7 +8,10 @@ import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
@@ -309,6 +312,50 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets all custom emotes for a specific Twitch channel including subscriber emotes, Bits tier emotes, and follower emotes.
+     * <p>
+     * Custom channel emotes are custom emoticons that viewers may use in Twitch chat once they are subscribed to, cheered in, or followed the channel that owns the emotes.
+     *
+     * @param authToken     Any User OAuth Token or App Access Token.
+     * @param broadcasterId The broadcaster whose emotes are being requested.
+     * @return EmoteList
+     */
+    @RequestLine("GET /chat/emotes?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EmoteList> getChannelEmotes(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Gets all global emotes.
+     * <p>
+     * Global emotes are Twitch-specific emoticons that every user can use in Twitch chat.
+     *
+     * @param authToken Any User OAuth Token or App Access Token.
+     * @return EmoteList
+     */
+    @RequestLine("GET /chat/emotes/global")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EmoteList> getGlobalEmotes(
+        @Param("token") String authToken
+    );
+
+    /**
+     * Gets all Twitch emotes for one or more specific emote sets.
+     *
+     * @param authToken Any User OAuth Token or App Access Token.
+     * @param ids       IDs of the emote sets. Minimum: 1. Maximum: 25. Warning: at the time of writing, the enforced maximum is actually 10.
+     * @return EmoteList
+     */
+    @RequestLine("GET /chat/emotes/set?emote_set_id={emote_set_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EmoteList> getEmoteSets(
+        @Param("token") String authToken,
+        @Param("emote_set_id") Collection<String> ids
+    );
+
+    /**
      * Gets the status of one or more provided codes.
      * <p>
      * The API is throttled to one request per second per authenticated user.
@@ -361,19 +408,50 @@ public interface TwitchHelix {
      * @param id        Optional: Unique Identifier of the entitlement.
      * @param userId    Optional: A Twitch User ID.
      * @param gameId    Optional: A Twitch Game ID.
+     * @param status    Optional: Fulfillment status used to filter entitlements.
      * @param after     Optional: The cursor used to fetch the next page of data.
      * @param limit     Optional: Maximum number of entitlements to return. Default: 20. Max: 1000.
      * @return DropsEntitlementList
      */
-    @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&after={after}&first={first}")
+    @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&fulfillment_status={fulfillment_status}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<DropsEntitlementList> getDropsEntitlements(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
         @Param("game_id") String gameId,
+        @Param("fulfillment_status") DropFulfillmentStatus status,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    @Deprecated
+    default HystrixCommand<DropsEntitlementList> getDropsEntitlements(
+        @Param("token") String authToken,
+        @Param("id") String id,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    ) {
+        return getDropsEntitlements(authToken, id, userId, gameId, null, after, limit);
+    }
+
+    /**
+     * Updates the fulfillment status on a set of Drops entitlements, specified by their entitlement IDs.
+     *
+     * @param authToken User OAuth Token or App Access Token where the client ID associated with the access token must have ownership of the game.
+     * @param input     The fulfillment_status to assign to each of the entitlement_ids.
+     * @return UpdatedDropEntitlementsList
+     */
+    @RequestLine("PATCH /entitlements/drops")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<UpdatedDropEntitlementsList> updateDropsEntitlements(
+        @Param("token") String authToken,
+        UpdateDropEntitlementInput input
     );
 
     /**
@@ -627,6 +705,25 @@ public interface TwitchHelix {
         @Param("token") String authToken,
         @Param("id") List<String> id,
         @Param("name") List<String> name
+    );
+
+    /**
+     * Gets the broadcaster’s list of active goals.
+     * <p>
+     * Use this to get the current progress of each goal.
+     * <p>
+     * NOTE: Although the API currently supports only one goal, you should write your application to support one or more goals.
+     *
+     * @param authToken     User access token from the broadcaster with the channel:read:goals scope.
+     * @param broadcasterId The ID of the broadcaster that created the goals.
+     * @return CreatorGoalsList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GOALS_READ
+     */
+    @RequestLine("GET /goals?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CreatorGoalsList> getCreatorGoals(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -988,6 +1085,122 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") String first
+    );
+
+    /**
+     * Gets all scheduled broadcasts or specific scheduled broadcasts from a channel’s stream schedule.
+     *
+     * @param authToken     User OAuth Token or App Access Token.
+     * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule.
+     * @param ids           The ID of the stream segment to return. Maximum: 100.
+     * @param startTime     A timestamp in RFC3339 format to start returning stream segments from. If not specified, the current date and time is used.
+     * @param utcOffset     A timezone offset for the requester specified in minutes. For example, a timezone that is +4 hours from GMT would be “240.” If not specified, “0” is used for GMT.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Maximum number of stream segments to return. Maximum: 25. Default: 20.
+     * @return StreamScheduleResponse
+     */
+    @RequestLine("GET /schedule?broadcaster_id={broadcaster_id}&id={id}&start_time={start_time}&utc_offset={utc_offset}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamScheduleResponse> getChannelStreamSchedule(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") Collection<String> ids,
+        @Param("start_time") Instant startTime,
+        @Param("utc_offset") String utcOffset,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @RequestLine("GET /schedule/icalendar?broadcaster_id={broadcaster_id}")
+    HystrixCommand<Response> getChannelInternetCalendarResponse(
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Gets all scheduled broadcasts from a channel’s stream schedule as an iCalendar.
+     *
+     * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule.
+     * @return iCalendar data is returned according to RFC5545, in a multi-line String.
+     */
+    default String getChannelInternetCalendar(String broadcasterId) throws IOException {
+        Response response = getChannelInternetCalendarResponse(broadcasterId).execute();
+        try (InputStream is = response.body().asInputStream()) {
+            return IOUtils.toString(is, response.charset());
+        }
+    }
+
+    /**
+     * Update the settings for a channel’s stream schedule.
+     *
+     * @param authToken       User OAuth Token of the broadcaster (scope: "channel:manage:schedule").
+     * @param broadcasterId   User ID of the broadcaster who owns the channel streaming schedule. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param vacationEnabled Indicates whether Vacation Mode is enabled.
+     * @param vacationStart   Start time for vacation specified in RFC3339 format. Required if is_vacation_enabled is set to true.
+     * @param vacationEnd     End time for vacation specified in RFC3339 format. Required if is_vacation_enabled is set to true.
+     * @param timezone        The timezone for when the vacation is being scheduled using the IANA time zone database format. Required if is_vacation_enabled is set to true.
+     * @return 204 No Content upon a successful call.
+     */
+    @RequestLine("PATCH /schedule/settings?broadcaster_id={broadcaster_id}&is_vacation_enabled={is_vacation_enabled}&vacation_start_time={vacation_start_time}&vacation_end_time={vacation_end_time}&timezone={timezone}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateChannelStreamSchedule(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("is_vacation_enabled") Boolean vacationEnabled,
+        @Param("vacation_start_time") Instant vacationStart,
+        @Param("vacation_end_time") Instant vacationEnd,
+        @Param("timezone") String timezone
+    );
+
+    /**
+     * Create a single scheduled broadcast or a recurring scheduled broadcast for a channel’s stream schedule.
+     *
+     * @param authToken     User OAuth Token of the broadcaster (scope: "channel:manage:schedule").
+     * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param segment       Properties of the scheduled broadcast (required: start_time, timezone, is_recurring).
+     * @return StreamScheduleResponse
+     */
+    @RequestLine("POST /schedule/segment?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamScheduleResponse> createStreamScheduleSegment(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        ScheduleSegmentInput segment
+    );
+
+    /**
+     * Update a single scheduled broadcast or a recurring scheduled broadcast for a channel’s stream schedule.
+     *
+     * @param authToken     User OAuth Token of the broadcaster (scope: "channel:manage:schedule").
+     * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param id            The ID of the streaming segment to update.
+     * @param segment       Updated properties of the scheduled broadcast.
+     * @return StreamScheduleResponse
+     */
+    @RequestLine("PATCH /schedule/segment?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<StreamScheduleResponse> updateStreamScheduleSegment(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String id,
+        ScheduleSegmentInput segment
+    );
+
+    /**
+     * Delete a single scheduled broadcast or a recurring scheduled broadcast for a channel’s stream schedule.
+     *
+     * @param authToken     User OAuth Token of the broadcaster (scope: "channel:manage:schedule").
+     * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param id            The ID of the streaming segment to delete.
+     * @return 204 No Content upon a successful call.
+     */
+    @RequestLine("DELETE /schedule/segment?broadcaster_id={broadcaster_id}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteStreamScheduleSegment(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("id") String id
     );
 
     /**
@@ -1390,6 +1603,7 @@ public interface TwitchHelix {
      * @param toId ID of the channel to be followed by the user
      * @param allowNotifications Whether the user gets email or push notifications (depending on the user’s notification settings) when the channel goes live. Default value is false
      * @return 204 No Content upon a successfully created follow
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
     @RequestLine("POST /users/follows")
     @Headers({
@@ -1397,6 +1611,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":{allow_notifications}%7D")
+    @Deprecated
     HystrixCommand<Void> createFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
@@ -1411,9 +1626,11 @@ public interface TwitchHelix {
      * @param fromId User ID of the follower
      * @param toId Channel to be unfollowed by the user
      * @return 204 No Content upon a successful deletion from the list of channel followers
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
     @RequestLine("DELETE /users/follows?from_id={from_id}&to_id={to_id}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<Void> deleteFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
@@ -1552,9 +1769,11 @@ public interface TwitchHelix {
      * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return WebhookSubscriptionList
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("GET /webhooks/subscriptions?after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<WebhookSubscriptionList> getWebhookSubscriptions(
         @Param("token") String authToken,
         @Param("after") String after,
@@ -1580,9 +1799,11 @@ public interface TwitchHelix {
      *
      * @see <a href="https://dev.twitch.tv/docs/api/webhooks-guid/">Twitch Webhooks Guide</a>
      * @return The response from the server
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("POST /webhooks/hub")
     @Headers({"Authorization: Bearer {token}", "content-type: application/json"})
+    @Deprecated
     HystrixCommand<Response> requestWebhookSubscription(
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
         @Param("token") String authToken

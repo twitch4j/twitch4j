@@ -31,7 +31,9 @@ public class UsersTopic extends TwitchWebhookTopic<UserList> {
      * This web hook requires the user:read:email OAuth scope, to get notifications of email changes.
      *
      * @param userId Required. Specifies the user whose data is monitored.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public UsersTopic(@NonNull String userId) {
         super(
             PATH,

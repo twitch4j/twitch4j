@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.Data;
 
 @Data
@@ -39,5 +40,8 @@ public class ChannelPointsRedemption {
 	 * reward redemption status, will be FULFILLED if a user skips the reward queue, UNFULFILLED otherwise
 	 */
 	private String status;
+
+	@Unofficial
+	private String cursor;
 
 }

@@ -68,11 +68,11 @@ public class AutomodContentClassification {
         /**
          * Sexual acts, anatomy.
          */
-        @JsonAlias({ "sex_based_terms", "anatomy" })
+        @JsonAlias({ "sexwords", "sex_based_terms", "anatomy" })
         SEXUAL,
 
         /**
-         * Swear words, &*^!#@%*.
+         * Swear words, &amp;*^!#{@literal @}%*.
          */
         @JsonAlias({ "swearing", "vulgar" })
         PROFANITY,

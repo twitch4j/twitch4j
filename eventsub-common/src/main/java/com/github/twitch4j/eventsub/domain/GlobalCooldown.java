@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class GlobalCooldown {
     /**
      * The cooldown in seconds.
      */
+    @JsonAlias("global_cooldown_seconds")
     private Integer seconds;
 
 }

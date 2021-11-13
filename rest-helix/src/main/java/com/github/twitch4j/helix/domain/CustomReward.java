@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.Reward;
@@ -8,11 +9,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.With;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,6 +153,9 @@ public class CustomReward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class MaxPerStreamSetting extends Setting {
@@ -159,6 +165,9 @@ public class CustomReward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class MaxPerUserPerStreamSetting extends Setting {
@@ -168,6 +177,9 @@ public class CustomReward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class GlobalCooldownSetting extends Setting {
@@ -177,7 +189,11 @@ public class CustomReward {
     @Data
     @Setter(AccessLevel.PRIVATE)
     @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
     public static class Setting {
+        @Getter(onMethod_ = { @JsonIgnore }) // avoid serializing both "is_enabled" and "enabled" from this single variable
         @Accessors(fluent = true)
         @JsonProperty("is_enabled")
         private Boolean isEnabled;

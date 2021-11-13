@@ -15,6 +15,9 @@ public class SubscriptionTypes {
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
+    public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
+    public final ChannelGoalProgressType CHANNEL_GOAL_PROGRESS;
+    public final ChannelGoalEndType CHANNEL_GOAL_END;
     public final ChannelModeratorAddType CHANNEL_MODERATOR_ADD;
     public final ChannelModeratorRemoveType CHANNEL_MODERATOR_REMOVE;
     public final ChannelPointsCustomRewardAddType CHANNEL_POINTS_CUSTOM_REWARD_ADD;
@@ -25,11 +28,12 @@ public class SubscriptionTypes {
     public final ChannelRaidType CHANNEL_RAID;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
-    @Unofficial public final BetaChannelSubscriptionGiftType BETA_CHANNEL_SUBSCRIPTION_GIFT;
+    public final ChannelSubscriptionGiftType CHANNEL_SUBSCRIPTION_GIFT;
+    public final ChannelSubscriptionMessageType CHANNEL_SUBSCRIPTION_MESSAGE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
-    @Unofficial public final BetaExtensionBitsTransactionCreateType BETA_EXTENSION_BITS_TRANSACTION_CREATE;
+    public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
     public final HypeTrainEndType HYPE_TRAIN_END;
     public final HypeTrainProgressType HYPE_TRAIN_PROGRESS;
@@ -42,6 +46,7 @@ public class SubscriptionTypes {
     public final PredictionEndType PREDICTION_END;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
+    public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
     public final UserAuthorizationRevokeType USER_AUTHORIZATION_REVOKE;
     public final UserUpdateType USER_UPDATE;
 
@@ -55,6 +60,9 @@ public class SubscriptionTypes {
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
+                CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
+                CHANNEL_GOAL_PROGRESS = new ChannelGoalProgressType(),
+                CHANNEL_GOAL_END = new ChannelGoalEndType(),
                 CHANNEL_MODERATOR_ADD = new ChannelModeratorAddType(),
                 CHANNEL_MODERATOR_REMOVE = new ChannelModeratorRemoveType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_ADD = new ChannelPointsCustomRewardAddType(),
@@ -65,11 +73,12 @@ public class SubscriptionTypes {
                 CHANNEL_RAID = new ChannelRaidType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
-                BETA_CHANNEL_SUBSCRIPTION_GIFT = new BetaChannelSubscriptionGiftType(),
+                CHANNEL_SUBSCRIPTION_GIFT = new ChannelSubscriptionGiftType(),
+                CHANNEL_SUBSCRIPTION_MESSAGE = new ChannelSubscriptionMessageType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
-                BETA_EXTENSION_BITS_TRANSACTION_CREATE = new BetaExtensionBitsTransactionCreateType(),
+                EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
                 HYPE_TRAIN_END = new HypeTrainEndType(),
                 HYPE_TRAIN_PROGRESS = new HypeTrainProgressType(),
@@ -82,6 +91,7 @@ public class SubscriptionTypes {
                 PREDICTION_END = new PredictionEndType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
+                USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),
                 USER_AUTHORIZATION_REVOKE = new UserAuthorizationRevokeType(),
                 USER_UPDATE = new UserUpdateType()
             ).collect(Collectors.toMap(type -> type.getName() + ':' + type.getVersion(), Function.identity()))

@@ -58,7 +58,9 @@ public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionEve
      *
      * @param broadcasterId Required. User ID of the broadcaster. Must match the User ID in the Bearer token.
      * @param userId        Optional. ID of the subscribed user. Currently only one user_id at a time can be queried.
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public ChannelSubscriptionTopic(@NonNull String broadcasterId, String userId) {
         this(broadcasterId, userId, null, null);
     }
@@ -74,7 +76,9 @@ public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionEve
      * @param userId        Optional. ID of the subscribed user.
      * @param gifterId      Optional. ID of the user who gifted the sub. Returns an empty string for non-gifts, "274598607" for anonymous gifts
      * @param gifterName    Optional. Display name of the user who gifted the sub. Returns an empty string for non-gifts, "AnAnonymousGifter" for anonymous gifts
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
+    @Deprecated
     public ChannelSubscriptionTopic(@NonNull String broadcasterId, String userId, String gifterId, String gifterName) {
         super(
             PATH,

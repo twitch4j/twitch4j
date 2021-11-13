@@ -31,6 +31,16 @@ public class DropsEntitlement {
     private Instant timestamp;
 
     /**
+     * UTC timestamp in ISO format for when this entitlement was last updated.
+     */
+    private Instant updatedAt;
+
+    /**
+     * The fulfillment status of the entitlement as determined by the game developer.
+     */
+    private DropFulfillmentStatus fulfillmentStatus;
+
+    /**
      * Twitch User ID of the user who was granted the entitlement.
      */
     private String userId;

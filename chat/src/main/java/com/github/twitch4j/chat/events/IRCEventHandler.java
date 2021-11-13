@@ -2,6 +2,7 @@ package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
+import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
@@ -153,7 +154,7 @@ public class IRCEventHandler {
                 int subTier = event.getSubscriptionTier().orElse(0);
 
                 // Dispatch Event
-                eventManager.publish(new CheerEvent(channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
+                eventManager.publish(new CheerEvent(event, channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
         }
     }
@@ -190,7 +191,7 @@ public class IRCEventHandler {
                 Integer multiMonthTenure = Integer.parseInt(event.getTags().getOrDefault("msg-param-multimonth-tenure", "0"));
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
             }
             // Receive Gifted Sub
             else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
@@ -213,7 +214,7 @@ public class IRCEventHandler {
                 Integer multiMonthTenure = StringUtils.isEmpty(multiTenureParam) ? null : Integer.parseInt(multiTenureParam);
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
             }
             // Gift X Subs
             else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
@@ -491,7 +492,7 @@ public class IRCEventHandler {
             EventChannel channel = event.getChannel();
             String messageId = event.getTagValue("msg-id").get();
 
-            if(messageId.equals("host_on")) {
+            if (messageId.equals(NoticeTag.HOST_ON.toString())) {
                 String message = event.getMessage().get();
                 String targetChannelName = message.substring(12, message.length() - 1);
                 EventChannel targetChannel = new EventChannel(null, targetChannelName);
@@ -505,7 +506,7 @@ public class IRCEventHandler {
             EventChannel channel = event.getChannel();
             String messageId = event.getTagValue("msg-id").get();
 
-            if(messageId.equals("host_off")) {
+            if (messageId.equals(NoticeTag.HOST_OFF.toString())) {
                 eventManager.publish(new HostOffEvent(channel));
             }
         }
@@ -513,24 +514,25 @@ public class IRCEventHandler {
 
     public void onInboundHostEvent(IRCMessageEvent event) {
         if ("PRIVMSG".equals(event.getCommandType()) && "jtv".equals(event.getClientName().orElse(null)) && event.getChannelName().isPresent() && event.getRawTags().isEmpty()) {
-            final String hostMessageSuffix = " is now hosting you.";
+            final String hostMessage = " is now hosting you";
             event.getMessage()
+                .map(msg -> msg.indexOf(hostMessage))
+                .filter(index -> index > 0)
+                .map(index -> event.getMessage().get().substring(0, index))
                 .map(String::trim)
-                .filter(msg -> msg.endsWith(hostMessageSuffix))
-                .map(msg -> msg.substring(0, msg.length() - hostMessageSuffix.length()))
                 .ifPresent(hostName -> eventManager.publish(new InboundHostEvent(event.getChannelName().get(), hostName)));
         }
     }
 
     public void onListModsEvent(IRCMessageEvent event) {
-        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("room_mods") || s.equals("no_mods")).isPresent()) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.ROOM_MODS.toString()) || s.equals(NoticeTag.NO_MODS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
             eventManager.publish(new ListModsEvent(event.getChannel(), names));
         }
     }
 
     public void onListVipsEvent(IRCMessageEvent event) {
-        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals("vips_success") || s.equals("no_vips")).isPresent()) {
+        if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.VIPS_SUCCESS.toString()) || s.equals(NoticeTag.NO_VIPS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
             eventManager.publish(new ListVipsEvent(event.getChannel(), names));
         }
@@ -564,6 +566,10 @@ public class IRCEventHandler {
                             states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
                             eventManager.publish(new Robot9000Event(channel, uniqActive));
                             break;
+                        case "rituals":
+                            boolean ritualsActive = "1".equals(v);
+                            states.put(ChannelStateEvent.ChannelState.RITUALS, ritualsActive);
+                            break;
                         case "slow":
                             long slowDelay = Long.parseLong(v);
                             states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
@@ -586,11 +592,12 @@ public class IRCEventHandler {
     public void onMessageDeleteResponse(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
-            String messageId = event.getTagValue("msg-id").get();
+            String messageId = event.getTagValue("msg-id").orElse(null);
+            NoticeTag tag = NoticeTag.parse(messageId);
 
-            if (messageId.equals("delete_message_success")) {
+            if (tag == NoticeTag.DELETE_MESSAGE_SUCCESS) {
                 eventManager.publish(new MessageDeleteSuccess(channel));
-            } else if (messageId.equals("bad_delete_message_error")) {
+            } else if (tag == NoticeTag.BAD_DELETE_MESSAGE_ERROR || tag == NoticeTag.BAD_DELETE_MESSAGE_BROADCASTER || tag == NoticeTag.BAD_DELETE_MESSAGE_MOD) {
                 eventManager.publish(new MessageDeleteError(channel));
                 log.warn("Failed to delete a message in {}!", channel.getName());
             }

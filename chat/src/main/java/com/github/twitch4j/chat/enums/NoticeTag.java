@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.enums;
 
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -76,6 +77,7 @@ public enum NoticeTag {
     /**
      * You cannot ban global moderator &lt;user&gt;. Please email support@twitch.tv if a global moderator is being abusive.
      */
+    @Deprecated
     BAD_BAN_GLOBAL_MOD,
 
     /**
@@ -102,6 +104,12 @@ public enum NoticeTag {
      * You cannot delete the broadcaster&#039;s messages.
      */
     BAD_DELETE_MESSAGE_BROADCASTER,
+
+    /**
+     * Failed to delete message.
+     */
+    @Unofficial
+    BAD_DELETE_MESSAGE_ERROR,
 
     /**
      * You cannot delete messages from another moderator &lt;user&gt;.
@@ -176,6 +184,7 @@ public enum NoticeTag {
     /**
      * You cannot timeout global moderator &lt;user&gt;. Please email support@twitch.tv if a global moderator is being abusive.
      */
+    @Deprecated
     BAD_TIMEOUT_GLOBAL_MOD,
 
     /**
@@ -207,6 +216,36 @@ public enum NoticeTag {
      * &lt;user&gt; is not a moderator of this channel.
      */
     BAD_UNMOD_MOD,
+
+    /**
+     * &lt;user&gt; is not a VIP of this channel.
+     */
+    @Unofficial
+    BAD_UNVIP_GRANTEE_NOT_VIP,
+
+    /**
+     * Unable to add VIP. Visit the Achievements page on your dashboard to learn how to unlock this feature.
+     */
+    @Unofficial
+    BAD_VIP_ACHIEVEMENT_INCOMPLETE,
+
+    /**
+     * &lt;user&gt; is already a VIP of this channel.
+     */
+    @Unofficial
+    BAD_VIP_GRANTEE_ALREADY_VIP,
+
+    /**
+     * &lt;user&gt; is banned in this channel. You must unban this user before granting VIP status.
+     */
+    @Unofficial
+    BAD_VIP_GRANTEE_BANNED,
+
+    /**
+     * Unable to add VIP. Visit the Achievements page on your dashboard to learn how to unlock additional VIP slots.
+     */
+    @Unofficial
+    BAD_VIP_MAX_VIPS_REACHED,
 
     /**
      * &lt;user&gt; is now banned from this channel.
@@ -309,6 +348,12 @@ public enum NoticeTag {
     MSG_BAD_CHARACTERS,
 
     /**
+     * Your message was not sent because your email address is banned from this channel.
+     */
+    @Unofficial
+    MSG_BANNED_EMAIL_ALIAS,
+
+    /**
      * Your message was not sent because your account is not in good standing in this channel.
      */
     MSG_CHANNEL_BLOCKED,
@@ -369,6 +414,12 @@ public enum NoticeTag {
     MSG_REJECTED_MANDATORY,
 
     /**
+     * A verified phone number is required to chat in this channel. Please visit https://www.twitch.tv/settings/security to verify your phone number.
+     */
+    @Unofficial
+    MSG_REQUIRES_VERIFIED_PHONE_NUMBER,
+
+    /**
      * The room was not found.
      */
     MSG_ROOM_NOT_FOUND,
@@ -417,6 +468,12 @@ public enum NoticeTag {
      * You don’t have permission to perform that action.
      */
     NO_PERMISSION,
+
+    /**
+     * This channel does not have any VIPs.
+     */
+    @Unofficial
+    NO_VIPS,
 
     /**
      * This room is no longer in r9k mode.
@@ -552,6 +609,12 @@ public enum NoticeTag {
      * &lt;user&gt; is no longer timed out in this channel.
      */
     UNTIMEOUT_SUCCESS,
+
+    /**
+     * You have removed &lt;user&gt; as a VIP of this channel.
+     */
+    @Unofficial
+    UNVIP_SUCCESS,
 
     /**
      * Usage: “/ban &lt;username&gt; [reason]” Permanently prevent a user from chatting. Reason is optional and will be shown to the target and other moderators. Use “/unban” to remove a ban.
@@ -693,6 +756,30 @@ public enum NoticeTag {
      * Usage: “/untimeout &lt;username&gt;” Removes a timeout on a user.
      */
     USAGE_UNTIMEOUT,
+
+    /**
+     * Usage: “/vip &lt;username&gt;” Grant VIP status to a user. Use “/vips” to list the moderators of this channel.
+     */
+    @Unofficial
+    USAGE_VIP,
+
+    /**
+     * Usage: “/vips” Lists the VIPs of this channel.
+     */
+    @Unofficial
+    USAGE_VIPS,
+
+    /**
+     * You have added &lt;user&gt; as a VIP of this channel.
+     */
+    @Unofficial
+    VIP_SUCCESS,
+
+    /**
+     * The VIPs of this channel are: &lt;list of users&gt;.
+     */
+    @Unofficial
+    VIPS_SUCCESS,
 
     /**
      * You have been banned from sending whispers.
