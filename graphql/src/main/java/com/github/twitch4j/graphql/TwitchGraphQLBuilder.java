@@ -2,6 +2,7 @@ package com.github.twitch4j.graphql;
 
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Unofficial
 public class TwitchGraphQLBuilder {
 
     /**
@@ -44,7 +46,7 @@ public class TwitchGraphQLBuilder {
     /**
      * Client Secret
      */
-    @With
+    @With(onMethod_ = { @Deprecated })
     private String clientSecret = "**SECRET**";
 
     /**
@@ -55,7 +57,7 @@ public class TwitchGraphQLBuilder {
     /**
      * BaseUrl
      */
-    private String baseUrl = "https://api.twitch.tv/gql";
+    private String baseUrl = "https://gql.twitch.tv/gql";
 
     /**
      * Initialize the builder
@@ -74,7 +76,7 @@ public class TwitchGraphQLBuilder {
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
-        TwitchGraphQL client = new TwitchGraphQL(eventManager, clientId, clientSecret, proxyConfig);
+        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig);
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);

@@ -1,0 +1,31 @@
+query fetchUser($id: ID, $login: String) {
+	user(id: $id, login: $login) {
+		id
+		login
+		displayName
+		description
+		profileImageURL(width: 50)
+		profileViewCount
+		primaryColorHex
+		broadcastSettings {
+			id
+			title
+			game {
+				id
+				displayName
+			}
+		}
+		stream {
+			id
+			previewImageURL
+		}
+		followers {
+			totalCount
+		}
+		roles {
+			isAffiliate
+			isPartner
+			isStaff
+		}
+	}
+}

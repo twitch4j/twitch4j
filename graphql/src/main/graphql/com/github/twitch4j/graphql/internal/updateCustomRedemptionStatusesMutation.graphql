@@ -1,0 +1,7 @@
+mutation updateCommunityPointsCustomRewardRedemptionStatusesByRedemptions($input: UpdateCommunityPointsCustomRewardRedemptionStatusesByRedemptionsInput!) {
+	updateCommunityPointsCustomRewardRedemptionStatusesByRedemptions(input: $input) {
+		error {
+			code
+		}
+	}
+}

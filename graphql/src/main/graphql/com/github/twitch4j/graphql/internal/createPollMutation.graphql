@@ -1,0 +1,73 @@
+mutation createPoll($input: CreatePollInput!) {
+	createPoll(input: $input) {
+		poll {
+			id
+			ownedBy {
+				id
+				latestPoll {
+					id
+					choices {
+						id
+						title
+						tokens {
+							bits
+							communityPoints
+							id
+						}
+					}
+					durationSeconds
+					startedAt
+					endedAt
+					status
+					title
+					ownedBy {
+						id
+					}
+					createdBy {
+						id
+					}
+					tokens {
+						bits
+						communityPoints
+						id
+					}
+					totalVoters
+					votes {
+						total
+						bits
+						communityPoints
+						base
+						id
+					}
+					settings {
+						bitsVotes {
+							cost
+							isEnabled
+						}
+						communityPointsVotes {
+							cost
+							isEnabled
+						}
+						id
+						multichoice {
+							isEnabled
+						}
+					}
+					remainingDurationMilliseconds
+					topBitsContributor {
+						bitsAmount
+						user {
+							id
+						}
+					}
+					topCommunityPointsContributor {
+						communityPointsAmount
+						user {
+							id
+						}
+					}
+				}
+			}
+		}
+	}
+}

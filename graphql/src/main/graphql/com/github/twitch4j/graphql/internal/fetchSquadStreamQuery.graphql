@@ -1,0 +1,14 @@
+query fetchSquadStream($id: ID!) {
+	squadStream(id: $id) {
+		id
+		members {
+			id
+			login
+			subscriptionProducts {
+				id
+				name
+			}
+		}
+		status
+	}
+}

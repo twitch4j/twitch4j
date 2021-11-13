@@ -1,0 +1,58 @@
+query fetchVideoComments($first: Int, $after: Cursor, $last: Int, $Before: Cursor, $id: String, $videoID: String, $channelID: String) {
+	videoComments(first: $first, after: $after, last: $last, Before: $Before, id: $id, videoID: $videoID, channelID: $channelID) {
+		edges {
+			cursor
+			node {
+				commenter {
+					id
+					login
+					displayName
+					description
+					createdAt
+					updatedAt
+					profileImageURL(width: 300)
+				}
+				contentOffsetSeconds
+				createdAt
+				id
+				message {
+					fragments {
+						emote {
+							emoteID
+							from
+							id
+							setID
+							to
+						}
+						mention {
+							id
+							displayName
+							login
+						}
+						text
+					}
+					userBadges {
+						clickURL
+						description
+						id
+						imageURL
+						setID
+						title
+						version
+					}
+					userColor
+				}
+				source
+				state
+				updatedAt
+				video {
+					id
+				}
+			}
+		}
+		pageInfo {
+			hasNextPage
+			hasPreviousPage
+		}
+	}
+}

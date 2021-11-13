@@ -1,0 +1,10 @@
+mutation updateCommunityPointsCustomRewardRedemptionStatus($input: UpdateCommunityPointsCustomRewardRedemptionStatusInput!) {
+	updateCommunityPointsCustomRewardRedemptionStatus(input: $input) {
+		redemption {
+			id
+			input
+			status
+			rewardID
+		}
+	}
+}

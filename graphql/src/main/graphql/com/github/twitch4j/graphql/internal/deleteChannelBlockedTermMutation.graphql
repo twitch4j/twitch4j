@@ -1,0 +1,9 @@
+mutation deleteChannelBlockedTerm($input: DeleteChannelBlockedTermInput!) {
+	deleteChannelBlockedTerm(input: $input) {
+		deletedAt
+		error {
+			code
+		}
+		phrases
+	}
+}

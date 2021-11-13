@@ -1,0 +1,19 @@
+mutation createPredictionEvent($input: CreatePredictionEventInput!) {
+	createPredictionEvent(input: $input) {
+		predictionEvent {
+			channel {
+				id
+			}
+			createdAt
+			id
+			outcomes {
+				color
+				id
+				title
+			}
+			predictionWindowSeconds
+			status
+			title
+		}
+	}
+}

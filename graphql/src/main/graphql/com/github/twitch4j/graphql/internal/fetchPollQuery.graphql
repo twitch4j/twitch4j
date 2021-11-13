@@ -1,0 +1,26 @@
+query fetchPoll($id: ID!) {
+	poll(id: $id) {
+		id
+		status
+		title
+		ownedBy {
+			id
+			login
+			displayName
+		}
+		durationSeconds
+		endedAt
+		startedAt
+		totalVoters
+		choices {
+			id
+			title
+			votes {
+				id
+				base
+				bits
+				total
+			}
+		}
+	}
+}

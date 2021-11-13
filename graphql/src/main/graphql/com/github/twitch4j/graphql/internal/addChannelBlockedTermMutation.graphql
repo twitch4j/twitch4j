@@ -1,0 +1,7 @@
+mutation addChannelBlockedTerm($input: AddChannelBlockedTermInput!) {
+	addChannelBlockedTerm(input: $input) {
+		addedAt
+		error
+		phrases
+	}
+}
