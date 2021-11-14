@@ -1,5 +1,5 @@
 query fetchUser($id: ID, $login: String) {
-	user(id: $id, login: $login) {
+	user(id: $id, login: $login, lookupType: ALL) {
 		id
 		login
 		displayName

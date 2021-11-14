@@ -192,6 +192,10 @@ public class TwitchGraphQL {
         return new CommandCreateModComment(getApolloClient(auth), channelId, targetId, text);
     }
 
+    public CommandFetchModComments fetchModComments(OAuth2Credential auth, String channelId, String targetId, String after) {
+        return new CommandFetchModComments(getApolloClient(auth), channelId, targetId, after);
+    }
+
     public CommandArchivePoll archivePoll(OAuth2Credential auth, String pollId) {
         return new CommandArchivePoll(getApolloClient(auth), pollId);
     }
