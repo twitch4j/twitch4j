@@ -9,6 +9,7 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
@@ -133,8 +134,11 @@ public class TwitchClientBuilder {
 
     /**
      * Enabled: GraphQL
+     * <p>
+     * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
      */
     @With
+    @Unofficial
     private Boolean enableGraphQL = false;
 
     /**
@@ -289,7 +293,7 @@ public class TwitchClientBuilder {
             log.warn("Twitch4J requires a scheduledThreadPoolExecutor with at least {} threads to be fully functional! Some features may not work as expected.", poolSize);
         }
         if (scheduledThreadPoolExecutor == null) {
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-"+ RandomStringUtils.random(4, true, true), poolSize);
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), poolSize);
         }
 
         // Module: Extensions

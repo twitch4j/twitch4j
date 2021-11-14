@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Twitch GraphQL Builder
+ * <p>
+ * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -87,7 +89,7 @@ public class TwitchGraphQLBuilder {
      */
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
-        log.warn("GraphQL: GraphQL is a experimental module, please take care as some features might break unannounced.");
+        log.warn("GraphQL: GraphQL is a experimental module not intended for third-party use, please take care as some features might break unannounced.");
         TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig, enableBatching, timeout);
 
         // Initialize/Check EventManager

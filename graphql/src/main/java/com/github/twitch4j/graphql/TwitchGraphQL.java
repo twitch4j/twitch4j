@@ -21,6 +21,9 @@ import okhttp3.Request;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
+ */
 @Slf4j
 @Unofficial
 @SuppressWarnings("unused")

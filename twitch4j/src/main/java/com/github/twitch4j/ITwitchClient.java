@@ -65,9 +65,10 @@ public interface ITwitchClient extends AutoCloseable {
      */
     ITwitchPubSub getPubSub();
 
-
     /**
      * Get GraphQL
+     * <p>
+     * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
      *
      * @return TwitchGraphQL
      */
