@@ -26,7 +26,7 @@ public abstract class BaseCommand<T extends Operation.Data> extends HystrixComma
     /**
      * Holds the result
      */
-    private T resultData;
+    private volatile T resultData;
 
     /**
      * Constructor
