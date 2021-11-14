@@ -1,0 +1,23 @@
+mutation banUserFromChatRoom($input: BanUserFromChatRoomInput!) {
+	banUserFromChatRoom(input: $input) {
+		ban {
+			bannedUser {
+				id
+				login
+				displayName
+			}
+			createdAt
+			expiresAt
+			isPermanent
+			moderator {
+				id
+				login
+				displayName
+			}
+			reason
+		}
+		error {
+			code
+		}
+	}
+}

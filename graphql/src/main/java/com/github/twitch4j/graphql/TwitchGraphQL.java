@@ -255,6 +255,10 @@ public class TwitchGraphQL {
         return new CommandDenyUnbanRequest(getApolloClient(auth), id, message);
     }
 
+    public CommandBanUser banUser(OAuth2Credential auth, String channelId, String targetUserLogin, String reason) {
+        return new CommandBanUser(getApolloClient(auth), channelId, targetUserLogin, reason);
+    }
+
     public CommandFetchUser fetchUser(OAuth2Credential auth, String userId, String userLogin) {
         return new CommandFetchUser(getApolloClient(auth), userId, userLogin);
     }
