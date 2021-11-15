@@ -2,9 +2,7 @@ package com.github.twitch4j.graphql.command;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
-import com.github.twitch4j.graphql.internal.CreateModeratorCommentMutation;
 import com.github.twitch4j.graphql.internal.FetchModCommentsQuery;
-import com.github.twitch4j.graphql.internal.type.CreateModeratorCommentInput;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 

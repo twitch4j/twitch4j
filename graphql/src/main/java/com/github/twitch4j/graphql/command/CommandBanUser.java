@@ -3,9 +3,7 @@ package com.github.twitch4j.graphql.command;
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.github.twitch4j.graphql.internal.BanUserFromChatRoomMutation;
-import com.github.twitch4j.graphql.internal.UpdateCommunityPointsCommunityGoalMutation;
 import com.github.twitch4j.graphql.internal.type.BanUserFromChatRoomInput;
-import com.github.twitch4j.graphql.internal.type.UpdateCommunityPointsCommunityGoalInput;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 

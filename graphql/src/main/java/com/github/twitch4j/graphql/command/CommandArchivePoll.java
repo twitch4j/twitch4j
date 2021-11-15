@@ -3,9 +3,7 @@ package com.github.twitch4j.graphql.command;
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.github.twitch4j.graphql.internal.ArchivePollMutation;
-import com.github.twitch4j.graphql.internal.TerminatePollMutation;
 import com.github.twitch4j.graphql.internal.type.ArchivePollInput;
-import com.github.twitch4j.graphql.internal.type.TerminatePollInput;
 import lombok.NonNull;
 
 public class CommandArchivePoll extends BaseCommand<ArchivePollMutation.Data> {

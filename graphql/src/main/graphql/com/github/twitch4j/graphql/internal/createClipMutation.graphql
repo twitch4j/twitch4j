@@ -1,0 +1,11 @@
+mutation createClip($input: CreateClipInput!) {
+	createClip(input: $input) {
+		clip {
+			id
+			url
+		}
+		error {
+			code
+		}
+	}
+}
