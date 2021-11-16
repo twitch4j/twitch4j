@@ -50,6 +50,11 @@ public class TwitchGraphQL {
     private final String clientId;
 
     /**
+     * Default Token
+     */
+    private final OAuth2Credential defaultToken;
+
+    /**
      * Proxy Configuration
      */
     private final ProxyConfig proxyConfig;
@@ -76,15 +81,17 @@ public class TwitchGraphQL {
      * @param userAgent       User Agent
      * @param eventManager    Event Manager
      * @param clientId        Client Id
+     * @param defaultToken    Default Token
      * @param proxyConfig     Proxy Config
      * @param batchingEnabled Query Batching
      * @param timeout         Query Timeout
      */
-    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout) {
+    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, OAuth2Credential defaultToken, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout) {
         this.baseUrl = baseUrl;
         this.userAgent = userAgent;
         this.eventManager = eventManager;
         this.clientId = clientId;
+        this.defaultToken = defaultToken;
         this.proxyConfig = proxyConfig;
         this.batchingEnabled = batchingEnabled;
         this.timeout = timeout;
@@ -98,6 +105,7 @@ public class TwitchGraphQL {
      * @return ApolloClient
      */
     private ApolloClient getApolloClient(OAuth2Credential credential) {
+        if (credential == null) credential = defaultToken;
         final String accessToken = credential != null && credential.getAccessToken() != null ? credential.getAccessToken() : "";
         return clientsByCredential.get(accessToken, s -> {
             // Http Client

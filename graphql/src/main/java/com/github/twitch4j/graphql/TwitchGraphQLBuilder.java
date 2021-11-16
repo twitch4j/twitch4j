@@ -1,5 +1,6 @@
 package com.github.twitch4j.graphql;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -52,6 +53,12 @@ public class TwitchGraphQLBuilder {
     private String clientSecret = "**SECRET**";
 
     /**
+     * Default First-Party OAuth Token
+     */
+    @With
+    private OAuth2Credential defaultFirstPartyToken = null;
+
+    /**
      * Whether GraphQL Queries should be batched
      */
     @With
@@ -90,7 +97,7 @@ public class TwitchGraphQLBuilder {
     public TwitchGraphQL build() {
         log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module not intended for third-party use, please take care as some features might break unannounced.");
-        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, proxyConfig, enableBatching, timeout);
+        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, defaultFirstPartyToken, proxyConfig, enableBatching, timeout);
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);

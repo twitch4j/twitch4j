@@ -204,10 +204,16 @@ public class TwitchClientBuilder {
     private long helperThreadDelay = 10000L;
 
     /**
-     * Default Auth Token for API Requests
+     * Default Auth Token for Helix API Requests
      */
     @With
     private OAuth2Credential defaultAuthToken = null;
+
+    /**
+     * Default First-Party OAuth Token for GraphQL calls
+     */
+    @With
+    private OAuth2Credential defaultFirstPartyToken = null;
 
     /**
      * Proxy Configuration
@@ -388,6 +394,7 @@ public class TwitchClientBuilder {
         if (this.enableGraphQL) {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
+                .withDefaultFirstPartyToken(defaultFirstPartyToken)
                 .withProxyConfig(proxyConfig)
                 .withTimeout(timeout)
                 .build();
