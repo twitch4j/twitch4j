@@ -1,5 +1,8 @@
 mutation createPoll($input: CreatePollInput!) {
 	createPoll(input: $input) {
+		error {
+			code
+		}
 		poll {
 			id
 			choices {

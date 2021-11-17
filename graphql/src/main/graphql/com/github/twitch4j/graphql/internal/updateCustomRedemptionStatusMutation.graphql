@@ -1,5 +1,8 @@
 mutation updateCommunityPointsCustomRewardRedemptionStatus($input: UpdateCommunityPointsCustomRewardRedemptionStatusInput!) {
 	updateCommunityPointsCustomRewardRedemptionStatus(input: $input) {
+		error {
+			code
+		}
 		redemption {
 			id
 			input

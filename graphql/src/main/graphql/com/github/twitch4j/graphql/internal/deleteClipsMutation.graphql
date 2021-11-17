@@ -4,5 +4,6 @@ mutation deleteClips($deleteClipsInput: DeleteClipsInput!) {
 			id
 			slug
 		}
+		count
 	}
 }

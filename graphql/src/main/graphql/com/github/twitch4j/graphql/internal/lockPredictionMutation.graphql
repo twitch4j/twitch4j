@@ -1,5 +1,8 @@
 mutation lockPredictionEvent($input: LockPredictionEventInput!) {
 	lockPredictionEvent(input: $input) {
+		error {
+			code
+		}
 		predictionEvent {
 			channel {
 				id

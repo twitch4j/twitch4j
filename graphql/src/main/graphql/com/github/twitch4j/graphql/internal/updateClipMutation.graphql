@@ -4,5 +4,8 @@ mutation updateClip($updateClipInput: UpdateClipInput!) {
 			id
 			title
 		}
+		error {
+			message
+		}
 	}
 }
