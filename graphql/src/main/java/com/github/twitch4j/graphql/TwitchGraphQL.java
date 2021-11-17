@@ -275,6 +275,10 @@ public class TwitchGraphQL {
         return new CommandFetchUser(getApolloClient(auth), userId, userLogin);
     }
 
+    public CommandFetchUserEmoteSets fetchUserEmoteSets(OAuth2Credential auth, String userId) {
+        return new CommandFetchUserEmoteSets(getApolloClient(auth), userId);
+    }
+
     public CommandFetchVideoComments fetchVideoComments(OAuth2Credential auth, String channelId, String videoId, String id, String after, String before, Integer first, Integer last) {
         return new CommandFetchVideoComments(getApolloClient(auth), channelId, videoId, id, after, before, first, last);
     }
