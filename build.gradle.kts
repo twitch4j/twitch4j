@@ -87,6 +87,14 @@ subprojects {
 
 			// Hystrix
 			api(group = "com.netflix.hystrix", name = "hystrix-core", version = "1.5.18")
+
+			// rich version declarations
+			add("api", "com.fasterxml.jackson.core:jackson-databind") {
+				version {
+					require("2.12.0")
+					prefer("2.13.0")
+				}
+			}
 		}
 
 		// Apache Commons
