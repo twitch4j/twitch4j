@@ -17,13 +17,6 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
-
-	tasks {
-		// disable 'lombok.config' generation
-		withType<io.freefair.gradle.plugins.lombok.tasks.GenerateLombokConfig> {
-			enabled = false
-		}
-	}
 }
 
 // Subprojects
@@ -41,6 +34,7 @@ subprojects {
 
 	lombok {
 		version.set("1.18.20")
+		disableConfig.set(true)
 	}
 
 	// Source Compatibility
