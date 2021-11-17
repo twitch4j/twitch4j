@@ -1,0 +1,12 @@
+mutation bulkDenyUnbanRequest($input: BulkDenyUnbanRequestInput!) {
+	bulkDenyUnbanRequest(input: $input) {
+		error {
+			code
+		}
+		unbanRequests {
+			id
+			status
+			resolvedAt
+		}
+	}
+}

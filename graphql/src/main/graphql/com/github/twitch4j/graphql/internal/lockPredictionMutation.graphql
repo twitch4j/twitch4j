@@ -1,0 +1,39 @@
+mutation lockPredictionEvent($input: LockPredictionEventInput!) {
+	lockPredictionEvent(input: $input) {
+		error {
+			code
+		}
+		predictionEvent {
+			channel {
+				id
+			}
+			createdAt
+			id
+			lockedAt
+			outcomes {
+				color
+				id
+				title
+				topPredictors {
+					id
+					points
+					predictedAt
+					updatedAt
+					user {
+						id
+						displayName
+						login
+					}
+				}
+				totalPoints
+				totalUsers
+			}
+			predictionWindowSeconds
+			status
+			title
+			winningOutcome {
+				id
+			}
+		}
+	}
+}

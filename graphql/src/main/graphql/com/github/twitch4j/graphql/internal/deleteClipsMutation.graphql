@@ -1,0 +1,9 @@
+mutation deleteClips($deleteClipsInput: DeleteClipsInput!) {
+	deleteClips(input: $deleteClipsInput) {
+		clips {
+			id
+			slug
+		}
+		count
+	}
+}

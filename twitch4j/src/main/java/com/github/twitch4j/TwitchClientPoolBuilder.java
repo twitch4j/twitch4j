@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.TwitchChatConnectionPool;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
@@ -156,8 +157,11 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Enabled: GraphQL
+     * <p>
+     * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
      */
     @With
+    @Unofficial
     private Boolean enableGraphQL = false;
 
     /**
@@ -448,9 +452,8 @@ public class TwitchClientPoolBuilder {
         if (this.enableGraphQL) {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
-                .withClientId(clientId)
-                .withClientSecret(clientSecret)
                 .withProxyConfig(proxyConfig)
+                .withTimeout(timeout)
                 .build();
         }
 

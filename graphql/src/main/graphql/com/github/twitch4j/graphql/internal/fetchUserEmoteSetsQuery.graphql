@@ -1,0 +1,22 @@
+query fetchUserEmoteSets($id: ID) {
+	user(id: $id) {
+		emoteSets {
+			emotes {
+				id
+				modifiers {
+					code
+				}
+				setID
+				token
+				type
+			}
+			id
+			owner {
+				id
+				login
+				displayName
+				profileImageURL(width: 50)
+			}
+		}
+	}
+}

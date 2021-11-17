@@ -1,0 +1,35 @@
+query fetchPrediction($id: ID!) {
+	predictionEvent(id: $id) {
+		channel {
+			id
+		}
+		createdAt
+		endedAt
+		id
+		lockedAt
+		outcomes {
+			color
+			id
+			title
+			topPredictors {
+				id
+				points
+				predictedAt
+				updatedAt
+				user {
+					id
+					displayName
+					login
+				}
+			}
+			totalPoints
+			totalUsers
+		}
+		predictionWindowSeconds
+		status
+		title
+		winningOutcome {
+			id
+		}
+	}
+}

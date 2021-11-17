@@ -192,11 +192,6 @@ public class TwitchClientPool implements ITwitchClient {
         return this.pubsub;
     }
 
-    /**
-     * Get GraphQL
-     *
-     * @return TwitchGraphQL
-     */
     @Unofficial
     public TwitchGraphQL getGraphQL() {
         if (this.graphql == null) {

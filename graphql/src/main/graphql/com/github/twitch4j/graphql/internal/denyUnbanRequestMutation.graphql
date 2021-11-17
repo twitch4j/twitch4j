@@ -1,0 +1,12 @@
+mutation denyUnbanRequest($input: DenyUnbanRequestInput!) {
+	denyUnbanRequest(input: $input) {
+		error {
+			code
+		}
+		unbanRequest {
+			id
+			status
+			resolvedAt
+		}
+	}
+}

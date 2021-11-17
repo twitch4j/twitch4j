@@ -1,0 +1,33 @@
+mutation createCommunityPointsCommunityGoal($input: CreateCommunityPointsCommunityGoalInput!) {
+	createCommunityPointsCommunityGoal(input: $input) {
+		error {
+			code
+		}
+		goal {
+			amountNeeded
+			backgroundColor
+			defaultImage {
+				url
+				url2x
+				url4x
+			}
+			description
+			durationDays
+			endedAt
+			id
+			image {
+				url
+				url2x
+				url4x
+			}
+			isInStock
+			perStreamUserMaximumContribution
+			pointsContributed
+			smallContribution
+			startedAt
+			status
+			title
+			type
+		}
+	}
+}

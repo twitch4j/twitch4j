@@ -10,6 +10,7 @@ import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
@@ -134,8 +135,11 @@ public class TwitchClientBuilder {
 
     /**
      * Enabled: GraphQL
+     * <p>
+     * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
      */
     @With
+    @Unofficial
     private Boolean enableGraphQL = false;
 
     /**
@@ -213,10 +217,16 @@ public class TwitchClientBuilder {
     private long helperThreadDelay = 10000L;
 
     /**
-     * Default Auth Token for API Requests
+     * Default Auth Token for Helix API Requests
      */
     @With
     private OAuth2Credential defaultAuthToken = null;
+
+    /**
+     * Default First-Party OAuth Token for GraphQL calls
+     */
+    @With
+    private OAuth2Credential defaultFirstPartyToken = null;
 
     /**
      * Proxy Configuration
@@ -302,7 +312,7 @@ public class TwitchClientBuilder {
             log.warn("Twitch4J requires a scheduledThreadPoolExecutor with at least {} threads to be fully functional! Some features may not work as expected.", poolSize);
         }
         if (scheduledThreadPoolExecutor == null) {
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-"+ RandomStringUtils.random(4, true, true), poolSize);
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), poolSize);
         }
 
         // Module: Extensions
@@ -399,9 +409,9 @@ public class TwitchClientBuilder {
         if (this.enableGraphQL) {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
-                .withClientId(clientId)
-                .withClientSecret(clientSecret)
+                .withDefaultFirstPartyToken(defaultFirstPartyToken)
                 .withProxyConfig(proxyConfig)
+                .withTimeout(timeout)
                 .build();
         }
 

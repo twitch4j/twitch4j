@@ -1,0 +1,14 @@
+mutation cancelPredictionEvent($input: CancelPredictionEventInput!) {
+	cancelPredictionEvent(input: $input) {
+		error {
+			code
+		}
+		predictionEvent {
+			channel {
+				id
+			}
+			id
+			status
+		}
+	}
+}

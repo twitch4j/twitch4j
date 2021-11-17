@@ -1,0 +1,18 @@
+mutation createPoll($input: CreatePollInput!) {
+	createPoll(input: $input) {
+		error {
+			code
+		}
+		poll {
+			id
+			choices {
+				id
+				title
+			}
+			startedAt
+			status
+			title
+			remainingDurationMilliseconds
+		}
+	}
+}

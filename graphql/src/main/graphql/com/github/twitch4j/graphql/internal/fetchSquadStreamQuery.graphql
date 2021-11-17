@@ -1,0 +1,15 @@
+query fetchSquadStream($id: ID!) {
+	squadStream(id: $id) {
+		id
+		members {
+			id
+			login
+			displayName
+			profileImageURL(width: 150)
+		}
+		owner {
+			id
+		}
+		status
+	}
+}
