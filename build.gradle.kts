@@ -40,7 +40,7 @@ subprojects {
 	}
 
 	lombok {
-		version.set("1.18.20")
+		version.set("1.18.22")
 	}
 
 	// Source Compatibility
