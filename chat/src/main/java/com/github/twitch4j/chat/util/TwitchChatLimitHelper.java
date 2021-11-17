@@ -41,6 +41,8 @@ public class TwitchChatLimitHelper {
 
     /**
      * Users (not bots)
+     * <p>
+     * Note: this does <i>not</i> implement the target user count restriction.
      */
     public final List<Bandwidth> USER_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(
@@ -51,6 +53,8 @@ public class TwitchChatLimitHelper {
 
     /**
      * Known bots
+     * <p>
+     * Note: this does <i>not</i> implement the target user count restriction.
      */
     public final List<Bandwidth> KNOWN_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(
@@ -61,6 +65,10 @@ public class TwitchChatLimitHelper {
 
     /**
      * Verified bots
+     * <p>
+     * Note: this does <i>not</i> implement the target user count restriction.
+     * <p>
+     * Note: this only applies to legacy verified bots (pre July 2021)
      */
     public final List<Bandwidth> VERIFIED_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(

@@ -1,11 +1,14 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
+import io.github.bucket4j.Bandwidth;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -63,6 +66,24 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Builder.Default
     protected final boolean automaticallyPartOnBan = false;
+
+    /**
+     * Custom RateLimit for ChatMessages
+     */
+    @Builder.Default
+    protected Bandwidth chatRateLimit = TwitchChatLimitHelper.USER_MESSAGE_LIMIT;
+
+    /**
+     * Custom RateLimit for Whispers
+     */
+    @Builder.Default
+    protected Bandwidth[] whisperRateLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
+
+    /**
+     * Custom RateLimit for JOIN/PART
+     */
+    @Builder.Default
+    protected Bandwidth joinRateLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
 
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
@@ -221,12 +242,15 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withEventManager(getConnectionEventManager())
                 .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
+                .withChatRateLimit(chatRateLimit)
+                .withWhisperRateLimit(whisperRateLimit)
+                .withJoinRateLimit(joinRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
 
         // Reclaim channel headroom upon a ban
-        chat.getEventManager().onEvent("twitch4j-chat-pool-ban-tracker", ChannelNoticeEvent.class, e -> {
-            if (automaticallyPartOnBan && "msg_banned".equals(e.getMsgId())) {
+        chat.getEventManager().onEvent(threadPrefix + "ban-tracker", ChannelNoticeEvent.class, e -> {
+            if (automaticallyPartOnBan && NoticeTag.MSG_BANNED.toString().equals(e.getMsgId())) {
                 unsubscribe(e.getChannel().getName());
             }
         });

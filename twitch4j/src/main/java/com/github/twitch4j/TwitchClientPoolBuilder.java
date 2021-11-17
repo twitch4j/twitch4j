@@ -11,6 +11,7 @@ import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.TwitchChatConnectionPool;
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
@@ -42,9 +43,10 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.time.Duration;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -190,7 +192,19 @@ public class TwitchClientPoolBuilder {
      * Custom RateLimit for ChatMessages
      */
     @With
-    protected Bandwidth chatRateLimit = Bandwidth.simple(20, Duration.ofSeconds(30));
+    protected Bandwidth chatRateLimit = TwitchChatLimitHelper.USER_MESSAGE_LIMIT;
+
+    /**
+     * Custom RateLimit for Whispers
+     */
+    @With
+    protected Bandwidth[] chatWhisperLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
+
+    /**
+     * Custom RateLimit for JOIN/PART
+     */
+    @With
+    protected Bandwidth chatJoinLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
 
     /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
@@ -382,13 +396,15 @@ public class TwitchClientPoolBuilder {
             chat = TwitchChatConnectionPool.builder()
                 .eventManager(eventManager)
                 .chatAccount(() -> chatAccount)
+                .chatRateLimit(chatRateLimit)
+                .whisperRateLimit(chatWhisperLimit)
+                .joinRateLimit(chatJoinLimit)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
                 .advancedConfiguration(builder ->
                     builder.withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
-                        .withChatRateLimit(chatRateLimit)
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withCommandTriggers(commandPrefixes)
@@ -402,6 +418,8 @@ public class TwitchClientPoolBuilder {
                 .withChatAccount(chatAccount)
                 .withChatQueueSize(chatQueueSize)
                 .withChatRateLimit(chatRateLimit)
+                .withWhisperRateLimit(chatWhisperLimit)
+                .withJoinRateLimit(chatJoinLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)

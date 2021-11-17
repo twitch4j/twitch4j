@@ -1,12 +1,12 @@
 // Plugins
 plugins {
-	id("com.apollographql.apollo") version "2.5.10"
+	id("com.apollographql.apollo") version "2.5.11"
 }
 
 // Dependencies
 dependencies {
 	// GraphQL
-	api(group = "com.apollographql.apollo", name = "apollo-runtime", version = "2.5.10")
+	api(group = "com.apollographql.apollo", name = "apollo-runtime", version = "2.5.11")
 	api(group = "org.jetbrains", name = "annotations")
 
 	// Hystrix
