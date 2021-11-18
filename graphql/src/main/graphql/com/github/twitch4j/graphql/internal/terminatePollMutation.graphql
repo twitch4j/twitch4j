@@ -1,0 +1,8 @@
+mutation terminatePoll($input: TerminatePollInput!) {
+	terminatePoll(input: $input) {
+		poll {
+			id
+			status
+		}
+	}
+}

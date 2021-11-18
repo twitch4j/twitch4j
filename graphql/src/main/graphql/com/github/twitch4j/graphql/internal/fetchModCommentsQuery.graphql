@@ -1,0 +1,31 @@
+query fetchModComments($channelID: ID!, $targetID: ID!, $after: Cursor) {
+	user(id: $channelID) {
+		modLogs {
+			comments(targetID: $targetID, after: $after) {
+				edges {
+					node {
+						author {
+							id
+							login
+							displayName
+						}
+						channel {
+							id
+						}
+						details {
+							text
+						}
+						id
+						target {
+							id
+							login
+							displayName
+						}
+						timestamp
+					}
+					cursor
+				}
+			}
+		}
+	}
+}

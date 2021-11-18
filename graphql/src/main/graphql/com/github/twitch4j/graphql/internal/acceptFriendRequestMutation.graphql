@@ -1,0 +1,7 @@
+mutation acceptFriendRequest($input: AcceptFriendRequestInput!) {
+	acceptFriendRequest(input: $input) {
+		user {
+			id
+		}
+	}
+}

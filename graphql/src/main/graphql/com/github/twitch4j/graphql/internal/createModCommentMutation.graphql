@@ -1,0 +1,20 @@
+mutation createModeratorComment($createModeratorCommentInput: CreateModeratorCommentInput!) {
+	createModeratorComment(input: $createModeratorCommentInput) {
+		comment {
+			id
+			timestamp
+			channel {
+				id
+			}
+			author {
+				id
+				login
+				displayName
+				chatColor
+			}
+			details {
+				text
+			}
+		}
+	}
+}

@@ -1,0 +1,11 @@
+mutation updateClip($updateClipInput: UpdateClipInput!) {
+	updateClip(input: $updateClipInput) {
+		clip {
+			id
+			title
+		}
+		error {
+			message
+		}
+	}
+}

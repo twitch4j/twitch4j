@@ -1,0 +1,12 @@
+mutation bulkApproveUnbanRequest($input: BulkApproveUnbanRequestInput!) {
+	bulkApproveUnbanRequest(input: $input) {
+		error {
+			code
+		}
+		unbanRequests {
+			id
+			status
+			resolvedAt
+		}
+	}
+}

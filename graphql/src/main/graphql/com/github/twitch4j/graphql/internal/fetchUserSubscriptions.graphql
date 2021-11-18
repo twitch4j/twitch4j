@@ -1,0 +1,43 @@
+query fetchUserSubscriptions($id: ID!, $first: Int = 75, $after: Cursor) {
+	user(id: $id) {
+		subscriptionBenefits(first: $first, after: $after, criteria: {filter: ALL}) {
+			edges {
+				cursor
+				node {
+					endsAt
+					gift {
+						giftDate
+						gifter {
+							id
+							login
+							displayName
+							profileImageURL(width: 50)
+						}
+						isGift
+					}
+					id
+					product {
+						displayName
+						id
+						name
+						emoteGroups(state: ACTIVE) {
+							id
+						}
+					}
+					purchasedWithPrime
+					renewsAt
+					tier
+					user {
+						id
+						login
+						displayName
+						profileImageURL(width: 50)
+					}
+				}
+			}
+			pageInfo {
+				hasNextPage
+			}
+		}
+	}
+}

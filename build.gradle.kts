@@ -3,7 +3,7 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "5.3.3.3"
+	id("io.freefair.lombok") version "6.3.0"
 	id("com.coditory.manifest") version "0.1.14"
 	id("com.github.johnrengelman.shadow") version "7.1.0"
 }
@@ -16,13 +16,6 @@ allprojects {
 	// Repositories
 	repositories {
 		mavenCentral()
-	}
-
-	tasks {
-		// disable 'lombok.config' generation
-		withType<io.freefair.gradle.plugins.lombok.tasks.GenerateLombokConfig> {
-			enabled = false
-		}
 	}
 }
 
@@ -41,6 +34,7 @@ subprojects {
 
 	lombok {
 		version.set("1.18.22")
+		disableConfig.set(true)
 	}
 
 	// Source Compatibility
@@ -102,7 +96,7 @@ subprojects {
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.8.1"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.6")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.7")
 	}
 
 	publishing {
