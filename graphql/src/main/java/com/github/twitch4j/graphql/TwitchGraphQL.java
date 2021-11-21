@@ -243,6 +243,10 @@ public class TwitchGraphQL {
         return new CommandFetchActivePredictions(getApolloClient(auth), channelId);
     }
 
+    public CommandFetchLockedPredictions fetchLockedPredictions(OAuth2Credential auth, String channelId) {
+        return new CommandFetchLockedPredictions(getApolloClient(auth), channelId);
+    }
+
     public CommandFetchPrediction fetchPrediction(OAuth2Credential auth, String predictionEventId) {
         return new CommandFetchPrediction(getApolloClient(auth), predictionEventId);
     }

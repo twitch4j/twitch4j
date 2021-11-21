@@ -1,0 +1,44 @@
+query fetchLockedPredictions($channelId: ID!) {
+	channel(id: $channelId) {
+		lockedPredictionEvents {
+			createdAt
+			createdBy {
+				... on User {
+					id
+					displayName
+					login
+				}
+			}
+			id
+			lockedAt
+			lockedBy {
+				... on User {
+					id
+					displayName
+					login
+				}
+			}
+			outcomes {
+				color
+				id
+				title
+				topPredictors {
+					id
+					points
+					predictedAt
+					updatedAt
+					user {
+						id
+						displayName
+						login
+					}
+				}
+				totalPoints
+				totalUsers
+			}
+			predictionWindowSeconds
+			status
+			title
+		}
+	}
+}
