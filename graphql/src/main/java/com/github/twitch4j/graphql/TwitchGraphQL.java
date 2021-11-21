@@ -159,6 +159,10 @@ public class TwitchGraphQL {
         return new CommandDeleteChannelPermittedTerm(getApolloClient(auth), channelId, phrases);
     }
 
+    public CommandFetchChatters fetchChatters(OAuth2Credential auth, String channelLogin) {
+        return new CommandFetchChatters(getApolloClient(auth), channelLogin);
+    }
+
     public CommandCreateClip createClip(OAuth2Credential auth, String channelId, Double offsetSeconds, String broadcastId, String videoId) {
         return new CommandCreateClip(getApolloClient(auth), channelId, offsetSeconds, broadcastId, videoId);
     }
