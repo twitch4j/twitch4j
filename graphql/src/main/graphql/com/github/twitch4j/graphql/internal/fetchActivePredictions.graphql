@@ -1,0 +1,36 @@
+query fetchActivePredictions($channelId: ID!) {
+	channel(id: $channelId) {
+		activePredictionEvents {
+			createdAt
+			createdBy {
+				... on User {
+					id
+					displayName
+					login
+				}
+			}
+			id
+			outcomes {
+				color
+				id
+				title
+				topPredictors {
+					id
+					points
+					predictedAt
+					updatedAt
+					user {
+						id
+						displayName
+						login
+					}
+				}
+				totalPoints
+				totalUsers
+			}
+			predictionWindowSeconds
+			status
+			title
+		}
+	}
+}
