@@ -143,6 +143,10 @@ public class TwitchGraphQL {
         });
     }
 
+    public CommandFetchBanStatus fetchBanStatus(OAuth2Credential auth, String channelId, String userId) {
+        return new CommandFetchBanStatus(getApolloClient(auth), channelId, userId);
+    }
+
     public CommandAddChannelBlockedTerm addChannelBlockedTerm(OAuth2Credential auth, String channelId, Boolean isModEditable, List<String> phrases) {
         return new CommandAddChannelBlockedTerm(getApolloClient(auth), channelId, isModEditable, phrases);
     }
