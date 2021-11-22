@@ -159,6 +159,10 @@ public class TwitchGraphQL {
         return new CommandDeleteChannelPermittedTerm(getApolloClient(auth), channelId, phrases);
     }
 
+    public CommandFetchChatHistory fetchChatHistory(OAuth2Credential auth, String channelId, String userId, String after) {
+        return new CommandFetchChatHistory(getApolloClient(auth), channelId, userId, after);
+    }
+
     public CommandFetchChatters fetchChatters(OAuth2Credential auth, String channelLogin) {
         return new CommandFetchChatters(getApolloClient(auth), channelLogin);
     }
