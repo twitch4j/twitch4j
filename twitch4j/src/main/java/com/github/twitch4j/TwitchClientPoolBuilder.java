@@ -245,6 +245,12 @@ public class TwitchClientPoolBuilder {
     private OAuth2Credential defaultAuthToken = null;
 
     /**
+     * Default First-Party OAuth Token for GraphQL calls
+     */
+    @With
+    private OAuth2Credential defaultFirstPartyToken = null;
+
+    /**
      * Proxy Configuration
      */
     @With
@@ -452,6 +458,7 @@ public class TwitchClientPoolBuilder {
         if (this.enableGraphQL) {
             graphql = TwitchGraphQLBuilder.builder()
                 .withEventManager(eventManager)
+                .withDefaultFirstPartyToken(defaultFirstPartyToken)
                 .withProxyConfig(proxyConfig)
                 .withTimeout(timeout)
                 .build();
