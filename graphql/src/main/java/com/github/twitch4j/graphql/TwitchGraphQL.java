@@ -143,6 +143,10 @@ public class TwitchGraphQL {
         });
     }
 
+    public CommandFetchBanStatus fetchBanStatus(OAuth2Credential auth, String channelId, String userId) {
+        return new CommandFetchBanStatus(getApolloClient(auth), channelId, userId);
+    }
+
     public CommandAddChannelBlockedTerm addChannelBlockedTerm(OAuth2Credential auth, String channelId, Boolean isModEditable, List<String> phrases) {
         return new CommandAddChannelBlockedTerm(getApolloClient(auth), channelId, isModEditable, phrases);
     }
@@ -157,6 +161,14 @@ public class TwitchGraphQL {
 
     public CommandDeleteChannelPermittedTerm deleteChannelPermittedTerm(OAuth2Credential auth, String channelId, List<String> phrases) {
         return new CommandDeleteChannelPermittedTerm(getApolloClient(auth), channelId, phrases);
+    }
+
+    public CommandFetchChatHistory fetchChatHistory(OAuth2Credential auth, String channelId, String userId, String after) {
+        return new CommandFetchChatHistory(getApolloClient(auth), channelId, userId, after);
+    }
+
+    public CommandFetchChatters fetchChatters(OAuth2Credential auth, String channelLogin) {
+        return new CommandFetchChatters(getApolloClient(auth), channelLogin);
     }
 
     public CommandCreateClip createClip(OAuth2Credential auth, String channelId, Double offsetSeconds, String broadcastId, String videoId) {
@@ -233,6 +245,14 @@ public class TwitchGraphQL {
 
     public CommandCreatePrediction createPrediction(OAuth2Credential auth, CreatePredictionEventInput input) {
         return new CommandCreatePrediction(getApolloClient(auth), input);
+    }
+
+    public CommandFetchActivePredictions fetchActivePredictions(OAuth2Credential auth, String channelId) {
+        return new CommandFetchActivePredictions(getApolloClient(auth), channelId);
+    }
+
+    public CommandFetchLockedPredictions fetchLockedPredictions(OAuth2Credential auth, String channelId) {
+        return new CommandFetchLockedPredictions(getApolloClient(auth), channelId);
     }
 
     public CommandFetchPrediction fetchPrediction(OAuth2Credential auth, String predictionEventId) {

@@ -1,7 +1,9 @@
 package com.github.twitch4j.graphql;
 
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.TwitchTestUtils;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.graphql.internal.FollowMutation;
 import com.github.twitch4j.graphql.internal.UnfollowMutation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ public class TwitchGraphQLTest {
     @BeforeAll
     public static void buildTwitch4J() {
         // external event manager (for shared module usage - streamlabs4j)
-        EventManager eventManager = new EventManager();
+        EventManager eventManager = EventManagerUtils.initializeEventManager(SimpleEventHandler.class);
 
         // construct twitchClient
         graphQLClient = TwitchGraphQLBuilder.builder()

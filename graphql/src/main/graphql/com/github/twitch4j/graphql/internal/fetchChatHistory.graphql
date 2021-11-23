@@ -1,0 +1,100 @@
+query fetchChatHistory($channelID: ID!, $userID: ID!, $after: Cursor, $first: Int = 100, $order: SortOrder = DESC, $includeMessageCount: Boolean = true, $includeTargetedActions: Boolean = true, $includeAutoModCaughtMessages: Boolean = true) {
+	user(id: $channelID) {
+		modLogs {
+			messagesBySender(senderID: $userID, first: $first, after: $after, order: $order, includeMessageCount: $includeMessageCount, includeTargetedActions: $includeTargetedActions, includeAutoModCaughtMessages: $includeAutoModCaughtMessages) {
+				edges {
+					cursor
+					node {
+						... on AutoModCaughtMessage {
+							category
+							id
+							modLogsMessage {
+								content {
+									fragments {
+										content {
+											... on AutoMod {
+												topics {
+													type
+													weight
+												}
+											}
+										}
+										text
+									}
+									text
+								}
+								id
+								sender {
+									id
+									login
+									displayName
+								}
+								sentAt
+							}
+							resolvedAt
+							resolver {
+								id
+								login
+								displayName
+							}
+							status
+						}
+						... on ModLogsMessage {
+							content {
+								fragments {
+									content {
+										... on AutoMod {
+											topics {
+												type
+												weight
+											}
+										}
+									}
+									text
+								}
+								text
+							}
+							id
+							sender {
+								id
+								login
+								displayName
+							}
+							sentAt
+						}
+						... on ModLogsTargetedModActionsEntry {
+							action
+							channel {
+								id
+								login
+								displayName
+							}
+							details {
+								bannedAt
+								durationSeconds
+								expiresAt
+								reason
+							}
+							id
+							target {
+								id
+								login
+								displayName
+							}
+							timestamp
+							user {
+								id
+								login
+								displayName
+							}
+						}
+					}
+				}
+				messageCount
+				pageInfo {
+					hasNextPage
+				}
+			}
+		}
+	}
+}

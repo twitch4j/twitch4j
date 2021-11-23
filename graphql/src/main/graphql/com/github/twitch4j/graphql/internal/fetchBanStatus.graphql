@@ -1,0 +1,18 @@
+query fetchBanStatus($channelID: ID!, $userID: ID!) {
+	chatRoomBanStatus(channelID: $channelID, userID: $userID) {
+		bannedUser {
+			id
+			login
+			displayName
+		}
+		createdAt
+		expiresAt
+		isPermanent
+		moderator {
+			id
+			login
+			displayName
+		}
+		reason
+	}
+}

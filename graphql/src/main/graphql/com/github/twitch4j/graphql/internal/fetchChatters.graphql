@@ -1,0 +1,22 @@
+query fetchChatters($login: String!) {
+	channel(name: $login) {
+		chatters {
+			broadcasters {
+				login
+			}
+			staff {
+				login
+			}
+			vips {
+				login
+			}
+			moderators {
+				login
+			}
+			viewers {
+				login
+			}
+			count
+		}
+	}
+}
