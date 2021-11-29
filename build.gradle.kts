@@ -94,7 +94,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.13.0"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.8.1"))
+		testImplementation(platform("org.junit:junit-bom:5.8.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.7")
 	}
