@@ -1,5 +1,7 @@
 package com.github.twitch4j.helix;
 
+import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
@@ -353,6 +355,47 @@ public interface TwitchHelix {
     HystrixCommand<EmoteList> getEmoteSets(
         @Param("token") String authToken,
         @Param("emote_set_id") Collection<String> ids
+    );
+
+    /**
+     * Gets the broadcaster’s chat settings.
+     *
+     * @param authToken     Required: OAuth access token. To read the non-moderator chat delay, a moderator's user access token must be specified with the moderator:read:chat_settings scope.
+     * @param broadcasterId Required: The ID of the broadcaster whose chat settings you want to get.
+     * @param moderatorId   Optional: The ID of a user that has permission to moderate the broadcaster’s chat room. Required only to access non moderator chat delay fields.
+     * @return ChatSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_SETTINGS_READ
+     */
+    @Unofficial // beta
+    @RequestLine("GET /chat/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChatSettingsWrapper> getChatSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Updates the broadcaster’s chat settings.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:chat_settings, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster whose chat settings you want to update.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param chatSettings  Required: The chat settings that you want to update.
+     * @return ChatSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_SETTINGS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("PATCH /chat/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<ChatSettingsWrapper> updateChatSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        ChatSettings chatSettings
     );
 
     /**
@@ -787,6 +830,61 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the broadcaster’s AutoMod settings, which are used to automatically block inappropriate or harassing messages from appearing in the broadcaster’s chat room.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:read:automod_settings
+     * @param broadcasterId Required: The ID of the broadcaster whose AutoMod settings you want to get.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @return AutoModSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_SETTINGS_READ
+     */
+    @Unofficial // beta
+    @RequestLine("GET /moderation/automod/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<AutoModSettingsWrapper> getAutoModSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Updates the broadcaster’s AutoMod settings, which are used to automatically block inappropriate or harassing messages from appearing in the broadcaster’s chat room.
+     * <p>
+     * You can set either overall_level or the individual settings like aggression, but not both.
+     * <p>
+     * Setting overall_level applies default values to the individual settings. However, setting overall_level to 4 does not mean that it applies 4 to all the individual settings.
+     * Instead, it applies a set of recommended defaults to the rest of the settings.
+     * For example, if you set overall_level to 2, Twitch provides some filtering on discrimination and sexual content, but more filtering on hostility (see the first example response).
+     * <p>
+     * If overall_level is currently set and you update swearing to 3, overall_level will be set to null and all settings other than swearing will be set to 0.
+     * The same is true if individual settings are set and you update overall_level to 3 — all the individual settings are updated to reflect the default level.
+     * <p>
+     * Note that if you set all the individual settings to values that match what overall_level would have set them to, Twitch changes AutoMod to use the default AutoMod level instead of using the individual settings.
+     * <p>
+     * Valid values for all levels are from 0 (no filtering) through 4 (most aggressive filtering).
+     * These levels affect how aggressively AutoMod holds back messages for moderators to review before they appear in chat or are denied (not shown).
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:automod_settings, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster whose AutoMod settings you want to update.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param settings      Required: The AutoMod Settings fields that should be overwritten.
+     * @return AutoModSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_SETTINGS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("PUT /moderation/automod/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<AutoModSettingsWrapper> updateAutoModSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        AutoModSettings settings
+    );
+
+    /**
      * Returns all banned and timed-out users in a channel.
      *
      * @param authToken     Auth Token (scope: moderation:read)
@@ -848,6 +946,126 @@ public interface TwitchHelix {
         @Param("user_id") List<String> userId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Bans one or more users from participating in a broadcaster’s chat room, or puts them in a timeout.
+     * <p>
+     * If the user is currently in a timeout, you can call this endpoint to change the duration of the timeout or ban them altogether.
+     * If the user is currently banned, you cannot call this method to put them in a timeout instead.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:banned_users, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster whose chat room the user is being banned from.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param data          Required: The list of users to ban or put in a timeout. You may specify a maximum of 100 users.
+     * @return BanUsersList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BANNED_USERS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("POST /moderation/bans?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<BanUsersList> banUsers(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        BanUsersInput data
+    );
+
+    /**
+     * Removes the ban or timeout that was placed on the specified user
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:banned_users, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster whose chat room the user is banned from chatting in.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param userId        Required: The ID of the user to remove the ban or timeout from.
+     * @return 204 No Content upon a successful unban or untimeout
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BANNED_USERS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("DELETE /moderation/bans?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> unbanUser(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("user_id") String userId
+    );
+
+    /**
+     * Gets the broadcaster’s list of non-private, blocked words or phrases.
+     * These are the terms that the broadcaster or moderator added manually, or that were denied by AutoMod.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:read:blocked_terms, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster whose blocked terms you’re getting.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param after         Optional: The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
+     * @param limit         Optional: The maximum number of blocked terms to return per page in the response. The minimum page size is 1 blocked term per page and the maximum is 100. The default is 20.
+     * @return BlockedTermList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_READ
+     */
+    @Unofficial // beta
+    @RequestLine("GET /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<BlockedTermList> getBlockedTerms(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Adds a word or phrase to the broadcaster’s list of blocked terms.
+     * These are the terms that broadcasters don’t want used in their chat room.
+     * <p>
+     * The term must contain a minimum of 2 characters and may contain up to a maximum of 500 characters.
+     * <p>
+     * Terms can use a wildcard character ({@literal *}).
+     * The wildcard character must appear at the beginning or end of a word, or set of characters.
+     * For example, {@literal *foo or foo*}.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:blocked_terms, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster that owns the list of blocked terms.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param term          Required: The word or phrase to block from being used in the broadcaster’s chat room.
+     * @return BlockedTermList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("POST /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"text\":\"{text}\"%7D")
+    HystrixCommand<BlockedTermList> addBlockedTerm(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param(value = "text", expander = JsonStringExpander.class) String term
+    );
+
+    /**
+     * Removes the word or phrase that the broadcaster is blocking users from using in their chat room.
+     *
+     * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:blocked_terms, associated with moderatorId.
+     * @param broadcasterId Required: The ID of the broadcaster that owns the list of blocked terms.
+     * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
+     * @param blockedTermId Required: The ID of the blocked term you want to delete.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("DELETE /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> removeBlockedTerm(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("id") String blockedTermId
     );
 
     /**

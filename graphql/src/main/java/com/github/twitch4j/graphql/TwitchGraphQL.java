@@ -147,10 +147,12 @@ public class TwitchGraphQL {
         return new CommandFetchBanStatus(getApolloClient(auth), channelId, userId);
     }
 
+    @Deprecated
     public CommandAddChannelBlockedTerm addChannelBlockedTerm(OAuth2Credential auth, String channelId, Boolean isModEditable, List<String> phrases) {
         return new CommandAddChannelBlockedTerm(getApolloClient(auth), channelId, isModEditable, phrases);
     }
 
+    @Deprecated
     public CommandDeleteChannelBlockedTerm deleteChannelBlockedTerm(OAuth2Credential auth, String channelId, List<String> phrases) {
         return new CommandDeleteChannelBlockedTerm(getApolloClient(auth), channelId, phrases);
     }
@@ -287,6 +289,7 @@ public class TwitchGraphQL {
         return new CommandDenyUnbanRequest(getApolloClient(auth), id, message);
     }
 
+    @Deprecated
     public CommandBanUser banUser(OAuth2Credential auth, String channelId, String targetUserLogin, String reason) {
         return new CommandBanUser(getApolloClient(auth), channelId, targetUserLogin, reason);
     }
