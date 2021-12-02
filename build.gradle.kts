@@ -185,6 +185,21 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 		title = "${rootProject.name} (v${project.version})"
 		windowTitle = "${rootProject.name} (v${project.version})"
 		encoding = "UTF-8"
+		this as StandardJavadocDocletOptions
+		group("Common", "com.github.twitch4j.common*")
+		group("Auth", "com.github.twitch4j.auth*")
+		group("Chat", "com.github.twitch4j.chat*")
+		group("EventSub", "com.github.twitch4j.eventsub*")
+		group("GraphQL", "com.github.twitch4j.graphql*")
+		group("PubSub", "com.github.twitch4j.pubsub*")
+		group("Extensions API", "com.github.twitch4j.extensions*")
+		group("New API - Helix", "com.github.twitch4j.helix*")
+		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
+		group("Twitch Message Interface - API", "com.github.twitch4j.tmi*")
+		group("Core",
+			"com.github.twitch4j", "com.github.twitch4j.domain*",
+			"com.github.twitch4j.events*", "com.github.twitch4j.modules*"
+		)
 	}
 
 	source(subprojects.map { it.tasks.delombok.get() })
