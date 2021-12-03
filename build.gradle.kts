@@ -17,6 +17,40 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
+
+	tasks {
+		withType<Javadoc> {
+			options {
+				this as StandardJavadocDocletOptions
+				links(
+					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
+					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
+					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/4.7.0/",
+					"https://square.github.io/okhttp/4.x/okhttp/",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
+					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
+					"https://netflix.github.io/Hystrix/javadoc/",
+					"https://takahikokawasaki.github.io/nv-websocket-client/",
+					"https://commons.apache.org/proper/commons-io/apidocs/",
+					"https://commons.apache.org/proper/commons-lang/apidocs/",
+					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.32",
+					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-modules-java8/javadoc/datetime/2.13/",
+					"https://projectlombok.org/api/",
+					"https://twitch4j.github.io/javadoc"
+				)
+			}
+		}
+	}
 }
 
 // Subprojects
@@ -198,8 +232,22 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 		)
 	}
 
-	source(subprojects.map { it.tasks.delombok.get() })
-	classpath = files(subprojects.map { it.sourceSets["main"].compileClasspath })
+	source(subprojects.map { it.tasks.javadoc.get().source })
+	classpath = files(subprojects.map { it.tasks.javadoc.get().classpath })
 
 	setDestinationDir(file("${rootDir}/docs/static/javadoc"))
+
+	doFirst {
+		if (destinationDir?.exists() == true) {
+			destinationDir?.deleteRecursively()
+		}
+	}
+
+	doLast {
+		copy {
+			from(file("${destinationDir!!}/element-list"))
+			into(destinationDir!!)
+			rename { "package-list" }
+		}
+	}
 }
