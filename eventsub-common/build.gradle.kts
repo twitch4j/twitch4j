@@ -11,8 +11,11 @@ dependencies {
 	api(project(":common"))
 }
 
+base {
+	archivesName.set("twitch4j-eventsub-common")
+}
+
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-eventsub-common"
 	pom {
 		name.set("Twitch4J API - EventSub Common Module")
 		description.set("EventSub Common dependency")

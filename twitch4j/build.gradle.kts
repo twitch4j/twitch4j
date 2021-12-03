@@ -10,8 +10,11 @@ dependencies {
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 }
 
+base {
+	archivesName.set("twitch4j")
+}
+
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j"
 	pom {
 		name.set("Twitch4J")
 		description.set("Core dependency")

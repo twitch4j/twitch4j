@@ -11,8 +11,11 @@ dependencies {
 	api(project(":auth"))
 }
 
+base {
+	archivesName.set("twitch4j-chat")
+}
+
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-chat"
 	pom {
 		name.set("Twitch4J Chat Module")
 		description.set("Chat dependency")

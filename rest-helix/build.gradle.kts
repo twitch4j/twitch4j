@@ -22,8 +22,11 @@ dependencies {
 	api(project(":auth"))
 }
 
+base {
+	archivesName.set("twitch4j-helix")
+}
+
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-helix"
 	pom {
 		name.set("Twitch4J API - Helix Module")
 		description.set("Helix API dependency")

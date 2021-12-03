@@ -16,8 +16,11 @@ dependencies {
 	api(project(":auth"))
 }
 
+base {
+	archivesName.set("twitch4j-kraken")
+}
+
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-kraken"
 	pom {
 		name.set("Twitch4J API - Kraken Module")
 		description.set("Kraken API dependency")

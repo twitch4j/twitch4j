@@ -28,10 +28,6 @@ subprojects {
 	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
-	base {
-		archivesBaseName = artifactId
-	}
-
 	lombok {
 		version.set("1.18.22")
 		disableConfig.set(true)
@@ -113,7 +109,7 @@ subprojects {
 		publications {
 			create<MavenPublication>("main") {
 				from(components["java"])
-				artifactId = project.artifactId
+				artifactId = base.archivesName.get()
 				pom.default()
 			}
 		}
