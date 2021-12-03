@@ -20,13 +20,15 @@ dependencies {
 	api(project(":auth"))
 }
 
-tasks.withType<io.freefair.gradle.plugins.lombok.tasks.Delombok> {
-	dependsOn("generateMainServiceApolloSources")
-}
+tasks {
+	withType<io.freefair.gradle.plugins.lombok.tasks.Delombok> {
+		dependsOn("generateMainServiceApolloSources")
+	}
 
-tasks.withType<Javadoc> {
-	// Ignore auto-generated files from apollo graphql
-	exclude("com/github/twitch4j/graphql/internal/**")
+	withType<Javadoc> {
+		// Ignore auto-generated files from apollo graphql
+		exclude("com/github/twitch4j/graphql/internal/**")
+	}
 }
 
 base {
