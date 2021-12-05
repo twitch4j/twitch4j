@@ -13,13 +13,22 @@ dependencies {
 	api(group = "org.jetbrains", name = "annotations")
 
 	// Twitch4J Modules
-	api(project(":eventsub-common"))
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-eventsub-common"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
 }
 
 base {
 	archivesName.set("twitch4j-pubsub")
+}
+
+tasks {
+	javadoc {
+		options {
+			title = "${base.archivesName.get()} (v${project.version})"
+			windowTitle = "${base.archivesName.get()} (v${project.version})"
+		}
+	}
 }
 
 publishing.publications.withType<MavenPublication> {

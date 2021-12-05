@@ -14,9 +14,16 @@ base {
 	archivesName.set("twitch4j")
 }
 
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Root Module API"
+		windowTitle = "Twitch4J (v${version}) - Root Module API"
+	}
+}
+
 publishing.publications.withType<MavenPublication> {
 	pom {
-		name.set("Twitch4J")
+		name.set("Twitch4J Root Module")
 		description.set("Core dependency")
 	}
 }

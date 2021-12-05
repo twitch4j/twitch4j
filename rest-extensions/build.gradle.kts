@@ -12,11 +12,14 @@ dependencies {
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Twitch4J Modules
-	api(project(":common"))
+	api(project(":twitch4j-common"))
 }
 
-base {
-	archivesName.set("twitch4j-extensions")
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Extensions Module API"
+		windowTitle = "Twitch4J (v${version}) - Extensions Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {

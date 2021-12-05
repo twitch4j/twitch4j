@@ -12,12 +12,15 @@ dependencies {
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Twitch4J Modules
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
 }
 
-base {
-	archivesName.set("twitch4j-kraken")
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Kraken Module API <sup>(deprecated)</sup>"
+		windowTitle = "Twitch4J (v${version}) - Kraken Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {

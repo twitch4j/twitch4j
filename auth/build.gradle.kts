@@ -10,8 +10,11 @@ dependencies {
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
 }
 
-base {
-	archivesName.set("twitch4j-auth")
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Auth Module"
+		windowTitle = "Twitch4J (v${version}) - Auth Module"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {

@@ -144,7 +144,6 @@ subprojects {
 		publications {
 			create<MavenPublication>("main") {
 				from(components["java"])
-				artifactId = base.archivesName.get()
 				pom.default()
 			}
 		}
@@ -184,8 +183,8 @@ subprojects {
 			dependsOn(delombok)
 			source(delombok)
 			options {
-				title = (ext.properties["displayName"] as String?) ?: "${project.name} (v${project.version})"
-				windowTitle = (ext.properties["displayName"] as String?) ?: "${project.name} (v${project.version})"
+				title = "${project.name} (v${project.version})"
+				windowTitle = "${project.name} (v${project.version})"
 				encoding = "UTF-8"
 				overview = file("${rootDir}/buildSrc/overview-single.html").absolutePath
 				this as StandardJavadocDocletOptions

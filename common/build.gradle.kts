@@ -20,11 +20,14 @@ dependencies {
 	compileOnly(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
 	// Twitch4J Modules
-	api(project(":auth"))
+	api(project(":twitch4j-auth"))
 }
 
-base {
-	archivesName.set("twitch4j-common")
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Common Module API"
+		windowTitle = "Twitch4J (v${version}) - Common Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
