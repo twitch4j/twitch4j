@@ -48,6 +48,7 @@ allprojects {
 					"https://projectlombok.org/api/",
 					"https://twitch4j.github.io/javadoc"
 				)
+				locale = "en"
 			}
 		}
 	}
