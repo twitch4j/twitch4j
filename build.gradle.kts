@@ -193,9 +193,17 @@ subprojects {
 			dependsOn(delombok)
 			source(delombok)
 			options {
-				title = "${project.artifactId} (v${project.version})"
-				windowTitle = "${project.artifactId} (v${project.version})"
+				title = (ext.properties["displayName"] as String?) ?: "${project.name} (v${project.version})"
+				windowTitle = (ext.properties["displayName"] as String?) ?: "${project.name} (v${project.version})"
 				encoding = "UTF-8"
+				overview = file("${rootDir}/buildSrc/overview-single.html").absolutePath
+				this as StandardJavadocDocletOptions
+				// hide javadoc warnings (a lot from delombok)
+				addStringOption("Xdoclint:none", "-quiet")
+				if (JavaVersion.current().isJava9Compatible) {
+					// javadoc / html5 support
+					addBooleanOption("html5", true)
+				}
 			}
 		}
 
@@ -216,6 +224,7 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 		windowTitle = "${rootProject.name} (v${project.version})"
 		encoding = "UTF-8"
 		this as StandardJavadocDocletOptions
+		overview = file("${rootDir}/buildSrc/overview-general.html").absolutePath
 		group("Common", "com.github.twitch4j.common*")
 		group("Auth", "com.github.twitch4j.auth*")
 		group("Chat", "com.github.twitch4j.chat*")
@@ -230,6 +239,7 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 			"com.github.twitch4j", "com.github.twitch4j.domain*",
 			"com.github.twitch4j.events*", "com.github.twitch4j.modules*"
 		)
+		addBooleanOption("html5").setValue(true)
 	}
 
 	source(subprojects.map { it.tasks.javadoc.get().source })
