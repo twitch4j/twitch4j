@@ -204,6 +204,10 @@ public class ChatModerationAction {
          */
         UNTIMEOUT,
         /**
+         * The recent chat history was wiped
+         */
+        CLEAR,
+        /**
          * Chat message was deleted
          */
         DELETE,
