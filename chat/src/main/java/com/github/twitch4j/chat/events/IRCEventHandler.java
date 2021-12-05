@@ -61,6 +61,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-cheer-trigger", IRCMessageEvent.class, this::onChannelCheer);
         eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
         eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
+        eventManager.onEvent("twitch4j-chat-clearmsg-trigger", IRCMessageEvent.class, this::onClearMsg);
         eventManager.onEvent("twitch4j-chat-join-trigger", IRCMessageEvent.class, this::onChannnelClientJoinEvent);
         eventManager.onEvent("twitch4j-chat-leave-trigger", IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
         eventManager.onEvent("twitch4j-chat-mod-trigger", IRCMessageEvent.class, this::onChannelModChange);
@@ -422,6 +423,24 @@ public class IRCEventHandler {
             } else { // Clear chat event
                 eventManager.publish(new ClearChatEvent(channel));
             }
+        }
+    }
+
+    /**
+     * A single message was deleted in a channel by a moderator
+     *
+     * @param event IRCMessageEvent
+     * @see <a href="https://dev.twitch.tv/docs/irc/tags#clearmsg-twitch-tags">Official documentation</a>
+     */
+    public void onClearMsg(IRCMessageEvent event) {
+        if ("CLEARMSG".equals(event.getCommandType())) {
+            EventChannel channel = event.getChannel();
+            String userName = event.getUserName();
+            String msgId = event.getTagValue("target-msg-id").orElse(null);
+            String message = event.getMessage().orElse("");
+            boolean wasActionMessage = message.startsWith("\u0001ACTION ") && message.endsWith("\u0001");
+            String trimmedMsg = wasActionMessage ? message.substring("\u0001ACTION ".length(), message.length() - "\u0001".length()) : message;
+            eventManager.publish(new DeleteMessageEvent(channel, userName, msgId, trimmedMsg, wasActionMessage));
         }
     }
 
