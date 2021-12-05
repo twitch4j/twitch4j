@@ -937,7 +937,10 @@ public interface TwitchHelix {
      * @param after         Optional: Cursor for forward pagination.
      * @param limit         Optional: Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return BannedEventList
+     * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-twitch-api-event-endpoints-that-supported-websub-based-webhooks/35137">Deprecation announcement</a>
+     * @deprecated Will be removed come March 15, 2022, in favor of EventSub and {@link #getBannedUsers(String, String, List, String, String, Integer)}
      */
+    @Deprecated
     @RequestLine("GET /moderation/banned/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<BannedEventList> getBannedEvents(
@@ -1130,13 +1133,16 @@ public interface TwitchHelix {
     /**
      * Returns a list of moderators or users added and removed as moderators from a channel.
      *
-     * @param authToken User Token for the broadcaster
+     * @param authToken     User Token for the broadcaster
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
-     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param userIds       Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return ModeratorList
+     * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-twitch-api-event-endpoints-that-supported-websub-based-webhooks/35137">Deprecation announcement</a>
+     * @deprecated Will be removed come March 15, 2022, in favor of EventSub and {@link #getModerators(String, String, List, String, Integer)}
      */
+    @Deprecated
     @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ModeratorEventList> getModeratorEvents(
@@ -1150,11 +1156,12 @@ public interface TwitchHelix {
     /**
      * Returns a list of moderators or users added and removed as moderators from a channel.
      *
-     * @param authToken User Token for the broadcaster
+     * @param authToken     User Token for the broadcaster
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
-     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param userIds       Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @return ModeratorList
+     * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-twitch-api-event-endpoints-that-supported-websub-based-webhooks/35137">Deprecation announcement</a>
      * @deprecated in favor of getModeratorEvents(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
     @Deprecated
@@ -1657,7 +1664,10 @@ public interface TwitchHelix {
      * @param after         Optional: Cursor for forward pagination; where to start fetching the next set of results in a multi-page response. This applies only to queries without user_id.
      * @param limit         Optional: Limit the number of items in the response payload. Maximum: 100.
      * @return SubscriptionEventList
+     * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-twitch-api-event-endpoints-that-supported-websub-based-webhooks/35137">Deprecation announcement</a>
+     * @deprecated Will be removed come March 15, 2022, in favor of EventSub and {@link #getSubscriptions(String, String, String, String, Integer)}
      */
+    @Deprecated
     @RequestLine("GET /subscriptions/events?broadcaster_id={broadcaster_id}&id={id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SubscriptionEventList> getSubscriptionEvents(
