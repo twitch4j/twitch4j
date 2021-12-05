@@ -157,16 +157,6 @@ subprojects {
 
 	// Source encoding
 	tasks {
-		// javadoc / html5 support
-		withType<Javadoc> {
-			// hide javadoc warnings (a lot from delombok)
-			(options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
-
-			if (JavaVersion.current().isJava9Compatible) {
-				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-			}
-		}
-
 		// shadowjar & relocation
 		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
 			target = shadowJar.get()
@@ -219,6 +209,7 @@ subprojects {
 }
 
 tasks.register<Javadoc>("aggregateJavadoc") {
+	enabled = JavaVersion.current().isJava9Compatible
 	group = JavaBasePlugin.DOCUMENTATION_GROUP
 	options {
 		title = "${rootProject.name} (v${project.version})"
