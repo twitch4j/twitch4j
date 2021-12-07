@@ -12,8 +12,9 @@ import lombok.Singular;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @With
 @Data
@@ -38,12 +39,14 @@ public class BanUsersInput {
      *
      * @param userIds  The ids of the users to be banned or timed out.
      * @param reason   The reason for the mod action.
-     * @param duration Seconds of the timeout period,  or null for a ban.
+     * @param duration Seconds of the timeout period, or null for a ban.
      */
-    public BanUsersInput(List<String> userIds, String reason, Integer duration) {
-        this.actions = userIds.stream()
-            .map(id -> BanUserInput.builder().userId(id).reason(reason).duration(duration).build())
-            .collect(Collectors.toList());
+    public BanUsersInput(Collection<String> userIds, String reason, Integer duration) {
+        List<BanUserInput> actions = new ArrayList<>(userIds.size());
+        for (String userId : userIds) {
+            actions.add(new BanUserInput(userId, reason, duration));
+        }
+        this.actions = actions;
     }
 
     /**
@@ -52,7 +55,7 @@ public class BanUsersInput {
      * @param userIds The ids of the users to be banned.
      * @param reason  The reason for the ban.
      */
-    public BanUsersInput(List<String> userIds, String reason) {
+    public BanUsersInput(Collection<String> userIds, String reason) {
         this(userIds, reason, null);
     }
 
