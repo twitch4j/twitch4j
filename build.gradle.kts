@@ -217,19 +217,16 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 		this as StandardJavadocDocletOptions
 		overview = file("${rootDir}/buildSrc/overview-general.html").absolutePath
 		group("Common", "com.github.twitch4j.common*")
+		group("Core", "com.github.twitch4j", "com.github.twitch4j.domain*", "com.github.twitch4j.events*", "com.github.twitch4j.modules*")
 		group("Auth", "com.github.twitch4j.auth*")
 		group("Chat", "com.github.twitch4j.chat*")
 		group("EventSub", "com.github.twitch4j.eventsub*")
-		group("GraphQL", "com.github.twitch4j.graphql*")
 		group("PubSub", "com.github.twitch4j.pubsub*")
-		group("Extensions API", "com.github.twitch4j.extensions*")
-		group("New API - Helix", "com.github.twitch4j.helix*")
-		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
+		group("Helix API", "com.github.twitch4j.helix*")
 		group("Twitch Message Interface - API", "com.github.twitch4j.tmi*")
-		group("Core",
-			"com.github.twitch4j", "com.github.twitch4j.domain*",
-			"com.github.twitch4j.events*", "com.github.twitch4j.modules*"
-		)
+		group("GraphQL", "com.github.twitch4j.graphql*")
+		group("Extensions API", "com.github.twitch4j.extensions*")
+		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
 		addBooleanOption("html5").setValue(true)
 	}
 
