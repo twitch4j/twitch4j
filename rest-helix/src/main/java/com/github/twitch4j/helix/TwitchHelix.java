@@ -653,6 +653,21 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a Soundtrack playlist, which includes its list of tracks.
+     *
+     * @param authToken App access token or User access token.
+     * @param id        The ASIN of the Soundtrack playlist to get.
+     * @return SoundtrackPlaylistTracksWrapper
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/playlist?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackPlaylistTracksWrapper> getSoundtrackPlaylist(
+        @Param("token") String authToken,
+        @Param("id") String id
+    );
+
+    /**
      * Gets a list of Soundtrack playlists.
      *
      * @param authToken App access token or User access token.
