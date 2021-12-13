@@ -673,6 +673,16 @@ public class TwitchPubSub implements ITwitchPubSub {
                                 } else {
                                     log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                 }
+                            } else if ("low-trust-users".equals(topicName) && topicParts.length == 3) {
+                                String userId = topicParts[1];
+                                String channelId = topicParts[2];
+                                if ("low_trust_user_new_message".equals(type)) {
+                                    eventManager.publish(new LowTrustUserNewMessageEvent(userId, channelId, TypeConvert.convertValue(msgData, LowTrustUserNewMessage.class)));
+                                } else if ("low_trust_user_treatment_update".equals(type)) {
+                                    eventManager.publish(new LowTrustUserTreatmentUpdateEvent(userId, channelId, TypeConvert.convertValue(msgData, LowTrustUserTreatmentUpdate.class)));
+                                } else {
+                                    log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                }
                             } else if ("onsite-notifications".equals(topicName) && topicParts.length > 1) {
                                 if ("create-notification".equalsIgnoreCase(type)) {
                                     eventManager.publish(new OnsiteNotificationCreationEvent(TypeConvert.convertValue(msgData, CreateNotificationData.class)));
