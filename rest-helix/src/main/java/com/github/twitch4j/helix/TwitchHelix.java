@@ -653,6 +653,19 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of Soundtrack playlists.
+     *
+     * @param authToken App access token or User access token.
+     * @return SoundtrackPlaylistMetadataList
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/playlists")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(
+        @Param("token") String authToken
+    );
+
+    /**
      * Starts a commercial on a specified channel
      *
      * @param authToken Auth Token (scope: channel:edit:commercial)
