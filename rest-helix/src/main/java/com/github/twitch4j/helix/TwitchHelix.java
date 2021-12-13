@@ -638,6 +638,21 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the Soundtrack track that the broadcaster is playing.
+     *
+     * @param authToken     App access token or User access token.
+     * @param broadcasterId The ID of the broadcaster that’s playing a Soundtrack track.
+     * @return SoundtrackCurrentTrackWrapper
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/current_track?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackCurrentTrackWrapper> getSoundtrackCurrentTrack(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Starts a commercial on a specified channel
      *
      * @param authToken Auth Token (scope: channel:edit:commercial)
