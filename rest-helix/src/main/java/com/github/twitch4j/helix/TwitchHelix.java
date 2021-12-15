@@ -638,6 +638,49 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the Soundtrack track that the broadcaster is playing.
+     *
+     * @param authToken     App access token or User access token.
+     * @param broadcasterId The ID of the broadcaster that’s playing a Soundtrack track.
+     * @return SoundtrackCurrentTrackWrapper
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/current_track?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackCurrentTrackWrapper> getSoundtrackCurrentTrack(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Gets a Soundtrack playlist, which includes its list of tracks.
+     *
+     * @param authToken App access token or User access token.
+     * @param id        The ASIN of the Soundtrack playlist to get.
+     * @return SoundtrackPlaylistTracksWrapper
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/playlist?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackPlaylistTracksWrapper> getSoundtrackPlaylist(
+        @Param("token") String authToken,
+        @Param("id") String id
+    );
+
+    /**
+     * Gets a list of Soundtrack playlists.
+     *
+     * @param authToken App access token or User access token.
+     * @return SoundtrackPlaylistMetadataList
+     */
+    @Unofficial // beta
+    @RequestLine("GET /soundtrack/playlists")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(
+        @Param("token") String authToken
+    );
+
+    /**
      * Starts a commercial on a specified channel
      *
      * @param authToken Auth Token (scope: channel:edit:commercial)
