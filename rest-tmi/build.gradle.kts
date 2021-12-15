@@ -11,12 +11,18 @@ dependencies {
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
 
 	// Twitch4J Modules
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
+}
+
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Message Interface Module API"
+		windowTitle = "Twitch4J (v${version}) - Message Interface Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-messaginginterface"
 	pom {
 		name.set("Twitch4J API - Message Interface Module")
 		description.set("Twitch Message Interface API dependency")

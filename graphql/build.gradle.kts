@@ -16,21 +16,29 @@ dependencies {
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
 	// Twitch4J Modules
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
 }
 
-tasks.withType<io.freefair.gradle.plugins.lombok.tasks.Delombok> {
-	dependsOn("generateMainServiceApolloSources")
-}
+tasks {
+	withType<io.freefair.gradle.plugins.lombok.tasks.Delombok> {
+		dependsOn("generateMainServiceApolloSources")
+	}
 
-tasks.withType<Javadoc> {
-	// Ignore auto-generated files from apollo graphql
-	exclude("com/github/twitch4j/graphql/internal/**")
+	withType<Javadoc> {
+		// Ignore auto-generated files from apollo graphql
+		exclude("com/github/twitch4j/graphql/internal/**")
+	}
+
+	javadoc {
+		options {
+			title = "Twitch4J (v${version}) - GraphQL Module"
+			windowTitle = "Twitch4J (v${version}) - GraphQL Module"
+		}
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-graphql"
 	pom {
 		name.set("Twitch4J GraphQL Module")
 		description.set("GraphQL dependency")

@@ -17,6 +17,41 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
+
+	tasks {
+		withType<Javadoc> {
+			options {
+				this as StandardJavadocDocletOptions
+				links(
+					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
+					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
+					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/4.7.0/",
+					"https://square.github.io/okhttp/4.x/okhttp/",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
+					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
+					"https://netflix.github.io/Hystrix/javadoc/",
+					"https://takahikokawasaki.github.io/nv-websocket-client/",
+					"https://commons.apache.org/proper/commons-io/apidocs/",
+					"https://commons.apache.org/proper/commons-lang/apidocs/",
+					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.32",
+					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
+					"https://fasterxml.github.io/jackson-modules-java8/javadoc/datetime/2.13/",
+					"https://projectlombok.org/api/",
+					"https://twitch4j.github.io/javadoc"
+				)
+				locale = "en"
+			}
+		}
+	}
 }
 
 // Subprojects
@@ -27,10 +62,6 @@ subprojects {
 	apply(plugin = "io.freefair.lombok")
 	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
-
-	base {
-		archivesBaseName = artifactId
-	}
 
 	lombok {
 		version.set("1.18.22")
@@ -113,7 +144,6 @@ subprojects {
 		publications {
 			create<MavenPublication>("main") {
 				from(components["java"])
-				artifactId = project.artifactId
 				pom.default()
 			}
 		}
@@ -126,16 +156,6 @@ subprojects {
 
 	// Source encoding
 	tasks {
-		// javadoc / html5 support
-		withType<Javadoc> {
-			// hide javadoc warnings (a lot from delombok)
-			(options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
-
-			if (JavaVersion.current().isJava9Compatible) {
-				(options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-			}
-		}
-
 		// shadowjar & relocation
 		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
 			target = shadowJar.get()
@@ -163,9 +183,17 @@ subprojects {
 			dependsOn(delombok)
 			source(delombok)
 			options {
-				title = "${project.artifactId} (v${project.version})"
-				windowTitle = "${project.artifactId} (v${project.version})"
+				title = "${project.name} (v${project.version})"
+				windowTitle = "${project.name} (v${project.version})"
 				encoding = "UTF-8"
+				overview = file("${rootDir}/buildSrc/overview-single.html").absolutePath
+				this as StandardJavadocDocletOptions
+				// hide javadoc warnings (a lot from delombok)
+				addStringOption("Xdoclint:none", "-quiet")
+				if (JavaVersion.current().isJava9Compatible) {
+					// javadoc / html5 support
+					addBooleanOption("html5", true)
+				}
 			}
 		}
 
@@ -180,15 +208,44 @@ subprojects {
 }
 
 tasks.register<Javadoc>("aggregateJavadoc") {
+	enabled = JavaVersion.current().isJava9Compatible
 	group = JavaBasePlugin.DOCUMENTATION_GROUP
 	options {
 		title = "${rootProject.name} (v${project.version})"
 		windowTitle = "${rootProject.name} (v${project.version})"
 		encoding = "UTF-8"
+		this as StandardJavadocDocletOptions
+		overview = file("${rootDir}/buildSrc/overview-general.html").absolutePath
+		group("Common", "com.github.twitch4j.common*")
+		group("Core", "com.github.twitch4j", "com.github.twitch4j.domain*", "com.github.twitch4j.events*", "com.github.twitch4j.modules*")
+		group("Auth", "com.github.twitch4j.auth*")
+		group("Chat", "com.github.twitch4j.chat*")
+		group("EventSub", "com.github.twitch4j.eventsub*")
+		group("PubSub", "com.github.twitch4j.pubsub*")
+		group("Helix API", "com.github.twitch4j.helix*")
+		group("Twitch Message Interface - API", "com.github.twitch4j.tmi*")
+		group("GraphQL", "com.github.twitch4j.graphql*")
+		group("Extensions API", "com.github.twitch4j.extensions*")
+		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
+		addBooleanOption("html5").setValue(true)
 	}
 
-	source(subprojects.map { it.tasks.delombok.get() })
-	classpath = files(subprojects.map { it.sourceSets["main"].compileClasspath })
+	source(subprojects.map { it.tasks.javadoc.get().source })
+	classpath = files(subprojects.map { it.tasks.javadoc.get().classpath })
 
 	setDestinationDir(file("${rootDir}/docs/static/javadoc"))
+
+	doFirst {
+		if (destinationDir?.exists() == true) {
+			destinationDir?.deleteRecursively()
+		}
+	}
+
+	doLast {
+		copy {
+			from(file("${destinationDir!!}/element-list"))
+			into(destinationDir!!)
+			rename { "package-list" }
+		}
+	}
 }

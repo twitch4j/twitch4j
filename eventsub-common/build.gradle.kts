@@ -8,11 +8,17 @@ dependencies {
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
 	// Twitch4J Modules
-	api(project(":common"))
+	api(project(":twitch4j-common"))
+}
+
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - EventSub Common Module API"
+		windowTitle = "Twitch4J (v${version}) - EventSub Common Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-eventsub-common"
 	pom {
 		name.set("Twitch4J API - EventSub Common Module")
 		description.set("EventSub Common dependency")

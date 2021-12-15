@@ -7,12 +7,18 @@ dependencies {
 	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
 	// Twitch4J Modules
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
+}
+
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Chat Module"
+		windowTitle = "Twitch4J (v${version}) - Chat Module"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-chat"
 	pom {
 		name.set("Twitch4J Chat Module")
 		description.set("Chat dependency")

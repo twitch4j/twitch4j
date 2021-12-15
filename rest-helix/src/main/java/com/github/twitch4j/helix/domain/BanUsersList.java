@@ -27,7 +27,7 @@ public class BanUsersList {
 
     /**
      * The list of users that weren't banned.
-     * The string is in the form: <user_id>: <error message>.
+     * The string is in the form: {@code &lt;user_id&gt;: &lt;error message&gt;}.
      * The list is empty if all users were successfully banned.
      */
     private List<String> errors;

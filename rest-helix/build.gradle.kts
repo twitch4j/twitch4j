@@ -17,13 +17,19 @@ dependencies {
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
 	// Twitch4J Modules
-	api(project(":eventsub-common"))
-	api(project(":common"))
-	api(project(":auth"))
+	api(project(":twitch4j-eventsub-common"))
+	api(project(":twitch4j-common"))
+	api(project(":twitch4j-auth"))
+}
+
+tasks.javadoc {
+	options {
+		title = "Twitch4J (v${version}) - Helix Module API"
+		windowTitle = "Twitch4J (v${version}) - Helix Module API"
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
-	artifactId = "twitch4j-helix"
 	pom {
 		name.set("Twitch4J API - Helix Module")
 		description.set("Helix API dependency")
