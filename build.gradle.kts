@@ -96,7 +96,7 @@ subprojects {
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.8.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.7")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.8")
 	}
 
 	publishing {
