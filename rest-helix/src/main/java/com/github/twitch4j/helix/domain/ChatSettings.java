@@ -53,17 +53,7 @@ public class ChatSettings {
      * The length of time, in minutes, that the followers must have followed the broadcaster to participate in the chat room
      * Is null if follower_mode is false.
      * <p>
-     * When setting this through the API, the possible values are:
-     * <ul>
-     *     <li>0 — No restriction (default)</li>
-     *     <li>10 — Minimum of 10 minutes</li>
-     *     <li>30 — Minimum of 30 minutes</li>
-     *     <li>60 — Minimum of 1 hour</li>
-     *     <li>1440 — Minimum of 1 day</li>
-     *     <li>10080 — Minimum of 1 week</li>
-     *     <li>43200 — Minimum of 1 month</li>
-     *     <li>129600 — Minimum of 3 months</li>
-     * </ul>
+     * When setting this through the API, the possible values range from 0 (all followers) to 129600 (3 months).
      *
      * @see #isFollowersOnlyMode()
      */
@@ -131,16 +121,7 @@ public class ChatSettings {
      * <p>
      * Is null if slow_mode is false.
      * <p>
-     * When setting this through the API, the possible values are:
-     * <ul>
-     *     <li>3 — 3 second delay</li>
-     *     <li>5 — 5 second delay</li>
-     *     <li>10 — 10 second delay</li>
-     *     <li>20 — 20 second delay</li>
-     *     <li>30 — 30 second delay (default)</li>
-     *     <li>60 — 1 minute delay</li>
-     *     <li>120 — 2 minute delay</li>
-     * </ul>
+     * When setting this through the API, the possible values range from 1 (one second) to 1800 (30 minutes).
      *
      * @see #isSlowMode()
      */
