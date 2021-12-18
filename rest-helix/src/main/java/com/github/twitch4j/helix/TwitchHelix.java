@@ -995,7 +995,7 @@ public interface TwitchHelix {
     );
 
     /**
-     * Bans one or more users from participating in a broadcaster’s chat room, or puts them in a timeout.
+     * Bans a user from participating in a broadcaster’s chat room, or puts them in a timeout.
      * <p>
      * If the user is currently in a timeout, you can call this endpoint to change the duration of the timeout or ban them altogether.
      * If the user is currently banned, you cannot call this method to put them in a timeout instead.
@@ -1003,7 +1003,7 @@ public interface TwitchHelix {
      * @param authToken     Required: User access token (of the broadcaster or a moderator) with scope set to moderator:manage:banned_users, associated with moderatorId.
      * @param broadcasterId Required: The ID of the broadcaster whose chat room the user is being banned from.
      * @param moderatorId   Required: The ID of a user that has permission to moderate the broadcaster’s chat room. Set this to the same value as broadcasterId if a broadcaster token is being used.
-     * @param data          Required: The list of users to ban or put in a timeout. You may specify a maximum of 100 users.
+     * @param data          Required: Information on the user to ban or put in a timeout.
      * @return BanUsersList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BANNED_USERS_MANAGE
      */
@@ -1013,11 +1013,12 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<BanUsersList> banUsers(
+    @Body("%7B\"data\":{data}%7D")
+    HystrixCommand<BanUsersList> banUser(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
-        BanUsersInput data
+        @Param(value = "data", expander = ObjectToJsonExpander.class) BanUserInput data
     );
 
     /**
