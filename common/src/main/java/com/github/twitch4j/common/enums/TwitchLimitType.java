@@ -11,8 +11,6 @@ public enum TwitchLimitType {
 
     /**
      * How fast authentication attempts can be issued over IRC.
-     * <p>
-     * Note: this limit is <i>not</i> currently implemented elsewhere in the library.
      */
     CHAT_AUTH_LIMIT("irc-auth-limit"),
 

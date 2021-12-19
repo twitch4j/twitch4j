@@ -136,6 +136,12 @@ public class TwitchChatBuilder {
     protected Bandwidth joinRateLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
 
     /**
+     * Custom RateLimit for AUTH
+     */
+    @With
+    protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
      * Shared bucket for messages
      */
     @With
@@ -152,6 +158,12 @@ public class TwitchChatBuilder {
      */
     @With
     protected Bucket ircJoinBucket = null;
+
+    /**
+     * Shared bucket for auths
+     */
+    @With
+    protected Bucket ircAuthBucket = null;
 
     /**
      * Scheduler Thread Pool Executor
@@ -228,8 +240,11 @@ public class TwitchChatBuilder {
         if (ircJoinBucket == null)
             ircJoinBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.joinRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_JOIN_LIMIT, Collections.singletonList(joinRateLimit));
 
+        if (ircAuthBucket == null)
+            ircAuthBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.authRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_AUTH_LIMIT, Collections.singletonList(authRateLimit));
+
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);
+        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds);
     }
 
     /**

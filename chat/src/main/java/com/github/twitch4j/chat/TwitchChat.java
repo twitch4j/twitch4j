@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -136,6 +135,11 @@ public class TwitchChat implements ITwitchChat {
     protected final Bucket ircJoinBucket;
 
     /**
+     * IRC Auth Bucket
+     */
+    protected final Bucket ircAuthBucket;
+
+    /**
      * IRC Command Queue
      */
     protected final BlockingQueue<String> ircCommandQueue;
@@ -232,6 +236,7 @@ public class TwitchChat implements ITwitchChat {
      * @param ircMessageBucket               Bucket for chat
      * @param ircWhisperBucket               Bucket for whispers
      * @param ircJoinBucket                  Bucket for joins
+     * @param ircAuthBucket                  Bucket for auths
      * @param taskExecutor                   ScheduledThreadPoolExecutor
      * @param chatQueueTimeout               Timeout to wait for events in Chat Queue
      * @param proxyConfig                    Proxy Configuration
@@ -239,7 +244,7 @@ public class TwitchChat implements ITwitchChat {
      * @param enableMembershipEvents         Whether JOIN/PART events should be enabled
      * @param botOwnerIds                    Bot Owner IDs
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -251,6 +256,7 @@ public class TwitchChat implements ITwitchChat {
         this.ircMessageBucket = ircMessageBucket;
         this.ircWhisperBucket = ircWhisperBucket;
         this.ircJoinBucket = ircJoinBucket;
+        this.ircAuthBucket = ircAuthBucket;
         this.taskExecutor = taskExecutor;
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
@@ -359,6 +365,11 @@ public class TwitchChat implements ITwitchChat {
     @Synchronized
     public void connect() {
         if (connectionState.equals(TMIConnectionState.DISCONNECTED) || connectionState.equals(TMIConnectionState.RECONNECTING)) {
+            if (chatCredential != null) {
+                // Wait for AUTH limit before opening the connection
+                ircAuthBucket.asBlocking().consumeUninterruptibly(1L);
+            }
+
             try {
                 // Change Connection State
                 connectionState = TMIConnectionState.CONNECTING;

@@ -36,7 +36,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -183,6 +182,12 @@ public class TwitchClientBuilder {
      */
     @With
     protected Bandwidth chatJoinLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
+
+    /**
+     * Custom RateLimit for AUTH
+     */
+    @With
+    protected Bandwidth chatAuthLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
 
     /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
@@ -384,6 +389,7 @@ public class TwitchClientBuilder {
                 .withChatRateLimit(chatRateLimit)
                 .withWhisperRateLimit(chatWhisperLimit)
                 .withJoinRateLimit(chatJoinLimit)
+                .withAuthRateLimit(chatAuthLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)

@@ -85,6 +85,12 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Builder.Default
     protected Bandwidth joinRateLimit = TwitchChatLimitHelper.USER_JOIN_LIMIT;
 
+    /**
+     * Custom RateLimit for AUTH
+     */
+    @Builder.Default
+    protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
         return this.sendMessage(channel, channel, message, tags);
@@ -245,6 +251,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withChatRateLimit(chatRateLimit)
                 .withWhisperRateLimit(whisperRateLimit)
                 .withJoinRateLimit(joinRateLimit)
+                .withAuthRateLimit(authRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
 
