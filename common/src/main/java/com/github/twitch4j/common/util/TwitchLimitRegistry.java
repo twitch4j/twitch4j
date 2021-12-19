@@ -3,9 +3,8 @@ package com.github.twitch4j.common.util;
 import com.github.twitch4j.common.enums.TwitchLimitType;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.BucketConfiguration;
-import io.github.bucket4j.IncompatibleConfigurationException;
+import io.github.bucket4j.TokensInheritanceStrategy;
 import io.github.bucket4j.local.LocalBucketBuilder;
 import lombok.NonNull;
 
@@ -44,12 +43,11 @@ public enum TwitchLimitRegistry {
      * @param userId    the id of the user whose rate limit is being specified.
      * @param limitType the type of rate-limit that is being configured.
      * @param limit     the bandwidths that are applicable for this user and rate limit type.
-     * @throws IncompatibleConfigurationException if overriding an old limit that is incompatible with the new configuration
      */
     public void setLimit(@NonNull String userId, @NonNull TwitchLimitType limitType, @NonNull List<Bandwidth> limit) {
         getBucketsByUser(userId).compute(limitType, (l, bucket) -> {
             if (bucket != null) {
-                bucket.replaceConfiguration(new BucketConfiguration(limit));
+                bucket.replaceConfiguration(new BucketConfiguration(limit), TokensInheritanceStrategy.AS_IS);
                 return bucket;
             }
 
@@ -86,7 +84,7 @@ public enum TwitchLimitRegistry {
     }
 
     private static Bucket constructBucket(List<Bandwidth> limits) {
-        LocalBucketBuilder builder = Bucket4j.builder();
+        LocalBucketBuilder builder = Bucket.builder();
         limits.forEach(builder::addLimit);
         return builder.build();
     }

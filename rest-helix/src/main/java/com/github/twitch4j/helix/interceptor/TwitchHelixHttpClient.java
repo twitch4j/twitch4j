@@ -48,7 +48,7 @@ public class TwitchHelixHttpClient implements Client {
                 } else {
                     try {
                         // effectively blocking, unfortunately
-                        return bucket.asAsyncScheduler().consume(1, executor)
+                        return bucket.asScheduler().consume(1, executor)
                             .thenApplyAsync(v -> {
                                 try {
                                     return client.execute(request, options);

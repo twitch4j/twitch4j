@@ -549,7 +549,7 @@ public class TwitchChat implements ITwitchChat {
      * @param command raw irc command
      */
     public boolean sendRaw(String command) {
-        return ircMessageBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(() -> queueCommand(command), taskExecutor) != null;
+        return ircMessageBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(() -> queueCommand(command), taskExecutor) != null;
     }
 
     /**
@@ -621,7 +621,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void issueJoin(String channelName) {
-        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+        ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
             () -> queueCommand("JOIN #" + channelName.toLowerCase()),
             taskExecutor
         );
@@ -657,7 +657,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void issuePart(String channelName) {
-        ircJoinBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+        ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
             () -> queueCommand("PART #" + channelName.toLowerCase()),
             taskExecutor
         );
@@ -685,7 +685,7 @@ public class TwitchChat implements ITwitchChat {
      */
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
-        ircWhisperBucket.asAsyncScheduler().consume(1, taskExecutor).thenRunAsync(
+        ircWhisperBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
             () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message)),
             taskExecutor
         );

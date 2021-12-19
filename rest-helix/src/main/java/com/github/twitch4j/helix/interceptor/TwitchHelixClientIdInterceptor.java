@@ -161,7 +161,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     }
 
     protected Bucket getOrInitializeBucket(String key) {
-        return buckets.get(key, k -> Bucket4j.builder().addLimit(DEFAULT_BANDWIDTH).build());
+        return buckets.get(key, k -> Bucket.builder().addLimit(DEFAULT_BANDWIDTH).build());
     }
 
     private OAuth2Credential getOrCreateAuthToken() {
