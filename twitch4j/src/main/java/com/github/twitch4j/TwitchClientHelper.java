@@ -248,11 +248,11 @@ public class TwitchClientHelper implements AutoCloseable {
             HystrixCommand<FollowList> commandGetFollowers = twitchHelix.getFollowers(null, null, channelId, null, MAX_LIMIT);
             try {
                 ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache());
-                Instant lastFollowDate = null;
+                Instant lastFollowDate = currentChannelCache.getLastFollowCheck();
 
                 boolean nextRequestCanBeImmediate = false;
 
-                if (currentChannelCache.getLastFollowCheck() != null) {
+                if (lastFollowDate != null) {
                     FollowList executionResult = commandGetFollowers.execute();
                     List<Follow> followList = executionResult.getFollows();
                     followBackoff.get().reset(); // API call was successful
@@ -293,7 +293,7 @@ public class TwitchClientHelper implements AutoCloseable {
                 if (currentChannelCache.getLastFollowCheck() == null) {
                     // only happens if the user doesn't have any followers at all
                     currentChannelCache.setLastFollowCheck(Instant.now());
-                } else {
+                } else if (lastFollowDate != null) {
                     // tracks the date of the latest follow to identify new ones later on
                     currentChannelCache.setLastFollowCheck(lastFollowDate);
                 }
