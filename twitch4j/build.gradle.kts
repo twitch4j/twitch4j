@@ -8,6 +8,9 @@ dependencies {
 
 	// Cache
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+
+	// Jackson
+	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
 }
 
 base {
