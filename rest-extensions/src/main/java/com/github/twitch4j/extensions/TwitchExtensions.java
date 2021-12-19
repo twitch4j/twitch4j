@@ -18,7 +18,10 @@ import java.util.Map;
 
 /**
  * Twitch - Extensions API
+ *
+ * @deprecated will be shutdown by twitch in February 2022 - https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708
  */
+@Deprecated
 public interface TwitchExtensions {
 
     /**

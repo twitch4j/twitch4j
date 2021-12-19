@@ -22,11 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Twitch API - Extensions
+ *
+ * @deprecated will be shutdown by twitch in February 2022 - https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Deprecated
 public class TwitchExtensionsBuilder {
 
     /**
