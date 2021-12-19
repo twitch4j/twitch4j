@@ -8,7 +8,7 @@ import lombok.Value;
 import lombok.experimental.Accessors;
 
 /**
- * Fired when a single message was deleted over IRC by a moderator via /delete <target-msg-id>
+ * Fired when a single message was deleted over IRC by a moderator via {@code /delete <target-msg-id>}
  */
 @Value
 @ToString(callSuper = true)
