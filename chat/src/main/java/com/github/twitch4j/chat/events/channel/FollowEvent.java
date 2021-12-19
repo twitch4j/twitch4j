@@ -13,19 +13,19 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class FollowEvent extends AbstractChannelEvent {
 
-	/**
-	 * User
-	 */
-	private EventUser user;
+    /**
+     * User
+     */
+    private EventUser user;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel The channel that this event originates from.
-	 * @param user    The user who triggered the event.
-	 */
-	public FollowEvent(EventChannel channel, EventUser user) {
-		super(channel);
-		this.user = user;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     * @param user    The user who triggered the event.
+     */
+    public FollowEvent(EventChannel channel, EventUser user) {
+        super(channel);
+        this.user = user;
+    }
 }

@@ -14,18 +14,18 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class HostOffEvent extends TwitchEvent {
 
-	/**
-	 * Event ChatChannel
-	 */
-	private EventChannel channel;
+    /**
+     * Event ChatChannel
+     */
+    private EventChannel channel;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
-	 */
-	public HostOffEvent(EventChannel channel) {
-		this.channel = channel;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     */
+    public HostOffEvent(EventChannel channel) {
+        this.channel = channel;
+    }
 
 }

@@ -16,7 +16,7 @@ public class TMIServiceTest {
      * @return TwitchMessagingInterface
      */
     public static TwitchMessagingInterface getClient() {
-       return TwitchMessagingInterfaceBuilder.builder().build();
+        return TwitchMessagingInterfaceBuilder.builder().build();
     }
 
     /**

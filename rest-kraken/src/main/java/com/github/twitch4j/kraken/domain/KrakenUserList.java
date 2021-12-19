@@ -6,8 +6,8 @@ import java.util.List;
 
 @Data
 public class KrakenUserList {
-	/**
-	 * Data
-	 */
-	private List<KrakenUser> users;
+    /**
+     * Data
+     */
+    private List<KrakenUser> users;
 }

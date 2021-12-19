@@ -37,7 +37,7 @@ public class FollowsTopic extends TwitchWebhookTopic<FollowList> {
      * At least one of fromId and toId is required.
      *
      * @param fromId Optional. Specifies the user who starts following someone.
-     * @param toId Optional. Specifies the user who has a new follower.
+     * @param toId   Optional. Specifies the user who has a new follower.
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @Deprecated

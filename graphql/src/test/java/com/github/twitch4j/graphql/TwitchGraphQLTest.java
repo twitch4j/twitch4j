@@ -7,7 +7,11 @@ import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.graphql.internal.FollowMutation;
 import com.github.twitch4j.graphql.internal.UnfollowMutation;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 @Tag("integration")

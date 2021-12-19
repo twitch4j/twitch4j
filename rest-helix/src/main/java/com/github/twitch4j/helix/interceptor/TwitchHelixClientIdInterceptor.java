@@ -9,7 +9,6 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

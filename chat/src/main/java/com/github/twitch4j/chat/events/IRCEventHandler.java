@@ -3,8 +3,46 @@ package com.github.twitch4j.chat.events;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.enums.NoticeTag;
-import com.github.twitch4j.chat.events.channel.*;
-import com.github.twitch4j.chat.events.roomstate.*;
+import com.github.twitch4j.chat.events.channel.BitsBadgeEarnedEvent;
+import com.github.twitch4j.chat.events.channel.ChannelJoinEvent;
+import com.github.twitch4j.chat.events.channel.ChannelLeaveEvent;
+import com.github.twitch4j.chat.events.channel.ChannelMessageActionEvent;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.chat.events.channel.ChannelModEvent;
+import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
+import com.github.twitch4j.chat.events.channel.CheerEvent;
+import com.github.twitch4j.chat.events.channel.ClearChatEvent;
+import com.github.twitch4j.chat.events.channel.DeleteMessageEvent;
+import com.github.twitch4j.chat.events.channel.ExtendSubscriptionEvent;
+import com.github.twitch4j.chat.events.channel.GiftSubUpgradeEvent;
+import com.github.twitch4j.chat.events.channel.GiftSubscriptionsEvent;
+import com.github.twitch4j.chat.events.channel.GlobalUserStateEvent;
+import com.github.twitch4j.chat.events.channel.HostOffEvent;
+import com.github.twitch4j.chat.events.channel.HostOnEvent;
+import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.events.channel.InboundHostEvent;
+import com.github.twitch4j.chat.events.channel.ListModsEvent;
+import com.github.twitch4j.chat.events.channel.ListVipsEvent;
+import com.github.twitch4j.chat.events.channel.MessageDeleteError;
+import com.github.twitch4j.chat.events.channel.MessageDeleteSuccess;
+import com.github.twitch4j.chat.events.channel.PayForwardEvent;
+import com.github.twitch4j.chat.events.channel.PrimeGiftReceivedEvent;
+import com.github.twitch4j.chat.events.channel.PrimeSubUpgradeEvent;
+import com.github.twitch4j.chat.events.channel.RaidCancellationEvent;
+import com.github.twitch4j.chat.events.channel.RaidEvent;
+import com.github.twitch4j.chat.events.channel.RewardGiftEvent;
+import com.github.twitch4j.chat.events.channel.RitualEvent;
+import com.github.twitch4j.chat.events.channel.SubscriptionEvent;
+import com.github.twitch4j.chat.events.channel.UserBanEvent;
+import com.github.twitch4j.chat.events.channel.UserStateEvent;
+import com.github.twitch4j.chat.events.channel.UserTimeoutEvent;
+import com.github.twitch4j.chat.events.roomstate.BroadcasterLanguageEvent;
+import com.github.twitch4j.chat.events.roomstate.EmoteOnlyEvent;
+import com.github.twitch4j.chat.events.roomstate.FollowersOnlyEvent;
+import com.github.twitch4j.chat.events.roomstate.Robot9000Event;
+import com.github.twitch4j.chat.events.roomstate.SlowModeEvent;
+import com.github.twitch4j.chat.events.roomstate.SubscribersOnlyEvent;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -28,7 +66,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
 
 /**
  * IRC Event Handler
- *
+ * <p>
  * Listens for any irc triggered events and created the corresponding events for the EventDispatcher.
  */
 @Getter
@@ -85,17 +123,18 @@ public class IRCEventHandler {
 
     /**
      * ChatChannel Message Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannelMessage(IRCMessageEvent event) {
-        if(event.getCommandType().equals("PRIVMSG")) {
-            if(!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
+        if (event.getCommandType().equals("PRIVMSG")) {
+            if (!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
 
                 // Dispatch Event
-                if(event.getMessage().get().startsWith("\u0001ACTION ")) {
+                if (event.getMessage().get().startsWith("\u0001ACTION ")) {
                     // Action
                     eventManager.publish(new ChannelMessageActionEvent(channel, event, user, event.getMessage().get().substring(8), event.getClientPermissions()));
                 } else {
@@ -108,10 +147,11 @@ public class IRCEventHandler {
 
     /**
      * Whisper Event
+     *
      * @param event IRCMessageEvent
      */
     public void onWhisper(IRCMessageEvent event) {
-        if(event.getCommandType().equals("WHISPER")) {
+        if (event.getCommandType().equals("WHISPER")) {
             // Load Info
             EventUser user = event.getUser();
 
@@ -141,11 +181,12 @@ public class IRCEventHandler {
 
     /**
      * ChatChannel Cheer (Bits) Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannelCheer(IRCMessageEvent event) {
-        if(event.getCommandType().equals("PRIVMSG")) {
-            if(event.getTags().containsKey("bits")) {
+        if (event.getCommandType().equals("PRIVMSG")) {
+            if (event.getTags().containsKey("bits")) {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
@@ -320,6 +361,7 @@ public class IRCEventHandler {
 
     /**
      * ChatChannel Raid Event (receiving)
+     *
      * @param event IRCMessageEvent
      */
     public void onRaid(IRCMessageEvent event) {
@@ -329,8 +371,7 @@ public class IRCEventHandler {
             Integer viewers;
             try {
                 viewers = Integer.parseInt(event.getTags().get("msg-param-viewerCount"));
-            }
-            catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 viewers = 0;
             }
             eventManager.publish(new RaidEvent(channel, raider, viewers));
@@ -394,6 +435,7 @@ public class IRCEventHandler {
 
     /**
      * ChatChannel clearing chat, timeouting or banning user Event
+     *
      * @param event IRCMessageEvent
      */
     public void onClearChat(IRCMessageEvent event) {
@@ -446,10 +488,11 @@ public class IRCEventHandler {
 
     /**
      * User Joins ChatChannel Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannnelClientJoinEvent(IRCMessageEvent event) {
-        if(event.getCommandType().equals("JOIN") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
+        if (event.getCommandType().equals("JOIN") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -463,10 +506,11 @@ public class IRCEventHandler {
 
     /**
      * User Leaves ChatChannel Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannnelClientLeaveEvent(IRCMessageEvent event) {
-        if(event.getCommandType().equals("PART") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
+        if (event.getCommandType().equals("PART") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -480,12 +524,13 @@ public class IRCEventHandler {
 
     /**
      * Mod Status Change Event
+     *
      * @param event IRCMessageEvent
      */
     public void onChannelModChange(IRCMessageEvent event) {
-        if(event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
+        if (event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
             // Receiving Mod Status
-            if(event.getPayload().get().substring(1).startsWith("o")) {
+            if (event.getPayload().get().substring(1).startsWith("o")) {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = new EventUser(null, event.getPayload().get().substring(3));

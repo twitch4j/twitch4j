@@ -7,15 +7,17 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public abstract class IModule {
-	private final String name;
-	private final String author;
-	private final String version;
-	public abstract void enable(ITwitchClient client);
-	public abstract void disable();
-	// String getMinimumTwitch4JVersion(); TODO: version implementing?
+    private final String name;
+    private final String author;
+    private final String version;
 
-	@Override
-	public String toString() {
-		return String.format("%s v[%s] by %s", name, version, author);
-	}
+    public abstract void enable(ITwitchClient client);
+
+    public abstract void disable();
+    // String getMinimumTwitch4JVersion(); TODO: version implementing?
+
+    @Override
+    public String toString() {
+        return String.format("%s v[%s] by %s", name, version, author);
+    }
 }

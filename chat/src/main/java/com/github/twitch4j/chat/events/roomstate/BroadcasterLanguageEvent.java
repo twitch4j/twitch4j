@@ -24,11 +24,11 @@ public class BroadcasterLanguageEvent extends ChannelStatesEvent {
     /**
      * Constructor
      *
-     * @param channel ChatChannel
+     * @param channel  ChatChannel
      * @param language Locale
      */
-	public BroadcasterLanguageEvent(EventChannel channel, Locale language) {
-		super(channel, language != null);
-		this.language = language;
-	}
+    public BroadcasterLanguageEvent(EventChannel channel, Locale language) {
+        super(channel, language != null);
+        this.language = language;
+    }
 }

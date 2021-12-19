@@ -1,6 +1,10 @@
 package com.github.twitch4j.helix.domain;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.List;
 

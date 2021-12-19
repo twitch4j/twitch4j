@@ -6,10 +6,85 @@ import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
-import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.domain.AutoModHeldMessageAction;
+import com.github.twitch4j.helix.domain.AutoModSettings;
+import com.github.twitch4j.helix.domain.AutoModSettingsWrapper;
+import com.github.twitch4j.helix.domain.AutomodEnforceCheckList;
+import com.github.twitch4j.helix.domain.AutomodEnforceStatusList;
+import com.github.twitch4j.helix.domain.BanUserInput;
+import com.github.twitch4j.helix.domain.BanUsersList;
+import com.github.twitch4j.helix.domain.BannedEventList;
+import com.github.twitch4j.helix.domain.BannedUserList;
+import com.github.twitch4j.helix.domain.BitsLeaderboard;
+import com.github.twitch4j.helix.domain.BlockedTermList;
+import com.github.twitch4j.helix.domain.BlockedUserList;
+import com.github.twitch4j.helix.domain.CategorySearchList;
+import com.github.twitch4j.helix.domain.ChannelEditorList;
+import com.github.twitch4j.helix.domain.ChannelInformation;
+import com.github.twitch4j.helix.domain.ChannelInformationList;
+import com.github.twitch4j.helix.domain.ChannelSearchList;
+import com.github.twitch4j.helix.domain.ChatBadgeSetList;
+import com.github.twitch4j.helix.domain.ChatSettings;
+import com.github.twitch4j.helix.domain.ChatSettingsWrapper;
+import com.github.twitch4j.helix.domain.CheermoteList;
+import com.github.twitch4j.helix.domain.ClipList;
+import com.github.twitch4j.helix.domain.CodeStatusList;
+import com.github.twitch4j.helix.domain.CommercialList;
+import com.github.twitch4j.helix.domain.CreateClipList;
+import com.github.twitch4j.helix.domain.CreatorGoalsList;
+import com.github.twitch4j.helix.domain.CustomReward;
+import com.github.twitch4j.helix.domain.CustomRewardList;
+import com.github.twitch4j.helix.domain.CustomRewardRedemptionList;
+import com.github.twitch4j.helix.domain.DeletedVideoList;
+import com.github.twitch4j.helix.domain.DropFulfillmentStatus;
+import com.github.twitch4j.helix.domain.DropsEntitlementList;
+import com.github.twitch4j.helix.domain.EmoteList;
+import com.github.twitch4j.helix.domain.EventSubSubscriptionList;
+import com.github.twitch4j.helix.domain.ExtensionActiveList;
+import com.github.twitch4j.helix.domain.ExtensionAnalyticsList;
+import com.github.twitch4j.helix.domain.ExtensionList;
+import com.github.twitch4j.helix.domain.ExtensionTransactionList;
+import com.github.twitch4j.helix.domain.FollowList;
+import com.github.twitch4j.helix.domain.GameAnalyticsList;
+import com.github.twitch4j.helix.domain.GameList;
+import com.github.twitch4j.helix.domain.GameTopList;
+import com.github.twitch4j.helix.domain.Highlight;
+import com.github.twitch4j.helix.domain.HypeTrainEventList;
+import com.github.twitch4j.helix.domain.IngestServerList;
+import com.github.twitch4j.helix.domain.ModeratorEventList;
+import com.github.twitch4j.helix.domain.ModeratorList;
+import com.github.twitch4j.helix.domain.Poll;
+import com.github.twitch4j.helix.domain.PollsList;
+import com.github.twitch4j.helix.domain.Prediction;
+import com.github.twitch4j.helix.domain.PredictionsList;
+import com.github.twitch4j.helix.domain.ScheduleSegmentInput;
+import com.github.twitch4j.helix.domain.SoundtrackCurrentTrackWrapper;
+import com.github.twitch4j.helix.domain.SoundtrackPlaylistMetadataList;
+import com.github.twitch4j.helix.domain.SoundtrackPlaylistTracksWrapper;
+import com.github.twitch4j.helix.domain.StreamKeyList;
+import com.github.twitch4j.helix.domain.StreamList;
+import com.github.twitch4j.helix.domain.StreamMarker;
+import com.github.twitch4j.helix.domain.StreamMarkersList;
+import com.github.twitch4j.helix.domain.StreamScheduleResponse;
+import com.github.twitch4j.helix.domain.StreamTagList;
+import com.github.twitch4j.helix.domain.SubscriptionEventList;
+import com.github.twitch4j.helix.domain.SubscriptionList;
+import com.github.twitch4j.helix.domain.TeamList;
+import com.github.twitch4j.helix.domain.TeamMembershipList;
+import com.github.twitch4j.helix.domain.UpdateDropEntitlementInput;
+import com.github.twitch4j.helix.domain.UpdatedDropEntitlementsList;
+import com.github.twitch4j.helix.domain.UploadEntitlementUrlList;
+import com.github.twitch4j.helix.domain.UserList;
+import com.github.twitch4j.helix.domain.VideoList;
+import com.github.twitch4j.helix.domain.WebhookSubscriptionList;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
-import feign.*;
+import feign.Body;
+import feign.CollectionFormat;
+import feign.Headers;
+import feign.Param;
+import feign.RequestLine;
+import feign.Response;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -94,7 +169,7 @@ public interface TwitchHelix {
     /**
      * Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat
      *
-     * @param authToken Auth Token
+     * @param authToken     Auth Token
      * @param broadcasterId ID for the broadcaster who might own specialized Cheermotes (optional)
      * @return CheermoteList
      */
@@ -549,11 +624,11 @@ public interface TwitchHelix {
     /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
-     * @param authToken App Access  OAuth Token
-     * @param extensionId ID of the extension to list transactions for.
+     * @param authToken      App Access  OAuth Token
+     * @param extensionId    ID of the extension to list transactions for.
      * @param transactionIds Transaction IDs to look up. Can include multiple to fetch multiple transactions in a single request. Maximum: 100
-     * @param after The cursor used to fetch the next page of data. This only applies to queries without ID. If an ID is specified, it supersedes the cursor.
-     * @param limit Maximum number of objects to return. Maximum: 100 Default: 20
+     * @param after          The cursor used to fetch the next page of data. This only applies to queries without ID. If an ID is specified, it supersedes the cursor.
+     * @param limit          Maximum number of objects to return. Maximum: 100 Default: 20
      * @return ExtensionTransactionList
      */
     @RequestLine("GET /extensions/transactions?after={after}&extension_id={extension_id}&first={first}&id={id}")
@@ -570,9 +645,9 @@ public interface TwitchHelix {
      * Returns a list of games or categories that match the query via name either entirely or partially
      *
      * @param authToken Auth Token
-     * @param query the search query
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param after Cursor for forward pagination
+     * @param query     the search query
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after     Cursor for forward pagination
      * @return CategorySearchList
      */
     @RequestLine("GET /search/categories?after={after}&first={first}&query={query}")
@@ -587,7 +662,7 @@ public interface TwitchHelix {
     /**
      * Gets channel information for users
      *
-     * @param authToken Auth Token
+     * @param authToken      Auth Token
      * @param broadcasterIds IDs of the channels to be retrieved
      * @return ChannelInformationList
      */
@@ -601,8 +676,8 @@ public interface TwitchHelix {
     /**
      * Modifies channel information for users
      *
-     * @param authToken Auth Token (scope: channel:manage:broadcast or user:edit:broadcast)
-     * @param broadcasterId ID of the channel to be updated (required)
+     * @param authToken          Auth Token (scope: channel:manage:broadcast or user:edit:broadcast)
+     * @param broadcasterId      ID of the channel to be updated (required)
      * @param channelInformation {@link ChannelInformation} (at least one parameter must be provided)
      * @return 204 No Content upon a successful update
      */
@@ -621,10 +696,10 @@ public interface TwitchHelix {
      * Returns a list of channels (those that have streamed within the past 6 months) that match the query either entirely or partially
      *
      * @param authToken Auth Token
-     * @param query the search query
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
-     * @param after Cursor for forward pagination
-     * @param liveOnly Filter results for live streams only. Default: false
+     * @param query     the search query
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after     Cursor for forward pagination
+     * @param liveOnly  Filter results for live streams only. Default: false
      * @return ChannelSearchList
      */
     @RequestLine("GET /search/channels?after={after}&first={first}&live_only={live_only}&query={query}")
@@ -683,9 +758,9 @@ public interface TwitchHelix {
     /**
      * Starts a commercial on a specified channel
      *
-     * @param authToken Auth Token (scope: channel:edit:commercial)
+     * @param authToken     Auth Token (scope: channel:edit:commercial)
      * @param broadcasterId ID of the channel requesting a commercial
-     * @param length Desired length of the commercial in seconds. Valid options are 30, 60, 90, 120, 150, 180.
+     * @param length        Desired length of the commercial in seconds. Valid options are 30, 60, 90, 120, 150, 180.
      * @return CommercialList
      */
     @RequestLine("POST /channels/commercial")
@@ -735,7 +810,7 @@ public interface TwitchHelix {
      * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
      * Using user-token or app-token to increase rate limits.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
+     * @param authToken     User or App auth Token, for increased rate-limits
      * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
      * @param gameId        ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
      * @param id            ID of the clip being queried. Limit: 100.
@@ -763,9 +838,9 @@ public interface TwitchHelix {
     /**
      * Creates a URL where you can upload a manifest file and notify users that they have an entitlement
      *
-     * @param authToken App access token
+     * @param authToken  App access token
      * @param manifestId Unique identifier of the manifest file to be uploaded. Must be 1-64 characters.
-     * @param type Type of entitlement being granted. Only "bulk_drops_grant" is supported.
+     * @param type       Type of entitlement being granted. Only "bulk_drops_grant" is supported.
      * @return UploadEntitlementUrlList
      */
     @RequestLine("POST /entitlements/upload?manifest_id={manifest_id}&type={type}")
@@ -781,8 +856,8 @@ public interface TwitchHelix {
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param id Game ID. At most 100 id values can be specified.
-     * @param name Game name. The name must be an exact match. For instance, â€œPokemonâ€� will not return a list of Pokemon games; instead, query the specific Pokemon game(s) in which you are interested. At most 100 name values can be specified.
+     * @param id        Game ID. At most 100 id values can be specified.
+     * @param name      Game name. The name must be an exact match. For instance, â€œPokemonâ€� will not return a list of Pokemon games; instead, query the specific Pokemon game(s) in which you are interested. At most 100 name values can be specified.
      * @return GameList
      */
     @RequestLine("GET /games?id={id}&name={name}")
@@ -816,11 +891,11 @@ public interface TwitchHelix {
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response
      *
-     * @param authToken Auth Token (scope: channel:read:hype_train)
+     * @param authToken     Auth Token (scope: channel:read:hype_train)
      * @param broadcasterId User ID of the broadcaster (required)
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
-     * @param id The id of the wanted event, if known. (optional)
-     * @param after Cursor for forward pagination (optional)
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
+     * @param id            The id of the wanted event, if known. (optional)
+     * @param after         Cursor for forward pagination (optional)
      * @return HypeTrainEventList
      */
     @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&id={id}&after={after}")
@@ -1137,11 +1212,11 @@ public interface TwitchHelix {
     /**
      * Returns all moderators in a channel.
      *
-     * @param authToken User Token for the broadcaster
+     * @param authToken     User Token for the broadcaster
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
-     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param userIds       Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return ModeratorList
      */
     @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
@@ -1157,10 +1232,10 @@ public interface TwitchHelix {
     /**
      * Returns all moderators in a channel.
      *
-     * @param authToken User Token for the broadcaster
+     * @param authToken     User Token for the broadcaster
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
-     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param userIds       Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
      * @return ModeratorList
      * @deprecated in favor of getModerators(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
@@ -1342,9 +1417,9 @@ public interface TwitchHelix {
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param before Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param first Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before    Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param first     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return GameList
      */
     @RequestLine("GET /games/top?after={after}&before={before}&first={first}")
@@ -1556,7 +1631,7 @@ public interface TwitchHelix {
     /**
      * Gets the channel stream key for a user
      *
-     * @param authToken Auth Token (scope: channel:read:stream_key)
+     * @param authToken     Auth Token (scope: channel:read:stream_key)
      * @param broadcasterId User ID of the broadcaster
      * @return StreamKeyList
      */
@@ -1579,10 +1654,10 @@ public interface TwitchHelix {
     @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getAllStreamTags(
-            @Param("token") String authToken,
-            @Param("after") String after,
-            @Param("first") Integer limit,
-            @Param("tag_id") List<UUID> tagIds
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit,
+        @Param("tag_id") List<UUID> tagIds
     );
 
     /**
@@ -1595,8 +1670,8 @@ public interface TwitchHelix {
     @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getStreamTags(
-            @Param("token") String authToken,
-            @Param("broadcaster_id") String broadcasterId
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -1615,9 +1690,9 @@ public interface TwitchHelix {
     })
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
     HystrixCommand<Void> replaceStreamTags(
-            @Param("token") String authToken,
-            @Param("broadcaster_id") String broadcasterId,
-            @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
     );
 
     /**
@@ -1626,8 +1701,8 @@ public interface TwitchHelix {
      * Markers can be created only if the broadcast identified by the specified {@code userId} is live and has enabled VOD (past broadcast) storage. Marker creation will fail if the broadcaster is airing a premiere or a rerun.
      * Requires scope: channel:manage:broadcast or user:edit:broadcast
      *
-     * @param authToken     Auth Token
-     * @param highlight     User id and optional description for the marker
+     * @param authToken Auth Token
+     * @param highlight User id and optional description for the marker
      * @return StreamMarker
      */
     @RequestLine("POST /streams/markers")
@@ -1665,11 +1740,11 @@ public interface TwitchHelix {
     /**
      * Get all subscribers of a channel
      *
-     * @param authToken User Auth Token
+     * @param authToken     User Auth Token
      * @param broadcasterId User ID of the broadcaster. Must match the User ID in the Bearer token.
-     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param before    Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param before        Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return SubscriptionList
      */
     @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&after={after}&before={before}&first={first}")
@@ -1685,9 +1760,9 @@ public interface TwitchHelix {
     /**
      * Check subscription status of provided user IDs (one or more) for a given channel
      *
-     * @param authToken User Auth Token
+     * @param authToken     User Auth Token
      * @param broadcasterId User ID of the broadcaster. Must match the User ID in the Bearer token.
-     * @param userIds Unique identifier of account to get subscription status of. Accepts up to 100 values.
+     * @param userIds       Unique identifier of account to get subscription status of. Accepts up to 100 values.
      * @return SubscriptionList
      */
     @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&user_id={user_id}")
@@ -1851,10 +1926,10 @@ public interface TwitchHelix {
      * Using user-token or app-token to increase rate limits.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param fromId User ID. The request returns information about users who are being followed by the from_id user.
-     * @param toId   User ID. The request returns information about users who are following the to_id user.
-     * @param after  Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit  Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param fromId    User ID. The request returns information about users who are being followed by the from_id user.
+     * @param toId      User ID. The request returns information about users who are following the to_id user.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return FollowList
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
@@ -1870,9 +1945,9 @@ public interface TwitchHelix {
     /**
      * Adds a specified user to the followers of a specified channel
      *
-     * @param authToken Auth Token (scope: user:edit:follows)
-     * @param fromId User ID of the follower
-     * @param toId ID of the channel to be followed by the user
+     * @param authToken          Auth Token (scope: user:edit:follows)
+     * @param fromId             User ID of the follower
+     * @param toId               ID of the channel to be followed by the user
      * @param allowNotifications Whether the user gets email or push notifications (depending on the user’s notification settings) when the channel goes live. Default value is false
      * @return 204 No Content upon a successfully created follow
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
@@ -1895,8 +1970,8 @@ public interface TwitchHelix {
      * Deletes a specified user from the followers of a specified channel
      *
      * @param authToken Auth Token (scope: user:edit:follows)
-     * @param fromId User ID of the follower
-     * @param toId Channel to be unfollowed by the user
+     * @param fromId    User ID of the follower
+     * @param toId      Channel to be unfollowed by the user
      * @return 204 No Content upon a successful deletion from the list of channel followers
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-create-and-delete-follows-api-endpoints/32351">Decommissioned by Twitch.</a>
      */
@@ -1962,7 +2037,7 @@ public interface TwitchHelix {
      * Updates the activation state, extension ID, and/or version number of installed extensions for a specified user, identified by a Bearer token.
      * If you try to activate a given extension under multiple extension types, the last write wins (and there is no guarantee of write order).
      *
-     * @param authToken Auth Token (scope: user:edit:broadcast)
+     * @param authToken  Auth Token (scope: user:edit:broadcast)
      * @param extensions {@link ExtensionActiveList}
      * @return ExtensionActiveList
      */
@@ -2034,12 +2109,12 @@ public interface TwitchHelix {
      * Get Webhook Subscriptions
      * <p>
      * Gets the Webhook subscriptions of a user identified by a Bearer token, in order of expiration.
-     *
+     * <p>
      * The response has a JSON payload with a data field containing an array of subscription elements and a pagination field containing information required to query for more subscriptions.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param after    Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit    Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return WebhookSubscriptionList
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
@@ -2066,11 +2141,10 @@ public interface TwitchHelix {
      * <p> * Subscription verify</p>
      * <p> * Subscription denied</p>
      *
-     * @param request WebhookRequest to be converted to the Json body of the API call.
-     * @param authToken   Auth Token
-     *
-     * @see <a href="https://dev.twitch.tv/docs/api/webhooks-guid/">Twitch Webhooks Guide</a>
+     * @param request   WebhookRequest to be converted to the Json body of the API call.
+     * @param authToken Auth Token
      * @return The response from the server
+     * @see <a href="https://dev.twitch.tv/docs/api/webhooks-guid/">Twitch Webhooks Guide</a>
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("POST /webhooks/hub")

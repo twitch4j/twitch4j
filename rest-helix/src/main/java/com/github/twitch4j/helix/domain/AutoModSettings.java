@@ -85,7 +85,7 @@ public class AutoModSettings {
      * @return whether the settings are valid to be passed to {@link com.github.twitch4j.helix.TwitchHelix#updateChatSettings(String, String, String, ChatSettings)}
      */
     public boolean isValidConfiguration() {
-        Integer[] levels = { aggression, bullying, disability, misogyny, raceEthnicityOrReligion, sexBasedTerms, sexualitySexOrGender, swearing };
+        Integer[] levels = {aggression, bullying, disability, misogyny, raceEthnicityOrReligion, sexBasedTerms, sexualitySexOrGender, swearing};
         boolean individual = Arrays.stream(levels).anyMatch(Objects::nonNull);
 
         if (individual) {

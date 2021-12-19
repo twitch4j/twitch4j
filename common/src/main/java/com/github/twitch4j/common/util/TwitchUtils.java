@@ -5,7 +5,13 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TwitchUtils {
 

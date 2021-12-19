@@ -6,22 +6,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public abstract class TwitchEvent extends Event {
 
-	/**
-	 * Constructor
-	 */
-	public TwitchEvent() {
-		super();
-	}
+    /**
+     * Constructor
+     */
+    public TwitchEvent() {
+        super();
+    }
 
-	/**
+    /**
      * Get TwitchChat
      *
      * @return TwitchChat Instance
-	 */
-	public TwitchChat getTwitchChat() {
-	    return getServiceMediator().getService(TwitchChat.class, "twitch4j-chat");
+     */
+    public TwitchChat getTwitchChat() {
+        return getServiceMediator().getService(TwitchChat.class, "twitch4j-chat");
     }
 }

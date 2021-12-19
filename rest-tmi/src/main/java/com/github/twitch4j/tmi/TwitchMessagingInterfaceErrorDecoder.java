@@ -40,7 +40,7 @@ public class TwitchMessagingInterfaceErrorDecoder implements ErrorDecoder {
      * Overwrite the Decode Method to handle custom error cases
      *
      * @param methodKey Method Key
-     * @param response Response
+     * @param response  Response
      * @return Exception
      */
     @Override

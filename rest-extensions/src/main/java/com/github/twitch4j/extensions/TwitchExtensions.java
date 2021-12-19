@@ -1,13 +1,13 @@
 package com.github.twitch4j.extensions;
 
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.github.twitch4j.extensions.domain.ChannelList;
 import com.github.twitch4j.extensions.domain.ConfigurationSegment;
 import com.github.twitch4j.extensions.domain.ConfigurationSegmentType;
 import com.github.twitch4j.extensions.domain.ExtensionConfigurationSegment;
 import com.github.twitch4j.extensions.domain.ExtensionInformation;
 import com.github.twitch4j.extensions.domain.ExtensionSecretList;
-import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Body;
 import feign.Headers;

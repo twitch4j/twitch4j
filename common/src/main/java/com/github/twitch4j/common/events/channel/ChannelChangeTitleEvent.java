@@ -28,8 +28,8 @@ public class ChannelChangeTitleEvent extends TwitchEvent {
     /**
      * Event Constructor
      *
-     * @param channel        The channel that went live
-     * @param title          The stream title
+     * @param channel The channel that went live
+     * @param title   The stream title
      */
     public ChannelChangeTitleEvent(EventChannel channel, String title) {
         this.channel = channel;

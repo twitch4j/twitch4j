@@ -17,47 +17,47 @@ import java.util.Currency;
 @EqualsAndHashCode(callSuper = false)
 public class DonationEvent extends AbstractChannelEvent {
 
-	/**
-	 * User
-	 */
-	private EventUser user;
+    /**
+     * User
+     */
+    private EventUser user;
 
-	/**
-	 * Donation Source
-	 */
-	private String source;
+    /**
+     * Donation Source
+     */
+    private String source;
 
-	/**
-	 * Donation Currency
-	 */
-	private Currency currency;
+    /**
+     * Donation Currency
+     */
+    private Currency currency;
 
-	/**
-	 * Donation Amount
-	 */
-	private Double amount;
+    /**
+     * Donation Amount
+     */
+    private Double amount;
 
-	/**
-	 * Donation Message
-	 */
-	private String message;
+    /**
+     * Donation Message
+     */
+    private String message;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel  The channel that this event originates from.
-	 * @param user     The user who triggered the event.
-	 * @param source   The source, where information was received from.
-	 * @param currency The currency, that money was donated in.
-	 * @param amount   The donated amount.
-	 * @param message  The plain text of the message.
-	 */
-	public DonationEvent(EventChannel channel, EventUser user, String source, Currency currency, Double amount, String message) {
-		super(channel);
-		this.user = user;
-		this.source = source;
-		this.currency = currency;
-		this.amount = amount;
-		this.message = message;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel  The channel that this event originates from.
+     * @param user     The user who triggered the event.
+     * @param source   The source, where information was received from.
+     * @param currency The currency, that money was donated in.
+     * @param amount   The donated amount.
+     * @param message  The plain text of the message.
+     */
+    public DonationEvent(EventChannel channel, EventUser user, String source, Currency currency, Double amount, String message) {
+        super(channel);
+        this.user = user;
+        this.source = source;
+        this.currency = currency;
+        this.amount = amount;
+        this.message = message;
+    }
 }

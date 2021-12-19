@@ -7,7 +7,7 @@ public class EventManagerUtils {
     /**
      * Validates the provided EventManager or initializes a new one
      *
-     * @param eventManager EventManager
+     * @param eventManager        EventManager
      * @param defaultEventHandler The default eventHandler class
      * @return EventManager
      */
@@ -23,7 +23,7 @@ public class EventManagerUtils {
     }
 
     /**
-     *  Initializes a new EventManager instance.
+     * Initializes a new EventManager instance.
      *
      * @param defaultEventHandler The default eventHandler class
      * @return EventManager

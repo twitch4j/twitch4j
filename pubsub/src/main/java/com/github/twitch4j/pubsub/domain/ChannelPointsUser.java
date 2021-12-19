@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class ChannelPointsUser {
 
-	private String id;
-	private String login;
-	private String displayName;
+    private String id;
+    private String login;
+    private String displayName;
 
 }

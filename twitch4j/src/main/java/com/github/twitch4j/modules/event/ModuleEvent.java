@@ -10,5 +10,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 abstract class ModuleEvent extends Event {
-	private final IModule module;
+    private final IModule module;
 }

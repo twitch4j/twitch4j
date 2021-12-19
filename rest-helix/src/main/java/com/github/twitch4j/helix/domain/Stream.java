@@ -26,62 +26,92 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 public class Stream {
 
-    /** Stream ID. */
+    /**
+     * Stream ID.
+     */
     @NonNull
     private String id;
 
-    /** ID of the user who is streaming. */
+    /**
+     * ID of the user who is streaming.
+     */
     @NonNull
     private String userId;
 
-    /** Login of the user who is streaming. */
+    /**
+     * Login of the user who is streaming.
+     */
     @NonNull
     private String userLogin;
 
-    /** Display name of the user who is streaming */
+    /**
+     * Display name of the user who is streaming
+     */
     @NonNull
     private String userName;
 
-    /** ID of the game being played on the stream. */
+    /**
+     * ID of the game being played on the stream.
+     */
     private String gameId;
 
-    /** Name of the game being played. */
+    /**
+     * Name of the game being played.
+     */
     private String gameName;
 
-    /** Array of community IDs. */
+    /**
+     * Array of community IDs.
+     */
     @Deprecated
     private List<UUID> communityIds;
 
-    /** Stream type: "live" or "" (in case of error). */
+    /**
+     * Stream type: "live" or "" (in case of error).
+     */
     @NonNull
     private String type;
 
-    /** Stream title. */
+    /**
+     * Stream title.
+     */
     @NonNull
     private String title;
 
-    /** Number of viewers watching the stream at the time of the query. */
+    /**
+     * Number of viewers watching the stream at the time of the query.
+     */
     @NonNull
     private Integer viewerCount;
 
-    /** UTC timestamp on when the stream started */
+    /**
+     * UTC timestamp on when the stream started
+     */
     @NonNull
     @JsonProperty("started_at")
     private Instant startedAtInstant;
 
-    /** Ids of active tags on the stream */
+    /**
+     * Ids of active tags on the stream
+     */
     private List<UUID> tagIds = new ArrayList<>();
 
-    /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */
+    /**
+     * Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences.
+     */
     @Accessors(fluent = true)
     @JsonProperty("is_mature")
     private Boolean isMature;
 
-    /** Stream language. */
+    /**
+     * Stream language.
+     */
     @NonNull
     private String language;
 
-    /** Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image */
+    /**
+     * Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image
+     */
     @NonNull
     private String thumbnailUrl;
 

@@ -12,7 +12,7 @@ public class ModuleEnabledEvent extends ModuleEvent {
      *
      * @param module Module
      */
-	public ModuleEnabledEvent(IModule module) {
-		super(module);
-	}
+    public ModuleEnabledEvent(IModule module) {
+        super(module);
+    }
 }

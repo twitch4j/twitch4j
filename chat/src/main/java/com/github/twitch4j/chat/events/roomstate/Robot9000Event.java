@@ -17,9 +17,9 @@ public class Robot9000Event extends ChannelStatesEvent {
      * Constructor
      *
      * @param channel ChatChannel
-     * @param active State active?
+     * @param active  State active?
      */
-	public Robot9000Event(EventChannel channel, boolean active) {
-		super(channel, active);
-	}
+    public Robot9000Event(EventChannel channel, boolean active) {
+        super(channel, active);
+    }
 }

@@ -42,7 +42,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
      * Overwrite the Decode Method to handle custom error cases
      *
      * @param methodKey Method Key
-     * @param response Response
+     * @param response  Response
      * @return Exception
      */
     @Override
@@ -66,7 +66,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 ex = new ContextedRuntimeException("To many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);;
+                    .addContextValue("responseBody", responseBody);
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.

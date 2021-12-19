@@ -21,58 +21,92 @@ import java.util.List;
 @NoArgsConstructor
 public class Video {
 
-    /** ID of the video. */
+    /**
+     * ID of the video.
+     */
     private String id;
 
-    /** ID of the stream that the video originated from if the type is "archive". Otherwise set to null. */
+    /**
+     * ID of the stream that the video originated from if the type is "archive". Otherwise set to null.
+     */
     @Nullable
     private String streamId;
 
-    /** ID of the user who owns the video. */
+    /**
+     * ID of the user who owns the video.
+     */
     private String userId;
 
-    /** Login of the user who owns the video. */
+    /**
+     * Login of the user who owns the video.
+     */
     private String userLogin;
 
-    /** Login name corresponding to user_id. */
+    /**
+     * Login name corresponding to user_id.
+     */
     private String userName;
 
-    /** Title of the video. */
+    /**
+     * Title of the video.
+     */
     private String title;
 
-    /** Description of the video. */
+    /**
+     * Description of the video.
+     */
     private String description;
 
-    /** Date when the video was created. */
+    /**
+     * Date when the video was created.
+     */
     @JsonProperty("created_at")
     private Instant createdAtInstant;
 
-    /** Date when the video was published. */
+    /**
+     * Date when the video was published.
+     */
     @JsonProperty("published_at")
     private Instant publishedAtInstant;
 
-    /** URL of the video. */
+    /**
+     * URL of the video.
+     */
     private String url;
 
-    /** Template URL for the thumbnail of the video. */
+    /**
+     * Template URL for the thumbnail of the video.
+     */
     private String thumbnailUrl;
 
-    /** Indicates whether the video is publicly viewable. Valid values: "public", "private". */
+    /**
+     * Indicates whether the video is publicly viewable. Valid values: "public", "private".
+     */
     private String viewable;
 
-    /** Number of times the video has been viewed. */
+    /**
+     * Number of times the video has been viewed.
+     */
     private Integer viewCount;
 
-    /** Language of the video. */
+    /**
+     * Language of the video.
+     */
     private String language;
 
-    /** Type of video. Valid values: "upload", "archive", "highlight". */
+    /**
+     * Type of video. Valid values: "upload", "archive", "highlight".
+     */
     private String type;
 
-    /** Length of the video. */
+    /**
+     * Length of the video.
+     */
     private String duration;
 
-    /** Array of muted segments in the video. If there are no muted segments, the value will be null. */
+    /**
+     * Array of muted segments in the video. If there are no muted segments, the value will be null.
+     */
     @Nullable
     private List<MutedSegment> mutedSegments;
 
@@ -86,8 +120,8 @@ public class Video {
     public String getThumbnailUrl(int width, int height) {
         return StringUtils.replaceEach(
             this.getThumbnailUrl(),
-            new String[] { "%{width}", "%{height}" },
-            new String[] { String.valueOf(width), String.valueOf(height) }
+            new String[]{"%{width}", "%{height}"},
+            new String[]{String.valueOf(width), String.valueOf(height)}
         );
     }
 

@@ -3,7 +3,11 @@ package com.github.twitch4j.pubsub;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 @Slf4j
 @Tag("integration")

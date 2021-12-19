@@ -20,17 +20,17 @@ public class FollowersOnlyEvent extends ChannelStatesEvent {
      */
     long time;
 
-	public FollowersOnlyEvent(EventChannel channel, long time, TimeUnit timeUnit) {
-		super(channel, time > -1);
-		this.time = timeUnit.toSeconds(time);
-	}
+    public FollowersOnlyEvent(EventChannel channel, long time, TimeUnit timeUnit) {
+        super(channel, time > -1);
+        this.time = timeUnit.toSeconds(time);
+    }
 
-	public FollowersOnlyEvent(EventChannel channel, long time) {
-		super(channel, time > -1);
-		this.time = TimeUnit.MINUTES.toSeconds(time);
-	}
+    public FollowersOnlyEvent(EventChannel channel, long time) {
+        super(channel, time > -1);
+        this.time = TimeUnit.MINUTES.toSeconds(time);
+    }
 
-	public long getTime(TimeUnit timeUnit) {
-		return timeUnit.convert(time, TimeUnit.SECONDS);
-	}
+    public long getTime(TimeUnit timeUnit) {
+        return timeUnit.convert(time, TimeUnit.SECONDS);
+    }
 }

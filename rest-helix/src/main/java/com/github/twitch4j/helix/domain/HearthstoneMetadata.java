@@ -1,7 +1,11 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Hearthstone Metadata
@@ -11,11 +15,15 @@ import lombok.*;
 @NoArgsConstructor
 public class HearthstoneMetadata {
 
-    /** The Broadcaster */
+    /**
+     * The Broadcaster
+     */
     @NonNull
     private HearthstonePlayer broadcaster;
 
-    /** The Opponent */
+    /**
+     * The Opponent
+     */
     @NonNull
     private HearthstonePlayer opponent;
 
@@ -27,7 +35,9 @@ public class HearthstoneMetadata {
     @NoArgsConstructor
     static class HearthstonePlayer {
 
-        /** Hero Type */
+        /**
+         * Hero Type
+         */
         private HearthstoneHero hero;
 
     }
@@ -40,16 +50,22 @@ public class HearthstoneMetadata {
     @NoArgsConstructor
     static class HearthstoneHero {
 
-        /** Name of the Hearthstone hero. */
+        /**
+         * Name of the Hearthstone hero.
+         */
         @NonNull
         private String name;
 
-        /** Class of the Hearthstone hero. */
+        /**
+         * Class of the Hearthstone hero.
+         */
         @NonNull
         @JsonProperty("class")
         private String className;
 
-        /** Type of Hearthstone hero. */
+        /**
+         * Type of Hearthstone hero.
+         */
         @NonNull
         private String type;
 

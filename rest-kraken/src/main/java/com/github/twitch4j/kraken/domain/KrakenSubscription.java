@@ -8,17 +8,17 @@ import java.time.Instant;
 @Data
 public class KrakenSubscription {
 
-	@JsonProperty("_id")
-	private String id;
+    @JsonProperty("_id")
+    private String id;
 
-	private Instant createdAt;
+    private Instant createdAt;
 
-	private KrakenUser user;
+    private KrakenUser user;
 
-	@JsonProperty("sub_plan")
-	private String subscriptionPlan;
+    @JsonProperty("sub_plan")
+    private String subscriptionPlan;
 
-	@JsonProperty("sub_plan_name")
-	private String subscriptionName;
+    @JsonProperty("sub_plan_name")
+    private String subscriptionName;
 
 }

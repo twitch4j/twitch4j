@@ -25,7 +25,7 @@ public class Highlight {
 
     public Highlight(String userId, String description) {
         this.userId = userId;
-        if(description == null)
+        if (description == null)
             this.description = "";
         else
             this.description = description;

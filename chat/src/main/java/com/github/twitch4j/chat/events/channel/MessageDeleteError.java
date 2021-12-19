@@ -19,7 +19,7 @@ public class MessageDeleteError extends AbstractChannelEvent {
     /**
      * Event Constructor
      *
-     * @param channel       The channel that this event originates from.
+     * @param channel The channel that this event originates from.
      */
     public MessageDeleteError(EventChannel channel) {
         super(channel);

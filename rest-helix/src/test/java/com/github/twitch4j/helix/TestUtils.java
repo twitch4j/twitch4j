@@ -28,7 +28,7 @@ public class TestUtils {
 
     /**
      * Gets a instance of the Helix Client
-     * 
+     *
      * @return TwitchHelix
      */
     public static TwitchHelix getTwitchHelixClient() {

@@ -33,9 +33,9 @@ public class ChannelGoLiveEvent extends TwitchEvent {
     /**
      * Event Constructor
      *
-     * @param channel        The channel that went live
-     * @param title          The stream title
-     * @param gameId         The gameId
+     * @param channel The channel that went live
+     * @param title   The stream title
+     * @param gameId  The gameId
      */
     public ChannelGoLiveEvent(EventChannel channel, String title, String gameId) {
         this.channel = channel;

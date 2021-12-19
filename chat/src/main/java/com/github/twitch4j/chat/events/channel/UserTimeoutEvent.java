@@ -15,33 +15,33 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class UserTimeoutEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event Target User
-	 */
-	private EventUser user;
+    /**
+     * Event Target User
+     */
+    private EventUser user;
 
-	/**
-	 * Duration in Minutes
-	 */
-	private Integer duration;
+    /**
+     * Duration in Minutes
+     */
+    private Integer duration;
 
-	/**
-	 * Reason for Punishment
-	 */
-	private String reason;
+    /**
+     * Reason for Punishment
+     */
+    private String reason;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel  The channel that this event originates from.
-	 * @param user     The user who triggered the event.
-	 * @param duration Timeout Duration in Minutes.
-	 * @param reason   Reason for Ban.
-	 */
-	public UserTimeoutEvent(EventChannel channel, EventUser user, Integer duration, String reason) {
-		super(channel);
-		this.user = user;
-		this.duration = duration;
-		this.reason = reason;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel  The channel that this event originates from.
+     * @param user     The user who triggered the event.
+     * @param duration Timeout Duration in Minutes.
+     * @param reason   Reason for Ban.
+     */
+    public UserTimeoutEvent(EventChannel channel, EventUser user, Integer duration, String reason) {
+        super(channel);
+        this.user = user;
+        this.duration = duration;
+        this.reason = reason;
+    }
 }

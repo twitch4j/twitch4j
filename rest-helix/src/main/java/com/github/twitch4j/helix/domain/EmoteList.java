@@ -39,13 +39,13 @@ public class EmoteList {
     public String getPopulatedTemplateUrl(@NonNull String id, @NonNull Emote.Format format, @NonNull Emote.Theme theme, @NonNull Emote.Scale size) {
         return StringUtils.replaceEach(
             getTemplate(),
-            new String[] {
+            new String[]{
                 "{{id}}",
                 "{{format}}",
                 "{{theme_mode}}",
                 "{{scale}}"
             },
-            new String[] {
+            new String[]{
                 id,
                 format.toString().toLowerCase(),
                 theme.toString().toLowerCase(),

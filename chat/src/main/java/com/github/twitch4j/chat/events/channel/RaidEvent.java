@@ -16,26 +16,25 @@ import lombok.Value;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 public class RaidEvent extends AbstractChannelEvent {
-    
-        /**
-	 * Event User who initiated the raid
-	 */
-	private EventUser raider;
-        
-        /**
-         * Number of viewers in the raid
-         */
-        private Integer viewers;
 
-        /**
-         * 
-         * @param channel ChatChannel receiving the raid
-         * @param raider User who is sending the raid
-         * @param viewers number of viewers from the raid
-         */
-        public RaidEvent(EventChannel channel, EventUser raider, Integer viewers) {
-            super(channel);
-            this.raider = raider;
-            this.viewers = viewers;
-        }
+    /**
+     * Event User who initiated the raid
+     */
+    private EventUser raider;
+
+    /**
+     * Number of viewers in the raid
+     */
+    private Integer viewers;
+
+    /**
+     * @param channel ChatChannel receiving the raid
+     * @param raider  User who is sending the raid
+     * @param viewers number of viewers from the raid
+     */
+    public RaidEvent(EventChannel channel, EventUser raider, Integer viewers) {
+        super(channel);
+        this.raider = raider;
+        this.viewers = viewers;
+    }
 }

@@ -1,7 +1,11 @@
 package com.github.twitch4j.helix.endpoints;
 
 import com.github.twitch4j.helix.TestUtils;
-import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.domain.IngestServerList;
+import com.github.twitch4j.helix.domain.StreamKey;
+import com.github.twitch4j.helix.domain.StreamList;
+import com.github.twitch4j.helix.domain.StreamMarkersList;
+import com.github.twitch4j.helix.domain.StreamTagList;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -21,13 +25,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 public class StreamsServiceTest extends AbstractEndpointTest {
 
-    /** UserId */
+    /**
+     * UserId
+     */
     private static String twitchUserId = "149223493";
 
-    /** Hearthstone GameId */
+    /**
+     * Hearthstone GameId
+     */
     private static String hearthstoneGameId = "138585";
 
-     /** Overwatch GameId */
+    /**
+     * Overwatch GameId
+     */
     private static String overwatchGameId = "488552";
 
     /**

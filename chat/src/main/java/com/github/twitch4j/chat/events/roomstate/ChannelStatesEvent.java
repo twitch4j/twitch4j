@@ -14,10 +14,10 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public abstract class ChannelStatesEvent extends AbstractChannelEvent {
 
-	private final boolean active;
+    private final boolean active;
 
-	public ChannelStatesEvent(EventChannel channel, boolean active) {
-		super(channel);
-		this.active = active;
-	}
+    public ChannelStatesEvent(EventChannel channel, boolean active) {
+        super(channel);
+        this.active = active;
+    }
 }

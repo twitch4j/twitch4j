@@ -18,11 +18,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class AnaylticsDateRange {
 
-    /** Starting date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z. */
+    /**
+     * Starting date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     */
     @JsonProperty("started_at")
     private Instant startedAtInstant;
 
-    /** Ending date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z. */
+    /**
+     * Ending date/time for returned reports, in RFC3339 format with the hours, minutes, and seconds zeroed out and the UTC timezone: YYYY-MM-DDT00:00:00Z.
+     */
     @JsonProperty("ended_at")
     private Instant endedAtInstant;
 

@@ -21,7 +21,7 @@ public class TwitchClientIdInterceptor implements RequestInterceptor {
     /**
      * Constructor
      *
-     * @param clientId Client Id
+     * @param clientId  Client Id
      * @param userAgent User Agent
      */
     public TwitchClientIdInterceptor(String clientId, String userAgent) {

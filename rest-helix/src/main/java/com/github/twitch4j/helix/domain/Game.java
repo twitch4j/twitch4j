@@ -15,13 +15,19 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 public class Game {
 
-    /** Game ID. */
+    /**
+     * Game ID.
+     */
     private String id;
 
-    /** Game name. */
+    /**
+     * Game name.
+     */
     private String name;
 
-    /** Template URL for the game’s box art. */
+    /**
+     * Template URL for the game’s box art.
+     */
     private String boxArtUrl;
 
     /**

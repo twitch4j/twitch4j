@@ -29,10 +29,12 @@ Check out the [Documentation](https://twitch4j.github.io/docs/getting-started/in
 ## Modules
 
 Shared
+
 * [Event4J](https://github.com/PhilippHeuer/events4j)
 * [Credential Manager](https://github.com/PhilippHeuer/credential-manager)
 
 Project
+
 * Auth
 * API - Extensions
 * API - Kraken (Deprecated)

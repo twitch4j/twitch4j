@@ -17,9 +17,9 @@ public class SubscribersOnlyEvent extends ChannelStatesEvent {
      * Constructor
      *
      * @param channel ChatChannel
-     * @param active State active?
+     * @param active  State active?
      */
-	public SubscribersOnlyEvent(EventChannel channel, boolean active) {
-		super(channel, active);
-	}
+    public SubscribersOnlyEvent(EventChannel channel, boolean active) {
+        super(channel, active);
+    }
 }

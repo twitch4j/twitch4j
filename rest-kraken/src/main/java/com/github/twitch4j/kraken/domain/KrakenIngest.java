@@ -13,15 +13,15 @@ import lombok.Data;
 @Data
 public class KrakenIngest {
 
-	@JsonProperty("_id")
-	private Long id;
+    @JsonProperty("_id")
+    private Long id;
 
-	private String name;
+    private String name;
 
-	private Integer availability;
+    private Integer availability;
 
-	@JsonProperty("default")
-	private Boolean isDefault;
+    @JsonProperty("default")
+    private Boolean isDefault;
 
-	private String urlTemplate;
+    private String urlTemplate;
 }

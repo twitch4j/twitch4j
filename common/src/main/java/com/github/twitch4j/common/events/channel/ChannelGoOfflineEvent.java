@@ -23,7 +23,7 @@ public class ChannelGoOfflineEvent extends TwitchEvent {
     /**
      * Event Constructor
      *
-     * @param channel        The channel that went offline
+     * @param channel The channel that went offline
      */
     public ChannelGoOfflineEvent(EventChannel channel) {
         this.channel = channel;

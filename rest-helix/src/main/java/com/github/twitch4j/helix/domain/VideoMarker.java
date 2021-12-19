@@ -3,7 +3,11 @@ package com.github.twitch4j.helix.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.util.TimeUtils;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Calendar;
@@ -18,24 +22,34 @@ import java.util.Calendar;
 @NoArgsConstructor
 public class VideoMarker {
 
-    /** Stream ID. */
+    /**
+     * Stream ID.
+     */
     @NonNull
     private String id;
 
-    /** RFC3339 timestamp of the marker. */
+    /**
+     * RFC3339 timestamp of the marker.
+     */
     @NonNull
     @JsonProperty("created_at")
     private Instant createdAtInstant;
 
-    /** Description of the marker. */
+    /**
+     * Description of the marker.
+     */
     @NonNull
     private String description;
 
-    /** Relative offset (in seconds) of the marker, from the beginning of the stream. */
+    /**
+     * Relative offset (in seconds) of the marker, from the beginning of the stream.
+     */
     @NonNull
     private String position_seconds;
 
-    /** A link to the stream with a query parameter that is a timestamp of the marker’s location. */
+    /**
+     * A link to the stream with a query parameter that is a timestamp of the marker’s location.
+     */
     @JsonProperty("URL")
     private String url;
 

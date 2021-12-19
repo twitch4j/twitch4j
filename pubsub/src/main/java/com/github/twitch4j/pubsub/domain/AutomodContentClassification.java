@@ -27,13 +27,13 @@ public class AutomodContentClassification {
         /**
          * Threatening, inciting, or promoting violence or other harm.
          */
-        @JsonAlias({ "aggression", "violence", "threats" })
+        @JsonAlias({"aggression", "violence", "threats"})
         AGGRESSIVE,
 
         /**
          * Name-calling, insults, or antagonization.
          */
-        @JsonAlias({ "namecalling", "insults", "antagonization" })
+        @JsonAlias({"namecalling", "insults", "antagonization"})
         BULLYING,
 
         /**
@@ -45,19 +45,19 @@ public class AutomodContentClassification {
         /**
          * Demonstrating hatred or prejudice based on sexual identity, sexual orientation, gender identity, or gender expression.
          */
-        @JsonAlias({ "sexuality", "homophobia", "gender", "orientation" })
+        @JsonAlias({"sexuality", "homophobia", "gender", "orientation"})
         SEXUALITY_SEX_OR_GENDER,
 
         /**
          * Demonstrating hatred or prejudice against women, including sexual objectification.
          */
-        @JsonAlias({ "sexism", "objectification" })
+        @JsonAlias({"sexism", "objectification"})
         MISOGYNY,
 
         /**
          * Demonstrating hatred or prejudice based on race, ethnicity, or religion.
          */
-        @JsonAlias({ "racism", "ethnicity", "religion" })
+        @JsonAlias({"racism", "ethnicity", "religion"})
         RACE_ETHNICITY_OR_RELIGION,
 
         /**
@@ -68,13 +68,13 @@ public class AutomodContentClassification {
         /**
          * Sexual acts, anatomy.
          */
-        @JsonAlias({ "sexwords", "sex_based_terms", "anatomy" })
+        @JsonAlias({"sexwords", "sex_based_terms", "anatomy"})
         SEXUAL,
 
         /**
          * Swear words, &amp;*^!#{@literal @}%*.
          */
-        @JsonAlias({ "swearing", "vulgar" })
+        @JsonAlias({"swearing", "vulgar"})
         PROFANITY,
 
         /**

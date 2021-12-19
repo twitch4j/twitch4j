@@ -18,50 +18,80 @@ import java.util.Date;
 @NoArgsConstructor
 public class Clip {
 
-    /** ID of the clip being queried. */
+    /**
+     * ID of the clip being queried.
+     */
     private String id;
 
-    /** URL where the clip can be viewed. */
+    /**
+     * URL where the clip can be viewed.
+     */
     private String url;
 
-    /** URL to embed the clip. */
+    /**
+     * URL to embed the clip.
+     */
     private String embedUrl;
 
-    /** User ID of the stream from which the clip was created. */
+    /**
+     * User ID of the stream from which the clip was created.
+     */
     private String broadcasterId;
 
-    /** User display name of the stream from which the clip was created. */
+    /**
+     * User display name of the stream from which the clip was created.
+     */
     private String broadcasterName;
 
-    /** Display name of the user who created the clip. */
+    /**
+     * Display name of the user who created the clip.
+     */
     private String creatorId;
 
-    /** Display name of the user who created the clip. */
+    /**
+     * Display name of the user who created the clip.
+     */
     private String creatorName;
 
-    /** ID of the video from which the clip was created. */
+    /**
+     * ID of the video from which the clip was created.
+     */
     private String videoId;
 
-    /** ID of the game assigned to the stream when the clip was created. */
+    /**
+     * ID of the game assigned to the stream when the clip was created.
+     */
     private String gameId;
 
-    /** Language of the stream from which the clip was created. */
+    /**
+     * Language of the stream from which the clip was created.
+     */
     private String language;
 
-    /** Title of the clip. */
+    /**
+     * Title of the clip.
+     */
     private String title;
 
-    /** Number of times the clip has been viewed. */
+    /**
+     * Number of times the clip has been viewed.
+     */
     private Integer viewCount;
 
-    /** Date when the clip was created. */
+    /**
+     * Date when the clip was created.
+     */
     @JsonProperty("created_at")
     private Instant createdAtInstant;
 
-    /** URL of the clip thumbnail. */
+    /**
+     * URL of the clip thumbnail.
+     */
     private String thumbnailUrl;
 
-    /** Duration of the Clip in seconds (up to 0.1 precision). */
+    /**
+     * Duration of the Clip in seconds (up to 0.1 precision).
+     */
     private Float duration;
 
     /**

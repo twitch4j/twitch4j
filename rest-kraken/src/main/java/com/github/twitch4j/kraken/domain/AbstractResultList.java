@@ -9,16 +9,16 @@ import lombok.Data;
 @Data
 public abstract class AbstractResultList {
 
-	/**
-	 * Cursor
-	 */
-	@JsonProperty("_cursor")
-	private String cursor;
+    /**
+     * Cursor
+     */
+    @JsonProperty("_cursor")
+    private String cursor;
 
-	/**
-	 * Total Entries
-	 */
-	@JsonProperty("_total")
-	private Long total;
+    /**
+     * Total Entries
+     */
+    @JsonProperty("_total")
+    private Long total;
 
 }

@@ -28,8 +28,8 @@ public class ChannelChangeGameEvent extends TwitchEvent {
     /**
      * Event Constructor
      *
-     * @param channel        The channel that went live
-     * @param gameId         The gameId
+     * @param channel The channel that went live
+     * @param gameId  The gameId
      */
     public ChannelChangeGameEvent(EventChannel channel, String gameId) {
         this.channel = channel;

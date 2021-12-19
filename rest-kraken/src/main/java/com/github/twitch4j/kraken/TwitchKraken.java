@@ -1,7 +1,29 @@
 package com.github.twitch4j.kraken;
 
 import com.github.twitch4j.common.annotation.Unofficial;
-import com.github.twitch4j.kraken.domain.*;
+import com.github.twitch4j.kraken.domain.ChatBadges;
+import com.github.twitch4j.kraken.domain.EmoticonList;
+import com.github.twitch4j.kraken.domain.EmoticonSetList;
+import com.github.twitch4j.kraken.domain.KrakenBlockList;
+import com.github.twitch4j.kraken.domain.KrakenBlockTransaction;
+import com.github.twitch4j.kraken.domain.KrakenChannel;
+import com.github.twitch4j.kraken.domain.KrakenClip;
+import com.github.twitch4j.kraken.domain.KrakenCollection;
+import com.github.twitch4j.kraken.domain.KrakenCollectionItem;
+import com.github.twitch4j.kraken.domain.KrakenCollectionList;
+import com.github.twitch4j.kraken.domain.KrakenCollectionMetadata;
+import com.github.twitch4j.kraken.domain.KrakenCreatedVideo;
+import com.github.twitch4j.kraken.domain.KrakenEmoticonSetList;
+import com.github.twitch4j.kraken.domain.KrakenFollowList;
+import com.github.twitch4j.kraken.domain.KrakenHostList;
+import com.github.twitch4j.kraken.domain.KrakenIngestList;
+import com.github.twitch4j.kraken.domain.KrakenSubscriptionList;
+import com.github.twitch4j.kraken.domain.KrakenTeam;
+import com.github.twitch4j.kraken.domain.KrakenTeamList;
+import com.github.twitch4j.kraken.domain.KrakenUser;
+import com.github.twitch4j.kraken.domain.KrakenUserList;
+import com.github.twitch4j.kraken.domain.KrakenVideo;
+import com.github.twitch4j.kraken.domain.SimpleEmoticonList;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Body;
 import feign.CollectionFormat;
@@ -163,7 +185,7 @@ public interface TwitchKraken {
      * Approve a message that was flagged by Automod
      *
      * @param authToken Auth Token
-     * @param msgId unique id for the message
+     * @param msgId     unique id for the message
      * @return no content for a successful call
      * @deprecated in favor of TwitchHelix#manageAutoModHeldMessage
      */
@@ -185,7 +207,7 @@ public interface TwitchKraken {
      * Deny a message that was flagged by Automod
      *
      * @param authToken Auth Token
-     * @param msgId unique id for the message
+     * @param msgId     unique id for the message
      * @return no content for a successful call
      * @deprecated in favor of TwitchHelix#manageAutoModHeldMessage
      */
@@ -246,9 +268,9 @@ public interface TwitchKraken {
      * Gets all collections owned by a specified channel.
      *
      * @param channelId The ID of the channel. (Required)
-     * @param limit Maximum number of most-recent objects to return. (Optional)
-     * @param cursor Tells the server where to start fetching the next set of results in a multi-page response. (Optional)
-     * @param videoId Returns only collections containing the specified video. Example: "video:89917098". (Optional)
+     * @param limit     Maximum number of most-recent objects to return. (Optional)
+     * @param cursor    Tells the server where to start fetching the next set of results in a multi-page response. (Optional)
+     * @param videoId   Returns only collections containing the specified video. Example: "video:89917098". (Optional)
      * @return {@link KrakenCollectionList}
      */
     @RequestLine("GET /channels/{channel_id}/collections?limit={limit}&cursor={cursor}&containing_item={containing_item}")
@@ -264,9 +286,9 @@ public interface TwitchKraken {
      * <p>
      * Creates a new collection owned by a specified channel.
      *
-     * @param token User Access Token for the broadcaster or channel editor with the collections_edit scope. (Required)
+     * @param token     User Access Token for the broadcaster or channel editor with the collections_edit scope. (Required)
      * @param channelId The ID of the channel. (Required)
-     * @param title The title of the collection. (Required)
+     * @param title     The title of the collection. (Required)
      * @return {@link KrakenCollectionMetadata}
      */
     @RequestLine("POST /channels/{channel_id}/collections")
@@ -301,9 +323,9 @@ public interface TwitchKraken {
      * <p>
      * Updates the title of a specified collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
-     * @param title The new title of the collection. (Required)
+     * @param title        The new title of the collection. (Required)
      * @return 204 No Content upon a successful request
      */
     @RequestLine("PUT /collections/{collection_id}")
@@ -322,9 +344,9 @@ public interface TwitchKraken {
      * <p>
      * Adds the thumbnail of a specified collection item as the thumbnail for the specified collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
-     * @param itemId The id of a video which must already be in the collection. (Required)
+     * @param itemId       The id of a video which must already be in the collection. (Required)
      * @return 204 No Content upon a successful request
      */
     @RequestLine("PUT /collections/{collection_id}/thumbnail")
@@ -343,7 +365,7 @@ public interface TwitchKraken {
      * <p>
      * Deletes a specified collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
      * @return 204 No Content upon a successful request
      */
@@ -361,9 +383,9 @@ public interface TwitchKraken {
      * <p>
      * Adds a specified video to a specified collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
-     * @param videoId The id of a video. (Required)
+     * @param videoId      The id of a video. (Required)
      * @return {@link KrakenCollectionItem}
      */
     @RequestLine("POST /collections/{collection_id}/items")
@@ -382,9 +404,9 @@ public interface TwitchKraken {
      * <p>
      * Deletes a specified collection item from a specified collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
-     * @param itemId The id of a collection item. (Required)
+     * @param itemId       The id of a collection item. (Required)
      * @return 204 No Content upon a successful request
      */
     @RequestLine("DELETE /collections/{collection_id}/items/{collection_item_id}")
@@ -402,10 +424,10 @@ public interface TwitchKraken {
      * <p>
      * Moves a specified collection item to a different position within a collection.
      *
-     * @param token User Access Token with the collections_edit scope. (Required)
+     * @param token        User Access Token with the collections_edit scope. (Required)
      * @param collectionId The id of tne collection. (Required)
-     * @param itemId The id of a collection item. (Required)
-     * @param position The new position of the item. (Required)
+     * @param itemId       The id of a collection item. (Required)
+     * @param position     The new position of the item. (Required)
      * @return 204 No Content upon a successful request
      */
     @RequestLine("PUT /collections/{collection_id}/items/{collection_item_id}")
@@ -613,7 +635,7 @@ public interface TwitchKraken {
      */
     @RequestLine(value = "GET /users?login={logins}", collectionFormat = CollectionFormat.CSV)
     HystrixCommand<KrakenUserList> getUsersByLogin(
-    	@Param("logins") List<String> logins
+        @Param("logins") List<String> logins
     );
 
     /**
@@ -621,9 +643,9 @@ public interface TwitchKraken {
      * <p>
      * Updates the title of a specified channel.
      *
-     * @param authToken    Auth Token
-     * @param channelId    Channel Id
-     * @param title        New stream title
+     * @param authToken Auth Token
+     * @param channelId Channel Id
+     * @param title     New stream title
      * @return Object
      * @deprecated in favor of TwitchHelix#updateChannelInformation
      */

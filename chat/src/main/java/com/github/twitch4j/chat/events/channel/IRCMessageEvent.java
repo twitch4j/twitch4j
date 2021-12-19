@@ -9,10 +9,22 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,60 +44,60 @@ public class IRCMessageEvent extends TwitchEvent {
     @Unofficial
     public static final String NONCE_TAG_NAME = "client-nonce";
 
-	/**
-	 * Tags
-	 */
-	private Map<String, String> tags = new HashMap<>();
+    /**
+     * Tags
+     */
+    private Map<String, String> tags = new HashMap<>();
 
     /**
      * Raw Tags
      */
     private Map<String, Object> rawTags = new HashMap<>();
 
-	/**
-	 * Badges
-	 */
-	private Map<String, String> badges = new HashMap<>();
+    /**
+     * Badges
+     */
+    private Map<String, String> badges = new HashMap<>();
 
     /**
      * Metadata related to the chat badges in the badges tag
      */
     private Map<String, String> badgeInfo = new HashMap<>();
 
-	/**
-	 * Client
-	 */
-	private Optional<String> clientName = Optional.empty();
+    /**
+     * Client
+     */
+    private Optional<String> clientName = Optional.empty();
 
-	/**
-	 * Message Type
-	 */
-	private String commandType = "UNKNOWN";
+    /**
+     * Message Type
+     */
+    private String commandType = "UNKNOWN";
 
     /**
      * Channel Id
      */
     private String channelId;
 
-	/**
-	 * Channel Name
-	 */
-	private Optional<String> channelName = Optional.empty();
+    /**
+     * Channel Name
+     */
+    private Optional<String> channelName = Optional.empty();
 
-	/**
-	 * Message
-	 */
-	private Optional<String> message = Optional.empty();
+    /**
+     * Message
+     */
+    private Optional<String> message = Optional.empty();
 
-	/**
-	 * IRC Command Payload
-	 */
-	private Optional<String> payload = Optional.empty();
+    /**
+     * IRC Command Payload
+     */
+    private Optional<String> payload = Optional.empty();
 
-	/**
-	 * Client Permissions
-	 */
-	private final Set<CommandPermission> clientPermissions = EnumSet.noneOf(CommandPermission.class);
+    /**
+     * Client Permissions
+     */
+    private final Set<CommandPermission> clientPermissions = EnumSet.noneOf(CommandPermission.class);
 
     /**
      * AutoMod Message Flag Indicators, relevant for PRIVMSG and USERNOTICE
@@ -94,23 +106,23 @@ public class IRCMessageEvent extends TwitchEvent {
     @Getter(lazy = true)
     private final List<AutoModFlag> flags = FlagParser.parseFlags(this);
 
-	/**
-	 * RAW Message
-	 */
-	private final String rawMessage;
+    /**
+     * RAW Message
+     */
+    private final String rawMessage;
 
     /**
      * Event Constructor
      *
-     * @param rawMessage  The raw message.
+     * @param rawMessage             The raw message.
      * @param channelIdToChannelName Mapping used to lookup a missing channel name in the event
      * @param channelNameToChannelId Mapping used to lookup a missing channel id in the event
-     * @param botOwnerIds The bot owner ids.
+     * @param botOwnerIds            The bot owner ids.
      */
-	public IRCMessageEvent(String rawMessage, Map<String, String> channelIdToChannelName, Map<String, String> channelNameToChannelId, Collection<String> botOwnerIds) {
-		this.rawMessage = rawMessage;
+    public IRCMessageEvent(String rawMessage, Map<String, String> channelIdToChannelName, Map<String, String> channelNameToChannelId, Collection<String> botOwnerIds) {
+        this.rawMessage = rawMessage;
 
-		this.parseRawMessage();
+        this.parseRawMessage();
 
         // set channel id
         if (tags.containsKey("room-id")) {
@@ -125,115 +137,116 @@ public class IRCMessageEvent extends TwitchEvent {
         }
 
         // permissions and badges
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
-		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
-	}
+        getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
+        getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
+    }
 
-	/**
-	 * Checks if the Event was parsed correctly.
-	 * @return Is the Event valid?
-	 */
-	public Boolean isValid() {
-		return !getCommandType().equals("UNKNOWN");
-	}
+    /**
+     * Checks if the Event was parsed correctly.
+     *
+     * @return Is the Event valid?
+     */
+    public Boolean isValid() {
+        return !getCommandType().equals("UNKNOWN");
+    }
 
-	/**
-	 * Parse RAW Message
-	 */
-	@SuppressWarnings("unchecked")
-	private void parseRawMessage() {
-		// Parse Message
-		Matcher matcher = MESSAGE_PATTERN.matcher(rawMessage);
-		if (matcher.matches()) {
-			// Parse Tags
-			tags = parseTags(matcher.group("tags"));
+    /**
+     * Parse RAW Message
+     */
+    @SuppressWarnings("unchecked")
+    private void parseRawMessage() {
+        // Parse Message
+        Matcher matcher = MESSAGE_PATTERN.matcher(rawMessage);
+        if (matcher.matches()) {
+            // Parse Tags
+            tags = parseTags(matcher.group("tags"));
             rawTags = parseTags(matcher.group("tags"));
-			clientName = parseClientName(matcher.group("clientName"));
-			commandType = matcher.group("command");
-			channelName = Optional.ofNullable(matcher.group("channel"));
-			message = Optional.ofNullable(matcher.group("message"));
-			payload = Optional.ofNullable(matcher.group("payload"));
-			return;
-		}
+            clientName = parseClientName(matcher.group("clientName"));
+            commandType = matcher.group("command");
+            channelName = Optional.ofNullable(matcher.group("channel"));
+            message = Optional.ofNullable(matcher.group("message"));
+            payload = Optional.ofNullable(matcher.group("payload"));
+            return;
+        }
 
-		// Parse Message - Whisper
-		Matcher matcherPM = WHISPER_PATTERN.matcher(rawMessage);
-		if (matcherPM.matches()) {
-			// Parse Tags
-			tags = parseTags(matcherPM.group("tags"));
-			rawTags = parseTags(matcherPM.group("tags"));
-			clientName = parseClientName(matcherPM.group("clientName"));
-			commandType = matcherPM.group("command");
-			channelName = Optional.ofNullable(matcherPM.group("channel"));
-			message = Optional.ofNullable(matcherPM.group("message"));
-			payload = Optional.ofNullable(matcherPM.group("payload"));
-		}
-	}
+        // Parse Message - Whisper
+        Matcher matcherPM = WHISPER_PATTERN.matcher(rawMessage);
+        if (matcherPM.matches()) {
+            // Parse Tags
+            tags = parseTags(matcherPM.group("tags"));
+            rawTags = parseTags(matcherPM.group("tags"));
+            clientName = parseClientName(matcherPM.group("clientName"));
+            commandType = matcherPM.group("command");
+            channelName = Optional.ofNullable(matcherPM.group("channel"));
+            message = Optional.ofNullable(matcherPM.group("message"));
+            payload = Optional.ofNullable(matcherPM.group("payload"));
+        }
+    }
 
-	/**
-	 * Parse Tags from raw list
-	 *
-	 * @param raw The raw list of tags.
-	 * @return A key-value map of the tags.
-	 */
-	public Map parseTags(String raw) {
-		Map<String, String> map = new HashMap<>();
-		if(StringUtils.isBlank(raw)) return map;
+    /**
+     * Parse Tags from raw list
+     *
+     * @param raw The raw list of tags.
+     * @return A key-value map of the tags.
+     */
+    public Map parseTags(String raw) {
+        Map<String, String> map = new HashMap<>();
+        if (StringUtils.isBlank(raw)) return map;
 
-		for (String tag: raw.split(";")) {
-			String[] val = tag.split("=");
-			final String key = val[0];
-			String value = (val.length > 1) ? val[1] : null;
-			map.put(key, value);
-		}
+        for (String tag : raw.split(";")) {
+            String[] val = tag.split("=");
+            final String key = val[0];
+            String value = (val.length > 1) ? val[1] : null;
+            map.put(key, value);
+        }
 
-		return Collections.unmodifiableMap(map); // formatting to Read-Only Map
-	}
+        return Collections.unmodifiableMap(map); // formatting to Read-Only Map
+    }
 
-	/**
-	 * Gets the ClientName from the IRC User Identifier (:user!user@user.tmi.twitch.tv)
-	 *
-	 * @param raw Raw ClientName
-	 * @return Client name, or empty.
-	 */
-	public Optional<String> parseClientName(String raw) {
-		if(raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
-			return Optional.empty();
-		}
+    /**
+     * Gets the ClientName from the IRC User Identifier (:user!user@user.tmi.twitch.tv)
+     *
+     * @param raw Raw ClientName
+     * @return Client name, or empty.
+     */
+    public Optional<String> parseClientName(String raw) {
+        if (raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
+            return Optional.empty();
+        }
 
-		Matcher matcher = CLIENT_PATTERN.matcher(raw);
-		if(matcher.matches()) {
-			return Optional.ofNullable(matcher.group(1));
-		}
+        Matcher matcher = CLIENT_PATTERN.matcher(raw);
+        if (matcher.matches()) {
+            return Optional.ofNullable(matcher.group(1));
+        }
 
-		return Optional.ofNullable(raw);
-	}
+        return Optional.ofNullable(raw);
+    }
 
-	/**
-	 * Gets the User Id (from Tags)
+    /**
+     * Gets the User Id (from Tags)
      *
      * @return Long userId
-	 */
-	public String getUserId() {
-		if (tags.containsKey("user-id")) {
-			return tags.get("user-id");
-		}
+     */
+    public String getUserId() {
+        if (tags.containsKey("user-id")) {
+            return tags.get("user-id");
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Gets the User Name (from Tags)
+    /**
+     * Gets the User Name (from Tags)
      *
      * @return String userName
-	 */
-	public String getUserName() {
-		if (tags.containsKey("login")) {
-			return tags.get("login");
-		}
+     */
+    public String getUserName() {
+        if (tags.containsKey("login")) {
+            return tags.get("login");
+        }
 
-		return getClientName().orElse(null);
-	}
+        return getClientName().orElse(null);
+    }
 
     /**
      * Gets the Target User Id (from Tags)
@@ -313,30 +326,30 @@ public class IRCMessageEvent extends TwitchEvent {
         return OptionalInt.empty();
     }
 
-	/**
-	 * Gets a optional tag from the irc message
+    /**
+     * Gets a optional tag from the irc message
      *
      * @param tagName The tag of the irc message
      * @return String tagValue
-	 */
-	public Optional<String> getTagValue(String tagName) {
-	    return Optional.ofNullable(tags.get(tagName))
+     */
+    public Optional<String> getTagValue(String tagName) {
+        return Optional.ofNullable(tags.get(tagName))
             .filter(StringUtils::isNotBlank)
             .map(EscapeUtils::unescapeTagValue);
-	}
+    }
 
-	/**
-	 * Get User
+    /**
+     * Get User
      *
      * @return ChatUser
-	 */
-	public EventUser getUser() {
-	    if (getUserId() != null || getUserName() != null) {
+     */
+    public EventUser getUser() {
+        if (getUserId() != null || getUserName() != null) {
             return new EventUser(getUserId(), getUserName());
         }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
      * Get Target User
@@ -348,13 +361,13 @@ public class IRCMessageEvent extends TwitchEvent {
     }
 
 
-	/**
-	 * Get ChatChannel
+    /**
+     * Get ChatChannel
      *
      * @return ChatChannel
-	 */
-	public EventChannel getChannel() {
-		return new EventChannel(getChannelId(), getChannelName().get());
-	}
+     */
+    public EventChannel getChannel() {
+        return new EventChannel(getChannelId(), getChannelName().get());
+    }
 
 }

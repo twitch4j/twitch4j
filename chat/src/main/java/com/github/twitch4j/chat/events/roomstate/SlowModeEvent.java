@@ -12,19 +12,19 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SlowModeEvent extends ChannelStatesEvent {
-	/**
-	 * Time in seconds
-	 */
+    /**
+     * Time in seconds
+     */
     long time;
 
     /**
      * Constructor
      *
      * @param channel ChatChannel
-     * @param time seconds
+     * @param time    seconds
      */
-	public SlowModeEvent(EventChannel channel, long time) {
-		super(channel, time > 0);
-		this.time = time;
-	}
+    public SlowModeEvent(EventChannel channel, long time) {
+        super(channel, time > 0);
+        this.time = time;
+    }
 }

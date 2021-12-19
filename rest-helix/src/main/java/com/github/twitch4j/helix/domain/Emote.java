@@ -205,7 +205,7 @@ public class Emote {
         private final String[] twitchStrings;
 
         Type() {
-            this.twitchStrings = new String[] { this.name().toLowerCase().replace("_", "") };
+            this.twitchStrings = new String[]{this.name().toLowerCase().replace("_", "")};
         }
 
         Type(String... names) {

@@ -3,12 +3,16 @@ package com.github.twitch4j.graphql;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.netflix.config.ConfigurationManager;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,7 +54,7 @@ public class TwitchGraphQLBuilder {
     /**
      * Client Secret
      */
-    @With(onMethod_ = { @Deprecated })
+    @With(onMethod_ = {@Deprecated})
     private String clientSecret = "**SECRET**";
 
     /**

@@ -15,26 +15,26 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ChannelModEvent extends AbstractChannelEvent {
 
-	/**
-	 * User
-	 */
-	private EventUser user;
+    /**
+     * User
+     */
+    private EventUser user;
 
-	/**
-	 * Is Moderator?
-	 */
-	private boolean isMod;
+    /**
+     * Is Moderator?
+     */
+    private boolean isMod;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
-	 * @param user 		  The user that gained/lost mod status.
-	 * @param isMod		  Did the use gain or lose mod status?
-	 */
-	public ChannelModEvent(EventChannel channel, EventUser user, boolean isMod) {
-		super(channel);
-		this.user = user;
-		this.isMod = isMod;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     * @param user    The user that gained/lost mod status.
+     * @param isMod   Did the use gain or lose mod status?
+     */
+    public ChannelModEvent(EventChannel channel, EventUser user, boolean isMod) {
+        super(channel);
+        this.user = user;
+        this.isMod = isMod;
+    }
 }

@@ -17,7 +17,7 @@ public class ThreadUtils {
      */
     public static ScheduledThreadPoolExecutor getDefaultScheduledThreadPoolExecutor(String namePrefix, Integer poolSize) {
         BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
-            .namingPattern(namePrefix+"-%d")
+            .namingPattern(namePrefix + "-%d")
             .daemon(false)
             .priority(Thread.NORM_PRIORITY)
             .build();

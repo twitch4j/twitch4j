@@ -2,7 +2,11 @@ package com.github.twitch4j.tmi.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,34 +17,48 @@ import java.util.Map;
 @NoArgsConstructor
 public class Chatters {
 
-    /** Viewer Count */
+    /**
+     * Viewer Count
+     */
     @NonNull
     @JsonProperty("chatter_count")
     private Integer viewerCount;
 
-    /** VIPS */
+    /**
+     * VIPS
+     */
     @JsonIgnore
     private List<String> vips;
 
-    /** Broadcaster */
+    /**
+     * Broadcaster
+     */
     @JsonIgnore
     private List<String> broadcaster;
 
-    /** Staff */
+    /**
+     * Staff
+     */
     @JsonIgnore
     @Deprecated
     private List<String> staff;
 
-    /** Admins */
+    /**
+     * Admins
+     */
     @JsonIgnore
     @Deprecated
     private List<String> admins;
 
-    /** Moderators */
+    /**
+     * Moderators
+     */
     @JsonIgnore
     private List<String> moderators;
 
-    /** Viewers */
+    /**
+     * Viewers
+     */
     @JsonIgnore
     private List<String> viewers;
 

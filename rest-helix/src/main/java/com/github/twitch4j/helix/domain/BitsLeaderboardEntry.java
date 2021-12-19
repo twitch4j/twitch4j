@@ -1,6 +1,10 @@
 package com.github.twitch4j.helix.domain;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Bits Leaderboard Entry
@@ -10,7 +14,9 @@ import lombok.*;
 @NoArgsConstructor
 public class BitsLeaderboardEntry {
 
-    /** ID of the user (viewer) in the leaderboard entry. */
+    /**
+     * ID of the user (viewer) in the leaderboard entry.
+     */
     @NonNull
     private String userId;
 
@@ -24,10 +30,14 @@ public class BitsLeaderboardEntry {
      */
     private String userName;
 
-    /** Leaderboard rank of the user. */
+    /**
+     * Leaderboard rank of the user.
+     */
     private Integer rank;
 
-    /** Leaderboard score (number of Bits) of the user. */
+    /**
+     * Leaderboard score (number of Bits) of the user.
+     */
     private Integer score;
 
 }

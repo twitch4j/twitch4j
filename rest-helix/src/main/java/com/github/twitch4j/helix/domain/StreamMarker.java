@@ -22,7 +22,7 @@ public class StreamMarker {
 
     @JsonProperty("data")
     private void unpack(List<Map<String, String>> data) {
-        if(!data.isEmpty()) {
+        if (!data.isEmpty()) {
             Map<String, String> marker = data.get(0);
             createdAt = marker.get("created_at");
             description = marker.get("description");

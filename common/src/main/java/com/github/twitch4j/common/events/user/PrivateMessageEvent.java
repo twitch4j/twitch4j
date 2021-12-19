@@ -17,32 +17,32 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class PrivateMessageEvent extends TwitchEvent {
 
-	/**
-	 * User
-	 */
-	private final EventUser user;
+    /**
+     * User
+     */
+    private final EventUser user;
 
-	/**
-	 * Message
-	 */
-	private final String message;
+    /**
+     * Message
+     */
+    private final String message;
 
-	/**
-	 * Permissions of the user
-	 */
-	private final Set<CommandPermission> permissions;
+    /**
+     * Permissions of the user
+     */
+    private final Set<CommandPermission> permissions;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param user        The user who triggered the event.
-	 * @param message     The plain text of the message.
-	 * @param permissions The permissions of the triggering user.
-	 */
-	public PrivateMessageEvent(EventUser user, String message, Set<CommandPermission> permissions) {
-		this.user = user;
-		this.message = message;
-		this.permissions = permissions;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param user        The user who triggered the event.
+     * @param message     The plain text of the message.
+     * @param permissions The permissions of the triggering user.
+     */
+    public PrivateMessageEvent(EventUser user, String message, Set<CommandPermission> permissions) {
+        this.user = user;
+        this.message = message;
+        this.permissions = permissions;
+    }
 
 }

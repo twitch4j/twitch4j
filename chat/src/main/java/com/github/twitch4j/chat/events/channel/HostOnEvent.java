@@ -14,20 +14,20 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class HostOnEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event Target ChatChannel
-	 */
-	private EventChannel targetChannel;
+    /**
+     * Event Target ChatChannel
+     */
+    private EventChannel targetChannel;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel       The channel that this event originates from.
-	 * @param targetChannel The channel that was hosted.
-	 */
-	public HostOnEvent(EventChannel channel, EventChannel targetChannel) {
-		super(channel);
-		this.targetChannel = targetChannel;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel       The channel that this event originates from.
+     * @param targetChannel The channel that was hosted.
+     */
+    public HostOnEvent(EventChannel channel, EventChannel targetChannel) {
+        super(channel);
+        this.targetChannel = targetChannel;
+    }
 
 }

@@ -1,6 +1,10 @@
 package com.github.twitch4j.helix.domain;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -14,19 +18,27 @@ import java.util.List;
 @NoArgsConstructor
 public class StreamMarkers {
 
-    /** Stream ID. */
+    /**
+     * Stream ID.
+     */
     @NonNull
     private String userId;
 
-    /** Display name corresponding to user_id. */
+    /**
+     * Display name corresponding to user_id.
+     */
     @NonNull
     private String userName;
 
-    /** Login corresponding to user_id. */
+    /**
+     * Login corresponding to user_id.
+     */
     @NonNull
     private String userLogin;
 
-    /** Markers */
+    /**
+     * Markers
+     */
     @NonNull
     private List<VideoMarkers> videos;
 

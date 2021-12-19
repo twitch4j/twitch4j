@@ -24,20 +24,20 @@ public class CheerEvent extends AbstractChannelEvent implements ReplyableEvent {
      */
     IRCMessageEvent messageEvent;
 
-	/**
-	 * Event Target User
-	 */
-	private EventUser user;
+    /**
+     * Event Target User
+     */
+    private EventUser user;
 
-	/**
-	 * Message
-	 */
-	private String message;
+    /**
+     * Message
+     */
+    private String message;
 
-	/**
-	 * Amount of Bits
-	 */
-	private Integer bits;
+    /**
+     * Amount of Bits
+     */
+    private Integer bits;
 
     /**
      * The exact number of months the user has been a subscriber, or zero if not subscribed
@@ -67,14 +67,14 @@ public class CheerEvent extends AbstractChannelEvent implements ReplyableEvent {
      * @param subscriptionTier The tier at which the user is subscribed.
      * @param flags            The regions of the message that were flagged by AutoMod.
      */
-	public CheerEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String message, Integer bits, int subscriberMonths, int subscriptionTier, List<AutoModFlag> flags) {
-		super(channel);
-		this.messageEvent = event;
-		this.user = user;
-		this.message = message;
-		this.bits = bits;
+    public CheerEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String message, Integer bits, int subscriberMonths, int subscriptionTier, List<AutoModFlag> flags) {
+        super(channel);
+        this.messageEvent = event;
+        this.user = user;
+        this.message = message;
+        this.bits = bits;
         this.subscriberMonths = subscriberMonths;
         this.subscriptionTier = subscriptionTier;
         this.flags = flags;
-	}
+    }
 }

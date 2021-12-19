@@ -70,14 +70,14 @@ public class EscapeUtils {
     public static String unescapeTagValue(String value) {
         return StringUtils.replaceEach(
             value,
-            new String[] {
+            new String[]{
                 "\\:",
                 "\\s",
                 "\\\\",
                 "\\r",
                 "\\n"
             },
-            new String[] {
+            new String[]{
                 ";",
                 " ",
                 "\\",

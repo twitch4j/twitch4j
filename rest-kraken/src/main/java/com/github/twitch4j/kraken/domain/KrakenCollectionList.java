@@ -1,6 +1,10 @@
 package com.github.twitch4j.kraken.domain;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 

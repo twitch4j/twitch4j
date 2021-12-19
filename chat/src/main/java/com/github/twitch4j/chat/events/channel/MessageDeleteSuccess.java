@@ -16,13 +16,13 @@ import lombok.Value;
 @ToString
 public class MessageDeleteSuccess extends AbstractChannelEvent {
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel       The channel that this event originates from.
-	 */
-	public MessageDeleteSuccess(EventChannel channel) {
-		super(channel);
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     */
+    public MessageDeleteSuccess(EventChannel channel) {
+        super(channel);
+    }
 
 }

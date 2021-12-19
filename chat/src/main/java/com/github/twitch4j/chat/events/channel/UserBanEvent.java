@@ -15,27 +15,27 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class UserBanEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event Target User
-	 */
-	private EventUser user;
+    /**
+     * Event Target User
+     */
+    private EventUser user;
 
-	/**
-	 * Reason for Punishment
-	 */
-	@Deprecated
-	private String reason;
+    /**
+     * Reason for Punishment
+     */
+    @Deprecated
+    private String reason;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel The channel that this event originates from.
-	 * @param user    The user who triggered the event.
-	 * @param reason  Reason for Ban.
-	 */
-	public UserBanEvent(EventChannel channel, EventUser user, String reason) {
-		super(channel);
-		this.user = user;
-		this.reason = reason;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     * @param user    The user who triggered the event.
+     * @param reason  Reason for Ban.
+     */
+    public UserBanEvent(EventChannel channel, EventUser user, String reason) {
+        super(channel);
+        this.user = user;
+        this.reason = reason;
+    }
 }

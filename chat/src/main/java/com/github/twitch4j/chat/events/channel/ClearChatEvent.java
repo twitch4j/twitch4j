@@ -11,12 +11,12 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ClearChatEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
-	 */
-	public ClearChatEvent(EventChannel channel) {
-		super(channel);
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     */
+    public ClearChatEvent(EventChannel channel) {
+        super(channel);
+    }
 }

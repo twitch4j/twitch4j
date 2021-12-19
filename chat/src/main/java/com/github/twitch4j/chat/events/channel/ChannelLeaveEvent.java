@@ -15,19 +15,19 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = false)
 public class ChannelLeaveEvent extends AbstractChannelEvent {
 
-	/**
-	 * User
-	 */
-	private EventUser user;
+    /**
+     * User
+     */
+    private EventUser user;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
-	 * @param user        The user triggering the event.
-	 */
-	public ChannelLeaveEvent(EventChannel channel, EventUser user) {
-		super(channel);
-		this.user = user;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     * @param user    The user triggering the event.
+     */
+    public ChannelLeaveEvent(EventChannel channel, EventUser user) {
+        super(channel);
+        this.user = user;
+    }
 }
