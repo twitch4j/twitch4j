@@ -118,7 +118,7 @@ subprojects {
 				add("api", dep) {
 					version {
 						strictly("[2.12,3[")
-						prefer("2.13.0")
+						prefer("2.13.1")
 					}
 				}
 			}
