@@ -547,6 +547,28 @@ public interface TwitchHelix {
     );
 
     /**
+     * Returns one page of live channels that have installed or activated a specific Extension,
+     * identified by a client ID value assigned to the Extension when it is created.
+     * <p>
+     * A channel that recently went live may take a few minutes to appear in this list,
+     * and a channel may continue to appear on this list for a few minutes after it stops broadcasting.
+     *
+     * @param authToken   User OAuth Token or App Access Token
+     * @param extensionId ID of the Extension to search for.
+     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after       The cursor used to fetch the next page of data.
+     * @return ExtensionLiveChannelsList
+     */
+    @RequestLine("GET /extensions/live?extension_id={extension_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionLiveChannelsList> getExtensionLiveChannels(
+        @Param("token") String authToken,
+        @Param("extension_id") String extensionId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
      * @param authToken App Access  OAuth Token
