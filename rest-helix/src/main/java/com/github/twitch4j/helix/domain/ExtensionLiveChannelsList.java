@@ -6,9 +6,11 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -24,23 +26,18 @@ public class ExtensionLiveChannelsList {
     private Object pagination;
 
     /**
-     * @return the cursor to specify in the next call to obtain the next page of results
+     * @return the cursor to specify in the next call to obtain the next page of results, in an optional wrapper
      * @implNote Pagination for this endpoint is currently <a href="https://github.com/twitchdev/issues/issues/540">broken</a>
      * in <a href="https://github.com/twitchdev/issues/issues/539">multiple</a> <a href="https://github.com/twitchdev/issues/issues/541">respects</a>
      */
     @JsonIgnore
-    public String getCursor() {
-        if (pagination instanceof String) {
-            // Currently, pagination is returned directly as a string, which departs from all of the other helix endpoints
-            return (String) pagination;
-        }
-
-        if (pagination instanceof Map) {
-            // In the future, Twitch may fix the above inconsistency and return an object that contains a string
-            return (String) ((Map<?, ?>) pagination).get("cursor");
-        }
-
-        return pagination != null ? pagination.toString() : null;
+    public Optional<String> getCursor() {
+        // Currently, pagination is returned directly as a string, which departs from all of the other helix endpoints
+        // In the future, Twitch may fix the above inconsistency and return an object that contains a string
+        return Optional.ofNullable(pagination instanceof Map ? ((Map<?, ?>) pagination).get("cursor") : pagination)
+            .filter(c -> c instanceof String)
+            .map(c -> (String) c)
+            .filter(StringUtils::isNotBlank);
     }
 
 }
