@@ -9,8 +9,8 @@ public enum BanEvasionEvaluation {
 
     UNLIKELY_EVADER,
 
-    LIKELY_EVADER,
+    POSSIBLE_EVADER,
 
-    VERY_LIKELY_EVADER
+    LIKELY_EVADER
 
 }
