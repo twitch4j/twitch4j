@@ -1,4 +1,8 @@
-// In this section you declare the dependencies for your production and test code
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J Extensions API")
+	artifactDescription.set("the extensions api provides methods for twitch extensions. It is part of the v5 infrastructure and deprecated, methods have been moved to helix.")
+}
+
 dependencies {
 	// HTTP Client
 	api(group = "io.github.openfeign", name = "feign-okhttp")
@@ -13,18 +17,4 @@ dependencies {
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
-}
-
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Extensions Module API"
-		windowTitle = "Twitch4J (v${version}) - Extensions Module API"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Extensions Module")
-		description.set("Extensions API dependency")
-	}
 }
