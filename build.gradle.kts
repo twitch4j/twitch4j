@@ -105,7 +105,7 @@ subprojects {
 			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.7")
 			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.7")
 			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.7")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.7")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.8")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
