@@ -89,7 +89,7 @@ public class ChatModerationAction {
 
     /**
      * @return optional wrapper around the username that was specified in a ban, unban, timeout, untimeout, vip,
-     * unvip, mod, unmod, host, raid, or delete message command
+     *     unvip, mod, unmod, host, raid, or delete message command
      */
     public Optional<String> getTargetedUserName() {
         final ModerationAction action = getModerationAction();
@@ -112,14 +112,16 @@ public class ChatModerationAction {
             case BAN:
                 if (args != null && args.size() > 1)
                     return Optional.of(args.get(1));
-
+                break;
             case TIMEOUT:
                 if (args != null && args.size() > 2)
                     return Optional.of(args.get(2));
-
+                break;
             default:
                 return Optional.empty();
         }
+
+        return Optional.empty();
     }
 
     /**

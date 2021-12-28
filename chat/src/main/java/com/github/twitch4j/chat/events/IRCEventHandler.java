@@ -211,8 +211,7 @@ public class IRCEventHandler {
         if (event.getCommandType().equals("USERNOTICE") && (msgId = event.getTags().get("msg-id")) != null) {
             EventChannel channel = event.getChannel();
 
-            // Sub
-            if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
+            if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) { // Sub
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
@@ -234,9 +233,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
-            }
-            // Receive Gifted Sub
-            else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
+            } else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) { // Receive Gifted Sub
                 // Load Info
                 EventUser user = new EventUser(event.getTagValue("msg-param-recipient-id").get(), event.getTagValue("msg-param-recipient-user-name").get());
                 EventUser giftedBy = event.getUser();
@@ -257,9 +254,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
-            }
-            // Gift X Subs
-            else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
+            } else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) { // Gift X Subs
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
@@ -268,9 +263,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
-            }
-            // Upgrading from a gifted sub
-            else if (msgId.equalsIgnoreCase("giftpaidupgrade") || msgId.equalsIgnoreCase("anongiftpaidupgrade")) {
+            } else if (msgId.equalsIgnoreCase("giftpaidupgrade") || msgId.equalsIgnoreCase("anongiftpaidupgrade")) { // Upgrading from a gifted sub
                 // Load Info
                 EventUser user = event.getUser();
                 String promoName = event.getTagValue("msg-param-promo-name").orElse(null);
@@ -281,18 +274,14 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubUpgradeEvent(channel, user, promoName, giftTotal, senderLogin, senderName));
-            }
-            // Upgrading from a Prime sub to a normal one
-            else if (msgId.equalsIgnoreCase("primepaidupgrade")) {
+            } else if (msgId.equalsIgnoreCase("primepaidupgrade")) { // Upgrading from a Prime sub to a normal one
                 // Load Info
                 EventUser user = event.getUser();
                 SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);
 
                 // Dispatch Event
                 eventManager.publish(new PrimeSubUpgradeEvent(channel, user, subPlan));
-            }
-            // Extend Subscription
-            else if (msgId.equalsIgnoreCase("extendsub")) {
+            } else if (msgId.equalsIgnoreCase("extendsub")) { // Extend Subscription
                 // Load Info
                 EventUser user = event.getUser();
                 SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);

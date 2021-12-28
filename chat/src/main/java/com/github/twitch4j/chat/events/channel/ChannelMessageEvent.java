@@ -121,8 +121,9 @@ public class ChannelMessageEvent extends AbstractChannelEvent implements Replyab
     }
 
     /**
+     * Note: This method is marked as unofficial since this tag does not appear in the irc guide.
+     *
      * @return whether this is the user's first message in the channel.
-     * @apiNote This method is marked as unofficial since this tag does not appear in the irc guide.
      * @see <a href="https://help.twitch.tv/s/article/first-time-chatter-highlight">Official documentation</a>
      */
     @Unofficial

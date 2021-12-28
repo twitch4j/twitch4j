@@ -63,14 +63,14 @@ public abstract class TwitchWebhookTopic<T> {
         this.type = type;
     }
 
-	// Generate the query string from the sorted list of parameters
+    // Generate the query string from the sorted list of parameters
     private String buildQuery(Iterable<Map.Entry<String, Object>> params) {
         StringBuilder urlBuilder = new StringBuilder();
 
-        if(params != null) {
+        if (params != null) {
             boolean first = true;
-            for(Map.Entry<String, Object> param : params) {
-                if(param.getValue() != null) {
+            for (Map.Entry<String, Object> param : params) {
+                if (param.getValue() != null) {
                     urlBuilder
                         .append(first ? "?" : "&")
                         .append(param.getKey())
@@ -137,6 +137,9 @@ public abstract class TwitchWebhookTopic<T> {
                 case (UsersTopic.PATH): {
                     String userId = params.get("user_id");
                     return new UsersTopic(userId);
+                }
+                default: {
+                    return new UnknownTopic(url);
                 }
             }
         }

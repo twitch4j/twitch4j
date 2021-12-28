@@ -82,7 +82,7 @@ public class KrakenVideoHelper {
                 }
                 return channelId;
             })
-            .thenApplyAsync(cId -> api.createVideo(authToken, cId, title, description, game, language, tags, viewable, viewableAt).execute())
+            .thenApplyAsync(cid -> api.createVideo(authToken, cid, title, description, game, language, tags, viewable, viewableAt).execute())
             .thenApplyAsync(vid -> {
                 try {
                     try {

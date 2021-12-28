@@ -473,26 +473,23 @@ public class TwitchChat implements ITwitchChat {
                             if (!message.equals("")) {
                                 // Handle messages
                                 log.trace("Received WebSocketMessage: " + message);
-                                // - CAP
+
                                 if (message.contains(":req Invalid CAP command")) {
+                                    // - CAP
                                     log.error("Failed to acquire requested IRC capabilities!");
-                                }
-                                // - CAP ACK
-                                else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
+                                } else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
+                                    // - CAP ACK
                                     List<String> capabilities = Arrays.asList(message.replace(":tmi.twitch.tv CAP * ACK :", "").split(" "));
                                     capabilities.forEach(cap -> log.debug("Acquired chat capability: " + cap));
-                                }
-                                // - Ping
-                                else if (message.contains("PING :tmi.twitch.tv")) {
+                                } else if (message.contains("PING :tmi.twitch.tv")) {
+                                    // - Ping
                                     sendTextToWebSocket("PONG :tmi.twitch.tv", true);
                                     log.debug("Responding to PING request!");
-                                }
-                                // - Login failed.
-                                else if (message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+                                } else if (message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+                                    // - Login failed.
                                     log.error("Invalid IRC Credentials. Login failed!");
-                                }
-                                // - Parse IRC Message
-                                else {
+                                } else {
+                                    // - Parse IRC Message
                                     try {
                                         IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 

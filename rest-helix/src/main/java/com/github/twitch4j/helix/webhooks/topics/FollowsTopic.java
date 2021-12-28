@@ -42,12 +42,8 @@ public class FollowsTopic extends TwitchWebhookTopic<FollowList> {
      */
     @Deprecated
     public FollowsTopic(String fromId, String toId) {
-        super(
-            PATH,
-            FollowList.class,
-            mapParameters(fromId, toId)
-        );
-        if(fromId == null && toId == null) throw new NullPointerException("At least one of fromId and toId is required.");
+        super(PATH, FollowList.class, mapParameters(fromId, toId));
+        if (fromId == null && toId == null) throw new NullPointerException("At least one of fromId and toId is required.");
         this.fromId = Optional.ofNullable(fromId);
         this.toId = Optional.ofNullable(toId);
     }

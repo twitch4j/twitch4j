@@ -328,7 +328,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                             // Logging
                             if (log.isDebugEnabled()) {
                                 Matcher matcher = LISTEN_AUTH_TOKEN.matcher(command);
-                                String cmd = matcher.find() ? matcher.group(1) + "\u2022\u2022\u2022" + matcher.group(2) : command;
+                                String cmd = matcher.find() ? matcher.group(1) + "•••" + matcher.group(2) : command;
                                 log.debug("Processed command from queue: [{}].", cmd);
                             }
                         } else {

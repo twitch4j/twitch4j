@@ -17,7 +17,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class StreamMarker {
 
-    private String createdAt, description, id;
+    private String createdAt;
+    private String description;
+    private String id;
     private Long positionSeconds;
 
     @JsonProperty("data")
