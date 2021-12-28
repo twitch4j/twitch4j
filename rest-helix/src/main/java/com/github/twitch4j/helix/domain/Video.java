@@ -120,8 +120,8 @@ public class Video {
     public String getThumbnailUrl(int width, int height) {
         return StringUtils.replaceEach(
             this.getThumbnailUrl(),
-            new String[]{"%{width}", "%{height}"},
-            new String[]{String.valueOf(width), String.valueOf(height)}
+            new String[] {"%{width}", "%{height}"},
+            new String[] {String.valueOf(width), String.valueOf(height)}
         );
     }
 

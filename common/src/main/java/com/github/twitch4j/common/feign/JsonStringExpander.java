@@ -10,7 +10,7 @@ public class JsonStringExpander implements Param.Expander {
 
     @Override
     public String expand(Object value) {
-        return value == null ? "" : StringUtils.replaceEach(value.toString(), new String[]{
+        return value == null ? "" : StringUtils.replaceEach(value.toString(), new String[] {
             "\"",
             "\\",
             "\t",
@@ -18,7 +18,7 @@ public class JsonStringExpander implements Param.Expander {
             "\n",
             "\b",
             "\f"
-        }, new String[]{
+        }, new String[] {
             "\\\"",
             "\\\\",
             "\\t",

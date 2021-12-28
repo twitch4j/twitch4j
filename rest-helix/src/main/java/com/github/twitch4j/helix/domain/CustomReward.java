@@ -193,7 +193,7 @@ public class CustomReward {
     @SuperBuilder(toBuilder = true)
     @Jacksonized
     public static class Setting {
-        @Getter(onMethod_ = { @JsonIgnore }) // avoid serializing both "is_enabled" and "enabled" from this single variable
+        @Getter(onMethod_ = {@JsonIgnore}) // avoid serializing both "is_enabled" and "enabled" from this single variable
         @Accessors(fluent = true)
         @JsonProperty("is_enabled")
         private Boolean isEnabled;

@@ -39,7 +39,7 @@ public class UserStateEvent extends AbstractChannelEvent {
         super(messageEvent.getChannel());
         this.messageEvent = messageEvent;
         String[] emoteSets = messageEvent.getTagValue("emote-sets")
-            .map(emoteSetsStr -> emoteSetsStr.split(",")).orElse(new String[]{});
+            .map(emoteSetsStr -> emoteSetsStr.split(",")).orElse(new String[] {});
         this.emoteSets = Collections.unmodifiableList(Arrays.asList(emoteSets));
     }
 
