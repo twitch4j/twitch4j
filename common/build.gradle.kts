@@ -1,4 +1,8 @@
-// In this section you declare the dependencies for your production and test code
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J Common")
+	artifactDescription.set("this module contains common code for all library modules")
+}
+
 dependencies {
 	// Event Manager
 	api(group = "com.github.philippheuer.events4j", name = "events4j-core")
@@ -21,18 +25,4 @@ dependencies {
 
 	// Twitch4J Modules
 	api(project(":twitch4j-auth"))
-}
-
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Common Module API"
-		windowTitle = "Twitch4J (v${version}) - Common Module API"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Common Module")
-		description.set("Common API dependency")
-	}
 }

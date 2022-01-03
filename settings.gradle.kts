@@ -1,3 +1,11 @@
+pluginManagement {
+	repositories {
+		mavenLocal()
+		gradlePluginPortal()
+		mavenCentral()
+	}
+}
+
 rootProject.name = "Twitch4J"
 
 include(

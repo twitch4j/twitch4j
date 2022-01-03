@@ -1,79 +1,46 @@
 // Plugins
 plugins {
-	signing
 	`java-library`
-	`maven-publish`
-	id("io.freefair.lombok") version "6.3.0"
-	id("com.coditory.manifest") version "0.1.14"
-	id("com.github.johnrengelman.shadow") version "7.1.1"
+	id("me.philippheuer.configuration") version "+"
 }
 
-group = group
-version = version
-
-// All-Projects
+// root + subprojects
 allprojects {
-	// Repositories
+	apply(plugin = "java-library")
+	apply(plugin = "me.philippheuer.configuration")
+
 	repositories {
 		mavenCentral()
 	}
 
-	tasks {
-		withType<Javadoc> {
-			options {
-				this as StandardJavadocDocletOptions
-				links(
-					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
-					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
-					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.0.0/",
-					"https://square.github.io/okhttp/4.x/okhttp/",
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
-					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/latest",
-					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/latest",
-					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/latest",
-					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/latest",
-					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
-					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/latest",
-					"https://netflix.github.io/Hystrix/javadoc/",
-					"https://takahikokawasaki.github.io/nv-websocket-client/",
-					"https://commons.apache.org/proper/commons-io/apidocs/",
-					"https://commons.apache.org/proper/commons-lang/apidocs/",
-					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.32",
-					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
-					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
-					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
-					"https://fasterxml.github.io/jackson-modules-java8/javadoc/datetime/2.13/",
-					"https://projectlombok.org/api/",
-					"https://twitch4j.github.io/javadoc"
-				)
-				locale = "en"
-			}
-		}
+	projectConfiguration {
+		logLevel.set(LogLevel.INFO)
+
+		// config
+		javadocLombok.set(false)
+		javadocOverviewTemplate.set("${rootDir}/buildSrc/overview-single.html")
+		javadocOverviewAggregateTemplate.set("${rootDir}/buildSrc/overview-general.html")
+		javadocAutoLinking.set(true)
+		javadocGroups.set(javadocPackageNames())
 	}
 }
 
-// Subprojects
+// subprojects
 subprojects {
-	apply(plugin = "signing")
-	apply(plugin = "java-library")
-	apply(plugin = "maven-publish")
-	apply(plugin = "io.freefair.lombok")
-	apply(plugin = "com.coditory.manifest")
-	apply(plugin = "com.github.johnrengelman.shadow")
+	projectConfiguration {
+		logLevel.set(LogLevel.INFO)
 
-	lombok {
-		version.set("1.18.22")
-		disableConfig.set(true)
-	}
+		// project
+		language.set(me.philippheuer.projectcfg.domain.ProjectLanguage.JAVA)
+		type.set(me.philippheuer.projectcfg.domain.ProjectType.LIBRARY)
+		javaVersion.set(JavaVersion.VERSION_1_8)
 
-	// Source Compatibility
-	java {
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
-		withSourcesJar()
-		withJavadocJar()
+		// pom
+		pom = {pom -> pom.default()}
+
+		// shading
+		shadow.set(true)
+		shadowRelocate.set("com.github.twitch4j.shaded")
 	}
 
 	// Dependency Management for Subprojects
@@ -138,124 +105,5 @@ subprojects {
 		testImplementation(platform("org.junit:junit-bom:5.8.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.10")
-	}
-
-	publishing {
-		repositories {
-			maven {
-				name = "maven"
-				url = uri(project.mavenRepositoryUrl)
-				credentials {
-					username = project.mavenRepositoryUsername
-					password = project.mavenRepositoryPassword
-				}
-			}
-		}
-		publications {
-			create<MavenPublication>("main") {
-				from(components["java"])
-				pom.default()
-			}
-		}
-	}
-
-	signing {
-		useGpgCmd()
-		sign(publishing.publications["main"])
-	}
-
-	// Source encoding
-	tasks {
-		// shadowjar & relocation
-		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
-			target = shadowJar.get()
-			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
-		}
-
-		// jar artifact id and version
-		withType<Jar> {
-			if (this is com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-				dependsOn(relocateShadowJar)
-				archiveClassifier.set("shaded")
-			}
-			dependsOn(project.tasks.manifest)
-			manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
-		}
-
-		// compile options
-		withType<JavaCompile> {
-			options.encoding = "UTF-8"
-		}
-
-		// javadoc & delombok
-		val delombok by getting(io.freefair.gradle.plugins.lombok.tasks.Delombok::class)
-		javadoc {
-			dependsOn(delombok)
-			source(delombok)
-			options {
-				title = "${project.name} (v${project.version})"
-				windowTitle = "${project.name} (v${project.version})"
-				encoding = "UTF-8"
-				overview = file("${rootDir}/buildSrc/overview-single.html").absolutePath
-				this as StandardJavadocDocletOptions
-				// hide javadoc warnings (a lot from delombok)
-				addStringOption("Xdoclint:none", "-quiet")
-				if (JavaVersion.current().isJava9Compatible) {
-					// javadoc / html5 support
-					addBooleanOption("html5", true)
-				}
-			}
-		}
-
-		// test
-		test {
-			useJUnitPlatform {
-				includeTags("unittest")
-				excludeTags("integration")
-			}
-		}
-	}
-}
-
-tasks.register<Javadoc>("aggregateJavadoc") {
-	enabled = JavaVersion.current().isJava9Compatible
-	group = JavaBasePlugin.DOCUMENTATION_GROUP
-	options {
-		title = "${rootProject.name} (v${project.version})"
-		windowTitle = "${rootProject.name} (v${project.version})"
-		encoding = "UTF-8"
-		this as StandardJavadocDocletOptions
-		overview = file("${rootDir}/buildSrc/overview-general.html").absolutePath
-		group("Common", "com.github.twitch4j.common*")
-		group("Core", "com.github.twitch4j", "com.github.twitch4j.domain*", "com.github.twitch4j.events*", "com.github.twitch4j.modules*")
-		group("Auth", "com.github.twitch4j.auth*")
-		group("Chat", "com.github.twitch4j.chat*")
-		group("EventSub", "com.github.twitch4j.eventsub*")
-		group("PubSub", "com.github.twitch4j.pubsub*")
-		group("Helix API", "com.github.twitch4j.helix*")
-		group("Twitch Message Interface - API", "com.github.twitch4j.tmi*")
-		group("GraphQL", "com.github.twitch4j.graphql*")
-		group("Extensions API", "com.github.twitch4j.extensions*")
-		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
-		addBooleanOption("html5").setValue(true)
-	}
-
-	source(subprojects.map { it.tasks.javadoc.get().source })
-	classpath = files(subprojects.map { it.tasks.javadoc.get().classpath })
-
-	setDestinationDir(file("${rootDir}/docs/static/javadoc"))
-
-	doFirst {
-		if (destinationDir?.exists() == true) {
-			destinationDir?.deleteRecursively()
-		}
-	}
-
-	doLast {
-		copy {
-			from(file("${destinationDir!!}/element-list"))
-			into(destinationDir!!)
-			rename { "package-list" }
-		}
 	}
 }

@@ -1,6 +1,10 @@
-// Plugins
 plugins {
 	id("com.apollographql.apollo") version "2.5.11"
+}
+
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J GraphQL API (unofficial)")
+	artifactDescription.set("contains a graphql client to call the unofficial graphql api")
 }
 
 // Dependencies
@@ -28,19 +32,5 @@ tasks {
 	withType<Javadoc> {
 		// Ignore auto-generated files from apollo graphql
 		exclude("com/github/twitch4j/graphql/internal/**")
-	}
-
-	javadoc {
-		options {
-			title = "Twitch4J (v${version}) - GraphQL Module"
-			windowTitle = "Twitch4J (v${version}) - GraphQL Module"
-		}
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J GraphQL Module")
-		description.set("GraphQL dependency")
 	}
 }
