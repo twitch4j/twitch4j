@@ -6,6 +6,8 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.helix.domain.CustomReward;
+import com.github.twitch4j.helix.interceptor.CustomRewardEncodeMixIn;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
@@ -123,6 +125,7 @@ public class TwitchHelixBuilder {
 
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
+        ObjectMapper serializer = mapper.copy().addMixIn(CustomReward.class, CustomRewardEncodeMixIn.class);
 
         // Create HttpClient with proxy
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
@@ -137,7 +140,7 @@ public class TwitchHelixBuilder {
         TwitchHelixClientIdInterceptor interceptor = new TwitchHelixClientIdInterceptor(this);
         return HystrixFeign.builder()
             .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, interceptor, timeout))
-            .encoder(new JacksonEncoder(mapper))
+            .encoder(new JacksonEncoder(serializer))
             .decoder(new TwitchHelixDecoder(mapper, interceptor))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
