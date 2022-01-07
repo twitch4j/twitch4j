@@ -6,6 +6,9 @@ dependencies {
 	// Rate Limiting
 	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
+	// Cache
+	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))

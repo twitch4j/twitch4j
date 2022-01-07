@@ -1,15 +1,23 @@
 package com.github.twitch4j.chat;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
+import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.events.channel.UserStateEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
@@ -43,6 +51,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 @Slf4j
 public class TwitchChat implements ITwitchChat {
@@ -206,6 +215,16 @@ public class TwitchChat implements ITwitchChat {
     protected final boolean enableMembershipEvents;
 
     /**
+     * The maximum number of attempts to make for joining each channel
+     */
+    protected final int maxJoinRetries;
+
+    /**
+     * Cache of recent number of join attempts for each channel
+     */
+    protected final Cache<String, Integer> joinAttemptsByChannelName;
+
+    /**
      * Helper class to compute delays between connection retries.
      *
      * @see <a href="https://dev.twitch.tv/docs/irc/guide#re-connecting-to-twitch-irc">Official suggestion</a>
@@ -243,8 +262,9 @@ public class TwitchChat implements ITwitchChat {
      * @param autoJoinOwnChannel             Whether one's own channel should automatically be joined
      * @param enableMembershipEvents         Whether JOIN/PART events should be enabled
      * @param botOwnerIds                    Bot Owner IDs
+     * @param maxJoinRetries                 Maximum join retries per channel
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, int maxJoinRetries) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -261,6 +281,7 @@ public class TwitchChat implements ITwitchChat {
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
         this.enableMembershipEvents = enableMembershipEvents;
+        this.maxJoinRetries = maxJoinRetries;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -357,6 +378,36 @@ public class TwitchChat implements ITwitchChat {
                 }
             }
         });
+
+        // Initialize joinAttemptsByChannelName (on an attempt expiring without explicit removal, we retry with exponential backoff)
+        if (maxJoinRetries > 0) {
+            final long initialWait = Math.max(chatQueueTimeout, 5000L);
+            this.joinAttemptsByChannelName = Caffeine.newBuilder()
+                .expireAfterWrite(initialWait, TimeUnit.MILLISECONDS)
+                .scheduler(Scheduler.forScheduledExecutorService(taskExecutor)) // required for prompt removals on java 8
+                .<String, Integer>evictionListener((name, attempts, cause) -> {
+                    if (cause == RemovalCause.EXPIRED && name != null && attempts != null) {
+                        if (attempts < maxJoinRetries) {
+                            taskExecutor.schedule(() -> {
+                                if (currentChannels.contains(name)) {
+                                    issueJoin(name, attempts + 1);
+                                }
+                            }, initialWait * (1L << (attempts + 1)), TimeUnit.MILLISECONDS); // exponential backoff (pow2 optimization)
+                        } else {
+                            log.debug("Chat connection exhausted retries when attempting to join channel: {}", name);
+                        }
+                    }
+                })
+                .build();
+        } else {
+            this.joinAttemptsByChannelName = Caffeine.newBuilder().maximumSize(0).build(); // optimization
+        }
+
+        // Remove successfully joined channels from joinAttemptsByChannelName (as further retries are not needed)
+        Consumer<AbstractChannelEvent> joinListener = e -> joinAttemptsByChannelName.invalidate(e.getChannel().getName().toLowerCase());
+        eventManager.onEvent(ChannelStateEvent.class, joinListener::accept);
+        eventManager.onEvent(ChannelNoticeEvent.class, joinListener::accept);
+        eventManager.onEvent(UserStateEvent.class, joinListener::accept);
     }
 
     /**
@@ -632,8 +683,16 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void issueJoin(String channelName) {
+        this.issueJoin(channelName, 0);
+    }
+
+    private void issueJoin(String channelName, int attempts) {
         ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
-            () -> queueCommand("JOIN #" + channelName.toLowerCase()),
+            () -> {
+                String name = channelName.toLowerCase();
+                queueCommand("JOIN #" + name);
+                joinAttemptsByChannelName.asMap().merge(name, attempts, Math::max); // mark that a join has been initiated to track later success or failure state
+            },
             taskExecutor
         );
     }
