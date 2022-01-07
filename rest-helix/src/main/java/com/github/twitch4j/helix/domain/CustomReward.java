@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,7 +13,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -156,47 +156,61 @@ public class CustomReward {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @SuperBuilder(toBuilder = true)
     @Jacksonized
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = false)
     public static class MaxPerStreamSetting extends Setting {
-        private Integer maxPerStream;
-    }
 
-    @Data
-    @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @SuperBuilder(toBuilder = true)
-    @Jacksonized
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static class MaxPerUserPerStreamSetting extends Setting {
-        private Integer maxPerUserPerStream;
-    }
-
-    @Data
-    @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @SuperBuilder(toBuilder = true)
-    @Jacksonized
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static class GlobalCooldownSetting extends Setting {
-        private Integer globalCooldownSeconds;
-    }
-
-    @Data
-    @Setter(AccessLevel.PRIVATE)
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @SuperBuilder(toBuilder = true)
-    @Jacksonized
-    public static class Setting {
-        @Getter(onMethod_ = { @JsonIgnore }) // avoid serializing both "is_enabled" and "enabled" from this single variable
+        @Getter(onMethod_ = { @JsonIgnore })
         @Accessors(fluent = true)
-        @JsonProperty("is_enabled")
+        @JsonAlias("is_enabled")
+        @JsonProperty("is_max_per_stream_enabled")
         private Boolean isEnabled;
+
+        private Integer maxPerStream;
+
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
+    @EqualsAndHashCode(callSuper = false)
+    public static class MaxPerUserPerStreamSetting extends Setting {
+
+        @Getter(onMethod_ = { @JsonIgnore })
+        @Accessors(fluent = true)
+        @JsonAlias("is_enabled")
+        @JsonProperty("is_max_per_user_per_stream_enabled")
+        private Boolean isEnabled;
+
+        private Integer maxPerUserPerStream;
+
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuperBuilder(toBuilder = true)
+    @Jacksonized
+    @EqualsAndHashCode(callSuper = false)
+    public static class GlobalCooldownSetting extends Setting {
+
+        @Getter(onMethod_ = { @JsonIgnore })
+        @Accessors(fluent = true)
+        @JsonAlias("is_enabled")
+        @JsonProperty("is_global_cooldown_enabled")
+        private Boolean isEnabled;
+
+        private Integer globalCooldownSeconds;
+
+    }
+
+    @NoArgsConstructor
+    @SuperBuilder(toBuilder = true)
+    public static abstract class Setting {
+        abstract Boolean isEnabled();
     }
 
 }
