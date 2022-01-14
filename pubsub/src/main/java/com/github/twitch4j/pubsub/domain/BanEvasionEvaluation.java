@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 
 public enum BanEvasionEvaluation {
 
-    @JsonAlias("")
+    @JsonAlias({ "", "UNKNOWN_EVADER" })
     NOT_EVALUATED,
 
     UNLIKELY_EVADER,
