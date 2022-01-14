@@ -16,7 +16,7 @@ public class LowTrustUser {
 
     private String channelId;
 
-    private SimpleUser sender;
+    private AutomodCaughtMessage.Sender sender;
 
     private Instant evaluatedAt;
 
