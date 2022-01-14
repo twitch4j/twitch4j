@@ -9,10 +9,12 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
+import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
+import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -210,6 +213,11 @@ public class TwitchChat implements ITwitchChat {
     protected final boolean autoJoinOwnChannel;
 
     /**
+     * Whether join failures should result in removal from current channels
+     */
+    protected final boolean removeChannelOnJoinFailure;
+
+    /**
      * Whether JOIN/PART events should be enabled
      */
     protected final boolean enableMembershipEvents;
@@ -262,9 +270,10 @@ public class TwitchChat implements ITwitchChat {
      * @param autoJoinOwnChannel             Whether one's own channel should automatically be joined
      * @param enableMembershipEvents         Whether JOIN/PART events should be enabled
      * @param botOwnerIds                    Bot Owner IDs
+     * @param removeChannelOnJoinFailure     Whether channels should be removed after a join failure
      * @param maxJoinRetries                 Maximum join retries per channel
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, int maxJoinRetries) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -281,6 +290,7 @@ public class TwitchChat implements ITwitchChat {
         this.chatQueueTimeout = chatQueueTimeout;
         this.autoJoinOwnChannel = autoJoinOwnChannel;
         this.enableMembershipEvents = enableMembershipEvents;
+        this.removeChannelOnJoinFailure = removeChannelOnJoinFailure;
         this.maxJoinRetries = maxJoinRetries;
 
         // Create WebSocketFactory and apply proxy settings
@@ -393,6 +403,8 @@ public class TwitchChat implements ITwitchChat {
                                     issueJoin(name, attempts + 1);
                                 }
                             }, initialWait * (1L << (attempts + 1)), TimeUnit.MILLISECONDS); // exponential backoff (pow2 optimization)
+                        } else if (removeChannelOnJoinFailure && removeCurrentChannel(name)) {
+                            eventManager.publish(new ChannelRemovedPostJoinFailureEvent(name, ChannelRemovedPostJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
                         } else {
                             log.debug("Chat connection exhausted retries when attempting to join channel: {}", name);
                         }
@@ -408,6 +420,17 @@ public class TwitchChat implements ITwitchChat {
         eventManager.onEvent(ChannelStateEvent.class, joinListener::accept);
         eventManager.onEvent(ChannelNoticeEvent.class, joinListener::accept);
         eventManager.onEvent(UserStateEvent.class, joinListener::accept);
+
+        // Ban Listener
+        final Set<NoticeTag> banNotices = EnumSet.of(NoticeTag.MSG_BANNED, NoticeTag.MSG_CHANNEL_SUSPENDED, NoticeTag.TOS_BAN); // bit vector
+        eventManager.onEvent(ChannelNoticeEvent.class, e -> {
+            String name = e.getChannel().getName();
+            NoticeTag type = e.getType();
+            if (removeChannelOnJoinFailure && banNotices.contains(type) && removeCurrentChannel(name)) {
+                ChannelRemovedPostJoinFailureEvent.Reason reason = type == NoticeTag.MSG_BANNED ? ChannelRemovedPostJoinFailureEvent.Reason.USER_BANNED : ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED;
+                eventManager.publish(new ChannelRemovedPostJoinFailureEvent(name, reason));
+            }
+        });
     }
 
     /**
@@ -731,6 +754,21 @@ public class TwitchChat implements ITwitchChat {
             () -> queueCommand("PART #" + channelName.toLowerCase()),
             taskExecutor
         );
+    }
+
+    private boolean removeCurrentChannel(String channelName) {
+        channelCacheLock.lock();
+        try {
+            if (currentChannels.remove(channelName)) {
+                String id = channelNameToChannelId.remove(channelName);
+                if (id != null) channelIdToChannelName.remove(id);
+                return true;
+            } else {
+                return false;
+            }
+        } finally {
+            channelCacheLock.unlock();
+        }
     }
 
     @Override

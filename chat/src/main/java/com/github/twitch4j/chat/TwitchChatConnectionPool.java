@@ -2,6 +2,7 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.chat.enums.NoticeTag;
+import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -254,6 +255,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withAuthRateLimit(authRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
+
+        // Reclaim channel headroom upon generic join failures
+        chat.getEventManager().onEvent(threadPrefix + "join-fail-tracker", ChannelRemovedPostJoinFailureEvent.class, e -> unsubscribe(e.getChannelName()));
 
         // Reclaim channel headroom upon a ban
         chat.getEventManager().onEvent(threadPrefix + "ban-tracker", ChannelNoticeEvent.class, e -> {

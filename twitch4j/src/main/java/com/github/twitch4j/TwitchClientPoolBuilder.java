@@ -217,6 +217,13 @@ public class TwitchClientPoolBuilder {
     private long chatQueueTimeout = 1000L;
 
     /**
+     * The maximum number of retries to make for joining each channel, with exponential backoff.
+     * Set to zero or a negative value to disable this feature.
+     */
+    @With
+    private int chatMaxJoinRetries = 3;
+
+    /**
      * Sets the default server used for chat
      * <p>
      * Defaults to TwitchChat.TWITCH_WEB_SOCKET_SERVER, you can use TwitchChat.FDGT_TEST_SOCKET_SERVER for testing
@@ -418,6 +425,7 @@ public class TwitchClientPoolBuilder {
                         .withChatQueueSize(chatQueueSize)
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
+                        .withMaxJoinRetries(chatMaxJoinRetries)
                         .withCommandTriggers(commandPrefixes)
                         .setBotOwnerIds(botOwnerIds)
                 )
@@ -437,6 +445,7 @@ public class TwitchClientPoolBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
+                .withMaxJoinRetries(chatMaxJoinRetries)
                 .setBotOwnerIds(botOwnerIds)
                 .build();
         }
