@@ -36,7 +36,8 @@ public class VideoPlaybackData {
         COMMERCIAL("commercial"),
         STREAM_DOWN("stream-down"),
         STREAM_UP("stream-up"),
-        VIEW_COUNT("viewcount");
+        VIEW_COUNT("viewcount"),
+        TOS_STRIKE("tos-strike");
 
         private final String type;
 
