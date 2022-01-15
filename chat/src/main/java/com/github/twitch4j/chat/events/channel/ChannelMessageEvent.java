@@ -21,7 +21,6 @@ import java.util.Set;
  * This event gets called when a message is received in a channel.
  */
 @Value
-@Getter
 @EqualsAndHashCode(callSuper = false)
 public class ChannelMessageEvent extends AbstractChannelEvent implements ReplyableEvent {
 
@@ -128,6 +127,16 @@ public class ChannelMessageEvent extends AbstractChannelEvent implements Replyab
     @Unofficial
     public boolean isDesignatedFirstMessage() {
         return "1".equals(getMessageEvent().getTags().get("first-msg"));
+    }
+
+    /**
+     * @return whether this message constitutes the user's designated introduction.
+     * @apiNote This method is unofficial since the experiment is not officially documented in the irc guide.
+     * @see <a href="https://twitter.com/TwitchSupport/status/1481008097749573641">Twitch Announcement</a>
+     */
+    @Unofficial
+    public boolean isUserIntroduction() {
+        return "user-intro".equals(getMessageEvent().getTags().get("msg-id"));
     }
 
     /**
