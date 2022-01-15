@@ -21,6 +21,11 @@ public class ChannelInformation {
     private String broadcasterId;
 
     /**
+     * Twitch User Login Name of this channel owner
+     */
+    private String broadcasterLogin;
+
+    /**
      * Twitch User Display Name of this channel owner
      */
     private String broadcasterName;
