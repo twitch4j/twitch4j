@@ -137,6 +137,12 @@ subprojects {
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.8.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
+		// - Mocking
+		testImplementation(group = "org.mockito", name = "mockito-core", version = "4.2.0")
+		testImplementation(group = "org.mockito", name = "mockito-junit-jupiter", version = "4.2.0")
+		// - Await
+		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.1.1")
+		// - Logging
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.10")
 	}
 

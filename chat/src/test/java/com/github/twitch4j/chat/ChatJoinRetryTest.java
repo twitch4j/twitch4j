@@ -1,0 +1,195 @@
+package com.github.twitch4j.chat;
+
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
+import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.Collections;
+
+import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+
+public class ChatJoinRetryTest {
+
+    private static final String FAKE_CHANNEL_NAME = "twitch4jtestchannelthatisnotreall"; // should exceed the max account length to make sure no such account can be created
+
+    private static TwitchChat getChatInstance(int maxRetries, boolean removeChannelOnJoinFailure) {
+        // helper property to reduce the duration of test executions
+        TwitchChat.initialWaitOverwrite = 100;
+
+        // spy on EventManager
+        EventManager eventManager = new EventManager();
+        eventManager.autoDiscovery();
+        eventManager.setDefaultEventHandler(SimpleEventHandler.class); // synchronous execution is best suited for tests
+
+        // spy on TwitchChat
+        TwitchChat twitchChat = Mockito.spy(
+            TwitchChatBuilder.builder()
+                .withEventManager(Mockito.spy(eventManager))
+                .withRemoveChannelOnJoinFailure(removeChannelOnJoinFailure)
+                .withMaxJoinRetries(maxRetries)
+                .build()
+        );
+
+        return twitchChat;
+    }
+
+    private static IRCMessageEvent testIRCMessageEvent(String raw) {
+        return new IRCMessageEvent(raw, Collections.singletonMap("149223493", FAKE_CHANNEL_NAME), Collections.singletonMap(FAKE_CHANNEL_NAME, "149223493"), null);
+    }
+
+    @Test
+    @DisplayName("successfully join a channel")
+    public void testChannelJoinSuccess() {
+        // init
+        TwitchChat twitchChat = getChatInstance(1, false);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // fake a successful join
+        twitchChat.getEventManager().publish(testIRCMessageEvent("@emote-only=0;followers-only=-1;r9k=0;rituals=0;room-id=149223493;slow=0;subs-only=0 :tmi.twitch.tv ROOMSTATE #"+FAKE_CHANNEL_NAME));
+
+        // should be gone from joinAttemptsByChannelName after successful join
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after successful join");
+
+        // cleanup
+        twitchChat.close();
+    }
+
+    @Test
+    @DisplayName("failed to join a channel because of unknown reasons")
+    public void testChannelJoinFailedByExpire() {
+        // init
+        TwitchChat twitchChat = getChatInstance(1, true);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertEquals(true, twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME) != null, "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // should see a ChannelRemovedPostJoinFailureEvent and entry should have expired
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after it expired");
+
+        // cleanup
+        twitchChat.close();
+    }
+
+    @Test
+    @DisplayName("fail to join a channel two times before successfully joining it")
+    public void testChannelJoinFailedBeforeSuccess() {
+        // init
+        TwitchChat twitchChat = getChatInstance(3, true);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertEquals(true, twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME) != null, "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // wait for 2 failed join attempts
+        await().until(() -> twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME) != null && twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME) == 2);
+
+        // fake a successful join
+        twitchChat.getEventManager().publish(testIRCMessageEvent("@emote-only=0;followers-only=-1;r9k=0;rituals=0;room-id=149223493;slow=0;subs-only=0 :tmi.twitch.tv ROOMSTATE #"+FAKE_CHANNEL_NAME));
+
+        // should be gone from joinAttemptsByChannelName after successful join
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after successful join");
+
+        // cleanup
+        twitchChat.close();
+    }
+
+    @Test
+    @DisplayName("failed to join a channel because we are banned")
+    public void testChannelJoinFailedByBannedUser() {
+        // init
+        TwitchChat twitchChat = getChatInstance(1, true);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // fake a banned notice
+        twitchChat.getEventManager().publish(testIRCMessageEvent("@msg-id=msg_banned :tmi.twitch.tv NOTICE #"+FAKE_CHANNEL_NAME+" :You are permanently banned from talking in "+FAKE_CHANNEL_NAME+"."));
+
+        // should be gone from joinAttemptsByChannelName because of the ban notice
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the ban notice");
+
+        // should have received a event about the removal of the channel
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.USER_BANNED));
+
+        // cleanup
+        twitchChat.close();
+    }
+
+    @Test
+    @DisplayName("failed to join a channel because the channel is suspended")
+    public void testChannelJoinFailedChannelSuspended() {
+        // init
+        TwitchChat twitchChat = getChatInstance(1, true);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // fake a banned notice
+        twitchChat.getEventManager().publish(testIRCMessageEvent("@msg-id=msg_channel_suspended :tmi.twitch.tv NOTICE #"+FAKE_CHANNEL_NAME+" :This channel has been suspended."));
+
+        // should be gone from joinAttemptsByChannelName because of the ban notice
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the channel suspension notice");
+
+        // should have received a event about the removal of the channel
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
+
+        // cleanup
+        twitchChat.close();
+    }
+
+    @Test
+    @DisplayName("failed to join a channel because it was closed due to TOS violations")
+    public void testChannelJoinFailedTOS() {
+        // init
+        TwitchChat twitchChat = getChatInstance(1, true);
+
+        // join channel and wait for the command to be processed
+        twitchChat.joinChannel(FAKE_CHANNEL_NAME);
+        verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+
+        // check that we kept track of the join attempt in joinAttemptsByChannelName
+        Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
+
+        // fake a banned notice
+        twitchChat.getEventManager().publish(testIRCMessageEvent("@msg-id=tos_ban :tmi.twitch.tv NOTICE #"+FAKE_CHANNEL_NAME+" :The community has closed channel "+FAKE_CHANNEL_NAME+" due to Terms of Service violations."));
+
+        // should be gone from joinAttemptsByChannelName because of the ban notice
+        Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the channel suspension notice");
+
+        // should have received a event about the removal of the channel
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
+
+        // cleanup
+        twitchChat.close();
+    }
+
+}

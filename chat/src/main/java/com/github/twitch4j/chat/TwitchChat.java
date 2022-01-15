@@ -14,9 +14,9 @@ import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
-import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.UserStateEvent;
@@ -250,6 +250,9 @@ public class TwitchChat implements ITwitchChat {
      */
     private volatile Future<?> backoffClearer;
 
+    // allows to overwrite the initialWait for join retries (for test-cases)
+    protected static Integer initialWaitOverwrite = null;
+
     /**
      * Constructor
      *
@@ -391,7 +394,7 @@ public class TwitchChat implements ITwitchChat {
 
         // Initialize joinAttemptsByChannelName (on an attempt expiring without explicit removal, we retry with exponential backoff)
         if (maxJoinRetries > 0) {
-            final long initialWait = Math.max(chatQueueTimeout, 5000L);
+            final long initialWait = initialWaitOverwrite != null ? initialWaitOverwrite : Math.max(chatQueueTimeout, 5000L);
             this.joinAttemptsByChannelName = Caffeine.newBuilder()
                 .expireAfterWrite(initialWait, TimeUnit.MILLISECONDS)
                 .scheduler(Scheduler.forScheduledExecutorService(taskExecutor)) // required for prompt removals on java 8
@@ -709,7 +712,7 @@ public class TwitchChat implements ITwitchChat {
         this.issueJoin(channelName, 0);
     }
 
-    private void issueJoin(String channelName, int attempts) {
+    protected void issueJoin(String channelName, int attempts) {
         ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
             () -> {
                 String name = channelName.toLowerCase();
