@@ -19,7 +19,8 @@ public class CreatorGoal {
 
     public enum Type {
         FOLLOWERS,
-        SUB_POINTS
+        SUB_POINTS,
+        NEW_SUB_POINTS
     }
 
     public enum State {
