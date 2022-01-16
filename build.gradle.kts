@@ -40,7 +40,7 @@ allprojects {
 					"https://takahikokawasaki.github.io/nv-websocket-client/",
 					"https://commons.apache.org/proper/commons-io/apidocs/",
 					"https://commons.apache.org/proper/commons-lang/apidocs/",
-					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.32",
+					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.33",
 					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
@@ -129,7 +129,7 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Logging
-		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.32")
+		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.33")
 
 		// Jackson BOM
 		api(platform("com.fasterxml.jackson:jackson-bom:2.13.1"))
