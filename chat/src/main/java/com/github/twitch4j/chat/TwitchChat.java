@@ -16,7 +16,7 @@ import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
-import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
+import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.UserStateEvent;
@@ -407,7 +407,7 @@ public class TwitchChat implements ITwitchChat {
                                 }
                             }, initialWait * (1L << (attempts + 1)), TimeUnit.MILLISECONDS); // exponential backoff (pow2 optimization)
                         } else if (removeChannelOnJoinFailure && removeCurrentChannel(name)) {
-                            eventManager.publish(new ChannelRemovedPostJoinFailureEvent(name, ChannelRemovedPostJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
+                            eventManager.publish(new ChannelJoinFailureEvent(name, ChannelJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
                         } else {
                             log.debug("Chat connection exhausted retries when attempting to join channel: {}", name);
                         }
@@ -430,8 +430,8 @@ public class TwitchChat implements ITwitchChat {
             String name = e.getChannel().getName();
             NoticeTag type = e.getType();
             if (removeChannelOnJoinFailure && banNotices.contains(type) && removeCurrentChannel(name)) {
-                ChannelRemovedPostJoinFailureEvent.Reason reason = type == NoticeTag.MSG_BANNED ? ChannelRemovedPostJoinFailureEvent.Reason.USER_BANNED : ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED;
-                eventManager.publish(new ChannelRemovedPostJoinFailureEvent(name, reason));
+                ChannelJoinFailureEvent.Reason reason = type == NoticeTag.MSG_BANNED ? ChannelJoinFailureEvent.Reason.USER_BANNED : ChannelJoinFailureEvent.Reason.CHANNEL_SUSPENDED;
+                eventManager.publish(new ChannelJoinFailureEvent(name, reason));
             }
         });
     }

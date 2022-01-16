@@ -6,7 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
+import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
@@ -199,7 +199,7 @@ public class TwitchChatBuilder {
     /**
      * Whether join failures should result in removal from current channels.
      *
-     * @see ChannelRemovedPostJoinFailureEvent
+     * @see ChannelJoinFailureEvent
      */
     @With
     private boolean removeChannelOnJoinFailure = false;

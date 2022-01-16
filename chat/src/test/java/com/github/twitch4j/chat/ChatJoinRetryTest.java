@@ -2,7 +2,7 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
-import com.github.twitch4j.chat.events.channel.ChannelRemovedPostJoinFailureEvent;
+import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -84,7 +84,7 @@ public class ChatJoinRetryTest {
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
 
         // should see a ChannelRemovedPostJoinFailureEvent and entry should have expired
-        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
         Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after it expired");
         Assertions.assertFalse(twitchChat.currentChannels.contains(FAKE_CHANNEL_NAME), "channel should be gone from currentChannels after retries have been exhausted");
 
@@ -139,7 +139,7 @@ public class ChatJoinRetryTest {
         Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the ban notice");
 
         // should have received an event about the removal of the channel
-        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.USER_BANNED));
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelJoinFailureEvent.Reason.USER_BANNED));
         Assertions.assertFalse(twitchChat.currentChannels.contains(FAKE_CHANNEL_NAME), "channel should be gone from currentChannels after the ban notice");
 
         // cleanup
@@ -166,7 +166,7 @@ public class ChatJoinRetryTest {
         Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the channel suspension notice");
 
         // should have received an event about the removal of the channel
-        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
         Assertions.assertFalse(twitchChat.currentChannels.contains(FAKE_CHANNEL_NAME), "channel should be gone from currentChannels after the channel suspension notice");
 
         // cleanup
@@ -193,7 +193,7 @@ public class ChatJoinRetryTest {
         Assertions.assertNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be gone from joinAttemptsByChannelName after the channel suspension notice");
 
         // should have received an event about the removal of the channel
-        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelRemovedPostJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelRemovedPostJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
+        verify(twitchChat.getEventManager(), timeout(30_000)).publish(new ChannelJoinFailureEvent(FAKE_CHANNEL_NAME, ChannelJoinFailureEvent.Reason.CHANNEL_SUSPENDED));
         Assertions.assertFalse(twitchChat.currentChannels.contains(FAKE_CHANNEL_NAME), "channel should be gone from currentChannels after the channel suspension notice");
 
         // cleanup

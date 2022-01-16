@@ -7,7 +7,7 @@ import lombok.Value;
  * resulting in removal from the instance's current channels.
  */
 @Value
-public class ChannelRemovedPostJoinFailureEvent {
+public class ChannelJoinFailureEvent {
 
     /**
      * The name of the channel that the chat instance was unable to join.
