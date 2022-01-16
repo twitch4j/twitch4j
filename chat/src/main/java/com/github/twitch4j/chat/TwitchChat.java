@@ -405,7 +405,7 @@ public class TwitchChat implements ITwitchChat {
                                 if (currentChannels.contains(name)) {
                                     issueJoin(name, attempts + 1);
                                 }
-                            }, initialWait * (1L << (attempts + 1)), TimeUnit.MILLISECONDS); // exponential backoff (pow2 optimization)
+                            }, initialWait * (1L << (Math.min(attempts, 16) + 1)), TimeUnit.MILLISECONDS); // exponential backoff (pow2 optimization)
                         } else if (removeChannelOnJoinFailure && removeCurrentChannel(name)) {
                             eventManager.publish(new ChannelJoinFailureEvent(name, ChannelJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
                         } else {
