@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -55,6 +56,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
@@ -79,6 +81,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
@@ -101,6 +104,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
@@ -128,6 +132,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
@@ -155,6 +160,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
@@ -182,6 +188,7 @@ public class ChatJoinRetryTest {
         // join channel and wait for the command to be processed
         twitchChat.joinChannel(FAKE_CHANNEL_NAME);
         verify(twitchChat, timeout(1_000)).issueJoin(FAKE_CHANNEL_NAME, 0);
+        TestUtils.sleepFor(50);
 
         // check that we kept track of the join attempt in joinAttemptsByChannelName
         Assertions.assertNotNull(twitchChat.joinAttemptsByChannelName.getIfPresent(FAKE_CHANNEL_NAME), "channel should be in joinAttemptsByChannelName while the join attempt is in an unknown state");
