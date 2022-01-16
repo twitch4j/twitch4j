@@ -200,7 +200,7 @@ public class TwitchClientBuilder {
      * Set to zero or a negative value to disable this feature.
      */
     @With
-    private int chatMaxJoinRetries = 3;
+    private int chatMaxJoinRetries = 7;
 
     /**
      * Sets the default server used for chat

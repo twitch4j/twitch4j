@@ -209,7 +209,7 @@ public class TwitchChatBuilder {
      * Set to zero or a negative value to disable this feature.
      */
     @With
-    private int maxJoinRetries = 3;
+    private int maxJoinRetries = 7;
 
     /**
      * Initialize the builder
