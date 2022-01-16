@@ -64,7 +64,10 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * Whether chat connections should automatically part from channels they have been banned from.
      * This is useful for reclaiming subscription headroom so a minimal number of chat instances are running.
      * By default false so that a chat instance can (eventually) reconnect if a unban occurs.
+     *
+     * @deprecated use removeChannelOnJoinFailure via advancedConfiguration instead.
      */
+    @Deprecated
     @Builder.Default
     protected final boolean automaticallyPartOnBan = false;
 

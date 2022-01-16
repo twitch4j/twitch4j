@@ -409,7 +409,7 @@ public class TwitchChat implements ITwitchChat {
                         } else if (removeChannelOnJoinFailure && removeCurrentChannel(name)) {
                             eventManager.publish(new ChannelJoinFailureEvent(name, ChannelJoinFailureEvent.Reason.RETRIES_EXHAUSTED));
                         } else {
-                            log.debug("Chat connection exhausted retries when attempting to join channel: {}", name);
+                            log.warn("Chat connection exhausted retries when attempting to join channel: {}", name);
                         }
                     }
                 })
