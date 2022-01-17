@@ -228,6 +228,11 @@ public class TwitchChat implements ITwitchChat {
     protected final int maxJoinRetries;
 
     /**
+     * Minimum milliseconds to wait after a join attempt
+     */
+    protected final long chatJoinTimeout;
+
+    /**
      * Cache of recent number of join attempts for each channel
      */
     protected final Cache<String, Integer> joinAttemptsByChannelName;
@@ -249,9 +254,6 @@ public class TwitchChat implements ITwitchChat {
      * Calls {@link ExponentialBackoffStrategy#reset()} upon a successful websocket connection
      */
     private volatile Future<?> backoffClearer;
-
-    // allows to overwrite the initialWait for join retries (for test-cases)
-    protected static Integer initialWaitOverwrite = null;
 
     /**
      * Constructor
@@ -275,8 +277,9 @@ public class TwitchChat implements ITwitchChat {
      * @param botOwnerIds                    Bot Owner IDs
      * @param removeChannelOnJoinFailure     Whether channels should be removed after a join failure
      * @param maxJoinRetries                 Maximum join retries per channel
+     * @param chatJoinTimeout                Minimum milliseconds to wait after a join attempt
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -295,6 +298,7 @@ public class TwitchChat implements ITwitchChat {
         this.enableMembershipEvents = enableMembershipEvents;
         this.removeChannelOnJoinFailure = removeChannelOnJoinFailure;
         this.maxJoinRetries = maxJoinRetries;
+        this.chatJoinTimeout = chatJoinTimeout;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -394,7 +398,7 @@ public class TwitchChat implements ITwitchChat {
 
         // Initialize joinAttemptsByChannelName (on an attempt expiring without explicit removal, we retry with exponential backoff)
         if (maxJoinRetries > 0) {
-            final long initialWait = initialWaitOverwrite != null ? initialWaitOverwrite : Math.max(chatQueueTimeout, 5000L);
+            final long initialWait = Math.max(chatJoinTimeout, 0);
             this.joinAttemptsByChannelName = Caffeine.newBuilder()
                 .expireAfterWrite(initialWait, TimeUnit.MILLISECONDS)
                 .scheduler(Scheduler.forScheduledExecutorService(taskExecutor)) // required for prompt removals on java 8

@@ -23,9 +23,6 @@ public class ChatJoinRetryTest {
     private static final String FAKE_CHANNEL_NAME = "twitch4jtestchannelthatisnotreall"; // should exceed the max account length to make sure no such account can be created
 
     private static TwitchChat getChatInstance(int maxRetries, boolean removeChannelOnJoinFailure) {
-        // helper property to reduce the duration of test executions
-        TwitchChat.initialWaitOverwrite = 100;
-
         // spy on EventManager
         EventManager eventManager = new EventManager();
         eventManager.autoDiscovery();
@@ -37,6 +34,7 @@ public class ChatJoinRetryTest {
                 .withEventManager(Mockito.spy(eventManager))
                 .withRemoveChannelOnJoinFailure(removeChannelOnJoinFailure)
                 .withMaxJoinRetries(maxRetries)
+                .withChatJoinTimeout(100L) // reduce the duration of test executions
                 .build()
         );
 
