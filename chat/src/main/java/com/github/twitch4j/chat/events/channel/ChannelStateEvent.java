@@ -22,9 +22,10 @@ public class ChannelStateEvent extends AbstractChannelEvent {
         FOLLOWERS,
         R9K,
         @Unofficial
+        @Deprecated
         RITUALS,
         SLOW,
-        SUBSCRIBERS;
+        SUBSCRIBERS
     }
 
     private final Map<ChannelState, Object> states;

@@ -77,7 +77,6 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-raid-trigger", IRCMessageEvent.class, this::onRaid);
         eventManager.onEvent("twitch4j-chat-unraid-trigger", IRCMessageEvent.class, this::onUnraid);
         eventManager.onEvent("twitch4j-chat-rewardgift-trigger", IRCMessageEvent.class, this::onRewardGift);
-        eventManager.onEvent("twitch4j-chat-ritual-trigger", IRCMessageEvent.class, this::onRitual);
         eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
         eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
         eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
@@ -379,7 +378,10 @@ public class IRCEventHandler {
      * ChatChannel Ritual Event Parser: celebration of a shared viewer milestone
      *
      * @param event the {@link IRCMessageEvent} to be checked
+     * @see <a href="https://twitter.com/TwitchSupport/status/1481008324502073347">Shut down announcement</a>
+     * @deprecated no longer sent by twitch.
      */
+    @Deprecated
     public void onRitual(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && "ritual".equalsIgnoreCase(event.getTags().get("msg-id"))) {
             // Load Info

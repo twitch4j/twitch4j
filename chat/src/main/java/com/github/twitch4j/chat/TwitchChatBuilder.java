@@ -243,6 +243,11 @@ public class TwitchChatBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
+        // Initialize/Check CredentialManager
+        if (credentialManager == null) {
+            credentialManager = CredentialManagerBuilder.builder().build();
+        }
+
         // Register rate limits across the user id contained within the chat token
         final String userId;
         if (chatAccount == null) {
