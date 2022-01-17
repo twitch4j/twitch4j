@@ -96,7 +96,7 @@ subprojects {
 
 			// Event Dispatcher
 			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.9.9")
-			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.9.8")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.9.9")
 
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
