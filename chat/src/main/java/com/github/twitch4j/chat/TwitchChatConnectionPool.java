@@ -2,6 +2,7 @@ package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.chat.enums.NoticeTag;
+import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -63,7 +64,10 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * Whether chat connections should automatically part from channels they have been banned from.
      * This is useful for reclaiming subscription headroom so a minimal number of chat instances are running.
      * By default false so that a chat instance can (eventually) reconnect if a unban occurs.
+     *
+     * @deprecated use removeChannelOnJoinFailure via advancedConfiguration instead.
      */
+    @Deprecated
     @Builder.Default
     protected final boolean automaticallyPartOnBan = false;
 
@@ -254,6 +258,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withAuthRateLimit(authRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
         ).build();
+
+        // Reclaim channel headroom upon generic join failures
+        chat.getEventManager().onEvent(threadPrefix + "join-fail-tracker", ChannelJoinFailureEvent.class, e -> unsubscribe(e.getChannelName()));
 
         // Reclaim channel headroom upon a ban
         chat.getEventManager().onEvent(threadPrefix + "ban-tracker", ChannelNoticeEvent.class, e -> {
