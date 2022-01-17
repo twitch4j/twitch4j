@@ -32,7 +32,8 @@ public class TwitchExtensionsBuilder {
     /**
      * Base Url
      */
-    private static final String BASE_URL = "https://api.twitch.tv/extensions";
+    @With
+    private String baseUrl = "https://api.twitch.tv/extensions";
 
     /**
      * Client Id
@@ -94,7 +95,7 @@ public class TwitchExtensionsBuilder {
         if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
             log.warn("Extensions: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
         }
-        
+
         // Jackson ObjectMapper
         ObjectMapper mapper = TypeConvert.getObjectMapper();
 
@@ -114,7 +115,7 @@ public class TwitchExtensionsBuilder {
             .requestInterceptor(new TwitchExtensionsClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
-            .target(TwitchExtensions.class, BASE_URL);
+            .target(TwitchExtensions.class, baseUrl);
     }
 
     /**

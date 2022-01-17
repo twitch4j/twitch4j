@@ -211,6 +211,17 @@ public class TwitchClientBuilder {
     private String chatServer = TwitchChat.TWITCH_WEB_SOCKET_SERVER;
 
     /**
+     * The base URL to use for Helix API calls.
+     * <p>
+     * Can be adjusted to point to the <a href="https://dev.twitch.tv/docs/cli/mock-api-command">Twitch CLI Mock API</a>, for example.
+     *
+     * @see TwitchHelixBuilder#OFFICIAL_BASE_URL
+     * @see TwitchHelixBuilder#MOCK_BASE_URL
+     */
+    @With
+    private String helixBaseUrl = TwitchHelixBuilder.OFFICIAL_BASE_URL;
+
+    /**
      * CredentialManager
      */
     @With
@@ -345,6 +356,7 @@ public class TwitchClientBuilder {
         TwitchHelix helix = null;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
+                .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
