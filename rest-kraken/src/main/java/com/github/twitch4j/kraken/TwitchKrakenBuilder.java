@@ -57,6 +57,7 @@ public class TwitchKrakenBuilder {
     /**
      * BaseUrl
      */
+    @With
     private String baseUrl = "https://api.twitch.tv/kraken";
 
     /**
