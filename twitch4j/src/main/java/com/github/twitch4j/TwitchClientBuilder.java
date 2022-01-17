@@ -356,6 +356,7 @@ public class TwitchClientBuilder {
         TwitchHelix helix = null;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
+                .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
