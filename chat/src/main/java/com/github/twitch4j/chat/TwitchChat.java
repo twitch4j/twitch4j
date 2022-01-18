@@ -567,21 +567,21 @@ public class TwitchChat implements ITwitchChat {
                                 // Handle messages
                                 log.trace("Received WebSocketMessage: " + message);
                                 // - CAP
-                                if (message.contains(":req Invalid CAP command")) {
+                                if (message.startsWith(":tmi.twitch.tv 410") || message.startsWith(":tmi.twitch.tv CAP * NAK")) {
                                     log.error("Failed to acquire requested IRC capabilities!");
                                 }
                                 // - CAP ACK
-                                else if (message.contains(":tmi.twitch.tv CAP * ACK :")) {
-                                    List<String> capabilities = Arrays.asList(message.replace(":tmi.twitch.tv CAP * ACK :", "").split(" "));
+                                else if (message.startsWith(":tmi.twitch.tv CAP * ACK :")) {
+                                    List<String> capabilities = Arrays.asList(message.substring(":tmi.twitch.tv CAP * ACK :".length()).split(" "));
                                     capabilities.forEach(cap -> log.debug("Acquired chat capability: " + cap));
                                 }
                                 // - Ping
-                                else if (message.contains("PING :tmi.twitch.tv")) {
+                                else if (message.equalsIgnoreCase("PING :tmi.twitch.tv")) {
                                     sendTextToWebSocket("PONG :tmi.twitch.tv", true);
                                     log.debug("Responding to PING request!");
                                 }
                                 // - Login failed.
-                                else if (message.equals(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
+                                else if (message.equalsIgnoreCase(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
                                     log.error("Invalid IRC Credentials. Login failed!");
                                 }
                                 // - Parse IRC Message
