@@ -406,7 +406,6 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     default PubSubSubscription listenForUserChatroomEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-user-v1." + userId);
     }
