@@ -31,8 +31,6 @@ inline fun <reified T : AbstractChannelEvent> TwitchChat.channelEventsAsFlow(
  * this flow. If this is a problem for you (e.g. you need to stay joined in the channel after removing a collector)
  * you are better off setting autoJoinAndLeave to false, and join/leave the channel on your own.
  *
- * this feature on false, and join/leave the twitch channel on your own.
- *
  * @param channel           The channel to read chat messages from
  * @param autoJoinAndLeave  Whether we automatically join and leave the channel or not
  * @return                  A flow object that encapsulates joining, listening to messages, and leaving a channel
