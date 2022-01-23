@@ -11,7 +11,8 @@ include(
 	":rest-tmi",
 	":pubsub",
 	":graphql",
-	":twitch4j"
+	":twitch4j",
+	":twitch4j-ktx"
 )
 
 project(":common").name = "twitch4j-common"
@@ -25,3 +26,4 @@ project(":rest-tmi").name = "twitch4j-messaginginterface"
 project(":pubsub").name = "twitch4j-pubsub"
 project(":graphql").name = "twitch4j-graphql"
 project(":twitch4j").name = "twitch4j"
+project(":twitch4j-ktx").name = "twitch4j-ktx"
