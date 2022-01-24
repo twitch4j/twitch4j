@@ -539,6 +539,23 @@ public class TwitchPubSub implements ITwitchPubSub {
                                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                                         break;
                                 }
+                            } else if ("chatrooms-user-v1".equals(topicName) && topicParts.length > 1) {
+                                final String userId = topicParts[1];
+                                switch (type) {
+                                    case "channel_banned_alias_restriction_update":
+                                        final AliasRestrictionUpdateData aliasData = TypeConvert.convertValue(msgData, AliasRestrictionUpdateData.class);
+                                        eventManager.publish(new AliasRestrictionUpdateEvent(userId, aliasData));
+                                        break;
+
+                                    case "user_moderation_action":
+                                        final UserModerationActionData actionData = TypeConvert.convertValue(msgData, UserModerationActionData.class);
+                                        eventManager.publish(new UserModerationActionEvent(userId, actionData));
+                                        break;
+
+                                    default:
+                                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                                        break;
+                                }
                             } else if ("following".equals(topicName) && topicParts.length > 1) {
                                 final FollowingData data = TypeConvert.jsonToObject(rawMessage, FollowingData.class);
                                 eventManager.publish(new FollowingEvent(lastTopicIdentifier, data));
