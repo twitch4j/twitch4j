@@ -40,7 +40,7 @@ allprojects {
 					"https://takahikokawasaki.github.io/nv-websocket-client/",
 					"https://commons.apache.org/proper/commons-io/apidocs/",
 					"https://commons.apache.org/proper/commons-lang/apidocs/",
-					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.33",
+					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.35",
 					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
