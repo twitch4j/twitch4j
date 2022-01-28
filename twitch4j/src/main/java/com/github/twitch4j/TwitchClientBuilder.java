@@ -124,7 +124,7 @@ public class TwitchClientBuilder {
     /**
      * IRC Command Handlers
      */
-    protected final Set<String> commandPrefixes = new HashSet<>();
+    protected Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Enabled: PubSub
@@ -412,10 +412,10 @@ public class TwitchClientBuilder {
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
-                .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
-                .setBotOwnerIds(botOwnerIds)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .setBotOwnerIds(botOwnerIds)
+                .setCommandPrefixes(commandPrefixes)
                 .build();
         }
 
