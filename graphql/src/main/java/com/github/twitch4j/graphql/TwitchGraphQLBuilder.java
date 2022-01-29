@@ -27,7 +27,7 @@ public class TwitchGraphQLBuilder {
      * Event Manager
      */
     @With
-    private EventManager eventManager = new EventManager();
+    private EventManager eventManager = null;
 
     /**
      * EventManager
