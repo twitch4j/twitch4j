@@ -23,12 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -110,7 +109,9 @@ public class TwitchChatBuilder {
     /**
      * IRC Command Handlers
      */
-    protected final List<String> commandPrefixes = new ArrayList<>();
+    @Setter
+    @Accessors(chain = true)
+    protected Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Size of the ChatQueue

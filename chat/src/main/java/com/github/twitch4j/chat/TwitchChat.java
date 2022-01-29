@@ -279,13 +279,13 @@ public class TwitchChat implements ITwitchChat {
      * @param maxJoinRetries                 Maximum join retries per channel
      * @param chatJoinTimeout                Minimum milliseconds to wait after a join attempt
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, List<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
         this.baseUrl = baseUrl;
         this.sendCredentialToThirdPartyHost = sendCredentialToThirdPartyHost;
-        this.commandPrefixes = commandPrefixes;
+        this.commandPrefixes = new ArrayList<>(commandPrefixes);
         this.botOwnerIds = botOwnerIds;
         this.ircCommandQueue = new ArrayBlockingQueue<>(chatQueueSize, true);
         this.ircMessageBucket = ircMessageBucket;
