@@ -366,7 +366,6 @@ public interface TwitchHelix {
      * @return ChatSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_SETTINGS_READ
      */
-    @Unofficial // beta
     @RequestLine("GET /chat/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ChatSettingsWrapper> getChatSettings(
@@ -385,7 +384,6 @@ public interface TwitchHelix {
      * @return ChatSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_SETTINGS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("PATCH /chat/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -881,7 +879,6 @@ public interface TwitchHelix {
      * @return AutoModSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_SETTINGS_READ
      */
-    @Unofficial // beta
     @RequestLine("GET /moderation/automod/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<AutoModSettingsWrapper> getAutoModSettings(
@@ -914,7 +911,6 @@ public interface TwitchHelix {
      * @return AutoModSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_SETTINGS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("PUT /moderation/automod/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -1007,7 +1003,6 @@ public interface TwitchHelix {
      * @return BanUsersList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BANNED_USERS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /moderation/bans?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -1031,7 +1026,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful unban or untimeout
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BANNED_USERS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("DELETE /moderation/bans?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> unbanUser(
@@ -1053,7 +1047,6 @@ public interface TwitchHelix {
      * @return BlockedTermList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_READ
      */
-    @Unofficial // beta
     @RequestLine("GET /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<BlockedTermList> getBlockedTerms(
@@ -1081,7 +1074,6 @@ public interface TwitchHelix {
      * @return BlockedTermList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -1105,7 +1097,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful request
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BLOCKED_TERMS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("DELETE /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&id={id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> removeBlockedTerm(
