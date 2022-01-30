@@ -1,4 +1,4 @@
-package com.github.twitch4j.ktx.chat
+package com.github.twitch4j.kotlin.chat
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent
 import com.github.twitch4j.chat.events.channel.ChannelJoinEvent
@@ -6,7 +6,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent
 import com.github.twitch4j.common.events.domain.EventChannel
 import com.github.twitch4j.common.events.domain.EventUser
-import com.github.twitch4j.ktx.mock.MockChat
+import com.github.twitch4j.kotlin.mock.MockChat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
@@ -141,8 +141,8 @@ class ChatKtxTest {
 	}
 
 	@Test
-	fun `Check if we automatically connect, join and leave`() = runTest {
-		val mockTwitchChat = MockChat().apply { disconnect() }
+	fun `Check if we automatically join and leave`() = runTest {
+		val mockTwitchChat = MockChat()
 
 		val collectorJob = launch {
 			mockTwitchChat.channelEventsAsFlow<AbstractChannelEvent>(testChannelName1, true)
@@ -150,7 +150,6 @@ class ChatKtxTest {
 		}
 		runCurrent()
 
-		assertEquals(true, mockTwitchChat.isConnected, "Did not set connected to true")
 		assertEquals(1, mockTwitchChat.channels.size, "Did not join any channel")
 		assertEquals(
 			testChannelName1.lowercase(),

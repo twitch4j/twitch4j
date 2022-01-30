@@ -1,4 +1,4 @@
-package com.github.twitch4j.ktx.mock
+package com.github.twitch4j.kotlin.mock
 
 import com.github.philippheuer.events4j.core.EventManager
 import com.github.twitch4j.chat.TwitchChat

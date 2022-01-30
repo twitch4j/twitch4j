@@ -1,4 +1,4 @@
-package com.github.twitch4j.ktx.main
+package com.github.twitch4j.kotlin.main
 
 import com.netflix.hystrix.HystrixCommand
 import kotlinx.coroutines.CoroutineDispatcher

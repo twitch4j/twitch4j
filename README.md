@@ -40,7 +40,7 @@ Project
 * Chat
 * PubSub
 * GraphQL
-* Kotlin KTX
+* Kotlin
 
 ## Problems
 
