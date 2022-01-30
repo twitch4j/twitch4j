@@ -101,10 +101,6 @@ subprojects {
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
 
-			// Kotlin libraries
-			api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.0")
-			testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.6.0")
-
 			// HTTP Client
 			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.8")
 			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.8")
