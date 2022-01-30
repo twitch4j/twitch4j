@@ -70,10 +70,13 @@ public class ChannelMessageEvent extends AbstractChannelEvent implements Replyab
 
     /**
      * Information regarding any associated Crowd Chant for this message, if applicable.
+     *
+     * @deprecated <a href="https://twitter.com/TwitchSupport/status/1486036628523073539">Will be disabled on 2022-02-02</a>
      */
     @Nullable
     @Unofficial
     @Getter(lazy = true)
+    @Deprecated
     ChatCrowdChant chantInfo = ChatCrowdChant.parse(getMessageEvent());
 
     /**
