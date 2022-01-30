@@ -92,14 +92,15 @@ public class IRCEventHandler {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
+                String message = event.getMessage().get();
 
                 // Dispatch Event
-                if(event.getMessage().get().startsWith("\u0001ACTION ")) {
+                if (message.startsWith("\u0001ACTION ") && message.endsWith("\u0001")) {
                     // Action
-                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, event.getMessage().get().substring(8), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, message.substring(8, message.length() - 1), event.getClientPermissions()));
                 } else {
                     // Regular Message
-                    eventManager.publish(new ChannelMessageEvent(channel, event, user, event.getMessage().get(), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageEvent(channel, event, user, message, event.getClientPermissions()));
                 }
             }
         }
