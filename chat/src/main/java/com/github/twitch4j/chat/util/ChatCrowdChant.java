@@ -18,9 +18,11 @@ import static com.github.twitch4j.chat.events.channel.IRCMessageEvent.NONCE_TAG_
  * Information regarding a Crowd Chant participation or initiation.
  *
  * @see <a href="https://twitch.uservoice.com/forums/310201-chat/suggestions/43451310--test-crowd-chant">Related Uservoice</a>
+ * @deprecated <a href="https://twitter.com/TwitchSupport/status/1486036628523073539">Will be disabled on 2022-02-02</a>
  */
 @Value
 @Unofficial
+@Deprecated
 public class ChatCrowdChant {
 
     public static final String CHANT_MSG_ID_TAG_NAME = "crowd-chant-parent-msg-id";
@@ -51,8 +53,10 @@ public class ChatCrowdChant {
      * Sends the same message in the same channel to participate in the Crowd Chant, with the proper chat tag.
      *
      * @param chat an authenticated TwitchChat instance.
+     * @deprecated <a href="https://twitter.com/TwitchSupport/status/1486036628523073539">Will be disabled on 2022-02-02</a>
      */
     @Unofficial
+    @Deprecated
     public void participate(ITwitchChat chat) {
         Map<String, Object> tags = new LinkedHashMap<>();
         tags.put(NONCE_TAG_NAME, CryptoUtils.generateNonce(32));
