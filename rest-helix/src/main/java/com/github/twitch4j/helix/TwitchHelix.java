@@ -569,6 +569,22 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information about a released Extension; either the current version or a specified version.
+     *
+     * @param authToken        User OAuth Token or App Access Token
+     * @param extensionId      ID of the Extension.
+     * @param extensionVersion The specific version of the Extension to return. If not provided, the current version is returned.
+     * @return ReleasedExtensionList
+     */
+    @RequestLine("GET /extensions/released?extension_id={extension_id}&extension_version={extension_version}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ReleasedExtensionList> getReleasedExtensions(
+        @Param("token") String authToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion
+    );
+
+    /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
      * @param authToken App Access  OAuth Token
