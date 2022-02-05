@@ -130,7 +130,10 @@ public interface TwitchHelix {
      * @return ExtensionBitsProductList
      */
     @RequestLine("PUT /bits/extensions")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     HystrixCommand<ExtensionBitsProductList> updateExtensionBitsProduct(
         @Param("token") String authToken,
         ExtensionBitsProduct product
