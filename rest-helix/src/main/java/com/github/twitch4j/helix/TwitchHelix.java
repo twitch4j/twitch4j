@@ -120,6 +120,23 @@ public interface TwitchHelix {
     );
 
     /**
+     * Add or update a Bits products that belongs to an Extension.
+     * <p>
+     * Required body fields: sku, cost.amount, cost.type, display_name.
+     * Optional fields: in_development, expiration, is_broadcast.
+     *
+     * @param authToken App Access Token associated with the Extension client ID
+     * @param product   The extension bits product to add or update
+     * @return ExtensionBitsProductList
+     */
+    @RequestLine("PUT /bits/extensions")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionBitsProductList> updateExtensionBitsProduct(
+        @Param("token") String authToken,
+        ExtensionBitsProduct product
+    );
+
+    /**
      * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
      *
      * @param authToken Auth Token

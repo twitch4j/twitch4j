@@ -1,19 +1,33 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
+import lombok.extern.jackson.Jacksonized;
 
 import java.time.Instant;
 
+@With
 @Data
 @Setter(AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
+@Jacksonized
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ExtensionBitsProduct {
 
     /**
-     * SKU of the Bits product. This is unique across all products that belong to an Extension.
+     * SKU of the Bits product.
+     * <p>
+     * This is unique across all products that belong to an Extension.
      */
     private String sku;
 
@@ -46,8 +60,14 @@ public class ExtensionBitsProduct {
     @JsonProperty("is_broadcast")
     private Boolean isBroadcast;
 
+    @With
     @Data
     @Setter(AccessLevel.PRIVATE)
+    @Builder(toBuilder = true)
+    @Jacksonized
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Cost {
 
         /**
@@ -56,9 +76,12 @@ public class ExtensionBitsProduct {
         private Integer amount;
 
         /**
-         * Cost type. The one valid value is "bits".
+         * Cost type.
+         * <p>
+         * The one valid value is "bits".
          */
-        private String type;
+        @Builder.Default
+        private String type = "bits";
 
     }
 
