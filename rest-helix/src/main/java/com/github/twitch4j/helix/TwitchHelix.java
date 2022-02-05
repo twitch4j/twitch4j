@@ -106,6 +106,20 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of Bits products that belongs to an Extension.
+     *
+     * @param authToken  App Access Token associated with the Extension client ID
+     * @param includeAll Optional: Whether Bits products that are disabled/expired should be included in the response. Default: false
+     * @return ExtensionBitsProductList
+     */
+    @RequestLine("GET /bits/extensions?should_include_all={should_include_all}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionBitsProductList> getExtensionBitsProducts(
+        @Param("token") String authToken,
+        @Param("should_include_all") Boolean includeAll
+    );
+
+    /**
      * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
      *
      * @param authToken Auth Token
