@@ -1,10 +1,9 @@
 package com.github.twitch4j.kotlin.chat
 
+import com.github.philippheuer.events4j.kotlin.flowOn
 import com.github.twitch4j.chat.ITwitchChat
 import com.github.twitch4j.chat.events.AbstractChannelEvent
 import com.github.twitch4j.chat.events.AbstractChannelMessageEvent
-import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
-import com.github.twitch4j.kotlin.main.flowOn
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ inline fun <reified T : AbstractChannelEvent> ITwitchChat.channelEventsAsFlow(
 ): Flow<T> = channelEventsAsFlow(T::class.java, channel, autoJoinAndLeave)
 
 /**
- * Creates a chat message flow for the given channel.
+ * Creates a flow for both normal as action messages for the given channel.
  *
  * This function creates a flow for channel messages and channel actions (/me text). It is wrapped in a joinChannel and
  * leaveChannel for convenience, which can be turned off.

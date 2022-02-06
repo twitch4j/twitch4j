@@ -1,16 +1,16 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	val versionKotlin = "1.6.0"
-
 	// Twitch4J Modules
 	// We use compileOnly so using this library does not require all modules.
 	// This does mean that using code that references modules not available will crash.
 	// This shouldn't be an issue as most, if not all, code are extension functions.
 	compileOnly(project(":twitch4j"))
 
+	api(group = "com.github.philippheuer.events4j", name="events4j-kotlin", version = "0.10.0")
+
 	// Kotlin coroutines
-	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = versionKotlin)
-	testImplementation(group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version = versionKotlin)
+	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.0")
+	testImplementation(group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version = "1.6.0")
 	testImplementation(project(":twitch4j"))
 }
 
