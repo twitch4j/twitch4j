@@ -95,7 +95,7 @@ subprojects {
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
 
 			// Event Dispatcher
-			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.9.9")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.10.0")
 			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.9.9")
 
 			// Credential Manager
