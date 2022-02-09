@@ -129,7 +129,7 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Logging
-		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.35")
+		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
 
 		// Jackson BOM
 		api(platform("com.fasterxml.jackson:jackson-bom:2.13.1"))
