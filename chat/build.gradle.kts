@@ -12,6 +12,10 @@ dependencies {
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
+
+	// Mocking
+	testImplementation(group = "org.mockito", name = "mockito-core")
+	testImplementation(group = "org.mockito", name = "mockito-junit-jupiter")
 }
 
 tasks.javadoc {
