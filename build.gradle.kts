@@ -26,7 +26,7 @@ allprojects {
 					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
 					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
 					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.0.0/",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.1.0/",
 					"https://square.github.io/okhttp/4.x/okhttp/",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
@@ -89,7 +89,7 @@ subprojects {
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Rate Limiting
-			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.0.0")
+			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.1.0")
 
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
