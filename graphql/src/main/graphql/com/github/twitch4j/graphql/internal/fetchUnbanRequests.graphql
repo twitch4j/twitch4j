@@ -1,0 +1,37 @@
+query fetchUnbanRequests($channelLogin: String!, $after: Cursor, $first: Int = 25, $order: UnbanRequestsSortOrder = NEWEST, $status: UnbanRequestStatus = PENDING, $userId: ID) {
+	channel(name: $channelLogin) {
+		id
+		unbanRequests(after: $after, first: $first, options: {order: $order, status: $status, userID: $userId}) {
+			edges {
+				cursor
+				node {
+					createdAt
+					id
+					requester {
+						id
+						login
+						displayName
+						profileImageURL(width: 50)
+					}
+					requesterMessage
+					resolvedAt
+					resolvedBy {
+						id
+						login
+						displayName
+					}
+					resolverMessage
+					status
+				}
+			}
+			pageInfo {
+				hasNextPage
+			}
+			totalCount(status: $status)
+		}
+		unbanRequestsSettings {
+			cooldownMinutes
+			isEnabled
+		}
+	}
+}

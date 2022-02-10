@@ -13,6 +13,8 @@ import com.github.twitch4j.graphql.internal.type.CommunityPointsCustomRewardRede
 import com.github.twitch4j.graphql.internal.type.CreateCommunityPointsCommunityGoalInput;
 import com.github.twitch4j.graphql.internal.type.CreatePollInput;
 import com.github.twitch4j.graphql.internal.type.CreatePredictionEventInput;
+import com.github.twitch4j.graphql.internal.type.UnbanRequestStatus;
+import com.github.twitch4j.graphql.internal.type.UnbanRequestsSortOrder;
 import com.github.twitch4j.graphql.internal.type.UpdateCommunityPointsCommunityGoalInput;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -287,6 +289,10 @@ public class TwitchGraphQL {
 
     public CommandDenyUnbanRequest denyUnbanRequest(OAuth2Credential auth, String id, String message) {
         return new CommandDenyUnbanRequest(getApolloClient(auth), id, message);
+    }
+
+    public CommandFetchUnbanRequests fetchUnbanRequests(OAuth2Credential auth, String channelLogin, String cursor, Integer limit, UnbanRequestsSortOrder order, UnbanRequestStatus status, String userId) {
+        return new CommandFetchUnbanRequests(getApolloClient(auth), channelLogin, cursor, limit, order, status, userId);
     }
 
     @Deprecated
