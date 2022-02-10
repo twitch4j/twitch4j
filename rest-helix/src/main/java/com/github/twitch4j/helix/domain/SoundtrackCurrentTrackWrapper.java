@@ -13,12 +13,11 @@ public class SoundtrackCurrentTrackWrapper {
 
     /**
      * A list that contains the Soundtrack track that the broadcaster is playing.
-     * The list is empty if the broadcaster is not playing a track.
      */
     private List<SoundtrackCurrentTrack> data;
 
     /**
-     * @return the Soundtrack track that the broadcaster is playing or empty if the broadcaster is not playing a track.
+     * @return the Soundtrack track that the broadcaster is playing.
      */
     public Optional<SoundtrackCurrentTrack> getTrack() {
         if (data == null || data.isEmpty())
