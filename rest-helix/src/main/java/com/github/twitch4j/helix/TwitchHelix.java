@@ -593,7 +593,7 @@ public interface TwitchHelix {
      * @param after       The cursor used to fetch the next page of data.
      * @return ExtensionLiveChannelsList
      */
-    @RequestLine("GET /extensions/live?extension_id={extension_id}&first={first}&after={after}")
+    @RequestLine("GET /extensions/live?extension_id={extension_id}&first={first}&after={after}&cursor={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ExtensionLiveChannelsList> getExtensionLiveChannels(
         @Param("token") String authToken,
