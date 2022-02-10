@@ -17,7 +17,12 @@ import org.apache.commons.lang3.exception.ContextedRuntimeException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @deprecated Due endpoints is deprecated decommission have been planned on <b>Febuary 28, 2022</b>.
+ *             More details about decommission finds <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>
+ */
 @Slf4j
+@Deprecated
 public class TwitchKrakenErrorDecoder implements ErrorDecoder {
 
     // Decoder
