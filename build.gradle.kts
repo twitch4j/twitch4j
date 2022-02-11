@@ -3,7 +3,7 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "6.3.0"
+	id("io.freefair.lombok") version "6.4.0"
 	id("com.coditory.manifest") version "0.1.14"
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 }
