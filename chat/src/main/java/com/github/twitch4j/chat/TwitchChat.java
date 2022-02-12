@@ -233,6 +233,11 @@ public class TwitchChat implements ITwitchChat {
     protected final long chatJoinTimeout;
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    private final int wsPingPeriod;
+
+    /**
      * Cache of recent number of join attempts for each channel
      */
     protected final Cache<String, Integer> joinAttemptsByChannelName;
@@ -278,8 +283,9 @@ public class TwitchChat implements ITwitchChat {
      * @param removeChannelOnJoinFailure     Whether channels should be removed after a join failure
      * @param maxJoinRetries                 Maximum join retries per channel
      * @param chatJoinTimeout                Minimum milliseconds to wait after a join attempt
+     * @param wsPingPeriod                   WebSocket Ping Period
      */
-    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout) {
+    public TwitchChat(EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -299,6 +305,7 @@ public class TwitchChat implements ITwitchChat {
         this.removeChannelOnJoinFailure = removeChannelOnJoinFailure;
         this.maxJoinRetries = maxJoinRetries;
         this.chatJoinTimeout = chatJoinTimeout;
+        this.wsPingPeriod = wsPingPeriod;
 
         // Create WebSocketFactory and apply proxy settings
         this.webSocketFactory = new WebSocketFactory();
@@ -511,6 +518,7 @@ public class TwitchChat implements ITwitchChat {
         try {
             // WebSocket
             this.webSocket = webSocketFactory.createSocket(this.baseUrl);
+            this.webSocket.setPingInterval(wsPingPeriod);
 
             // WebSocket Listeners
             this.webSocket.clearListeners();
@@ -617,7 +625,6 @@ public class TwitchChat implements ITwitchChat {
                         log.info("Disconnected from Twitch IRC (WebSocket)!");
                     }
                 }
-
             });
 
         } catch (Exception ex) {

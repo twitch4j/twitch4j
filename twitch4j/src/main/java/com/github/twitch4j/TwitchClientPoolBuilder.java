@@ -285,6 +285,12 @@ public class TwitchClientPoolBuilder {
     private Logger.Level feignLogLevel = Logger.Level.NONE;
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -432,6 +438,7 @@ public class TwitchClientPoolBuilder {
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
+                .wsPingPeriod(wsPingPeriod)
                 .advancedConfiguration(builder ->
                     builder.withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
@@ -459,6 +466,7 @@ public class TwitchClientPoolBuilder {
                 .withMaxJoinRetries(chatMaxJoinRetries)
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
+                .withWsPingPeriod(wsPingPeriod)
                 .build();
         }
 

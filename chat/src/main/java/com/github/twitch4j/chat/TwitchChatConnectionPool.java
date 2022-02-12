@@ -95,6 +95,12 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Builder.Default
     protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
 
+    /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @Builder.Default
+    protected int wsPingPeriod = 15_000;
+
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
         return this.sendMessage(channel, channel, message, tags);
@@ -257,6 +263,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withJoinRateLimit(joinRateLimit)
                 .withAuthRateLimit(authRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
+                .withWsPingPeriod(wsPingPeriod)
         ).build();
 
         // Reclaim channel headroom upon generic join failures
