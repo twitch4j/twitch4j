@@ -438,13 +438,13 @@ public class TwitchClientPoolBuilder {
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
-                .wsPingPeriod(wsPingPeriod)
                 .advancedConfiguration(builder ->
                     builder.withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
+                        .withWsPingPeriod(wsPingPeriod)
                         .setCommandPrefixes(commandPrefixes)
                         .setBotOwnerIds(botOwnerIds)
                 )
@@ -477,13 +477,14 @@ public class TwitchClientPoolBuilder {
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
-                .advancedConfiguration(builder -> builder.setBotOwnerIds(botOwnerIds))
+                .advancedConfiguration(builder -> builder.withWsPingPeriod(wsPingPeriod).setBotOwnerIds(botOwnerIds))
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
+                .withWsPingPeriod(wsPingPeriod)
                 .setBotOwnerIds(botOwnerIds)
                 .build();
         }
