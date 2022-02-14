@@ -56,6 +56,12 @@ public class TwitchPubSubBuilder {
     private Collection<String> botOwnerIds = new HashSet<>();
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch PubSub Builder
@@ -77,7 +83,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds);
+        return new TwitchPubSub(this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod);
     }
 
     /**

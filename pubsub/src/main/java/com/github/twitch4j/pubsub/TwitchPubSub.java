@@ -140,6 +140,11 @@ public class TwitchPubSub implements ITwitchPubSub {
     private final Collection<String> botOwnerIds;
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    private final int wsPingPeriod;
+
+    /**
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
@@ -177,11 +182,14 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param taskExecutor ScheduledThreadPoolExecutor
      * @param proxyConfig  ProxyConfig
      * @param botOwnerIds  Bot Owner IDs
+     * @param wsPingPeriod WebSocket Ping Period
      */
-    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds) {
+    public TwitchPubSub(EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod) {
+        this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
-        this.eventManager = eventManager;
+        this.wsPingPeriod = wsPingPeriod;
+
         // register with serviceMediator
         this.eventManager.getServiceMediator().addService("twitch4j-pubsub", this);
 
@@ -339,6 +347,7 @@ public class TwitchPubSub implements ITwitchPubSub {
         try {
             // WebSocket
             this.webSocket = webSocketFactory.createSocket(WEB_SOCKET_SERVER);
+            this.webSocket.setPingInterval(wsPingPeriod);
 
             // WebSocket Listeners
             this.webSocket.clearListeners();

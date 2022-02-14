@@ -285,6 +285,12 @@ public class TwitchClientPoolBuilder {
     private Logger.Level feignLogLevel = Logger.Level.NONE;
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -438,6 +444,7 @@ public class TwitchClientPoolBuilder {
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
+                        .withWsPingPeriod(wsPingPeriod)
                         .setCommandPrefixes(commandPrefixes)
                         .setBotOwnerIds(botOwnerIds)
                 )
@@ -459,6 +466,7 @@ public class TwitchClientPoolBuilder {
                 .withMaxJoinRetries(chatMaxJoinRetries)
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
+                .withWsPingPeriod(wsPingPeriod)
                 .build();
         }
 
@@ -469,13 +477,14 @@ public class TwitchClientPoolBuilder {
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
-                .advancedConfiguration(builder -> builder.setBotOwnerIds(botOwnerIds))
+                .advancedConfiguration(builder -> builder.withWsPingPeriod(wsPingPeriod).setBotOwnerIds(botOwnerIds))
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
+                .withWsPingPeriod(wsPingPeriod)
                 .setBotOwnerIds(botOwnerIds)
                 .build();
         }
