@@ -586,7 +586,7 @@ public interface TwitchHelix {
      * Gets channel information for users
      *
      * @param authToken Auth Token
-     * @param broadcasterIds IDs of the channels to be retrieved
+     * @param broadcasterIds IDs of the channels to be retrieved (up to 100)
      * @return ChannelInformationList
      */
     @RequestLine("GET /channels?broadcaster_id={broadcaster_id}")
@@ -637,6 +637,8 @@ public interface TwitchHelix {
 
     /**
      * Gets the Soundtrack track that the broadcaster is playing.
+     * <p>
+     * If the broadcaster is not playing a track, the endpoint returns HTTP status code 404 Not Found.
      *
      * @param authToken     App access token or User access token.
      * @param broadcasterId The ID of the broadcaster that’s playing a Soundtrack track.
