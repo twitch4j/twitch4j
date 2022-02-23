@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions.*
 @ExperimentalCoroutinesApi
 @Slf4j
 @Tag("unittest")
-class ChatKtxTest {
+class ChatExtensionsTest {
 
 	@Test
 	fun `Assert that channels are not the same`() {
