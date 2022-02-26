@@ -581,6 +581,28 @@ public interface TwitchHelix {
     );
 
     /**
+     * Retrieves a specified Extension’s secret data consisting of a version and an array of secret objects.
+     * <p>
+     * Each secret object contains a base64-encoded secret, a UTC timestamp when the secret becomes active, and a timestamp when the secret expires.
+     * <p>
+     * Signed JWT created by an Extension Backend Service (EBS), following the requirements documented in Signing the JWT.
+     * A signed JWT must include the exp, user_id, and role fields documented in JWT Schema, and role must be set to "external".
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId The Client ID associated with the extension
+     * @return ExtensionSecretsList
+     */
+    @RequestLine("GET /extensions/jwt/secrets?extension_id={extension_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extensionId}"
+    })
+    HystrixCommand<ExtensionSecretsList> getExtensionSecrets(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId
+    );
+
+    /**
      * Returns one page of live channels that have installed or activated a specific Extension,
      * identified by a client ID value assigned to the Extension when it is created.
      * <p>
