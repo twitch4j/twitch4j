@@ -589,17 +589,39 @@ public interface TwitchHelix {
      * A signed JWT must include the exp, user_id, and role fields documented in JWT Schema, and role must be set to "external".
      *
      * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
-     * @param extensionId The Client ID associated with the extension
+     * @param extensionId The Client ID associated with the extension.
      * @return ExtensionSecretsList
      */
     @RequestLine("GET /extensions/jwt/secrets?extension_id={extension_id}")
     @Headers({
         "Authorization: Bearer {token}",
-        "Client-Id: {extensionId}"
+        "Client-Id: {extension_id}"
     })
     HystrixCommand<ExtensionSecretsList> getExtensionSecrets(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId
+    );
+
+    /**
+     * Creates a JWT signing secret for a specific Extension.
+     * <p>
+     * Also rotates any current secrets out of service, with enough time for instances of the Extension to gracefully switch over to the new secret.
+     * Use this function only when you are ready to install the new secret it returns.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId The Client ID associated with the extension.
+     * @param delay       Optional: JWT signing activation delay for the newly created secret in seconds. Minimum: 300. Default: 300.
+     * @return ExtensionSecretsList
+     */
+    @RequestLine("POST /extensions/jwt/secrets?extension_id={extension_id}&delay={delay}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ExtensionSecretsList> createExtensionSecret(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("delay") Integer delay
     );
 
     /**
