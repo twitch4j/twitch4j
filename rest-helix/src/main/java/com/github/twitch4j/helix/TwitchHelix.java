@@ -625,6 +625,35 @@ public interface TwitchHelix {
     );
 
     /**
+     * Sends a specified chat message to a specified channel. The message will appear in the channel’s chat as a normal message.
+     * <p>
+     * The “username” of the message is the Extension name.
+     * <p>
+     * There is a limit of 12 messages per minute, per channel.
+     *
+     * @param jwtToken         Signed JWT with user_id and role (set to "external").
+     * @param extensionId      Client ID associated with the Extension.
+     * @param extensionVersion Version of the Extension sending this message.
+     * @param broadcasterId    User ID of the broadcaster whose channel has the Extension activated.
+     * @param text             Message for Twitch chat. Maximum: 280 characters.
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("POST /extensions/chat?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"text\":\"{text}\"%7D")
+    HystrixCommand<Void> sendExtensionChatMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("text") String text
+    );
+
+    /**
      * Returns one page of live channels that have installed or activated a specific Extension,
      * identified by a client ID value assigned to the Extension when it is created.
      * <p>
