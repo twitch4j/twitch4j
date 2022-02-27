@@ -2205,6 +2205,8 @@ public interface TwitchHelix {
      * <p>
      * Gets a list of all extensions (both active and inactive) for a specified user, identified by a Bearer token. The response has a JSON payload with a data field containing an array of user-information elements.
      * Required scope: user:read:broadcast
+     * <p>
+     * Note: inactive extensions are only returned if the token has the user:edit:broadcast scope - https://github.com/twitchdev/issues/issues/477
      *
      * @param authToken Auth Token
      * @return ExtensionList
