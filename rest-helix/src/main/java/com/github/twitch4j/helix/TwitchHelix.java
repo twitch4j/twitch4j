@@ -106,6 +106,40 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of Bits products that belongs to an Extension.
+     *
+     * @param authToken  App Access Token associated with the Extension client ID
+     * @param includeAll Optional: Whether Bits products that are disabled/expired should be included in the response. Default: false
+     * @return ExtensionBitsProductList
+     */
+    @RequestLine("GET /bits/extensions?should_include_all={should_include_all}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionBitsProductList> getExtensionBitsProducts(
+        @Param("token") String authToken,
+        @Param("should_include_all") Boolean includeAll
+    );
+
+    /**
+     * Add or update a Bits products that belongs to an Extension.
+     * <p>
+     * Required body fields: sku, cost.amount, cost.type, display_name.
+     * Optional fields: in_development, expiration, is_broadcast.
+     *
+     * @param authToken App Access Token associated with the Extension client ID
+     * @param product   The extension bits product to add or update
+     * @return ExtensionBitsProductList
+     */
+    @RequestLine("PUT /bits/extensions")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<ExtensionBitsProductList> updateExtensionBitsProduct(
+        @Param("token") String authToken,
+        ExtensionBitsProduct product
+    );
+
+    /**
      * Gets a ranked list of Bits leaderboard information for an authorized broadcaster.
      *
      * @param authToken Auth Token
@@ -542,6 +576,246 @@ public interface TwitchHelix {
         @Param("status") EventSubSubscriptionStatus status,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Gets information about your Extensions; either the current version or a specified version.
+     *
+     * @param jwtToken         Signed JWT with role set to "external".
+     * @param extensionId      ID of the Extension.
+     * @param extensionVersion The specific version of the Extension to return. If not provided, the current version is returned.
+     * @return ReleasedExtensionList
+     */
+    @RequestLine("GET /extensions?extension_id={extension_id}&extension_version={extension_version}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ReleasedExtensionList> getExtensions(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion
+    );
+
+    /**
+     * Sends a specified chat message to a specified channel.
+     * <p>
+     * The message will appear in the channel’s chat as a normal message.
+     * The “username” of the message is the Extension name.
+     * <p>
+     * There is a limit of 12 messages per minute, per channel.
+     *
+     * @param jwtToken         Signed JWT with user_id and role (set to "external").
+     * @param extensionId      Client ID associated with the Extension.
+     * @param extensionVersion Version of the Extension sending this message.
+     * @param broadcasterId    User ID of the broadcaster whose channel has the Extension activated.
+     * @param text             Message for Twitch chat. Maximum: 280 characters.
+     * @return 204 No Content upon a successful request
+     */
+    @RequestLine("POST /extensions/chat?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"text\":\"{text}\"%7D")
+    HystrixCommand<Void> sendExtensionChatMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("text") String text
+    );
+
+    /**
+     * Gets the specified configuration segment from the specified extension.
+     * <p>
+     * You can retrieve each segment a maximum of 20 times per minute.
+     * If you exceed the limit, the request returns HTTP status code 429.
+     *
+     * @param jwtToken      Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId   The ID of the extension that contains the configuration segment you want to get.
+     * @param segment       The type of configuration segment to get.
+     * @param broadcasterId The ID of the broadcaster for the configuration returned. This parameter is required if you set the segment parameter to broadcaster or developer. Do not specify this parameter if you set segment to global.
+     * @return ExtensionConfigurationSegmentList
+     */
+    @RequestLine("GET /extensions/configurations?broadcaster_id={broadcaster_id}&extension_id={extension_id}&segment={segment}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ExtensionConfigurationSegmentList> getExtensionConfigurationSegment(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("segment") List<ExtensionSegment> segment,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Sets a single configuration segment of any type.
+     * <p>
+     * Each segment is limited to 5 KB and can be set at most 20 times per minute.
+     * Updates to this data are not delivered to Extensions that have already been rendered.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId ID for the Extension which the configuration is for.
+     * @param input       Segment configuration info.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("PUT /extensions/configurations")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<Void> setExtensionConfigurationSegment(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        ExtensionConfigurationSegmentInput input
+    );
+
+    /**
+     * Retrieves a specified Extension’s secret data consisting of a version and an array of secret objects.
+     * <p>
+     * Each secret object contains a base64-encoded secret, a UTC timestamp when the secret becomes active, and a timestamp when the secret expires.
+     * <p>
+     * Signed JWT created by an Extension Backend Service (EBS), following the requirements documented in Signing the JWT.
+     * A signed JWT must include the exp, user_id, and role fields documented in JWT Schema, and role must be set to "external".
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId The Client ID associated with the extension.
+     * @return ExtensionSecretsList
+     */
+    @RequestLine("GET /extensions/jwt/secrets?extension_id={extension_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ExtensionSecretsList> getExtensionSecrets(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId
+    );
+
+    /**
+     * Creates a JWT signing secret for a specific Extension.
+     * <p>
+     * Also rotates any current secrets out of service, with enough time for instances of the Extension to gracefully switch over to the new secret.
+     * Use this function only when you are ready to install the new secret it returns.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId The Client ID associated with the extension.
+     * @param delay       Optional: JWT signing activation delay for the newly created secret in seconds. Minimum: 300. Default: 300.
+     * @return ExtensionSecretsList
+     */
+    @RequestLine("POST /extensions/jwt/secrets?extension_id={extension_id}&delay={delay}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ExtensionSecretsList> createExtensionSecret(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("delay") Integer delay
+    );
+
+    /**
+     * Returns one page of live channels that have installed or activated a specific Extension,
+     * identified by a client ID value assigned to the Extension when it is created.
+     * <p>
+     * A channel that recently went live may take a few minutes to appear in this list,
+     * and a channel may continue to appear on this list for a few minutes after it stops broadcasting.
+     *
+     * @param authToken   User OAuth Token or App Access Token
+     * @param extensionId ID of the Extension to search for.
+     * @param limit       Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param after       The cursor used to fetch the next page of data.
+     * @return ExtensionLiveChannelsList
+     */
+    @RequestLine("GET /extensions/live?extension_id={extension_id}&first={first}&after={after}&cursor={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ExtensionLiveChannelsList> getExtensionLiveChannels(
+        @Param("token") String authToken,
+        @Param("extension_id") String extensionId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
+     * Twitch provides a publish-subscribe system for your EBS to communicate with both the broadcaster and viewers.
+     * Calling this endpoint forwards your message using the same mechanism as the send JavaScript helper function.
+     * <p>
+     * A message can be sent to either a specified channel or globally (all channels on which your extension is active).
+     * <p>
+     * Extension PubSub has a rate limit of 100 requests per minute for a combination of Extension client ID and broadcaster ID.
+     * <p>
+     * A signed JWT must include the channel_id and pubsub_perms fields documented in JWT Schema.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, role, channel_id, pubsub_perms.send
+     * @param extensionId Client ID associated with the Extension.
+     * @param input       Details on the message to be sent and its targets.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("POST /extensions/pubsub")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<Void> sendExtensionPubSubMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        SendPubSubMessageInput input
+    );
+
+    /**
+     * Gets information about a released Extension; either the current version or a specified version.
+     *
+     * @param authToken        User OAuth Token or App Access Token
+     * @param extensionId      ID of the Extension.
+     * @param extensionVersion The specific version of the Extension to return. If not provided, the current version is returned.
+     * @return ReleasedExtensionList
+     */
+    @RequestLine("GET /extensions/released?extension_id={extension_id}&extension_version={extension_version}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ReleasedExtensionList> getReleasedExtensions(
+        @Param("token") String authToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion
+    );
+
+    /**
+     * Enable activation of a specified Extension, after any required broadcaster configuration is correct.
+     * <p>
+     * This is for Extensions that require broadcaster configuration before activation.
+     * Use this if, in Extension Capabilities, you select Custom/My Own Service.
+     * <p>
+     * You enforce required broadcaster configuration with a required_configuration string in the Extension manifest. The contents of this string can be whatever you want.
+     * Once your EBS determines that the Extension is correctly configured on a channel, use this endpoint to provide that same configuration string, which enables activation on the channel.
+     * The endpoint URL includes the channel ID of the page where the Extension is iframe embedded.
+     * <p>
+     * If a future version of the Extension requires a different configuration, change the required_configuration string in your manifest.
+     * When the new version is released, broadcasters will be required to re-configure that new version.
+     *
+     * @param jwtToken             Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId          ID for the Extension to activate.
+     * @param extensionVersion     The version fo the Extension to release.
+     * @param configurationVersion The version of the configuration to use with the Extension.
+     * @param broadcasterId        User ID of the broadcaster who has activated the specified Extension on their channel.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("PUT /extensions/required_configuration?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"required_configuration\":\"{configuration_version}\",\"configuration_version\":\"{configuration_version}\"%7D")
+    HystrixCommand<Void> setExtensionRequiredConfiguration(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion,
+        @Param("configuration_version") String configurationVersion,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -1924,6 +2198,8 @@ public interface TwitchHelix {
      * <p>
      * Gets a list of all extensions (both active and inactive) for a specified user, identified by a Bearer token. The response has a JSON payload with a data field containing an array of user-information elements.
      * Required scope: user:read:broadcast
+     * <p>
+     * Note: inactive extensions are only returned if the token has the user:edit:broadcast scope - https://github.com/twitchdev/issues/issues/477
      *
      * @param authToken Auth Token
      * @return ExtensionList
