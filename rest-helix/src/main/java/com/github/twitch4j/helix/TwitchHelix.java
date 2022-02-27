@@ -625,8 +625,9 @@ public interface TwitchHelix {
     );
 
     /**
-     * Sends a specified chat message to a specified channel. The message will appear in the channel’s chat as a normal message.
+     * Sends a specified chat message to a specified channel.
      * <p>
+     * The message will appear in the channel’s chat as a normal message.
      * The “username” of the message is the Extension name.
      * <p>
      * There is a limit of 12 messages per minute, per channel.
@@ -673,6 +674,33 @@ public interface TwitchHelix {
         @Param("extension_id") String extensionId,
         @Param("first") Integer limit,
         @Param("after") String after
+    );
+
+    /**
+     * Twitch provides a publish-subscribe system for your EBS to communicate with both the broadcaster and viewers.
+     * Calling this endpoint forwards your message using the same mechanism as the send JavaScript helper function.
+     * <p>
+     * A message can be sent to either a specified channel or globally (all channels on which your extension is active).
+     * <p>
+     * Extension PubSub has a rate limit of 100 requests per minute for a combination of Extension client ID and broadcaster ID.
+     * <p>
+     * A signed JWT must include the channel_id and pubsub_perms fields documented in JWT Schema.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, role, channel_id, pubsub_perms.send
+     * @param extensionId Client ID associated with the Extension.
+     * @param input       Details on the message to be sent and its targets.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("POST /extensions/pubsub")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<Void> sendExtensionPubSubMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        SendPubSubMessageInput input
     );
 
     /**
