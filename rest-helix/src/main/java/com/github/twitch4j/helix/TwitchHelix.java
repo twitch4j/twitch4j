@@ -720,6 +720,41 @@ public interface TwitchHelix {
     );
 
     /**
+     * Enable activation of a specified Extension, after any required broadcaster configuration is correct.
+     * <p>
+     * This is for Extensions that require broadcaster configuration before activation.
+     * Use this if, in Extension Capabilities, you select Custom/My Own Service.
+     * <p>
+     * You enforce required broadcaster configuration with a required_configuration string in the Extension manifest. The contents of this string can be whatever you want.
+     * Once your EBS determines that the Extension is correctly configured on a channel, use this endpoint to provide that same configuration string, which enables activation on the channel.
+     * The endpoint URL includes the channel ID of the page where the Extension is iframe embedded.
+     * <p>
+     * If a future version of the Extension requires a different configuration, change the required_configuration string in your manifest.
+     * When the new version is released, broadcasters will be required to re-configure that new version.
+     *
+     * @param jwtToken             Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId          ID for the Extension to activate.
+     * @param extensionVersion     The version fo the Extension to release.
+     * @param configurationVersion The version of the configuration to use with the Extension.
+     * @param broadcasterId        User ID of the broadcaster who has activated the specified Extension on their channel.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("PUT /extensions/required_configuration?broadcaster_id={broadcaster_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"required_configuration\":\"{configuration_version}\",\"configuration_version\":\"{configuration_version}\"%7D")
+    HystrixCommand<Void> setExtensionRequiredConfiguration(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion,
+        @Param("configuration_version") String configurationVersion,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Get Extension Transactions allows extension back end servers to fetch a list of transactions that have occurred for their extension across all of Twitch.
      *
      * @param authToken App Access  OAuth Token

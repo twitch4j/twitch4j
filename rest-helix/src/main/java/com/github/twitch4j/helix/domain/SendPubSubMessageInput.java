@@ -66,6 +66,8 @@ public class SendPubSubMessageInput {
 
     /**
      * String-encoded JSON message to be sent.
+     * <p>
+     * Must not exceed 5 KB in size.
      */
     private String message;
 
