@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum ExtensionState {
 
-    @JsonAlias("Testing") // undocumented, observed
+    @JsonAlias({ "Testing", "HostedTest" }) // undocumented, but have observed "Testing"
     @JsonProperty("InTest")
     IN_TEST,
 
-    @JsonAlias("Reviewing") // undocumented, unobserved
+    @JsonAlias({ "Reviewing", "ReadyForReview" }) // undocumented, unobserved
     @JsonProperty("InReview")
     IN_REVIEW,
 
@@ -29,6 +29,7 @@ public enum ExtensionState {
     @JsonProperty("PendingAction")
     PENDING_ACTION,
 
+    @JsonAlias("Uploading") // undocumented, unobserved
     @JsonProperty("AssetsUploaded")
     ASSETS_UPLOADED,
 
