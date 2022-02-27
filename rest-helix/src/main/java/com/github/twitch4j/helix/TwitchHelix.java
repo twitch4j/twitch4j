@@ -679,6 +679,29 @@ public interface TwitchHelix {
     );
 
     /**
+     * Sets a single configuration segment of any type.
+     * <p>
+     * Each segment is limited to 5 KB and can be set at most 20 times per minute.
+     * Updates to this data are not delivered to Extensions that have already been rendered.
+     *
+     * @param jwtToken    Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId ID for the Extension which the configuration is for.
+     * @param input       Segment configuration info.
+     * @return 204 No Content upon a successful request.
+     */
+    @RequestLine("PUT /extensions/configurations")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<Void> setExtensionConfigurationSegment(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        ExtensionConfigurationSegmentInput input
+    );
+
+    /**
      * Returns one page of live channels that have installed or activated a specific Extension,
      * identified by a client ID value assigned to the Extension when it is created.
      * <p>
