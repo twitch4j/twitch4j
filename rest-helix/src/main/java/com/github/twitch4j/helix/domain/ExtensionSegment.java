@@ -11,6 +11,11 @@ public enum ExtensionSegment {
     DEVELOPER,
 
     @JsonProperty("global")
-    GLOBAL
+    GLOBAL;
+
+    @Override
+    public String toString() {
+        return this.name().toLowerCase();
+    }
 
 }
