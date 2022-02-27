@@ -581,6 +581,25 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information about your Extensions; either the current version or a specified version.
+     *
+     * @param jwtToken         Signed JWT with role set to "external".
+     * @param extensionId      ID of the Extension.
+     * @param extensionVersion The specific version of the Extension to return. If not provided, the current version is returned.
+     * @return ReleasedExtensionList
+     */
+    @RequestLine("GET /extensions?extension_id={extension_id}&extension_version={extension_version}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ReleasedExtensionList> getExtensions(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("extension_version") String extensionVersion
+    );
+
+    /**
      * Retrieves a specified Extension’s secret data consisting of a version and an array of secret objects.
      * <p>
      * Each secret object contains a base64-encoded secret, a UTC timestamp when the secret becomes active, and a timestamp when the secret expires.

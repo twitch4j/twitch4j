@@ -1,33 +1,38 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ExtensionState {
 
+    @JsonAlias("Testing") // undocumented, observed
+    @JsonProperty("InTest")
     IN_TEST,
+
+    @JsonAlias("Reviewing") // undocumented, unobserved
+    @JsonProperty("InReview")
     IN_REVIEW,
+
+    @JsonProperty("Rejected")
     REJECTED,
+
+    @JsonProperty("Approved")
     APPROVED,
+
+    @JsonProperty("Released")
     RELEASED,
+
+    @JsonProperty("Deprecated")
     DEPRECATED,
+
+    @JsonAlias("Pending") // undocumented, unobserved
+    @JsonProperty("PendingAction")
     PENDING_ACTION,
+
+    @JsonProperty("AssetsUploaded")
     ASSETS_UPLOADED,
-    DELETED;
 
-    @Override
-    public String toString() {
-        // convert enum to SentenceCase
-        final char[] nameArray = this.name().toCharArray();
-        final StringBuilder sb = new StringBuilder(nameArray.length);
+    @JsonProperty("Deleted")
+    DELETED
 
-        boolean capitalize = true; // capitalize first letter
-        for (char c : nameArray) {
-            if (c == '_') {
-                capitalize = true; // capitalize next letter
-            } else {
-                sb.append(capitalize ? c : Character.toLowerCase(c));
-                capitalize = false;
-            }
-        }
-
-        return sb.toString();
-    }
 }
