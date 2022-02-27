@@ -655,6 +655,30 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the specified configuration segment from the specified extension.
+     * <p>
+     * You can retrieve each segment a maximum of 20 times per minute.
+     * If you exceed the limit, the request returns HTTP status code 429.
+     *
+     * @param jwtToken      Signed JWT with exp, user_id, and role (set to "external").
+     * @param extensionId   The ID of the extension that contains the configuration segment you want to get.
+     * @param segment       The type of configuration segment to get.
+     * @param broadcasterId The ID of the broadcaster for the configuration returned. This parameter is required if you set the segment parameter to broadcaster or developer. Do not specify this parameter if you set segment to global.
+     * @return ExtensionConfigurationSegmentList
+     */
+    @RequestLine("GET /extensions/configurations?broadcaster_id={broadcaster_id}&extension_id={extension_id}&segment={segment}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}"
+    })
+    HystrixCommand<ExtensionConfigurationSegmentList> getExtensionConfigurationSegment(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("segment") List<ExtensionSegment> segment,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Returns one page of live channels that have installed or activated a specific Extension,
      * identified by a client ID value assigned to the Extension when it is created.
      * <p>
