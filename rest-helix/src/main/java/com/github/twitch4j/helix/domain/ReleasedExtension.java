@@ -55,7 +55,7 @@ public class ReleasedExtension {
      */
     @JsonProperty("has_chat_support")
     @Accessors(fluent = true)
-    private String hasChatSupport;
+    private Boolean hasChatSupport;
 
     /**
      * The default icon to be displayed in the Extensions directory.
