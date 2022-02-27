@@ -2,9 +2,12 @@ package com.github.twitch4j.extensions.domain;
 
 import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,9 @@ import java.util.Map;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Jacksonized
 @Unofficial
 public class ExtensionInformation {
 

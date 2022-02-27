@@ -73,12 +73,14 @@ public interface TwitchExtensions {
      * @param clientId     The client ID identifying the extension when it is created.
      * @param jsonWebToken Signed JWT created by the EBS, following the requirements documented in “Signing the JWT” (in Building Extensions)
      * @return 204 No Content on a successful call
+     * @deprecated No migration path in the new Helix API.
      */
     @RequestLine("DELETE /{client_id}/auth/secret")
     @Headers({
         "Client-Id: {client_id}",
         "Authorization: Bearer {token}"
     })
+    @Deprecated
     HystrixCommand<Void> revokeExtensionSecrets(
         @Param("client_id") String clientId,
         @Param("token") String jsonWebToken
@@ -90,13 +92,27 @@ public interface TwitchExtensions {
      * A channel that just went live may take a few minutes to appear in this list, and a channel may continue to appear on this list for a few minutes after it stops broadcasting.
      *
      * @param clientId The client ID value assigned to the extension when it is created.
+     * @param cursor   Cursor for forward pagination.
      * @return ChannelList
      */
-    @RequestLine("GET /{client_id}/live_activated_channels")
+    @RequestLine("GET /{client_id}/live_activated_channels?cursor={cursor}")
     @Headers("Client-Id: {client_id}")
     HystrixCommand<ChannelList> getLiveChannelsWithExtensionActivated(
-        @Param("client_id") String clientId
+        @Param("client_id") String clientId,
+        @Param("cursor") String cursor
     );
+
+    /**
+     * Returns one page of live channels that have installed and activated a specified extension.
+     *
+     * @param clientId The client ID value assigned to the extension when it is created.
+     * @return ChannelList
+     * @deprecated use {@link #getLiveChannelsWithExtensionActivated(String, String)} instead (can pass null for cursor)
+     */
+    @Deprecated
+    default HystrixCommand<ChannelList> getLiveChannelsWithExtensionActivated(String clientId) {
+        return getLiveChannelsWithExtensionActivated(clientId, null);
+    }
 
     /**
      * Enable activation of a specified extension, after any required broadcaster configuration is correct.

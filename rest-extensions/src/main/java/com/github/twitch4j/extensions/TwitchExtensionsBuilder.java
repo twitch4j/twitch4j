@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.extensions.compat.TwitchExtensionsCompatibilityLayer;
 import com.github.twitch4j.extensions.util.TwitchExtensionsClientIdInterceptor;
 import com.github.twitch4j.extensions.util.TwitchExtensionsErrorDecoder;
 import com.netflix.config.ConfigurationManager;
@@ -78,6 +79,12 @@ public class TwitchExtensionsBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * Whether the compatibility layer should be used to forward requests to the new Helix API
+     */
+    @With
+    private boolean compatibilityLayer = true;
+
+    /**
      * Twitch API Client (Extensions)
      *
      * @return TwitchExtensions
@@ -103,6 +110,19 @@ public class TwitchExtensionsBuilder {
         okhttp3.OkHttpClient.Builder clientBuilder = new okhttp3.OkHttpClient.Builder();
         if (proxyConfig != null)
             proxyConfig.apply(clientBuilder);
+
+        // Helix Compatibility Layer
+        if (compatibilityLayer) {
+            return TwitchExtensionsCompatibilityLayer.builder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .userAgent(userAgent)
+                .timeout(timeout)
+                .requestQueueSize(requestQueueSize)
+                .logLevel(logLevel)
+                .proxyConfig(proxyConfig)
+                .build();
+        }
 
         // Feign
         return HystrixFeign.builder()

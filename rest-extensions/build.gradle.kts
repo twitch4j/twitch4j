@@ -13,6 +13,7 @@ dependencies {
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
+	api(project(":twitch4j-helix"))
 }
 
 tasks.javadoc {
