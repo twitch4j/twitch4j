@@ -82,7 +82,7 @@ public class TwitchExtensionsBuilder {
      * Whether the compatibility layer should be used to forward requests to the new Helix API
      */
     @With
-    private boolean compatibilityLayer = true;
+    private boolean helixForwarding = true;
 
     /**
      * Twitch API Client (Extensions)
@@ -112,7 +112,7 @@ public class TwitchExtensionsBuilder {
             proxyConfig.apply(clientBuilder);
 
         // Helix Compatibility Layer
-        if (compatibilityLayer) {
+        if (helixForwarding) {
             return TwitchExtensionsCompatibilityLayer.builder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)

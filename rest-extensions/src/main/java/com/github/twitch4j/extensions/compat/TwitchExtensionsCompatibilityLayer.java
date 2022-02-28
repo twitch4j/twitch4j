@@ -23,7 +23,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.*;
+import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.CONFIG_SEGMENT_LIST_CONVERTER;
+import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.EXTENSION_LIST_CONVERTER;
+import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.LIVE_CHANNELS_CONVERTER;
+import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.SECRETS_CONVERTER;
+import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.SEGMENT_CONVERTER;
 
 /**
  * Forwards twitch extensions api calls to the new helix api
