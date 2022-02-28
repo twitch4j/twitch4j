@@ -23,11 +23,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Twitch API - Extensions
+ *
+ * @see <a href="https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708">Twitch Shutdown Announcement</a>
+ * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Deprecated
 public class TwitchExtensionsBuilder {
 
     /**
@@ -88,9 +92,25 @@ public class TwitchExtensionsBuilder {
      * Twitch API Client (Extensions)
      *
      * @return TwitchExtensions
+     * @see <a href="https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708">Twitch Shutdown Announcement</a>
+     * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
      */
+    @Deprecated
     public TwitchExtensions build() {
         log.debug("Extensions: Initializing Module ...");
+
+        // Helix Compatibility Layer
+        if (helixForwarding) {
+            return TwitchExtensionsCompatibilityLayer.builder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .userAgent(userAgent)
+                .timeout(timeout)
+                .requestQueueSize(requestQueueSize)
+                .logLevel(logLevel)
+                .proxyConfig(proxyConfig)
+                .build();
+        }
 
         // Hystrix
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
@@ -111,19 +131,6 @@ public class TwitchExtensionsBuilder {
         if (proxyConfig != null)
             proxyConfig.apply(clientBuilder);
 
-        // Helix Compatibility Layer
-        if (helixForwarding) {
-            return TwitchExtensionsCompatibilityLayer.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .userAgent(userAgent)
-                .timeout(timeout)
-                .requestQueueSize(requestQueueSize)
-                .logLevel(logLevel)
-                .proxyConfig(proxyConfig)
-                .build();
-        }
-
         // Feign
         return HystrixFeign.builder()
             .client(new OkHttpClient(clientBuilder.build()))
@@ -142,7 +149,10 @@ public class TwitchExtensionsBuilder {
      * Initialize the builder
      *
      * @return Twitch Extensions Builder
+     * @see <a href="https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708">Twitch Shutdown Announcement</a>
+     * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
      */
+    @Deprecated
     public static TwitchExtensionsBuilder builder() {
         return new TwitchExtensionsBuilder();
     }
