@@ -53,6 +53,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -236,6 +237,14 @@ public class TwitchChat implements ITwitchChat {
      * WebSocket RFC Ping Period in ms (0 = disabled)
      */
     private final int wsPingPeriod;
+
+    /**
+     * Tracks the timestamp of the last outbound ping
+     */
+    protected final AtomicLong lastPing = new AtomicLong();
+
+    @Getter
+    protected volatile long latency = -1L;
 
     /**
      * Cache of recent number of join attempts for each channel
@@ -625,6 +634,23 @@ public class TwitchChat implements ITwitchChat {
                         log.info("Disconnected from Twitch IRC (WebSocket)!");
                     }
                 }
+
+                @Override
+                public void onFrameSent(WebSocket websocket, WebSocketFrame frame) {
+                    if (frame != null && frame.isPingFrame()) {
+                        lastPing.compareAndSet(0L, System.currentTimeMillis());
+                    }
+                }
+
+                @Override
+                public void onPongFrame(WebSocket websocket, WebSocketFrame frame) {
+                    final long last = lastPing.getAndSet(0L);
+                    if (last > 0) {
+                        latency = System.currentTimeMillis() - last;
+                        log.trace("TwitchChat: Round-trip socket latency recorded at {} ms.", latency);
+                    }
+                }
+
             });
 
         } catch (Exception ex) {

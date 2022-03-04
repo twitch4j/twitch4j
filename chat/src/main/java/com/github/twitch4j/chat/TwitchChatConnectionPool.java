@@ -278,6 +278,20 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         connection.close();
     }
 
+    @Override
+    public long getLatency() {
+        long sum = 0;
+        int count = 0;
+        for (TwitchChat connection : getConnections()) {
+            final long latency = connection.getLatency();
+            if (latency > 0) {
+                sum += latency;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : -1L;
+    }
+
     /**
      * Note: this map does not dynamically update unlike {@link TwitchChat#getChannelIdToChannelName()}
      * <p>
