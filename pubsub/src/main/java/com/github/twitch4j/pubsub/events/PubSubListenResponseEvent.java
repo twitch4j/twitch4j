@@ -1,8 +1,14 @@
 package com.github.twitch4j.pubsub.events;
 
 import com.github.twitch4j.common.events.TwitchEvent;
+import com.github.twitch4j.pubsub.domain.PubSubRequest;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Value;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @Value
 @EqualsAndHashCode(callSuper = false)
@@ -17,6 +23,18 @@ public class PubSubListenResponseEvent extends TwitchEvent {
      * The error message associated with the request, or an empty string if there is no error.
      */
     String error;
+
+    @Getter(AccessLevel.PRIVATE)
+    Supplier<PubSubRequest> listenRequestSupplier;
+
+    /**
+     * @return the listen request associated with this response.
+     * @implNote The current implementation requires unique nonce's across requests (which is the default behavior for the listen methods provided by the library).
+     * @implSpec This method involves an O(n) operation where n <= 50, so it is best to only call it once when needed.
+     */
+    public Optional<PubSubRequest> getListenRequest() {
+        return Optional.ofNullable(listenRequestSupplier.get());
+    }
 
     public boolean hasError() {
         return error != null && error.length() > 0;
