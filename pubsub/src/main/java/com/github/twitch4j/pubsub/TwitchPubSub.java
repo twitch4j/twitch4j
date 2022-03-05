@@ -113,7 +113,7 @@ public class TwitchPubSub implements ITwitchPubSub {
     /**
      * Command Queue
      */
-    protected final BlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(200);
+    protected final BlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(128);
 
     /**
      * Holds the subscribed topics in case we need to reconnect
