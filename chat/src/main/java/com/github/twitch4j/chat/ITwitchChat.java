@@ -80,6 +80,11 @@ public interface ITwitchChat extends AutoCloseable {
     void close();
 
     /**
+     * @return the most recently measured round-trip latency for the socket(s) in milliseconds, or -1 if unknown
+     */
+    long getLatency();
+
+    /**
      * @return cached mappings of channel ids to names
      */
     Map<String, String> getChannelIdToChannelName();
