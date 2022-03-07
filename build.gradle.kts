@@ -26,7 +26,7 @@ allprojects {
 					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
 					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
 					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.2.0/",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.3.0/",
 					"https://square.github.io/okhttp/4.x/okhttp/",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
