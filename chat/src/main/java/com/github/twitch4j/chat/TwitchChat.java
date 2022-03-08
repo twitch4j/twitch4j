@@ -355,7 +355,7 @@ public class TwitchChat implements ITwitchChat {
                 String command = null;
                 try {
                     // Send the command
-                    command = ircCommandQueue.poll(this.chatQueueTimeout, TimeUnit.MILLISECONDS);
+                    command = ircCommandQueue.poll();
                     if (command == null) break;
                     sendTextToWebSocket(command, false);
 
