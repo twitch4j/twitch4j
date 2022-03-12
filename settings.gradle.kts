@@ -3,6 +3,7 @@ rootProject.name = "Twitch4J"
 include(
 	":common",
 	":auth",
+	":client-websocket",
 	":chat",
 	":eventsub-common",
 	":rest-extensions",
@@ -15,6 +16,7 @@ include(
 )
 
 project(":common").name = "twitch4j-common"
+project(":client-websocket").name = "twitch4j-client-websocket"
 project(":auth").name = "twitch4j-auth"
 project(":chat").name = "twitch4j-chat"
 project(":eventsub-common").name = "twitch4j-eventsub-common"

@@ -195,8 +195,8 @@ public class TwitchPubSub implements ITwitchPubSub {
 
         // WebSocket Factory and proxy settings
         this.webSocketFactory = new WebSocketFactory();
-        if (proxyConfig != null)
-            proxyConfig.applyWs(webSocketFactory.getProxySettings());
+        //if (proxyConfig != null)
+        //    proxyConfig.applyWs(webSocketFactory.getProxySettings());
 
         // connect
         this.connect();

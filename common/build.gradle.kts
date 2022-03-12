@@ -13,9 +13,6 @@ dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
-	// Websocket (for common proxy settings)
-	compileOnly(group = "com.neovisionaries", name = "nv-websocket-client")
-
 	// Rate-limit buckets for registry
 	compileOnly(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
