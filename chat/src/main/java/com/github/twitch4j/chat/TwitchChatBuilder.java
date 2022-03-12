@@ -52,7 +52,7 @@ public class TwitchChatBuilder {
      * <p>
      * can be used to inject a mocked connection into the TwitchChat instance
      */
-    @With
+    @With(AccessLevel.PROTECTED)
     private WebsocketConnection websocketConnection = null;
 
     /**

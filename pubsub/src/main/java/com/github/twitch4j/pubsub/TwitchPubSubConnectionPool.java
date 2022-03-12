@@ -121,4 +121,17 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
         return -1;
     }
 
+    @Override
+    public long getLatency() {
+        long sum = 0;
+        int count = 0;
+        for (TwitchPubSub connection : getConnections()) {
+            final long latency = connection.getLatency();
+            if (latency > 0) {
+                sum += latency;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : -1L;
+    }
 }
