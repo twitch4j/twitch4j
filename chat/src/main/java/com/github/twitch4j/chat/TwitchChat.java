@@ -10,6 +10,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.NoticeTag;
+import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
@@ -46,7 +47,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -210,11 +210,6 @@ public class TwitchChat implements ITwitchChat {
     protected final long chatJoinTimeout;
 
     /**
-     * Tracks the timestamp of the last outbound ping
-     */
-    protected final AtomicLong lastPing = new AtomicLong();
-
-    /**
      * Cache of recent number of join attempts for each channel
      */
     protected final Cache<String, Integer> joinAttemptsByChannelName;
@@ -273,6 +268,7 @@ public class TwitchChat implements ITwitchChat {
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.onDisconnecting(this::onDisconnecting);
+                spec.taskExecutor(taskExecutor);
                 if (proxyConfig != null) {
                     spec.proxyHost(proxyConfig.getHostname());
                     spec.proxyPort(proxyConfig.getPort());
@@ -505,7 +501,7 @@ public class TwitchChat implements ITwitchChat {
      * Connecting to IRC-WS
      */
     public void connect() {
-        if (connection.getConnectionState().equals(WebsocketConnectionState.DISCONNECTED) || connection.getConnectionState().equals(WebsocketConnectionState.RECONNECTING)) {
+        if (WebsocketConnectionState.DISCONNECTED.equals(connection.getConnectionState()) || WebsocketConnectionState.RECONNECTING.equals(connection.getConnectionState())) {
             if (chatCredential != null) {
                 // Wait for AUTH limit before opening the connection
                 ircAuthBucket.asBlocking().consumeUninterruptibly(1L);
@@ -786,5 +782,32 @@ public class TwitchChat implements ITwitchChat {
 
     public long getLatency() {
         return connection.getLatency();
+    }
+
+    /**
+     * @return the connection state
+     */
+    public WebsocketConnectionState getState() {
+        return connection.getConnectionState();
+    }
+
+    /**
+     * @return the connection state
+     * @deprecated use {@link #getState()} instead
+     */
+    @Deprecated
+    public TMIConnectionState getConnectionState() {
+        switch (connection.getConnectionState()) {
+            case DISCONNECTING:
+                return TMIConnectionState.DISCONNECTING;
+            case RECONNECTING:
+                return TMIConnectionState.RECONNECTING;
+            case CONNECTING:
+                return TMIConnectionState.CONNECTING;
+            case CONNECTED:
+                return TMIConnectionState.CONNECTED;
+            default:
+                return TMIConnectionState.DISCONNECTED;
+        }
     }
 }

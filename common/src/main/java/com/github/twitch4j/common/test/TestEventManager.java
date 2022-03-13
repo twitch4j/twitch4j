@@ -4,10 +4,11 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestEventManager extends EventManager {
-    private List<Object> publishedEvents = new ArrayList<>();
+    private final List<Object> publishedEvents = Collections.synchronizedList(new ArrayList<>());
 
     public TestEventManager() {
         super();

@@ -83,8 +83,7 @@ public class WebsocketConnection implements AutoCloseable {
             @Override
             public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
                 // hook: on connected
-                if (config.onConnected() != null)
-                    config.onConnected().run();
+                config.onConnected().run();
 
                 // Connection Success
                 connectionState = WebsocketConnectionState.CONNECTED;
@@ -96,9 +95,8 @@ public class WebsocketConnection implements AutoCloseable {
 
             @Override
             public void onTextMessage(WebSocket ws, String text) {
-                 // hook: on text message
-                if (config.onTextMessage() != null)
-                    config.onTextMessage().accept(text);
+                // hook: on text message
+                config.onTextMessage().accept(text);
             }
 
             @Override
@@ -141,8 +139,7 @@ public class WebsocketConnection implements AutoCloseable {
         if (connectionState.equals(WebsocketConnectionState.DISCONNECTED) || connectionState.equals(WebsocketConnectionState.RECONNECTING)) {
             try {
                 // hook: on pre connect
-                if (config.onPreConnect() != null)
-                    config.onPreConnect().run();
+                config.onPreConnect().run();
 
                 // Change Connection State
                 connectionState = WebsocketConnectionState.CONNECTING;
@@ -157,8 +154,7 @@ public class WebsocketConnection implements AutoCloseable {
                 this.webSocket.connect();
 
                 // hook: post connect
-                if (config.onPostConnect() != null)
-                    config.onPostConnect().run();
+                config.onPostConnect().run();
             } catch (Exception ex) {
                 log.error("connection to webSocket server {} failed: retrying ...", config.baseUrl(), ex);
                 // Sleep before trying to reconnect
@@ -181,15 +177,13 @@ public class WebsocketConnection implements AutoCloseable {
     public void disconnect() {
         if (connectionState.equals(WebsocketConnectionState.CONNECTED)) {
             // hook: disconnecting
-            if (config.onDisconnecting() != null)
-                config.onDisconnecting().run();
+            config.onDisconnecting().run();
 
             connectionState = WebsocketConnectionState.DISCONNECTING;
         }
 
         // hook: pre disconnect
-        if (config.onPreDisconnect() != null)
-            config.onPreDisconnect().run();
+        config.onPreDisconnect().run();
 
         connectionState = WebsocketConnectionState.DISCONNECTED;
 
@@ -199,8 +193,7 @@ public class WebsocketConnection implements AutoCloseable {
         this.webSocket = null;
 
         // hook: post disconnect
-        if (config.onPostDisconnect() != null)
-            config.onPostDisconnect().run();
+        config.onPostDisconnect().run();
     }
 
     /**

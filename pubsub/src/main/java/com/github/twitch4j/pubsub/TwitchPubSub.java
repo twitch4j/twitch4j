@@ -258,6 +258,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 spec.wsPingPeriod(wsPingPeriod);
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
+                spec.taskExecutor(taskExecutor);
                 if (proxyConfig != null) {
                     spec.proxyHost(proxyConfig.getHostname());
                     spec.proxyPort(proxyConfig.getPort());
@@ -771,8 +772,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 log.debug("PubSub: Unknown Message Type: " + message);
             }
         } catch (Exception ex) {
-            log.warn("PubSub: Unparsable Message: " + text + " - [" + ex.getMessage() + "]");
-            ex.printStackTrace();
+            log.warn("PubSub: Unparsable Message: " + text + " - [" + ex.getMessage() + "]", ex);
         }
     }
 

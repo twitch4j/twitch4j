@@ -1,11 +1,9 @@
 package com.github.twitch4j.client.websocket;
 
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
-import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -28,10 +26,20 @@ public class WebsocketConnectionConfig {
      * validate the config
      */
     public void validate() {
-        Objects.requireNonNull(baseUrl, "baseUrl is a required parameter!");
-        Objects.requireNonNull(wsPingPeriod, "wsPingPeriod is a required parameter, set to 0 to disable!");
-        Objects.requireNonNull(taskExecutor, "taskExecutor is a required parameter!");
-        Objects.requireNonNull(backoffStrategy, "backoffStrategy is a required parameter!");
+        Objects.requireNonNull(baseUrl, "baseUrl may not be null!");
+        if (wsPingPeriod < 0) {
+            throw new RuntimeException("wsPingPeriod must be 0 or greater, set to 0 to disable!");
+        }
+        Objects.requireNonNull(taskExecutor, "taskExecutor may not be null!");
+        Objects.requireNonNull(backoffStrategy, "backoffStrategy may not be null!");
+        Objects.requireNonNull(onPreConnect, "onPreConnect may not be null!");
+        Objects.requireNonNull(onPostConnect, "onPostConnect may not be null!");
+        Objects.requireNonNull(onConnected, "onConnected may not be null!");
+        Objects.requireNonNull(onTextMessage, "onTextMessage may not be null!");
+        Objects.requireNonNull(onTextMessage, "onTextMessage may not be null!");
+        Objects.requireNonNull(onDisconnecting, "onDisconnecting may not be null!");
+        Objects.requireNonNull(onPreDisconnect, "onPreDisconnect may not be null!");
+        Objects.requireNonNull(onPostDisconnect, "onPostDisconnect may not be null!");
     }
 
     /**
@@ -44,7 +52,10 @@ public class WebsocketConnectionConfig {
      */
     private int wsPingPeriod = 0;
 
-    private ScheduledExecutorService taskExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 2);
+    /**
+     * Task Executor
+     */
+    private ScheduledExecutorService taskExecutor;
 
     /**
      * Helper class to compute delays between connection retries
@@ -60,39 +71,39 @@ public class WebsocketConnectionConfig {
     /**
      * called before connecting
      */
-    private Runnable onPreConnect;
+    private Runnable onPreConnect = () -> {};
 
     /**
      * called after connecting
      */
-    private Runnable onPostConnect;
+    private Runnable onPostConnect = () -> {};
 
     /**
      * called after the connection to the websocket server has been established successfully
      */
-    private Runnable onConnected;
+    private Runnable onConnected = () -> {};
 
     /**
      * called when receiving a text message on from the websocket server
      */
-    private Consumer<String> onTextMessage;
+    private Consumer<String> onTextMessage = (text) -> {};
 
     /**
      * called when connection state is changing from CONNECTED to DISCONNECTING
      */
-    private Runnable onDisconnecting;
+    private Runnable onDisconnecting = () -> {};
 
     /**
      * called before the disconnect
      * <p>
      * this occurs after onDisconnecting and before the connection is disposed
      */
-    private Runnable onPreDisconnect;
+    private Runnable onPreDisconnect = () -> {};
 
     /**
      * called after the disconnect
      */
-    private Runnable onPostDisconnect;
+    private Runnable onPostDisconnect = () -> {};
 
     private String proxyHost;
     private Integer proxyPort;
