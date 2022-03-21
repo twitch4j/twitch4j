@@ -106,7 +106,13 @@ public class WebsocketConnection implements AutoCloseable {
 
                     // connection lost - reconnecting
                     if (backoffClearer != null) backoffClearer.cancel(false);
-                    config.taskExecutor().schedule(() -> reconnect(), config.backoffStrategy().get(), TimeUnit.MILLISECONDS);
+                    long reconnectDelay = config.backoffStrategy().get();
+                    if (reconnectDelay < 0) {
+                        log.debug("Maximum retry count for websocket reconnection attempts was hit.");
+                        config.backoffStrategy().reset(); // start fresh on the next manual connect() call
+                    } else {
+                        config.taskExecutor().schedule(() -> reconnect(), reconnectDelay, TimeUnit.MILLISECONDS);
+                    }
                 } else {
                     connectionState = WebsocketConnectionState.DISCONNECTED;
                     log.info("Disconnected from WebSocket [{}]!", config.baseUrl());
@@ -156,10 +162,17 @@ public class WebsocketConnection implements AutoCloseable {
                 // hook: post connect
                 config.onPostConnect().run();
             } catch (Exception ex) {
+                final long retryDelay = config.backoffStrategy().get();
+                if (retryDelay < 0) {
+                    log.error("failed to connect to webSocket server {} and max retries were hit.", config.baseUrl(), ex);
+                    config.backoffStrategy().reset(); // start fresh on the next manual connect() call
+                    return;
+                }
+
                 log.error("connection to webSocket server {} failed: retrying ...", config.baseUrl(), ex);
                 // Sleep before trying to reconnect
                 try {
-                    config.backoffStrategy().sleep();
+                    Thread.sleep(retryDelay);
                 } catch (Exception ignored) {
 
                 } finally {
