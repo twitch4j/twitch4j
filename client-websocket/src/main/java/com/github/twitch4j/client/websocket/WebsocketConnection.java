@@ -70,12 +70,12 @@ public class WebsocketConnection implements AutoCloseable {
 
         // webSocketFactory and proxy configuration
         this.webSocketFactory = new WebSocketFactory();
-        if (config.proxyHost() != null) {
+        if (config.proxyConfig() != null) {
             webSocketFactory.getProxySettings()
-                .setHost(config.proxyHost())
-                .setPort(config.proxyPort())
-                .setId(config.proxyUsername())
-                .setPassword(config.proxyPassword());
+                .setHost(config.proxyConfig().getHostname())
+                .setPort(config.proxyConfig().getPort())
+                .setId(config.proxyConfig().getUsername())
+                .setPassword(config.proxyConfig().getPassword() == null ? null : String.valueOf(config.proxyConfig().getPassword()));
         }
 
         // adapter

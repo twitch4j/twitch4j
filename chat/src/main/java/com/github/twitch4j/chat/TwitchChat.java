@@ -269,12 +269,7 @@ public class TwitchChat implements ITwitchChat {
                 spec.onTextMessage(this::onTextMessage);
                 spec.onDisconnecting(this::onDisconnecting);
                 spec.taskExecutor(taskExecutor);
-                if (proxyConfig != null) {
-                    spec.proxyHost(proxyConfig.getHostname());
-                    spec.proxyPort(proxyConfig.getPort());
-                    spec.proxyUsername(proxyConfig.getUsername());
-                    spec.proxyPassword(String.valueOf(proxyConfig.getPassword()));
-                }
+                spec.proxyConfig(proxyConfig);
             });
         } else {
             this.connection = websocketConnection;

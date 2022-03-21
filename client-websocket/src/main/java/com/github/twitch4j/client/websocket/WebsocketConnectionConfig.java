@@ -1,5 +1,6 @@
 package com.github.twitch4j.client.websocket;
 
+import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,8 +106,8 @@ public class WebsocketConnectionConfig {
      */
     private Runnable onPostDisconnect = () -> {};
 
-    private String proxyHost;
-    private Integer proxyPort;
-    private String proxyUsername;
-    private String proxyPassword;
+    /**
+     * proxy config
+     */
+    private ProxyConfig proxyConfig;
 }
