@@ -1,7 +1,10 @@
 package com.github.twitch4j.client.websocket;
 
+import com.github.twitch4j.common.config.ProxyConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class WebsocketConnectionConfigTest {
 
@@ -17,10 +20,8 @@ public class WebsocketConnectionConfigTest {
             spec.onDisconnecting(() -> System.out.println("on-disconnecting"));
             spec.onPreDisconnect(() -> System.out.println("on-pre-disconnect"));
             spec.onPostDisconnect(() -> System.out.println("on-post-disconnect"));
-            spec.proxyHost("localhost:3200");
-            spec.proxyPort(3128);
-            spec.proxyUsername("admin");
-            spec.proxyPassword("default");
+            spec.proxyConfig(ProxyConfig.builder().hostname("localhost").port(3128).username("admin").password("default".toCharArray()).build());
+            spec.taskExecutor(new ScheduledThreadPoolExecutor(2));
         });
 
         Assertions.assertEquals("https://twitch4j.github.io", connection.config.baseUrl());
@@ -33,10 +34,11 @@ public class WebsocketConnectionConfigTest {
         Assertions.assertNotNull(connection.config.onPreDisconnect());
         Assertions.assertNotNull(connection.config.onPostDisconnect());
         Assertions.assertNotNull(connection.config.backoffStrategy());
-        Assertions.assertEquals("localhost:3200", connection.config.proxyHost());
-        Assertions.assertEquals(3128, connection.config.proxyPort());
-        Assertions.assertEquals("admin", connection.config.proxyUsername());
-        Assertions.assertEquals("default", connection.config.proxyPassword());
+        Assertions.assertEquals("localhost", connection.config.proxyConfig().getHostname());
+        Assertions.assertEquals(3128, connection.config.proxyConfig().getPort());
+        Assertions.assertEquals("admin", connection.config.proxyConfig().getUsername());
+        Assertions.assertEquals("default", String.valueOf(connection.config.proxyConfig().getPassword()));
+        Assertions.assertNotNull(connection.config.taskExecutor());
     }
 
     @Test
@@ -47,18 +49,16 @@ public class WebsocketConnectionConfigTest {
 
         Assertions.assertEquals("https://twitch4j.github.io", connection.config.baseUrl());
         Assertions.assertEquals(0, connection.config.wsPingPeriod());
-        Assertions.assertNull(connection.config.onPreConnect());
-        Assertions.assertNull(connection.config.onPostConnect());
-        Assertions.assertNull(connection.config.onConnected());
-        Assertions.assertNull(connection.config.onTextMessage());
-        Assertions.assertNull(connection.config.onDisconnecting());
-        Assertions.assertNull(connection.config.onPreDisconnect());
-        Assertions.assertNull(connection.config.onPostDisconnect());
+        Assertions.assertNotNull(connection.config.onPreConnect());
+        Assertions.assertNotNull(connection.config.onPostConnect());
+        Assertions.assertNotNull(connection.config.onConnected());
+        Assertions.assertNotNull(connection.config.onTextMessage());
+        Assertions.assertNotNull(connection.config.onDisconnecting());
+        Assertions.assertNotNull(connection.config.onPreDisconnect());
+        Assertions.assertNotNull(connection.config.onPostDisconnect());
         Assertions.assertNotNull(connection.config.backoffStrategy());
-        Assertions.assertNull(connection.config.proxyHost());
-        Assertions.assertNull(connection.config.proxyPort());
-        Assertions.assertNull(connection.config.proxyUsername());
-        Assertions.assertNull(connection.config.proxyPassword());
+        Assertions.assertNull(connection.config.proxyConfig());
+        Assertions.assertNotNull(connection.config.taskExecutor());
     }
 
 }

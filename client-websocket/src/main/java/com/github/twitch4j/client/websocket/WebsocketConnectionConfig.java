@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 @Accessors(chain = true, fluent = true, prefix = "")
@@ -56,7 +57,7 @@ public class WebsocketConnectionConfig {
     /**
      * Task Executor
      */
-    private ScheduledExecutorService taskExecutor;
+    private ScheduledExecutorService taskExecutor = new ScheduledThreadPoolExecutor(2);
 
     /**
      * Helper class to compute delays between connection retries
