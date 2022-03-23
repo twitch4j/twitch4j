@@ -5,6 +5,7 @@ import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class PubSubListenResponseEvent extends TwitchEvent {
      */
     String error;
 
+    @ToString.Exclude
     @Getter(AccessLevel.PRIVATE)
     Supplier<PubSubRequest> listenRequestSupplier;
 
