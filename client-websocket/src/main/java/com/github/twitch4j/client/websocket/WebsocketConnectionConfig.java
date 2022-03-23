@@ -2,6 +2,7 @@ package com.github.twitch4j.client.websocket;
 
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
+import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -62,7 +63,7 @@ public class WebsocketConnectionConfig {
     /**
      * Helper class to compute delays between connection retries
      */
-    private ExponentialBackoffStrategy backoffStrategy = ExponentialBackoffStrategy.builder()
+    private IBackoffStrategy backoffStrategy = ExponentialBackoffStrategy.builder()
         .immediateFirst(true)
         .baseMillis(Duration.ofSeconds(1).toMillis())
         .jitter(true)

@@ -12,6 +12,7 @@ include(
 	":rest-tmi",
 	":pubsub",
 	":graphql",
+	":util",
 	":twitch4j"
 )
 
@@ -26,4 +27,5 @@ project(":rest-kraken").name = "twitch4j-kraken"
 project(":rest-tmi").name = "twitch4j-messaginginterface"
 project(":pubsub").name = "twitch4j-pubsub"
 project(":graphql").name = "twitch4j-graphql"
+project(":util").name = "twitch4j-util"
 project(":twitch4j").name = "twitch4j"

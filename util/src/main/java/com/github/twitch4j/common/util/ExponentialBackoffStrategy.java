@@ -1,5 +1,6 @@
 package com.github.twitch4j.common.util;
 
+import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Value
 @Builder(toBuilder = true)
-public class ExponentialBackoffStrategy {
+public class ExponentialBackoffStrategy implements IBackoffStrategy {
 
     /**
      * The maximum backoff value (on average), in milliseconds.
@@ -75,11 +76,6 @@ public class ExponentialBackoffStrategy {
      */
     AtomicInteger failures = new AtomicInteger();
 
-    /**
-     * Sleeps for the delay suggested by {@link #get()}.
-     *
-     * @return whether the sleep was successful (could be false if maximum attempts have been hit, for example).
-     */
     public boolean sleep() {
         final long millis = this.get();
 
@@ -96,11 +92,6 @@ public class ExponentialBackoffStrategy {
         return true;
     }
 
-    /**
-     * Increments the failure count and computes the appropriate exponential backoff.
-     *
-     * @return the amount of milliseconds to delay before retrying.
-     */
     public long get() {
         // Atomically increment failures
         int f = failures.getAndIncrement();
@@ -149,9 +140,6 @@ public class ExponentialBackoffStrategy {
         return Math.round(delay);
     }
 
-    /**
-     * Resets the failure count for exponential backoff calculations.
-     */
     public void reset() {
         setFailures(0);
     }

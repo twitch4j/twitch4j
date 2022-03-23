@@ -18,6 +18,7 @@ dependencies {
 
 	// Twitch4J Modules
 	api(project(":twitch4j-auth"))
+	api(project(":twitch4j-util"))
 }
 
 tasks.javadoc {

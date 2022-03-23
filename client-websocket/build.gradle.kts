@@ -1,7 +1,7 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Common
-	api(project(":twitch4j-common"))
+	api(project(":twitch4j-util"))
 
 	// WebSocket
 	api(group = "com.neovisionaries", name = "nv-websocket-client")
