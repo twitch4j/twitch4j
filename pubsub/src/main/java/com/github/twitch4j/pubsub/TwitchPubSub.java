@@ -141,6 +141,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -203,7 +204,7 @@ public class TwitchPubSub implements ITwitchPubSub {
     /**
      * Command Queue
      */
-    protected final BlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(200);
+    protected final BlockingQueue<String> commandQueue = new ArrayBlockingQueue<>(128);
 
     /**
      * Holds the subscribed topics in case we need to reconnect
@@ -744,7 +745,16 @@ public class TwitchPubSub implements ITwitchPubSub {
                 }
 
             } else if (message.getType().equals(PubSubType.RESPONSE)) {
-                eventManager.publish(new PubSubListenResponseEvent(message.getNonce(), message.getError()));
+                Supplier<PubSubRequest> findListenRequest = () -> {
+                    for (PubSubRequest topic : subscribedTopics) {
+                        if (topic != null && StringUtils.equals(message.getNonce(), topic.getNonce())) {
+                            return topic;
+                        }
+                    }
+                    return null;
+                };
+
+                eventManager.publish(new PubSubListenResponseEvent(message.getNonce(), message.getError(), findListenRequest));
 
                 // topic subscription success or failed, response to listen command
                 // System.out.println(message.toString());

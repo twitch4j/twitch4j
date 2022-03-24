@@ -3,9 +3,6 @@ dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
-	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
-
 	// Annotations
 	api(group = "org.jetbrains", name = "annotations")
 
