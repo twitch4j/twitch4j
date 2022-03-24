@@ -131,7 +131,7 @@ public class WebsocketConnection implements AutoCloseable {
                 final long last = lastPing.getAndSet(0L);
                 if (last > 0) {
                     latency = System.currentTimeMillis() - last;
-                    log.trace("TwitchChat: Round-trip socket latency recorded at {} ms.", latency);
+                    log.trace("T4J Websocket: Round-trip socket latency recorded at {} ms.", latency);
                 }
             }
         };

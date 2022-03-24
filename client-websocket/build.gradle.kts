@@ -4,7 +4,7 @@ dependencies {
 	api(project(":twitch4j-util"))
 
 	// WebSocket
-	api(group = "com.neovisionaries", name = "nv-websocket-client")
+	implementation(group = "com.neovisionaries", name = "nv-websocket-client")
 }
 
 tasks.javadoc {
