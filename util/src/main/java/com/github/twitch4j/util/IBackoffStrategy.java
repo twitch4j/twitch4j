@@ -6,7 +6,21 @@ public interface IBackoffStrategy {
      *
      * @return whether the sleep was successful (could be false if maximum attempts have been hit, for example).
      */
-    boolean sleep();
+    default boolean sleep() {
+        final long millis = this.get();
+
+        if (millis < 0)
+            return false;
+
+        if (millis > 0)
+            try {
+                Thread.sleep(millis);
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+
+        return true;
+    }
 
     /**
      * Increments the failure count and computes the appropriate exponential backoff.

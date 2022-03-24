@@ -76,22 +76,7 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
      */
     AtomicInteger failures = new AtomicInteger();
 
-    public boolean sleep() {
-        final long millis = this.get();
-
-        if (millis < 0)
-            return false;
-
-        if (millis > 0)
-            try {
-                Thread.sleep(millis);
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-
-        return true;
-    }
-
+    @Override
     public long get() {
         // Atomically increment failures
         int f = failures.getAndIncrement();
@@ -140,6 +125,7 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
         return Math.round(delay);
     }
 
+    @Override
     public void reset() {
         setFailures(0);
     }
@@ -148,6 +134,7 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
         this.failures.set(failures);
     }
 
+    @Override
     public int getFailures() {
         return this.failures.get();
     }
