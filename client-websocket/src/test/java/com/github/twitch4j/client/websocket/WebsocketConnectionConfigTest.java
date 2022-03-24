@@ -1,15 +1,19 @@
 package com.github.twitch4j.client.websocket;
 
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.neovisionaries.ws.client.WebSocket;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class WebsocketConnectionConfigTest {
 
     @Test
-    public void testFullConfiguration() {
+    public void testFullConfiguration() throws IOException {
         WebsocketConnection connection = new WebsocketConnection(spec -> {
             spec.baseUrl("https://twitch4j.github.io");
             spec.wsPingPeriod(17_000);
@@ -22,6 +26,9 @@ public class WebsocketConnectionConfigTest {
             spec.onPostDisconnect(() -> System.out.println("on-post-disconnect"));
             spec.proxyConfig(ProxyConfig.builder().hostname("localhost").port(3128).username("admin").password("default".toCharArray()).build());
             spec.taskExecutor(new ScheduledThreadPoolExecutor(2));
+            Map<String, String> headers = new HashMap<>();
+            headers.put("User-Agent", "my-user-agent");
+            spec.headers(headers);
         });
 
         Assertions.assertEquals("https://twitch4j.github.io", connection.config.baseUrl());
@@ -39,6 +46,11 @@ public class WebsocketConnectionConfigTest {
         Assertions.assertEquals("admin", connection.config.proxyConfig().getUsername());
         Assertions.assertEquals("default", String.valueOf(connection.config.proxyConfig().getPassword()));
         Assertions.assertNotNull(connection.config.taskExecutor());
+        Assertions.assertEquals("my-user-agent", connection.config.headers().get("User-Agent"));
+
+        // create websocket and check the result
+        WebSocket ws = connection.createWebsocket();
+        Assertions.assertEquals(17_000, ws.getPingInterval());
     }
 
     @Test
@@ -59,6 +71,7 @@ public class WebsocketConnectionConfigTest {
         Assertions.assertNotNull(connection.config.backoffStrategy());
         Assertions.assertNull(connection.config.proxyConfig());
         Assertions.assertNotNull(connection.config.taskExecutor());
+        Assertions.assertNull(connection.config.headers());
     }
 
 }

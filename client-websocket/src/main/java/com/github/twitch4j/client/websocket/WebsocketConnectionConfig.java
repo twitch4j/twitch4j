@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -54,6 +55,11 @@ public class WebsocketConnectionConfig {
      * WebSocket RFC Ping Period in ms (0 = disabled)
      */
     private int wsPingPeriod = 0;
+
+    /**
+     * WebSocket Headers
+     */
+    private Map<String, String> headers = null;
 
     /**
      * Task Executor

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -137,6 +138,17 @@ public class WebsocketConnection implements AutoCloseable {
         };
     }
 
+    protected WebSocket createWebsocket() throws IOException {
+        WebSocket ws = webSocketFactory.createSocket(config.baseUrl());
+        ws.setPingInterval(config.wsPingPeriod());
+        if (config.headers() != null)
+            config.headers().forEach(ws::addHeader);
+        ws.clearListeners();
+        ws.addListener(webSocketAdapter);
+
+        return ws;
+    }
+
     /**
      * Connect to the WebSocket
      */
@@ -151,10 +163,7 @@ public class WebsocketConnection implements AutoCloseable {
                 connectionState = WebsocketConnectionState.CONNECTING;
 
                 // init websocket
-                webSocket = webSocketFactory.createSocket(config.baseUrl());
-                webSocket.setPingInterval(config.wsPingPeriod());
-                webSocket.clearListeners();
-                webSocket.addListener(webSocketAdapter);
+                webSocket = createWebsocket();
 
                 // connect
                 this.webSocket.connect();
