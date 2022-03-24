@@ -1,7 +1,5 @@
 package com.github.twitch4j.pubsub;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
@@ -11,7 +9,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 /**
@@ -25,10 +22,6 @@ import java.util.stream.StreamSupport;
 public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> implements ITwitchPubSub {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
-
-    private final Cache<String, PubSubSubscription> subscriptionsByNonce = Caffeine.newBuilder()
-        .expireAfterWrite(30, TimeUnit.SECONDS)
-        .build();
 
     @Override
     public PubSubSubscription listenOnTopic(PubSubRequest request) {
@@ -44,10 +37,8 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     public PubSubSubscription subscribe(PubSubRequest pubSubRequest) {
         final int topics = getTopicCount(pubSubRequest);
         if (topics <= 0) return null;
-        final String nonce = injectNonce(pubSubRequest);
-        final PubSubSubscription subscription = super.subscribe(pubSubRequest);
-        subscriptionsByNonce.put(nonce, subscription);
-        return subscription;
+        injectNonce(pubSubRequest);
+        return super.subscribe(pubSubRequest);
     }
 
     @Override
@@ -62,10 +53,8 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
 
         // Reclaim topic headroom upon a failed subscription
         client.getEventManager().onEvent("twitch4j-pubsub-pool-nonce-tracker", PubSubListenResponseEvent.class, e -> {
-            if (StringUtils.isNotEmpty(e.getNonce())) {
-                PubSubSubscription subscription = subscriptionsByNonce.asMap().remove(e.getNonce());
-                if (e.hasError() && subscription != null)
-                    unsubscribe(subscription);
+            if (e.hasError()) {
+                e.getListenRequest().map(PubSubSubscription::new).ifPresent(this::unsubscribe);
             }
         });
 
@@ -104,10 +93,9 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
         return getTopicCount(pubSubRequest);
     }
 
-    private static String injectNonce(PubSubRequest req) {
+    private static void injectNonce(PubSubRequest req) {
         if (StringUtils.isBlank(req.getNonce()))
             req.setNonce(CryptoUtils.generateNonce(30));
-        return req.getNonce();
     }
 
     private static int getTopicCount(PubSubRequest req) {
