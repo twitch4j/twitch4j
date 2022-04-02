@@ -251,4 +251,17 @@ public interface ITwitchChat extends AutoCloseable {
         return this.sendMessage(channel, String.format("/unban %s", user));
     }
 
+    /**
+     * Send a mod announcement (accented message)
+     *
+     * @param channel the name of the channel to send the announcement in.
+     * @param message the message to be announced.
+     * @return whether the command was added to the queue
+     * @see <a href="https://twitter.com/TwitchSupport/status/1509634525982302208">Official Announcement</a>
+     */
+    @Unofficial
+    default boolean sendAnnouncement(String channel, String message) {
+        return this.sendMessage(channel, String.format("/announce %s", message));
+    }
+
 }
