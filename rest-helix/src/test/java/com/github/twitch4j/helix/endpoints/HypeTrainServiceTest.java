@@ -19,7 +19,7 @@ public class HypeTrainServiceTest {
     @Test
     @DisplayName("Get Hype Train Events")
     public void getHypeTrainEvents() {
-        List<HypeTrainEvent> resultList = TestUtils.getTwitchHelixClient().getHypeTrainEvents(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null).execute().getEvents();
+        List<HypeTrainEvent> resultList = TestUtils.getTwitchHelixClient().getHypeTrainEvents(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null).execute().getEvents();
         Assertions.assertTrue(resultList.isEmpty()); // no hype trains available on this account
     }
 
