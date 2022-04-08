@@ -4,11 +4,9 @@ import com.github.twitch4j.helix.TestUtils;
 import com.github.twitch4j.helix.domain.AutomodEnforceCheck;
 import com.github.twitch4j.helix.domain.AutomodEnforceCheckList;
 import com.github.twitch4j.helix.domain.AutomodEnforceStatus;
-import com.github.twitch4j.helix.domain.BannedEvent;
 import com.github.twitch4j.helix.domain.BannedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -27,17 +25,6 @@ public class ModerationServiceTest extends AbstractEndpointTest {
         List<BannedUser> results = TestUtils.getTwitchHelixClient().getBannedUsers(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null, null)
             .execute()
             .getResults();
-
-        Assertions.assertNotNull(results);
-    }
-
-    @Test
-    @Disabled
-    @DisplayName("Get Banned Events")
-    public void getBannedEvents() {
-        List<BannedEvent> results = TestUtils.getTwitchHelixClient().getBannedEvents(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null)
-            .execute()
-            .getEvents();
 
         Assertions.assertNotNull(results);
     }

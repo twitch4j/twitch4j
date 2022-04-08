@@ -65,18 +65,6 @@ public class UsersServiceTest extends AbstractEndpointTest {
         });
     }
 
-    @Test
-    @DisplayName("Create User Follows")
-    public void createFollow() {
-        TestUtils.getTwitchHelixClient().createFollow(TestUtils.getCredential().getAccessToken(), twitchUserId, "12826", false).execute();
-    }
-
-    @Test
-    @DisplayName("Delete User Follows")
-    public void deleteFollow() {
-        TestUtils.getTwitchHelixClient().deleteFollow(TestUtils.getCredential().getAccessToken(), twitchUserId, "12826").execute();
-    }
-
     /**
      * Update user description
      */
