@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -39,7 +40,13 @@ public class User {
     /** URL of the user’s offline image. */
     private String offlineImageUrl;
 
-    /** Total number of views of the user’s channel. */
+    /**
+     * Total number of views of the user’s channel.
+     *
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777">This field will contain stale data beginning April 15, 2022, and will eventually no longer be populated due to Twitch changes.</a>
+     */
+    @Nullable
+    @Deprecated
     private Integer viewCount;
 
     /** User’s email address. Returned if the request includes the user:read:email scope. */

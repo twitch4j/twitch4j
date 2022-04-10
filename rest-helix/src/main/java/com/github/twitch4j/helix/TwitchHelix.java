@@ -1088,24 +1088,46 @@ public interface TwitchHelix {
 
     /**
      * Gets the information of the most recent Hype Train of the given channel ID.
-     * After 5 days, if no Hype Train has been active, the endpoint will return an empty response
+     * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
-     * @param authToken Auth Token (scope: channel:read:hype_train)
+     * @param authToken     User Auth Token (scope: channel:read:hype_train)
      * @param broadcasterId User ID of the broadcaster (required)
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
-     * @param id The id of the wanted event, if known. (optional)
-     * @param after Cursor for forward pagination (optional)
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
+     * @param after         Cursor for forward pagination (optional)
      * @return HypeTrainEventList
      */
-    @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&id={id}&after={after}")
+    @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&after={after}&cursor={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("first") Integer limit,
-        @Param("id") String id,
         @Param("after") String after
     );
+
+    /**
+     * Gets the information of the most recent Hype Train of the given channel ID.
+     * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
+     *
+     * @param authToken     User Auth Token (scope: channel:read:hype_train)
+     * @param broadcasterId User ID of the broadcaster (required)
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
+     * @param id            The id of the wanted event, if known. This field has been deprecated by twitch and has no effect. (optional)
+     * @param after         Cursor for forward pagination (optional)
+     * @return HypeTrainEventList
+     * @see <a href="https://discuss.dev.twitch.tv/t/get-hype-train-events-api-endpoint-id-query-parameter-deprecation/37613">id parameter deprecation announcement</a>
+     * @deprecated Use {@link #getHypeTrainEvents(String, String, Integer, String)} instead (no id argument)
+     */
+    @Deprecated
+    default HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
+        String authToken,
+        String broadcasterId,
+        Integer limit,
+        @SuppressWarnings("unused") String id,
+        String after
+    ) {
+        return this.getHypeTrainEvents(authToken, broadcasterId, limit, after);
+    }
 
     @RequestLine("GET /ingests")
     HystrixCommand<IngestServerList> getIngestServers(URI baseUrl);
