@@ -5,11 +5,14 @@ import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.TwitchHelixError;
+import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import feign.Request;
+import feign.RequestTemplate;
 import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
+import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
@@ -23,6 +26,9 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     // Decoder
     final Decoder decoder;
 
+    // Interceptor
+    final TwitchHelixClientIdInterceptor interceptor;
+
     // Error Decoder
     final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
 
@@ -32,17 +38,19 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     /**
      * Constructor
      *
-     * @param decoder Feign Decoder
+     * @param decoder     Feign Decoder
+     * @param interceptor Helix Interceptor
      */
-    public TwitchHelixErrorDecoder(Decoder decoder) {
+    public TwitchHelixErrorDecoder(Decoder decoder, TwitchHelixClientIdInterceptor interceptor) {
         this.decoder = decoder;
+        this.interceptor = interceptor;
     }
 
     /**
      * Overwrite the Decode Method to handle custom error cases
      *
      * @param methodKey Method Key
-     * @param response Response
+     * @param response  Response
      * @return Exception
      */
     @Override
@@ -63,10 +71,18 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 429) {
-                ex = new ContextedRuntimeException("To many requests!")
+                ex = new ContextedRuntimeException("Too many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);;
+                    .addContextValue("responseBody", responseBody);
+
+                // Deplete ban bucket on 429 (to be safe)
+                RequestTemplate template = response.request().requestTemplate();
+                if (template.path().endsWith("/moderation/bans")) {
+                    String channelId = template.queries().get("broadcaster_id").iterator().next();
+                    Bucket modBucket = interceptor.getModerationBucket(channelId);
+                    modBucket.consumeIgnoringRateLimits(Math.max(modBucket.tryConsumeAsMuchAsPossible(), 1));
+                }
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
@@ -80,7 +96,8 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                     .addContextValue("responseBody", responseBody)
                     .addContextValue("errorType", error.getError())
                     .addContextValue("errorStatus", error.getStatus())
-                    .addContextValue("errorType", error.getMessage());
+                    .addContextValue("errorType", error.getMessage())
+                    .addContextValue("errorMessage", error.getMessage());
             }
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);

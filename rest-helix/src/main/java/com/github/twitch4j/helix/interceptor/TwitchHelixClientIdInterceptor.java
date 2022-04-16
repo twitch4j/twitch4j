@@ -179,7 +179,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         return buckets.get(key, k -> Bucket.builder().addLimit(this.apiRateLimit).build());
     }
 
-    protected Bucket getModerationBucket(String channelId) {
+    public Bucket getModerationBucket(String channelId) {
         return bansByChannelId.get(channelId, k -> Bucket.builder().addLimit(BANS_BANDWIDTH).build());
     }
 

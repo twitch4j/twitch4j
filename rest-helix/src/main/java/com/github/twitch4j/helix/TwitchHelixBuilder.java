@@ -174,7 +174,7 @@ public class TwitchHelixBuilder {
             .decoder(new TwitchHelixDecoder(mapper, interceptor))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
-            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
+            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), interceptor))
             .requestInterceptor(interceptor)
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
