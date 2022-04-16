@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -27,6 +28,12 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+
+    /**
+     * Empirically determined rate limit on helix bans and unbans, per channel
+     */
+    @Unofficial
+    private static final Bandwidth BANS_BANDWIDTH = Bandwidth.simple(100, Duration.ofSeconds(30));
 
     /**
      * Reference to the Client Builder
@@ -57,6 +64,13 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      * Rate limit buckets by user/app
      */
     private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
+        .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Moderation API rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> bansByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
 
@@ -163,6 +177,10 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
     protected Bucket getOrInitializeBucket(String key) {
         return buckets.get(key, k -> Bucket.builder().addLimit(this.apiRateLimit).build());
+    }
+
+    protected Bucket getModerationBucket(String channelId) {
+        return bansByChannelId.get(channelId, k -> Bucket.builder().addLimit(BANS_BANDWIDTH).build());
     }
 
     private OAuth2Credential getOrCreateAuthToken() {
