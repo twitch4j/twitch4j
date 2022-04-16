@@ -9,7 +9,6 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Bucket4j;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,14 +29,14 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     public static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
-     */
-    private static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
-
-    /**
      * Reference to the Client Builder
      */
     private final TwitchHelixBuilder twitchAPIBuilder;
+
+    /**
+     * Helix Rate Limit
+     */
+    private final Bandwidth apiRateLimit;
 
     /**
      * Reference to the twitch identity provider
@@ -80,6 +79,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         this.twitchAPIBuilder = twitchHelixBuilder;
         twitchIdentityProvider = new TwitchIdentityProvider(twitchHelixBuilder.getClientId(), twitchHelixBuilder.getClientSecret(), null);
         this.defaultClientId = twitchAPIBuilder.getClientId();
+        this.apiRateLimit = twitchAPIBuilder.getApiRateLimit();
         this.defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
         if (defaultAuthToken != null)
             twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken).ifPresent(oauth -> {
@@ -162,7 +162,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     }
 
     protected Bucket getOrInitializeBucket(String key) {
-        return buckets.get(key, k -> Bucket.builder().addLimit(DEFAULT_BANDWIDTH).build());
+        return buckets.get(key, k -> Bucket.builder().addLimit(this.apiRateLimit).build());
     }
 
     private OAuth2Credential getOrCreateAuthToken() {

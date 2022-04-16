@@ -20,10 +20,12 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import io.github.bucket4j.Bandwidth;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +49,11 @@ public class TwitchHelixBuilder {
      * @see <a href="https://github.com/twitchdev/twitch-cli/blob/main/docs/mock-api.md">Mock API Docs</a>
      */
     public static final String MOCK_BASE_URL = "http://localhost:8080/mock";
+
+    /**
+     * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
+     */
+    public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
 
     /**
      * Client Id
@@ -109,6 +116,12 @@ public class TwitchHelixBuilder {
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
 
     /**
+     * Custom Rate Limit to use for Helix calls
+     */
+    @With
+    private Bandwidth apiRateLimit = DEFAULT_BANDWIDTH;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -148,6 +161,10 @@ public class TwitchHelixBuilder {
         // Executor for rate limiting
         if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 1);
+
+        // Enforce non-null rate limit bandwidth
+        if (apiRateLimit == null)
+            apiRateLimit = DEFAULT_BANDWIDTH;
 
         // Feign
         TwitchHelixClientIdInterceptor interceptor = new TwitchHelixClientIdInterceptor(this);
