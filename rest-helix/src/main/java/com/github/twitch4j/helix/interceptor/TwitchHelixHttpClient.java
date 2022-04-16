@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -77,10 +78,7 @@ public class TwitchHelixHttpClient implements Client {
         // Moderation API: banUser and unbanUser share a bucket per channel id
         if (request.requestTemplate().path().endsWith("/moderation/bans")) {
             // Obtain the channel id
-            String query = request.requestTemplate().queryLine();
-            int start = query.indexOf("broadcaster_id=") + "broadcaster_id=".length();
-            int end = query.indexOf('&', start);
-            String channelId = query.substring(start, end > start ? end : query.length());
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
             Bucket modBucket = interceptor.getModerationBucket(channelId);
