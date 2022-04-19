@@ -43,6 +43,12 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     private static final Bandwidth CLIPS_BANDWIDTH = Bandwidth.simple(600, Duration.ofSeconds(60));
 
     /**
+     * Empirically determined rate limit on helix add and remove block term, per channel
+     */
+    @Unofficial
+    private static final Bandwidth TERMS_BANDWIDTH = Bandwidth.simple(60, Duration.ofSeconds(60));
+
+    /**
      * Reference to the Client Builder
      */
     private final TwitchHelixBuilder twitchAPIBuilder;
@@ -75,7 +81,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         .build();
 
     /**
-     * Moderation API rate limit buckets per channel
+     * Moderation API: ban and unban rate limit buckets per channel
      */
     private final Cache<String, Bucket> bansByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
@@ -85,6 +91,13 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      * Create Clip API rate limit buckets per user
      */
     private final Cache<String, Bucket> clipsByUserId = Caffeine.newBuilder()
+        .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Moderation API: add and remove blocked term rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> termsByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
 
@@ -195,6 +208,10 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
     protected Bucket getClipBucket(String userId) {
         return clipsByUserId.get(userId, k -> Bucket.builder().addLimit(CLIPS_BANDWIDTH).build());
+    }
+
+    protected Bucket getTermsBucket(String channelId) {
+        return termsByChannelId.get(channelId, k -> Bucket.builder().addLimit(TERMS_BANDWIDTH).build());
     }
 
     private OAuth2Credential getOrCreateAuthToken() {

@@ -65,8 +65,10 @@ public class TwitchHelixHttpClient implements Client {
      * @throws IOException on network errors
      */
     private Response delegatedExecute(Request request, Request.Options options) throws IOException {
+        String templatePath = request.requestTemplate().path();
+
         // Moderation API: banUser and unbanUser share a bucket per channel id
-        if (request.requestTemplate().path().endsWith("/moderation/bans")) {
+        if (templatePath.endsWith("/moderation/bans")) {
             // Obtain the channel id
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
@@ -74,8 +76,19 @@ public class TwitchHelixHttpClient implements Client {
             Bucket modBucket = interceptor.getModerationBucket(channelId);
             return executeAgainstBucket(modBucket, () -> client.execute(request, options));
         }
+
+        // Moderation API: addBlockedTerm and removeBlockedTerm share a bucket per channel id
+        if (templatePath.endsWith("/moderation/blocked_terms") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket termsBucket = interceptor.getTermsBucket(channelId);
+            return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
+        }
+
         // Clips API: createClip has a stricter bucket that applies per user id
-        else if (request.httpMethod() == Request.HttpMethod.POST && request.requestTemplate().path().endsWith("/clips")) {
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id
             String token = request.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
             OAuth2Credential cred = interceptor.getAccessTokenCache().getIfPresent(token);

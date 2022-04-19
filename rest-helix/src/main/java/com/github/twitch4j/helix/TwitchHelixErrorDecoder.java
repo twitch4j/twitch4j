@@ -81,7 +81,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 if (template.path().endsWith("/moderation/bans")) {
                     String channelId = template.queries().get("broadcaster_id").iterator().next();
                     Bucket modBucket = interceptor.getModerationBucket(channelId);
-                    modBucket.consumeIgnoringRateLimits(Math.max(modBucket.tryConsumeAsMuchAsPossible(), 1));
+                    modBucket.consumeIgnoringRateLimits(Math.max(modBucket.tryConsumeAsMuchAsPossible(), 1)); // intentionally go negative to induce a pause
                 }
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
