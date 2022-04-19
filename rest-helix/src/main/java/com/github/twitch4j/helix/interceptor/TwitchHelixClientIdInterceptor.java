@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Injects ClientId Header, the User Agent and other common headers into each API Request
@@ -34,6 +35,12 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      */
     @Unofficial
     private static final Bandwidth BANS_BANDWIDTH = Bandwidth.simple(100, Duration.ofSeconds(30));
+
+    /**
+     * Empirically determined rate limit on the helix create clip endpoint, per user
+     */
+    @Unofficial
+    private static final Bandwidth CLIPS_BANDWIDTH = Bandwidth.simple(600, Duration.ofSeconds(60));
 
     /**
      * Reference to the Client Builder
@@ -71,6 +78,13 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
      * Moderation API rate limit buckets per channel
      */
     private final Cache<String, Bucket> bansByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Create Clip API rate limit buckets per user
+     */
+    private final Cache<String, Bucket> clipsByUserId = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
 
@@ -155,15 +169,11 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     }
 
     public void updateRemaining(String token, int remaining) {
-        OAuth2Credential credential = accessTokenCache.getIfPresent(token);
-        if (credential == null) return;
+        this.updateRemainingGeneric(token, remaining, this::getKey, this::getOrInitializeBucket);
+    }
 
-        String key = getKey(credential);
-        if (key == null) return;
-
-        Bucket bucket = getOrInitializeBucket(key);
-        long diff = bucket.getAvailableTokens() - remaining;
-        if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
+    public void updateRemainingCreateClip(String token, int remaining) {
+        this.updateRemainingGeneric(token, remaining, OAuth2Credential::getUserId, this::getClipBucket);
     }
 
     public void clearDefaultToken() {
@@ -183,6 +193,10 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         return bansByChannelId.get(channelId, k -> Bucket.builder().addLimit(BANS_BANDWIDTH).build());
     }
 
+    protected Bucket getClipBucket(String userId) {
+        return clipsByUserId.get(userId, k -> Bucket.builder().addLimit(CLIPS_BANDWIDTH).build());
+    }
+
     private OAuth2Credential getOrCreateAuthToken() {
         if (defaultAuthToken == null)
             synchronized (this) {
@@ -199,4 +213,17 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
         return this.defaultAuthToken;
     }
+
+    private void updateRemainingGeneric(String token, int remaining, Function<OAuth2Credential, String> credToKey, Function<String, Bucket> keyToBucket) {
+        OAuth2Credential credential = accessTokenCache.getIfPresent(token);
+        if (credential == null) return;
+
+        String key = credToKey.apply(credential);
+        if (key == null) return;
+
+        Bucket bucket = keyToBucket.apply(key);
+        long diff = bucket.getAvailableTokens() - remaining;
+        if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
+    }
+
 }

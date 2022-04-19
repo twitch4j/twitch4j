@@ -48,17 +48,7 @@ public class TwitchHelixHttpClient implements Client {
             OAuth2Credential credential = interceptor.getAccessTokenCache().getIfPresent(token.substring(BEARER_PREFIX.length()));
             if (credential != null) {
                 Bucket bucket = interceptor.getOrInitializeBucket(interceptor.getKey(credential));
-                try {
-                    return executeAgainstBucket(
-                        bucket,
-                        () -> delegatedExecute(request, options),
-                        executor
-                    ).get(timeout, TimeUnit.MILLISECONDS);
-                } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                    if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
-                    log.error("Throttled Helix API call timed-out before completion", e);
-                    return null;
-                }
+                return executeAgainstBucket(bucket, () -> delegatedExecute(request, options));
             }
         }
 
@@ -82,17 +72,32 @@ public class TwitchHelixHttpClient implements Client {
 
             // Conform to endpoint-specific bucket
             Bucket modBucket = interceptor.getModerationBucket(channelId);
-            try {
-                return executeAgainstBucket(modBucket, () -> client.execute(request, options), executor).get(timeout, TimeUnit.MILLISECONDS);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
-                log.error("Throttled Helix API call timed-out before completion", e);
-                return null;
-            }
+            return executeAgainstBucket(modBucket, () -> client.execute(request, options));
+        }
+        // Clips API: createClip has a stricter bucket that applies per user id
+        else if (request.httpMethod() == Request.HttpMethod.POST && request.requestTemplate().path().endsWith("/clips")) {
+            // Obtain user id
+            String token = request.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
+            OAuth2Credential cred = interceptor.getAccessTokenCache().getIfPresent(token);
+            String userId = cred != null ? cred.getUserId() : "";
+
+            // Conform to endpoint-specific bucket
+            Bucket clipBucket = interceptor.getClipBucket(userId != null ? userId : "");
+            return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 
         // no endpoint-specific rate limiting was needed; perform network request now
         return client.execute(request, options);
+    }
+
+    private <T> T executeAgainstBucket(Bucket bucket, Callable<T> call) throws IOException {
+        try {
+            return scheduleAgainstBucket(bucket, call, executor).get(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
+            log.error("Throttled Helix API call timed-out before completion", e);
+            return null;
+        }
     }
 
     /**
@@ -103,7 +108,7 @@ public class TwitchHelixHttpClient implements Client {
      * @param executor scheduled executor service for async calls
      * @return the future result of the call
      */
-    private static <T> CompletableFuture<T> executeAgainstBucket(Bucket bucket, Callable<T> call, ScheduledExecutorService executor) {
+    private static <T> CompletableFuture<T> scheduleAgainstBucket(Bucket bucket, Callable<T> call, ScheduledExecutorService executor) {
         if (bucket.tryConsume(1L))
             return CompletableFuture.supplyAsync(new SneakySupplier<>(call));
 

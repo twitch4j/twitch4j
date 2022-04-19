@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
 import feign.Response;
 import feign.jackson.JacksonDecoder;
 
@@ -27,11 +28,24 @@ public class TwitchHelixDecoder extends JacksonDecoder {
         // track rate limit for token
         String token = singleFirst(response.request().headers().get(AUTH_HEADER));
         if (token != null && token.startsWith(BEARER_PREFIX)) {
-            String remaining = singleFirst(response.headers().get(REMAINING_HEADER));
+            // Parse remaining
+            String remainingStr = singleFirst(response.headers().get(REMAINING_HEADER));
+            Integer remaining;
+            try {
+                remaining = Integer.parseInt(remainingStr);
+            } catch (NumberFormatException ignored) {
+                remaining = null;
+            }
+
+            // Synchronize library buckets with twitch data
             if (remaining != null) {
-                try {
-                    interceptor.updateRemaining(token.substring(BEARER_PREFIX.length()), Integer.parseInt(remaining));
-                } catch (Exception ignored) {
+                String bearer = token.substring(BEARER_PREFIX.length());
+                if (response.request().httpMethod() == Request.HttpMethod.POST && response.request().requestTemplate().path().endsWith("/clips")) {
+                    // Create Clip has a separate rate limit to synchronize
+                    interceptor.updateRemainingCreateClip(bearer, remaining);
+                } else {
+                    // Normal/global helix rate limit synchronization
+                    interceptor.updateRemaining(bearer, remaining);
                 }
             }
         }
