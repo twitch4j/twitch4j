@@ -4,23 +4,18 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-import com.github.twitch4j.common.annotation.Unofficial;
-import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * Injects ClientId Header, the User Agent and other common headers into each API Request
@@ -32,24 +27,6 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     public static final String BEARER_PREFIX = "Bearer ";
 
     /**
-     * Empirically determined rate limit on helix bans and unbans, per channel
-     */
-    @Unofficial
-    private static final Bandwidth BANS_BANDWIDTH = Bandwidth.simple(100, Duration.ofSeconds(30));
-
-    /**
-     * Empirically determined rate limit on the helix create clip endpoint, per user
-     */
-    @Unofficial
-    private static final Bandwidth CLIPS_BANDWIDTH = Bandwidth.simple(600, Duration.ofSeconds(60));
-
-    /**
-     * Empirically determined rate limit on helix add and remove block term, per channel
-     */
-    @Unofficial
-    private static final Bandwidth TERMS_BANDWIDTH = Bandwidth.simple(60, Duration.ofSeconds(60));
-
-    /**
      * Reference to the Client Builder
      */
     private final TwitchHelixBuilder twitchAPIBuilder;
@@ -57,7 +34,14 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     /**
      * Helix Rate Limit
      */
+    @Getter(AccessLevel.PROTECTED)
     private final Bandwidth apiRateLimit;
+
+    /**
+     * Helix Rate Limit Tracker
+     */
+    @Getter
+    private final TwitchHelixRateLimitTracker rateLimitTracker;
 
     /**
      * Reference to the twitch identity provider
@@ -72,34 +56,6 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     private final Cache<String, OAuth2Credential> accessTokenCache = Caffeine.newBuilder()
         .expireAfterAccess(15, TimeUnit.MINUTES)
         .maximumSize(10_000)
-        .build();
-
-    /**
-     * Rate limit buckets by user/app
-     */
-    private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
-
-    /**
-     * Moderation API: ban and unban rate limit buckets per channel
-     */
-    private final Cache<String, Bucket> bansByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
-
-    /**
-     * Create Clip API rate limit buckets per user
-     */
-    private final Cache<String, Bucket> clipsByUserId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
-
-    /**
-     * Moderation API: add and remove blocked term rate limit buckets per channel
-     */
-    private final Cache<String, Bucket> termsByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
         .build();
 
     /**
@@ -123,6 +79,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         this.defaultClientId = twitchAPIBuilder.getClientId();
         this.apiRateLimit = twitchAPIBuilder.getApiRateLimit();
         this.defaultAuthToken = twitchHelixBuilder.getDefaultAuthToken();
+        this.rateLimitTracker = new TwitchHelixRateLimitTracker(this);
         if (defaultAuthToken != null)
             twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken).ifPresent(oauth -> {
                 this.defaultClientId = (String) oauth.getContext().get("client_id");
@@ -182,37 +139,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         template.header("User-Agent", twitchAPIBuilder.getUserAgent());
     }
 
-    public void updateRemaining(String token, int remaining) {
-        this.updateRemainingGeneric(token, remaining, this::getKey, this::getOrInitializeBucket);
-    }
-
-    public void updateRemainingCreateClip(String token, int remaining) {
-        this.updateRemainingGeneric(token, remaining, OAuth2Credential::getUserId, this::getClipBucket);
-    }
-
     public void clearDefaultToken() {
         this.defaultAuthToken = null;
-    }
-
-    protected String getKey(OAuth2Credential credential) {
-        String clientId = (String) credential.getContext().get("client_id");
-        return clientId == null ? null : credential.getUserId() == null ? clientId : clientId + "-" + credential.getUserId();
-    }
-
-    protected Bucket getOrInitializeBucket(String key) {
-        return buckets.get(key, k -> BucketUtils.createBucket(this.apiRateLimit));
-    }
-
-    public Bucket getModerationBucket(String channelId) {
-        return bansByChannelId.get(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
-    }
-
-    protected Bucket getClipBucket(String userId) {
-        return clipsByUserId.get(userId, k -> BucketUtils.createBucket(CLIPS_BANDWIDTH));
-    }
-
-    protected Bucket getTermsBucket(String channelId) {
-        return termsByChannelId.get(channelId, k -> BucketUtils.createBucket(TERMS_BANDWIDTH));
     }
 
     private OAuth2Credential getOrCreateAuthToken() {
@@ -222,7 +150,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
                     String clientId = twitchAPIBuilder.getClientId();
                     OAuth2Credential token = twitchIdentityProvider.getAppAccessToken();
                     token.getContext().put("client_id", clientId);
-                    getOrInitializeBucket(clientId);
+                    rateLimitTracker.getOrInitializeBucket(clientId);
                     accessTokenCache.put(token.getAccessToken(), token);
                     this.defaultClientId = clientId;
                     return this.defaultAuthToken = token;
@@ -230,18 +158,6 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
             }
 
         return this.defaultAuthToken;
-    }
-
-    private void updateRemainingGeneric(String token, int remaining, Function<OAuth2Credential, String> credToKey, Function<String, Bucket> keyToBucket) {
-        OAuth2Credential credential = accessTokenCache.getIfPresent(token);
-        if (credential == null) return;
-
-        String key = credToKey.apply(credential);
-        if (key == null) return;
-
-        Bucket bucket = keyToBucket.apply(key);
-        long diff = bucket.getAvailableTokens() - remaining;
-        if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
     }
 
 }

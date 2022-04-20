@@ -12,7 +12,6 @@ import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
-import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
@@ -80,8 +79,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 RequestTemplate template = response.request().requestTemplate();
                 if (template.path().endsWith("/moderation/bans")) {
                     String channelId = template.queries().get("broadcaster_id").iterator().next();
-                    Bucket modBucket = interceptor.getModerationBucket(channelId);
-                    modBucket.consumeIgnoringRateLimits(Math.max(modBucket.tryConsumeAsMuchAsPossible(), 1)); // intentionally go negative to induce a pause
+                    interceptor.getRateLimitTracker().markDepletedBanBucket(channelId);
                 }
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.

@@ -45,7 +45,7 @@ public class TwitchHelixHttpClient implements Client {
             OAuth2Credential credential = interceptor.getAccessTokenCache().getIfPresent(token.substring(BEARER_PREFIX.length()));
             if (credential != null) {
                 // First consume from helix global rate limit (800/min by default)
-                Bucket bucket = interceptor.getOrInitializeBucket(interceptor.getKey(credential));
+                Bucket bucket = interceptor.getRateLimitTracker().getOrInitializeBucket(interceptor.getRateLimitTracker().getKey(credential));
                 return executeAgainstBucket(bucket, () -> delegatedExecute(request, options));
             }
         }
@@ -71,7 +71,7 @@ public class TwitchHelixHttpClient implements Client {
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket modBucket = interceptor.getModerationBucket(channelId);
+            Bucket modBucket = interceptor.getRateLimitTracker().getModerationBucket(channelId);
             return executeAgainstBucket(modBucket, () -> client.execute(request, options));
         }
 
@@ -81,7 +81,7 @@ public class TwitchHelixHttpClient implements Client {
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket termsBucket = interceptor.getTermsBucket(channelId);
+            Bucket termsBucket = interceptor.getRateLimitTracker().getTermsBucket(channelId);
             return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
         }
 
@@ -93,7 +93,7 @@ public class TwitchHelixHttpClient implements Client {
             String userId = cred != null ? cred.getUserId() : "";
 
             // Conform to endpoint-specific bucket
-            Bucket clipBucket = interceptor.getClipBucket(userId != null ? userId : "");
+            Bucket clipBucket = interceptor.getRateLimitTracker().getClipBucket(userId != null ? userId : "");
             return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 

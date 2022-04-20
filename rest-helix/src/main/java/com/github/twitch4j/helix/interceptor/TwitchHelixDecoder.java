@@ -42,10 +42,10 @@ public class TwitchHelixDecoder extends JacksonDecoder {
                 String bearer = token.substring(BEARER_PREFIX.length());
                 if (response.request().httpMethod() == Request.HttpMethod.POST && response.request().requestTemplate().path().endsWith("/clips")) {
                     // Create Clip has a separate rate limit to synchronize
-                    interceptor.updateRemainingCreateClip(bearer, remaining);
+                    interceptor.getRateLimitTracker().updateRemainingCreateClip(bearer, remaining);
                 } else {
                     // Normal/global helix rate limit synchronization
-                    interceptor.updateRemaining(bearer, remaining);
+                    interceptor.getRateLimitTracker().updateRemaining(bearer, remaining);
                 }
             }
         }

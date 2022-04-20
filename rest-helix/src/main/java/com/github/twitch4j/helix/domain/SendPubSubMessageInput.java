@@ -42,7 +42,7 @@ public class SendPubSubMessageInput {
 
     /**
      * Strings for valid PubSub targets.
-     * Valid values: "broadcast", "global", "whisper-<user-id>"
+     * Valid values: "broadcast", "global", "{@literal whisper-<user-id>}"
      */
     @Singular
     @JsonProperty("target")
