@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -199,19 +200,19 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
     }
 
     protected Bucket getOrInitializeBucket(String key) {
-        return buckets.get(key, k -> Bucket.builder().addLimit(this.apiRateLimit).build());
+        return buckets.get(key, k -> BucketUtils.createBucket(this.apiRateLimit));
     }
 
     public Bucket getModerationBucket(String channelId) {
-        return bansByChannelId.get(channelId, k -> Bucket.builder().addLimit(BANS_BANDWIDTH).build());
+        return bansByChannelId.get(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
     }
 
     protected Bucket getClipBucket(String userId) {
-        return clipsByUserId.get(userId, k -> Bucket.builder().addLimit(CLIPS_BANDWIDTH).build());
+        return clipsByUserId.get(userId, k -> BucketUtils.createBucket(CLIPS_BANDWIDTH));
     }
 
     protected Bucket getTermsBucket(String channelId) {
-        return termsByChannelId.get(channelId, k -> Bucket.builder().addLimit(TERMS_BANDWIDTH).build());
+        return termsByChannelId.get(channelId, k -> BucketUtils.createBucket(TERMS_BANDWIDTH));
     }
 
     private OAuth2Credential getOrCreateAuthToken() {

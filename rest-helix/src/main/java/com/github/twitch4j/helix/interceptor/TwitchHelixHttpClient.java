@@ -1,25 +1,22 @@
 package com.github.twitch4j.helix.interceptor;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.common.util.BucketUtils;
 import feign.Client;
 import feign.Request;
 import feign.Response;
 import feign.okhttp.OkHttpClient;
 import io.github.bucket4j.Bucket;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
 
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
@@ -47,6 +44,7 @@ public class TwitchHelixHttpClient implements Client {
         if (token != null && token.startsWith(BEARER_PREFIX)) {
             OAuth2Credential credential = interceptor.getAccessTokenCache().getIfPresent(token.substring(BEARER_PREFIX.length()));
             if (credential != null) {
+                // First consume from helix global rate limit (800/min by default)
                 Bucket bucket = interceptor.getOrInitializeBucket(interceptor.getKey(credential));
                 return executeAgainstBucket(bucket, () -> delegatedExecute(request, options));
             }
@@ -99,43 +97,17 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 
-        // no endpoint-specific rate limiting was needed; perform network request now
+        // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
     }
 
     private <T> T executeAgainstBucket(Bucket bucket, Callable<T> call) throws IOException {
         try {
-            return scheduleAgainstBucket(bucket, call, executor).get(timeout, TimeUnit.MILLISECONDS);
+            return BucketUtils.scheduleAgainstBucket(bucket, executor, call).get(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
             log.error("Throttled Helix API call timed-out before completion", e);
             return null;
-        }
-    }
-
-    /**
-     * Performs the callable after a token has been consumed from the bucket using the executor.
-     *
-     * @param bucket   rate limit bucket
-     * @param call     task that requires a bucket point
-     * @param executor scheduled executor service for async calls
-     * @return the future result of the call
-     */
-    private static <T> CompletableFuture<T> scheduleAgainstBucket(Bucket bucket, Callable<T> call, ScheduledExecutorService executor) {
-        if (bucket.tryConsume(1L))
-            return CompletableFuture.supplyAsync(new SneakySupplier<>(call));
-
-        return bucket.asScheduler().consume(1L, executor).thenApplyAsync(v -> new SneakySupplier<>(call).get());
-    }
-
-    @RequiredArgsConstructor
-    private static class SneakySupplier<T> implements Supplier<T> {
-        private final Callable<T> callable;
-
-        @Override
-        @SneakyThrows
-        public T get() {
-            return callable.call();
         }
     }
 
