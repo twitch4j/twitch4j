@@ -27,13 +27,15 @@ public class TwitchHelixHttpClient implements Client {
 
     private final Client client;
     private final ScheduledExecutorService executor;
-    private final TwitchHelixClientIdInterceptor interceptor;
+    private final TwitchHelixTokenManager tokenManager;
+    private final TwitchHelixRateLimitTracker rateLimitTracker;
     private final long timeout;
 
-    public TwitchHelixHttpClient(OkHttpClient client, ScheduledThreadPoolExecutor executor, TwitchHelixClientIdInterceptor interceptor, Integer timeout) {
+    public TwitchHelixHttpClient(OkHttpClient client, ScheduledThreadPoolExecutor executor, TwitchHelixTokenManager tokenManager, TwitchHelixRateLimitTracker rateLimitTracker, Integer timeout) {
         this.client = client;
         this.executor = executor;
-        this.interceptor = interceptor;
+        this.tokenManager = tokenManager;
+        this.rateLimitTracker = rateLimitTracker;
         this.timeout = timeout == null ? 60 * 1000 : timeout.longValue();
     }
 
@@ -42,10 +44,10 @@ public class TwitchHelixHttpClient implements Client {
         // Check whether this request should be delayed to conform to rate limits
         String token = singleFirst(request.headers().get(AUTH_HEADER));
         if (token != null && token.startsWith(BEARER_PREFIX)) {
-            OAuth2Credential credential = interceptor.getAccessTokenCache().getIfPresent(token.substring(BEARER_PREFIX.length()));
+            OAuth2Credential credential = tokenManager.getIfPresent(token.substring(BEARER_PREFIX.length()));
             if (credential != null) {
                 // First consume from helix global rate limit (800/min by default)
-                Bucket bucket = interceptor.getRateLimitTracker().getOrInitializeBucket(interceptor.getRateLimitTracker().getKey(credential));
+                Bucket bucket = rateLimitTracker.getOrInitializeBucket(rateLimitTracker.getPrimaryBucketKey(credential));
                 return executeAgainstBucket(bucket, () -> delegatedExecute(request, options));
             }
         }
@@ -71,7 +73,7 @@ public class TwitchHelixHttpClient implements Client {
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket modBucket = interceptor.getRateLimitTracker().getModerationBucket(channelId);
+            Bucket modBucket = rateLimitTracker.getModerationBucket(channelId);
             return executeAgainstBucket(modBucket, () -> client.execute(request, options));
         }
 
@@ -81,7 +83,7 @@ public class TwitchHelixHttpClient implements Client {
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket termsBucket = interceptor.getRateLimitTracker().getTermsBucket(channelId);
+            Bucket termsBucket = rateLimitTracker.getTermsBucket(channelId);
             return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
         }
 
@@ -89,11 +91,11 @@ public class TwitchHelixHttpClient implements Client {
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id
             String token = request.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
-            OAuth2Credential cred = interceptor.getAccessTokenCache().getIfPresent(token);
+            OAuth2Credential cred = tokenManager.getIfPresent(token);
             String userId = cred != null ? cred.getUserId() : "";
 
             // Conform to endpoint-specific bucket
-            Bucket clipBucket = interceptor.getRateLimitTracker().getClipBucket(userId != null ? userId : "");
+            Bucket clipBucket = rateLimitTracker.getClipBucket(userId != null ? userId : "");
             return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 

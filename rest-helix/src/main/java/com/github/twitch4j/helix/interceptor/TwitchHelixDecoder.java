@@ -16,11 +16,11 @@ public class TwitchHelixDecoder extends JacksonDecoder {
 
     public static final String REMAINING_HEADER = "Ratelimit-Remaining";
 
-    private final TwitchHelixClientIdInterceptor interceptor;
+    private final TwitchHelixRateLimitTracker rateLimitTracker;
 
-    public TwitchHelixDecoder(ObjectMapper mapper, TwitchHelixClientIdInterceptor interceptor) {
+    public TwitchHelixDecoder(ObjectMapper mapper, TwitchHelixRateLimitTracker rateLimitTracker) {
         super(mapper);
-        this.interceptor = interceptor;
+        this.rateLimitTracker = rateLimitTracker;
     }
 
     @Override
@@ -42,10 +42,10 @@ public class TwitchHelixDecoder extends JacksonDecoder {
                 String bearer = token.substring(BEARER_PREFIX.length());
                 if (response.request().httpMethod() == Request.HttpMethod.POST && response.request().requestTemplate().path().endsWith("/clips")) {
                     // Create Clip has a separate rate limit to synchronize
-                    interceptor.getRateLimitTracker().updateRemainingCreateClip(bearer, remaining);
+                    rateLimitTracker.updateRemainingCreateClip(bearer, remaining);
                 } else {
                     // Normal/global helix rate limit synchronization
-                    interceptor.getRateLimitTracker().updateRemaining(bearer, remaining);
+                    rateLimitTracker.updateRemaining(bearer, remaining);
                 }
             }
         }

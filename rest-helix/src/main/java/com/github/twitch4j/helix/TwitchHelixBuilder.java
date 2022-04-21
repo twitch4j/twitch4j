@@ -8,9 +8,11 @@ import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.helix.interceptor.CustomRewardEncodeMixIn;
+import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
+import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -167,15 +169,16 @@ public class TwitchHelixBuilder {
             apiRateLimit = DEFAULT_BANDWIDTH;
 
         // Feign
-        TwitchHelixClientIdInterceptor interceptor = new TwitchHelixClientIdInterceptor(this);
+        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(clientId, clientSecret, defaultAuthToken);
+        TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
         return HystrixFeign.builder()
-            .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, interceptor, timeout))
+            .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
             .encoder(new JacksonEncoder(serializer))
-            .decoder(new TwitchHelixDecoder(mapper, interceptor))
+            .decoder(new TwitchHelixDecoder(mapper, rateLimitTracker))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
-            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), interceptor))
-            .requestInterceptor(interceptor)
+            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), rateLimitTracker))
+            .requestInterceptor(new TwitchHelixClientIdInterceptor(userAgent, tokenManager))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);

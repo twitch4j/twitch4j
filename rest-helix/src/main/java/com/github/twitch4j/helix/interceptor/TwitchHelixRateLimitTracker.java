@@ -8,13 +8,16 @@ import com.github.twitch4j.common.util.BucketUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class TwitchHelixRateLimitTracker {
+@SuppressWarnings("ConstantConditions")
+public final class TwitchHelixRateLimitTracker {
 
     /**
      * Empirically determined rate limit on helix bans and unbans, per channel
@@ -63,43 +66,53 @@ public class TwitchHelixRateLimitTracker {
         .build();
 
     /**
-     * Twitch Helix Interceptor
+     * The primary (global helix) rate limit bandwidth to use
      */
-    private final TwitchHelixClientIdInterceptor interceptor; // provided by RequiredArgsConstructor
+    private final Bandwidth apiRateLimit;
+
+    /**
+     * Twitch Helix Token Manager
+     */
+    private final TwitchHelixTokenManager tokenManager;
 
     /*
      * Primary (global helix) rate limit bucket finder
      */
 
-    protected Bucket getOrInitializeBucket(String key) {
-        return primaryBuckets.get(key, k -> BucketUtils.createBucket(interceptor.getApiRateLimit()));
+    @NotNull
+    Bucket getOrInitializeBucket(@NotNull String key) {
+        return primaryBuckets.get(key, k -> BucketUtils.createBucket(this.apiRateLimit));
     }
 
-    protected String getKey(OAuth2Credential credential) {
+    @NotNull
+    String getPrimaryBucketKey(@NotNull OAuth2Credential credential) {
         // App access tokens share the same bucket for a given client id
         // User access tokens share the same bucket for a given client id & user id pair
         // For this method to work, credential must have been augmented with information from getAdditionalCredentialInformation (which is done by the interceptor)
         // Thus, this logic yields the key that is associated with each primary helix bucket
-        String clientId = (String) credential.getContext().get("client_id");
-        return clientId == null ? null : credential.getUserId() == null ? clientId : clientId + "-" + credential.getUserId();
+        String clientId = TwitchHelixTokenManager.extractClientId(credential);
+        return clientId == null ? "" : StringUtils.isEmpty(credential.getUserId()) ? clientId : clientId + "-" + credential.getUserId();
     }
 
     /*
      * Secondary (endpoint-specific) rate limit buckets
      */
 
+    @NotNull
     @Unofficial
-    protected Bucket getModerationBucket(String channelId) {
+    Bucket getModerationBucket(@NotNull String channelId) {
         return bansByChannelId.get(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
     }
 
+    @NotNull
     @Unofficial
-    protected Bucket getClipBucket(String userId) {
+    Bucket getClipBucket(@NotNull String userId) {
         return clipsByUserId.get(userId, k -> BucketUtils.createBucket(CLIPS_BANDWIDTH));
     }
 
+    @NotNull
     @Unofficial
-    protected Bucket getTermsBucket(String channelId) {
+    Bucket getTermsBucket(@NotNull String channelId) {
         return termsByChannelId.get(channelId, k -> BucketUtils.createBucket(TERMS_BANDWIDTH));
     }
 
@@ -107,22 +120,23 @@ public class TwitchHelixRateLimitTracker {
      * Methods to conservatively update remaining points in rate limit buckets, based on incoming twitch statistics
      */
 
-    public void updateRemaining(String token, int remaining) {
-        this.updateRemainingGeneric(token, remaining, this::getKey, this::getOrInitializeBucket);
+    public void updateRemaining(@NotNull String token, int remaining) {
+        this.updateRemainingGeneric(token, remaining, this::getPrimaryBucketKey, this::getOrInitializeBucket);
     }
 
-    public void updateRemainingCreateClip(String token, int remaining) {
+    public void updateRemainingCreateClip(@NotNull String token, int remaining) {
         this.updateRemainingGeneric(token, remaining, OAuth2Credential::getUserId, this::getClipBucket);
     }
 
-    public void markDepletedBanBucket(String channelId) {
+    @Unofficial
+    public void markDepletedBanBucket(@NotNull String channelId) {
         // Called upon a 429 for banUser or unbanUser
         Bucket modBucket = this.getModerationBucket(channelId);
         modBucket.consumeIgnoringRateLimits(Math.max(modBucket.tryConsumeAsMuchAsPossible(), 1)); // intentionally go negative to induce a pause
     }
 
     private void updateRemainingGeneric(String token, int remaining, Function<OAuth2Credential, String> credToKey, Function<String, Bucket> keyToBucket) {
-        OAuth2Credential credential = interceptor.getAccessTokenCache().getIfPresent(token);
+        OAuth2Credential credential = tokenManager.getIfPresent(token);
         if (credential == null) return;
 
         String key = credToKey.apply(credential);

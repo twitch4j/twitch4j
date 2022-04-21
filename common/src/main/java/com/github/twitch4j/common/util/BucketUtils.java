@@ -3,6 +3,7 @@ package com.github.twitch4j.common.util;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.local.LocalBucketBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +17,8 @@ public class BucketUtils {
      * @param limit the bandwidth
      * @return the bucket
      */
-    public static Bucket createBucket(Bandwidth limit) {
+    @NotNull
+    public static Bucket createBucket(@NotNull Bandwidth limit) {
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -26,7 +28,8 @@ public class BucketUtils {
      * @param limits the bandwidths
      * @return the bucket
      */
-    public static Bucket createBucket(Bandwidth... limits) {
+    @NotNull
+    public static Bucket createBucket(@NotNull Bandwidth... limits) {
         LocalBucketBuilder builder = Bucket.builder();
         for (Bandwidth limit : limits) {
             builder.addLimit(limit);
@@ -40,7 +43,8 @@ public class BucketUtils {
      * @param limits the bandwidths
      * @return the bucket
      */
-    public static Bucket createBucket(Iterable<Bandwidth> limits) {
+    @NotNull
+    public static Bucket createBucket(@NotNull Iterable<Bandwidth> limits) {
         LocalBucketBuilder builder = Bucket.builder();
         for (Bandwidth limit : limits) {
             builder.addLimit(limit);
@@ -58,7 +62,8 @@ public class BucketUtils {
      * @param call     task that requires a bucket point
      * @return the future result of the call
      */
-    public static <T> CompletableFuture<T> scheduleAgainstBucket(Bucket bucket, ScheduledExecutorService executor, Callable<T> call) {
+    @NotNull
+    public static <T> CompletableFuture<T> scheduleAgainstBucket(@NotNull Bucket bucket, @NotNull ScheduledExecutorService executor, @NotNull Callable<T> call) {
         if (bucket.tryConsume(1L))
             return CompletableFuture.supplyAsync(new SneakySupplier<>(call));
 
@@ -75,7 +80,8 @@ public class BucketUtils {
      * @param action   runnable that requires a bucket point
      * @return a future to track completion progress
      */
-    public static CompletableFuture<Void> scheduleAgainstBucket(Bucket bucket, ScheduledExecutorService executor, Runnable action) {
+    @NotNull
+    public static CompletableFuture<Void> scheduleAgainstBucket(@NotNull Bucket bucket, @NotNull ScheduledExecutorService executor, @NotNull Runnable action) {
         if (bucket.tryConsume(1L))
             return CompletableFuture.runAsync(action);
 

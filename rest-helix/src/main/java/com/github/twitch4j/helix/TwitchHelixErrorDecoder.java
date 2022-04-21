@@ -5,7 +5,7 @@ import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.TwitchHelixError;
-import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
+import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Response;
@@ -25,8 +25,8 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     // Decoder
     final Decoder decoder;
 
-    // Interceptor
-    final TwitchHelixClientIdInterceptor interceptor;
+    // Rate Limit Tracker
+    final TwitchHelixRateLimitTracker rateLimitTracker;
 
     // Error Decoder
     final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
@@ -37,12 +37,12 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     /**
      * Constructor
      *
-     * @param decoder     Feign Decoder
-     * @param interceptor Helix Interceptor
+     * @param decoder          Feign Decoder
+     * @param rateLimitTracker Helix Rate Limit Tracker
      */
-    public TwitchHelixErrorDecoder(Decoder decoder, TwitchHelixClientIdInterceptor interceptor) {
+    public TwitchHelixErrorDecoder(Decoder decoder, TwitchHelixRateLimitTracker rateLimitTracker) {
         this.decoder = decoder;
-        this.interceptor = interceptor;
+        this.rateLimitTracker = rateLimitTracker;
     }
 
     /**
@@ -54,7 +54,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
      */
     @Override
     public Exception decode(String methodKey, Response response) {
-        Exception ex = null;
+        Exception ex;
 
         try {
             String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
@@ -79,7 +79,7 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 RequestTemplate template = response.request().requestTemplate();
                 if (template.path().endsWith("/moderation/bans")) {
                     String channelId = template.queries().get("broadcaster_id").iterator().next();
-                    interceptor.getRateLimitTracker().markDepletedBanBucket(channelId);
+                    rateLimitTracker.markDepletedBanBucket(channelId);
                 }
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
