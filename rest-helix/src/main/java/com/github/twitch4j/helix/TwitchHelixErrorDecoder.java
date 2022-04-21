@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -56,8 +57,8 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     public Exception decode(String methodKey, Response response) {
         Exception ex;
 
-        try {
-            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+        try (InputStream is = response.body() == null ? null : response.body().asInputStream()) {
+            String responseBody = is == null ? "" : IOUtils.toString(is, StandardCharsets.UTF_8);
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
