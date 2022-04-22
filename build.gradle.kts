@@ -64,7 +64,7 @@ subprojects {
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	lombok {
-		version.set("1.18.22")
+		version.set("1.18.24")
 		disableConfig.set(true)
 	}
 
