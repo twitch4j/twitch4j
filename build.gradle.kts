@@ -3,7 +3,7 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "6.4.2"
+	id("io.freefair.lombok") version "6.4.3"
 	id("com.coditory.manifest") version "0.1.14"
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -64,7 +64,7 @@ subprojects {
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	lombok {
-		version.set("1.18.22")
+		version.set("1.18.24")
 		disableConfig.set(true)
 	}
 
