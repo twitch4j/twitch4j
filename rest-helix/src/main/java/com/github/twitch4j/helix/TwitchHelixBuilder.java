@@ -23,6 +23,7 @@ import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Refill;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -55,7 +56,7 @@ public class TwitchHelixBuilder {
     /**
      * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
      */
-    public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
+    public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.classic(800, Refill.greedy(600, Duration.ofMinutes(1)));
 
     /**
      * Client Id
