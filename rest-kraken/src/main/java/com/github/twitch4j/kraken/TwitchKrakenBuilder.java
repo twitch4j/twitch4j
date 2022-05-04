@@ -25,8 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @deprecated Due endpoints is deprecated decommission have been planned on <b>Febuary 28, 2022</b>.
- *             More details about decommission finds <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>
+ * @deprecated Kraken is deprecated and has been shut down on <b>Febuary 28, 2022</b>.
+ *             More details about deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -102,8 +102,8 @@ public class TwitchKrakenBuilder {
      */
     @Deprecated
     public TwitchKraken build() {
-        log.warn("Due endpoints is deprecated decommission have been planned on Febuary 28, 2022.");
-        log.warn("More details about decommission finds here: https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline");
+        log.warn("Kraken is deprecated and has been shut down on Febuary 28, 2022.");
+        log.warn("More details about the decommission are available here: https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline");
         log.debug("Kraken: Initializing Module ...");
 
         // Hystrix
