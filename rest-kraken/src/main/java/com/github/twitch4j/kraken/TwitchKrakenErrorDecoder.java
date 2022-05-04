@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * @deprecated Kraken is deprecated and has been shut down on <b>Febuary 28, 2022</b>.
- *             More details about deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
+ *             More details about the deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
  */
 @Slf4j
 @Deprecated
