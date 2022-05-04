@@ -70,7 +70,7 @@ public class WebsocketConnectionConfig {
      * Helper class to compute delays between connection retries
      */
     private IBackoffStrategy backoffStrategy = ExponentialBackoffStrategy.builder()
-        .immediateFirst(true)
+        .immediateFirst(false)
         .baseMillis(Duration.ofSeconds(1).toMillis())
         .jitter(true)
         .multiplier(2.0)
