@@ -27,13 +27,5 @@ publishing.publications.withType<MavenPublication> {
 	pom {
 		name.set("Twitch4J API - Kraken Module")
 		description.set("Kraken API dependency")
-	  // TODO: Uncomment after decommission + remove this comment + remove this module in the next release
-//		distributionManagement {
-//			relocation {
-//				groupId.set("$group")
-//				artifactId.set("twitch4j-helix")
-//				message.set("Due endpoints is deprecated decommission have been planned on Febuary 28, 2022. More details about decommission finds here: https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline")
-//			}
-//		}
 	}
 }
