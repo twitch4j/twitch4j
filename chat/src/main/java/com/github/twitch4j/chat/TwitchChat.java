@@ -21,6 +21,7 @@ import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.UserStateEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
@@ -674,7 +675,7 @@ public class TwitchChat implements ITwitchChat {
      * @param command raw irc command
      */
     public boolean sendRaw(String command) {
-        return ircMessageBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(() -> queueCommand(command), taskExecutor) != null;
+        return BucketUtils.scheduleAgainstBucket(ircMessageBucket, taskExecutor, () -> queueCommand(command)) != null;
     }
 
     /**
@@ -750,14 +751,11 @@ public class TwitchChat implements ITwitchChat {
     }
 
     protected void issueJoin(String channelName, int attempts) {
-        ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
-            () -> {
-                String name = channelName.toLowerCase();
-                queueCommand("JOIN #" + name);
-                joinAttemptsByChannelName.asMap().merge(name, attempts, Math::max); // mark that a join has been initiated to track later success or failure state
-            },
-            taskExecutor
-        );
+        BucketUtils.scheduleAgainstBucket(ircJoinBucket, taskExecutor, () -> {
+            String name = channelName.toLowerCase();
+            queueCommand("JOIN #" + name);
+            joinAttemptsByChannelName.asMap().merge(name, attempts, Math::max); // mark that a join has been initiated to track later success or failure state
+        });
     }
 
     /**
@@ -790,9 +788,10 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void issuePart(String channelName) {
-        ircJoinBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
-            () -> queueCommand("PART #" + channelName.toLowerCase()),
-            taskExecutor
+        BucketUtils.scheduleAgainstBucket(
+            ircJoinBucket,
+            taskExecutor,
+            () -> queueCommand("PART #" + channelName.toLowerCase())
         );
     }
 
@@ -833,9 +832,10 @@ public class TwitchChat implements ITwitchChat {
      */
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
-        ircWhisperBucket.asScheduler().consume(1, taskExecutor).thenRunAsync(
-            () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message)),
-            taskExecutor
+        BucketUtils.scheduleAgainstBucket(
+            ircWhisperBucket,
+            taskExecutor,
+            () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message))
         );
     }
 

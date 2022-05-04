@@ -5,7 +5,9 @@ import com.github.twitch4j.common.exception.NotFoundException;
 import com.github.twitch4j.common.exception.UnauthorizedException;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.TwitchHelixError;
+import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
 import feign.Request;
+import feign.RequestTemplate;
 import feign.Response;
 import feign.RetryableException;
 import feign.codec.Decoder;
@@ -15,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -22,6 +25,9 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
 
     // Decoder
     final Decoder decoder;
+
+    // Rate Limit Tracker
+    final TwitchHelixRateLimitTracker rateLimitTracker;
 
     // Error Decoder
     final ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
@@ -32,25 +38,27 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
     /**
      * Constructor
      *
-     * @param decoder Feign Decoder
+     * @param decoder          Feign Decoder
+     * @param rateLimitTracker Helix Rate Limit Tracker
      */
-    public TwitchHelixErrorDecoder(Decoder decoder) {
+    public TwitchHelixErrorDecoder(Decoder decoder, TwitchHelixRateLimitTracker rateLimitTracker) {
         this.decoder = decoder;
+        this.rateLimitTracker = rateLimitTracker;
     }
 
     /**
      * Overwrite the Decode Method to handle custom error cases
      *
      * @param methodKey Method Key
-     * @param response Response
+     * @param response  Response
      * @return Exception
      */
     @Override
     public Exception decode(String methodKey, Response response) {
-        Exception ex = null;
+        Exception ex;
 
-        try {
-            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+        try (InputStream is = response.body() == null ? null : response.body().asInputStream()) {
+            String responseBody = is == null ? "" : IOUtils.toString(is, StandardCharsets.UTF_8);
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
@@ -63,10 +71,17 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 429) {
-                ex = new ContextedRuntimeException("To many requests!")
+                ex = new ContextedRuntimeException("Too many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);;
+                    .addContextValue("responseBody", responseBody);
+
+                // Deplete ban bucket on 429 (to be safe)
+                RequestTemplate template = response.request().requestTemplate();
+                if (template.path().endsWith("/moderation/bans")) {
+                    String channelId = template.queries().get("broadcaster_id").iterator().next();
+                    rateLimitTracker.markDepletedBanBucket(channelId);
+                }
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
@@ -80,7 +95,8 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                     .addContextValue("responseBody", responseBody)
                     .addContextValue("errorType", error.getError())
                     .addContextValue("errorStatus", error.getStatus())
-                    .addContextValue("errorType", error.getMessage());
+                    .addContextValue("errorType", error.getMessage())
+                    .addContextValue("errorMessage", error.getMessage());
             }
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);
