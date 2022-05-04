@@ -9,6 +9,7 @@ import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import lombok.Builder;
 import lombok.NonNull;
@@ -94,6 +95,12 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Builder.Default
     protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
+     * WebSocket Connection Backoff Strategy
+     */
+    @Builder.Default
+    private IBackoffStrategy connectionBackoffStrategy = null;
 
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
@@ -257,6 +264,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withJoinRateLimit(joinRateLimit)
                 .withAuthRateLimit(authRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
+                .withConnectionBackoffStrategy(connectionBackoffStrategy)
         ).build();
 
         // Reclaim channel headroom upon generic join failures

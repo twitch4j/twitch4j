@@ -25,6 +25,7 @@ import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bucket;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -239,8 +240,9 @@ public class TwitchChat implements ITwitchChat {
      * @param maxJoinRetries                 Maximum join retries per channel
      * @param chatJoinTimeout                Minimum milliseconds to wait after a join attempt
      * @param wsPingPeriod                   WebSocket Ping Period
+     * @param connectionBackoffStrategy      WebSocket Connection Backoff Strategy
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -270,6 +272,8 @@ public class TwitchChat implements ITwitchChat {
                 spec.onDisconnecting(this::onDisconnecting);
                 spec.taskExecutor(taskExecutor);
                 spec.proxyConfig(proxyConfig);
+                if (connectionBackoffStrategy != null)
+                    spec.backoffStrategy(connectionBackoffStrategy);
             });
         } else {
             this.connection = websocketConnection;

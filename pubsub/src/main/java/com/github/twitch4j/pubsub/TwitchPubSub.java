@@ -122,6 +122,7 @@ import com.github.twitch4j.pubsub.events.UserPredictionResultEvent;
 import com.github.twitch4j.pubsub.events.UserPresenceEvent;
 import com.github.twitch4j.pubsub.events.UserUnbanRequestUpdateEvent;
 import com.github.twitch4j.pubsub.events.VideoPlaybackEvent;
+import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -232,25 +233,20 @@ public class TwitchPubSub implements ITwitchPubSub {
     private final Collection<String> botOwnerIds;
 
     /**
-     * WebSocket RFC Ping Period in ms (0 = disabled)
-     */
-    private final int wsPingPeriod;
-
-    /**
      * Constructor
      *
-     * @param websocketConnection WebsocketConnection
-     * @param eventManager EventManager
-     * @param taskExecutor ScheduledThreadPoolExecutor
-     * @param proxyConfig  ProxyConfig
-     * @param botOwnerIds  Bot Owner IDs
-     * @param wsPingPeriod WebSocket Ping Period
+     * @param websocketConnection       WebsocketConnection
+     * @param eventManager              EventManager
+     * @param taskExecutor              ScheduledThreadPoolExecutor
+     * @param proxyConfig               ProxyConfig
+     * @param botOwnerIds               Bot Owner IDs
+     * @param wsPingPeriod              WebSocket Ping Period
+     * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      */
-    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod) {
+    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy) {
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
-        this.wsPingPeriod = wsPingPeriod;
 
         // init connection
         if (websocketConnection == null) {
@@ -261,6 +257,8 @@ public class TwitchPubSub implements ITwitchPubSub {
                 spec.onTextMessage(this::onTextMessage);
                 spec.taskExecutor(taskExecutor);
                 spec.proxyConfig(proxyConfig);
+                if (connectionBackoffStrategy != null)
+                    spec.backoffStrategy(connectionBackoffStrategy);
             });
         } else {
             this.connection = websocketConnection;

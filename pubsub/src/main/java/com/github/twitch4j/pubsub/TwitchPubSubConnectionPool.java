@@ -4,6 +4,8 @@ import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
+import com.github.twitch4j.util.IBackoffStrategy;
+import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +24,12 @@ import java.util.stream.StreamSupport;
 public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> implements ITwitchPubSub {
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
+
+    /**
+     * WebSocket Connection Backoff Strategy
+     */
+    @Builder.Default
+    private IBackoffStrategy connectionBackoffStrategy = null;
 
     @Override
     public PubSubSubscription listenOnTopic(PubSubRequest request) {
@@ -49,6 +57,7 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
                 .withEventManager(getConnectionEventManager())
                 .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
+                .withConnectionBackoffStrategy(connectionBackoffStrategy)
         ).build();
 
         // Reclaim topic headroom upon a failed subscription
