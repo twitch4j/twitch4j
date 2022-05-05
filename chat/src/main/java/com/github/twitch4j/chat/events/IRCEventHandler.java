@@ -62,6 +62,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-announcement-trigger", IRCMessageEvent.class, this::onAnnouncement);
         eventManager.onEvent("twitch4j-chat-bits-badge-trigger", IRCMessageEvent.class, this::onBitsBadgeTier);
         eventManager.onEvent("twitch4j-chat-cheer-trigger", IRCMessageEvent.class, this::onChannelCheer);
+        eventManager.onEvent("twitch4j-chat-direct-cheer-trigger", IRCMessageEvent.class, this::onDirectCheer);
         eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
         eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
         eventManager.onEvent("twitch4j-chat-clearmsg-trigger", IRCMessageEvent.class, this::onClearMsg);
@@ -174,6 +175,18 @@ public class IRCEventHandler {
                 // Dispatch Event
                 eventManager.publish(new CheerEvent(event, channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
+        }
+    }
+
+    /**
+     * ChatChannel Direct Cheer (Currency) Event
+     *
+     * @param event IRCMessageEvent
+     */
+    @Unofficial
+    public void onDirectCheer(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "midnightsquid".equals(event.getTags().get("msg-id"))) {
+            eventManager.publish(new DirectCheerEvent(event));
         }
     }
 
