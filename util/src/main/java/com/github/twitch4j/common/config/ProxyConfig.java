@@ -1,6 +1,5 @@
 package com.github.twitch4j.common.config;
 
-import com.neovisionaries.ws.client.ProxySettings;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -60,18 +59,6 @@ public class ProxyConfig {
      */
     public void apply(OkHttpClient.Builder builder) {
         builder.proxy(getProxy()).proxyAuthenticator(getAuthenticator());
-    }
-
-    /**
-     * Applies this proxy configuration to a websocket factory's settings
-     *
-     * @param settings WebSocket's proxy settings
-     */
-    public void applyWs(ProxySettings settings) {
-        settings.setHost(this.hostname)
-            .setPort(this.port)
-            .setId(this.username)
-            .setPassword(password == null ? null : String.valueOf(this.password));
     }
 
     /**

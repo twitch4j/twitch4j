@@ -504,4 +504,8 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "pv-watch-party-events." + channelId);
     }
 
+    /**
+     * @return the most recently measured round-trip latency for the socket(s) in milliseconds, or -1 if unknown
+     */
+    long getLatency();
 }

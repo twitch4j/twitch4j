@@ -1,8 +1,5 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	// WebSocket
-	api(group = "com.neovisionaries", name = "nv-websocket-client")
-
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
@@ -13,6 +10,12 @@ dependencies {
 	api(project(":twitch4j-eventsub-common"))
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
+	api(project(":twitch4j-client-websocket"))
+
+	// Testing
+	testImplementation(group = "org.mockito", name = "mockito-core")
+	testImplementation(group = "org.mockito", name = "mockito-junit-jupiter")
+	testImplementation(group = "org.awaitility", name = "awaitility")
 }
 
 base {
