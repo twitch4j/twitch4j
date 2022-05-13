@@ -124,6 +124,7 @@ public class TwitchClient implements ITwitchClient {
      *
      * @return TwitchExtensions
      */
+    @Deprecated
     public TwitchExtensions getExtensions() {
         if (this.extensions == null) {
             throw new RuntimeException("You have not enabled the Extensions Module! Please check out the documentation on Twitch4J -> Extensions.");

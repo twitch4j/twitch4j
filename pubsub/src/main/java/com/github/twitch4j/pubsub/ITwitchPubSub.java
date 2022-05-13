@@ -458,7 +458,14 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "following." + channelId);
     }
 
+    /**
+     * @param credential user access token
+     * @param userId     user id associated with the token
+     * @return PubSubSubscription
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForFriendshipEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "friendship." + userId);
     }
@@ -478,7 +485,14 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "polls." + channelId);
     }
 
+    /**
+     * @param credential user access token
+     * @param userId     user id associated with the token
+     * @return PubSubSubscription
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
     }
