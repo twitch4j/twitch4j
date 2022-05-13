@@ -162,7 +162,7 @@ public class TwitchChatBuilder {
     /**
      * Custom RateLimit for Messages per Channel
      * <p>
-     * For example, this can restrict messages per channel at 100/30 for a verified bot that has a global 7500/30 message limit.
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
      */
     @With
     protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");

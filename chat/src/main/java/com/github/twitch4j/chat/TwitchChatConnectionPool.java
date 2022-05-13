@@ -97,6 +97,14 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
 
     /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @Builder.Default
+    protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+
+    /**
      * WebSocket Connection Backoff Strategy
      */
     @Builder.Default
@@ -263,6 +271,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withWhisperRateLimit(whisperRateLimit)
                 .withJoinRateLimit(joinRateLimit)
                 .withAuthRateLimit(authRateLimit)
+                .withPerChannelRateLimit(perChannelRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
                 .withConnectionBackoffStrategy(connectionBackoffStrategy)
         ).build();

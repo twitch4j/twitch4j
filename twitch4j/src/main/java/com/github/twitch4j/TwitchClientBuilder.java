@@ -198,6 +198,14 @@ public class TwitchClientBuilder {
     protected Bandwidth chatAuthLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
 
     /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @With
+    protected Bandwidth chatChannelMessageLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+
+    /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
      */
     @With
@@ -423,6 +431,7 @@ public class TwitchClientBuilder {
                 .withWhisperRateLimit(chatWhisperLimit)
                 .withJoinRateLimit(chatJoinLimit)
                 .withAuthRateLimit(chatAuthLimit)
+                .withPerChannelRateLimit(chatChannelMessageLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
