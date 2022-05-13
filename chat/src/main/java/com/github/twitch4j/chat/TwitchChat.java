@@ -27,9 +27,11 @@ import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
+import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,6 +138,11 @@ public class TwitchChat implements ITwitchChat {
     protected final Bucket ircAuthBucket;
 
     /**
+     * IRC Per-Channel Message Limit
+     */
+    protected final Bandwidth perChannelRateLimit;
+
+    /**
      * IRC Command Queue
      */
     protected final BlockingQueue<String> ircCommandQueue;
@@ -217,6 +224,11 @@ public class TwitchChat implements ITwitchChat {
     protected final Cache<String, Integer> joinAttemptsByChannelName;
 
     /**
+     * Cache of per-channel message buckets
+     */
+    protected final Cache<String, Bucket> bucketByChannelName;
+
+    /**
      * Constructor
      *
      * @param websocketConnection            WebsocketConnection
@@ -242,8 +254,9 @@ public class TwitchChat implements ITwitchChat {
      * @param chatJoinTimeout                Minimum milliseconds to wait after a join attempt
      * @param wsPingPeriod                   WebSocket Ping Period
      * @param connectionBackoffStrategy      WebSocket Connection Backoff Strategy
+     * @param perChannelRateLimit            Per channel message limit
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -262,6 +275,12 @@ public class TwitchChat implements ITwitchChat {
         this.removeChannelOnJoinFailure = removeChannelOnJoinFailure;
         this.maxJoinRetries = maxJoinRetries;
         this.chatJoinTimeout = chatJoinTimeout;
+        this.perChannelRateLimit = perChannelRateLimit;
+
+        // init per channel message buckets by channel name
+        this.bucketByChannelName = Caffeine.newBuilder()
+            .expireAfterAccess(perChannelRateLimit.getRefillPeriodNanos(), TimeUnit.NANOSECONDS)
+            .build();
 
         // init connection
         if (websocketConnection == null) {
@@ -537,9 +556,12 @@ public class TwitchChat implements ITwitchChat {
 
     /**
      * Send raw irc command
+     * <p>
+     * Note: perChannelRateLimit does not apply when directly using this method
      *
      * @param command raw irc command
      */
+    @SuppressWarnings("ConstantConditions")
     public boolean sendRaw(String command) {
         return BucketUtils.scheduleAgainstBucket(ircMessageBucket, taskExecutor, () -> queueCommand(command)) != null;
     }
@@ -677,6 +699,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public boolean sendMessage(String channel, String message, Map<String, Object> tags) {
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {
@@ -687,7 +710,7 @@ public class TwitchChat implements ITwitchChat {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        return sendRaw(sb.toString());
+        return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(sb.toString())) != null;
     }
 
     /**
@@ -809,4 +832,9 @@ public class TwitchChat implements ITwitchChat {
                 return TMIConnectionState.DISCONNECTED;
         }
     }
+
+    private Bucket getChannelMessageBucket(@NotNull String channelName) {
+        return bucketByChannelName.get(channelName.toLowerCase(), k -> BucketUtils.createBucket(perChannelRateLimit));
+    }
+
 }
