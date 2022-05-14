@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static com.github.twitch4j.TwitchClientHelper.MAX_LIMIT;
 import static com.github.twitch4j.TwitchClientHelper.log;
 
-public interface IClientHelper {
+public interface IClientHelper extends AutoCloseable {
 
     TwitchHelix getTwitchHelix();
 

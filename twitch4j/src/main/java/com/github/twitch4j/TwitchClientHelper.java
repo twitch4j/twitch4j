@@ -52,7 +52,7 @@ import java.util.function.UnaryOperator;
 /**
  * A helper class that covers a few basic use cases of most library users
  */
-public class TwitchClientHelper implements IClientHelper, AutoCloseable {
+public class TwitchClientHelper implements IClientHelper {
 
     static final Logger log = LoggerFactory.getLogger(TwitchClientHelper.class);
 
@@ -582,8 +582,13 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
         if (followerFuture != null)
             followerFuture.cancel(false);
 
+        final Future<?> clipFuture = this.clipEventFuture.getAndSet(null);
+        if (clipFuture != null)
+            clipFuture.cancel(false);
+
         listenForGoLive.clear();
         listenForFollow.clear();
+        listenForClips.clear();
         channelInformation.invalidateAll();
     }
 
