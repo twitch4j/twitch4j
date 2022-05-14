@@ -216,6 +216,72 @@ public interface IClientHelper {
     }
 
     /**
+     * Clip Creation Listener
+     *
+     * @param channelName Channel Name
+     * @return the channel whose clip creations are now tracked, or null (if unable to resolve or already tracking)
+     */
+    @Nullable
+    default User enableClipEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            User user = users.getUsers().get(0);
+            if (enableClipEventListener(user.getId(), user.getLogin()))
+                return user;
+        } else {
+            log.error("Failed to add channel " + channelName + " to Clip Creation Listener, maybe it doesn't exist!");
+        }
+
+        return null;
+    }
+
+    /**
+     * Enable Clip Creation Listener for the given channel names
+     *
+     * @param channelNames the channel names to be added
+     * @return the channels that are freshly tracked for clip creations
+     */
+    default Collection<User> enableClipEventListener(Iterable<String> channelNames) {
+        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(UserList::getUsers)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(user -> enableClipEventListener(user.getId(), user.getLogin()))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Disable Clip Creation Listener
+     *
+     * @param channelName Channel Name
+     * @return whether a previously-tracked channel was removed
+     */
+    default boolean disableClipEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            return disableClipEventListenerForId(users.getUsers().get(0).getId());
+        } else {
+            log.error("Failed to remove channel " + channelName + " from clip creation listener!");
+            return false;
+        }
+    }
+
+    /**
+     * Disable Clip Creation Listener for the given channel names
+     *
+     * @param channelNames the channel names to be removed
+     */
+    default void disableClipEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            users.getUsers().forEach(user -> disableClipEventListenerForId(user.getId()));
+        });
+    }
+
+    /**
      * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
      *
      * @param threadRate the maximum <i>rate</i> of api calls per second
