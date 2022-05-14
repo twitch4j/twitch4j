@@ -17,20 +17,21 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.events.ChannelViewerCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
-import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.domain.Follow;
+import com.github.twitch4j.helix.domain.FollowList;
+import com.github.twitch4j.helix.domain.Stream;
+import com.github.twitch4j.helix.domain.StreamList;
 import com.netflix.hystrix.HystrixCommand;
+import lombok.Getter;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,20 +44,20 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
  */
-@Slf4j
-public class TwitchClientHelper implements AutoCloseable {
+public class TwitchClientHelper implements IClientHelper, AutoCloseable {
+
+    static final Logger log = LoggerFactory.getLogger(TwitchClientHelper.class);
 
     public static final int REQUIRED_THREAD_COUNT = 2;
 
     /**
      * The greatest number of streams or followers that can be requested in a single API call
      */
-    private static final int MAX_LIMIT = 100;
+    static final int MAX_LIMIT = 100;
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -71,12 +72,8 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Twitch Helix
      */
+    @Getter
     private final TwitchHelix twitchHelix;
-
-    /**
-     * Event Manager
-     */
-    private final EventManager eventManager;
 
     /**
      * Event Task - Stream Status
@@ -133,7 +130,6 @@ public class TwitchClientHelper implements AutoCloseable {
      */
     public TwitchClientHelper(TwitchHelix twitchHelix, EventManager eventManager, ScheduledThreadPoolExecutor executor) {
         this.twitchHelix = twitchHelix;
-        this.eventManager = eventManager;
         this.executor = executor;
 
         final ExponentialBackoffStrategy defaultBackoff = ExponentialBackoffStrategy.builder().immediateFirst(false).baseMillis(1000L).jitter(false).build();
@@ -170,11 +166,11 @@ public class TwitchClientHelper implements AutoCloseable {
                     if (stream != null && stream.getType().equalsIgnoreCase("live")) {
                         // is live
                         // - live status
-                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                        if (currentChannelCache.getIsLive() != null && !currentChannelCache.getIsLive()) {
                             dispatchGoLiveEvent = true;
                         }
                         currentChannelCache.setIsLive(true);
-                        boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
+                        boolean wasAlreadyLive = !dispatchGoLiveEvent && currentChannelCache.getIsLive();
 
                         // - change stream title event
                         if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
@@ -194,7 +190,7 @@ public class TwitchClientHelper implements AutoCloseable {
                         }
                     } else {
                         // was online previously?
-                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive()) {
                             dispatchGoOfflineEvent = true;
                         }
 
@@ -310,48 +306,7 @@ public class TwitchClientHelper implements AutoCloseable {
         };
     }
 
-    /**
-     * Enable StreamEvent Listener
-     *
-     * @param channelName Channel Name
-     */
-    @Nullable
-    public User enableStreamEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            User user = users.getUsers().get(0);
-            if (enableStreamEventListener(user.getId(), user.getLogin()))
-                return user;
-        } else {
-            log.error("Failed to add channel {} to stream event listener!", channelName);
-        }
-
-        return null;
-    }
-
-    /**
-     * Enable StreamEvent Listener for the given channel names
-     *
-     * @param channelNames the channel names to be added
-     */
-    public Collection<User> enableStreamEventListener(Iterable<String> channelNames) {
-        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
-            .map(UserList::getUsers)
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .filter(user -> enableStreamEventListener(user.getId(), user.getLogin()))
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * Enable StreamEvent Listener, without invoking a Helix API call
-     *
-     * @param channelId   Channel Id
-     * @param channelName Channel Name
-     * @return true if the channel was added, false otherwise
-     */
+    @Override
     public boolean enableStreamEventListener(String channelId, String channelName) {
         // add to set
         final boolean add = listenForGoLive.add(channelId);
@@ -365,39 +320,7 @@ public class TwitchClientHelper implements AutoCloseable {
         return add;
     }
 
-    /**
-     * Disable StreamEvent Listener
-     *
-     * @param channelName Channel Name
-     */
-    public void disableStreamEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
-        } else {
-            log.error("Failed to remove channel " + channelName + " from stream event listener!");
-        }
-    }
-
-    /**
-     * Disable StreamEvent Listener for the given channel names
-     *
-     * @param channelNames the channel names to be removed
-     */
-    public void disableStreamEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
-        });
-    }
-
-    /**
-     * Disable StreamEventListener, without invoking a Helix API call
-     *
-     * @param channelId Channel Id
-     * @return true if the channel was removed, false otherwise
-     */
+    @Override
     public boolean disableStreamEventListenerForId(String channelId) {
         // remove from set
         boolean remove = listenForGoLive.remove(channelId);
@@ -418,48 +341,7 @@ public class TwitchClientHelper implements AutoCloseable {
         return remove;
     }
 
-    /**
-     * Follow Listener
-     *
-     * @param channelName Channel Name
-     */
-    @Nullable
-    public User enableFollowEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            User user = users.getUsers().get(0);
-            if (enableFollowEventListener(user.getId(), user.getLogin()))
-                return user;
-        } else {
-            log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
-        }
-
-        return null;
-    }
-
-    /**
-     * Enable Follow Listener for the given channel names
-     *
-     * @param channelNames the channel names to be added
-     */
-    public Collection<User> enableFollowEventListener(Iterable<String> channelNames) {
-        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
-            .map(UserList::getUsers)
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .filter(user -> enableFollowEventListener(user.getId(), user.getLogin()))
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * Enable Follow Listener, without invoking a Helix API call
-     *
-     * @param channelId   Channel Id
-     * @param channelName Channel Name
-     * @return true if the channel was added, false otherwise
-     */
+    @Override
     public boolean enableFollowEventListener(String channelId, String channelName) {
         // add to list
         final boolean add = listenForFollow.add(channelId);
@@ -473,39 +355,7 @@ public class TwitchClientHelper implements AutoCloseable {
         return add;
     }
 
-    /**
-     * Disable Follow Listener
-     *
-     * @param channelName Channel Name
-     */
-    public void disableFollowEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
-        } else {
-            log.error("Failed to remove channel " + channelName + " from follow listener!");
-        }
-    }
-
-    /**
-     * Disable Follow Listener for the given channel names
-     *
-     * @param channelNames the channel names to be removed
-     */
-    public void disableFollowEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
-        });
-    }
-
-    /**
-     * Disable Follow Listener, without invoking a Helix API call
-     *
-     * @param channelId Channel Id
-     * @return true when a previously-tracked channel was removed, false otherwise
-     */
+    @Override
     public boolean disableFollowEventListenerForId(String channelId) {
         // remove from set
         boolean remove = listenForFollow.remove(channelId);
@@ -539,7 +389,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Performs the "heavy lifting" of starting or stopping a listener
      *
-     * @param stopCondition   yields whether or not the listener should be running
+     * @param stopCondition   yields whether the listener should be running
      * @param futureReference the current listener in an atomic wrapper
      * @param startCommand    the command to start the listener
      * @param backoff         the {@link ExponentialBackoffStrategy} for the listener
@@ -621,20 +471,7 @@ public class TwitchClientHelper implements AutoCloseable {
             }
     }
 
-    /**
-     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
-     *
-     * @param threadRate the maximum <i>rate</i> of api calls per second
-     */
-    public void setThreadRate(long threadRate) {
-        this.setThreadDelay(1000 / threadRate);
-    }
-
-    /**
-     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
-     *
-     * @param threadDelay the minimum milliseconds <i>delay</i> between each api call
-     */
+    @Override
     public void setThreadDelay(long threadDelay) {
         final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
             ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
@@ -646,16 +483,7 @@ public class TwitchClientHelper implements AutoCloseable {
         this.followBackoff.getAndUpdate(updateBackoff);
     }
 
-    /**
-     * Get cached information for a channel's stream status and follower count.
-     * <p>
-     * For this information to be valid, the respective event listeners need to be enabled for the channel.
-     * <p>
-     * For thread safety, the setters on this object should not be used; only getters.
-     *
-     * @param channelId The ID of the channel whose cache is to be retrieved.
-     * @return ChannelCache in an optional wrapper.
-     */
+    @Override
     public Optional<ChannelCache> getCachedInformation(String channelId) {
         return Optional.ofNullable(channelInformation.getIfPresent(channelId));
     }
@@ -663,6 +491,7 @@ public class TwitchClientHelper implements AutoCloseable {
     /**
      * Close
      */
+    @Override
     public void close() {
         final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
         if (streamStatusFuture != null)

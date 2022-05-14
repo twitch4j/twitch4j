@@ -1,0 +1,210 @@
+package com.github.twitch4j;
+
+import com.github.twitch4j.common.util.CollectionUtils;
+import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
+import com.github.twitch4j.domain.ChannelCache;
+import com.github.twitch4j.helix.TwitchHelix;
+import com.github.twitch4j.helix.domain.User;
+import com.github.twitch4j.helix.domain.UserList;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.github.twitch4j.TwitchClientHelper.MAX_LIMIT;
+import static com.github.twitch4j.TwitchClientHelper.log;
+
+public interface IClientHelper {
+
+    TwitchHelix getTwitchHelix();
+
+    /**
+     * Enable StreamEvent Listener, without invoking a Helix API call
+     *
+     * @param channelId   Channel Id
+     * @param channelName Channel Name
+     * @return true if the channel was added, false otherwise
+     */
+    boolean enableStreamEventListener(String channelId, String channelName);
+
+    /**
+     * Disable StreamEventListener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @return true if the channel was removed, false otherwise
+     */
+    boolean disableStreamEventListenerForId(String channelId);
+
+    /**
+     * Enable Follow Listener, without invoking a Helix API call
+     *
+     * @param channelId   Channel Id
+     * @param channelName Channel Name
+     * @return true if the channel was added, false otherwise
+     */
+    boolean enableFollowEventListener(String channelId, String channelName);
+
+    /**
+     * Disable Follow Listener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @return true when a previously-tracked channel was removed, false otherwise
+     */
+    boolean disableFollowEventListenerForId(String channelId);
+
+    /**
+     * Get cached information for a channel's stream status and follower count.
+     * <p>
+     * For this information to be valid, the respective event listeners need to be enabled for the channel.
+     * <p>
+     * For thread safety, the setters on this object should not be used; only getters.
+     *
+     * @param channelId The ID of the channel whose cache is to be retrieved.
+     * @return ChannelCache in an optional wrapper.
+     */
+    Optional<ChannelCache> getCachedInformation(String channelId);
+
+    /**
+     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
+     *
+     * @param threadDelay the minimum milliseconds <i>delay</i> between each api call
+     */
+    void setThreadDelay(long threadDelay);
+
+    /**
+     * Enable StreamEvent Listener
+     *
+     * @param channelName Channel Name
+     */
+    @Nullable
+    default User enableStreamEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            User user = users.getUsers().get(0);
+            if (enableStreamEventListener(user.getId(), user.getLogin()))
+                return user;
+        } else {
+            log.error("Failed to add channel {} to stream event listener!", channelName);
+        }
+
+        return null;
+    }
+
+    /**
+     * Enable StreamEvent Listener for the given channel names
+     *
+     * @param channelNames the channel names to be added
+     */
+    default Collection<User> enableStreamEventListener(Iterable<String> channelNames) {
+        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(UserList::getUsers)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(user -> enableStreamEventListener(user.getId(), user.getLogin()))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Disable StreamEvent Listener
+     *
+     * @param channelName Channel Name
+     */
+    default void disableStreamEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
+        } else {
+            log.error("Failed to remove channel " + channelName + " from stream event listener!");
+        }
+    }
+
+    /**
+     * Disable StreamEvent Listener for the given channel names
+     *
+     * @param channelNames the channel names to be removed
+     */
+    default void disableStreamEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
+        });
+    }
+
+    /**
+     * Follow Listener
+     *
+     * @param channelName Channel Name
+     */
+    @Nullable
+    default User enableFollowEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            User user = users.getUsers().get(0);
+            if (enableFollowEventListener(user.getId(), user.getLogin()))
+                return user;
+        } else {
+            log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
+        }
+
+        return null;
+    }
+
+    /**
+     * Enable Follow Listener for the given channel names
+     *
+     * @param channelNames the channel names to be added
+     */
+    default Collection<User> enableFollowEventListener(Iterable<String> channelNames) {
+        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(UserList::getUsers)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .filter(user -> enableFollowEventListener(user.getId(), user.getLogin()))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Disable Follow Listener
+     *
+     * @param channelName Channel Name
+     */
+    default void disableFollowEventListener(String channelName) {
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+
+        if (users.getUsers().size() == 1) {
+            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
+        } else {
+            log.error("Failed to remove channel " + channelName + " from follow listener!");
+        }
+    }
+
+    /**
+     * Disable Follow Listener for the given channel names
+     *
+     * @param channelNames the channel names to be removed
+     */
+    default void disableFollowEventListener(Iterable<String> channelNames) {
+        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
+            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
+        });
+    }
+
+    /**
+     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
+     *
+     * @param threadRate the maximum <i>rate</i> of api calls per second
+     */
+    default void setThreadRate(long threadRate) {
+        this.setThreadDelay(1000 / threadRate);
+    }
+
+}
