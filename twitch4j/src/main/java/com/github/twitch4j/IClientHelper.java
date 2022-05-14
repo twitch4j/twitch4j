@@ -56,6 +56,23 @@ public interface IClientHelper {
     boolean disableFollowEventListenerForId(String channelId);
 
     /**
+     * Enable Clip Creation Listener, without invoking a Helix API call
+     *
+     * @param channelId   Channel Id
+     * @param channelName Channel Name
+     * @return whether the channel was added
+     */
+    boolean enableClipEventListener(String channelId, String channelName);
+
+    /**
+     * Disable Clip Creation Listener, without invoking a Helix API call
+     *
+     * @param channelId Channel Id
+     * @return whether a previously-tracked channel was removed
+     */
+    boolean disableClipEventListenerForId(String channelId);
+
+    /**
      * Get cached information for a channel's stream status and follower count.
      * <p>
      * For this information to be valid, the respective event listeners need to be enabled for the channel.

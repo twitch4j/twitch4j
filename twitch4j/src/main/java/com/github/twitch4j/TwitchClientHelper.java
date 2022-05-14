@@ -9,14 +9,18 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
+import com.github.twitch4j.common.util.PaginationUtil;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
 import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelClipCreatedEvent;
 import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.events.ChannelViewerCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
+import com.github.twitch4j.helix.domain.Clip;
+import com.github.twitch4j.helix.domain.ClipList;
 import com.github.twitch4j.helix.domain.Follow;
 import com.github.twitch4j.helix.domain.FollowList;
 import com.github.twitch4j.helix.domain.Stream;
@@ -70,6 +74,11 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
     private final Set<String> listenForFollow = ConcurrentHashMap.newKeySet();
 
     /**
+     * Holds the channels that are checked for new clip creations
+     */
+    private final Set<String> listenForClips = ConcurrentHashMap.newKeySet();
+
+    /**
      * Twitch Helix
      */
     @Getter
@@ -100,6 +109,18 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
     private final AtomicReference<Future<?>> followerEventFuture = new AtomicReference<>();
 
     /**
+     * Event Task - Clip Creations
+     * <p>
+     * Accepts a channel id as the input; Yields true if the next call should not be delayed
+     */
+    private final Function<String, Boolean> clipEventTask;
+
+    /**
+     * The {@link Future} associated with clipEventTask, in an atomic wrapper
+     */
+    private final AtomicReference<Future<?>> clipEventFuture = new AtomicReference<>();
+
+    /**
      * Channel Information Cache
      */
     private final Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
@@ -122,6 +143,11 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
     private final AtomicReference<ExponentialBackoffStrategy> followBackoff;
 
     /**
+     * Holds the {@link ExponentialBackoffStrategy} used for the clip creation listener
+     */
+    private final AtomicReference<ExponentialBackoffStrategy> clipBackoff;
+
+    /**
      * Constructor
      *
      * @param twitchHelix  TwitchHelix
@@ -133,10 +159,11 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
         this.executor = executor;
 
         final ExponentialBackoffStrategy defaultBackoff = ExponentialBackoffStrategy.builder().immediateFirst(false).baseMillis(1000L).jitter(false).build();
-        liveBackoff = new AtomicReference<>(defaultBackoff);
-        followBackoff = new AtomicReference<>(defaultBackoff.copy());
+        this.liveBackoff = new AtomicReference<>(defaultBackoff);
+        this.followBackoff = new AtomicReference<>(defaultBackoff.copy());
+        this.clipBackoff = new AtomicReference<>(defaultBackoff.copy());
 
-        // Threads
+        // Tasks
         this.streamStatusEventTask = channels -> {
             // check go live / stream events
             HystrixCommand<StreamList> hystrixGetAllStreams = twitchHelix.getStreams(null, null, null, channels.size(), null, null, channels, null);
@@ -304,6 +331,46 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
                 return false;
             }
         };
+        this.clipEventTask = channelId -> {
+            // check clip creations
+            boolean nextRequestCanBeImmediate = false;
+
+            final ChannelCache currentChannelCache = channelInformation.get(channelId, c -> new ChannelCache());
+            final AtomicReference<Instant> windowStart = currentChannelCache.getClipWindowStart();
+            final Instant startedAt = windowStart.get();
+            final Instant now = Instant.now();
+
+            if (startedAt == null) {
+                // initialize clip query window started_at
+                nextRequestCanBeImmediate = windowStart.compareAndSet(null, now);
+            } else {
+                // get all clips in range [startedAt, now]
+                final List<Clip> clips = getClips(channelId, startedAt, now);
+
+                // cache channel name if unknown and construct event channel to be passed to events
+                if (!clips.isEmpty() && clips.get(0) != null && currentChannelCache.getUserName() == null) {
+                    currentChannelCache.setUserName(clips.get(0).getBroadcasterName());
+                }
+                final EventChannel channel = new EventChannel(channelId, currentChannelCache.getUserName());
+
+                // loop through queried clips
+                Instant maxCreatedAt = startedAt;
+                for (Clip clip : clips) {
+                    if (clip != null && clip.getCreatedAtInstant() != null && clip.getCreatedAtInstant().compareTo(startedAt) > 0) {
+                        eventManager.publish(new ChannelClipCreatedEvent(channel, clip)); // found a new clip
+
+                        if (clip.getCreatedAtInstant().compareTo(maxCreatedAt) > 0)
+                            maxCreatedAt = clip.getCreatedAtInstant(); // keep track of most recently created clip
+                    }
+                }
+
+                // next clip window should start just after the most recent clip we've seen for this channel
+                final Instant nextStartedAt = maxCreatedAt;
+                windowStart.updateAndGet(old -> old == null || old.compareTo(nextStartedAt) < 0 ? nextStartedAt : old);
+            }
+
+            return nextRequestCanBeImmediate;
+        };
     }
 
     @Override
@@ -326,7 +393,7 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
         boolean remove = listenForGoLive.remove(channelId);
 
         // invalidate cache
-        if (!listenForFollow.contains(channelId)) {
+        if (!listenForFollow.contains(channelId) && !listenForClips.contains(channelId)) {
             channelInformation.invalidate(channelId);
         } else if (remove) {
             ChannelCache info = channelInformation.getIfPresent(channelId);
@@ -361,13 +428,46 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
         boolean remove = listenForFollow.remove(channelId);
 
         // invalidate cache
-        if (!listenForGoLive.contains(channelId)) {
+        if (!listenForGoLive.contains(channelId) && !listenForClips.contains(channelId)) {
             channelInformation.invalidate(channelId);
         } else if (remove) {
             ChannelCache info = channelInformation.getIfPresent(channelId);
             if (info != null) {
                 info.setLastFollowCheck(null);
-                info.getFollowers().set(null);
+                info.getFollowers().lazySet(null);
+            }
+        }
+
+        startOrStopEventGenerationThread();
+        return remove;
+    }
+
+    @Override
+    public boolean enableClipEventListener(String channelId, String channelName) {
+        // add to set
+        final boolean add = listenForClips.add(channelId);
+        if (!add) {
+            log.info("Channel {} already added for Clip Creation Events", channelName);
+        } else {
+            // initialize cache
+            channelInformation.get(channelId, s -> new ChannelCache(channelName));
+        }
+        startOrStopEventGenerationThread();
+        return add;
+    }
+
+    @Override
+    public boolean disableClipEventListenerForId(String channelId) {
+        // remove from set
+        boolean remove = listenForClips.remove(channelId);
+
+        // invalidate cache
+        if (!listenForGoLive.contains(channelId) && !listenForFollow.contains(channelId)) {
+            channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.getClipWindowStart().lazySet(null);
             }
         }
 
@@ -384,6 +484,9 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
 
         // follower event thread
         updateListener(listenForFollow::isEmpty, followerEventFuture, this::runRecursiveFollowerCheck, followBackoff);
+
+        // clip creation event thread
+        updateListener(listenForClips::isEmpty, clipEventFuture, this::runRecursiveClipCheck, clipBackoff);
     }
 
     /**
@@ -428,47 +531,24 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
      * Initiates the stream status listener execution
      */
     private void runRecursiveStreamStatusCheck() {
-        if (streamStatusEventFuture.get() != null)
-            synchronized (streamStatusEventFuture) {
-                if (cancel(streamStatusEventFuture))
-                    streamStatusEventFuture.set(
-                        executor.submit(
-                            new ListenerRunnable<>(
-                                executor,
-                                CollectionUtils.chunked(listenForGoLive, MAX_LIMIT),
-                                streamStatusEventFuture,
-                                liveBackoff,
-                                this::runRecursiveStreamStatusCheck,
-                                chunk -> {
-                                    streamStatusEventTask.accept(chunk);
-                                    return false; // treat as always consuming from the api rate-limit
-                                }
-                            )
-                        )
-                    );
-            }
+        runRecursiveCheck(streamStatusEventFuture, executor, CollectionUtils.chunked(listenForGoLive, MAX_LIMIT), liveBackoff, this::runRecursiveStreamStatusCheck, chunk -> {
+            streamStatusEventTask.accept(chunk);
+            return false; // treat as always consuming from the api rate-limit
+        });
     }
 
     /**
      * Initiates the follower listener execution
      */
     private void runRecursiveFollowerCheck() {
-        if (followerEventFuture.get() != null)
-            synchronized (followerEventFuture) {
-                if (cancel(followerEventFuture))
-                    followerEventFuture.set(
-                        executor.submit(
-                            new ListenerRunnable<>(
-                                executor,
-                                new ArrayList<>(listenForFollow),
-                                followerEventFuture,
-                                followBackoff,
-                                this::runRecursiveFollowerCheck,
-                                followerEventTask
-                            )
-                        )
-                    );
-            }
+        runRecursiveCheck(followerEventFuture, executor, new ArrayList<>(listenForFollow), followBackoff, this::runRecursiveFollowerCheck, followerEventTask);
+    }
+
+    /**
+     * Initiates the clip creation listener execution
+     */
+    private void runRecursiveClipCheck() {
+        runRecursiveCheck(clipEventFuture, executor, new ArrayList<>(listenForClips), clipBackoff, this::runRecursiveClipCheck, clipEventTask);
     }
 
     @Override
@@ -481,6 +561,7 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
 
         this.liveBackoff.getAndUpdate(updateBackoff);
         this.followBackoff.getAndUpdate(updateBackoff);
+        this.clipBackoff.getAndUpdate(updateBackoff);
     }
 
     @Override
@@ -554,6 +635,49 @@ public class TwitchClientHelper implements IClientHelper, AutoCloseable {
     private static boolean cancel(AtomicReference<Future<?>> futureRef) {
         Future<?> future = futureRef.get();
         return future != null && future.cancel(false);
+    }
+
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    private static <T> void runRecursiveCheck(AtomicReference<Future<?>> future, ScheduledExecutorService executor, List<T> units, AtomicReference<ExponentialBackoffStrategy> backoff, Runnable startCommand, Function<T, Boolean> task) {
+        if (future.get() != null)
+            synchronized (future) {
+                if (cancel(future))
+                    future.set(
+                        executor.submit(
+                            new ListenerRunnable<>(
+                                executor,
+                                units,
+                                future,
+                                backoff,
+                                startCommand,
+                                task
+                            )
+                        )
+                    );
+            }
+    }
+
+    private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
+        return PaginationUtil.getPaginated(
+            cursor -> {
+                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt);
+                try {
+                    ClipList result = commandGetClips.execute();
+                    clipBackoff.get().reset(); // successful api call
+                    return result;
+                } catch (Exception ex) {
+                    if (commandGetClips != null && commandGetClips.isFailedExecution()) {
+                        log.trace(ex.getMessage(), ex);
+                    }
+                    log.error("Failed to check for Clip Events: " + ex.getMessage());
+                    clipBackoff.get().get(); // increment failures
+                    return null;
+                }
+            },
+            ClipList::getData,
+            call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
+            20
+        );
     }
 
 }
