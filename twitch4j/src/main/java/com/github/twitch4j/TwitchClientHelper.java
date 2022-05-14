@@ -475,6 +475,44 @@ public class TwitchClientHelper implements IClientHelper {
         return remove;
     }
 
+    @Override
+    public void setThreadDelay(long threadDelay) {
+        final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
+            ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
+            next.setFailures(old.getFailures());
+            return next;
+        };
+
+        this.liveBackoff.getAndUpdate(updateBackoff);
+        this.followBackoff.getAndUpdate(updateBackoff);
+        this.clipBackoff.getAndUpdate(updateBackoff);
+    }
+
+    @Override
+    public Optional<ChannelCache> getCachedInformation(String channelId) {
+        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
+    }
+
+    @Override
+    public void close() {
+        final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
+        if (streamStatusFuture != null)
+            streamStatusFuture.cancel(false);
+
+        final Future<?> followerFuture = this.followerEventFuture.getAndSet(null);
+        if (followerFuture != null)
+            followerFuture.cancel(false);
+
+        final Future<?> clipFuture = this.clipEventFuture.getAndSet(null);
+        if (clipFuture != null)
+            clipFuture.cancel(false);
+
+        listenForGoLive.clear();
+        listenForFollow.clear();
+        listenForClips.clear();
+        channelInformation.invalidateAll();
+    }
+
     /**
      * Start or quit the thread, depending on usage
      */
@@ -551,45 +589,27 @@ public class TwitchClientHelper implements IClientHelper {
         runRecursiveCheck(clipEventFuture, executor, new ArrayList<>(listenForClips), clipBackoff, this::runRecursiveClipCheck, clipEventTask);
     }
 
-    @Override
-    public void setThreadDelay(long threadDelay) {
-        final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
-            ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
-            next.setFailures(old.getFailures());
-            return next;
-        };
-
-        this.liveBackoff.getAndUpdate(updateBackoff);
-        this.followBackoff.getAndUpdate(updateBackoff);
-        this.clipBackoff.getAndUpdate(updateBackoff);
-    }
-
-    @Override
-    public Optional<ChannelCache> getCachedInformation(String channelId) {
-        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
-    }
-
-    /**
-     * Close
-     */
-    @Override
-    public void close() {
-        final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
-        if (streamStatusFuture != null)
-            streamStatusFuture.cancel(false);
-
-        final Future<?> followerFuture = this.followerEventFuture.getAndSet(null);
-        if (followerFuture != null)
-            followerFuture.cancel(false);
-
-        final Future<?> clipFuture = this.clipEventFuture.getAndSet(null);
-        if (clipFuture != null)
-            clipFuture.cancel(false);
-
-        listenForGoLive.clear();
-        listenForFollow.clear();
-        listenForClips.clear();
-        channelInformation.invalidateAll();
+    private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
+        return PaginationUtil.getPaginated(
+            cursor -> {
+                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt);
+                try {
+                    ClipList result = commandGetClips.execute();
+                    clipBackoff.get().reset(); // successful api call
+                    return result;
+                } catch (Exception ex) {
+                    if (commandGetClips != null && commandGetClips.isFailedExecution()) {
+                        log.trace(ex.getMessage(), ex);
+                    }
+                    log.error("Failed to check for Clip Events: " + ex.getMessage());
+                    clipBackoff.get().get(); // increment failures
+                    return null;
+                }
+            },
+            ClipList::getData,
+            call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
+            20
+        );
     }
 
     @Value
@@ -660,29 +680,6 @@ public class TwitchClientHelper implements IClientHelper {
                         )
                     );
             }
-    }
-
-    private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
-        return PaginationUtil.getPaginated(
-            cursor -> {
-                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt);
-                try {
-                    ClipList result = commandGetClips.execute();
-                    clipBackoff.get().reset(); // successful api call
-                    return result;
-                } catch (Exception ex) {
-                    if (commandGetClips != null && commandGetClips.isFailedExecution()) {
-                        log.trace(ex.getMessage(), ex);
-                    }
-                    log.error("Failed to check for Clip Events: " + ex.getMessage());
-                    clipBackoff.get().get(); // increment failures
-                    return null;
-                }
-            },
-            ClipList::getData,
-            call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
-            20
-        );
     }
 
 }
