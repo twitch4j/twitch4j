@@ -313,6 +313,30 @@ public class IRCMessageEvent extends TwitchEvent {
         return OptionalInt.empty();
     }
 
+    /**
+     * @return the index of the choice this user is predicting, in an optional wrapper
+     */
+    public OptionalInt getPredictedChoiceIndex() {
+        String predictions = badges.get("predictions");
+
+        if (predictions != null) {
+            int delim = predictions.indexOf('-');
+            try {
+                return OptionalInt.of(Integer.parseInt(predictions.substring(delim + 1)));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return OptionalInt.empty();
+    }
+
+    /**
+     * @return the title of the choice this user is predicting, in an optional wrapper
+     */
+    public Optional<String> getPredictedChoiceTitle() {
+        return Optional.ofNullable(badgeInfo.get("predictions")).map(EscapeUtils::unescapeTagValue);
+    }
+
 	/**
 	 * Gets a optional tag from the irc message
      *
