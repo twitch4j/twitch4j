@@ -5,8 +5,12 @@ import com.github.twitch4j.pubsub.domain.PresenceData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class UserPresenceEvent extends TwitchEvent {
     private final PresenceData data;
 }

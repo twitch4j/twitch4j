@@ -41,7 +41,6 @@ public class UsersServiceTest extends AbstractEndpointTest {
             assertEquals(user.getDisplayName(), "twitch4j", "Twitch4J user display name should be twitch4j!");
             assertEquals(user.getType(), "", "Type should be empty!");
             assertEquals(user.getBroadcasterType(), "", "broadcaster-type should be empty!");
-            assertTrue(user.getViewCount() > 0, "Views should be grater than 0!");
             assertEquals(Instant.parse("2017-03-02T12:09:38.184103Z"), user.getCreatedAt());
         });
     }
