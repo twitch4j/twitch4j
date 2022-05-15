@@ -147,6 +147,10 @@ public class TwitchHelixBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Hystrix: Ban/Unban API already has special 429 logic such that circuit breaking is not needed (and just trips on trivial errors like 'user is already banned')
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#banUser(String,String,String,BanUserInput).circuitBreaker.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#unbanUser(String,String,String,String).circuitBreaker.enabled", false);
+
         // Warning
         if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
             log.warn("Helix: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
