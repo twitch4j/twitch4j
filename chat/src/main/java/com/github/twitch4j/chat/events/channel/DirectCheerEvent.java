@@ -78,7 +78,7 @@ public class DirectCheerEvent extends CheerEvent {
     public DirectCheerEvent(IRCMessageEvent event) {
         this(
             event,
-            event.getTagValue("msg-param-amount").map(Integer::parseInt).orElse(null),
+            event.getTagValue("msg-param-amount").map(Integer::parseInt).orElse(0),
             event.getTagValue("system-msg").map(String::trim).orElse("")
         );
     }
