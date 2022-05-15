@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -279,7 +280,7 @@ public class TwitchChat implements ITwitchChat {
 
         // init per channel message buckets by channel name
         this.bucketByChannelName = Caffeine.newBuilder()
-            .expireAfterAccess(perChannelRateLimit.getRefillPeriodNanos(), TimeUnit.NANOSECONDS)
+            .expireAfterAccess(Math.max(perChannelRateLimit.getRefillPeriodNanos(), Duration.ofSeconds(30L).toNanos()), TimeUnit.NANOSECONDS)
             .build();
 
         // init connection
