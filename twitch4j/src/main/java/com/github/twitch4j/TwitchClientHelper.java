@@ -366,7 +366,8 @@ public class TwitchClientHelper implements IClientHelper {
 
                 // next clip window should start just after the most recent clip we've seen for this channel
                 final Instant nextStartedAt = maxCreatedAt;
-                windowStart.updateAndGet(old -> old == null || old.compareTo(nextStartedAt) < 0 ? nextStartedAt : old);
+                if (nextStartedAt != startedAt)
+                    windowStart.updateAndGet(old -> old == null || old.compareTo(nextStartedAt) < 0 ? nextStartedAt : old);
             }
 
             return nextRequestCanBeImmediate;
