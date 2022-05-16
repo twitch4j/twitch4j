@@ -9,7 +9,7 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
-import com.github.twitch4j.common.util.PaginationUtil;
+import com.github.twitch4j.util.PaginationUtil;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
 import com.github.twitch4j.events.ChannelChangeTitleEvent;
