@@ -42,7 +42,7 @@ public class PaginationUtil {
     public static <T, K, C extends Collection<T>> C getPaginated(Function<String, K> callByCursor, Function<K, Collection<T>> extractResult, Function<K, String> extractCursor, int maxPages, int maxElements, Supplier<C> createCollection, boolean strict) {
         final C collection = createCollection.get();
 
-        Set<String> cursors = strict ? new HashSet<>(maxPages) : null;
+        Set<String> cursors = strict ? new HashSet<>(Math.max(16, Math.min(maxPages, 1024))) : null;
         String cursor = null;
         int page = 0;
         do {
@@ -58,7 +58,7 @@ public class PaginationUtil {
             if (Objects.equals(next, cursor)) break; // we got the same cursor back; avoid infinite loop
             if (strict && cursor != null && !cursors.add(cursor)) break; // we've already seen this cursor in the past; avoid infinite loop
             cursor = next;
-        } while (cursor != null && !cursor.isEmpty() && page < maxPages && collection.size() < maxElements);
+        } while (cursor != null && !cursor.isEmpty() && (maxPages < 0 || page < maxPages) && (maxElements < 0 || collection.size() < maxElements));
 
         return collection;
     }
