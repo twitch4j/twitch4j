@@ -4,7 +4,7 @@ plugins {
 	`java-library`
 	`maven-publish`
 	id("io.freefair.lombok") version "6.4.3"
-	id("com.coditory.manifest") version "0.1.14"
+	id("com.coditory.manifest") version "0.2.0"
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
