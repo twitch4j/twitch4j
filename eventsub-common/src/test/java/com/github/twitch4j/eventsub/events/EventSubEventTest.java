@@ -29,7 +29,7 @@ public class EventSubEventTest {
     public void deserializeModerationEvent() {
         ChannelBanEvent event = jsonToObject(
             "{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\",\"moderator_user_id\":\"1339\"," +
-                "\"moderator_user_login\":\"mod_user\",\"moderator_user_name\":\"Mod_User\",\"reason\":\"Offensive language\",\"ends_at\":\"2020-07-15T18:16:11.17106713Z\",\"is_permanent\":false}",
+                "\"moderator_user_login\":\"mod_user\",\"moderator_user_name\":\"Mod_User\",\"reason\":\"Offensive language\",\"banned_at\":\"2020-07-15T18:15:11.17106713Z\",\"ends_at\":\"2020-07-15T18:16:11.17106713Z\",\"is_permanent\":false}",
             ChannelBanEvent.class
         );
 
@@ -46,6 +46,7 @@ public class EventSubEventTest {
         assertEquals("Mod_User", event.getModeratorUserName());
 
         assertEquals("Offensive language", event.getReason());
+        assertEquals(Instant.parse("2020-07-15T18:15:11.17106713Z"), event.getBannedAt());
         assertEquals(Instant.parse("2020-07-15T18:16:11.17106713Z"), event.getEndsAt());
         assertFalse(event.isPermanent());
     }
@@ -377,13 +378,14 @@ public class EventSubEventTest {
     @DisplayName("Deserialize UserUpdateEvent")
     public void deserializeComplexUserEvent() {
         UserUpdateEvent event = jsonToObject(
-            "{\"user_id\":\"1337\",\"user_name\":\"cool_user\",\"email\":\"user@email.com\",\"description\":\"cool description\"}",
+            "{\"user_id\":\"1337\",\"user_name\":\"cool_user\",\"email\":\"user@email.com\",\"email_verified\":true,\"description\":\"cool description\"}",
             UserUpdateEvent.class
         );
 
         assertEquals("1337", event.getUserId());
         assertEquals("cool_user", event.getUserName());
         assertEquals("user@email.com", event.getEmail());
+        assertTrue(event.isEmailVerified());
         assertEquals("cool description", event.getDescription());
     }
 

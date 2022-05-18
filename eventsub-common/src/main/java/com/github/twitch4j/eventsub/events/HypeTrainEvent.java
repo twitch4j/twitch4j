@@ -29,6 +29,11 @@ public abstract class HypeTrainEvent extends EventSubChannelEvent {
     private List<Contribution> topContributions;
 
     /**
+     * Current level of hype train event.
+     */
+    private Integer level;
+
+    /**
      * The timestamp at which the hype train started.
      */
     private Instant startedAt;

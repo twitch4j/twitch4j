@@ -17,11 +17,6 @@ import java.time.Instant;
 public class HypeTrainEndEvent extends HypeTrainEvent {
 
     /**
-     * Current level of hype train event.
-     */
-    private Integer level;
-
-    /**
      * The timestamp at which the hype train ended.
      */
     private Instant endedAt;
