@@ -24,7 +24,7 @@ allprojects {
 				this as StandardJavadocDocletOptions
 				links(
 					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
-					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
+					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.3",
 					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
 					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.5.0/",
 					"https://square.github.io/okhttp/4.x/okhttp/",

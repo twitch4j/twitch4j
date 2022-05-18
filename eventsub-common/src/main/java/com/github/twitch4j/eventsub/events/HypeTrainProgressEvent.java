@@ -18,11 +18,6 @@ import java.time.Instant;
 public class HypeTrainProgressEvent extends HypeTrainEvent {
 
     /**
-     * Current level of hype train event.
-     */
-    private Integer level;
-
-    /**
      * The number of points contributed to the hype train at the current level.
      */
     private Integer progress;

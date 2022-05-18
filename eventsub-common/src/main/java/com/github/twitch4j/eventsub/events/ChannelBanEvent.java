@@ -25,6 +25,11 @@ public class ChannelBanEvent extends EventSubModerationEvent {
     private String reason;
 
     /**
+     * The UTC date and time (in RFC3339 format) of when the user was banned or put in a timeout.
+     */
+    private Instant bannedAt;
+
+    /**
      * Will be null if permanent ban. If it is a timeout, this field shows when the timeout will end.
      */
     @Nullable
