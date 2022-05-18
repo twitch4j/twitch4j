@@ -8,6 +8,7 @@ import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -56,13 +57,14 @@ public interface IClientHelper extends AutoCloseable {
     boolean disableFollowEventListenerForId(String channelId);
 
     /**
-     * Enable Clip Creation Listener, without invoking a Helix API call
+     * Enable Clip Creation Listener, without invoking a Helix API call, starting at a custom timestamp
      *
      * @param channelId   Channel Id
      * @param channelName Channel Name
+     * @param startedAt   The oldest clip creation timestamp to start the queries at
      * @return whether the channel was added
      */
-    boolean enableClipEventListener(String channelId, String channelName);
+    boolean enableClipEventListener(String channelId, String channelName, Instant startedAt);
 
     /**
      * Disable Clip Creation Listener, without invoking a Helix API call
@@ -213,6 +215,17 @@ public interface IClientHelper extends AutoCloseable {
             UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
             users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
         });
+    }
+
+    /**
+     * Enable Clip Creation Listener, without invoking a Helix API call
+     *
+     * @param channelId   Channel Id
+     * @param channelName Channel Name
+     * @return whether the channel was added
+     */
+    default boolean enableClipEventListener(String channelId, String channelName) {
+        return enableClipEventListener(channelId, channelName, Instant.now());
     }
 
     /**

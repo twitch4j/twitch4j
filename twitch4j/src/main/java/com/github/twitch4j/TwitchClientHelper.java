@@ -444,14 +444,15 @@ public class TwitchClientHelper implements IClientHelper {
     }
 
     @Override
-    public boolean enableClipEventListener(String channelId, String channelName) {
+    public boolean enableClipEventListener(String channelId, String channelName, Instant startedAt) {
         // add to set
         final boolean add = listenForClips.add(channelId);
         if (!add) {
             log.info("Channel {} already added for Clip Creation Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            ChannelCache channelCache = channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            channelCache.getClipWindowStart().compareAndSet(null, startedAt);
         }
         startOrStopEventGenerationThread();
         return add;
