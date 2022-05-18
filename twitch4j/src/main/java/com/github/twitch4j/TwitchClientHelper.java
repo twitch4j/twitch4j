@@ -9,28 +9,33 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
+import com.github.twitch4j.util.PaginationUtil;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
 import com.github.twitch4j.events.ChannelChangeTitleEvent;
+import com.github.twitch4j.events.ChannelClipCreatedEvent;
 import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.events.ChannelViewerCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
-import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.domain.Clip;
+import com.github.twitch4j.helix.domain.ClipList;
+import com.github.twitch4j.helix.domain.Follow;
+import com.github.twitch4j.helix.domain.FollowList;
+import com.github.twitch4j.helix.domain.Stream;
+import com.github.twitch4j.helix.domain.StreamList;
 import com.netflix.hystrix.HystrixCommand;
+import lombok.Getter;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,20 +48,20 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 /**
  * A helper class that covers a few basic use cases of most library users
  */
-@Slf4j
-public class TwitchClientHelper implements AutoCloseable {
+public class TwitchClientHelper implements IClientHelper {
+
+    static final Logger log = LoggerFactory.getLogger(TwitchClientHelper.class);
 
     public static final int REQUIRED_THREAD_COUNT = 2;
 
     /**
      * The greatest number of streams or followers that can be requested in a single API call
      */
-    private static final int MAX_LIMIT = 100;
+    static final int MAX_LIMIT = 100;
 
     /**
      * Holds the channels that are checked for live/offline state changes
@@ -69,14 +74,15 @@ public class TwitchClientHelper implements AutoCloseable {
     private final Set<String> listenForFollow = ConcurrentHashMap.newKeySet();
 
     /**
-     * Twitch Helix
+     * Holds the channels that are checked for new clip creations
      */
-    private final TwitchHelix twitchHelix;
+    private final Set<String> listenForClips = ConcurrentHashMap.newKeySet();
 
     /**
-     * Event Manager
+     * Twitch Helix
      */
-    private final EventManager eventManager;
+    @Getter
+    private final TwitchHelix twitchHelix;
 
     /**
      * Event Task - Stream Status
@@ -103,6 +109,18 @@ public class TwitchClientHelper implements AutoCloseable {
     private final AtomicReference<Future<?>> followerEventFuture = new AtomicReference<>();
 
     /**
+     * Event Task - Clip Creations
+     * <p>
+     * Accepts a channel id as the input; Yields true if the next call should not be delayed
+     */
+    private final Function<String, Boolean> clipEventTask;
+
+    /**
+     * The {@link Future} associated with clipEventTask, in an atomic wrapper
+     */
+    private final AtomicReference<Future<?>> clipEventFuture = new AtomicReference<>();
+
+    /**
      * Channel Information Cache
      */
     private final Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
@@ -125,6 +143,11 @@ public class TwitchClientHelper implements AutoCloseable {
     private final AtomicReference<ExponentialBackoffStrategy> followBackoff;
 
     /**
+     * Holds the {@link ExponentialBackoffStrategy} used for the clip creation listener
+     */
+    private final AtomicReference<ExponentialBackoffStrategy> clipBackoff;
+
+    /**
      * Constructor
      *
      * @param twitchHelix  TwitchHelix
@@ -133,14 +156,14 @@ public class TwitchClientHelper implements AutoCloseable {
      */
     public TwitchClientHelper(TwitchHelix twitchHelix, EventManager eventManager, ScheduledThreadPoolExecutor executor) {
         this.twitchHelix = twitchHelix;
-        this.eventManager = eventManager;
         this.executor = executor;
 
         final ExponentialBackoffStrategy defaultBackoff = ExponentialBackoffStrategy.builder().immediateFirst(false).baseMillis(1000L).jitter(false).build();
-        liveBackoff = new AtomicReference<>(defaultBackoff);
-        followBackoff = new AtomicReference<>(defaultBackoff.copy());
+        this.liveBackoff = new AtomicReference<>(defaultBackoff);
+        this.followBackoff = new AtomicReference<>(defaultBackoff.copy());
+        this.clipBackoff = new AtomicReference<>(defaultBackoff.copy());
 
-        // Threads
+        // Tasks
         this.streamStatusEventTask = channels -> {
             // check go live / stream events
             HystrixCommand<StreamList> hystrixGetAllStreams = twitchHelix.getStreams(null, null, null, channels.size(), null, null, channels, null);
@@ -170,11 +193,11 @@ public class TwitchClientHelper implements AutoCloseable {
                     if (stream != null && stream.getType().equalsIgnoreCase("live")) {
                         // is live
                         // - live status
-                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == false) {
+                        if (currentChannelCache.getIsLive() != null && !currentChannelCache.getIsLive()) {
                             dispatchGoLiveEvent = true;
                         }
                         currentChannelCache.setIsLive(true);
-                        boolean wasAlreadyLive = dispatchGoLiveEvent != true && currentChannelCache.getIsLive() == true;
+                        boolean wasAlreadyLive = !dispatchGoLiveEvent && currentChannelCache.getIsLive();
 
                         // - change stream title event
                         if (wasAlreadyLive && currentChannelCache.getTitle() != null && !currentChannelCache.getTitle().equalsIgnoreCase(stream.getTitle())) {
@@ -194,7 +217,7 @@ public class TwitchClientHelper implements AutoCloseable {
                         }
                     } else {
                         // was online previously?
-                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive() == true) {
+                        if (currentChannelCache.getIsLive() != null && currentChannelCache.getIsLive()) {
                             dispatchGoOfflineEvent = true;
                         }
 
@@ -308,50 +331,50 @@ public class TwitchClientHelper implements AutoCloseable {
                 return false;
             }
         };
+        this.clipEventTask = channelId -> {
+            // check clip creations
+            boolean nextRequestCanBeImmediate = false;
+
+            final ChannelCache currentChannelCache = channelInformation.get(channelId, c -> new ChannelCache());
+            final AtomicReference<Instant> windowStart = currentChannelCache.getClipWindowStart();
+            final Instant startedAt = windowStart.get();
+            final Instant now = Instant.now();
+
+            if (startedAt == null) {
+                // initialize clip query window started_at
+                nextRequestCanBeImmediate = windowStart.compareAndSet(null, now);
+            } else {
+                // get all clips in range [startedAt, now]
+                final List<Clip> clips = getClips(channelId, startedAt, now);
+
+                // cache channel name if unknown and construct event channel to be passed to events
+                if (!clips.isEmpty() && clips.get(0) != null && currentChannelCache.getUserName() == null) {
+                    currentChannelCache.setUserName(clips.get(0).getBroadcasterName());
+                }
+                final EventChannel channel = new EventChannel(channelId, currentChannelCache.getUserName());
+
+                // loop through queried clips
+                Instant maxCreatedAt = startedAt;
+                for (Clip clip : clips) {
+                    if (clip != null && clip.getCreatedAtInstant() != null && clip.getCreatedAtInstant().compareTo(startedAt) > 0) {
+                        eventManager.publish(new ChannelClipCreatedEvent(channel, clip)); // found a new clip
+
+                        if (clip.getCreatedAtInstant().compareTo(maxCreatedAt) > 0)
+                            maxCreatedAt = clip.getCreatedAtInstant(); // keep track of most recently created clip
+                    }
+                }
+
+                // next clip window should start just after the most recent clip we've seen for this channel
+                final Instant nextStartedAt = maxCreatedAt;
+                if (nextStartedAt != startedAt)
+                    windowStart.updateAndGet(old -> old == null || old.compareTo(nextStartedAt) < 0 ? nextStartedAt : old);
+            }
+
+            return nextRequestCanBeImmediate;
+        };
     }
 
-    /**
-     * Enable StreamEvent Listener
-     *
-     * @param channelName Channel Name
-     */
-    @Nullable
-    public User enableStreamEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            User user = users.getUsers().get(0);
-            if (enableStreamEventListener(user.getId(), user.getLogin()))
-                return user;
-        } else {
-            log.error("Failed to add channel {} to stream event listener!", channelName);
-        }
-
-        return null;
-    }
-
-    /**
-     * Enable StreamEvent Listener for the given channel names
-     *
-     * @param channelNames the channel names to be added
-     */
-    public Collection<User> enableStreamEventListener(Iterable<String> channelNames) {
-        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
-            .map(UserList::getUsers)
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .filter(user -> enableStreamEventListener(user.getId(), user.getLogin()))
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * Enable StreamEvent Listener, without invoking a Helix API call
-     *
-     * @param channelId   Channel Id
-     * @param channelName Channel Name
-     * @return true if the channel was added, false otherwise
-     */
+    @Override
     public boolean enableStreamEventListener(String channelId, String channelName) {
         // add to set
         final boolean add = listenForGoLive.add(channelId);
@@ -365,45 +388,13 @@ public class TwitchClientHelper implements AutoCloseable {
         return add;
     }
 
-    /**
-     * Disable StreamEvent Listener
-     *
-     * @param channelName Channel Name
-     */
-    public void disableStreamEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
-        } else {
-            log.error("Failed to remove channel " + channelName + " from stream event listener!");
-        }
-    }
-
-    /**
-     * Disable StreamEvent Listener for the given channel names
-     *
-     * @param channelNames the channel names to be removed
-     */
-    public void disableStreamEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
-        });
-    }
-
-    /**
-     * Disable StreamEventListener, without invoking a Helix API call
-     *
-     * @param channelId Channel Id
-     * @return true if the channel was removed, false otherwise
-     */
+    @Override
     public boolean disableStreamEventListenerForId(String channelId) {
         // remove from set
         boolean remove = listenForGoLive.remove(channelId);
 
         // invalidate cache
-        if (!listenForFollow.contains(channelId)) {
+        if (!listenForFollow.contains(channelId) && !listenForClips.contains(channelId)) {
             channelInformation.invalidate(channelId);
         } else if (remove) {
             ChannelCache info = channelInformation.getIfPresent(channelId);
@@ -418,48 +409,7 @@ public class TwitchClientHelper implements AutoCloseable {
         return remove;
     }
 
-    /**
-     * Follow Listener
-     *
-     * @param channelName Channel Name
-     */
-    @Nullable
-    public User enableFollowEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            User user = users.getUsers().get(0);
-            if (enableFollowEventListener(user.getId(), user.getLogin()))
-                return user;
-        } else {
-            log.error("Failed to add channel " + channelName + " to Follow Listener, maybe it doesn't exist!");
-        }
-
-        return null;
-    }
-
-    /**
-     * Enable Follow Listener for the given channel names
-     *
-     * @param channelNames the channel names to be added
-     */
-    public Collection<User> enableFollowEventListener(Iterable<String> channelNames) {
-        return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> twitchHelix.getUsers(null, null, channels).execute())
-            .map(UserList::getUsers)
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .filter(user -> enableFollowEventListener(user.getId(), user.getLogin()))
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * Enable Follow Listener, without invoking a Helix API call
-     *
-     * @param channelId   Channel Id
-     * @param channelName Channel Name
-     * @return true if the channel was added, false otherwise
-     */
+    @Override
     public boolean enableFollowEventListener(String channelId, String channelName) {
         // add to list
         final boolean add = listenForFollow.add(channelId);
@@ -473,56 +423,96 @@ public class TwitchClientHelper implements AutoCloseable {
         return add;
     }
 
-    /**
-     * Disable Follow Listener
-     *
-     * @param channelName Channel Name
-     */
-    public void disableFollowEventListener(String channelName) {
-        UserList users = twitchHelix.getUsers(null, null, Collections.singletonList(channelName)).execute();
-
-        if (users.getUsers().size() == 1) {
-            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
-        } else {
-            log.error("Failed to remove channel " + channelName + " from follow listener!");
-        }
-    }
-
-    /**
-     * Disable Follow Listener for the given channel names
-     *
-     * @param channelNames the channel names to be removed
-     */
-    public void disableFollowEventListener(Iterable<String> channelNames) {
-        CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = twitchHelix.getUsers(null, null, channels).execute();
-            users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
-        });
-    }
-
-    /**
-     * Disable Follow Listener, without invoking a Helix API call
-     *
-     * @param channelId Channel Id
-     * @return true when a previously-tracked channel was removed, false otherwise
-     */
+    @Override
     public boolean disableFollowEventListenerForId(String channelId) {
         // remove from set
         boolean remove = listenForFollow.remove(channelId);
 
         // invalidate cache
-        if (!listenForGoLive.contains(channelId)) {
+        if (!listenForGoLive.contains(channelId) && !listenForClips.contains(channelId)) {
             channelInformation.invalidate(channelId);
         } else if (remove) {
             ChannelCache info = channelInformation.getIfPresent(channelId);
             if (info != null) {
                 info.setLastFollowCheck(null);
-                info.getFollowers().set(null);
+                info.getFollowers().lazySet(null);
             }
         }
 
         startOrStopEventGenerationThread();
         return remove;
+    }
+
+    @Override
+    public boolean enableClipEventListener(String channelId, String channelName, Instant startedAt) {
+        // add to set
+        final boolean add = listenForClips.add(channelId);
+        if (!add) {
+            log.info("Channel {} already added for Clip Creation Events", channelName);
+        } else {
+            // initialize cache
+            ChannelCache channelCache = channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            channelCache.getClipWindowStart().compareAndSet(null, startedAt);
+        }
+        startOrStopEventGenerationThread();
+        return add;
+    }
+
+    @Override
+    public boolean disableClipEventListenerForId(String channelId) {
+        // remove from set
+        boolean remove = listenForClips.remove(channelId);
+
+        // invalidate cache
+        if (!listenForGoLive.contains(channelId) && !listenForFollow.contains(channelId)) {
+            channelInformation.invalidate(channelId);
+        } else if (remove) {
+            ChannelCache info = channelInformation.getIfPresent(channelId);
+            if (info != null) {
+                info.getClipWindowStart().lazySet(null);
+            }
+        }
+
+        startOrStopEventGenerationThread();
+        return remove;
+    }
+
+    @Override
+    public void setThreadDelay(long threadDelay) {
+        final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
+            ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
+            next.setFailures(old.getFailures());
+            return next;
+        };
+
+        this.liveBackoff.getAndUpdate(updateBackoff);
+        this.followBackoff.getAndUpdate(updateBackoff);
+        this.clipBackoff.getAndUpdate(updateBackoff);
+    }
+
+    @Override
+    public Optional<ChannelCache> getCachedInformation(String channelId) {
+        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
+    }
+
+    @Override
+    public void close() {
+        final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
+        if (streamStatusFuture != null)
+            streamStatusFuture.cancel(false);
+
+        final Future<?> followerFuture = this.followerEventFuture.getAndSet(null);
+        if (followerFuture != null)
+            followerFuture.cancel(false);
+
+        final Future<?> clipFuture = this.clipEventFuture.getAndSet(null);
+        if (clipFuture != null)
+            clipFuture.cancel(false);
+
+        listenForGoLive.clear();
+        listenForFollow.clear();
+        listenForClips.clear();
+        channelInformation.invalidateAll();
     }
 
     /**
@@ -534,12 +524,15 @@ public class TwitchClientHelper implements AutoCloseable {
 
         // follower event thread
         updateListener(listenForFollow::isEmpty, followerEventFuture, this::runRecursiveFollowerCheck, followBackoff);
+
+        // clip creation event thread
+        updateListener(listenForClips::isEmpty, clipEventFuture, this::runRecursiveClipCheck, clipBackoff);
     }
 
     /**
      * Performs the "heavy lifting" of starting or stopping a listener
      *
-     * @param stopCondition   yields whether or not the listener should be running
+     * @param stopCondition   yields whether the listener should be running
      * @param futureReference the current listener in an atomic wrapper
      * @param startCommand    the command to start the listener
      * @param backoff         the {@link ExponentialBackoffStrategy} for the listener
@@ -578,103 +571,47 @@ public class TwitchClientHelper implements AutoCloseable {
      * Initiates the stream status listener execution
      */
     private void runRecursiveStreamStatusCheck() {
-        if (streamStatusEventFuture.get() != null)
-            synchronized (streamStatusEventFuture) {
-                if (cancel(streamStatusEventFuture))
-                    streamStatusEventFuture.set(
-                        executor.submit(
-                            new ListenerRunnable<>(
-                                executor,
-                                CollectionUtils.chunked(listenForGoLive, MAX_LIMIT),
-                                streamStatusEventFuture,
-                                liveBackoff,
-                                this::runRecursiveStreamStatusCheck,
-                                chunk -> {
-                                    streamStatusEventTask.accept(chunk);
-                                    return false; // treat as always consuming from the api rate-limit
-                                }
-                            )
-                        )
-                    );
-            }
+        runRecursiveCheck(streamStatusEventFuture, executor, CollectionUtils.chunked(listenForGoLive, MAX_LIMIT), liveBackoff, this::runRecursiveStreamStatusCheck, chunk -> {
+            streamStatusEventTask.accept(chunk);
+            return false; // treat as always consuming from the api rate-limit
+        });
     }
 
     /**
      * Initiates the follower listener execution
      */
     private void runRecursiveFollowerCheck() {
-        if (followerEventFuture.get() != null)
-            synchronized (followerEventFuture) {
-                if (cancel(followerEventFuture))
-                    followerEventFuture.set(
-                        executor.submit(
-                            new ListenerRunnable<>(
-                                executor,
-                                new ArrayList<>(listenForFollow),
-                                followerEventFuture,
-                                followBackoff,
-                                this::runRecursiveFollowerCheck,
-                                followerEventTask
-                            )
-                        )
-                    );
-            }
+        runRecursiveCheck(followerEventFuture, executor, new ArrayList<>(listenForFollow), followBackoff, this::runRecursiveFollowerCheck, followerEventTask);
     }
 
     /**
-     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
-     *
-     * @param threadRate the maximum <i>rate</i> of api calls per second
+     * Initiates the clip creation listener execution
      */
-    public void setThreadRate(long threadRate) {
-        this.setThreadDelay(1000 / threadRate);
+    private void runRecursiveClipCheck() {
+        runRecursiveCheck(clipEventFuture, executor, new ArrayList<>(listenForClips), clipBackoff, this::runRecursiveClipCheck, clipEventTask);
     }
 
-    /**
-     * Updates {@link ExponentialBackoffStrategy#getBaseMillis()} for each of the independent listeners (i.e. stream status and followers)
-     *
-     * @param threadDelay the minimum milliseconds <i>delay</i> between each api call
-     */
-    public void setThreadDelay(long threadDelay) {
-        final UnaryOperator<ExponentialBackoffStrategy> updateBackoff = old -> {
-            ExponentialBackoffStrategy next = old.toBuilder().baseMillis(threadDelay).build();
-            next.setFailures(old.getFailures());
-            return next;
-        };
-
-        this.liveBackoff.getAndUpdate(updateBackoff);
-        this.followBackoff.getAndUpdate(updateBackoff);
-    }
-
-    /**
-     * Get cached information for a channel's stream status and follower count.
-     * <p>
-     * For this information to be valid, the respective event listeners need to be enabled for the channel.
-     * <p>
-     * For thread safety, the setters on this object should not be used; only getters.
-     *
-     * @param channelId The ID of the channel whose cache is to be retrieved.
-     * @return ChannelCache in an optional wrapper.
-     */
-    public Optional<ChannelCache> getCachedInformation(String channelId) {
-        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
-    }
-
-    /**
-     * Close
-     */
-    public void close() {
-        final Future<?> streamStatusFuture = this.streamStatusEventFuture.getAndSet(null);
-        if (streamStatusFuture != null)
-            streamStatusFuture.cancel(false);
-
-        final Future<?> followerFuture = this.followerEventFuture.getAndSet(null);
-        if (followerFuture != null)
-            followerFuture.cancel(false);
-
-        listenForGoLive.clear();
-        listenForFollow.clear();
-        channelInformation.invalidateAll();
+    private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
+        return PaginationUtil.getPaginated(
+            cursor -> {
+                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt);
+                try {
+                    ClipList result = commandGetClips.execute();
+                    clipBackoff.get().reset(); // successful api call
+                    return result;
+                } catch (Exception ex) {
+                    if (commandGetClips != null && commandGetClips.isFailedExecution()) {
+                        log.trace(ex.getMessage(), ex);
+                    }
+                    log.error("Failed to check for Clip Events: " + ex.getMessage());
+                    clipBackoff.get().get(); // increment failures
+                    return null;
+                }
+            },
+            ClipList::getData,
+            call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
+            20
+        );
     }
 
     @Value
@@ -725,6 +662,26 @@ public class TwitchClientHelper implements AutoCloseable {
     private static boolean cancel(AtomicReference<Future<?>> futureRef) {
         Future<?> future = futureRef.get();
         return future != null && future.cancel(false);
+    }
+
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
+    private static <T> void runRecursiveCheck(AtomicReference<Future<?>> future, ScheduledExecutorService executor, List<T> units, AtomicReference<ExponentialBackoffStrategy> backoff, Runnable startCommand, Function<T, Boolean> task) {
+        if (future.get() != null)
+            synchronized (future) {
+                if (cancel(future))
+                    future.set(
+                        executor.submit(
+                            new ListenerRunnable<>(
+                                executor,
+                                units,
+                                future,
+                                backoff,
+                                startCommand,
+                                task
+                            )
+                        )
+                    );
+            }
     }
 
 }
