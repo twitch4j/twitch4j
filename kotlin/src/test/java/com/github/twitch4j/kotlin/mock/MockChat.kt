@@ -13,7 +13,7 @@ class MockChat : TwitchChat(
     EventManager().apply { autoDiscovery() },
     null,
     null,
-    null,
+    FDGT_TEST_SOCKET_SERVER,
     false,
     emptyList(),
     1,
@@ -34,6 +34,7 @@ class MockChat : TwitchChat(
     null,
     TwitchChatLimitHelper.MOD_MESSAGE_LIMIT
 ) {
+    @Volatile
     var isConnected = false
 
     override fun connect() {

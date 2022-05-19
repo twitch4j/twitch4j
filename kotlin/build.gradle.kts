@@ -18,6 +18,7 @@ dependencies {
 }
 
 tasks.javadoc {
+	enabled = false
 	options {
 		title = "Twitch4J (v${version}) - Kotlin extension functions"
 		windowTitle = "Twitch4J (v${version}) - Kotlin extension functions"
