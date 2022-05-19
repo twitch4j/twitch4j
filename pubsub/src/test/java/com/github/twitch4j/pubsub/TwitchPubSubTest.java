@@ -1,41 +1,66 @@
 package com.github.twitch4j.pubsub;
 
-import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.util.TestUtils;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.client.websocket.WebsocketConnection;
+import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
+import com.github.twitch4j.common.test.TestEventManager;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.Duration;
+import java.util.regex.Pattern;
+
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.times;
 
 @Slf4j
-@Tag("integration")
 public class TwitchPubSubTest {
+    private WebsocketConnection connection;
 
-    private static TwitchPubSub twitchPubSub;
+    private TestEventManager eventManager;
 
-    @BeforeAll
-    public static void connectToChat() {
-        // external event manager
-        EventManager eventManager = new EventManager();
+    private TwitchPubSub pubSub;
+
+    private OAuth2Credential credential = new OAuth2Credential("twitch", "my-secret-token");
+
+    @BeforeEach
+    void init() {
+        // mock connection
+        connection = Mockito.mock(WebsocketConnection.class);
+
+        // mock eventManager
+        eventManager = new TestEventManager();
 
         // construct twitchChat
-        twitchPubSub = TwitchPubSubBuilder.builder()
+        pubSub = TwitchPubSubBuilder.builder()
+            .withWebsocketConnection(connection)
             .withEventManager(eventManager)
             .build();
-
-        // sleep for a few seconds so that we're connected
-        TestUtils.sleepFor(5000);
     }
 
     @Test
-    @DisplayName("Local test to keep it running for debugging")
-    @Disabled
-    public void localTestRun() {
-        // listen for events in channel
-        twitchPubSub.listenForCheerEvents(TestUtils.getCredential(), "149223493");
-        twitchPubSub.listenForSubscriptionEvents(TestUtils.getCredential(), "149223493");
-        twitchPubSub.listenForWhisperEvents(TestUtils.getCredential(), "149223493");
+    public void testTopicListen() {
+        // fake connected state
+        Mockito.when(connection.getConnectionState()).thenReturn(WebsocketConnectionState.CONNECTED);
 
-        // sleep a second and look of the message was sended
-        TestUtils.sleepFor(60000);
+        // join channel
+        pubSub.listenForCheerEvents(credential, "149223493");
+        pubSub.listenForSubscriptionEvents(credential, "149223493");
+        pubSub.listenForWhisperEvents(credential, "149223493");
+
+        // wait for all commands to be processed
+        await().atMost(Duration.ofSeconds(1)).until(() -> pubSub.commandQueue.size() == 0);
+
+        // verify
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"channel-bits-events-v2.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"channel-subscribe-events-v1.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"whispers.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
     }
 
+    private String noncePattern(String input) {
+        return Pattern.quote(input).replace("NONCE_ANY", "\\E.+\\Q");
+    }
 }

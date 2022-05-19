@@ -7,12 +7,20 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+ */
 @Data
+@Deprecated
 public class FriendshipData {
     private String userId;
     private String targetUserId;
     private Change change;
 
+    /**
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
+    @Deprecated
     public enum Change {
         ACCEPTED,
         REJECTED,

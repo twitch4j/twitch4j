@@ -219,7 +219,14 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "creator-goals-events-v1." + channelId);
     }
 
+    /**
+     * @param credential {@link OAuth2Credential}
+     * @param channelId  channel id
+     * @return PubSubSubscription
+     * @deprecated the crowd chant experiment was disabled by <a href="https://twitter.com/twitchsupport/status/1486036628523073539">Twitch</a> on 2022-02-02
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForCrowdChantEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "crowd-chant-channel-v1." + channelId);
     }
@@ -406,7 +413,6 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     default PubSubSubscription listenForUserChatroomEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "chatrooms-user-v1." + userId);
     }
@@ -459,7 +465,14 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "following." + channelId);
     }
 
+    /**
+     * @param credential user access token
+     * @param userId     user id associated with the token
+     * @return PubSubSubscription
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForFriendshipEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "friendship." + userId);
     }
@@ -479,7 +492,14 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "polls." + channelId);
     }
 
+    /**
+     * @param credential user access token
+     * @param userId     user id associated with the token
+     * @return PubSubSubscription
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
     }
@@ -505,4 +525,8 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "pv-watch-party-events." + channelId);
     }
 
+    /**
+     * @return the most recently measured round-trip latency for the socket(s) in milliseconds, or -1 if unknown
+     */
+    long getLatency();
 }

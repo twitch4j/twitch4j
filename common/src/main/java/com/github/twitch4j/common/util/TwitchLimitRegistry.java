@@ -5,7 +5,6 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.TokensInheritanceStrategy;
-import io.github.bucket4j.local.LocalBucketBuilder;
 import lombok.NonNull;
 
 import java.util.Collections;
@@ -51,7 +50,7 @@ public enum TwitchLimitRegistry {
                 return bucket;
             }
 
-            return constructBucket(limit);
+            return BucketUtils.createBucket(limit);
         });
     }
 
@@ -76,17 +75,11 @@ public enum TwitchLimitRegistry {
      * @return the shared rate limit bucket for this user and limit type
      */
     public Bucket getOrInitializeBucket(@NonNull String userId, @NonNull TwitchLimitType limitType, @NonNull List<Bandwidth> limit) {
-        return getBucketsByUser(userId).computeIfAbsent(limitType, l -> constructBucket(limit));
+        return getBucketsByUser(userId).computeIfAbsent(limitType, l -> BucketUtils.createBucket(limit));
     }
 
     private Map<TwitchLimitType, Bucket> getBucketsByUser(String userId) {
         return limits.computeIfAbsent(userId, s -> Collections.synchronizedMap(new EnumMap<>(TwitchLimitType.class)));
-    }
-
-    private static Bucket constructBucket(List<Bandwidth> limits) {
-        LocalBucketBuilder builder = Bucket.builder();
-        limits.forEach(builder::addLimit);
-        return builder.build();
     }
 
     /**

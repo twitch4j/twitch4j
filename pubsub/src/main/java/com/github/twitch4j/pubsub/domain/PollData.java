@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.Data;
 
 import java.time.Instant;
@@ -76,6 +77,10 @@ public class PollData {
     public enum Status {
         ACTIVE,
         COMPLETED,
-        ARCHIVED
+        ARCHIVED,
+        TERMINATED,
+        MODERATED,
+        @JsonEnumDefaultValue
+        INVALID
     }
 }

@@ -6,7 +6,11 @@ import lombok.Data;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+ */
 @Data
+@Deprecated
 public class PresenceData {
     private String userId;
     private String userLogin;
@@ -19,7 +23,11 @@ public class PresenceData {
     private Activity activity;
     private List<Activity> activities;
 
+    /**
+     * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
+     */
     @Data
+    @Deprecated
     public static class Activity {
         /**
          * Activity Type. Examples include: "none", "watching", "broadcasting"

@@ -9,6 +9,7 @@ import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import lombok.Builder;
 import lombok.NonNull;
@@ -94,6 +95,20 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Builder.Default
     protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @Builder.Default
+    protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+
+    /**
+     * WebSocket Connection Backoff Strategy
+     */
+    @Builder.Default
+    private IBackoffStrategy connectionBackoffStrategy = null;
 
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
@@ -256,7 +271,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withWhisperRateLimit(whisperRateLimit)
                 .withJoinRateLimit(joinRateLimit)
                 .withAuthRateLimit(authRateLimit)
+                .withPerChannelRateLimit(perChannelRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
+                .withConnectionBackoffStrategy(connectionBackoffStrategy)
         ).build();
 
         // Reclaim channel headroom upon generic join failures
@@ -276,6 +293,20 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected void disposeConnection(TwitchChat connection) {
         connection.close();
+    }
+
+    @Override
+    public long getLatency() {
+        long sum = 0;
+        int count = 0;
+        for (TwitchChat connection : getConnections()) {
+            final long latency = connection.getLatency();
+            if (latency > 0) {
+                sum += latency;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : -1L;
     }
 
     /**

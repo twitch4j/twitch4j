@@ -2,9 +2,11 @@ package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
+import com.github.twitch4j.chat.enums.AnnouncementColor;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -57,8 +59,10 @@ public class IRCEventHandler {
         // register event handlers
         eventManager.onEvent("twitch4j-chat-message-trigger", IRCMessageEvent.class, this::onChannelMessage);
         eventManager.onEvent("twitch4j-chat-whisper-trigger", IRCMessageEvent.class, this::onWhisper);
+        eventManager.onEvent("twitch4j-chat-announcement-trigger", IRCMessageEvent.class, this::onAnnouncement);
         eventManager.onEvent("twitch4j-chat-bits-badge-trigger", IRCMessageEvent.class, this::onBitsBadgeTier);
         eventManager.onEvent("twitch4j-chat-cheer-trigger", IRCMessageEvent.class, this::onChannelCheer);
+        eventManager.onEvent("twitch4j-chat-direct-cheer-trigger", IRCMessageEvent.class, this::onDirectCheer);
         eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
         eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
         eventManager.onEvent("twitch4j-chat-clearmsg-trigger", IRCMessageEvent.class, this::onClearMsg);
@@ -82,6 +86,20 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
     }
 
+    @Unofficial
+    public void onAnnouncement(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "announcement".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            // Load Info
+            EventChannel channel = event.getChannel();
+            EventUser user = event.getUser();
+            String message = event.getMessage().orElse("");
+            String color = event.getTagValue("msg-param-color").orElse(AnnouncementColor.PRIMARY.toString());
+
+            // Dispatch Event
+            eventManager.publish(new ModAnnouncementEvent(event, channel, user, message, AnnouncementColor.parseColor(color)));
+        }
+    }
+
     /**
      * ChatChannel Message Event
      * @param event IRCMessageEvent
@@ -92,14 +110,15 @@ public class IRCEventHandler {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
+                String message = event.getMessage().get();
 
                 // Dispatch Event
-                if(event.getMessage().get().startsWith("\u0001ACTION ")) {
+                if (message.startsWith("\u0001ACTION ") && message.endsWith("\u0001")) {
                     // Action
-                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, event.getMessage().get().substring(8), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, message.substring(8, message.length() - 1), event.getClientPermissions()));
                 } else {
                     // Regular Message
-                    eventManager.publish(new ChannelMessageEvent(channel, event, user, event.getMessage().get(), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageEvent(channel, event, user, message, event.getClientPermissions()));
                 }
             }
         }
@@ -156,6 +175,18 @@ public class IRCEventHandler {
                 // Dispatch Event
                 eventManager.publish(new CheerEvent(event, channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
             }
+        }
+    }
+
+    /**
+     * ChatChannel Direct Cheer (Currency) Event
+     *
+     * @param event IRCMessageEvent
+     */
+    @Unofficial
+    public void onDirectCheer(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "midnightsquid".equals(event.getTags().get("msg-id"))) {
+            eventManager.publish(new DirectCheerEvent(event));
         }
     }
 

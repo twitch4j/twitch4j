@@ -7,28 +7,23 @@ public class EventManagerUtils {
     /**
      * Validates the provided EventManager or initializes a new one
      *
-     * @param eventManager EventManager
+     * @param eventManager        EventManager
      * @param defaultEventHandler The default eventHandler class
      * @return EventManager
      */
-    public static EventManager validateOrInitializeEventManager(EventManager eventManager, @SuppressWarnings("rawtypes") Class defaultEventHandler) {
-        if (eventManager == null) {
-            EventManager newEM = initializeEventManager(defaultEventHandler);
-            validateEventManager(newEM);
-            return newEM;
-        } else {
-            validateEventManager(eventManager);
-            return eventManager;
-        }
+    public static EventManager validateOrInitializeEventManager(EventManager eventManager, Class<?> defaultEventHandler) {
+        EventManager em = eventManager != null ? eventManager : initializeEventManager(defaultEventHandler);
+        validateEventManager(em);
+        return em;
     }
 
     /**
-     *  Initializes a new EventManager instance.
+     * Initializes a new EventManager instance.
      *
      * @param defaultEventHandler The default eventHandler class
      * @return EventManager
      */
-    public static EventManager initializeEventManager(@SuppressWarnings("rawtypes") Class defaultEventHandler) {
+    public static EventManager initializeEventManager(Class<?> defaultEventHandler) {
         EventManager eventManager = new EventManager();
 
         eventManager.autoDiscovery();

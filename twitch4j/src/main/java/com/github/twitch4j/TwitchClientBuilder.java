@@ -86,8 +86,12 @@ public class TwitchClientBuilder {
 
     /**
      * Enabled: Extensions
+     *
+     * @see <a href="https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708">Twitch Shutdown Announcement</a>
+     * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
      */
     @With
+    @Deprecated
     private Boolean enableExtensions = false;
 
     /**
@@ -98,8 +102,12 @@ public class TwitchClientBuilder {
 
     /**
      * Enabled: Kraken
+     * @deprecated Kraken is deprecated and has been shut down on <b>Febuary 28, 2022</b>.
+     *             More details about the deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
+     *             Use {@link #withEnableHelix(Boolean)} instead.
      */
     @With
+    @Deprecated
     private Boolean enableKraken = false;
 
     /**
@@ -124,7 +132,7 @@ public class TwitchClientBuilder {
     /**
      * IRC Command Handlers
      */
-    protected final Set<String> commandPrefixes = new HashSet<>();
+    protected Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Enabled: PubSub
@@ -188,6 +196,14 @@ public class TwitchClientBuilder {
      */
     @With
     protected Bandwidth chatAuthLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @With
+    protected Bandwidth chatChannelMessageLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
 
     /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
@@ -262,6 +278,12 @@ public class TwitchClientBuilder {
      */
     @With
     private Logger.Level feignLogLevel = Logger.Level.NONE;
+
+    /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
 
     /**
      * With a Bot Owner's User ID
@@ -409,13 +431,15 @@ public class TwitchClientBuilder {
                 .withWhisperRateLimit(chatWhisperLimit)
                 .withJoinRateLimit(chatJoinLimit)
                 .withAuthRateLimit(chatAuthLimit)
+                .withPerChannelRateLimit(chatChannelMessageLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
-                .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
-                .setBotOwnerIds(botOwnerIds)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .setBotOwnerIds(botOwnerIds)
+                .setCommandPrefixes(commandPrefixes)
+                .withWsPingPeriod(wsPingPeriod)
                 .build();
         }
 
@@ -427,6 +451,7 @@ public class TwitchClientBuilder {
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
                 .setBotOwnerIds(botOwnerIds)
+                .withWsPingPeriod(wsPingPeriod)
                 .build();
         }
 

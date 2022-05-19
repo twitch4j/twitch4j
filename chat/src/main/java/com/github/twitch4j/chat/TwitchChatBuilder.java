@@ -5,30 +5,37 @@ import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.enums.TwitchLimitType;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TwitchLimitRegistry;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -41,6 +48,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchChatBuilder {
+
+    /**
+     * WebsocketConnection
+     * <p>
+     * can be used to inject a mocked connection into the TwitchChat instance
+     */
+    @With(AccessLevel.PROTECTED)
+    private WebsocketConnection websocketConnection = null;
 
     /**
      * Client Id
@@ -110,7 +125,9 @@ public class TwitchChatBuilder {
     /**
      * IRC Command Handlers
      */
-    protected final List<String> commandPrefixes = new ArrayList<>();
+    @Setter
+    @Accessors(chain = true)
+    protected Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Size of the ChatQueue
@@ -141,6 +158,14 @@ public class TwitchChatBuilder {
      */
     @With
     protected Bandwidth authRateLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @With
+    protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
 
     /**
      * Shared bucket for messages
@@ -221,6 +246,18 @@ public class TwitchChatBuilder {
     private long chatJoinTimeout = 2000L;
 
     /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
+
+    /**
+     * WebSocket Connection Backoff Strategy
+     */
+    @With
+    private IBackoffStrategy connectionBackoffStrategy = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Chat Builder
@@ -262,19 +299,22 @@ public class TwitchChatBuilder {
         }
 
         if (ircMessageBucket == null)
-            ircMessageBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.chatRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_MESSAGE_LIMIT, Collections.singletonList(chatRateLimit));
+            ircMessageBucket = userId == null ? BucketUtils.createBucket(this.chatRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_MESSAGE_LIMIT, Collections.singletonList(chatRateLimit));
 
         if (ircWhisperBucket == null)
-            ircWhisperBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.whisperRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, Arrays.asList(whisperRateLimit));
+            ircWhisperBucket = userId == null ? BucketUtils.createBucket(this.whisperRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, Arrays.asList(whisperRateLimit));
 
         if (ircJoinBucket == null)
-            ircJoinBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.joinRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_JOIN_LIMIT, Collections.singletonList(joinRateLimit));
+            ircJoinBucket = userId == null ? BucketUtils.createBucket(this.joinRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_JOIN_LIMIT, Collections.singletonList(joinRateLimit));
 
         if (ircAuthBucket == null)
-            ircAuthBucket = userId == null ? TwitchChatLimitHelper.createBucket(this.authRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_AUTH_LIMIT, Collections.singletonList(authRateLimit));
+            ircAuthBucket = userId == null ? BucketUtils.createBucket(this.authRateLimit) : TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_AUTH_LIMIT, Collections.singletonList(authRateLimit));
+
+        if (perChannelRateLimit == null)
+            perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit);
     }
 
     /**

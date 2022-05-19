@@ -1,8 +1,5 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
-	// WebSocket
-	api(group = "com.neovisionaries", name = "nv-websocket-client")
-
 	// Rate Limiting
 	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
 
@@ -12,6 +9,12 @@ dependencies {
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
+	api(project(":twitch4j-client-websocket"))
+
+	// Testing
+	testImplementation(group = "org.mockito", name = "mockito-core")
+	testImplementation(group = "org.mockito", name = "mockito-junit-jupiter")
+	testImplementation(group = "org.awaitility", name = "awaitility")
 }
 
 tasks.javadoc {

@@ -3,8 +3,8 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "6.3.0"
-	id("com.coditory.manifest") version "0.1.14"
+	id("io.freefair.lombok") version "6.4.3"
+	id("com.coditory.manifest") version "0.2.0"
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -24,9 +24,9 @@ allprojects {
 				this as StandardJavadocDocletOptions
 				links(
 					"https://javadoc.io/doc/org.jetbrains/annotations/latest",
-					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.2",
+					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.3",
 					"https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.0.0/",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.5.0/",
 					"https://square.github.io/okhttp/4.x/okhttp/",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/latest",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/latest",
@@ -40,7 +40,7 @@ allprojects {
 					"https://takahikokawasaki.github.io/nv-websocket-client/",
 					"https://commons.apache.org/proper/commons-io/apidocs/",
 					"https://commons.apache.org/proper/commons-lang/apidocs/",
-					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.33",
+					"https://www.javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 					"https://fasterxml.github.io/jackson-databind/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-core/javadoc/2.13/",
 					"https://fasterxml.github.io/jackson-annotations/javadoc/2.13/",
@@ -64,7 +64,7 @@ subprojects {
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	lombok {
-		version.set("1.18.22")
+		version.set("1.18.24")
 		disableConfig.set(true)
 	}
 
@@ -89,14 +89,14 @@ subprojects {
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Rate Limiting
-			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.0.0")
+			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.5.0")
 
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
 
 			// Event Dispatcher
-			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.9.9")
-			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.9.9")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.10.0")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.10.0")
 
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
@@ -118,7 +118,7 @@ subprojects {
 				add("api", dep) {
 					version {
 						strictly("[2.12,3[")
-						prefer("2.13.1")
+						prefer("2.13.2")
 					}
 				}
 			}
@@ -129,21 +129,20 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Logging
-		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.33")
+		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.13.1"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.13.3"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.8.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		// - Mocking
-		testImplementation(group = "org.mockito", name = "mockito-core", version = "4.2.0")
-		testImplementation(group = "org.mockito", name = "mockito-junit-jupiter", version = "4.2.0")
+		testImplementation(platform("org.mockito:mockito-bom:4.5.1"))
 		// - Await
-		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.1.1")
+		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.0")
 		// - Logging
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.10")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.11")
 	}
 
 	publishing {

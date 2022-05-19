@@ -1,9 +1,9 @@
 package com.github.twitch4j.chat.util;
 
 import com.github.twitch4j.common.enums.TwitchLimitType;
+import com.github.twitch4j.common.util.BucketUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.local.LocalBucketBuilder;
 import lombok.experimental.UtilityClass;
 
 import java.time.Duration;
@@ -103,24 +103,34 @@ public class TwitchChatLimitHelper {
      */
     public final Bandwidth VERIFIED_AUTH_LIMIT = Bandwidth.simple(200, Duration.ofSeconds(10)).withId(AUTH_BANDWIDTH_ID);
 
+    /**
+     * @param limit bandwidth
+     * @return bucket
+     * @deprecated in favor of BucketUtils
+     */
+    @Deprecated
     public Bucket createBucket(Bandwidth limit) {
-        return Bucket.builder().addLimit(limit).build();
+        return BucketUtils.createBucket(limit);
     }
 
+    /**
+     * @param limits bandwidths
+     * @return bucket
+     * @deprecated in favor of BucketUtils
+     */
+    @Deprecated
     public Bucket createBucket(Bandwidth... limits) {
-        LocalBucketBuilder builder = Bucket.builder();
-        for (Bandwidth limit : limits) {
-            builder.addLimit(limit);
-        }
-        return builder.build();
+        return BucketUtils.createBucket(limits);
     }
 
+    /**
+     * @param limits bandwidths
+     * @return bucket
+     * @deprecated in favor of BucketUtils
+     */
+    @Deprecated
     public Bucket createBucket(Iterable<Bandwidth> limits) {
-        LocalBucketBuilder builder = Bucket.builder();
-        for (Bandwidth limit : limits) {
-            builder.addLimit(limit);
-        }
-        return builder.build();
+        return BucketUtils.createBucket(limits);
     }
 
 }

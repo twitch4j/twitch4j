@@ -31,6 +31,11 @@ public class VideoPlaybackData {
      */
     private Integer length;
 
+    /**
+     * Sent when {@link #getType()} is {@link Type#COMMERCIAL}.
+     */
+    private Boolean scheduled;
+
     @RequiredArgsConstructor
     public enum Type {
         COMMERCIAL("commercial"),

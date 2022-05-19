@@ -8,9 +8,11 @@ import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.helix.interceptor.CustomRewardEncodeMixIn;
+import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
+import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -20,10 +22,13 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Refill;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.Duration;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,6 +52,11 @@ public class TwitchHelixBuilder {
      * @see <a href="https://github.com/twitchdev/twitch-cli/blob/main/docs/mock-api.md">Mock API Docs</a>
      */
     public static final String MOCK_BASE_URL = "http://localhost:8080/mock";
+
+    /**
+     * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
+     */
+    public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.classic(800, Refill.greedy(600, Duration.ofMinutes(1)));
 
     /**
      * Client Id
@@ -109,6 +119,12 @@ public class TwitchHelixBuilder {
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
 
     /**
+     * Custom Rate Limit to use for Helix calls
+     */
+    @With
+    private Bandwidth apiRateLimit = DEFAULT_BANDWIDTH;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -131,6 +147,10 @@ public class TwitchHelixBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
         ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
 
+        // Hystrix: Ban/Unban API already has special 429 logic such that circuit breaking is not needed (and just trips on trivial errors like 'user is already banned')
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#banUser(String,String,String,BanUserInput).circuitBreaker.enabled", false);
+        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#unbanUser(String,String,String,String).circuitBreaker.enabled", false);
+
         // Warning
         if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
             log.warn("Helix: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
@@ -149,16 +169,21 @@ public class TwitchHelixBuilder {
         if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 1);
 
+        // Enforce non-null rate limit bandwidth
+        if (apiRateLimit == null)
+            apiRateLimit = DEFAULT_BANDWIDTH;
+
         // Feign
-        TwitchHelixClientIdInterceptor interceptor = new TwitchHelixClientIdInterceptor(this);
+        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(clientId, clientSecret, defaultAuthToken);
+        TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
         return HystrixFeign.builder()
-            .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, interceptor, timeout))
+            .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
             .encoder(new JacksonEncoder(serializer))
-            .decoder(new TwitchHelixDecoder(mapper, interceptor))
+            .decoder(new TwitchHelixDecoder(mapper, rateLimitTracker))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
-            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder()))
-            .requestInterceptor(interceptor)
+            .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), rateLimitTracker))
+            .requestInterceptor(new TwitchHelixClientIdInterceptor(userAgent, tokenManager))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
             .target(TwitchHelix.class, baseUrl);

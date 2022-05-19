@@ -30,6 +30,7 @@ public class ChannelPointsReward {
 	private GlobalCooldown globalCooldown;
 	private Integer redemptionsRedeemedCurrentStream;
 	private Instant cooldownExpiresAt;
+    private String templateId;
 
 	@Data
 	public static class Image {

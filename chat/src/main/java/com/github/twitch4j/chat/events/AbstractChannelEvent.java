@@ -1,9 +1,12 @@
 package com.github.twitch4j.chat.events;
 
 import com.github.twitch4j.common.events.domain.EventChannel;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Duration;
 
@@ -12,30 +15,32 @@ import java.time.Duration;
  */
 @Data
 @Getter
+@Setter(AccessLevel.PRIVATE)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class AbstractChannelEvent extends TwitchEvent {
 
-	/**
-	 * Event Channel
-	 */
-	private final EventChannel channel;
+    /**
+     * Event Channel
+     */
+    private EventChannel channel;
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel The channel that this event originates from.
-	 */
-	public AbstractChannelEvent(EventChannel channel) {
-		super();
-		this.channel = channel;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     */
+    public AbstractChannelEvent(EventChannel channel) {
+        super();
+        this.channel = channel;
+    }
 
     /**
      * Timeout a user
      *
-     * @param user username
+     * @param user     username
      * @param duration duration
-     * @param reason reason
+     * @param reason   reason
      */
     public void timeout(String user, Duration duration, String reason) {
         StringBuilder sb = new StringBuilder()
@@ -49,7 +54,7 @@ public class AbstractChannelEvent extends TwitchEvent {
     /**
      * Ban a user
      *
-     * @param user username
+     * @param user   username
      * @param reason reason
      */
     public void ban(String user, String reason) {

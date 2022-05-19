@@ -15,9 +15,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @deprecated Kraken is deprecated and has been shut down on <b>Febuary 28, 2022</b>.
+ *             More details about the deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
+ */
 @Slf4j
+@Deprecated
 public class TwitchKrakenErrorDecoder implements ErrorDecoder {
 
     // Decoder
@@ -42,15 +48,15 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
      * Overwrite the Decode Method to handle custom error cases
      *
      * @param methodKey Method Key
-     * @param response Response
+     * @param response  Response
      * @return Exception
      */
     @Override
     public Exception decode(String methodKey, Response response) {
-        Exception ex = null;
+        Exception ex;
 
-        try {
-            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+        try (InputStream is = response.body() == null ? null : response.body().asInputStream()) {
+            String responseBody = is == null ? "" : IOUtils.toString(is, StandardCharsets.UTF_8);
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
@@ -63,10 +69,10 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 429) {
-                ex = new ContextedRuntimeException("To many requests!")
+                ex = new ContextedRuntimeException("Too many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);;
+                    .addContextValue("responseBody", responseBody);
             } else if (response.status() == 503) {
                 // If you get an HTTP 503 (Service Unavailable) error, retry once.
                 // If that retry also results in an HTTP 503, there probably is something wrong with the downstream service.
@@ -80,7 +86,8 @@ public class TwitchKrakenErrorDecoder implements ErrorDecoder {
                     .addContextValue("responseBody", responseBody)
                     .addContextValue("errorType", error.getError())
                     .addContextValue("errorStatus", error.getStatus())
-                    .addContextValue("errorType", error.getMessage());
+                    .addContextValue("errorType", error.getMessage())
+                    .addContextValue("errorMessage", error.getMessage());
             }
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);

@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -32,6 +34,19 @@ public class TwitchClientTest {
             .withEnableKraken(true)
             .withEnableChat(false)
             .build();
+    }
+
+    @Test
+    @DisplayName("Ensure builder calls don't reset command triggers")
+    public void buildCommandPrefix() {
+        TwitchClientBuilder b1 = TwitchClientBuilder.builder().withEnableChat(true);
+        assertTrue(b1.getCommandPrefixes().isEmpty());
+
+        TwitchClientBuilder b2 = b1.withCommandTrigger("!");
+        assertEquals(1, b2.getCommandPrefixes().size());
+
+        TwitchClientBuilder b3 = b2.withEnablePubSub(true);
+        assertEquals(1, b3.getCommandPrefixes().size());
     }
 
     @Test

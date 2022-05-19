@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
@@ -39,8 +40,8 @@ public class TwitchExtensionsErrorDecoder implements ErrorDecoder {
     public Exception decode(String methodKey, Response response) {
         Exception ex;
 
-        try {
-            String responseBody = response.body() == null ? "" : IOUtils.toString(response.body().asInputStream(), StandardCharsets.UTF_8.name());
+        try (InputStream is = response.body() == null ? null : response.body().asInputStream()) {
+            String responseBody = is == null ? "" : IOUtils.toString(is, StandardCharsets.UTF_8);
 
             if (response.status() == 401) {
                 ex = new UnauthorizedException()
@@ -53,7 +54,7 @@ public class TwitchExtensionsErrorDecoder implements ErrorDecoder {
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("responseBody", responseBody);
             } else if (response.status() == 429) {
-                ex = new ContextedRuntimeException("To many requests!")
+                ex = new ContextedRuntimeException("Too many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
                     .addContextValue("responseBody", responseBody);
@@ -70,7 +71,8 @@ public class TwitchExtensionsErrorDecoder implements ErrorDecoder {
                     .addContextValue("responseBody", responseBody)
                     .addContextValue("errorType", error.getError())
                     .addContextValue("errorStatus", error.getStatus())
-                    .addContextValue("errorType", error.getMessage());
+                    .addContextValue("errorType", error.getMessage())
+                    .addContextValue("errorMessage", error.getMessage());
             }
         } catch (IOException fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);

@@ -95,8 +95,12 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Enabled: Extensions
+     *
+     * @see <a href="https://discuss.dev.twitch.tv/t/how-extensions-are-affected-by-the-legacy-twitch-api-v5-shutdown/32708">Twitch Shutdown Announcement</a>
+     * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
      */
     @With
+    @Deprecated
     private Boolean enableExtensions = false;
 
     /**
@@ -139,7 +143,7 @@ public class TwitchClientPoolBuilder {
     /**
      * IRC Command Handlers
      */
-    protected final Set<String> commandPrefixes = new HashSet<>();
+    protected Set<String> commandPrefixes = new HashSet<>();
 
     /**
      * Enabled: PubSub
@@ -209,6 +213,14 @@ public class TwitchClientPoolBuilder {
      */
     @With
     protected Bandwidth chatAuthLimit = TwitchChatLimitHelper.USER_AUTH_LIMIT;
+
+    /**
+     * Custom RateLimit for Messages per Channel
+     * <p>
+     * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
+     */
+    @With
+    protected Bandwidth chatChannelMessageLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
 
     /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended
@@ -283,6 +295,12 @@ public class TwitchClientPoolBuilder {
      */
     @With
     private Logger.Level feignLogLevel = Logger.Level.NONE;
+
+    /**
+     * WebSocket RFC Ping Period in ms (0 = disabled)
+     */
+    @With
+    private int wsPingPeriod = 15_000;
 
     /**
      * With a Bot Owner's User ID
@@ -429,6 +447,7 @@ public class TwitchClientPoolBuilder {
                 .whisperRateLimit(chatWhisperLimit)
                 .joinRateLimit(chatJoinLimit)
                 .authRateLimit(chatAuthLimit)
+                .perChannelRateLimit(chatChannelMessageLimit)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
@@ -438,7 +457,8 @@ public class TwitchClientPoolBuilder {
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
-                        .withCommandTriggers(commandPrefixes)
+                        .withWsPingPeriod(wsPingPeriod)
+                        .setCommandPrefixes(commandPrefixes)
                         .setBotOwnerIds(botOwnerIds)
                 )
                 .build();
@@ -452,13 +472,15 @@ public class TwitchClientPoolBuilder {
                 .withWhisperRateLimit(chatWhisperLimit)
                 .withJoinRateLimit(chatJoinLimit)
                 .withAuthRateLimit(chatAuthLimit)
+                .withPerChannelRateLimit(chatChannelMessageLimit)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
-                .withCommandTriggers(commandPrefixes)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
                 .setBotOwnerIds(botOwnerIds)
+                .setCommandPrefixes(commandPrefixes)
+                .withWsPingPeriod(wsPingPeriod)
                 .build();
         }
 
@@ -469,13 +491,14 @@ public class TwitchClientPoolBuilder {
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
-                .advancedConfiguration(builder -> builder.setBotOwnerIds(botOwnerIds))
+                .advancedConfiguration(builder -> builder.withWsPingPeriod(wsPingPeriod).setBotOwnerIds(botOwnerIds))
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
+                .withWsPingPeriod(wsPingPeriod)
                 .setBotOwnerIds(botOwnerIds)
                 .build();
         }

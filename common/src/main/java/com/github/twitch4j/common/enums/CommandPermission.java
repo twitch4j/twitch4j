@@ -47,12 +47,14 @@ public enum CommandPermission {
     CURRENT_HYPE_TRAIN_CONDUCTOR,
 
     /**
-     * Participated in the most recent predictions event for the blue/first option
+     * Participated in the most recent predictions event for a blue option
+     * <p>
+     * Warning: when there are three or more prediction choices, they are all blue
      */
     PREDICTIONS_BLUE,
 
     /**
-     * Participated in the most recent predictions event for the pink/second option
+     * Participated in the most recent predictions event for a pink option
      */
     PREDICTIONS_PINK,
 

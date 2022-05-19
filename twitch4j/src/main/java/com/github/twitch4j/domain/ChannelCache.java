@@ -51,6 +51,11 @@ public class ChannelCache {
     private final AtomicReference<Integer> followers = new AtomicReference<>();
 
     /**
+     * Clip Query Started At
+     */
+    private final AtomicReference<Instant> clipWindowStart = new AtomicReference<>();
+
+    /**
      * Construct Channel Cache
      *
      * @param userName the name of the channel.

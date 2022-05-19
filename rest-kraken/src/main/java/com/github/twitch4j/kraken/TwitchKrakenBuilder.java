@@ -24,10 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @deprecated Kraken is deprecated and has been shut down on <b>Febuary 28, 2022</b>.
+ *             More details about the deprecation are available <a href="https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline">here</a>.
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Deprecated
 public class TwitchKrakenBuilder {
 
     /**
@@ -95,7 +100,10 @@ public class TwitchKrakenBuilder {
      *
      * @return TwitchKraken
      */
+    @Deprecated
     public TwitchKraken build() {
+        log.warn("Kraken is deprecated and has been shut down on Febuary 28, 2022.");
+        log.warn("More details about the decommission are available here: https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline");
         log.debug("Kraken: Initializing Module ...");
 
         // Hystrix
