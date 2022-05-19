@@ -36,14 +36,16 @@ tasks.dokkaJavadoc {
 			}
 
 			externalDocumentationLink {
-				url.set(uri("https://twitch4j.github.io/docs/").toURL())
+				url.set(uri("https://twitch4j.github.io/javadoc/").toURL())
 			}
 		}
 	}
 }
 
 tasks.javadoc {
-	enabled = false
+	options {
+		exclude("**/*.kt")
+	}
 }
 
 publishing.publications.withType<MavenPublication> {
