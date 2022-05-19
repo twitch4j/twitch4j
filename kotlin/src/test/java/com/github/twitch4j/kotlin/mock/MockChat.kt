@@ -2,12 +2,14 @@ package com.github.twitch4j.kotlin.mock
 
 import com.github.philippheuer.events4j.core.EventManager
 import com.github.twitch4j.chat.TwitchChat
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper
 import com.github.twitch4j.common.util.ThreadUtils
 
 /**
  * The bare minimum we need to test the TwitchChat extensions
  */
 class MockChat : TwitchChat(
+    null,
     EventManager().apply { autoDiscovery() },
     null,
     null,
@@ -27,7 +29,10 @@ class MockChat : TwitchChat(
     null,
     false,
     100,
-    1
+    1,
+    0,
+    null,
+    TwitchChatLimitHelper.MOD_MESSAGE_LIMIT
 ) {
     var isConnected = false
 

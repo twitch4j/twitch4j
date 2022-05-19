@@ -1,4 +1,7 @@
-// In this section you declare the dependencies for your production and test code
+plugins {
+	kotlin("jvm") version "1.6.21"
+}
+
 dependencies {
 	// Twitch4J Modules
 	// We use compileOnly so using this library does not require all modules.
