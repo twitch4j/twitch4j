@@ -6,11 +6,11 @@ dependencies {
 	// This shouldn't be an issue as most, if not all, code are extension functions.
 	compileOnly(project(":twitch4j"))
 
-	api(group = "com.github.philippheuer.events4j", name="events4j-kotlin", version = "0.10.0")
+	api(group = "com.github.philippheuer.events4j", name = "events4j-kotlin", version = "0.10.0")
 
 	// Kotlin coroutines
-	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.0")
-	testImplementation(group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-test", version = "1.6.0")
+	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.1")
+	testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.6.1")
 	testImplementation(project(":twitch4j"))
 }
 
@@ -27,5 +27,3 @@ publishing.publications.withType<MavenPublication> {
 		description.set("Twitch4J Kotlin extension functions")
 	}
 }
-
-
