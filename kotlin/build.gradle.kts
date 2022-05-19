@@ -24,6 +24,22 @@ tasks.javadocJar {
 
 tasks.dokkaJavadoc {
 	moduleName.set("Twitch4J (v${version}) - Kotlin extension functions")
+
+	dokkaSourceSets {
+		configureEach {
+			jdkVersion.set(8)
+
+			sourceLink {
+				localDirectory.set(file("src/main/kotlin"))
+				remoteUrl.set(uri("https://github.com/twitch4j/twitch4j/tree/master/kotlin/src/main/kotlin").toURL())
+				remoteLineSuffix.set("#L")
+			}
+
+			externalDocumentationLink {
+				url.set(uri("https://twitch4j.github.io/docs/").toURL())
+			}
+		}
+	}
 }
 
 tasks.javadoc {
