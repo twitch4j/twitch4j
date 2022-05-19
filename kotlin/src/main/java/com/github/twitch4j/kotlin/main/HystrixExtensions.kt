@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
  * @return           The result of execute
  */
 suspend fun <T> HystrixCommand<T>.get(
-	dispatcher: CoroutineDispatcher = Dispatchers.IO
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): T = withContext(dispatcher) {
-	execute()
+    execute()
 }

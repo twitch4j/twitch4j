@@ -32,8 +32,8 @@ import kotlinx.coroutines.launch
  * @return                  A flow object that encapsulates handling joining, listening to, and leaving a channel
  */
 inline fun <reified T : AbstractChannelEvent> ITwitchChat.channelEventsAsFlow(
-	channel: String,
-	autoJoinAndLeave: Boolean = true
+    channel: String,
+    autoJoinAndLeave: Boolean = true
 ): Flow<T> = channelEventsAsFlow(T::class.java, channel, autoJoinAndLeave)
 
 /**
@@ -59,10 +59,10 @@ inline fun <reified T : AbstractChannelEvent> ITwitchChat.channelEventsAsFlow(
  * @return                  A flow object that encapsulates joining, listening to messages, and leaving a channel
  */
 fun ITwitchChat.channelChatAsFlow(
-	channel: String,
-	autoJoinAndLeave: Boolean = true
+    channel: String,
+    autoJoinAndLeave: Boolean = true
 ): Flow<AbstractChannelMessageEvent> =
-	channelEventsAsFlow(AbstractChannelMessageEvent::class.java, channel, autoJoinAndLeave)
+    channelEventsAsFlow(AbstractChannelMessageEvent::class.java, channel, autoJoinAndLeave)
 
 
 /**
@@ -90,23 +90,23 @@ fun ITwitchChat.channelChatAsFlow(
  * @return                  A flow object that encapsulates handling joining, listening to, and leaving a channel
  */
 fun <T : AbstractChannelEvent> ITwitchChat.channelEventsAsFlow(
-	klass: Class<T>,
-	channel: String,
-	autoJoinAndLeave: Boolean
+    klass: Class<T>,
+    channel: String,
+    autoJoinAndLeave: Boolean
 ): Flow<T> = channelFlow {
-	if (autoJoinAndLeave) {
-		joinChannel(channel)
-	}
+    if (autoJoinAndLeave) {
+        joinChannel(channel)
+    }
 
-	launch {
-		eventManager.flowOn(klass)
-			.filter { it.channel.name.equals(channel, true) }
-			.collect(::send)
-	}
+    launch {
+        eventManager.flowOn(klass)
+            .filter { it.channel.name.equals(channel, true) }
+            .collect(::send)
+    }
 
-	awaitClose {
-		if (autoJoinAndLeave) {
-			leaveChannel(channel)
-		}
-	}
+    awaitClose {
+        if (autoJoinAndLeave) {
+            leaveChannel(channel)
+        }
+    }
 }
