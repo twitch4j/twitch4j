@@ -1,5 +1,6 @@
 plugins {
 	kotlin("jvm") version "1.6.21"
+	id("org.jetbrains.dokka") version "1.6.21"
 }
 
 dependencies {
@@ -17,12 +18,16 @@ dependencies {
 	testImplementation(project(":twitch4j"))
 }
 
+tasks.javadocJar {
+	from(tasks.dokkaJavadoc)
+}
+
+tasks.dokkaJavadoc {
+	moduleName.set("Twitch4J (v${version}) - Kotlin extension functions")
+}
+
 tasks.javadoc {
 	enabled = false
-	options {
-		title = "Twitch4J (v${version}) - Kotlin extension functions"
-		windowTitle = "Twitch4J (v${version}) - Kotlin extension functions"
-	}
 }
 
 publishing.publications.withType<MavenPublication> {

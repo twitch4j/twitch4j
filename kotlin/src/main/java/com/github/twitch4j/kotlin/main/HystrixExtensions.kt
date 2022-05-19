@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * A simple wrapper function that will default to dispatch the execute job in the IO dispatcher.
- * Also see {@link HystrixCommand#execute}
+ * Also see [HystrixCommand#execute]
  *
  * @param dispatcher The dispatcher to run in
  * @return           The result of execute
