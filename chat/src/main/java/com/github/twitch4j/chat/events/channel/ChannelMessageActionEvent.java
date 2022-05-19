@@ -12,21 +12,22 @@ import java.util.Set;
  */
 public class ChannelMessageActionEvent extends AbstractChannelMessageEvent {
 
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
+    /**
+     * Event Constructor
+     *
+     * @param channel      The channel that this event originates from.
      * @param messageEvent The raw message event
-	 * @param user        The user who triggered the event.
-	 * @param message     The plain text of the message.
-	 * @param permissions The permissions of the triggering user.
-	 */
-	public ChannelMessageActionEvent(
+     * @param user         The user who triggered the event.
+     * @param message      The plain text of the message.
+     * @param permissions  The permissions of the triggering user.
+     */
+    public ChannelMessageActionEvent(
         EventChannel channel,
         IRCMessageEvent messageEvent,
         EventUser user, String message,
         Set<CommandPermission> permissions
     ) {
-		super(channel, messageEvent, user, message, permissions);
-	}
+        super(channel, messageEvent, user, message, permissions);
+    }
+
 }

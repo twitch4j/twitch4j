@@ -8,19 +8,23 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Set;
 
-@Getter
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Data
+@Setter(AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = false)
 public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent implements ReplyableEvent {
+
     /**
      * RAW Message Event
      */
-    private final IRCMessageEvent messageEvent;
+    private IRCMessageEvent messageEvent;
 
     /**
      * User
@@ -47,8 +51,14 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
      */
     private int subscriptionTier;
 
+    /**
+     * Nonce
+     */
+    @Unofficial
+    @Getter(lazy = true)
+    private final String nonce = getMessageEvent().getNonce().orElse(null);
 
-	public AbstractChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message, Set<CommandPermission> permissions) {
+    public AbstractChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message, Set<CommandPermission> permissions) {
         super(channel);
         this.messageEvent = messageEvent;
         this.user = user;
@@ -56,7 +66,7 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
         this.permissions = permissions;
         this.subscriberMonths = messageEvent.getSubscriberMonths().orElse(0);
         this.subscriptionTier = messageEvent.getSubscriptionTier().orElse(0);
-	}
+    }
 
     /**
      * @return the regions of the message that were flagged by AutoMod.
@@ -65,4 +75,5 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
     public List<AutoModFlag> getFlags() {
         return this.getMessageEvent().getFlags();
     }
+
 }

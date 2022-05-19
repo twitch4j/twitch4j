@@ -9,6 +9,7 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.ChatReply;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,22 +20,16 @@ import java.util.Set;
  * This event gets called when a message is received in a channel.
  */
 @Value
-@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class ChannelMessageEvent extends AbstractChannelMessageEvent {
-
-    /**
-     * Nonce
-     */
-    @Unofficial
-    @Getter(lazy = true)
-    private String nonce = getMessageEvent().getNonce().orElse(null);
 
     /**
      * Information regarding the parent message being replied to, if applicable.
      */
     @Nullable
     @Getter(lazy = true)
-    private ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
+    ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
 
     /**
      * Information regarding any associated Crowd Chant for this message, if applicable.
@@ -108,4 +103,5 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
     public boolean isUserIntroduction() {
         return "user-intro".equals(getMessageEvent().getTags().get("msg-id"));
     }
+
 }
