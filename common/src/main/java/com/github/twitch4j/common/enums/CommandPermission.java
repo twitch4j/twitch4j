@@ -59,6 +59,26 @@ public enum CommandPermission {
     PREDICTIONS_PINK,
 
     /**
+     * Watching without audio (user-selected)
+     */
+    NO_AUDIO,
+
+    /**
+     * Watching without video (user-selected)
+     */
+    NO_VIDEO,
+
+    /**
+     * Earned for being a part of at least 1 moment on a channel
+     */
+    MOMENTS,
+
+    /**
+     * Artist on this Channel
+     */
+    ARTIST,
+
+    /**
      * VIP
      */
     VIP,
