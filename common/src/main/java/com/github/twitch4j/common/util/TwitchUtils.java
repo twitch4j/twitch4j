@@ -70,7 +70,7 @@ public class TwitchUtils {
                 permissionSet.add(CommandPermission.PRIME_TURBO);
             }
             // Twitch Staff
-            if (badges.containsKey("staff")) {
+            if (badges.containsKey("staff") || badges.containsKey("admin")) {
                 permissionSet.add(CommandPermission.TWITCHSTAFF);
             }
             // Subscriber
@@ -78,11 +78,11 @@ public class TwitchUtils {
                 permissionSet.add(CommandPermission.SUBSCRIBER);
             }
             // SubGifter
-            if (badges.containsKey("sub-gifter")) {
+            if (badges.containsKey("sub-gifter") || badges.containsKey("sub-gift-leader")) {
                 permissionSet.add(CommandPermission.SUBGIFTER);
             }
             // Cheerer
-            if (badges.containsKey("bits") || badges.containsKey("bits-leader")) {
+            if (badges.containsKey("bits") || badges.containsKey("bits-leader") || badges.containsKey("anonymous-cheerer")) {
                 permissionSet.add(CommandPermission.BITS_CHEERER);
             }
             // Founder
@@ -117,6 +117,21 @@ public class TwitchUtils {
                 } else if (first == 'p') {
                     permissionSet.add(CommandPermission.PREDICTIONS_PINK);
                 }
+            }
+            // Accessibility
+            if (badges.containsKey("no_audio")) {
+                permissionSet.add(CommandPermission.NO_AUDIO);
+            }
+            if (badges.containsKey("no_video")) {
+                permissionSet.add(CommandPermission.NO_VIDEO);
+            }
+            // Present for Channel Moment
+            if (badges.containsKey("moments")) {
+                permissionSet.add(CommandPermission.MOMENTS);
+            }
+            // Channel Emote Artist
+            if (badges.containsKey("artist-badge")) {
+                permissionSet.add(CommandPermission.ARTIST);
             }
         }
 
