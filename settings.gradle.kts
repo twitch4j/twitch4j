@@ -13,7 +13,8 @@ include(
 	":pubsub",
 	":graphql",
 	":util",
-	":twitch4j"
+	":twitch4j",
+	":kotlin"
 )
 
 project(":common").name = "twitch4j-common"
@@ -29,3 +30,4 @@ project(":pubsub").name = "twitch4j-pubsub"
 project(":graphql").name = "twitch4j-graphql"
 project(":util").name = "twitch4j-util"
 project(":twitch4j").name = "twitch4j"
+project(":kotlin").name = "twitch4j-kotlin"

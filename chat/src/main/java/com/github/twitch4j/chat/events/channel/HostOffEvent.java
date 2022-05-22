@@ -1,31 +1,26 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.events.TwitchEvent;
+import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 
 /**
  * This event gets called when the user stops hosting someone.
  */
 @Value
-@Getter
-@EqualsAndHashCode(callSuper = false)
-public class HostOffEvent extends TwitchEvent {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class HostOffEvent extends AbstractChannelEvent {
 
-	/**
-	 * Event ChatChannel
-	 */
-	private EventChannel channel;
-
-	/**
-	 * Event Constructor
-	 *
-	 * @param channel     The channel that this event originates from.
-	 */
-	public HostOffEvent(EventChannel channel) {
-		this.channel = channel;
-	}
+    /**
+     * Event Constructor
+     *
+     * @param channel The channel that this event originates from.
+     */
+    public HostOffEvent(EventChannel channel) {
+        super(channel);
+    }
 
 }
