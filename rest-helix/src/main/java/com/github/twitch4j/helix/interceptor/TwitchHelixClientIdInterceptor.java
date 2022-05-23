@@ -14,6 +14,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+    public static final String CLIENT_HEADER = "Client-Id";
 
     /**
      * User Agent
@@ -65,8 +66,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         }
 
         // set headers
-        if (!template.headers().containsKey("Client-Id"))
-            template.header("Client-Id", clientId);
+        if (!template.headers().containsKey(CLIENT_HEADER))
+            template.header(CLIENT_HEADER, clientId);
         template.header("User-Agent", userAgent);
     }
 

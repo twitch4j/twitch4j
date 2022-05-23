@@ -5,8 +5,10 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.BucketUtils;
+import com.github.twitch4j.helix.domain.SendPubSubMessageInput;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +20,18 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @SuppressWarnings("ConstantConditions")
 public final class TwitchHelixRateLimitTracker {
+
+    /**
+     * Officially documented per-channel rate limit on {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionChatMessage(String, String, String, String, String)}
+     */
+    private static final Bandwidth EXT_CHAT_BANDWIDTH = Bandwidth.simple(12, Duration.ofMinutes(1L));
+
+    /**
+     * Officially documented bucket size (but unofficial refill rate) for {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionPubSubMessage(String, String, SendPubSubMessageInput)}
+     *
+     * @see <a href="https://github.com/twitchdev/issues/issues/612">Issue report</a>
+     */
+    private static final Bandwidth EXT_PUBSUB_BANDWIDTH = Bandwidth.classic(100, Refill.greedy(1, Duration.ofSeconds(1L)));
 
     /**
      * Empirically determined rate limit on helix bans and unbans, per channel
@@ -41,7 +55,21 @@ public final class TwitchHelixRateLimitTracker {
      * Rate limit buckets by user/app
      */
     private final Cache<String, Bucket> primaryBuckets = Caffeine.newBuilder()
+        .expireAfterAccess(80, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Extensions API: send chat message rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> extensionChatBuckets = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Extensions API: send pubsub message rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> extensionPubSubBuckets = Caffeine.newBuilder()
+        .expireAfterAccess(100, TimeUnit.SECONDS)
         .build();
 
     /**
@@ -99,6 +127,16 @@ public final class TwitchHelixRateLimitTracker {
      */
 
     @NotNull
+    Bucket getExtensionChatBucket(@NotNull String clientId, @NotNull String channelId) {
+        return extensionChatBuckets.get(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_CHAT_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getExtensionPubSubBucket(@NotNull String clientId, @NotNull String channelId) {
+        return extensionPubSubBuckets.get(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_PUBSUB_BANDWIDTH));
+    }
+
+    @NotNull
     @Unofficial
     Bucket getModerationBucket(@NotNull String channelId) {
         return bansByChannelId.get(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
@@ -124,6 +162,14 @@ public final class TwitchHelixRateLimitTracker {
         this.updateRemainingGeneric(token, remaining, this::getPrimaryBucketKey, this::getOrInitializeBucket);
     }
 
+    public void updateRemainingExtensionChat(@NotNull String clientId, @NotNull String channelId, int remaining) {
+        this.updateRemainingConservative(getExtensionChatBucket(clientId, channelId), remaining);
+    }
+
+    public void updateRemainingExtensionPubSub(@NotNull String clientId, @NotNull String target, int remaining) {
+        this.updateRemainingConservative(getExtensionPubSubBucket(clientId, target), remaining);
+    }
+
     public void updateRemainingCreateClip(@NotNull String token, int remaining) {
         this.updateRemainingGeneric(token, remaining, OAuth2Credential::getUserId, this::getClipBucket);
     }
@@ -143,6 +189,10 @@ public final class TwitchHelixRateLimitTracker {
         if (key == null) return;
 
         Bucket bucket = keyToBucket.apply(key);
+        updateRemainingConservative(bucket, remaining);
+    }
+
+    private void updateRemainingConservative(Bucket bucket, int remaining) {
         long diff = bucket.getAvailableTokens() - remaining;
         if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
     }

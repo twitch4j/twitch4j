@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
+import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.CLIENT_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixDecoder.singleFirst;
 
 @Slf4j
@@ -99,8 +100,45 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 
+        // Extensions API: sendExtensionChatMessage has a stricter per-channel bucket
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/extensions/chat")) {
+            // Obtain the bucket key
+            String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket chatBucket = rateLimitTracker.getExtensionChatBucket(clientId, channelId);
+            return executeAgainstBucket(chatBucket, () -> client.execute(request, options));
+        }
+
+        // Extensions API: sendExtensionPubSubMessage has a stricter bucket depending on the target
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/extensions/pubsub")) {
+            // Obtain the bucket key
+            String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
+            String target = getExtensionPubSubTarget(request.body());
+
+            // Conform to endpoint-specific bucket
+            Bucket pubSubBucket = rateLimitTracker.getExtensionPubSubBucket(clientId, target);
+            return executeAgainstBucket(pubSubBucket, () -> client.execute(request, options));
+        }
+
         // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
+    }
+
+    static String getExtensionPubSubTarget(byte[] body) {
+        String bodyStr = new String(body);
+        int i = bodyStr.indexOf("\"broadcaster_id\":");
+        String target; // if no broadcaster is specified, the target is global. alphabetical field order provides a check that we aren't grabbing an id from within the specified message
+        if (i < 0 || i > bodyStr.indexOf("\"message\":")) {
+            target = "global";
+        } else {
+            i += "\"broadcaster_id\":".length();
+            int start = bodyStr.indexOf('"', i) + 1;
+            int end = bodyStr.indexOf('"', start);
+            target = end > start ? bodyStr.substring(start, end) : "global";
+        }
+        return target;
     }
 
     private <T> T executeAgainstBucket(Bucket bucket, Callable<T> call) throws IOException {
