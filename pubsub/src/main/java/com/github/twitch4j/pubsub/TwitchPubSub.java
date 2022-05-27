@@ -371,7 +371,7 @@ public class TwitchPubSub implements ITwitchPubSub {
         // 3) allow other threads to update subscribedTopics again
         // 4) send unlisten requests for the old elements of subscribedTopics (optional?)
         // 5) call listenOnTopic for each new PubSubRequest
-        subscribedTopics.forEach(topic -> queueRequest(topic));
+        subscribedTopics.forEach(this::queueRequest);
     }
 
     protected void onTextMessage(String text) {
@@ -593,6 +593,9 @@ public class TwitchPubSub implements ITwitchPubSub {
                             break;
                         case "hype-train-cooldown-expiration":
                             eventManager.publish(new HypeTrainCooldownExpirationEvent(lastTopicIdentifier));
+                            break;
+                        case "last-x-experiment-event":
+                            // ignore for now (experiment is not publicly deployed)
                             break;
                         default:
                             log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
