@@ -27,7 +27,7 @@ allprojects {
 					"https://javadoc.io/doc/com.github.ben-manes.caffeine/caffeine/2.9.3",
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.5.0",
-					"https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3",
+					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.2",
@@ -35,7 +35,6 @@ allprojects {
 					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.8",
 					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/11.8",
 					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/11.8",
-					"https://javadoc.io/doc/com.netflix.hystrix/hystrix-core/1.5.18",
 					"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 					"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.13.3",
