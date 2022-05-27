@@ -13,8 +13,8 @@ dependencies {
 	api(group = "com.github.philippheuer.events4j", name = "events4j-kotlin", version = "0.10.0")
 
 	// Kotlin coroutines
-	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.1")
-	testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.6.1")
+	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.2")
+	testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.6.2")
 	testImplementation(project(":twitch4j"))
 }
 
