@@ -42,7 +42,6 @@ allprojects {
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.13.3",
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.13.3",
 					"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
-					"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
 					"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.12.0",
 					"https://javadoc.io/doc/org.projectlombok/lombok/1.18.24",
 					"https://twitch4j.github.io/javadoc"
