@@ -24,8 +24,8 @@ public class SupportActivityFeedData {
     private Integer quantity;
 
     @Unofficial
-    public boolean isCheer() {
-        return "BITS".equals(source) || "CHEER".equals(action);
+    public boolean isBitsCheer() {
+        return "BITS".equals(source) && "CHEER".equals(action);
     }
 
     @Unofficial
