@@ -1627,6 +1627,43 @@ public interface TwitchHelix {
     );
 
     /**
+     * Raid another channel by sending the broadcaster’s viewers to the targeted channel.
+     * <p>
+     * This endpoint triggers a 90-second cooldown before the raid is executed (or the broadcaster can manually press "Raid now").
+     *
+     * @param authToken         Broadcaster user access token with the channel:manage:raids scope.
+     * @param fromBroadcasterId The ID of the broadcaster that’s sending the raiding party.
+     * @param toBroadcasterId   The ID of the broadcaster to raid.
+     * @return RaidRequestList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_RAIDS_MANAGE
+     */
+    @Unofficial // currently in open beta
+    @RequestLine("POST /raids?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<RaidRequestList> startRaid(
+        @Param("token") String authToken,
+        @Param("from_broadcaster_id") String fromBroadcasterId,
+        @Param("to_broadcaster_id") String toBroadcasterId
+    );
+
+    /**
+     * Cancel a pending raid.
+     * <p>
+     * You can cancel a raid at any point up until the broadcaster clicks Raid Now in the Twitch UX or the 90 seconds countdown expires.
+     *
+     * @param authToken     Broadcaster user access token with the channel:manage:raids scope.
+     * @param broadcasterId The ID of the broadcaster that sent the raiding party.
+     * @return 204 No Content upon a successful raid cancel call
+     */
+    @Unofficial // currently in open beta
+    @RequestLine("DELETE /raids?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> cancelRaid(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Gets games sorted by number of current viewers on Twitch, most popular first.
      * Using user-token or app-token to increase rate limits.
      *

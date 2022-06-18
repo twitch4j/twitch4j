@@ -99,6 +99,17 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(clipBucket, () -> client.execute(request, options));
         }
 
+        // Raids API: startRaid and cancelRaid have a stricter bucket that applies per channel id
+        if (templatePath.endsWith("/raids")) {
+            // Obtain the channel id
+            String param = request.httpMethod() == Request.HttpMethod.POST ? "from_broadcaster_id" : "broadcaster_id";
+            String channelId = request.requestTemplate().queries().getOrDefault(param, Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket raidBucket = rateLimitTracker.getRaidsBucket(channelId);
+            return executeAgainstBucket(raidBucket, () -> client.execute(request, options));
+        }
+
         // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
     }
