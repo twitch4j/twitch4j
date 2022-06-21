@@ -1757,7 +1757,10 @@ public interface TwitchHelix {
      * @return StreamScheduleResponse
      */
     @RequestLine("POST /schedule/segment?broadcaster_id={broadcaster_id}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     HystrixCommand<StreamScheduleResponse> createStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
@@ -1774,7 +1777,10 @@ public interface TwitchHelix {
      * @return StreamScheduleResponse
      */
     @RequestLine("PATCH /schedule/segment?broadcaster_id={broadcaster_id}&id={id}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     HystrixCommand<StreamScheduleResponse> updateStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
