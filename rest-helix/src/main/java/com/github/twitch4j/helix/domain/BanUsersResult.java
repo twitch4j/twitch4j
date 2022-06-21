@@ -29,6 +29,11 @@ public class BanUsersResult {
     private String userId;
 
     /**
+     * The UTC date and time (in RFC3999 format) when the ban was created.
+     */
+    private Instant createdAt;
+
+    /**
      * The UTC date and time (in RFC3339 format) that the timeout will end.
      * Is null if the user was banned instead of put in a timeout.
      */

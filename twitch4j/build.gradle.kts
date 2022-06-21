@@ -2,9 +2,12 @@
 dependencies {
 	// Twitch4J Modules
 	val thatProject = project
-	rootProject.subprojects.filter { it != thatProject }.forEach {
-		api(it)
-	}
+	rootProject.subprojects
+		.filter { it != thatProject }
+		.filter { it.name != "twitch4j-kotlin" }
+		.forEach {
+			api(it)
+		}
 
 	// Cache
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")

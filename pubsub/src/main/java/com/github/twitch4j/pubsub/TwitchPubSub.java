@@ -54,6 +54,7 @@ import com.github.twitch4j.pubsub.domain.RadioData;
 import com.github.twitch4j.pubsub.domain.RedemptionProgress;
 import com.github.twitch4j.pubsub.domain.SubGiftData;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
+import com.github.twitch4j.pubsub.domain.SupportActivityFeedData;
 import com.github.twitch4j.pubsub.domain.UpdateSummaryData;
 import com.github.twitch4j.pubsub.domain.UpdatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.UserAutomodCaughtMessage;
@@ -111,6 +112,7 @@ import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.github.twitch4j.pubsub.events.SubLeaderboardEvent;
+import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
 import com.github.twitch4j.pubsub.events.UpdateOnsiteNotificationSummaryEvent;
 import com.github.twitch4j.pubsub.events.UpdateRedemptionFinishedEvent;
 import com.github.twitch4j.pubsub.events.UpdateRedemptionProgressEvent;
@@ -371,7 +373,7 @@ public class TwitchPubSub implements ITwitchPubSub {
         // 3) allow other threads to update subscribedTopics again
         // 4) send unlisten requests for the old elements of subscribedTopics (optional?)
         // 5) call listenOnTopic for each new PubSubRequest
-        subscribedTopics.forEach(topic -> queueRequest(topic));
+        subscribedTopics.forEach(this::queueRequest);
     }
 
     protected void onTextMessage(String text) {
@@ -593,6 +595,11 @@ public class TwitchPubSub implements ITwitchPubSub {
                             break;
                         case "hype-train-cooldown-expiration":
                             eventManager.publish(new HypeTrainCooldownExpirationEvent(lastTopicIdentifier));
+                            break;
+                        case "last-x-experiment-event":
+                            // note: this isn't a true hype train event (it can be fired with no train active), but twitch hacked together the feature to use the hype pubsub infrastructure
+                            final SupportActivityFeedData lastData = TypeConvert.convertValue(msgData, SupportActivityFeedData.class);
+                            eventManager.publish(new SupportActivityFeedEvent(lastTopicIdentifier, lastData));
                             break;
                         default:
                             log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());

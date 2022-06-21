@@ -24,6 +24,7 @@ public enum TwitchScopes {
     HELIX_CHANNEL_POLLS_READ("channel:read:polls"),
     HELIX_CHANNEL_PREDICTIONS_MANAGE("channel:manage:predictions"),
     HELIX_CHANNEL_PREDICTIONS_READ("channel:read:predictions"),
+    HELIX_CHANNEL_RAIDS_MANAGE("channel:manage:raids"),
     HELIX_CHANNEL_REDEMPTIONS_READ("channel:read:redemptions"),
     HELIX_CHANNEL_STREAM_KEY_READ("channel:read:stream_key"),
     HELIX_CHANNEL_SUBSCRIPTIONS_READ("channel:read:subscriptions"),

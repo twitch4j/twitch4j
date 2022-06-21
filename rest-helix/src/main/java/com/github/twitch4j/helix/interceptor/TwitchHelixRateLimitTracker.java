@@ -51,6 +51,11 @@ public final class TwitchHelixRateLimitTracker {
     );
 
     /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
+     */
+    private static final Bandwidth RAIDS_BANDWIDTH = Bandwidth.simple(10, Duration.ofMinutes(10));
+
+    /**
      * Empirically determined rate limit on helix bans and unbans, per channel
      */
     @Unofficial
@@ -73,6 +78,13 @@ public final class TwitchHelixRateLimitTracker {
      */
     private final Cache<String, Bucket> primaryBuckets = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Raids API: start and cancel raid rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> raidsByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.MINUTES)
         .build();
 
     /**
@@ -132,6 +144,11 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     Bucket getAutomodStatusBucket(@NotNull String channelId) {
         return TwitchLimitRegistry.getInstance().getOrInitializeBucket(channelId, TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT, AUTOMOD_STATUS_NORMAL_BANDWIDTH);
+    }
+
+    @NotNull
+    Bucket getRaidsBucket(@NotNull String channelId) {
+        return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
     }
 
     @NotNull
