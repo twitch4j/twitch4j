@@ -35,6 +35,11 @@ public class BannedUser {
     private Instant expiresAt;
 
     /**
+     * The UTC date and time (in RFC3999 format) when the ban was created.
+     */
+    private Instant createdAt;
+
+    /**
      * The reason for the ban if provided by the moderator.
      */
     @Nullable

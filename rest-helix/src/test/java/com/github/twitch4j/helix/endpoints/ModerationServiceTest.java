@@ -35,7 +35,7 @@ public class ModerationServiceTest extends AbstractEndpointTest {
         List<AutomodEnforceStatus> results = TestUtils.getTwitchHelixClient().checkAutomodStatus(
             TestUtils.getCredential().getAccessToken(),
             TWITCH_USER_ID,
-            AutomodEnforceCheckList.builder().message(new AutomodEnforceCheck("Hello world!", "142621956")).build()
+            AutomodEnforceCheckList.builder().message(new AutomodEnforceCheck("Hello world!")).build()
         ).execute().getStatuses();
 
         Assertions.assertNotNull(results);

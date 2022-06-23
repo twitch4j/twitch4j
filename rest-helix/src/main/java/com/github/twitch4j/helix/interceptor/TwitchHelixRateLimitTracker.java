@@ -4,7 +4,9 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.enums.TwitchLimitType;
 import com.github.twitch4j.common.util.BucketUtils;
+import com.github.twitch4j.common.util.TwitchLimitRegistry;
 import com.github.twitch4j.helix.domain.SendPubSubMessageInput;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -14,12 +16,46 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({ "ConstantConditions", "unused" })
 public final class TwitchHelixRateLimitTracker {
+
+    private static final String AUTOMOD_STATUS_MINUTE_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-min";
+    private static final String AUTOMOD_STATUS_HOUR_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-hr";
+
+    /**
+     * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
+     */
+    public static final List<Bandwidth> AUTOMOD_STATUS_NORMAL_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(5, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
+        Bandwidth.simple(50, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+    );
+
+    /**
+     * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
+     */
+    public static final List<Bandwidth> AUTOMOD_STATUS_AFFILIATE_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(10, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
+        Bandwidth.simple(100, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+    );
+
+    /**
+     * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
+     */
+    public static final List<Bandwidth> AUTOMOD_STATUS_PARTNER_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(30, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
+        Bandwidth.simple(300, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+    );
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
+     */
+    private static final Bandwidth RAIDS_BANDWIDTH = Bandwidth.simple(10, Duration.ofMinutes(10));
 
     /**
      * Officially documented per-channel rate limit on {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionChatMessage(String, String, String, String, String)}
@@ -70,6 +106,13 @@ public final class TwitchHelixRateLimitTracker {
      */
     private final Cache<String, Bucket> extensionPubSubBuckets = Caffeine.newBuilder()
         .expireAfterAccess(100, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Raids API: start and cancel raid rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> raidsByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(10, TimeUnit.MINUTES)
         .build();
 
     /**
@@ -134,6 +177,16 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     Bucket getExtensionPubSubBucket(@NotNull String clientId, @NotNull String channelId) {
         return extensionPubSubBuckets.get(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_PUBSUB_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getAutomodStatusBucket(@NotNull String channelId) {
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(channelId, TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT, AUTOMOD_STATUS_NORMAL_BANDWIDTH);
+    }
+
+    @NotNull
+    Bucket getRaidsBucket(@NotNull String channelId) {
+        return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
     }
 
     @NotNull
