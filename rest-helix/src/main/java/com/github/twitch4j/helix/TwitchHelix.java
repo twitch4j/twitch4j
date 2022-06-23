@@ -2408,7 +2408,7 @@ public interface TwitchHelix {
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("POST /webhooks/hub")
-    @Headers({"Authorization: Bearer {token}", "content-type: application/json"})
+    @Headers({"Authorization: Bearer {token}", "Content-Type: application/json"})
     @Deprecated
     HystrixCommand<Response> requestWebhookSubscription(
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
