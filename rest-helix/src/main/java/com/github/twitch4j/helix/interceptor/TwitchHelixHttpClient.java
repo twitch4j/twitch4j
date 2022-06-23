@@ -67,6 +67,16 @@ public class TwitchHelixHttpClient implements Client {
     private Response delegatedExecute(Request request, Request.Options options) throws IOException {
         String templatePath = request.requestTemplate().path();
 
+        // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/moderation/enforcements/status")) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket autoModBucket = rateLimitTracker.getAutomodStatusBucket(channelId);
+            return executeAgainstBucket(autoModBucket, () -> client.execute(request, options));
+        }
+
         // Moderation API: banUser and unbanUser share a bucket per channel id
         if (templatePath.endsWith("/moderation/bans")) {
             // Obtain the channel id

@@ -55,6 +55,27 @@ public enum TwitchLimitRegistry {
     }
 
     /**
+     * Invalidates the registered rate limits for this id.
+     *
+     * @param userId the id of the user or channel whose registered limits can be cleared from memory
+     * @return whether the user had registered limits that were cleared
+     */
+    public boolean invalidateLimitsByUserId(String userId) {
+        return limits.remove(userId) != null;
+    }
+
+    /**
+     * Invalidates a specific rate limit type that was registered for a specific user/channel id.
+     *
+     * @param userId    the id of the user or channel whose registered limit should be cleared from memory
+     * @param limitType the type of rate limit that should be cleared
+     * @return whether the user a registered limit of the specified type that could be cleared
+     */
+    public boolean invalidateLimit(String userId, TwitchLimitType limitType) {
+        return limits.getOrDefault(userId, Collections.emptyMap()).remove(limitType) != null;
+    }
+
+    /**
      * Obtains the {@link Bucket} for a user and rate limit type, if it has been registered.
      *
      * @param userId    the id of the user whose rate limit bucket is being requested.
@@ -74,6 +95,7 @@ public enum TwitchLimitRegistry {
      * @param limit     the default bandwidth settings for this user and rate limit type.
      * @return the shared rate limit bucket for this user and limit type
      */
+    @NonNull
     public Bucket getOrInitializeBucket(@NonNull String userId, @NonNull TwitchLimitType limitType, @NonNull List<Bandwidth> limit) {
         return getBucketsByUser(userId).computeIfAbsent(limitType, l -> BucketUtils.createBucket(limit));
     }
@@ -85,6 +107,7 @@ public enum TwitchLimitRegistry {
     /**
      * @return the single thread-safe instance of the limit registry.
      */
+    @NonNull
     public static TwitchLimitRegistry getInstance() {
         return INSTANCE;
     }

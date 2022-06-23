@@ -27,7 +27,14 @@ public enum TwitchLimitType {
     /**
      * How fast private messages can be issued over IRC.
      */
-    CHAT_WHISPER_LIMIT("irc-whisper-limit");
+    CHAT_WHISPER_LIMIT("irc-whisper-limit"),
+
+    /**
+     * How fast Check AutoMod Status can be called per channel via Helix.
+     *
+     * @see <a href="https://discuss.dev.twitch.tv/t/upcoming-changes-to-the-check-automod-status-api-endpoint/38512#rate-limits-2">Twitch Announcement</a>
+     */
+    HELIX_AUTOMOD_STATUS_LIMIT("helix-automod_status-limit");
 
     /**
      * The identifier for the related bandwidth slot in a bucket for smoother replacement.
