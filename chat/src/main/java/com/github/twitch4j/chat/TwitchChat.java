@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.ChatConnectionStateEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
+import com.github.twitch4j.chat.events.TwitchEvent;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
@@ -31,6 +32,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
+import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -451,6 +453,18 @@ public class TwitchChat implements ITwitchChat {
             }
         });
 
+        // channel event metrics
+        eventManager.onEvent(TwitchEvent.class, metricEvent -> {
+            if (metricEvent instanceof AbstractChannelEvent) {
+                String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
+                if (StringUtils.isNotEmpty(channelId)) {
+                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection", instanceId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+                }
+            } else {
+                meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection", instanceId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
+            }
+        });
+
         // Initialize joinAttemptsByChannelName (on an attempt expiring without explicit removal, we retry with exponential backoff)
         if (maxJoinRetries > 0) {
             final long initialWait = Math.max(chatJoinTimeout, 0);
@@ -580,8 +594,10 @@ public class TwitchChat implements ITwitchChat {
                             IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
                             if (event.isValid()) {
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection", instanceId), Tag.of("status", "ok"))).increment();
                                 eventManager.publish(event);
                             } else {
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection", instanceId), Tag.of("status", "parse_error"))).increment();
                                 log.trace("Can't parse {}", event.getRawMessage());
                             }
                         } catch (Exception ex) {
