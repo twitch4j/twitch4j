@@ -12,9 +12,16 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -27,6 +34,9 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class TwitchMessagingInterfaceBuilder {
+
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * Client Id
@@ -117,6 +127,7 @@ public class TwitchMessagingInterfaceBuilder {
             .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchMessagingInterfaceErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .retryer(new Retryer.Default(1, 10000, 3))

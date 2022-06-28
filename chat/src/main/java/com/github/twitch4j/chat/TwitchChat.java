@@ -27,6 +27,7 @@ import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
@@ -64,6 +65,10 @@ import java.util.function.Consumer;
 public class TwitchChat implements ITwitchChat {
 
     public static final int REQUIRED_THREAD_COUNT = 2;
+
+    private final MeterRegistry meterRegistry;
+
+    private final String instanceId;
 
     /**
      * EventManager
@@ -254,6 +259,8 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Constructor
      *
+     * @param instanceId                     Instance Id
+     * @param meterRegistry                  Micrometer MeterRegistry
      * @param websocketConnection            WebsocketConnection
      * @param eventManager                   EventManager
      * @param credentialManager              CredentialManager
@@ -282,7 +289,9 @@ public class TwitchChat implements ITwitchChat {
      * @param wsCloseDelay                   Websocket Close Delay
      * @param outboundCommandFilter          Outbound Command Filter
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+    public TwitchChat(String instanceId, MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+        this.instanceId = instanceId;
+        this.meterRegistry = meterRegistry;
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -315,6 +324,8 @@ public class TwitchChat implements ITwitchChat {
         // init connection
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
+                spec.instanceId(instanceId);
+                spec.meterRegistry(meterRegistry);
                 spec.baseUrl(baseUrl);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);

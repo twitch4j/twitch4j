@@ -35,7 +35,14 @@ import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import feign.Logger;
 import io.github.bucket4j.Bandwidth;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -264,6 +271,9 @@ public class TwitchClientBuilder {
     @With
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
+
     /**
      * Scheduler Thread Pool Executor
      */
@@ -418,6 +428,7 @@ public class TwitchClientBuilder {
         TwitchExtensions extensions = null;
         if (this.enableExtensions) {
             extensions = TwitchExtensionsBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -432,6 +443,7 @@ public class TwitchClientBuilder {
         TwitchHelix helix = null;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
@@ -449,6 +461,7 @@ public class TwitchClientBuilder {
         TwitchKraken kraken = null;
         if (this.enableKraken) {
             kraken = TwitchKrakenBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -463,6 +476,7 @@ public class TwitchClientBuilder {
         TwitchMessagingInterface tmi = null;
         if (this.enableTMI) {
             tmi = TwitchMessagingInterfaceBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -478,6 +492,7 @@ public class TwitchClientBuilder {
         if (this.enableChat) {
             //noinspection deprecation (withOutboundCommandFilter *can* be used internally)
             chat = TwitchChatBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
@@ -525,6 +540,7 @@ public class TwitchClientBuilder {
         TwitchPubSub pubSub = null;
         if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)

@@ -17,6 +17,9 @@ dependencies {
 
 	// Regex
 	api(group = "com.github.tony19", name = "named-regexp")
+
+	// Metrics
+	api("io.micrometer:micrometer-core")
 }
 
 base {

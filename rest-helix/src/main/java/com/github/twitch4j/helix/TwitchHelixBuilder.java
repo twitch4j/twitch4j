@@ -8,11 +8,11 @@ import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.helix.interceptor.CustomRewardEncodeMixIn;
-import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
 import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
+import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -20,10 +20,17 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import io.github.bucket4j.Bandwidth;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import lombok.With;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -56,6 +63,9 @@ public class TwitchHelixBuilder {
      * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
      */
     public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
+
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * Client Id
@@ -181,6 +191,7 @@ public class TwitchHelixBuilder {
             .decoder(new TwitchHelixDecoder(mapper, rateLimitTracker))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), rateLimitTracker))
             .requestInterceptor(new TwitchHelixClientIdInterceptor(userAgent, tokenManager))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))

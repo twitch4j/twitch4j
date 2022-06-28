@@ -9,6 +9,9 @@ dependencies {
 	// Named Capture Groups
 	api(group = "com.github.tony19", name = "named-regexp")
 
+	// Metrics
+	api("io.micrometer:micrometer-core")
+
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))

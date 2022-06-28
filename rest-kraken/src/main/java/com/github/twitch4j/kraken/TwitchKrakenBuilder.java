@@ -13,8 +13,11 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +37,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Deprecated
 public class TwitchKrakenBuilder {
+
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * Client Id
@@ -140,6 +146,7 @@ public class TwitchKrakenBuilder {
             .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .requestInterceptor(t -> t.header("Accept", "application/vnd.twitchtv.v5+json"))

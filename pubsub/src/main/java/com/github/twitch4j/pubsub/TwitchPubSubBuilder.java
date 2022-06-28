@@ -9,6 +9,8 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchPubSubBuilder {
+
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * WebsocketConnection

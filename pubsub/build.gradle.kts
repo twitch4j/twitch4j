@@ -6,6 +6,9 @@ dependencies {
 	// Annotations
 	api(group = "org.jetbrains", name = "annotations")
 
+	// Metrics
+	api("io.micrometer:micrometer-core")
+
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))
 	api(project(":twitch4j-common"))

@@ -5,6 +5,9 @@ dependencies {
 
 	// WebSocket
 	implementation(group = "com.neovisionaries", name = "nv-websocket-client")
+
+	// Metrics
+	api("io.micrometer:micrometer-core")
 }
 
 tasks.javadoc {

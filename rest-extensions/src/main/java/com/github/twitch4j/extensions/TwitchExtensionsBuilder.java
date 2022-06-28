@@ -14,8 +14,11 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +36,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Deprecated
 public class TwitchExtensionsBuilder {
+
+    @With
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
      * Base Url
@@ -138,6 +144,7 @@ public class TwitchExtensionsBuilder {
             .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchExtensionsErrorDecoder(mapper, new JacksonDecoder()))
             .requestInterceptor(new TwitchExtensionsClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))

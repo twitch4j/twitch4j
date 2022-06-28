@@ -4,6 +4,9 @@ import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.util.IBackoffStrategy;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -34,6 +37,7 @@ public class WebsocketConnectionConfig {
      * validate the config
      */
     public void validate() {
+        Objects.requireNonNull(meterRegistry, "meterRegistry may not be null!");
         Objects.requireNonNull(baseUrl, "baseUrl may not be null!");
         if (wsPingPeriod < 0) {
             throw new RuntimeException("wsPingPeriod must be 0 or greater, set to 0 to disable!");
@@ -60,6 +64,16 @@ public class WebsocketConnectionConfig {
         Objects.requireNonNull(onPostDisconnect, "onPostDisconnect may not be null!");
         Objects.requireNonNull(onCloseFrame, "onCloseFrame may not be null!");
     }
+
+    /**
+     * current instance (module + connection index)
+     */
+    private String instanceId;
+
+    /**
+     * micrometer registry
+     */
+    private MeterRegistry meterRegistry = new CompositeMeterRegistry(Clock.SYSTEM);
 
     /**
      * The websocket url for the chat client to connect to.

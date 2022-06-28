@@ -53,6 +53,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
 
     private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
 
+    private int connectionIndex = 0;
+
     /**
      * Provides a chat account to be used when constructing a new {@link TwitchChat} instance.
      * By default, this yields null, which corresponds to an anonymous connection.
@@ -267,6 +269,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
             TwitchChatBuilder.builder()
+                .withInstanceId("twitch-chat-"+connectionIndex++)
                 .withChatAccount(chatAccount.get())
                 .withEventManager(getConnectionEventManager())
                 .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
