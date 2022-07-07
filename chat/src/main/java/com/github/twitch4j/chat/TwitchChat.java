@@ -22,6 +22,7 @@ import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.UserStateEvent;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
+import com.github.twitch4j.client.websocket.events.WebsocketStateEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.CryptoUtils;
@@ -288,6 +289,7 @@ public class TwitchChat implements ITwitchChat {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(baseUrl);
                 spec.wsPingPeriod(wsPingPeriod);
+                spec.onStateChanged((state) -> eventManager.publish(new WebsocketStateEvent(state, this)));
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.onDisconnecting(this::onDisconnecting);

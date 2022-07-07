@@ -1,5 +1,6 @@
 package com.github.twitch4j.client.websocket;
 
+import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.util.IBackoffStrategy;
@@ -36,6 +37,7 @@ public class WebsocketConnectionConfig {
         }
         Objects.requireNonNull(taskExecutor, "taskExecutor may not be null!");
         Objects.requireNonNull(backoffStrategy, "backoffStrategy may not be null!");
+        Objects.requireNonNull(onStateChanged, "onStateChanged may not be null!");
         Objects.requireNonNull(onPreConnect, "onPreConnect may not be null!");
         Objects.requireNonNull(onPostConnect, "onPostConnect may not be null!");
         Objects.requireNonNull(onConnected, "onConnected may not be null!");
@@ -76,6 +78,11 @@ public class WebsocketConnectionConfig {
         .multiplier(2.0)
         .maximumBackoff(Duration.ofMinutes(5).toMillis())
         .build();
+
+    /**
+     * called when the websocket's state changes
+     */
+    private Consumer<WebsocketConnectionState> onStateChanged = (state) -> {};
 
     /**
      * called before connecting

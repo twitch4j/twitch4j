@@ -5,5 +5,6 @@ public enum WebsocketConnectionState {
     RECONNECTING,
     DISCONNECTED,
     CONNECTING,
-    CONNECTED
+    CONNECTED,
+    LOST
 }
