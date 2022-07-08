@@ -113,7 +113,11 @@ public class WebsocketConnection implements AutoCloseable {
                         log.debug("Maximum retry count for websocket reconnection attempts was hit.");
                         config.backoffStrategy().reset(); // start fresh on the next manual connect() call
                     } else {
-                        config.taskExecutor().schedule(() -> reconnect(), reconnectDelay, TimeUnit.MILLISECONDS);
+                        config.taskExecutor().schedule(() -> {
+                            WebsocketConnectionState state = connectionState.get();
+                            if (state != WebsocketConnectionState.CONNECTING && state != WebsocketConnectionState.CONNECTED)
+                                reconnect();
+                        }, reconnectDelay, TimeUnit.MILLISECONDS);
                     }
                 } else {
                     setState(WebsocketConnectionState.DISCONNECTED);
@@ -163,7 +167,7 @@ public class WebsocketConnection implements AutoCloseable {
     @Synchronized
     public void connect() {
         WebsocketConnectionState connectionState = this.connectionState.get();
-        if (connectionState == WebsocketConnectionState.DISCONNECTED || connectionState == WebsocketConnectionState.RECONNECTING) {
+        if (connectionState == WebsocketConnectionState.DISCONNECTED || connectionState == WebsocketConnectionState.RECONNECTING || connectionState == WebsocketConnectionState.LOST) {
             try {
                 // hook: on pre connect
                 config.onPreConnect().run();
