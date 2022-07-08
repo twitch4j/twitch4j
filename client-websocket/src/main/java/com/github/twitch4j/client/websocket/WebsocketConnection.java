@@ -163,7 +163,7 @@ public class WebsocketConnection implements AutoCloseable {
     @Synchronized
     public void connect() {
         WebsocketConnectionState connectionState = this.connectionState.get();
-        if (connectionState.equals(WebsocketConnectionState.DISCONNECTED) || connectionState.equals(WebsocketConnectionState.RECONNECTING)) {
+        if (connectionState == WebsocketConnectionState.DISCONNECTED || connectionState == WebsocketConnectionState.RECONNECTING) {
             try {
                 // hook: on pre connect
                 config.onPreConnect().run();
@@ -207,7 +207,7 @@ public class WebsocketConnection implements AutoCloseable {
     @Synchronized
     public void disconnect() {
         WebsocketConnectionState connectionState = this.connectionState.get();
-        if (connectionState.equals(WebsocketConnectionState.CONNECTED) || connectionState.equals(WebsocketConnectionState.LOST)) {
+        if (connectionState == WebsocketConnectionState.CONNECTED || connectionState == WebsocketConnectionState.LOST) {
             // hook: disconnecting
             config.onDisconnecting().run();
 
@@ -247,7 +247,7 @@ public class WebsocketConnection implements AutoCloseable {
     public boolean sendText(String message) {
         // only send if state is CONNECTING or CONNECTED
         WebsocketConnectionState connectionState = this.connectionState.get();
-        if (!connectionState.equals(WebsocketConnectionState.CONNECTED) && !connectionState.equals(WebsocketConnectionState.CONNECTING)) {
+        if (connectionState != WebsocketConnectionState.CONNECTED && connectionState != WebsocketConnectionState.CONNECTING) {
             return false;
         }
 
