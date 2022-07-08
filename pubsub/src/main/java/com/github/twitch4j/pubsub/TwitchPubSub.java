@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
-import com.github.twitch4j.client.websocket.events.WebsocketStateEvent;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -105,6 +104,7 @@ import com.github.twitch4j.pubsub.events.PollsEvent;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PresenceSettingsEvent;
+import com.github.twitch4j.pubsub.events.PubSubConnectionEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RadioEvent;
 import com.github.twitch4j.pubsub.events.RaidCancelEvent;
@@ -256,7 +256,7 @@ public class TwitchPubSub implements ITwitchPubSub {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.wsPingPeriod(wsPingPeriod);
-                spec.onStateChanged((oldState, newState) -> eventManager.publish(new WebsocketStateEvent(newState, this)));
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionEvent(newState, this)));
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.taskExecutor(taskExecutor);

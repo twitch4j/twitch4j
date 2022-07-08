@@ -1,18 +1,19 @@
-package com.github.twitch4j.client.websocket.events;
+package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.domain.Event;
+import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Websocket State Event
- * <p>
- * Called when the websocket changes its connection state.
+ * Chat Connection Event
+ *
+ * Called when a chat's connection changes.
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class WebsocketStateEvent extends Event {
+@EqualsAndHashCode(callSuper=false)
+public class ChatConnectionEvent extends Event {
 
     /**
      * The state of the websocket
@@ -20,8 +21,7 @@ public class WebsocketStateEvent extends Event {
     private final WebsocketConnectionState state;
 
     /**
-     * The parent of the websocket
+     * The chat whose connection changed
      */
-    private final AutoCloseable parent;
-
+    private final TwitchChat chat;
 }
