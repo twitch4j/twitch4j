@@ -257,6 +257,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 spec.wsPingPeriod(wsPingPeriod);
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
+                spec.onPostDisconnect(commandQueue::clear);
                 spec.taskExecutor(taskExecutor);
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
