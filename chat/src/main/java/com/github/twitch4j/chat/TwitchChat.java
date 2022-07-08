@@ -289,7 +289,7 @@ public class TwitchChat implements ITwitchChat {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(baseUrl);
                 spec.wsPingPeriod(wsPingPeriod);
-                spec.onStateChanged((oldState, newState) -> eventManager.publish(new ChatConnectionEvent(newState, this)));
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new ChatConnectionEvent(oldState, newState, this)));
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.onDisconnecting(this::onDisconnecting);

@@ -8,20 +8,26 @@ import lombok.EqualsAndHashCode;
 
 /**
  * PubSub Connection Event
- *
- * Called when a pubsub's connection changes.
+ * <p>
+ * Called when a PubSub socket's connection status changes.
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class PubSubConnectionEvent extends Event {
 
     /**
-     * The state of the websocket
+     * The previous state of the websocket.
+     */
+    private final WebsocketConnectionState previousState;
+
+    /**
+     * The updated state of the websocket.
      */
     private final WebsocketConnectionState state;
 
     /**
-     * The pubsub whose connection changed
+     * The PubSub instance whose connection status changed.
      */
     private final TwitchPubSub chat;
+
 }

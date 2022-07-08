@@ -8,20 +8,26 @@ import lombok.EqualsAndHashCode;
 
 /**
  * Chat Connection Event
- *
- * Called when a chat's connection changes.
+ * <p>
+ * Called when a chat socket's connection status changes.
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class ChatConnectionEvent extends Event {
 
     /**
-     * The state of the websocket
+     * The previous state of the websocket.
+     */
+    private final WebsocketConnectionState previousState;
+
+    /**
+     * The updated state of the websocket.
      */
     private final WebsocketConnectionState state;
 
     /**
-     * The chat whose connection changed
+     * The chat instance whose connection status changed.
      */
     private final TwitchChat chat;
+
 }

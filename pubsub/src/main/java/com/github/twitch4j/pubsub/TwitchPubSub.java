@@ -256,7 +256,7 @@ public class TwitchPubSub implements ITwitchPubSub {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.wsPingPeriod(wsPingPeriod);
-                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionEvent(newState, this)));
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionEvent(oldState, newState, this)));
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.taskExecutor(taskExecutor);
