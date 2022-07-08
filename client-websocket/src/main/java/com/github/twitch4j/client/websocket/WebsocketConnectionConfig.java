@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Accessors(chain = true, fluent = true, prefix = "")
@@ -82,7 +83,7 @@ public class WebsocketConnectionConfig {
     /**
      * called when the websocket's state changes
      */
-    private Consumer<WebsocketConnectionState> onStateChanged = (state) -> {};
+    private BiConsumer<WebsocketConnectionState, WebsocketConnectionState> onStateChanged = (oldState, newState) -> {};
 
     /**
      * called before connecting

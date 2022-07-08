@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -35,8 +36,7 @@ public class WebsocketConnection implements AutoCloseable {
     /**
      * connection state
      */
-    @Getter
-    private volatile WebsocketConnectionState connectionState = WebsocketConnectionState.DISCONNECTED;
+    private final AtomicReference<WebsocketConnectionState> connectionState = new AtomicReference<>(WebsocketConnectionState.DISCONNECTED);
 
     /**
      * Calls {@link ExponentialBackoffStrategy#reset()} upon a successful websocket connection
@@ -89,7 +89,7 @@ public class WebsocketConnection implements AutoCloseable {
                 // Connection Success
                 setState(WebsocketConnectionState.CONNECTED);
                 backoffClearer = config.taskExecutor().schedule(() -> {
-                    if (connectionState == WebsocketConnectionState.CONNECTED)
+                    if (connectionState.get() == WebsocketConnectionState.CONNECTED)
                         config.backoffStrategy().reset();
                 }, 30, TimeUnit.SECONDS);
             }
@@ -102,7 +102,7 @@ public class WebsocketConnection implements AutoCloseable {
 
             @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
-                if (!connectionState.equals(WebsocketConnectionState.DISCONNECTING)) {
+                if (connectionState.get() != WebsocketConnectionState.DISCONNECTING) {
                     setState(WebsocketConnectionState.LOST);
                     log.info("Connection to WebSocket [{}] lost! Retrying soon ...", config.baseUrl());
 
@@ -150,9 +150,11 @@ public class WebsocketConnection implements AutoCloseable {
         return ws;
     }
 
-    protected void setState(WebsocketConnectionState state) {
-        connectionState = state;
-        config.onStateChanged().accept(state);
+    protected void setState(WebsocketConnectionState newState) {
+        WebsocketConnectionState oldState = connectionState.getAndSet(newState);
+        if (oldState != newState) {
+            config.onStateChanged().accept(oldState, newState);
+        }
     }
 
     /**
@@ -160,6 +162,7 @@ public class WebsocketConnection implements AutoCloseable {
      */
     @Synchronized
     public void connect() {
+        WebsocketConnectionState connectionState = this.connectionState.get();
         if (connectionState.equals(WebsocketConnectionState.DISCONNECTED) || connectionState.equals(WebsocketConnectionState.RECONNECTING)) {
             try {
                 // hook: on pre connect
@@ -203,6 +206,7 @@ public class WebsocketConnection implements AutoCloseable {
      */
     @Synchronized
     public void disconnect() {
+        WebsocketConnectionState connectionState = this.connectionState.get();
         if (connectionState.equals(WebsocketConnectionState.CONNECTED) || connectionState.equals(WebsocketConnectionState.LOST)) {
             // hook: disconnecting
             config.onDisconnecting().run();
@@ -242,6 +246,7 @@ public class WebsocketConnection implements AutoCloseable {
      */
     public boolean sendText(String message) {
         // only send if state is CONNECTING or CONNECTED
+        WebsocketConnectionState connectionState = this.connectionState.get();
         if (!connectionState.equals(WebsocketConnectionState.CONNECTED) && !connectionState.equals(WebsocketConnectionState.CONNECTING)) {
             return false;
         }
@@ -249,6 +254,13 @@ public class WebsocketConnection implements AutoCloseable {
         this.webSocket.sendText(message);
 
         return true;
+    }
+
+    /**
+     * @return the socket's connection state
+     */
+    public WebsocketConnectionState getConnectionState() {
+        return connectionState.get();
     }
 
     @Override

@@ -20,6 +20,7 @@ public class WebsocketConnectionConfigTest {
             spec.onPreConnect(() -> System.out.println("on-pre-connect"));
             spec.onPostConnect(() -> System.out.println("on-post-connect"));
             spec.onConnected(() -> System.out.println("on-connected"));
+            spec.onStateChanged((oldState, newState) -> System.out.println("on-state-change"));
             spec.onTextMessage((text) -> System.out.println("on-text-message"));
             spec.onDisconnecting(() -> System.out.println("on-disconnecting"));
             spec.onPreDisconnect(() -> System.out.println("on-pre-disconnect"));

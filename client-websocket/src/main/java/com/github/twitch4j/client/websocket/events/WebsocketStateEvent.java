@@ -7,11 +7,11 @@ import lombok.EqualsAndHashCode;
 
 /**
  * Websocket State Event
- *
- * Called when the websocket changes it's connection state.
+ * <p>
+ * Called when the websocket changes its connection state.
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class WebsocketStateEvent extends Event {
 
     /**
@@ -23,4 +23,5 @@ public class WebsocketStateEvent extends Event {
      * The parent of the websocket
      */
     private final AutoCloseable parent;
+
 }
