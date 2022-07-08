@@ -28,6 +28,6 @@ public class ChatConnectionEvent extends Event {
     /**
      * The chat instance whose connection status changed.
      */
-    private final TwitchChat chat;
+    private final TwitchChat connection;
 
 }

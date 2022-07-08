@@ -28,6 +28,6 @@ public class PubSubConnectionEvent extends Event {
     /**
      * The PubSub instance whose connection status changed.
      */
-    private final TwitchPubSub chat;
+    private final TwitchPubSub connection;
 
 }
