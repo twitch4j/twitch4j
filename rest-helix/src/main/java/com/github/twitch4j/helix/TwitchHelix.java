@@ -6,7 +6,9 @@ import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
+import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.domain.*;
+import com.github.twitch4j.helix.interceptor.EventSubSubscriptionNameExpander;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
@@ -562,21 +564,50 @@ public interface TwitchHelix {
 
     /**
      * Get a list of your EventSub subscriptions.
+     * <p>
+     * The list is paginated and ordered by the oldest subscription first.
+     * <p>
+     * Use the status, type, and user_id query parameters to filter the list of subscriptions that are returned.
+     * The filters are mutually exclusive; the request fails if you specify more than one filter.
+     *
+     * @param authToken Required: App Access Token.
+     * @param status    Optional: Include this parameter to filter subscriptions by their status.
+     * @param type      Optional: Include this parameter to filter subscriptions by subscription type.
+     * @param userId    Optional: Include this parameter to filter subscriptions by user ID in the condition object.
+     * @param after     Optional: Cursor for forward pagination.
+     * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Minimum: 10.
+     * @return EventSubSubscriptionList
+     */
+    @RequestLine("GET /eventsub/subscriptions?status={status}&type={type}&user_id={user_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+        @Param("token") String authToken,
+        @Param("status") EventSubSubscriptionStatus status,
+        @Param(value = "type", expander = EventSubSubscriptionNameExpander.class) SubscriptionType<?, ?, ?> type,
+        @Param("user_id") String userId,
+        @Param("after") String after,
+        @Param("first") Integer limit
+    );
+
+    /**
+     * Get a list of your EventSub subscriptions.
      *
      * @param authToken Required: App Access Token.
      * @param status    Optional: Include this parameter to filter subscriptions by their status.
      * @param after     Optional: Cursor for forward pagination.
      * @param limit     Optional: Maximum number of objects to return. Maximum: 100. Minimum: 10.
      * @return EventSubSubscriptionList
+     * @deprecated in favor of {@link #getEventSubSubscriptions(String, EventSubSubscriptionStatus, SubscriptionType, String, String, Integer)}
      */
-    @RequestLine("GET /eventsub/subscriptions?status={status}&after={after}&first={first}")
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+    @Deprecated
+    default HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
         @Param("token") String authToken,
         @Param("status") EventSubSubscriptionStatus status,
         @Param("after") String after,
         @Param("first") Integer limit
-    );
+    ) {
+        return getEventSubSubscriptions(authToken, status, null, null, after, limit);
+    }
 
     /**
      * Gets information about your Extensions; either the current version or a specified version.
@@ -1637,7 +1668,6 @@ public interface TwitchHelix {
      * @return RaidRequestList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_RAIDS_MANAGE
      */
-    @Unofficial // currently in open beta
     @RequestLine("POST /raids?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<RaidRequestList> startRaid(
@@ -1655,7 +1685,6 @@ public interface TwitchHelix {
      * @param broadcasterId The ID of the broadcaster that sent the raiding party.
      * @return 204 No Content upon a successful raid cancel call
      */
-    @Unofficial // currently in open beta
     @RequestLine("DELETE /raids?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> cancelRaid(
@@ -1757,7 +1786,10 @@ public interface TwitchHelix {
      * @return StreamScheduleResponse
      */
     @RequestLine("POST /schedule/segment?broadcaster_id={broadcaster_id}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     HystrixCommand<StreamScheduleResponse> createStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
@@ -1774,7 +1806,10 @@ public interface TwitchHelix {
      * @return StreamScheduleResponse
      */
     @RequestLine("PATCH /schedule/segment?broadcaster_id={broadcaster_id}&id={id}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     HystrixCommand<StreamScheduleResponse> updateStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
@@ -2402,7 +2437,7 @@ public interface TwitchHelix {
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/deprecation-of-websub-based-webhooks/32152">Will be decommissioned after 2021-09-16 in favor of EventSub</a>
      */
     @RequestLine("POST /webhooks/hub")
-    @Headers({"Authorization: Bearer {token}", "content-type: application/json"})
+    @Headers({"Authorization: Bearer {token}", "Content-Type: application/json"})
     @Deprecated
     HystrixCommand<Response> requestWebhookSubscription(
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
