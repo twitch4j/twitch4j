@@ -103,6 +103,7 @@ public class WebsocketConnection implements AutoCloseable {
             @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
                 if (connectionState.get() != WebsocketConnectionState.DISCONNECTING) {
+                    closeSocket(); // avoid possible resource leak
                     setState(WebsocketConnectionState.LOST);
                     log.info("Connection to WebSocket [{}] lost! Retrying soon ...", config.baseUrl());
 
@@ -169,6 +170,9 @@ public class WebsocketConnection implements AutoCloseable {
         WebsocketConnectionState connectionState = this.connectionState.get();
         if (connectionState == WebsocketConnectionState.DISCONNECTED || connectionState == WebsocketConnectionState.RECONNECTING || connectionState == WebsocketConnectionState.LOST) {
             try {
+                // avoid any resource leaks
+                this.closeSocket();
+
                 // hook: on pre connect
                 config.onPreConnect().run();
 
@@ -211,6 +215,12 @@ public class WebsocketConnection implements AutoCloseable {
     @Synchronized
     public void disconnect() {
         WebsocketConnectionState connectionState = this.connectionState.get();
+
+        if (connectionState == WebsocketConnectionState.DISCONNECTED) {
+            // have already disconnected
+            return;
+        }
+
         if (connectionState == WebsocketConnectionState.CONNECTED || connectionState == WebsocketConnectionState.LOST) {
             // hook: disconnecting
             config.onDisconnecting().run();
@@ -221,12 +231,11 @@ public class WebsocketConnection implements AutoCloseable {
         // hook: pre disconnect
         config.onPreDisconnect().run();
 
-        setState(WebsocketConnectionState.DISCONNECTED);
-
         // CleanUp
-        this.webSocket.disconnect();
-        this.webSocket.clearListeners();
-        this.webSocket = null;
+        this.closeSocket();
+
+        // update state
+        setState(WebsocketConnectionState.DISCONNECTED);
 
         // hook: post disconnect
         config.onPostDisconnect().run();
@@ -271,4 +280,14 @@ public class WebsocketConnection implements AutoCloseable {
     public void close() throws Exception {
         disconnect();
     }
+
+    @Synchronized
+    private void closeSocket() {
+        if (webSocket != null) {
+            this.webSocket.disconnect();
+            this.webSocket.clearListeners();
+            this.webSocket = null;
+        }
+    }
+
 }
