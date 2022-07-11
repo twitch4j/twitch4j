@@ -104,7 +104,7 @@ import com.github.twitch4j.pubsub.events.PollsEvent;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PresenceSettingsEvent;
-import com.github.twitch4j.pubsub.events.PubSubConnectionEvent;
+import com.github.twitch4j.pubsub.events.PubSubConnectionStateEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RadioEvent;
 import com.github.twitch4j.pubsub.events.RaidCancelEvent;
@@ -256,7 +256,7 @@ public class TwitchPubSub implements ITwitchPubSub {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.wsPingPeriod(wsPingPeriod);
-                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionEvent(oldState, newState, this)));
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionStateEvent(oldState, newState, this)));
                 spec.onPreConnect(this::onPreConnect);
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);

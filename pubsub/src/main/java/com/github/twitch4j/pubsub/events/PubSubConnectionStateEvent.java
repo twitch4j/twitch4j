@@ -1,19 +1,19 @@
-package com.github.twitch4j.chat.events;
+package com.github.twitch4j.pubsub.events;
 
 import com.github.philippheuer.events4j.core.domain.Event;
-import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
+import com.github.twitch4j.pubsub.TwitchPubSub;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Chat Connection Event
+ * PubSub Connection Event
  * <p>
- * Called when a chat socket's connection status changes.
+ * Called when a PubSub socket's connection status changes.
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ChatConnectionEvent extends Event {
+public class PubSubConnectionStateEvent extends Event {
 
     /**
      * The previous state of the websocket.
@@ -26,8 +26,8 @@ public class ChatConnectionEvent extends Event {
     private final WebsocketConnectionState state;
 
     /**
-     * The chat instance whose connection status changed.
+     * The PubSub instance whose connection status changed.
      */
-    private final TwitchChat connection;
+    private final TwitchPubSub connection;
 
 }
