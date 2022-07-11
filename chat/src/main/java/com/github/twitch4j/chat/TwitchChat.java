@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.chat.events.ChatConnectionStateEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
@@ -288,6 +289,7 @@ public class TwitchChat implements ITwitchChat {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(baseUrl);
                 spec.wsPingPeriod(wsPingPeriod);
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new ChatConnectionStateEvent(oldState, newState, this)));
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
                 spec.onDisconnecting(this::onDisconnecting);
