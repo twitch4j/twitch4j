@@ -931,7 +931,7 @@ public interface TwitchHelix {
      *
      * @param authToken Required: App access token or User access token.
      * @param id        Required: The ID of the Soundtrack playlist to get.
-     * @param limit     Optional: The maximum number of tracks to return for this playlist in the response. The minimum number of tracks is 1 and the maximum is 100. The default is 20.
+     * @param limit     Optional: The maximum number of tracks to return for this playlist in the response. The minimum number of tracks is 1 and the maximum is 50. The default is 20.
      * @param after     Optional: The cursor used to get the next page of tracks for this playlist. The Pagination object in the response contains the cursor’s value.
      * @return SoundtrackPlaylistTracksList
      */
@@ -953,14 +953,18 @@ public interface TwitchHelix {
      *
      * @param authToken Required: App access token or User access token.
      * @param id        Optional: The ID of the Soundtrack playlist to get. Specify an ID only if you want to get a single playlist instead of all playlists.
+     * @param limit     Optional: The maximum number of playlists to return in the response. The minimum number of playlists is 1 and the maximum is 50. The default is 20.
+     * @param after     Optional: The cursor used to get the next page of playlists. The Pagination object in the response contains the cursor’s value.
      * @return SoundtrackPlaylistMetadataList
      */
     @Unofficial // beta
-    @RequestLine("GET /soundtrack/playlists?id={id}")
+    @RequestLine("GET /soundtrack/playlists?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(
         @Param("token") String authToken,
-        @Param("id") String id
+        @Param("id") String id,
+        @Param("first") Integer limit,
+        @Param("after") String after
     );
 
     /**
