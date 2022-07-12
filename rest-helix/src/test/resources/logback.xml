@@ -32,7 +32,7 @@
 	</appender>
 
 	<!-- Appender Output Configuration -->
-	<root level="trace">
+	<root level="info">
 		<appender-ref ref="CONSOLE"/>
 	</root>
 </configuration>

@@ -16,6 +16,10 @@ dependencies {
 	// Cache
 	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
 
+	// TestContainers
+	testImplementation(group = "org.testcontainers", name = "testcontainers", version = "1.17.3")
+	testImplementation(group = "org.testcontainers", name = "junit-jupiter", version = "1.17.3")
+
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))
 	api(project(":twitch4j-common"))

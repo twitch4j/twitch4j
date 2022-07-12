@@ -23,6 +23,8 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
+    private String baseUrl = "https://id.twitch.tv/oauth2";
+
     /**
      * Constructor
      *
@@ -39,6 +41,23 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
     }
 
     /**
+     * Constructs a TwitchIdentityProvider against a customized baseUrl for testing against the mock api
+     *
+     * @param baseUrl      Base URL
+     * @param clientId     OAuth Client Id
+     * @param clientSecret OAuth Client Secret
+     * @param redirectUrl  Redirect Url
+     */
+    public TwitchIdentityProvider(String baseUrl, String clientId, String clientSecret, String redirectUrl) {
+        super("twitch", "oauth2", clientId, clientSecret, baseUrl+"/authorize", baseUrl+"/token", redirectUrl);
+        this.baseUrl = baseUrl;
+
+        // configuration
+        this.tokenEndpointPostType = "QUERY";
+        this.scopeSeperator = "+"; // Prevents a URISyntaxException when creating a URI from the authUrl
+    }
+
+    /**
      * Get Auth Token Information
      *
      * @param credential OAuth2 Credential
@@ -47,7 +66,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         try {
             // api call
             Request request = new Request.Builder()
-                .url("https://id.twitch.tv/oauth2/validate")
+                .url(baseUrl+"/validate")
                 .header("Authorization", "OAuth " + credential.getAccessToken())
                 .build();
 
@@ -90,7 +109,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @return whether the credential was successfully revoked
      */
     public boolean revokeCredential(OAuth2Credential credential) {
-        HttpUrl url = HttpUrl.parse("https://id.twitch.tv/oauth2/revoke").newBuilder()
+        HttpUrl url = HttpUrl.parse(baseUrl+"/revoke").newBuilder()
             .addQueryParameter("client_id", (String) credential.getContext().getOrDefault("client_id", clientId))
             .addQueryParameter("token", credential.getAccessToken())
             .build();
