@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -29,6 +30,12 @@ public class SoundtrackTrack {
      * The track’s ASIN (Amazon Standard Identification Number).
      */
     private String id;
+
+    /**
+     * The track’s ISRC (International Standard Recording Code).
+     */
+    @JsonProperty("isrc")
+    private String code;
 
     /**
      * The track’s title.
