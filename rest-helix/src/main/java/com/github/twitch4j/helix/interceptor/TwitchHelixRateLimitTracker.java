@@ -53,12 +53,19 @@ public final class TwitchHelixRateLimitTracker {
     );
 
     /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#sendWhisper(String, String, String, String)}
+     *
      * @see TwitchLimitType#CHAT_WHISPER_LIMIT
      */
-    private static final List<Bandwidth> USER_WHISPER_BANDWIDTH = Arrays.asList(
+    private static final List<Bandwidth> WHISPERS_BANDWIDTH = Arrays.asList(
         Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
         Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
     );
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelModerator(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelModerator(String, String, String)}
+     */
+    private static final Bandwidth MOD_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
 
     /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
@@ -88,6 +95,13 @@ public final class TwitchHelixRateLimitTracker {
      */
     private final Cache<String, Bucket> primaryBuckets = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Moderators API: add and remove moderator rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> moderatorsByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
     /**
@@ -157,13 +171,18 @@ public final class TwitchHelixRateLimitTracker {
     }
 
     @NotNull
+    Bucket getModeratorsBucket(@NotNull String channelId) {
+        return moderatorsByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+    }
+
+    @NotNull
     Bucket getRaidsBucket(@NotNull String channelId) {
         return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
     }
 
     @NotNull
     Bucket getWhispersBucket(@NotNull String userId) {
-        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, USER_WHISPER_BANDWIDTH);
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, WHISPERS_BANDWIDTH);
     }
 
     @NotNull

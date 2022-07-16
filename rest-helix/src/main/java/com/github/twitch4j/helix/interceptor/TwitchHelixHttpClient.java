@@ -97,6 +97,16 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
         }
 
+        // Moderation API: addChannelModerator and removeChannelModerator (likely) share a bucket per channel id
+        if (templatePath.endsWith("/moderation/moderators") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket modsBucket = rateLimitTracker.getModeratorsBucket(channelId);
+            return executeAgainstBucket(modsBucket, () -> client.execute(request, options));
+        }
+
         // Clips API: createClip has a stricter bucket that applies per user id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id
