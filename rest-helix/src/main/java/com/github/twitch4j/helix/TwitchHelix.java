@@ -2456,4 +2456,43 @@ public interface TwitchHelix {
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
         @Param("token") String authToken
     );
+
+    /**
+     * Sends a whisper message to the specified user.
+     * <p>
+     * Note: The user sending the whisper must have a verified phone number.
+     * <p>
+     * Note: The API may silently drop whispers that it suspects of violating Twitch policies.
+     * (The API does not indicate that it dropped the whisper; it returns a 204 status code as if it succeeded).
+     * <p>
+     * Rate Limits: You may whisper to a maximum of 40 unique recipients per day.
+     * Within the per day limit, you may whisper a maximum of 3 whispers per second and a maximum of 100 whispers per minute.
+     * <p>
+     * The ID in the from_user_id query parameter must match the user ID in the access token.
+     * <p>
+     * The maximum message lengths are:
+     * <ul>
+     *     <li>500 characters if the user you're sending the message to hasn't whispered you before.</li>
+     *     <li>10,000 characters if the user you're sending the message to has whispered you before.</li>
+     * </ul>
+     * <p>
+     * Error 400 (Bad Request) can occur if the user that you're sending the whisper to doesn't allow whisper messages from strangers,
+     * and has not followed the sender's twitch account.
+     *
+     * @param authToken  User access token for the whisper sender that includes the user:manage:whispers scope
+     * @param fromUserId The ID of the user sending the whisper. This user must have a verified phone number.
+     * @param toUserId   The ID of the user to receive the whisper.
+     * @param message    The whisper message to send. The message must not be empty. Messages that exceed the maximum length are truncated.
+     * @return 204 No Content upon a successful call, even if the message was silently dropped
+     */
+    @RequestLine("POST /whispers?from_user_id={from_user_id}&to_user_id={to_user_id}")
+    @Headers("Authorization: Bearer {token}")
+    @Body("%7B\"message\":\"{message}\"%7D")
+    HystrixCommand<Void> sendWhisper(
+        @Param("token") String authToken,
+        @Param("from_user_id") String fromUserId,
+        @Param("to_user_id") String toUserId,
+        @Param(value = "message", expander = JsonStringExpander.class) String message
+    );
+
 }
