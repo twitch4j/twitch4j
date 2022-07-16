@@ -380,6 +380,29 @@ public interface TwitchHelix {
     );
 
     /**
+     * Updates the color used for the user’s name in chat.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     * <p>
+     * All users may specify one of the following named color values in {@link NamedUserChatColor}.
+     * Turbo and Prime users may specify a named color or a Hex color code like #9146FF.
+     *
+     * @param authToken User access token that includes the user:manage:chat_color scope.
+     * @param userId    The ID of the user whose chat color you want to update. This must match the user ID in the access token.
+     * @param color     The color to use for the user’s name in chat.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_COLOR_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("PUT /chat/color?user_id={user_id}&color={color}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateUserChatColor(
+        @Param("token") String authToken,
+        @Param("user_id") String userId,
+        @Param("color") String color
+    );
+
+    /**
      * Gets all custom emotes for a specific Twitch channel including subscriber emotes, Bits tier emotes, and follower emotes.
      * <p>
      * Custom channel emotes are custom emoticons that viewers may use in Twitch chat once they are subscribed to, cheered in, or followed the channel that owns the emotes.
