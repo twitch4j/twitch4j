@@ -67,6 +67,16 @@ public class TwitchHelixHttpClient implements Client {
     private Response delegatedExecute(Request request, Request.Options options) throws IOException {
         String templatePath = request.requestTemplate().path();
 
+        // Channels API: addChannelVip and removeChannelVip (likely) share a bucket per channel id
+        if (templatePath.endsWith("/channels/vips") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket vipBucket = rateLimitTracker.getVipsBucket(channelId);
+            return executeAgainstBucket(vipBucket, () -> client.execute(request, options));
+        }
+
         // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/moderation/enforcements/status")) {
             // Obtain the channel id

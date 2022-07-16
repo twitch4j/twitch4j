@@ -53,16 +53,6 @@ public final class TwitchHelixRateLimitTracker {
     );
 
     /**
-     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#sendWhisper(String, String, String, String)}
-     *
-     * @see TwitchLimitType#CHAT_WHISPER_LIMIT
-     */
-    private static final List<Bandwidth> WHISPERS_BANDWIDTH = Arrays.asList(
-        Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
-        Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
-    );
-
-    /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelModerator(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelModerator(String, String, String)}
      */
     private static final Bandwidth MOD_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
@@ -71,6 +61,21 @@ public final class TwitchHelixRateLimitTracker {
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
      */
     private static final Bandwidth RAIDS_BANDWIDTH = Bandwidth.simple(10, Duration.ofMinutes(10));
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelVip(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelVip(String, String, String)}
+     */
+    private static final Bandwidth VIP_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#sendWhisper(String, String, String, String)}
+     *
+     * @see TwitchLimitType#CHAT_WHISPER_LIMIT
+     */
+    private static final List<Bandwidth> WHISPERS_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
+        Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+    );
 
     /**
      * Empirically determined rate limit on helix bans and unbans, per channel
@@ -109,6 +114,13 @@ public final class TwitchHelixRateLimitTracker {
      */
     private final Cache<String, Bucket> raidsByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Channels API: add and remove VIP rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> vipsByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
     /**
@@ -178,6 +190,11 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     Bucket getRaidsBucket(@NotNull String channelId) {
         return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getVipsBucket(@NotNull String channelId) {
+        return vipsByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
     }
 
     @NotNull
