@@ -13,6 +13,7 @@ import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -320,6 +321,34 @@ public interface TwitchHelix {
         @Param("reward_id") String rewardId,
         @Param("id") Collection<String> redemptionIds,
         @Param("status") RedemptionStatus newStatus
+    );
+
+    /**
+     * Sends an announcement to the broadcaster’s chat room.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     *
+     * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
+     * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.
+     * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token, which can be a moderator or the broadcaster.
+     * @param message       The announcement to make in the broadcaster’s chat room. Announcements are limited to a maximum of 500 characters.
+     * @param color         The color used to highlight the announcement.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("POST /chat/announcements?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"message\":\"{message}\",\"color\":\"{color}\"%7D")
+    HystrixCommand<Void> sendChatAnnouncement(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @NotNull @Param(value = "message", expander = JsonStringExpander.class) String message,
+        @NotNull @Param("color") AnnouncementColor color
     );
 
     /**
@@ -2460,6 +2489,8 @@ public interface TwitchHelix {
     /**
      * Sends a whisper message to the specified user.
      * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     * <p>
      * Note: The user sending the whisper must have a verified phone number.
      * <p>
      * Note: The API may silently drop whispers that it suspects of violating Twitch policies.
@@ -2484,15 +2515,20 @@ public interface TwitchHelix {
      * @param toUserId   The ID of the user to receive the whisper.
      * @param message    The whisper message to send. The message must not be empty. Messages that exceed the maximum length are truncated.
      * @return 204 No Content upon a successful call, even if the message was silently dropped
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_WHISPERS_MANAGE
      */
+    @Unofficial // beta
     @RequestLine("POST /whispers?from_user_id={from_user_id}&to_user_id={to_user_id}")
-    @Headers("Authorization: Bearer {token}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
     @Body("%7B\"message\":\"{message}\"%7D")
     HystrixCommand<Void> sendWhisper(
         @Param("token") String authToken,
-        @Param("from_user_id") String fromUserId,
-        @Param("to_user_id") String toUserId,
-        @Param(value = "message", expander = JsonStringExpander.class) String message
+        @NotNull @Param("from_user_id") String fromUserId,
+        @NotNull @Param("to_user_id") String toUserId,
+        @NotNull @Param(value = "message", expander = JsonStringExpander.class) String message
     );
 
 }
