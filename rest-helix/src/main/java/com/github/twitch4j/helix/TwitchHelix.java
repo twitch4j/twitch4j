@@ -380,6 +380,24 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the color used for the user’s name in chat.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     *
+     * @param authToken App access token or user access token.
+     * @param userIds   The ID of the users whose color you want to get. Maximum: 100.
+     * @return UserChatColorList
+     * @see ChatUserColor#getColor()
+     */
+    @Unofficial // beta
+    @RequestLine("GET /chat/color?user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UserChatColorList> getUserChatColor(
+        @Param("token") String authToken,
+        @Param("user_id") List<String> userIds
+    );
+
+    /**
      * Updates the color used for the user’s name in chat.
      * <p>
      * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
