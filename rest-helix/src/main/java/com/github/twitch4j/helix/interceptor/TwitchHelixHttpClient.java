@@ -120,6 +120,16 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(raidBucket, () -> client.execute(request, options));
         }
 
+        // Whispers API: sendWhisper has a stricter bucket that applies per user id
+        if (templatePath.endsWith("/whispers")) {
+            // Obtain the user id
+            String userId = request.requestTemplate().queries().getOrDefault("from_user_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket whisperBucket = rateLimitTracker.getWhispersBucket(userId);
+            return executeAgainstBucket(whisperBucket, () -> client.execute(request, options));
+        }
+
         // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
     }

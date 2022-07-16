@@ -25,6 +25,8 @@ public final class TwitchHelixRateLimitTracker {
 
     private static final String AUTOMOD_STATUS_MINUTE_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-min";
     private static final String AUTOMOD_STATUS_HOUR_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-hr";
+    private static final String WHISPER_MINUTE_BANDWIDTH_ID = TwitchLimitType.CHAT_WHISPER_LIMIT.getBandwidthId() + "-minute";
+    private static final String WHISPER_SECOND_BANDWIDTH_ID = TwitchLimitType.CHAT_WHISPER_LIMIT.getBandwidthId() + "-second";
 
     /**
      * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
@@ -48,6 +50,14 @@ public final class TwitchHelixRateLimitTracker {
     public static final List<Bandwidth> AUTOMOD_STATUS_PARTNER_BANDWIDTH = Arrays.asList(
         Bandwidth.simple(30, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
         Bandwidth.simple(300, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+    );
+
+    /**
+     * @see TwitchLimitType#CHAT_WHISPER_LIMIT
+     */
+    private static final List<Bandwidth> USER_WHISPER_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
+        Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
     );
 
     /**
@@ -149,6 +159,11 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     Bucket getRaidsBucket(@NotNull String channelId) {
         return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getWhispersBucket(@NotNull String userId) {
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, USER_WHISPER_BANDWIDTH);
     }
 
     @NotNull
