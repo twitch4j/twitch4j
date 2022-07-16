@@ -14,6 +14,7 @@ import com.netflix.hystrix.HystrixCommand;
 import feign.*;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1475,6 +1476,39 @@ public interface TwitchHelix {
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
         @Param("id") String blockedTermId
+    );
+
+    /**
+     * Removes a single chat message or all chat messages from the broadcaster’s chat room.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     * <p>
+     * The ID in the moderator_id query parameter must match the user ID in the access token.
+     * If the broadcaster wants to remove messages themselves (instead of having the moderator do it), set this parameter to the broadcaster’s ID, too.
+     * <p>
+     * The id tag in the PRIVMSG contains the message’s ID (see {@code IRCMessageEvent#getMessageId}).
+     * Restrictions:
+     * <ul>
+     *     <li>The message must have been created within the last 6 hours.</li>
+     *     <li>The message must not belong to the broadcaster.</li>
+     * </ul>
+     * If id is not specified, the request removes all messages in the broadcaster’s chat room.
+     *
+     * @param authToken     User access token (scope: moderator:manage:chat_messages) of the broadcaster or a moderator.
+     * @param broadcasterId The ID of the broadcaster that owns the chat room to remove messages from.
+     * @param moderatorId   The ID of a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token.
+     * @param messageId     The ID of the message to remove. If not specified, the request removes all messages in the broadcaster’s chat room.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("DELETE /moderation/chat?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteChatMessages(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @Nullable @Param("message_id") String messageId
     );
 
     /**
