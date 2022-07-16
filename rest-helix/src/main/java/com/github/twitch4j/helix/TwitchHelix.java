@@ -1087,6 +1087,30 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of the channel’s VIPs.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     *
+     * @param authToken     Broadcaster's user access token that includes the channel:read:vips scope.
+     * @param broadcasterId The ID of the broadcaster whose list of VIPs you want to get.
+     * @param userIds       Filters the list for specific VIPs. The maximum number of IDs that you may specify is 100.
+     * @param limit         The maximum number of items to return per page in the response. Minimum: 1. Maximum: 100. Default: 20.
+     * @param after         The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
+     * @return ChannelVipList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIPS_READ
+     */
+    @Unofficial // beta
+    @RequestLine("GET /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChannelVipList> getChannelVips(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @Nullable @Param("user_id") List<String> userIds,
+        @Nullable @Param("first") Integer limit,
+        @Nullable @Param("after") String after
+    );
+
+    /**
      * Adds a VIP to the broadcaster’s chat room.
      * <p>
      * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
