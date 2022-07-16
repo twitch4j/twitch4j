@@ -1087,6 +1087,26 @@ public interface TwitchHelix {
     );
 
     /**
+     * Adds a VIP to the broadcaster’s chat room.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     *
+     * @param authToken     Broadcaster's user access token that includes the channel:manage:vips scope.
+     * @param broadcasterId The ID of the broadcaster that’s granting VIP status to the user.
+     * @param userId        The ID of the user to add as a VIP in the broadcaster’s chat room.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIPS_MANAGE
+     */
+    @Unofficial // beta
+    @RequestLine("POST /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> addChannelVip(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
+    );
+
+    /**
      * Creates a clip programmatically. This returns both an ID and an edit URL for the new clip.
      *
      * @param authToken     Auth Token
