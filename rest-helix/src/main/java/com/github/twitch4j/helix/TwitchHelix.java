@@ -1574,6 +1574,25 @@ public interface TwitchHelix {
     );
 
     /**
+     * Adds a moderator to the broadcaster’s chat room.
+     * <p>
+     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
+     *
+     * @param authToken     Broadcaster's user access token that includes the channel:manage:moderators scope.
+     * @param broadcasterId The ID of the broadcaster that owns the chat room.
+     * @param userId        The ID of the user to add as a moderator in the broadcaster’s chat room.
+     * @return 204 No Content upon a successful call
+     */
+    @Unofficial // beta
+    @RequestLine("POST /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> addChannelModerator(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("user_id") String userId
+    );
+
+    /**
      * Returns all moderators in a channel.
      *
      * @param authToken User Token for the broadcaster
