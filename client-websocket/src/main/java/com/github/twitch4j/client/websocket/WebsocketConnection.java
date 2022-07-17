@@ -283,11 +283,16 @@ public class WebsocketConnection implements AutoCloseable {
 
     @Synchronized
     private void closeSocket() {
+        // Clean up the socket
         if (webSocket != null) {
             this.webSocket.disconnect();
             this.webSocket.clearListeners();
             this.webSocket = null;
         }
+
+        // Reset latency tracker
+        this.latency = -1L;
+        lastPing.lazySet(0L);
     }
 
 }
