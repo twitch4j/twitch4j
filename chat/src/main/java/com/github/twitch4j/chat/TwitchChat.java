@@ -7,6 +7,7 @@ import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.auth.domain.TwitchScopes;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.NoticeTag;
@@ -32,6 +33,7 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -305,15 +307,43 @@ public class TwitchChat implements ITwitchChat {
         // credential validation
         if (this.chatCredential == null) {
             log.info("TwitchChat: No ChatAccount provided, Chat will be joined anonymously! Please look at the docs Twitch4J -> Chat if this is unintentional");
-        } else if (this.chatCredential.getUserName() == null) {
-            log.debug("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
-
-            // credential manager
+        } else {
             Optional<OAuth2Credential> credential = credentialManager.getOAuth2IdentityProviderByName("twitch")
                 .orElse(new TwitchIdentityProvider(null, null, null))
                 .getAdditionalCredentialInformation(this.chatCredential);
+
             if (credential.isPresent()) {
-                this.chatCredential = credential.get();
+                OAuth2Credential enriched = credential.get();
+
+                // Update ChatCredential
+                if (this.chatCredential.getUserName() == null) {
+                    log.debug("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
+                    this.chatCredential = enriched;
+                } else {
+                    chatCredential.setExpiresIn(enriched.getExpiresIn());
+                    if ((chatCredential.getScopes() == null || chatCredential.getScopes().isEmpty()) && enriched.getScopes() != null) {
+                        chatCredential.getScopes().addAll(enriched.getScopes());
+                    }
+                    if ((chatCredential.getContext() == null || chatCredential.getContext().isEmpty()) && enriched.getContext() != null) {
+                        chatCredential.getContext().putAll(enriched.getContext());
+                    }
+                }
+
+                // Check token type
+                if (StringUtils.isEmpty(enriched.getUserId())) {
+                    log.warn("TwitchChat: ChatAccount is an App Access Token, while IRC requires User Access! Chat will be joined anonymously to avoid errors.");
+                    this.chatCredential = null; // connect anonymously to at least be able to read messages
+                }
+
+                // Check scopes
+                Collection<String> scopes = enriched.getScopes();
+                if (scopes == null || scopes.isEmpty() || (!scopes.contains(TwitchScopes.CHAT_READ.toString())) && !scopes.contains(TwitchScopes.KRAKEN_CHAT_LOGIN.toString())) {
+                    log.warn("TwitchChat: AccessToken does not have required scope ({}) to connect to chat, joining anonymously instead!", TwitchScopes.CHAT_READ);
+                    this.chatCredential = null; // connect anonymously to at least be able to read messages
+                }
+                if (scopes == null || !scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
+                    log.debug("TwitchChat: AccessToken does not have the scope to write messages ({}).", TwitchScopes.CHAT_EDIT);
+                }
             } else {
                 log.error("TwitchChat: Failed to get AccessToken Information, the token is probably not valid. Please check the docs Twitch4J -> Chat on how to obtain a valid token.");
             }
