@@ -394,7 +394,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserChatColorList> getUserChatColor(
         @Param("token") String authToken,
-        @Param("user_id") List<String> userIds
+        @NotNull @Param("user_id") List<String> userIds
     );
 
     /**
@@ -416,8 +416,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> updateUserChatColor(
         @Param("token") String authToken,
-        @Param("user_id") String userId,
-        @Param("color") String color
+        @NotNull @Param("user_id") String userId,
+        @NotNull @Param("color") String color
     );
 
     /**
@@ -1144,8 +1144,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> addChannelVip(
         @Param("token") String authToken,
-        @Param("broadcaster_id") String broadcasterId,
-        @Param("user_id") String userId
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("user_id") String userId
     );
 
     /**
@@ -1164,8 +1164,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> removeChannelVip(
         @Param("token") String authToken,
-        @Param("broadcaster_id") String broadcasterId,
-        @Param("user_id") String userId
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("user_id") String userId
     );
 
     /**
@@ -1671,8 +1671,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> addChannelModerator(
         @Param("token") String authToken,
-        @Param("broadcaster_id") String broadcasterId,
-        @Param("user_id") String userId
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("user_id") String userId
     );
 
     /**
@@ -1691,8 +1691,8 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> removeChannelModerator(
         @Param("token") String authToken,
-        @Param("broadcaster_id") String broadcasterId,
-        @Param("user_id") String userId
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("user_id") String userId
     );
 
     /**
