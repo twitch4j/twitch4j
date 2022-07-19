@@ -103,9 +103,16 @@ public final class TwitchHelixRateLimitTracker {
         .build();
 
     /**
-     * Moderators API: add and remove moderator rate limit buckets per channel
+     * Moderators API: add moderator rate limit bucket per channel
      */
-    private final Cache<String, Bucket> moderatorsByChannelId = Caffeine.newBuilder()
+    private final Cache<String, Bucket> addModByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Moderators API: remove moderator rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> removeModByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
@@ -117,9 +124,16 @@ public final class TwitchHelixRateLimitTracker {
         .build();
 
     /**
-     * Channels API: add and remove VIP rate limit buckets per channel
+     * Channels API: add VIP rate limit bucket per channel
      */
-    private final Cache<String, Bucket> vipsByChannelId = Caffeine.newBuilder()
+    private final Cache<String, Bucket> addVipByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Channels API: remove VIP rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> removeVipByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
@@ -183,8 +197,13 @@ public final class TwitchHelixRateLimitTracker {
     }
 
     @NotNull
-    Bucket getModeratorsBucket(@NotNull String channelId) {
-        return moderatorsByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+    Bucket getModAddBucket(@NotNull String channelId) {
+        return addModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getModRemoveBucket(@NotNull String channelId) {
+        return removeModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
     }
 
     @NotNull
@@ -193,8 +212,13 @@ public final class TwitchHelixRateLimitTracker {
     }
 
     @NotNull
-    Bucket getVipsBucket(@NotNull String channelId) {
-        return vipsByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+    Bucket getVipAddBucket(@NotNull String channelId) {
+        return addVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getVipRemoveBucket(@NotNull String channelId) {
+        return removeVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
     }
 
     @NotNull

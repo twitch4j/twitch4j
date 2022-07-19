@@ -68,13 +68,22 @@ public class TwitchHelixHttpClient implements Client {
         String templatePath = request.requestTemplate().path();
 
         // Channels API: addChannelVip and removeChannelVip (likely) share a bucket per channel id
-        if (templatePath.endsWith("/channels/vips") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
+        if (templatePath.endsWith("/channels/vips")) {
             // Obtain the channel id
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket vipBucket = rateLimitTracker.getVipsBucket(channelId);
-            return executeAgainstBucket(vipBucket, () -> client.execute(request, options));
+            Bucket vipBucket;
+            if (request.httpMethod() == Request.HttpMethod.POST) {
+                vipBucket = rateLimitTracker.getVipAddBucket(channelId);
+            } else if (request.httpMethod() == Request.HttpMethod.DELETE) {
+                vipBucket = rateLimitTracker.getVipRemoveBucket(channelId);
+            } else {
+                vipBucket = null;
+            }
+
+            if (vipBucket != null)
+                return executeAgainstBucket(vipBucket, () -> client.execute(request, options));
         }
 
         // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
@@ -107,14 +116,23 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
         }
 
-        // Moderation API: addChannelModerator and removeChannelModerator (likely) share a bucket per channel id
-        if (templatePath.endsWith("/moderation/moderators") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
+        // Moderation API: addChannelModerator and removeChannelModerator have independent buckets per channel id
+        if (templatePath.endsWith("/moderation/moderators")) {
             // Obtain the channel id
             String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
-            Bucket modsBucket = rateLimitTracker.getModeratorsBucket(channelId);
-            return executeAgainstBucket(modsBucket, () -> client.execute(request, options));
+            Bucket modsBucket;
+            if (request.httpMethod() == Request.HttpMethod.POST) {
+                modsBucket = rateLimitTracker.getModAddBucket(channelId);
+            } else if (request.httpMethod() == Request.HttpMethod.DELETE) {
+                modsBucket = rateLimitTracker.getModRemoveBucket(channelId);
+            } else {
+                modsBucket = null;
+            }
+
+            if (modsBucket != null)
+                return executeAgainstBucket(modsBucket, () -> client.execute(request, options));
         }
 
         // Clips API: createClip has a stricter bucket that applies per user id
