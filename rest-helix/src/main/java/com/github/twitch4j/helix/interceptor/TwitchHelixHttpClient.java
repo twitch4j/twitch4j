@@ -67,6 +67,25 @@ public class TwitchHelixHttpClient implements Client {
     private Response delegatedExecute(Request request, Request.Options options) throws IOException {
         String templatePath = request.requestTemplate().path();
 
+        // Channels API: addChannelVip and removeChannelVip (likely) share a bucket per channel id
+        if (templatePath.endsWith("/channels/vips")) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket vipBucket;
+            if (request.httpMethod() == Request.HttpMethod.POST) {
+                vipBucket = rateLimitTracker.getVipAddBucket(channelId);
+            } else if (request.httpMethod() == Request.HttpMethod.DELETE) {
+                vipBucket = rateLimitTracker.getVipRemoveBucket(channelId);
+            } else {
+                vipBucket = null;
+            }
+
+            if (vipBucket != null)
+                return executeAgainstBucket(vipBucket, () -> client.execute(request, options));
+        }
+
         // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/moderation/enforcements/status")) {
             // Obtain the channel id
@@ -97,6 +116,25 @@ public class TwitchHelixHttpClient implements Client {
             return executeAgainstBucket(termsBucket, () -> client.execute(request, options));
         }
 
+        // Moderation API: addChannelModerator and removeChannelModerator have independent buckets per channel id
+        if (templatePath.endsWith("/moderation/moderators")) {
+            // Obtain the channel id
+            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket modsBucket;
+            if (request.httpMethod() == Request.HttpMethod.POST) {
+                modsBucket = rateLimitTracker.getModAddBucket(channelId);
+            } else if (request.httpMethod() == Request.HttpMethod.DELETE) {
+                modsBucket = rateLimitTracker.getModRemoveBucket(channelId);
+            } else {
+                modsBucket = null;
+            }
+
+            if (modsBucket != null)
+                return executeAgainstBucket(modsBucket, () -> client.execute(request, options));
+        }
+
         // Clips API: createClip has a stricter bucket that applies per user id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id
@@ -118,6 +156,16 @@ public class TwitchHelixHttpClient implements Client {
             // Conform to endpoint-specific bucket
             Bucket raidBucket = rateLimitTracker.getRaidsBucket(channelId);
             return executeAgainstBucket(raidBucket, () -> client.execute(request, options));
+        }
+
+        // Whispers API: sendWhisper has a stricter bucket that applies per user id
+        if (templatePath.endsWith("/whispers")) {
+            // Obtain the user id
+            String userId = request.requestTemplate().queries().getOrDefault("from_user_id", Collections.emptyList()).iterator().next();
+
+            // Conform to endpoint-specific bucket
+            Bucket whisperBucket = rateLimitTracker.getWhispersBucket(userId);
+            return executeAgainstBucket(whisperBucket, () -> client.execute(request, options));
         }
 
         // no endpoint-specific rate limiting was needed; simply perform network request now
