@@ -99,10 +99,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", ver11.9.1 = "11.9")
-			api(group = "io.github.openfeign", name = "feign-okhttp", ver11.9.1 = "11.9")
-			api(group = "io.github.openfeign", name = "feign-jackson", ver11.9.1 = "11.9")
-			api(group = "io.github.openfeign", name = "feign-hystrix", ver11.9.1 = "11.9")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.9.1")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
