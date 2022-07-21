@@ -258,6 +258,17 @@ public class TwitchChatBuilder {
     private IBackoffStrategy connectionBackoffStrategy = null;
 
     /**
+     * Whether the {@link #getChatAccount()} should be validated on every connect.
+     * <p>
+     * If enabled and the token has expired, chat will connect in read-only mode instead.
+     * <p>
+     * If the network connection is too slow, you may want to disable this setting to avoid
+     * disconnects while waiting for the result of the validate endpoint.
+     */
+    @With
+    private boolean validateTokenOnConnect = true;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Chat Builder
@@ -314,7 +325,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.validateTokenOnConnect);
     }
 
     /**

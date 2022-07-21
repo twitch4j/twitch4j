@@ -233,6 +233,16 @@ public class TwitchChat implements ITwitchChat {
     protected final Cache<String, Bucket> bucketByChannelName;
 
     /**
+     * Twitch Identity Provider
+     */
+    protected final TwitchIdentityProvider identityProvider;
+
+    /**
+     * Whether OAuth token status should be checked on reconnect
+     */
+    protected final boolean validateOnConnect;
+
+    /**
      * Constructor
      *
      * @param websocketConnection            WebsocketConnection
@@ -259,8 +269,9 @@ public class TwitchChat implements ITwitchChat {
      * @param wsPingPeriod                   WebSocket Ping Period
      * @param connectionBackoffStrategy      WebSocket Connection Backoff Strategy
      * @param perChannelRateLimit            Per channel message limit
+     * @param validateOnConnect              Whether token should be validated on connect
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -280,6 +291,7 @@ public class TwitchChat implements ITwitchChat {
         this.maxJoinRetries = maxJoinRetries;
         this.chatJoinTimeout = chatJoinTimeout;
         this.perChannelRateLimit = perChannelRateLimit;
+        this.validateOnConnect = validateOnConnect;
 
         // init per channel message buckets by channel name
         this.bucketByChannelName = Caffeine.newBuilder()
@@ -304,13 +316,16 @@ public class TwitchChat implements ITwitchChat {
             this.connection = websocketConnection;
         }
 
+        this.identityProvider = credentialManager.getOAuth2IdentityProviderByName("twitch")
+            .filter(ip -> ip instanceof TwitchIdentityProvider)
+            .map(ip -> (TwitchIdentityProvider) ip)
+            .orElse(new TwitchIdentityProvider(null, null, null));
+
         // credential validation
         if (this.chatCredential == null) {
             log.info("TwitchChat: No ChatAccount provided, Chat will be joined anonymously! Please look at the docs Twitch4J -> Chat if this is unintentional");
         } else {
-            Optional<OAuth2Credential> credential = credentialManager.getOAuth2IdentityProviderByName("twitch")
-                .orElse(new TwitchIdentityProvider(null, null, null))
-                .getAdditionalCredentialInformation(this.chatCredential);
+            Optional<OAuth2Credential> credential = identityProvider.getAdditionalCredentialInformation(this.chatCredential);
 
             if (credential.isPresent()) {
                 OAuth2Credential enriched = credential.get();
@@ -481,12 +496,29 @@ public class TwitchChat implements ITwitchChat {
             boolean sendRealPass = sendCredentialToThirdPartyHost // check whether this security feature has been overridden
                 || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER) // check whether the url is exactly the official one
                 || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER.substring(0, TWITCH_WEB_SOCKET_SERVER.length() - 4)); // check whether the url matches without the port
-            sendTextToWebSocket(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)), true);
-            userName = String.valueOf(chatCredential.getUserName()).toLowerCase();
+
+            String token;
+            if (sendRealPass) {
+                if (validateOnConnect && !identityProvider.getAdditionalCredentialInformation(chatCredential).isPresent()) {
+                    log.warn("TwitchChat: Credential is no longer valid! Connecting anonymously...");
+                    token = null;
+                } else {
+                    token = chatCredential.getAccessToken();
+                }
+            } else {
+                token = CryptoUtils.generateNonce(30);
+            }
+
+            if (token != null) {
+                sendTextToWebSocket(String.format("pass oauth:%s", token), true);
+                userName = String.valueOf(chatCredential.getUserName()).toLowerCase();
+            } else {
+                userName = null;
+            }
         } else {
-            userName = "justinfan" + ThreadLocalRandom.current().nextInt(100000);
+            userName = null;
         }
-        sendTextToWebSocket(String.format("nick %s", userName), true);
+        sendTextToWebSocket(String.format("nick %s", userName != null ? userName : "justinfan" + ThreadLocalRandom.current().nextInt(100000)), true);
 
         // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
         for (String channel : currentChannels) {
@@ -494,7 +526,7 @@ public class TwitchChat implements ITwitchChat {
         }
 
         // then join to own channel - required for sending or receiving whispers
-        if (chatCredential != null && chatCredential.getUserName() != null) {
+        if (chatCredential != null && chatCredential.getUserName() != null && userName != null) {
             if (autoJoinOwnChannel && !currentChannels.contains(userName))
                 joinChannel(userName);
         } else {
