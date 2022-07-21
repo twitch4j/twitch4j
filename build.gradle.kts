@@ -82,9 +82,6 @@ subprojects {
 			// Annotations
 			api(group = "org.jetbrains", name = "annotations", version = "23.0.0")
 
-			// Caching
-			api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine", version = "1.0.0-SNAPSHOT") // switch to just cache-core in t4j 2.0
-
 			// Apache Commons
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
@@ -127,6 +124,9 @@ subprojects {
 		// Apache Commons
 		api(group = "commons-io", name = "commons-io", version = "2.11.0")
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
+
+		// Cache BOM
+		api(platform("io.github.xanthic.cache:cache-bom:1.0.0-SNAPSHOT"))
 
 		// Logging
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
