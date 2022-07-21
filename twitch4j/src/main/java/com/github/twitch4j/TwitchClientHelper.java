@@ -1,7 +1,5 @@
 package com.github.twitch4j;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
@@ -26,11 +24,15 @@ import com.github.twitch4j.helix.domain.FollowList;
 import com.github.twitch4j.helix.domain.Stream;
 import com.github.twitch4j.helix.domain.StreamList;
 import com.netflix.hystrix.HystrixCommand;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
 import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,9 +125,11 @@ public class TwitchClientHelper implements IClientHelper {
     /**
      * Channel Information Cache
      */
-    private final Cache<String, ChannelCache> channelInformation = Caffeine.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, ChannelCache> channelInformation = CacheApi.create(spec -> {
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(10L));
+        spec.maxSize(1_048_576L);
+    });
 
     /**
      * Scheduled Thread Pool Executor
@@ -178,7 +182,7 @@ public class TwitchClientHelper implements IClientHelper {
                     if (!listenForGoLive.contains(userId))
                         return;
 
-                    ChannelCache currentChannelCache = channelInformation.get(userId, s -> new ChannelCache());
+                    ChannelCache currentChannelCache = channelInformation.computeIfAbsent(userId, s -> new ChannelCache());
                     // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
                     if (stream != null && currentChannelCache.getUserName() == null)
                         currentChannelCache.setUserName(stream.getUserName());
@@ -270,7 +274,7 @@ public class TwitchClientHelper implements IClientHelper {
             // check follow events
             HystrixCommand<FollowList> commandGetFollowers = twitchHelix.getFollowers(null, null, channelId, null, MAX_LIMIT);
             try {
-                ChannelCache currentChannelCache = channelInformation.get(channelId, s -> new ChannelCache());
+                ChannelCache currentChannelCache = channelInformation.computeIfAbsent(channelId, s -> new ChannelCache());
                 Instant lastFollowDate = currentChannelCache.getLastFollowCheck();
 
                 boolean nextRequestCanBeImmediate = false;
@@ -335,7 +339,7 @@ public class TwitchClientHelper implements IClientHelper {
             // check clip creations
             boolean nextRequestCanBeImmediate = false;
 
-            final ChannelCache currentChannelCache = channelInformation.get(channelId, c -> new ChannelCache());
+            final ChannelCache currentChannelCache = channelInformation.computeIfAbsent(channelId, c -> new ChannelCache());
             final AtomicReference<Instant> windowStart = currentChannelCache.getClipWindowStart();
             final Instant startedAt = windowStart.get();
             final Instant now = Instant.now();
@@ -382,7 +386,7 @@ public class TwitchClientHelper implements IClientHelper {
             log.info("Channel {} already added for Stream Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            channelInformation.computeIfAbsent(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -395,9 +399,9 @@ public class TwitchClientHelper implements IClientHelper {
 
         // invalidate cache
         if (!listenForFollow.contains(channelId) && !listenForClips.contains(channelId)) {
-            channelInformation.invalidate(channelId);
+            channelInformation.remove(channelId);
         } else if (remove) {
-            ChannelCache info = channelInformation.getIfPresent(channelId);
+            ChannelCache info = channelInformation.get(channelId);
             if (info != null) {
                 info.setIsLive(null);
                 info.setGameId(null);
@@ -417,7 +421,7 @@ public class TwitchClientHelper implements IClientHelper {
             log.info("Channel {} already added for Follow Events", channelName);
         } else {
             // initialize cache
-            channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            channelInformation.computeIfAbsent(channelId, s -> new ChannelCache(channelName));
         }
         startOrStopEventGenerationThread();
         return add;
@@ -430,9 +434,9 @@ public class TwitchClientHelper implements IClientHelper {
 
         // invalidate cache
         if (!listenForGoLive.contains(channelId) && !listenForClips.contains(channelId)) {
-            channelInformation.invalidate(channelId);
+            channelInformation.remove(channelId);
         } else if (remove) {
-            ChannelCache info = channelInformation.getIfPresent(channelId);
+            ChannelCache info = channelInformation.get(channelId);
             if (info != null) {
                 info.setLastFollowCheck(null);
                 info.getFollowers().lazySet(null);
@@ -451,7 +455,7 @@ public class TwitchClientHelper implements IClientHelper {
             log.info("Channel {} already added for Clip Creation Events", channelName);
         } else {
             // initialize cache
-            ChannelCache channelCache = channelInformation.get(channelId, s -> new ChannelCache(channelName));
+            ChannelCache channelCache = channelInformation.computeIfAbsent(channelId, s -> new ChannelCache(channelName));
             channelCache.getClipWindowStart().compareAndSet(null, startedAt);
         }
         startOrStopEventGenerationThread();
@@ -465,9 +469,9 @@ public class TwitchClientHelper implements IClientHelper {
 
         // invalidate cache
         if (!listenForGoLive.contains(channelId) && !listenForFollow.contains(channelId)) {
-            channelInformation.invalidate(channelId);
+            channelInformation.remove(channelId);
         } else if (remove) {
-            ChannelCache info = channelInformation.getIfPresent(channelId);
+            ChannelCache info = channelInformation.get(channelId);
             if (info != null) {
                 info.getClipWindowStart().lazySet(null);
             }
@@ -492,7 +496,7 @@ public class TwitchClientHelper implements IClientHelper {
 
     @Override
     public Optional<ChannelCache> getCachedInformation(String channelId) {
-        return Optional.ofNullable(channelInformation.getIfPresent(channelId));
+        return Optional.ofNullable(channelInformation.get(channelId));
     }
 
     @Override
@@ -512,7 +516,7 @@ public class TwitchClientHelper implements IClientHelper {
         listenForGoLive.clear();
         listenForFollow.clear();
         listenForClips.clear();
-        channelInformation.invalidateAll();
+        channelInformation.clear();
     }
 
     /**

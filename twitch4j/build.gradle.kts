@@ -10,7 +10,7 @@ dependencies {
 		}
 
 	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
 
 	// Jackson
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
