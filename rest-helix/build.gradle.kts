@@ -14,7 +14,7 @@ dependencies {
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
 
 	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))

@@ -1,7 +1,5 @@
 package com.github.twitch4j.helix.interceptor;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.TwitchLimitType;
@@ -9,6 +7,9 @@ import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.TwitchLimitRegistry;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,11 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-@SuppressWarnings({ "ConstantConditions", "unused" })
+@SuppressWarnings("unused")
 public final class TwitchHelixRateLimitTracker {
 
     private static final String AUTOMOD_STATUS_MINUTE_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-min";
@@ -98,65 +98,86 @@ public final class TwitchHelixRateLimitTracker {
     /**
      * Rate limit buckets by user/app
      */
-    private final Cache<String, Bucket> primaryBuckets = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, Bucket> primaryBuckets = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(1L));
+    });
+
 
     /**
      * Moderators API: add moderator rate limit bucket per channel
      */
-    private final Cache<String, Bucket> addModByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(30, TimeUnit.SECONDS)
-        .build();
+    private final Cache<String, Bucket> addModByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofSeconds(30L));
+    });
 
     /**
      * Moderators API: remove moderator rate limit bucket per channel
      */
-    private final Cache<String, Bucket> removeModByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(30, TimeUnit.SECONDS)
-        .build();
+    private final Cache<String, Bucket> removeModByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofSeconds(30L));
+    });
 
     /**
      * Raids API: start and cancel raid rate limit buckets per channel
      */
-    private final Cache<String, Bucket> raidsByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, Bucket> raidsByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(10L));
+    });
+
 
     /**
      * Channels API: add VIP rate limit bucket per channel
      */
-    private final Cache<String, Bucket> addVipByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(30, TimeUnit.SECONDS)
-        .build();
+    private final Cache<String, Bucket> addVipByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofSeconds(30L));
+    });
+
 
     /**
      * Channels API: remove VIP rate limit bucket per channel
      */
-    private final Cache<String, Bucket> removeVipByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(30, TimeUnit.SECONDS)
-        .build();
+    private final Cache<String, Bucket> removeVipByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofSeconds(30L));
+    });
 
     /**
      * Moderation API: ban and unban rate limit buckets per channel
      */
-    private final Cache<String, Bucket> bansByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, Bucket> bansByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(1L));
+    });
 
     /**
      * Create Clip API rate limit buckets per user
      */
-    private final Cache<String, Bucket> clipsByUserId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, Bucket> clipsByUserId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(1L));
+    });
 
     /**
      * Moderation API: add and remove blocked term rate limit buckets per channel
      */
-    private final Cache<String, Bucket> termsByChannelId = Caffeine.newBuilder()
-        .expireAfterAccess(1, TimeUnit.MINUTES)
-        .build();
+    private final Cache<String, Bucket> termsByChannelId = CacheApi.create(spec -> {
+        spec.maxSize(1024L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(1L));
+    });
 
     /**
      * The primary (global helix) rate limit bandwidth to use
@@ -174,7 +195,7 @@ public final class TwitchHelixRateLimitTracker {
 
     @NotNull
     Bucket getOrInitializeBucket(@NotNull String key) {
-        return primaryBuckets.get(key, k -> BucketUtils.createBucket(this.apiRateLimit));
+        return primaryBuckets.computeIfAbsent(key, k -> BucketUtils.createBucket(this.apiRateLimit));
     }
 
     @NotNull
@@ -198,27 +219,27 @@ public final class TwitchHelixRateLimitTracker {
 
     @NotNull
     Bucket getModAddBucket(@NotNull String channelId) {
-        return addModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+        return addModByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
     }
 
     @NotNull
     Bucket getModRemoveBucket(@NotNull String channelId) {
-        return removeModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+        return removeModByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
     }
 
     @NotNull
     Bucket getRaidsBucket(@NotNull String channelId) {
-        return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
+        return raidsByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
     }
 
     @NotNull
     Bucket getVipAddBucket(@NotNull String channelId) {
-        return addVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+        return addVipByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
     }
 
     @NotNull
     Bucket getVipRemoveBucket(@NotNull String channelId) {
-        return removeVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+        return removeVipByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
     }
 
     @NotNull
@@ -229,19 +250,19 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     @Unofficial
     Bucket getModerationBucket(@NotNull String channelId) {
-        return bansByChannelId.get(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
+        return bansByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(BANS_BANDWIDTH));
     }
 
     @NotNull
     @Unofficial
     Bucket getClipBucket(@NotNull String userId) {
-        return clipsByUserId.get(userId, k -> BucketUtils.createBucket(CLIPS_BANDWIDTH));
+        return clipsByUserId.computeIfAbsent(userId, k -> BucketUtils.createBucket(CLIPS_BANDWIDTH));
     }
 
     @NotNull
     @Unofficial
     Bucket getTermsBucket(@NotNull String channelId) {
-        return termsByChannelId.get(channelId, k -> BucketUtils.createBucket(TERMS_BANDWIDTH));
+        return termsByChannelId.computeIfAbsent(channelId, k -> BucketUtils.createBucket(TERMS_BANDWIDTH));
     }
 
     /*
