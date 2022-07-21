@@ -16,6 +16,10 @@ allprojects {
 	// Repositories
 	repositories {
 		mavenCentral()
+		maven {
+			name = "sonatype-snapshots"
+			url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+		}
 	}
 
 	tasks {
@@ -80,6 +84,7 @@ subprojects {
 			api(group = "org.jetbrains", name = "annotations", version = "23.0.0")
 
 			// Caching
+			api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine", version = "1.0.0-SNAPSHOT")
 			api(group = "com.github.ben-manes.caffeine", name = "caffeine", version = "2.9.3")
 
 			// Apache Commons
