@@ -1,4 +1,4 @@
-query fetchChannelPointRewards($login: String!) {
+query fetchCommunityPointsSettings($login: String!) {
 	channel(name: $login) {
 		id
 		communityPointsSettings {
