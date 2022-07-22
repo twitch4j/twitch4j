@@ -187,6 +187,10 @@ public class TwitchGraphQL {
         return new CommandUpdateClip(getApolloClient(auth), slug, newTitle);
     }
 
+    public CommandFetchCommunityPointsSettings fetchChannelPointRewards(OAuth2Credential auth, String channelLogin) {
+        return new CommandFetchCommunityPointsSettings(getApolloClient(auth), channelLogin);
+    }
+
     public CommandCreateCommunityPointsGoal createCommunityPointsGoal(OAuth2Credential auth, CreateCommunityPointsCommunityGoalInput input) {
         return new CommandCreateCommunityPointsGoal(getApolloClient(auth), input);
     }
