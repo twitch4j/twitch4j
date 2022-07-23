@@ -39,6 +39,41 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
     }
 
     /**
+     * Checks whether an {@link OAuth2Credential} is valid.
+     * <p>
+     * Expired tokens will yield false (assuming the network request succeeds).
+     *
+     * @param credential the OAuth credential to check
+     * @return whether the token is valid, or empty if the network request did not succeed
+     */
+    public Optional<Boolean> isCredentialValid(OAuth2Credential credential) {
+        if (credential == null || credential.getAccessToken() == null || credential.getAccessToken().isEmpty())
+            return Optional.of(false);
+
+        try {
+            // build request
+            Request request = new Request.Builder()
+                .url("https://id.twitch.tv/oauth2/validate")
+                .header("Authorization", "OAuth " + credential.getAccessToken())
+                .build();
+
+            // perform call
+            Response response = HTTP_CLIENT.newCall(request).execute();
+
+            // return token status
+            if (response.isSuccessful())
+                return Optional.of(true);
+
+            if (response.code() >= 400)
+                return Optional.of(false);
+        } catch (Exception ignored) {
+            // fall through to return empty
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Get Auth Token Information
      *
      * @param credential OAuth2 Credential

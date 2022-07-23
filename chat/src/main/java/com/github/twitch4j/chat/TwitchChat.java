@@ -56,6 +56,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -499,7 +500,8 @@ public class TwitchChat implements ITwitchChat {
 
             String token;
             if (sendRealPass) {
-                if (validateOnConnect && connection.getConfig().backoffStrategy().getFailures() > 1 && !identityProvider.getAdditionalCredentialInformation(chatCredential).isPresent()) {
+                BooleanSupplier hasExpired = () -> identityProvider.isCredentialValid(chatCredential).filter(valid -> !valid).isPresent();
+                if (validateOnConnect && connection.getConfig().backoffStrategy().getFailures() > 1 && hasExpired.getAsBoolean()) {
                     log.warn("TwitchChat: Credential is no longer valid! Connecting anonymously...");
                     token = null;
                 } else {
