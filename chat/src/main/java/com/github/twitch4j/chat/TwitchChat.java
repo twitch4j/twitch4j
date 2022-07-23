@@ -499,7 +499,7 @@ public class TwitchChat implements ITwitchChat {
 
             String token;
             if (sendRealPass) {
-                if (validateOnConnect && !identityProvider.getAdditionalCredentialInformation(chatCredential).isPresent()) {
+                if (validateOnConnect && connection.getConfig().backoffStrategy().getFailures() > 1 && !identityProvider.getAdditionalCredentialInformation(chatCredential).isPresent()) {
                     log.warn("TwitchChat: Credential is no longer valid! Connecting anonymously...");
                     token = null;
                 } else {

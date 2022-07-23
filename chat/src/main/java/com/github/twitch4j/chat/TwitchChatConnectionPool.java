@@ -274,7 +274,6 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withPerChannelRateLimit(perChannelRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
                 .withConnectionBackoffStrategy(connectionBackoffStrategy)
-                .withValidateTokenOnConnect(false)
         ).build();
 
         // Reclaim channel headroom upon generic join failures

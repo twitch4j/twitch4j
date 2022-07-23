@@ -258,7 +258,7 @@ public class TwitchChatBuilder {
     private IBackoffStrategy connectionBackoffStrategy = null;
 
     /**
-     * Whether the {@link #getChatAccount()} should be validated on every connect.
+     * Whether the {@link #getChatAccount()} should be validated on reconnection failures.
      * <p>
      * If enabled and the token has expired, chat will connect in read-only mode instead.
      * <p>
@@ -266,7 +266,7 @@ public class TwitchChatBuilder {
      * disconnects while waiting for the result of the validate endpoint.
      */
     @With
-    private boolean validateTokenOnConnect = true;
+    private boolean validateReconnectToken = true;
 
     /**
      * Initialize the builder
@@ -325,7 +325,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.validateTokenOnConnect);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.validateReconnectToken);
     }
 
     /**
