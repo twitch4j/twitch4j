@@ -842,6 +842,22 @@ public interface TwitchHelix {
         @Param("after") String after
     );
 
+    @Deprecated // meant to only be called internally
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @RequestLine("POST /extensions/pubsub")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json",
+        "Twitch4J-Target: {twitch4j_target}"
+    })
+    HystrixCommand<Void> sendExtensionPubSubMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("twitch4j_target") String target,
+        SendPubSubMessageInput input
+    );
+
     /**
      * Twitch provides a publish-subscribe system for your EBS to communicate with both the broadcaster and viewers.
      * Calling this endpoint forwards your message using the same mechanism as the send JavaScript helper function.
@@ -857,17 +873,14 @@ public interface TwitchHelix {
      * @param input       Details on the message to be sent and its targets.
      * @return 204 No Content upon a successful request.
      */
-    @RequestLine("POST /extensions/pubsub")
-    @Headers({
-        "Authorization: Bearer {token}",
-        "Client-Id: {extension_id}",
-        "Content-Type: application/json"
-    })
-    HystrixCommand<Void> sendExtensionPubSubMessage(
-        @Param("token") String jwtToken,
-        @Param("extension_id") String extensionId,
-        SendPubSubMessageInput input
-    );
+    default HystrixCommand<Void> sendExtensionPubSubMessage(
+        String jwtToken,
+        @NotNull String extensionId,
+        @NotNull SendPubSubMessageInput input
+    ) {
+        final String target = input.isGlobalBroadcast() ? SendPubSubMessageInput.GLOBAL_TARGET : input.getBroadcasterId() != null ? input.getBroadcasterId() : input.getTargets().get(0);
+        return this.sendExtensionPubSubMessage(jwtToken, extensionId, target, input);
+    }
 
     /**
      * Gets information about a released Extension; either the current version or a specified version.
