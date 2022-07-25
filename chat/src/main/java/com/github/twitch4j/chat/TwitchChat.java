@@ -68,9 +68,14 @@ public class TwitchChat implements ITwitchChat {
 
     public static final int REQUIRED_THREAD_COUNT = 2;
 
-    private final MeterRegistry meterRegistry;
+    @NotNull
+    protected final String connectionName;
 
-    private final String instanceId;
+    @NotNull
+    protected final String connectionId;
+
+    @NotNull
+    private final MeterRegistry meterRegistry;
 
     /**
      * EventManager
@@ -261,7 +266,8 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Constructor
      *
-     * @param instanceId                     Instance Id
+     * @param connectionName                 Connection Name
+     * @param connectionId                   Connection Id
      * @param meterRegistry                  Micrometer MeterRegistry
      * @param websocketConnection            WebsocketConnection
      * @param eventManager                   EventManager
@@ -291,8 +297,9 @@ public class TwitchChat implements ITwitchChat {
      * @param wsCloseDelay                   Websocket Close Delay
      * @param outboundCommandFilter          Outbound Command Filter
      */
-    public TwitchChat(String instanceId, MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
-        this.instanceId = instanceId;
+    public TwitchChat(@NotNull String connectionName, @NotNull String connectionId, @NotNull MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+        this.connectionName = connectionName;
+        this.connectionId = connectionId;
         this.meterRegistry = meterRegistry;
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
@@ -326,7 +333,8 @@ public class TwitchChat implements ITwitchChat {
         // init connection
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
-                spec.instanceId(instanceId);
+                spec.connectionName(connectionName);
+                spec.connectionId(connectionId);
                 spec.meterRegistry(meterRegistry);
                 spec.baseUrl(baseUrl);
                 spec.closeDelay(wsCloseDelay);
@@ -458,10 +466,10 @@ public class TwitchChat implements ITwitchChat {
             if (metricEvent instanceof AbstractChannelEvent) {
                 String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
                 if (StringUtils.isNotEmpty(channelId)) {
-                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection", instanceId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
                 }
             } else {
-                meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection", instanceId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
+                meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
             }
         });
 
@@ -594,10 +602,10 @@ public class TwitchChat implements ITwitchChat {
                             IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
                             if (event.isValid()) {
-                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection", instanceId), Tag.of("status", "ok"))).increment();
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("status", "ok"))).increment();
                                 eventManager.publish(event);
                             } else {
-                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection", instanceId), Tag.of("status", "parse_error"))).increment();
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("status", "parse_error"))).increment();
                                 log.trace("Can't parse {}", event.getRawMessage());
                             }
                         } catch (Exception ex) {

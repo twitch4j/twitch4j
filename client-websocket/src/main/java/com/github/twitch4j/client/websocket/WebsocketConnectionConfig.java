@@ -37,6 +37,8 @@ public class WebsocketConnectionConfig {
      * validate the config
      */
     public void validate() {
+        Objects.requireNonNull(connectionName, "connectionName may not be null!");
+        Objects.requireNonNull(connectionId, "connectionId may not be null!");
         Objects.requireNonNull(meterRegistry, "meterRegistry may not be null!");
         Objects.requireNonNull(baseUrl, "baseUrl may not be null!");
         if (wsPingPeriod < 0) {
@@ -66,23 +68,33 @@ public class WebsocketConnectionConfig {
     }
 
     /**
-     * current instance (module + connection index)
+     * connection type
      */
-    private String instanceId;
+    @NotNull
+    private String connectionName;
+
+    /**
+     * connection index
+     */
+    @NotNull
+    private String connectionId;
 
     /**
      * micrometer registry
      */
+    @NotNull
     private MeterRegistry meterRegistry = new CompositeMeterRegistry(Clock.SYSTEM);
 
     /**
      * The websocket url for the chat client to connect to.
      */
+    @NotNull
     private String baseUrl;
 
     /**
      * WebSocket RFC Ping Period in ms (0 = disabled)
      */
+    @NotNull
     private int wsPingPeriod = 0;
 
     /**
@@ -111,11 +123,13 @@ public class WebsocketConnectionConfig {
     /**
      * Task Executor
      */
+    @NotNull
     private ScheduledExecutorService taskExecutor = new ScheduledThreadPoolExecutor(2);
 
     /**
      * Helper class to compute delays between connection retries
      */
+    @NotNull
     private IBackoffStrategy backoffStrategy = ExponentialBackoffStrategy.builder()
         .immediateFirst(false)
         .baseMillis(Duration.ofSeconds(1).toMillis())
@@ -127,31 +141,37 @@ public class WebsocketConnectionConfig {
     /**
      * called when the websocket's state changes
      */
+    @NotNull
     private BiConsumer<WebsocketConnectionState, WebsocketConnectionState> onStateChanged = (oldState, newState) -> {};
 
     /**
      * called before connecting
      */
+    @NotNull
     private Runnable onPreConnect = () -> {};
 
     /**
      * called after connecting
      */
+    @NotNull
     private Runnable onPostConnect = () -> {};
 
     /**
      * called after the connection to the websocket server has been established successfully
      */
+    @NotNull
     private Runnable onConnected = () -> {};
 
     /**
      * called when receiving a text message on from the websocket server
      */
+    @NotNull
     private Consumer<String> onTextMessage = (text) -> {};
 
     /**
      * called when connection state is changing from CONNECTED to DISCONNECTING
      */
+    @NotNull
     private Runnable onDisconnecting = () -> {};
 
     /**
@@ -159,11 +179,13 @@ public class WebsocketConnectionConfig {
      * <p>
      * this occurs after onDisconnecting and before the connection is disposed
      */
+    @NotNull
     private Runnable onPreDisconnect = () -> {};
 
     /**
      * called after the disconnect
      */
+    @NotNull
     private Runnable onPostDisconnect = () -> {};
 
     /**
@@ -175,4 +197,5 @@ public class WebsocketConnectionConfig {
      * proxy config
      */
     private ProxyConfig proxyConfig;
+
 }

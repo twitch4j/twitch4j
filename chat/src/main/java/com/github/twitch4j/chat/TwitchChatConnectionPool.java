@@ -9,11 +9,13 @@ import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.ChatReply;
+import com.github.twitch4j.common.util.IncrementalReusableIdProvider;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,11 +51,17 @@ import java.util.function.Supplier;
  * twitchChatBuilder.withAutoJoinOwnChannel(true) via advancedConfiguration to avoid the manual join.
  */
 @SuperBuilder
+@Slf4j
 public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> implements ITwitchChat {
+    private final IncrementalReusableIdProvider connectionIdProvider = new IncrementalReusableIdProvider();
 
-    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
-
-    private int connectionIndex = 0;
+    /**
+     * The name of this connection pool
+     * This name will be used in metrics / logging to identify this connection.
+     */
+    @NonNull
+    @Builder.Default
+    private String connectionName = RandomStringUtils.random(8, true, true);
 
     /**
      * Provides a chat account to be used when constructing a new {@link TwitchChat} instance.
@@ -265,14 +273,16 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected TwitchChat createConnection() {
         if (closed.get()) throw new IllegalStateException("Chat socket cannot be created after pool was closed!");
+        int connId = connectionIdProvider.getAsInt();
 
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
             TwitchChatBuilder.builder()
-                .withInstanceId("twitch-chat-"+connectionIndex++)
+                .withConnectionName(connectionName)
+                .withConnectionId(connId)
                 .withChatAccount(chatAccount.get())
                 .withEventManager(getConnectionEventManager())
-                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
+                .withScheduledThreadPoolExecutor(getExecutor("twitch4j-pool-" + connectionName + "-" + connId, TwitchChat.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
                 .withChatRateLimit(chatRateLimit)
                 .withWhisperRateLimit(whisperRateLimit)
@@ -284,10 +294,10 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
         ).build();
 
         // Reclaim channel headroom upon generic join failures
-        chat.getEventManager().onEvent(threadPrefix + "join-fail-tracker", ChannelJoinFailureEvent.class, e -> unsubscribe(e.getChannelName()));
+        chat.getEventManager().onEvent(connectionName + "-join-fail-tracker", ChannelJoinFailureEvent.class, e -> unsubscribe(e.getChannelName()));
 
         // Reclaim channel headroom upon a ban
-        chat.getEventManager().onEvent(threadPrefix + "ban-tracker", ChannelNoticeEvent.class, e -> {
+        chat.getEventManager().onEvent(connectionName + "-ban-tracker", ChannelNoticeEvent.class, e -> {
             if (automaticallyPartOnBan && NoticeTag.MSG_BANNED.toString().equals(e.getMsgId())) {
                 unsubscribe(e.getChannel().getName());
             }
@@ -300,6 +310,11 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected void disposeConnection(TwitchChat connection) {
         connection.close();
+        try {
+            connectionIdProvider.release(Integer.parseInt(connection.connectionId));
+        } catch (NumberFormatException ex) {
+            log.error("Failed to parse connection id, this error should never occur.", ex);
+        }
     }
 
     @Override

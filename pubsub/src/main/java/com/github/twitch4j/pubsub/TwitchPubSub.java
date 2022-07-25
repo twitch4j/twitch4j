@@ -180,6 +180,10 @@ public class TwitchPubSub implements ITwitchPubSub {
 
     private static final Pattern LISTEN_AUTH_TOKEN = Pattern.compile("(\\{.*\"type\"\\s*?:\\s*?\"LISTEN\".*\"data\"\\s*?:\\s*?\\{.*\"auth_token\"\\s*?:\\s*?\").+(\".*}\\s*?})");
 
+    protected final String connectionName;
+
+    protected final String connectionId;
+
     /**
      * EventManager
      */
@@ -259,6 +263,8 @@ public class TwitchPubSub implements ITwitchPubSub {
     /**
      * Constructor
      *
+     * @param connectionName            Connection Name
+     * @param connectionId              Connection Id
      * @param websocketConnection       WebsocketConnection
      * @param eventManager              EventManager
      * @param taskExecutor              ScheduledThreadPoolExecutor
@@ -268,7 +274,9 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      * @param wsCloseDelay              Websocket Close Delay
      */
-    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
+    public TwitchPubSub(String connectionName, String connectionId, WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
+        this.connectionName = connectionName;
+        this.connectionId = connectionId;
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
@@ -276,6 +284,8 @@ public class TwitchPubSub implements ITwitchPubSub {
         // init connection
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
+                spec.connectionName(connectionName);
+                spec.connectionId(connectionId);
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);

@@ -33,6 +33,17 @@ public class TwitchPubSubBuilder {
     private MeterRegistry meterRegistry = new CompositeMeterRegistry();
 
     /**
+     * The name of this connection
+     * This name will be used in metrics / logging to identify this connection.
+     */
+    @With
+    @NonNull
+    private String connectionName = RandomStringUtils.random(8, true, true);
+
+    @With
+    private int connectionId = 0;
+
+    /**
      * WebsocketConnection
      * <p>
      * can be used to inject a mocked connection into the TwitchChat instance
@@ -113,7 +124,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
+        return new TwitchPubSub(connectionName, String.valueOf(this.connectionId), this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
     }
 
     /**

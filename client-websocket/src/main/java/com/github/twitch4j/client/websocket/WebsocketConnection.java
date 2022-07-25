@@ -108,7 +108,7 @@ public class WebsocketConnection implements AutoCloseable {
         webSocketAdapter = new WebSocketAdapter() {
             @Override
             public void onConnected(WebSocket ws, Map<String, List<String>> headers) {
-                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "connected"))).increment();
+                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "connected"))).increment();
 
                 // hook: on connected
                 config.onConnected().run();
@@ -138,7 +138,7 @@ public class WebsocketConnection implements AutoCloseable {
                     closeSocket(); // avoid possible resource leak
                     setState(WebsocketConnectionState.LOST);
                     log.info("Connection to WebSocket [{}] lost! Retrying soon ...", config.baseUrl());
-                    config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "connection-lost"))).increment();
+                    config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "connection-lost"))).increment();
 
                     // connection lost - reconnecting
                     if (backoffClearer != null) backoffClearer.cancel(false);
@@ -168,7 +168,7 @@ public class WebsocketConnection implements AutoCloseable {
 
             @Override
             public void onFrameSent(WebSocket websocket, WebSocketFrame frame) {
-                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "frame-sent"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
+                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "frame-sent"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
 
                 if (frame != null && frame.isPingFrame()) {
                     lastPing.compareAndSet(0L, System.currentTimeMillis());
@@ -186,17 +186,17 @@ public class WebsocketConnection implements AutoCloseable {
 
             @Override
             public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "error"), Tag.of("error", cause.getMessage()))).increment();
+                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "error"), Tag.of("error", cause.getMessage()))).increment();
             }
 
             @Override
             public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "frame"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
+                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "frame"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
             }
 
             @Override
             public void onSendingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection", config.instanceId()), Tag.of("type", "frame-sending"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
+                config.meterRegistry().counter("websocket_event", Arrays.asList(Tag.of("connection_name", config.connectionName()), Tag.of("connection_id", config.connectionId()), Tag.of("type", "frame-sending"), Tag.of("opcode", String.valueOf(frame.getOpcode())))).increment();
             }
         };
     }
