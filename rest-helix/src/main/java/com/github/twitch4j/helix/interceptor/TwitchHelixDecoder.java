@@ -13,7 +13,6 @@ import java.util.Collections;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.CLIENT_HEADER;
-import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getExtensionPubSubTarget;
 
 public class TwitchHelixDecoder extends JacksonDecoder {
 
@@ -55,7 +54,7 @@ public class TwitchHelixDecoder extends JacksonDecoder {
                 } else if (request.httpMethod() == Request.HttpMethod.POST && request.requestTemplate().path().endsWith("/extensions/pubsub")) {
                     // Send Extension PubSub Message rate limit
                     String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-                    String target = getExtensionPubSubTarget(request.body());
+                    String target = request.headers().getOrDefault("Twitch4J-Target", Collections.emptyList()).iterator().next();
                     rateLimitTracker.updateRemainingExtensionPubSub(clientId, target, remaining);
                 } else {
                     // Normal/global helix rate limit synchronization

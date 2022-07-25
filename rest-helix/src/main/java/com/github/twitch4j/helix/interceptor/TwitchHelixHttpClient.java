@@ -163,7 +163,7 @@ public class TwitchHelixHttpClient implements Client {
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/extensions/pubsub")) {
             // Obtain the bucket key
             String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-            String target = getExtensionPubSubTarget(request.body());
+            String target = request.headers().getOrDefault("Twitch4J-Target", Collections.emptyList()).iterator().next();
 
             // Conform to endpoint-specific bucket
             Bucket pubSubBucket = rateLimitTracker.getExtensionPubSubBucket(clientId, target);
@@ -193,21 +193,6 @@ public class TwitchHelixHttpClient implements Client {
 
         // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
-    }
-
-    static String getExtensionPubSubTarget(byte[] body) {
-        String bodyStr = new String(body);
-        int i = bodyStr.indexOf("\"broadcaster_id\":");
-        String target; // if no broadcaster is specified, the target is global. alphabetical field order provides a check that we aren't grabbing an id from within the specified message
-        if (i < 0 || i > bodyStr.indexOf("\"message\":")) {
-            target = "global";
-        } else {
-            i += "\"broadcaster_id\":".length();
-            int start = bodyStr.indexOf('"', i) + 1;
-            int end = bodyStr.indexOf('"', start);
-            target = end > start ? bodyStr.substring(start, end) : "global";
-        }
-        return target;
     }
 
     private <T> T executeAgainstBucket(Bucket bucket, Callable<T> call) throws IOException {
