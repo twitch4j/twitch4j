@@ -8,9 +8,12 @@ import feign.Response;
 import feign.okhttp.OkHttpClient;
 import io.github.bucket4j.Bucket;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +24,6 @@ import java.util.concurrent.TimeoutException;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.CLIENT_HEADER;
-import static com.github.twitch4j.helix.interceptor.TwitchHelixDecoder.singleFirst;
 
 @Slf4j
 public class TwitchHelixHttpClient implements Client {
@@ -43,7 +45,7 @@ public class TwitchHelixHttpClient implements Client {
     @Override
     public Response execute(Request request, Request.Options options) throws IOException {
         // Check whether this request should be delayed to conform to rate limits
-        String token = singleFirst(request.headers().get(AUTH_HEADER));
+        String token = getFirstHeader(AUTH_HEADER, request);
         if (token != null && token.startsWith(BEARER_PREFIX)) {
             OAuth2Credential credential = tokenManager.getIfPresent(token.substring(BEARER_PREFIX.length()));
             if (credential != null) {
@@ -71,7 +73,7 @@ public class TwitchHelixHttpClient implements Client {
         // Channels API: addChannelVip and removeChannelVip (likely) share a bucket per channel id
         if (templatePath.endsWith("/channels/vips")) {
             // Obtain the channel id
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
             Bucket vipBucket;
@@ -90,7 +92,7 @@ public class TwitchHelixHttpClient implements Client {
         // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/moderation/enforcements/status")) {
             // Obtain the channel id
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
             Bucket autoModBucket = rateLimitTracker.getAutomodStatusBucket(channelId);
@@ -100,7 +102,7 @@ public class TwitchHelixHttpClient implements Client {
         // Moderation API: banUser and unbanUser share a bucket per channel id
         if (templatePath.endsWith("/moderation/bans")) {
             // Obtain the channel id
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
             Bucket modBucket = rateLimitTracker.getModerationBucket(channelId);
@@ -110,7 +112,7 @@ public class TwitchHelixHttpClient implements Client {
         // Moderation API: addBlockedTerm and removeBlockedTerm share a bucket per channel id
         if (templatePath.endsWith("/moderation/blocked_terms") && (request.httpMethod() == Request.HttpMethod.POST || request.httpMethod() == Request.HttpMethod.DELETE)) {
             // Obtain the channel id
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
             Bucket termsBucket = rateLimitTracker.getTermsBucket(channelId);
@@ -120,7 +122,7 @@ public class TwitchHelixHttpClient implements Client {
         // Moderation API: addChannelModerator and removeChannelModerator have independent buckets per channel id
         if (templatePath.endsWith("/moderation/moderators")) {
             // Obtain the channel id
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
             Bucket modsBucket;
@@ -139,7 +141,7 @@ public class TwitchHelixHttpClient implements Client {
         // Clips API: createClip has a stricter bucket that applies per user id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id
-            String token = request.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
+            String token = Objects.requireNonNull(getFirstHeader(AUTH_HEADER, request)).substring(BEARER_PREFIX.length());
             OAuth2Credential cred = tokenManager.getIfPresent(token);
             String userId = cred != null ? cred.getUserId() : "";
 
@@ -151,22 +153,22 @@ public class TwitchHelixHttpClient implements Client {
         // Extensions API: sendExtensionChatMessage has a stricter per-channel bucket
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/extensions/chat")) {
             // Obtain the bucket key
-            String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-            String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+            String clientId = getFirstHeader(CLIENT_HEADER, request);
+            String channelId = getFirstParam("broadcaster_id", request);
 
             // Conform to endpoint-specific bucket
-            Bucket chatBucket = rateLimitTracker.getExtensionChatBucket(clientId, channelId);
+            Bucket chatBucket = rateLimitTracker.getExtensionChatBucket(Objects.requireNonNull(clientId), Objects.requireNonNull(channelId));
             return executeAgainstBucket(chatBucket, () -> client.execute(request, options));
         }
 
         // Extensions API: sendExtensionPubSubMessage has a stricter bucket depending on the target
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/extensions/pubsub")) {
             // Obtain the bucket key
-            String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-            String target = request.headers().getOrDefault("Twitch4J-Target", Collections.emptyList()).iterator().next();
+            String clientId = getFirstHeader(CLIENT_HEADER, request);
+            String target = getFirstHeader("Twitch4J-Target", request);
 
             // Conform to endpoint-specific bucket
-            Bucket pubSubBucket = rateLimitTracker.getExtensionPubSubBucket(clientId, target);
+            Bucket pubSubBucket = rateLimitTracker.getExtensionPubSubBucket(Objects.requireNonNull(clientId), Objects.requireNonNull(target));
             return executeAgainstBucket(pubSubBucket, () -> client.execute(request, options));
         }
 
@@ -174,25 +176,41 @@ public class TwitchHelixHttpClient implements Client {
         if (templatePath.endsWith("/raids")) {
             // Obtain the channel id
             String param = request.httpMethod() == Request.HttpMethod.POST ? "from_broadcaster_id" : "broadcaster_id";
-            String channelId = request.requestTemplate().queries().getOrDefault(param, Collections.emptyList()).iterator().next();
+            String channelId = getFirstParam(param, request);
 
             // Conform to endpoint-specific bucket
-            Bucket raidBucket = rateLimitTracker.getRaidsBucket(channelId);
+            Bucket raidBucket = rateLimitTracker.getRaidsBucket(Objects.requireNonNull(channelId));
             return executeAgainstBucket(raidBucket, () -> client.execute(request, options));
         }
 
         // Whispers API: sendWhisper has a stricter bucket that applies per user id
         if (templatePath.endsWith("/whispers")) {
             // Obtain the user id
-            String userId = request.requestTemplate().queries().getOrDefault("from_user_id", Collections.emptyList()).iterator().next();
+            String userId = getFirstParam("from_user_id", request);
 
             // Conform to endpoint-specific bucket
-            Bucket whisperBucket = rateLimitTracker.getWhispersBucket(userId);
+            Bucket whisperBucket = rateLimitTracker.getWhispersBucket(Objects.requireNonNull(userId));
             return executeAgainstBucket(whisperBucket, () -> client.execute(request, options));
         }
 
         // no endpoint-specific rate limiting was needed; simply perform network request now
         return client.execute(request, options);
+    }
+
+    @Nullable
+    static String getFirstHeader(String key, Request request) {
+        return getFirst(key, request.headers());
+    }
+
+    @Nullable
+    static String getFirstParam(String key, Request request) {
+        return getFirst(key, request.requestTemplate().queries());
+    }
+
+    @Nullable
+    static String getFirst(String key, Map<String, Collection<String>> map) {
+        final Collection<String> values = map.get(key);
+        return values != null && !values.isEmpty() ? values.iterator().next() : null;
     }
 
     private <T> T executeAgainstBucket(Bucket bucket, Callable<T> call) throws IOException {

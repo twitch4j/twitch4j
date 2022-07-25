@@ -45,7 +45,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
         // if a oauth token is passed is has to match that client id, default to global client id otherwise (for ie. token verification)
         if (template.headers().containsKey(AUTH_HEADER)) {
-            String oauthToken = template.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
+            // noinspection ConstantConditions
+            String oauthToken = TwitchHelixHttpClient.getFirst(AUTH_HEADER, template.headers()).substring(BEARER_PREFIX.length());
 
             if (oauthToken.isEmpty()) {
                 try {

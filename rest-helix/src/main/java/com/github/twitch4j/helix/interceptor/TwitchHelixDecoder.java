@@ -7,12 +7,12 @@ import feign.jackson.JacksonDecoder;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
 
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.CLIENT_HEADER;
+import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getFirstHeader;
+import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getFirstParam;
 
 public class TwitchHelixDecoder extends JacksonDecoder {
 
@@ -29,10 +29,10 @@ public class TwitchHelixDecoder extends JacksonDecoder {
     public Object decode(Response response, Type type) throws IOException {
         // track rate limit for token
         Request request = response.request();
-        String token = singleFirst(request.headers().get(AUTH_HEADER));
+        String token = getFirstHeader(AUTH_HEADER, request);
         if (token != null && token.startsWith(BEARER_PREFIX)) {
             // Parse remaining
-            String remainingStr = singleFirst(response.headers().get(REMAINING_HEADER));
+            String remainingStr = getFirstHeader(REMAINING_HEADER, request);
             Integer remaining;
             try {
                 remaining = Integer.parseInt(remainingStr);
@@ -48,13 +48,13 @@ public class TwitchHelixDecoder extends JacksonDecoder {
                     rateLimitTracker.updateRemainingCreateClip(bearer, remaining);
                 } else if (request.httpMethod() == Request.HttpMethod.POST && request.requestTemplate().path().endsWith("/extensions/chat")) {
                     // Send Extension Chat Message rate limit
-                    String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-                    String channelId = request.requestTemplate().queries().getOrDefault("broadcaster_id", Collections.emptyList()).iterator().next();
+                    String clientId = getFirstHeader(CLIENT_HEADER, request);
+                    String channelId = getFirstParam("broadcaster_id", request);
                     rateLimitTracker.updateRemainingExtensionChat(clientId, channelId, remaining);
                 } else if (request.httpMethod() == Request.HttpMethod.POST && request.requestTemplate().path().endsWith("/extensions/pubsub")) {
                     // Send Extension PubSub Message rate limit
-                    String clientId = request.headers().getOrDefault(CLIENT_HEADER, Collections.emptyList()).iterator().next();
-                    String target = request.headers().getOrDefault("Twitch4J-Target", Collections.emptyList()).iterator().next();
+                    String clientId = getFirstHeader(CLIENT_HEADER, request);
+                    String target = getFirstHeader("Twitch4J-Target", request);
                     rateLimitTracker.updateRemainingExtensionPubSub(clientId, target, remaining);
                 } else {
                     // Normal/global helix rate limit synchronization
@@ -65,11 +65,6 @@ public class TwitchHelixDecoder extends JacksonDecoder {
 
         // delegate to JacksonDecoder
         return super.decode(response, type);
-    }
-
-    static String singleFirst(Collection<String> collection) {
-        if (collection == null || collection.size() != 1) return null;
-        return collection.toArray(new String[1])[0];
     }
 
 }
