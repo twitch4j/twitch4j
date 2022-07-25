@@ -878,7 +878,7 @@ public interface TwitchHelix {
         @NotNull String extensionId,
         @NotNull SendPubSubMessageInput input
     ) {
-        final String target = input.isGlobalBroadcast() ? "broadcast" : input.getBroadcasterId() != null ? input.getBroadcasterId() : input.getTargets().get(0);
+        final String target = input.isGlobalBroadcast() ? SendPubSubMessageInput.GLOBAL_TARGET : input.getBroadcasterId() != null ? input.getBroadcasterId() : input.getTargets().get(0);
         return this.sendExtensionPubSubMessage(jwtToken, extensionId, target, input);
     }
 
