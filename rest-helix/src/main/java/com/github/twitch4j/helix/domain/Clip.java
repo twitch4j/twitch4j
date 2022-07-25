@@ -64,6 +64,9 @@ public class Clip {
     /** Duration of the Clip in seconds (up to 0.1 precision). */
     private Float duration;
 
+    /** The zero-based offset, in seconds, to where the clip starts in the video (VOD) or stream. */
+    private Integer vodOffset;
+
     /**
      * @return the timestamp for the clip's creation
      * @deprecated in favor of getCreatedAtInstant()

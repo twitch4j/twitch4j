@@ -69,6 +69,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         if (!template.headers().containsKey(CLIENT_HEADER))
             template.header(CLIENT_HEADER, clientId);
         template.header("User-Agent", userAgent);
+        if (template.body() != null && !template.headers().containsKey("Content-Type"))
+            template.header("Content-Type", "application/json");
     }
 
 }

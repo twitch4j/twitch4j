@@ -48,11 +48,20 @@ public class CreatorGoal {
     /**
      * The current value.
      * <p>
-     * If the goal is to increase followers, this field is set to the current number of followers.
-     * This number increases with new followers and decreases if users unfollow the channel.
+     * If type is {@link GoalType#FOLLOWERS}, this field is set to the broadcaster's current number of followers.
+     * This number increases with new followers and decreases when users unfollow the broadcaster.
      * <p>
-     * For subscriptions, current_amount is increased and decreased by the points value associated with the subscription tier.
-     * For example, if a tier-two subscription is worth 2 points, current_amount is increased or decreased by 2, not 1.
+     * If type is {@link GoalType#SUBSCRIPTIONS}, this field is increased and decreased by the points value associated with the subscription tier.
+     * For example, if a tier-two subscription is worth 2 points, this field is increased or decreased by 2, not 1.
+     * <p>
+     * If type is {@link GoalType#SUB_COUNT}, this field is increased by 1 for each new subscription and decreased by 1 for each user that unsubscribes.
+     * <p>
+     * If type is {@link GoalType#NEW_SUBSCRIPTIONS}, this field is increased by the points value associated with the subscription tier.
+     * For example, if a tier-two subscription is worth 2 points, this field is increased by 2, not 1.
+     * <p>
+     * If type is {@link GoalType#NEW_SUB_COUNT}, this field is increased by 1 for each new subscription.
+     *
+     * @see #getType()
      */
     private Integer currentAmount;
 

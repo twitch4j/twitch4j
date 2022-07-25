@@ -104,6 +104,7 @@ import com.github.twitch4j.pubsub.events.PollsEvent;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PresenceSettingsEvent;
+import com.github.twitch4j.pubsub.events.PubSubConnectionStateEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RadioEvent;
 import com.github.twitch4j.pubsub.events.RaidCancelEvent;
@@ -255,8 +256,11 @@ public class TwitchPubSub implements ITwitchPubSub {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.wsPingPeriod(wsPingPeriod);
+                spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionStateEvent(oldState, newState, this)));
+                spec.onPreConnect(this::onPreConnect);
                 spec.onConnected(this::onConnected);
                 spec.onTextMessage(this::onTextMessage);
+                spec.onPostDisconnect(commandQueue::clear);
                 spec.taskExecutor(taskExecutor);
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
@@ -339,10 +343,6 @@ public class TwitchPubSub implements ITwitchPubSub {
      * Connecting to IRC-WS
      */
     public void connect() {
-        // Reset last ping to avoid edge case loop where reconnect occurred after sending PING but before receiving PONG
-        lastPong = TimeUtils.getCurrentTimeInMillis();
-        lastPing = lastPong - 4 * 60 * 1000;
-
         connection.connect();
     }
 
@@ -359,6 +359,12 @@ public class TwitchPubSub implements ITwitchPubSub {
     @Synchronized
     public void reconnect() {
         connection.reconnect();
+    }
+
+    protected void onPreConnect() {
+        // Reset last ping to avoid edge case loop where reconnect occurred after sending PING but before receiving PONG
+        lastPong = TimeUtils.getCurrentTimeInMillis();
+        lastPing = lastPong - 4 * 60 * 1000;
     }
 
     protected void onConnected() {

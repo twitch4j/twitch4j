@@ -42,6 +42,8 @@ public class WebhooksServiceTest extends AbstractEndpointTest {
             System.getenv("APP_ACCESS_TOKEN"),
             null,
             null,
+            null,
+            null,
             null
         ).execute();
         assertTrue(subList.getTotal() > 0, "Sub list size was " + subList.getTotal());
