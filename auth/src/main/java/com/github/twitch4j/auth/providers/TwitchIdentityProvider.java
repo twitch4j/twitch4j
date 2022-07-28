@@ -64,7 +64,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
             if (response.isSuccessful())
                 return Optional.of(true);
 
-            if (response.code() >= 400)
+            if (response.code() >= 400 && response.code() < 500)
                 return Optional.of(false);
         } catch (Exception ignored) {
             // fall through to return empty
