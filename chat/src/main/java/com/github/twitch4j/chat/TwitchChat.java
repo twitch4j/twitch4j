@@ -288,7 +288,6 @@ public class TwitchChat implements ITwitchChat {
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(baseUrl);
-                spec.socketTimeout((int) chatQueueTimeout);
                 spec.wsPingPeriod(wsPingPeriod);
                 spec.onStateChanged((oldState, newState) -> eventManager.publish(new ChatConnectionStateEvent(oldState, newState, this)));
                 spec.onConnected(this::onConnected);
