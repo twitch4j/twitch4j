@@ -36,6 +36,9 @@ public class WebsocketConnectionConfig {
         if (wsPingPeriod < 0) {
             throw new RuntimeException("wsPingPeriod must be 0 or greater, set to 0 to disable!");
         }
+        if (connectionTimeout < 0) {
+            throw new RuntimeException("timeout must be 0 or greater, set to 0 to disable!");
+        }
         Objects.requireNonNull(taskExecutor, "taskExecutor may not be null!");
         Objects.requireNonNull(backoffStrategy, "backoffStrategy may not be null!");
         Objects.requireNonNull(onStateChanged, "onStateChanged may not be null!");
@@ -58,6 +61,16 @@ public class WebsocketConnectionConfig {
      * WebSocket RFC Ping Period in ms (0 = disabled)
      */
     private int wsPingPeriod = 0;
+
+    /**
+     * Websocket timeout milliseconds for establishing a connection (0 = disabled).
+     */
+    private int connectionTimeout = 60_000;
+
+    /**
+     * Websocket timeout milliseconds for read and write operations (0 = disabled).
+     */
+    private int socketTimeout = 10_000;
 
     /**
      * WebSocket Headers
