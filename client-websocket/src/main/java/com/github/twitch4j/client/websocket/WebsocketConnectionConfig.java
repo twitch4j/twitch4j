@@ -37,7 +37,10 @@ public class WebsocketConnectionConfig {
             throw new RuntimeException("wsPingPeriod must be 0 or greater, set to 0 to disable!");
         }
         if (connectionTimeout < 0) {
-            throw new RuntimeException("timeout must be 0 or greater, set to 0 to disable!");
+            throw new RuntimeException("connectionTimeout must be 0 or greater, set to 0 to disable!");
+        }
+        if (socketTimeout < 0) {
+            throw new RuntimeException("socketTimeout must be 0 or greater, set to 0 to disable!");
         }
         Objects.requireNonNull(taskExecutor, "taskExecutor may not be null!");
         Objects.requireNonNull(backoffStrategy, "backoffStrategy may not be null!");
