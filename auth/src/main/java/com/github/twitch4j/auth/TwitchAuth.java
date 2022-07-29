@@ -33,7 +33,7 @@ public class TwitchAuth {
 
     public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
         // register the twitch identityProvider
-        Optional<OAuth2IdentityProvider> ip = credentialManager.getOAuth2IdentityProviderByName("twitch");
+        Optional<TwitchIdentityProvider> ip = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class);
         if (!ip.isPresent()) {
             // register
             IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);

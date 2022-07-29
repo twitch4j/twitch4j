@@ -6,6 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -295,6 +296,7 @@ public class TwitchChatBuilder {
         if (credentialManager == null) {
             credentialManager = CredentialManagerBuilder.builder().build();
         }
+        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, null);
 
         // Register rate limits across the user id contained within the chat token
         final String userId;
@@ -302,9 +304,9 @@ public class TwitchChatBuilder {
             userId = null;
         } else {
             if (StringUtils.isEmpty(chatAccount.getUserId())) {
-                chatAccount = credentialManager.getOAuth2IdentityProviderByName("twitch")
-                    .orElse(new TwitchIdentityProvider(null, null, null))
-                    .getAdditionalCredentialInformation(chatAccount).orElse(chatAccount);
+                chatAccount = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
+                    .flatMap(tip -> tip.getAdditionalCredentialInformation(chatAccount))
+                    .orElse(chatAccount);
             }
             userId = StringUtils.defaultIfEmpty(chatAccount.getUserId(), null);
         }
