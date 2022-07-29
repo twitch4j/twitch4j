@@ -317,9 +317,7 @@ public class TwitchChat implements ITwitchChat {
             this.connection = websocketConnection;
         }
 
-        this.identityProvider = credentialManager.getOAuth2IdentityProviderByName("twitch")
-            .filter(ip -> ip instanceof TwitchIdentityProvider)
-            .map(ip -> (TwitchIdentityProvider) ip)
+        this.identityProvider = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
             .orElse(new TwitchIdentityProvider(null, null, null));
 
         // credential validation
@@ -336,13 +334,7 @@ public class TwitchChat implements ITwitchChat {
                     log.debug("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
                     this.chatCredential = enriched;
                 } else {
-                    chatCredential.setExpiresIn(enriched.getExpiresIn());
-                    if ((chatCredential.getScopes() == null || chatCredential.getScopes().isEmpty()) && enriched.getScopes() != null) {
-                        chatCredential.getScopes().addAll(enriched.getScopes());
-                    }
-                    if ((chatCredential.getContext() == null || chatCredential.getContext().isEmpty()) && enriched.getContext() != null) {
-                        chatCredential.getContext().putAll(enriched.getContext());
-                    }
+                    chatCredential.updateCredential(enriched);
                 }
 
                 // Check token type
@@ -353,11 +345,11 @@ public class TwitchChat implements ITwitchChat {
 
                 // Check scopes
                 Collection<String> scopes = enriched.getScopes();
-                if (scopes == null || scopes.isEmpty() || (!scopes.contains(TwitchScopes.CHAT_READ.toString())) && !scopes.contains(TwitchScopes.KRAKEN_CHAT_LOGIN.toString())) {
+                if (scopes.isEmpty() || (!scopes.contains(TwitchScopes.CHAT_READ.toString())) && !scopes.contains(TwitchScopes.KRAKEN_CHAT_LOGIN.toString())) {
                     log.warn("TwitchChat: AccessToken does not have required scope ({}) to connect to chat, joining anonymously instead!", TwitchScopes.CHAT_READ);
                     this.chatCredential = null; // connect anonymously to at least be able to read messages
                 }
-                if (scopes == null || !scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
+                if (!scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
                     log.debug("TwitchChat: AccessToken does not have the scope to write messages ({}).", TwitchScopes.CHAT_EDIT);
                 }
             } else {
