@@ -7,8 +7,10 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.TwitchLimitType;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.TwitchLimitRegistry;
+import com.github.twitch4j.helix.domain.SendPubSubMessageInput;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +27,8 @@ public final class TwitchHelixRateLimitTracker {
 
     private static final String AUTOMOD_STATUS_MINUTE_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-min";
     private static final String AUTOMOD_STATUS_HOUR_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-hr";
+    private static final String WHISPER_MINUTE_BANDWIDTH_ID = TwitchLimitType.CHAT_WHISPER_LIMIT.getBandwidthId() + "-minute";
+    private static final String WHISPER_SECOND_BANDWIDTH_ID = TwitchLimitType.CHAT_WHISPER_LIMIT.getBandwidthId() + "-second";
 
     /**
      * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
@@ -51,9 +55,41 @@ public final class TwitchHelixRateLimitTracker {
     );
 
     /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelModerator(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelModerator(String, String, String)}
+     */
+    private static final Bandwidth MOD_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
+
+    /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
      */
     private static final Bandwidth RAIDS_BANDWIDTH = Bandwidth.simple(10, Duration.ofMinutes(10));
+
+    /**
+     * Officially documented per-channel rate limit on {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionChatMessage(String, String, String, String, String)}
+     */
+    private static final Bandwidth EXT_CHAT_BANDWIDTH = Bandwidth.simple(12, Duration.ofMinutes(1L));
+
+    /**
+     * Officially documented bucket size (but unofficial refill rate) for {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionPubSubMessage(String, String, SendPubSubMessageInput)}
+     *
+     * @see <a href="https://github.com/twitchdev/issues/issues/612">Issue report</a>
+     */
+    private static final Bandwidth EXT_PUBSUB_BANDWIDTH = Bandwidth.classic(100, Refill.greedy(1, Duration.ofSeconds(1L)));
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelVip(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelVip(String, String, String)}
+     */
+    private static final Bandwidth VIP_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
+
+    /**
+     * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#sendWhisper(String, String, String, String)}
+     *
+     * @see TwitchLimitType#CHAT_WHISPER_LIMIT
+     */
+    private static final List<Bandwidth> WHISPERS_BANDWIDTH = Arrays.asList(
+        Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
+        Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+    );
 
     /**
      * Empirically determined rate limit on helix bans and unbans, per channel
@@ -77,7 +113,35 @@ public final class TwitchHelixRateLimitTracker {
      * Rate limit buckets by user/app
      */
     private final Cache<String, Bucket> primaryBuckets = Caffeine.newBuilder()
+        .expireAfterAccess(80, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Extensions API: send chat message rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> extensionChatBuckets = Caffeine.newBuilder()
         .expireAfterAccess(1, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Extensions API: send pubsub message rate limit buckets per channel
+     */
+    private final Cache<String, Bucket> extensionPubSubBuckets = Caffeine.newBuilder()
+        .expireAfterAccess(100, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Moderators API: add moderator rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> addModByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Moderators API: remove moderator rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> removeModByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
     /**
@@ -85,6 +149,20 @@ public final class TwitchHelixRateLimitTracker {
      */
     private final Cache<String, Bucket> raidsByChannelId = Caffeine.newBuilder()
         .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build();
+
+    /**
+     * Channels API: add VIP rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> addVipByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
+        .build();
+
+    /**
+     * Channels API: remove VIP rate limit bucket per channel
+     */
+    private final Cache<String, Bucket> removeVipByChannelId = Caffeine.newBuilder()
+        .expireAfterAccess(30, TimeUnit.SECONDS)
         .build();
 
     /**
@@ -142,13 +220,48 @@ public final class TwitchHelixRateLimitTracker {
      */
 
     @NotNull
+    Bucket getExtensionChatBucket(@NotNull String clientId, @NotNull String channelId) {
+        return extensionChatBuckets.get(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_CHAT_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getExtensionPubSubBucket(@NotNull String clientId, @NotNull String channelId) {
+        return extensionPubSubBuckets.get(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_PUBSUB_BANDWIDTH));
+    }
+
+    @NotNull
     Bucket getAutomodStatusBucket(@NotNull String channelId) {
         return TwitchLimitRegistry.getInstance().getOrInitializeBucket(channelId, TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT, AUTOMOD_STATUS_NORMAL_BANDWIDTH);
     }
 
     @NotNull
+    Bucket getModAddBucket(@NotNull String channelId) {
+        return addModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getModRemoveBucket(@NotNull String channelId) {
+        return removeModByChannelId.get(channelId, k -> BucketUtils.createBucket(MOD_BANDWIDTH));
+    }
+
+    @NotNull
     Bucket getRaidsBucket(@NotNull String channelId) {
         return raidsByChannelId.get(channelId, k -> BucketUtils.createBucket(RAIDS_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getVipAddBucket(@NotNull String channelId) {
+        return addVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getVipRemoveBucket(@NotNull String channelId) {
+        return removeVipByChannelId.get(channelId, k -> BucketUtils.createBucket(VIP_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getWhispersBucket(@NotNull String userId) {
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_WHISPER_LIMIT, WHISPERS_BANDWIDTH);
     }
 
     @NotNull
@@ -177,6 +290,14 @@ public final class TwitchHelixRateLimitTracker {
         this.updateRemainingGeneric(token, remaining, this::getPrimaryBucketKey, this::getOrInitializeBucket);
     }
 
+    public void updateRemainingExtensionChat(@NotNull String clientId, @NotNull String channelId, int remaining) {
+        this.updateRemainingConservative(getExtensionChatBucket(clientId, channelId), remaining);
+    }
+
+    public void updateRemainingExtensionPubSub(@NotNull String clientId, @NotNull String target, int remaining) {
+        this.updateRemainingConservative(getExtensionPubSubBucket(clientId, target), remaining);
+    }
+
     public void updateRemainingCreateClip(@NotNull String token, int remaining) {
         this.updateRemainingGeneric(token, remaining, OAuth2Credential::getUserId, this::getClipBucket);
     }
@@ -196,6 +317,10 @@ public final class TwitchHelixRateLimitTracker {
         if (key == null) return;
 
         Bucket bucket = keyToBucket.apply(key);
+        updateRemainingConservative(bucket, remaining);
+    }
+
+    private void updateRemainingConservative(Bucket bucket, int remaining) {
         long diff = bucket.getAvailableTokens() - remaining;
         if (diff > 0) bucket.tryConsumeAsMuchAsPossible(diff);
     }
