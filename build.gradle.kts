@@ -30,7 +30,7 @@ allprojects {
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
-					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.3",
+					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.4",
 					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/11.9.1",
 					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.9.1",
 					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/11.9.1",
