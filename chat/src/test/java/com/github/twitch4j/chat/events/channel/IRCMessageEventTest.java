@@ -79,6 +79,13 @@ public class IRCMessageEventTest {
     }
 
     @Test
+    @DisplayName("Tests that RECONNECT is parsed by IRCMessageEvent")
+    void parseReconnect() {
+        IRCMessageEvent e = build(":tmi.twitch.tv RECONNECT");
+        assertEquals("RECONNECT", e.getCommandType());
+    }
+
+    @Test
     @DisplayName("Test that whispers are parsed by IRCMessageEvent")
     void parseWhisper() {
         IRCMessageEvent e = build("@badges=;color=;display-name=HexaFice;emotes=;message-id=103;thread-id=142621956_149223493;turbo=0;user-id=142621956;user-type= " +
