@@ -1,5 +1,6 @@
 package com.github.twitch4j.kotlin.mock
 
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder
 import com.github.philippheuer.events4j.core.EventManager
 import com.github.twitch4j.chat.TwitchChat
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper
@@ -11,7 +12,7 @@ import com.github.twitch4j.common.util.ThreadUtils
 class MockChat : TwitchChat(
     null,
     EventManager().apply { autoDiscovery() },
-    null,
+    CredentialManagerBuilder.builder().build(),
     null,
     FDGT_TEST_SOCKET_SERVER,
     false,
@@ -32,7 +33,8 @@ class MockChat : TwitchChat(
     1,
     0,
     null,
-    TwitchChatLimitHelper.MOD_MESSAGE_LIMIT
+    TwitchChatLimitHelper.MOD_MESSAGE_LIMIT,
+    false
 ) {
     @Volatile
     var isConnected = false

@@ -6,7 +6,6 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -20,8 +19,6 @@ import java.util.Optional;
  */
 @Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
-
-    private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
     /**
      * Constructor
@@ -39,6 +36,41 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
     }
 
     /**
+     * Checks whether an {@link OAuth2Credential} is valid.
+     * <p>
+     * Expired tokens will yield false (assuming the network request succeeds).
+     *
+     * @param credential the OAuth credential to check
+     * @return whether the token is valid, or empty if the network request did not succeed
+     */
+    public Optional<Boolean> isCredentialValid(OAuth2Credential credential) {
+        if (credential == null || credential.getAccessToken() == null || credential.getAccessToken().isEmpty())
+            return Optional.of(false);
+
+        try {
+            // build request
+            Request request = new Request.Builder()
+                .url("https://id.twitch.tv/oauth2/validate")
+                .header("Authorization", "OAuth " + credential.getAccessToken())
+                .build();
+
+            // perform call
+            Response response = httpClient.newCall(request).execute();
+
+            // return token status
+            if (response.isSuccessful())
+                return Optional.of(true);
+
+            if (response.code() >= 400 && response.code() < 500)
+                return Optional.of(false);
+        } catch (Exception ignored) {
+            // fall through to return empty
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Get Auth Token Information
      *
      * @param credential OAuth2 Credential
@@ -51,7 +83,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
                 .header("Authorization", "OAuth " + credential.getAccessToken())
                 .build();
 
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
             String responseBody = response.body().string();
 
             // parse response
@@ -101,7 +133,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
             .build();
 
         try {
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
             if (response.isSuccessful()) {
                 return true;
             } else {

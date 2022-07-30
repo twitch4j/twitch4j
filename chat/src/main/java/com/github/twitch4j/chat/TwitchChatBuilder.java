@@ -6,6 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -258,6 +259,17 @@ public class TwitchChatBuilder {
     private IBackoffStrategy connectionBackoffStrategy = null;
 
     /**
+     * Whether the {@link #getChatAccount()} should be validated on reconnection failures.
+     * <p>
+     * If enabled and the token has expired, chat will connect in read-only mode instead.
+     * <p>
+     * If the network connection is too slow, you may want to disable this setting to avoid
+     * disconnects while waiting for the result of the validate endpoint.
+     */
+    @With
+    private boolean verifyChatAccountOnReconnect = true;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Chat Builder
@@ -284,6 +296,7 @@ public class TwitchChatBuilder {
         if (credentialManager == null) {
             credentialManager = CredentialManagerBuilder.builder().build();
         }
+        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, null);
 
         // Register rate limits across the user id contained within the chat token
         final String userId;
@@ -291,9 +304,9 @@ public class TwitchChatBuilder {
             userId = null;
         } else {
             if (StringUtils.isEmpty(chatAccount.getUserId())) {
-                chatAccount = credentialManager.getOAuth2IdentityProviderByName("twitch")
-                    .orElse(new TwitchIdentityProvider(null, null, null))
-                    .getAdditionalCredentialInformation(chatAccount).orElse(chatAccount);
+                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
+                    .flatMap(tip -> tip.getAdditionalCredentialInformation(chatAccount))
+                    .ifPresent(chatAccount::updateCredential);
             }
             userId = StringUtils.defaultIfEmpty(chatAccount.getUserId(), null);
         }
@@ -314,7 +327,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect);
     }
 
     /**
