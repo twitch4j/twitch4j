@@ -86,6 +86,17 @@ public class IRCMessageEventTest {
     }
 
     @Test
+    @DisplayName("Tests that ROOMSTATE is parsed by IRCMessageEvent")
+    void parseRoomState() {
+        IRCMessageEvent e = build("@emote-only=0;followers-only=-1;r9k=0;rituals=0;room-id=12345678;slow=0;subs-only=0 :tmi.twitch.tv ROOMSTATE #bar");
+        assertEquals("ROOMSTATE", e.getCommandType());
+        assertEquals("bar", e.getChannelName().orElse(null));
+        assertEquals("12345678", e.getChannelId());
+        assertEquals("0", e.getTags().get("emote-only"));
+        assertEquals("-1", e.getTags().get("followers-only"));
+    }
+
+    @Test
     @DisplayName("Test that whispers are parsed by IRCMessageEvent")
     void parseWhisper() {
         IRCMessageEvent e = build("@badges=;color=;display-name=HexaFice;emotes=;message-id=103;thread-id=142621956_149223493;turbo=0;user-id=142621956;user-type= " +
