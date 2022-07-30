@@ -334,18 +334,18 @@ public class TwitchChat implements ITwitchChat {
 
                 // Check token type
                 if (StringUtils.isEmpty(enriched.getUserId())) {
-                    log.warn("TwitchChat: ChatAccount is an App Access Token, while IRC requires User Access! Chat will be joined anonymously to avoid errors.");
+                    log.error("TwitchChat: ChatAccount is an App Access Token, while IRC requires User Access! Chat will be joined anonymously to avoid errors.");
                     this.chatCredential = null; // connect anonymously to at least be able to read messages
                 }
 
                 // Check scopes
                 Collection<String> scopes = enriched.getScopes();
                 if (scopes.isEmpty() || (!scopes.contains(TwitchScopes.CHAT_READ.toString())) && !scopes.contains(TwitchScopes.KRAKEN_CHAT_LOGIN.toString())) {
-                    log.warn("TwitchChat: AccessToken does not have required scope ({}) to connect to chat, joining anonymously instead!", TwitchScopes.CHAT_READ);
+                    log.error("TwitchChat: AccessToken does not have required scope ({}) to connect to chat, joining anonymously instead!", TwitchScopes.CHAT_READ);
                     this.chatCredential = null; // connect anonymously to at least be able to read messages
                 }
                 if (!scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
-                    log.info("TwitchChat: AccessToken does not have the scope to write messages ({}). Consider joining anonymously if this is intentional...", TwitchScopes.CHAT_EDIT);
+                    log.warn("TwitchChat: AccessToken does not have the scope to write messages ({}). Consider joining anonymously if this is intentional...", TwitchScopes.CHAT_EDIT);
                 }
             } else {
                 log.error("TwitchChat: Failed to get AccessToken Information, the token is probably not valid. Please check the docs Twitch4J -> Chat on how to obtain a valid token.");
