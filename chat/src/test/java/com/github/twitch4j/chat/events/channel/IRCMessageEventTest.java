@@ -68,6 +68,17 @@ public class IRCMessageEventTest {
     }
 
     @Test
+    @DisplayName("Tests that NOTICE is parsed by IRCMessageEvent")
+    void parseNotice() {
+        IRCMessageEvent e = build("@msg-id=delete_message_success :tmi.twitch.tv NOTICE #bar :The message from foo is now deleted.");
+
+        assertEquals("NOTICE", e.getCommandType());
+        assertEquals("bar", e.getChannelName().orElse(null));
+        assertEquals("delete_message_success", e.getTags().get("msg-id"));
+        assertEquals("The message from foo is now deleted.", e.getMessage().orElse(null));
+    }
+
+    @Test
     @DisplayName("Test that whispers are parsed by IRCMessageEvent")
     void parseWhisper() {
         IRCMessageEvent e = build("@badges=;color=;display-name=HexaFice;emotes=;message-id=103;thread-id=142621956_149223493;turbo=0;user-id=142621956;user-type= " +
