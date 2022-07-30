@@ -345,7 +345,7 @@ public class TwitchChat implements ITwitchChat {
                     this.chatCredential = null; // connect anonymously to at least be able to read messages
                 }
                 if (!scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
-                    log.debug("TwitchChat: AccessToken does not have the scope to write messages ({}).", TwitchScopes.CHAT_EDIT);
+                    log.info("TwitchChat: AccessToken does not have the scope to write messages ({}). Consider joining anonymously if this is intentional...", TwitchScopes.CHAT_EDIT);
                 }
             } else {
                 log.error("TwitchChat: Failed to get AccessToken Information, the token is probably not valid. Please check the docs Twitch4J -> Chat on how to obtain a valid token.");
