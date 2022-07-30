@@ -14,6 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class IRCMessageEventTest {
 
     @Test
+    @DisplayName("Tests that CLEARCHAT is parsed by IRCMessageEvent")
+    void parseChatClear() {
+        IRCMessageEvent e = build("@room-id=12345678;tmi-sent-ts=1642715756806 :tmi.twitch.tv CLEARCHAT #dallas");
+
+        assertEquals("CLEARCHAT", e.getCommandType());
+        assertEquals("dallas", e.getChannelName().orElse(null));
+        assertEquals("12345678", e.getChannelId());
+    }
+
+    @Test
     @DisplayName("Tests that CLEARMSG is parsed by IRCMessageEvent")
     void parseMessageDeletion() {
         IRCMessageEvent e = build("@login=foo;room-id=;target-msg-id=94e6c7ff-bf98-4faa-af5d-7ad633a158a9;tmi-sent-ts=1642720582342 :tmi.twitch.tv CLEARMSG #bar :what a great day");
