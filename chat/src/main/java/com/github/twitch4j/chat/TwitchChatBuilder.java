@@ -304,9 +304,9 @@ public class TwitchChatBuilder {
             userId = null;
         } else {
             if (StringUtils.isEmpty(chatAccount.getUserId())) {
-                chatAccount = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
+                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
                     .flatMap(tip -> tip.getAdditionalCredentialInformation(chatAccount))
-                    .orElse(chatAccount);
+                    .ifPresent(chatAccount::updateCredential);
             }
             userId = StringUtils.defaultIfEmpty(chatAccount.getUserId(), null);
         }

@@ -330,12 +330,7 @@ public class TwitchChat implements ITwitchChat {
                 OAuth2Credential enriched = credential.get();
 
                 // Update ChatCredential
-                if (this.chatCredential.getUserName() == null) {
-                    log.debug("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
-                    this.chatCredential = enriched;
-                } else {
-                    chatCredential.updateCredential(enriched);
-                }
+                chatCredential.updateCredential(enriched);
 
                 // Check token type
                 if (StringUtils.isEmpty(enriched.getUserId())) {
