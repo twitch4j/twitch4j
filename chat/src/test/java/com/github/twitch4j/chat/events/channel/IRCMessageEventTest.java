@@ -97,6 +97,23 @@ public class IRCMessageEventTest {
     }
 
     @Test
+    @DisplayName("Tests that USERNOTICE is parsed by IRCMessageEvent")
+    void parseUserNotice() {
+        IRCMessageEvent e = build("@badge-info=;badges=staff/1,premium/1;color=#0000FF;display-name=TWW2;emotes=;id=e9176cd8-5e22-4684-ad40-ce53c2561c5e;login=tww2;mod=0;msg-id=subgift;" +
+            "msg-param-months=1;msg-param-recipient-display-name=Mr_Woodchuck;msg-param-recipient-id=55554444;msg-param-recipient-name=mr_woodchuck;msg-param-sub-plan-name=House\\sof\\sNyoro~n;msg-param-sub-plan=1000;" +
+            "room-id=12345678;subscriber=0;system-msg=TWW2\\sgifted\\sa\\sTier\\s1\\ssub\\sto\\sMr_Woodchuck!;tmi-sent-ts=1521159445153;turbo=0;user-id=87654321;user-type=staff :tmi.twitch.tv USERNOTICE #forstycup");
+
+        assertEquals("USERNOTICE", e.getCommandType());
+        assertEquals("12345678", e.getChannelId());
+        assertEquals("forstycup", e.getChannelName().orElse(null));
+        assertEquals("87654321", e.getUserId());
+        assertEquals("TWW2 gifted a Tier 1 sub to Mr_Woodchuck!", e.getTagValue("system-msg").orElse(null));
+        assertEquals("TWW2", e.getTagValue("display-name").orElse(null));
+        assertEquals("tww2", e.getUserName());
+        assertEquals("subgift", e.getTagValue("msg-id").orElse(null));
+    }
+
+    @Test
     @DisplayName("Test that whispers are parsed by IRCMessageEvent")
     void parseWhisper() {
         IRCMessageEvent e = build("@badges=;color=;display-name=HexaFice;emotes=;message-id=103;thread-id=142621956_149223493;turbo=0;user-id=142621956;user-type= " +
