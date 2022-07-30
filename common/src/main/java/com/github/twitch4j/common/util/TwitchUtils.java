@@ -152,10 +152,10 @@ public class TwitchUtils {
         if (StringUtils.isBlank(raw)) return map;
 
         // Fix Whitespaces
-        raw = raw.replace("\\s", " ");
+        raw = EscapeUtils.unescapeTagValue(raw);
 
-        for (String tag : raw.split(",")) {
-            String[] val = tag.split("/");
+        for (String tag : StringUtils.split(raw, ',')) {
+            String[] val = StringUtils.split(tag, "/", 2);
             final String key = val[0];
             String value = (val.length > 1) ? val[1] : null;
             map.put(key, value);
