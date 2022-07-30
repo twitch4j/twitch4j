@@ -73,7 +73,7 @@ public class WebsocketConnectionConfig {
     /**
      * Websocket timeout milliseconds for read and write operations (0 = disabled).
      */
-    private int socketTimeout = 10_000;
+    private int socketTimeout = 30_000;
 
     /**
      * WebSocket Headers
