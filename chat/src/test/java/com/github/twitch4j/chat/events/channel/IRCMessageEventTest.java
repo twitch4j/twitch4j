@@ -44,6 +44,7 @@ public class IRCMessageEventTest {
         assertEquals("GLOBALUSERSTATE", e.getCommandType());
         assertEquals("12345678", e.getUserId());
         assertEquals("dallas", e.getTagValue("display-name").orElse(null));
+        assertEquals("dallas", e.getUserName());
         assertEquals("0,33,50,237,793,2126,3517,4578,5569,9400,10337,12239", e.getTagValue("emote-sets").orElse(null));
     }
 

@@ -232,7 +232,9 @@ public class IRCMessageEvent extends TwitchEvent {
 			return tags.get("login");
 		}
 
-		return getClientName().orElse(null);
+		return getClientName()
+            .filter(StringUtils::isNotBlank)
+            .orElseGet(() -> getTagValue("display-name").orElse(null));
 	}
 
     /**
