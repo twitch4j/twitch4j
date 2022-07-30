@@ -96,7 +96,7 @@ subprojects {
 			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.10.0")
 
 			// Credential Manager
-			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.3")
+			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.4")
 
 			// HTTP Client
 			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.9.1")

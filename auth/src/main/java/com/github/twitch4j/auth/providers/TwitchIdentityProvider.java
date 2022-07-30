@@ -6,7 +6,6 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -20,8 +19,6 @@ import java.util.Optional;
  */
 @Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
-
-    private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
     /**
      * Constructor
@@ -58,7 +55,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
                 .build();
 
             // perform call
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
 
             // return token status
             if (response.isSuccessful())
@@ -86,7 +83,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
                 .header("Authorization", "OAuth " + credential.getAccessToken())
                 .build();
 
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
             String responseBody = response.body().string();
 
             // parse response
@@ -136,7 +133,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
             .build();
 
         try {
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = httpClient.newCall(request).execute();
             if (response.isSuccessful()) {
                 return true;
             } else {
