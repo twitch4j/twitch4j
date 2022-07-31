@@ -114,6 +114,19 @@ public class IRCMessageEventTest {
     }
 
     @Test
+    @DisplayName("Tests that USERSTATE is parsed by IRCMessageEevent")
+    void parseUserState() {
+        IRCMessageEvent e = build("@badge-info=;badges=staff/1;color=#0D4200;display-name=ronni;emote-sets=0,33,50,237,793,2126,3517,4578,5569,9400,10337,12239;mod=1;subscriber=1;turbo=1;user-type=staff " +
+            ":tmi.twitch.tv USERSTATE #dallas");
+
+        assertEquals("USERSTATE", e.getCommandType());
+        assertEquals("dallas", e.getChannelName().orElse(null));
+        assertEquals("ronni", e.getUserName());
+        assertEquals("0,33,50,237,793,2126,3517,4578,5569,9400,10337,12239", e.getTagValue("emote-sets").orElse(null));
+        assertTrue(e.getClientPermissions().contains(CommandPermission.TWITCHSTAFF));
+    }
+
+    @Test
     @DisplayName("Test that whispers are parsed by IRCMessageEvent")
     void parseWhisper() {
         IRCMessageEvent e = build("@badges=;color=;display-name=HexaFice;emotes=;message-id=103;thread-id=142621956_149223493;turbo=0;user-id=142621956;user-type= " +
