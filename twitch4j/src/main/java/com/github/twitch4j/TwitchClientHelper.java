@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -345,7 +346,8 @@ public class TwitchClientHelper implements IClientHelper {
                 nextRequestCanBeImmediate = windowStart.compareAndSet(null, now);
             } else {
                 // get all clips in range [startedAt, now]
-                final List<Clip> clips = getClips(channelId, startedAt, now);
+                // end time is adjusted for https://github.com/twitchdev/issues/issues/52
+                final List<Clip> clips = getClips(channelId, startedAt, now.plus(10, ChronoUnit.MINUTES));
 
                 // cache channel name if unknown and construct event channel to be passed to events
                 if (!clips.isEmpty() && clips.get(0) != null && currentChannelCache.getUserName() == null) {
