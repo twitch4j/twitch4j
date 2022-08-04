@@ -282,9 +282,9 @@ public class TwitchClientHelper implements IClientHelper {
                     followBackoff.get().reset(); // API call was successful
 
                     // Prepare EventChannel
-                    String channelName = currentChannelCache.getUserName(); // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                    String channelName = currentChannelCache.getUserName();
                     if (channelName == null && !followList.isEmpty()) {
-                        channelName = followList.get(0).getToName();
+                        channelName = followList.get(0).getToLogin();
                         currentChannelCache.setUserName(channelName);
                     }
                     EventChannel channel = new EventChannel(channelId, channelName);
