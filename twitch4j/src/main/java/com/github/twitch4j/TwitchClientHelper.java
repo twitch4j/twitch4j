@@ -612,7 +612,7 @@ public class TwitchClientHelper implements IClientHelper {
             },
             ClipList::getData,
             call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
-            20
+            10
         );
     }
 
