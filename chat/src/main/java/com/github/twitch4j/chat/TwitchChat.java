@@ -3,6 +3,7 @@ package com.github.twitch4j.chat;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
+import com.github.twitch4j.auth.domain.TwitchScopes;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
 import com.github.twitch4j.chat.enums.NoticeTag;
@@ -31,6 +32,7 @@ import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -53,6 +55,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -230,6 +233,16 @@ public class TwitchChat implements ITwitchChat {
     protected final Cache<String, Bucket> bucketByChannelName;
 
     /**
+     * Twitch Identity Provider
+     */
+    protected final TwitchIdentityProvider identityProvider;
+
+    /**
+     * Whether OAuth token status should be checked on reconnect
+     */
+    protected final boolean validateOnConnect;
+
+    /**
      * Constructor
      *
      * @param websocketConnection            WebsocketConnection
@@ -256,8 +269,9 @@ public class TwitchChat implements ITwitchChat {
      * @param wsPingPeriod                   WebSocket Ping Period
      * @param connectionBackoffStrategy      WebSocket Connection Backoff Strategy
      * @param perChannelRateLimit            Per channel message limit
+     * @param validateOnConnect              Whether token should be validated on connect
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -277,6 +291,7 @@ public class TwitchChat implements ITwitchChat {
         this.maxJoinRetries = maxJoinRetries;
         this.chatJoinTimeout = chatJoinTimeout;
         this.perChannelRateLimit = perChannelRateLimit;
+        this.validateOnConnect = validateOnConnect;
 
         // init per channel message buckets by channel name
         this.bucketByChannelName = CacheApi.create(spec -> {
@@ -303,18 +318,36 @@ public class TwitchChat implements ITwitchChat {
             this.connection = websocketConnection;
         }
 
+        this.identityProvider = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
+            .orElse(new TwitchIdentityProvider(null, null, null));
+
         // credential validation
         if (this.chatCredential == null) {
             log.info("TwitchChat: No ChatAccount provided, Chat will be joined anonymously! Please look at the docs Twitch4J -> Chat if this is unintentional");
-        } else if (this.chatCredential.getUserName() == null) {
-            log.debug("TwitchChat: AccessToken does not contain any user information, fetching using the CredentialManager ...");
+        } else {
+            Optional<OAuth2Credential> credential = identityProvider.getAdditionalCredentialInformation(this.chatCredential);
 
-            // credential manager
-            Optional<OAuth2Credential> credential = credentialManager.getOAuth2IdentityProviderByName("twitch")
-                .orElse(new TwitchIdentityProvider(null, null, null))
-                .getAdditionalCredentialInformation(this.chatCredential);
             if (credential.isPresent()) {
-                this.chatCredential = credential.get();
+                OAuth2Credential enriched = credential.get();
+
+                // Update ChatCredential
+                chatCredential.updateCredential(enriched);
+
+                // Check token type
+                if (StringUtils.isEmpty(enriched.getUserId())) {
+                    log.error("TwitchChat: ChatAccount is an App Access Token, while IRC requires User Access! Chat will be joined anonymously to avoid errors.");
+                    this.chatCredential = null; // connect anonymously to at least be able to read messages
+                }
+
+                // Check scopes
+                Collection<String> scopes = enriched.getScopes();
+                if (scopes.isEmpty() || (!scopes.contains(TwitchScopes.CHAT_READ.toString())) && !scopes.contains(TwitchScopes.KRAKEN_CHAT_LOGIN.toString())) {
+                    log.error("TwitchChat: AccessToken does not have required scope ({}) to connect to chat, joining anonymously instead!", TwitchScopes.CHAT_READ);
+                    this.chatCredential = null; // connect anonymously to at least be able to read messages
+                }
+                if (!scopes.contains(TwitchScopes.CHAT_EDIT.toString())) {
+                    log.warn("TwitchChat: AccessToken does not have the scope to write messages ({}). Consider joining anonymously if this is intentional...", TwitchScopes.CHAT_EDIT);
+                }
             } else {
                 log.error("TwitchChat: Failed to get AccessToken Information, the token is probably not valid. Please check the docs Twitch4J -> Chat on how to obtain a valid token.");
             }
@@ -454,12 +487,30 @@ public class TwitchChat implements ITwitchChat {
             boolean sendRealPass = sendCredentialToThirdPartyHost // check whether this security feature has been overridden
                 || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER) // check whether the url is exactly the official one
                 || baseUrl.equalsIgnoreCase(TWITCH_WEB_SOCKET_SERVER.substring(0, TWITCH_WEB_SOCKET_SERVER.length() - 4)); // check whether the url matches without the port
-            sendTextToWebSocket(String.format("pass oauth:%s", sendRealPass ? chatCredential.getAccessToken() : CryptoUtils.generateNonce(30)), true);
-            userName = String.valueOf(chatCredential.getUserName()).toLowerCase();
+
+            String token;
+            if (sendRealPass) {
+                BooleanSupplier hasExpired = () -> identityProvider.isCredentialValid(chatCredential).filter(valid -> !valid).isPresent();
+                if (validateOnConnect && connection.getConfig().backoffStrategy().getFailures() > 1 && hasExpired.getAsBoolean()) {
+                    log.warn("TwitchChat: Credential is no longer valid! Connecting anonymously...");
+                    token = null;
+                } else {
+                    token = chatCredential.getAccessToken();
+                }
+            } else {
+                token = CryptoUtils.generateNonce(30);
+            }
+
+            if (token != null) {
+                sendTextToWebSocket(String.format("pass oauth:%s", token), true);
+                userName = String.valueOf(chatCredential.getUserName()).toLowerCase();
+            } else {
+                userName = null;
+            }
         } else {
-            userName = "justinfan" + ThreadLocalRandom.current().nextInt(100000);
+            userName = null;
         }
-        sendTextToWebSocket(String.format("nick %s", userName), true);
+        sendTextToWebSocket(String.format("nick %s", userName != null ? userName : "justinfan" + ThreadLocalRandom.current().nextInt(100000)), true);
 
         // Join defined channels, in case we reconnect or weren't connected yet when we called joinChannel
         for (String channel : currentChannels) {
@@ -467,7 +518,7 @@ public class TwitchChat implements ITwitchChat {
         }
 
         // then join to own channel - required for sending or receiving whispers
-        if (chatCredential != null && chatCredential.getUserName() != null) {
+        if (chatCredential != null && chatCredential.getUserName() != null && userName != null) {
             if (autoJoinOwnChannel && !currentChannels.contains(userName))
                 joinChannel(userName);
         } else {

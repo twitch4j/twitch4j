@@ -1,0 +1,138 @@
+query fetchCommunityPointsSettings($login: String!) {
+	channel(name: $login) {
+		id
+		communityPointsSettings {
+			name
+			image {
+				url
+				url2x
+				url4x
+			}
+			isEnabled
+			automaticRewards {
+				backgroundColor
+				cost
+				defaultBackgroundColor
+				defaultCost
+				defaultImage {
+					url
+					url2x
+					url4x
+				}
+				globallyUpdatedForIndicatorAt
+				id
+				image {
+					url
+					url2x
+					url4x
+				}
+				isEnabled
+				isHiddenForSubs
+				minimumCost
+				type
+				updatedForIndicatorAt
+			}
+			customRewards {
+				backgroundColor
+				cooldownExpiresAt
+				cost
+				defaultImage {
+					url
+					url2x
+					url4x
+				}
+				globalCooldownSetting {
+					isEnabled
+					globalCooldownSeconds
+				}
+				id
+				image {
+					url
+					url2x
+					url4x
+				}
+				isEnabled
+				isInStock
+				isPaused
+				isSubOnly
+				isUserInputRequired
+				maxPerStreamSetting {
+					isEnabled
+					maxPerStream
+				}
+				maxPerUserPerStreamSetting {
+					isEnabled
+					maxPerUserPerStream
+				}
+				prompt
+				redemptionsRedeemedCurrentStream
+				shouldRedemptionsSkipRequestQueue
+				title
+				updatedForIndicatorAt
+			}
+			goals {
+				amountNeeded
+				backgroundColor
+				defaultImage {
+					url
+					url2x
+					url4x
+				}
+				description
+				durationDays
+				endedAt
+				id
+				image {
+					url
+					url2x
+					url4x
+				}
+				isInStock
+				perStreamUserMaximumContribution
+				pointsContributed
+				smallContribution
+				startedAt
+				status
+				title
+				type
+			}
+			emoteVariants {
+				emote {
+					id
+					token
+				}
+				id
+				isUnlockable
+				modifications {
+					emote {
+						id
+						token
+					}
+					globallyUpdatedForIndicatorAt
+					id
+					modifier {
+						id
+					}
+				}
+			}
+			earning {
+				averagePointsPerHour
+				cheerPoints
+				claimPoints
+				followPoints
+				id
+				multipliers {
+					reasonCode
+					factor
+				}
+				passiveWatchPoints
+				raidPoints
+				subscriptionGiftPoints
+				watchStreakPoints {
+					points
+					streakLength
+				}
+			}
+		}
+	}
+}

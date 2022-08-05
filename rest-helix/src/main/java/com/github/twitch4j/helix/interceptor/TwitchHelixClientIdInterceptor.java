@@ -14,6 +14,7 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
     public static final String AUTH_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+    public static final String CLIENT_HEADER = "Client-Id";
 
     /**
      * User Agent
@@ -44,7 +45,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
 
         // if a oauth token is passed is has to match that client id, default to global client id otherwise (for ie. token verification)
         if (template.headers().containsKey(AUTH_HEADER)) {
-            String oauthToken = template.headers().get(AUTH_HEADER).iterator().next().substring(BEARER_PREFIX.length());
+            // noinspection ConstantConditions
+            String oauthToken = TwitchHelixHttpClient.getFirst(AUTH_HEADER, template.headers()).substring(BEARER_PREFIX.length());
 
             if (oauthToken.isEmpty()) {
                 try {
@@ -65,8 +67,8 @@ public class TwitchHelixClientIdInterceptor implements RequestInterceptor {
         }
 
         // set headers
-        if (!template.headers().containsKey("Client-Id"))
-            template.header("Client-Id", clientId);
+        if (!template.headers().containsKey(CLIENT_HEADER))
+            template.header(CLIENT_HEADER, clientId);
         template.header("User-Agent", userAgent);
         if (template.body() != null && !template.headers().containsKey("Content-Type"))
             template.header("Content-Type", "application/json");

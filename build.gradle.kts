@@ -25,15 +25,15 @@ allprojects {
 				links(
 					"https://javadoc.io/doc/org.jetbrains/annotations/23.0.0",
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.5.0",
+					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.6.0",
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
-					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.2",
-					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/11.9",
-					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.9",
-					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/11.9",
-					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/11.9",
+					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.4",
+					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/11.9.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.9.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/11.9.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/11.9.1",
 					"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 					"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.13.3",
@@ -82,7 +82,7 @@ subprojects {
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Rate Limiting
-			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.5.0")
+			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.6.0")
 
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
@@ -92,13 +92,13 @@ subprojects {
 			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.10.0")
 
 			// Credential Manager
-			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.2")
+			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.4")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.9")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.9")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.9")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.9")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.9.1")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.9.1")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -131,7 +131,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.13.3"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.8.2"))
+		testImplementation(platform("org.junit:junit-bom:5.9.0"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		// - Mocking
 		testImplementation(platform("org.mockito:mockito-bom:4.6.1"))

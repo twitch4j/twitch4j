@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -285,9 +286,9 @@ public class TwitchClientHelper implements IClientHelper {
                     followBackoff.get().reset(); // API call was successful
 
                     // Prepare EventChannel
-                    String channelName = currentChannelCache.getUserName(); // Prefer login (even if old) to display_name https://github.com/twitchdev/issues/issues/3#issuecomment-562713594
+                    String channelName = currentChannelCache.getUserName();
                     if (channelName == null && !followList.isEmpty()) {
-                        channelName = followList.get(0).getToName();
+                        channelName = followList.get(0).getToLogin();
                         currentChannelCache.setUserName(channelName);
                     }
                     EventChannel channel = new EventChannel(channelId, channelName);
@@ -349,7 +350,8 @@ public class TwitchClientHelper implements IClientHelper {
                 nextRequestCanBeImmediate = windowStart.compareAndSet(null, now);
             } else {
                 // get all clips in range [startedAt, now]
-                final List<Clip> clips = getClips(channelId, startedAt, now);
+                // end time is adjusted for https://github.com/twitchdev/issues/issues/52
+                final List<Clip> clips = getClips(channelId, startedAt, now.plus(10, ChronoUnit.MINUTES));
 
                 // cache channel name if unknown and construct event channel to be passed to events
                 if (!clips.isEmpty() && clips.get(0) != null && currentChannelCache.getUserName() == null) {
@@ -614,7 +616,7 @@ public class TwitchClientHelper implements IClientHelper {
             },
             ClipList::getData,
             call -> call.getPagination() != null ? call.getPagination().getCursor() : null,
-            20
+            10
         );
     }
 

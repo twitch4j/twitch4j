@@ -326,8 +326,6 @@ public interface TwitchHelix {
 
     /**
      * Sends an announcement to the broadcaster’s chat room.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
      * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.
@@ -337,7 +335,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /chat/announcements?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -381,15 +378,12 @@ public interface TwitchHelix {
 
     /**
      * Gets the color used for the user’s name in chat.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken App access token or user access token.
      * @param userIds   The ID of the users whose color you want to get. Maximum: 100.
      * @return UserChatColorList
      * @see ChatUserColor#getColor()
      */
-    @Unofficial // beta
     @RequestLine("GET /chat/color?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserChatColorList> getUserChatColor(
@@ -400,8 +394,6 @@ public interface TwitchHelix {
     /**
      * Updates the color used for the user’s name in chat.
      * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
-     * <p>
      * All users may specify one of the following named color values in {@link NamedUserChatColor}.
      * Turbo and Prime users may specify a named color or a Hex color code like #9146FF.
      *
@@ -411,7 +403,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_COLOR_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("PUT /chat/color?user_id={user_id}&color={color}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> updateUserChatColor(
@@ -842,6 +833,22 @@ public interface TwitchHelix {
         @Param("after") String after
     );
 
+    @Deprecated // meant to only be called internally
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @RequestLine("POST /extensions/pubsub")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Client-Id: {extension_id}",
+        "Content-Type: application/json",
+        "Twitch4J-Target: {twitch4j_target}"
+    })
+    HystrixCommand<Void> sendExtensionPubSubMessage(
+        @Param("token") String jwtToken,
+        @Param("extension_id") String extensionId,
+        @Param("twitch4j_target") String target,
+        SendPubSubMessageInput input
+    );
+
     /**
      * Twitch provides a publish-subscribe system for your EBS to communicate with both the broadcaster and viewers.
      * Calling this endpoint forwards your message using the same mechanism as the send JavaScript helper function.
@@ -857,17 +864,14 @@ public interface TwitchHelix {
      * @param input       Details on the message to be sent and its targets.
      * @return 204 No Content upon a successful request.
      */
-    @RequestLine("POST /extensions/pubsub")
-    @Headers({
-        "Authorization: Bearer {token}",
-        "Client-Id: {extension_id}",
-        "Content-Type: application/json"
-    })
-    HystrixCommand<Void> sendExtensionPubSubMessage(
-        @Param("token") String jwtToken,
-        @Param("extension_id") String extensionId,
-        SendPubSubMessageInput input
-    );
+    default HystrixCommand<Void> sendExtensionPubSubMessage(
+        String jwtToken,
+        @NotNull String extensionId,
+        @NotNull SendPubSubMessageInput input
+    ) {
+        final String target = input.isGlobalBroadcast() ? SendPubSubMessageInput.GLOBAL_TARGET : input.getBroadcasterId() != null ? input.getBroadcasterId() : input.getTargets().get(0);
+        return this.sendExtensionPubSubMessage(jwtToken, extensionId, target, input);
+    }
 
     /**
      * Gets information about a released Extension; either the current version or a specified version.
@@ -1106,8 +1110,6 @@ public interface TwitchHelix {
 
     /**
      * Gets a list of the channel’s VIPs.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:read:vips scope.
      * @param broadcasterId The ID of the broadcaster whose list of VIPs you want to get.
@@ -1117,7 +1119,6 @@ public interface TwitchHelix {
      * @return ChannelVipList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIPS_READ
      */
-    @Unofficial // beta
     @RequestLine("GET /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ChannelVipList> getChannelVips(
@@ -1130,8 +1131,6 @@ public interface TwitchHelix {
 
     /**
      * Adds a VIP to the broadcaster’s chat room.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:manage:vips scope.
      * @param broadcasterId The ID of the broadcaster that’s granting VIP status to the user.
@@ -1139,7 +1138,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIPS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> addChannelVip(
@@ -1150,8 +1148,6 @@ public interface TwitchHelix {
 
     /**
      * Removes a VIP from the broadcaster’s chat room.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:manage:vips scope.
      * @param broadcasterId The ID of the broadcaster that’s removing VIP status from the user.
@@ -1159,7 +1155,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_VIPS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("DELETE /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> removeChannelVip(
@@ -1586,8 +1581,6 @@ public interface TwitchHelix {
     /**
      * Removes a single chat message or all chat messages from the broadcaster’s chat room.
      * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
-     * <p>
      * The ID in the moderator_id query parameter must match the user ID in the access token.
      * If the broadcaster wants to remove messages themselves (instead of having the moderator do it), set this parameter to the broadcaster’s ID, too.
      * <p>
@@ -1606,7 +1599,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("DELETE /moderation/chat?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> deleteChatMessages(
@@ -1657,8 +1649,6 @@ public interface TwitchHelix {
 
     /**
      * Adds a moderator to the broadcaster’s chat room.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:manage:moderators scope.
      * @param broadcasterId The ID of the broadcaster that owns the chat room.
@@ -1666,7 +1656,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_MODS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> addChannelModerator(
@@ -1677,8 +1666,6 @@ public interface TwitchHelix {
 
     /**
      * Removes a moderator from the broadcaster’s chat room.
-     * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:manage:moderators scope.
      * @param broadcasterId The ID of the broadcaster that owns the chat room.
@@ -1686,7 +1673,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_MODS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("DELETE /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> removeChannelModerator(
@@ -2668,8 +2654,6 @@ public interface TwitchHelix {
     /**
      * Sends a whisper message to the specified user.
      * <p>
-     * This endpoint is in <a href="https://discuss.dev.twitch.tv/t/new-chat-and-role-management-api-endpoints-are-now-in-open-beta/39563">open beta</a>.
-     * <p>
      * Note: The user sending the whisper must have a verified phone number.
      * <p>
      * Note: The API may silently drop whispers that it suspects of violating Twitch policies.
@@ -2696,7 +2680,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful call, even if the message was silently dropped
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_WHISPERS_MANAGE
      */
-    @Unofficial // beta
     @RequestLine("POST /whispers?from_user_id={from_user_id}&to_user_id={to_user_id}")
     @Headers({
         "Authorization: Bearer {token}",
