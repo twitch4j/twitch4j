@@ -16,10 +16,6 @@ allprojects {
 	// Repositories
 	repositories {
 		mavenCentral()
-		maven {
-			name = "sonatype-snapshots"
-			url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-		}
 	}
 
 	tasks {
@@ -126,7 +122,7 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Cache BOM
-		api(platform("io.github.xanthic.cache:cache-bom:1.0.0-SNAPSHOT"))
+		api(platform("io.github.xanthic.cache:cache-bom:0.1.0"))
 
 		// Logging
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
