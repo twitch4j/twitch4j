@@ -1,9 +1,10 @@
 package com.github.twitch4j.helix.interceptor;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Slf4j
 public final class TwitchHelixTokenManager {
@@ -21,10 +22,11 @@ public final class TwitchHelixTokenManager {
     /**
      * Access token cache
      */
-    private final Cache<String, OAuth2Credential> accessTokenCache = Caffeine.newBuilder()
-        .expireAfterAccess(15, TimeUnit.MINUTES)
-        .maximumSize(10_000)
-        .build();
+    private final Cache<String, OAuth2Credential> accessTokenCache = CacheApi.create(spec -> {
+        spec.maxSize(10_000L);
+        spec.expiryType(ExpiryType.POST_ACCESS);
+        spec.expiryTime(Duration.ofMinutes(15L));
+    });
 
     /**
      * Reference to the twitch identity provider
@@ -86,7 +88,7 @@ public final class TwitchHelixTokenManager {
 
     @Nullable
     OAuth2Credential getIfPresent(@NotNull String accessToken) {
-        return accessTokenCache.getIfPresent(accessToken);
+        return accessTokenCache.get(accessToken);
     }
 
     @NotNull

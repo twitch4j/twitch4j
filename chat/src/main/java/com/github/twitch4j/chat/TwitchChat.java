@@ -1,9 +1,5 @@
 package com.github.twitch4j.chat;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.Scheduler;
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
@@ -31,6 +27,9 @@ import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -295,9 +294,11 @@ public class TwitchChat implements ITwitchChat {
         this.validateOnConnect = validateOnConnect;
 
         // init per channel message buckets by channel name
-        this.bucketByChannelName = Caffeine.newBuilder()
-            .expireAfterAccess(Math.max(perChannelRateLimit.getRefillPeriodNanos(), Duration.ofSeconds(30L).toNanos()), TimeUnit.NANOSECONDS)
-            .build();
+        this.bucketByChannelName = CacheApi.create(spec -> {
+            spec.maxSize(2048L);
+            spec.expiryType(ExpiryType.POST_ACCESS);
+            spec.expiryTime(Duration.ofNanos(Math.max(perChannelRateLimit.getRefillPeriodNanos(), Duration.ofSeconds(30L).toNanos())));
+        });
 
         // init connection
         if (websocketConnection == null) {
@@ -429,11 +430,13 @@ public class TwitchChat implements ITwitchChat {
         // Initialize joinAttemptsByChannelName (on an attempt expiring without explicit removal, we retry with exponential backoff)
         if (maxJoinRetries > 0) {
             final long initialWait = Math.max(chatJoinTimeout, 0);
-            this.joinAttemptsByChannelName = Caffeine.newBuilder()
-                .expireAfterWrite(initialWait, TimeUnit.MILLISECONDS)
-                .scheduler(Scheduler.forScheduledExecutorService(taskExecutor)) // required for prompt removals on java 8
-                .<String, Integer>evictionListener((name, attempts, cause) -> {
-                    if (cause == RemovalCause.EXPIRED && name != null && attempts != null) {
+            this.joinAttemptsByChannelName = CacheApi.create(spec -> {
+                spec.maxSize(2048L);
+                spec.expiryType(ExpiryType.POST_WRITE);
+                spec.expiryTime(Duration.ofMillis(initialWait));
+                spec.executor(taskExecutor);
+                spec.removalListener((name, attempts, cause) -> {
+                    if (cause.isEviction()) {
                         if (attempts < maxJoinRetries) {
                             taskExecutor.schedule(() -> {
                                 if (currentChannels.contains(name)) {
@@ -446,14 +449,14 @@ public class TwitchChat implements ITwitchChat {
                             log.warn("Chat connection exhausted retries when attempting to join channel: {}", name);
                         }
                     }
-                })
-                .build();
+                });
+            });
         } else {
-            this.joinAttemptsByChannelName = Caffeine.newBuilder().maximumSize(0).build(); // optimization
+            this.joinAttemptsByChannelName = CacheApi.create(spec -> spec.maxSize(0L)); // optimization
         }
 
         // Remove successfully joined channels from joinAttemptsByChannelName (as further retries are not needed)
-        Consumer<AbstractChannelEvent> joinListener = e -> joinAttemptsByChannelName.invalidate(e.getChannel().getName().toLowerCase());
+        Consumer<AbstractChannelEvent> joinListener = e -> joinAttemptsByChannelName.remove(e.getChannel().getName().toLowerCase());
         eventManager.onEvent(ChannelStateEvent.class, joinListener::accept);
         eventManager.onEvent(ChannelNoticeEvent.class, joinListener::accept);
         eventManager.onEvent(UserStateEvent.class, joinListener::accept);
@@ -696,7 +699,7 @@ public class TwitchChat implements ITwitchChat {
         BucketUtils.scheduleAgainstBucket(ircJoinBucket, taskExecutor, () -> {
             String name = channelName.toLowerCase();
             queueCommand("JOIN #" + name);
-            joinAttemptsByChannelName.asMap().merge(name, attempts, Math::max); // mark that a join has been initiated to track later success or failure state
+            joinAttemptsByChannelName.merge(name, attempts, Math::max); // mark that a join has been initiated to track later success or failure state
         });
     }
 
@@ -888,7 +891,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private Bucket getChannelMessageBucket(@NotNull String channelName) {
-        return bucketByChannelName.get(channelName.toLowerCase(), k -> BucketUtils.createBucket(perChannelRateLimit));
+        return bucketByChannelName.computeIfAbsent(channelName.toLowerCase(), k -> BucketUtils.createBucket(perChannelRateLimit));
     }
 
 }

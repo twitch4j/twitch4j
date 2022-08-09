@@ -5,7 +5,7 @@ dependencies {
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Cache
-	api(group = "com.github.ben-manes.caffeine", name = "caffeine")
+	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))

@@ -2,8 +2,6 @@ package com.github.twitch4j.graphql;
 
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.internal.batch.BatchConfig;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -16,10 +14,14 @@ import com.github.twitch4j.graphql.internal.type.CreatePredictionEventInput;
 import com.github.twitch4j.graphql.internal.type.UnbanRequestStatus;
 import com.github.twitch4j.graphql.internal.type.UnbanRequestsSortOrder;
 import com.github.twitch4j.graphql.internal.type.UpdateCommunityPointsCommunityGoalInput;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -97,7 +99,11 @@ public class TwitchGraphQL {
         this.proxyConfig = proxyConfig;
         this.batchingEnabled = batchingEnabled;
         this.timeout = timeout;
-        this.clientsByCredential = Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+        this.clientsByCredential = CacheApi.create(spec -> {
+            spec.maxSize(64L);
+            spec.expiryType(ExpiryType.POST_ACCESS);
+            spec.expiryTime(Duration.ofMinutes(5L));
+        });
     }
 
     /**
@@ -109,7 +115,7 @@ public class TwitchGraphQL {
     private ApolloClient getApolloClient(OAuth2Credential credential) {
         if (credential == null) credential = defaultToken;
         final String accessToken = credential != null && credential.getAccessToken() != null ? credential.getAccessToken() : "";
-        return clientsByCredential.get(accessToken, s -> {
+        return clientsByCredential.computeIfAbsent(accessToken, s -> {
             // Http Client
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .callTimeout(timeout, TimeUnit.MILLISECONDS)

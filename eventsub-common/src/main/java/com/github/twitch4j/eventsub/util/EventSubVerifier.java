@@ -1,8 +1,9 @@
 package com.github.twitch4j.eventsub.util;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.twitch4j.common.util.CryptoUtils;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +32,11 @@ public class EventSubVerifier {
     /**
      * The Twitch-Eventsub-Message-Id's that have been observed during {@link #RECENT_EVENT}
      */
-    private final Cache<String, Boolean> RECENT_MESSAGE_IDS = Caffeine.newBuilder().expireAfterWrite(RECENT_EVENT).build();
+    private final Cache<String, Boolean> RECENT_MESSAGE_IDS = CacheApi.create(spec -> {
+        spec.expiryType(ExpiryType.POST_WRITE);
+        spec.expiryTime(RECENT_EVENT);
+        spec.maxSize(65_536L);
+    });
 
     /**
      * Twitch's prefix for Twitch-Eventsub-Message-Signature
@@ -64,7 +69,7 @@ public class EventSubVerifier {
      * @return whether the message id has not been observed recently
      */
     public boolean verifyMessageId(String messageId) {
-        return messageId != null && !messageId.isEmpty() && RECENT_MESSAGE_IDS.asMap().putIfAbsent(messageId, Boolean.TRUE) == null;
+        return messageId != null && !messageId.isEmpty() && RECENT_MESSAGE_IDS.putIfAbsent(messageId, Boolean.TRUE) == null;
     }
 
     /**
