@@ -10,7 +10,7 @@ public enum GoalType {
     /**
      * The goal is to increase followers.
      */
-    @JsonAlias("follower")
+    @JsonAlias({ "follower", "follow" })
     FOLLOWERS,
 
     /**
