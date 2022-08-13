@@ -122,7 +122,7 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.12.0")
 
 		// Cache BOM
-		api(platform("io.github.xanthic.cache:cache-bom:0.1.0"))
+		api(platform("io.github.xanthic.cache:cache-bom:0.1.1"))
 
 		// Logging
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
