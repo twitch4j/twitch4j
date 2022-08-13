@@ -1,7 +1,7 @@
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// Rate Limiting
-	api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
+	api(group = "com.bucket4j", name = "bucket4j_jdk8-core")
 
 	// Cache
 	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")

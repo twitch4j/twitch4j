@@ -82,7 +82,7 @@ subprojects {
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Rate Limiting
-			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.6.0")
+			api(group = "com.bucket4j", name = "bucket4j_jdk8-core", version = "8.0.1")
 
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
