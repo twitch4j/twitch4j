@@ -14,7 +14,7 @@ dependencies {
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
 	// Rate-limit buckets for registry
-	compileOnly(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core")
+	compileOnly(group = "com.bucket4j", name = "bucket4j_jdk8-core")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-auth"))

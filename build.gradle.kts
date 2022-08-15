@@ -25,7 +25,7 @@ allprojects {
 				links(
 					"https://javadoc.io/doc/org.jetbrains/annotations/23.0.0",
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.6.0",
+					"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.0.1",
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
@@ -82,7 +82,7 @@ subprojects {
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
 
 			// Rate Limiting
-			api(group = "com.github.vladimir-bukhtoyarov", name = "bucket4j-core", version = "7.6.0")
+			api(group = "com.bucket4j", name = "bucket4j_jdk8-core", version = "8.0.1")
 
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
