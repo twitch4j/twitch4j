@@ -62,10 +62,11 @@ public final class TwitchHelixTokenManager {
         this.defaultAuthToken = defaultAuthToken;
 
         if (defaultAuthToken != null) {
+            this.defaultClientId = defaultAuthToken.getContext().getOrDefault(CLIENT_ID_CONTEXT, clientId).toString();
             twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken).ifPresent(oauth -> {
                 populateCache(oauth);
                 this.defaultClientId = extractClientId(oauth);
-                this.defaultAuthToken = oauth;
+                this.defaultAuthToken.updateCredential(oauth);
             });
         }
     }
