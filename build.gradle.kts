@@ -25,7 +25,7 @@ allprojects {
 				links(
 					"https://javadoc.io/doc/org.jetbrains/annotations/23.0.0",
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
-					"https://javadoc.io/doc/com.github.vladimir-bukhtoyarov/bucket4j-core/7.6.0",
+					"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.0.1",
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
