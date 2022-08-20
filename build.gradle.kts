@@ -110,8 +110,8 @@ subprojects {
 			listOf("com.fasterxml.jackson.core:jackson-annotations", "com.fasterxml.jackson.core:jackson-core", "com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.datatype:jackson-datatype-jsr310").forEach { dep ->
 				add("api", dep) {
 					version {
-						strictly("[2.12,3[")
-						prefer("2.13.2")
+						strictly("[2.12,3-alpha[")
+						prefer("2.13.3")
 					}
 				}
 			}
