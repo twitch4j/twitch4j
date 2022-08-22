@@ -47,16 +47,14 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         if (credential == null || credential.getAccessToken() == null || credential.getAccessToken().isEmpty())
             return Optional.of(false);
 
-        try {
-            // build request
-            Request request = new Request.Builder()
-                .url("https://id.twitch.tv/oauth2/validate")
-                .header("Authorization", "OAuth " + credential.getAccessToken())
-                .build();
+        // build request
+        Request request = new Request.Builder()
+            .url("https://id.twitch.tv/oauth2/validate")
+            .header("Authorization", "OAuth " + credential.getAccessToken())
+            .build();
 
-            // perform call
-            Response response = httpClient.newCall(request).execute();
-
+        // perform call
+        try (Response response = httpClient.newCall(request).execute()) {
             // return token status
             if (response.isSuccessful())
                 return Optional.of(true);
