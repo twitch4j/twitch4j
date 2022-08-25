@@ -71,8 +71,14 @@ public class WebsocketConnection implements AutoCloseable {
     @Getter
     protected volatile long latency = -1L;
 
+    /**
+     * Whether {@link #close()} has been called
+     */
     protected final AtomicBoolean closed = new AtomicBoolean(false);
 
+    /**
+     * Latch used to indicate that the underlying socket has fully disconnected following {@link #close()}.
+     */
     protected final CountDownLatch closeLatch = new CountDownLatch(1);
 
     /**
@@ -309,14 +315,19 @@ public class WebsocketConnection implements AutoCloseable {
         if (closed.getAndSet(true))
             return; // resource close was already requested
 
+        // Cancel backoff clear task, if outstanding
         if (backoffClearer != null)
             backoffClearer.cancel(false);
 
+        // Cancel any outstanding reconnect task
         Future<?> reconnector = reconnectTask.getAndSet(null);
         if (reconnector != null)
             reconnector.cancel(false);
 
+        // Disconnect from socket
         try {
+            // This call does not block, so we use CountdownLatch to block
+            // until the underlying socket fully closes.
             disconnect();
         } catch (Exception e) {
             log.warn("Exception thrown from websocket disconnect attempt", e);
@@ -341,17 +352,22 @@ public class WebsocketConnection implements AutoCloseable {
         // Clean up the socket
         final WebSocket socket = this.webSocket;
         if (socket != null) {
+            // The disconnecting socket no needs to invoke this.webSocketAdapter
             socket.clearListeners();
+
+            // However, if a full close is requested, we should track when the underlying socket closes to release the latch.
             if (closed.get()) {
                 socket.addListener(new WebSocketAdapter() {
                     @Override
                     public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
+                        // The underlying java.net.Socket fully closed (e.g., after receiving close); release the latch.
                         socket.clearListeners();
                         closeLatch.countDown();
                     }
 
                     @Override
                     public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) {
+                        // Flushing (e.g., of the close frame) failed because the socket was already closed; release latch.
                         if (cause != null && cause.getError() == WebSocketError.FLUSH_ERROR) {
                             socket.clearListeners();
                             closeLatch.countDown();
@@ -359,8 +375,19 @@ public class WebsocketConnection implements AutoCloseable {
                     }
                 });
             }
+
+            // Similarly, this disconnect call is non-blocking.
+            // Under the hood, this queues a close frame to be sent to the server,
+            // and the WritingThread is otherwise stopped.
+            // This also schedules a task to forcibly close the underlying socket,
+            // after the close delay passes.
+            // If the close delay is set very low, the queued close frame may never
+            // successfully flush, triggering onSendError.
+            // Lastly, the ReadingThread starts to block, awaiting a close frame from the server.
+            // Upon receiving a close frame, the socket also closes, indicated by onDisconnected.
             socket.disconnect(WebSocketCloseCode.NORMAL, null, config.closeDelay());
 
+            // Release the reference to the closing websocket.
             this.webSocket = null;
         }
 
