@@ -49,6 +49,11 @@ public class WebsocketConnection implements AutoCloseable {
     private volatile Future<?> backoffClearer;
 
     /**
+     * Calls {@link #reconnect()} following a connection loss
+     */
+    private final AtomicReference<Future<?>> reconnectTask = new AtomicReference<>();
+
+    /**
      * WebSocket Factory
      */
     protected final WebSocketFactory webSocketFactory;
@@ -126,11 +131,18 @@ public class WebsocketConnection implements AutoCloseable {
                         log.debug("Maximum retry count for websocket reconnection attempts was hit.");
                         config.backoffStrategy().reset(); // start fresh on the next manual connect() call
                     } else {
-                        config.taskExecutor().schedule(() -> {
-                            WebsocketConnectionState state = connectionState.get();
-                            if (state != WebsocketConnectionState.CONNECTING && state != WebsocketConnectionState.CONNECTED)
-                                reconnect();
-                        }, reconnectDelay, TimeUnit.MILLISECONDS);
+                        // Schedule the next reconnect according to the delay from the backoff strategy
+                        Future<?> previousReconnection = reconnectTask.getAndSet(
+                            config.taskExecutor().schedule(() -> {
+                                WebsocketConnectionState state = connectionState.get();
+                                if (state != WebsocketConnectionState.CONNECTING && state != WebsocketConnectionState.CONNECTED && !closed.get())
+                                    reconnect();
+                            }, reconnectDelay, TimeUnit.MILLISECONDS)
+                        );
+
+                        // Cancel the previous reconnect task, if outstanding
+                        if (previousReconnection != null)
+                            previousReconnection.cancel(false);
                     }
                 } else {
                     setState(WebsocketConnectionState.DISCONNECTED);
@@ -299,6 +311,10 @@ public class WebsocketConnection implements AutoCloseable {
 
         if (backoffClearer != null)
             backoffClearer.cancel(false);
+
+        Future<?> reconnector = reconnectTask.getAndSet(null);
+        if (reconnector != null)
+            reconnector.cancel(false);
 
         try {
             disconnect();
