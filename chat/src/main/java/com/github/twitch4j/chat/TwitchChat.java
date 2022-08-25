@@ -31,6 +31,7 @@ import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -817,11 +818,12 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Close
      */
+    @SneakyThrows
     @Override
     public void close() {
         this.stopQueueThread = true;
         queueThread.cancel(false);
-        this.disconnect();
+        connection.close();
     }
 
     @Override

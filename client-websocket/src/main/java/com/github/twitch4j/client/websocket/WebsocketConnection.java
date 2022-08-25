@@ -5,6 +5,8 @@ import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketCloseCode;
+import com.neovisionaries.ws.client.WebSocketError;
+import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import lombok.Getter;
@@ -14,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -61,6 +65,10 @@ public class WebsocketConnection implements AutoCloseable {
 
     @Getter
     protected volatile long latency = -1L;
+
+    protected final AtomicBoolean closed = new AtomicBoolean(false);
+
+    protected final CountDownLatch closeLatch = new CountDownLatch(1);
 
     /**
      * TwitchWebsocketConnection
@@ -174,6 +182,9 @@ public class WebsocketConnection implements AutoCloseable {
     public void connect() {
         WebsocketConnectionState connectionState = this.connectionState.get();
         if (connectionState == WebsocketConnectionState.DISCONNECTED || connectionState == WebsocketConnectionState.RECONNECTING || connectionState == WebsocketConnectionState.LOST) {
+            if (closed.get())
+                throw new IllegalStateException("WebsocketConnection was already closed!");
+
             try {
                 // avoid any resource leaks
                 this.closeSocket();
@@ -283,15 +294,54 @@ public class WebsocketConnection implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        disconnect();
+        if (closed.getAndSet(true))
+            return; // resource close was already requested
+
+        try {
+            disconnect();
+        } catch (Exception e) {
+            log.warn("Exception thrown from websocket disconnect attempt", e);
+            this.closeSocket(); // really make sure the resource was released
+        } finally {
+            // await the close of the underlying socket
+            try {
+                boolean completed = closeLatch.await(Math.max(1000, config.closeDelay()) * 2L, TimeUnit.MILLISECONDS);
+                if (completed) {
+                    log.trace("Underlying websocket complete close was successful");
+                } else {
+                    log.warn("Underlying websocket did not close within the expected delay");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Synchronized
     private void closeSocket() {
         // Clean up the socket
-        if (webSocket != null) {
-            this.webSocket.disconnect(WebSocketCloseCode.NORMAL, null, config.closeDelay());
-            this.webSocket.clearListeners();
+        final WebSocket socket = this.webSocket;
+        if (socket != null) {
+            socket.clearListeners();
+            if (closed.get()) {
+                socket.addListener(new WebSocketAdapter() {
+                    @Override
+                    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
+                        socket.clearListeners();
+                        closeLatch.countDown();
+                    }
+
+                    @Override
+                    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) {
+                        if (cause != null && cause.getError() == WebSocketError.FLUSH_ERROR) {
+                            socket.clearListeners();
+                            closeLatch.countDown();
+                        }
+                    }
+                });
+            }
+            socket.disconnect(WebSocketCloseCode.NORMAL, null, config.closeDelay());
+
             this.webSocket = null;
         }
 

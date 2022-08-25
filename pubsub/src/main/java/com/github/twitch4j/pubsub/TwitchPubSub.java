@@ -127,6 +127,7 @@ import com.github.twitch4j.pubsub.events.UserUnbanRequestUpdateEvent;
 import com.github.twitch4j.pubsub.events.VideoPlaybackEvent;
 import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -857,13 +858,14 @@ public class TwitchPubSub implements ITwitchPubSub {
     /**
      * Close
      */
+    @SneakyThrows
     @Override
     public void close() {
         if (!isClosed) {
             isClosed = true;
             heartbeatTask.cancel(false);
             queueTask.cancel(false);
-            disconnect();
+            connection.close();
         }
     }
 
