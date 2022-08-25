@@ -297,6 +297,9 @@ public class WebsocketConnection implements AutoCloseable {
         if (closed.getAndSet(true))
             return; // resource close was already requested
 
+        if (backoffClearer != null)
+            backoffClearer.cancel(false);
+
         try {
             disconnect();
         } catch (Exception e) {
