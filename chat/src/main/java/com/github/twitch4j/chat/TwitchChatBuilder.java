@@ -11,6 +11,7 @@ import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
+import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.enums.TwitchLimitType;
@@ -253,6 +254,14 @@ public class TwitchChatBuilder {
     private int wsPingPeriod = 15_000;
 
     /**
+     * Websocket Close Delay in ms (0 = minimum)
+
+     * @see WebsocketConnectionConfig#closeDelay()
+     */
+    @With
+    private int wsCloseDelay = 1_000;
+
+    /**
      * WebSocket Connection Backoff Strategy
      */
     @With
@@ -327,7 +336,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect, this.wsCloseDelay);
     }
 
     /**

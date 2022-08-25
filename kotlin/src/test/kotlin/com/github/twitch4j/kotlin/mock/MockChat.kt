@@ -34,7 +34,8 @@ class MockChat : TwitchChat(
     0,
     null,
     TwitchChatLimitHelper.MOD_MESSAGE_LIMIT,
-    false
+    false,
+    0
 ) {
     @Volatile
     var isConnected = false

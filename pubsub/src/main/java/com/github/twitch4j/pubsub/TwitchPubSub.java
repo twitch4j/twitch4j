@@ -245,8 +245,9 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param botOwnerIds               Bot Owner IDs
      * @param wsPingPeriod              WebSocket Ping Period
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
+     * @param wsCloseDelay              Websocket Close Delay
      */
-    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy) {
+    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
@@ -255,6 +256,7 @@ public class TwitchPubSub implements ITwitchPubSub {
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(WEB_SOCKET_SERVER);
+                spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);
                 spec.onStateChanged((oldState, newState) -> eventManager.publish(new PubSubConnectionStateEvent(oldState, newState, this)));
                 spec.onPreConnect(this::onPreConnect);

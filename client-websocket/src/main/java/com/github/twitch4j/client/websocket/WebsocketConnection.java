@@ -4,6 +4,7 @@ import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketCloseCode;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import lombok.Getter;
@@ -149,6 +150,7 @@ public class WebsocketConnection implements AutoCloseable {
 
     protected WebSocket createWebsocket() throws IOException {
         WebSocket ws = webSocketFactory.createSocket(config.baseUrl());
+        ws.setMissingCloseFrameAllowed(true);
         ws.setPingInterval(config.wsPingPeriod());
         if (config.headers() != null)
             config.headers().forEach(ws::addHeader);
@@ -288,7 +290,7 @@ public class WebsocketConnection implements AutoCloseable {
     private void closeSocket() {
         // Clean up the socket
         if (webSocket != null) {
-            this.webSocket.disconnect();
+            this.webSocket.disconnect(WebSocketCloseCode.NORMAL, null, config.closeDelay());
             this.webSocket.clearListeners();
             this.webSocket = null;
         }

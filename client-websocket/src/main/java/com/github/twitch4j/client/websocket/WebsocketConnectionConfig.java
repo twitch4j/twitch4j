@@ -42,6 +42,9 @@ public class WebsocketConnectionConfig {
         if (socketTimeout < 0) {
             throw new RuntimeException("socketTimeout must be 0 or greater, set to 0 to disable!");
         }
+        if (closeDelay < 0) {
+            throw new RuntimeException("closeDelay must be 0 or greater!");
+        }
         Objects.requireNonNull(taskExecutor, "taskExecutor may not be null!");
         Objects.requireNonNull(backoffStrategy, "backoffStrategy may not be null!");
         Objects.requireNonNull(onStateChanged, "onStateChanged may not be null!");
@@ -74,6 +77,14 @@ public class WebsocketConnectionConfig {
      * Websocket timeout milliseconds for read and write operations (0 = disabled).
      */
     private int socketTimeout = 30_000;
+
+    /**
+     * The maximum number of milliseconds to wait after sending a close frame
+     * to receive confirmation from the server, before fully closing the socket.
+     * <p>
+     * This can be set as low as 0 for applications that require prompt socket closes upon disconnect calls.
+     */
+    private int closeDelay = 1_000;
 
     /**
      * WebSocket Headers
