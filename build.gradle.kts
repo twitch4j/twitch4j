@@ -111,6 +111,7 @@ subprojects {
 				add("api", dep) {
 					version {
 						strictly("[2.12,3-alpha[")
+						// renovate: depName=com.fasterxml.jackson:jackson-bom
 						prefer("2.13.3")
 					}
 				}
