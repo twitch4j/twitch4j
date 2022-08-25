@@ -308,7 +308,7 @@ public class WebsocketConnection implements AutoCloseable {
         } finally {
             // await the close of the underlying socket
             try {
-                boolean completed = closeLatch.await(Math.max(1000, config.closeDelay()) * 2L, TimeUnit.MILLISECONDS);
+                boolean completed = closeLatch.await(config.closeDelay() + 1000L, TimeUnit.MILLISECONDS);
                 if (completed) {
                     log.trace("Underlying websocket complete close was successful");
                 } else {
