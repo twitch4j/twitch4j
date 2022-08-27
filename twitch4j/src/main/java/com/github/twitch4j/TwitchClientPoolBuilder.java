@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.TwitchChatConnectionPool;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
+import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
@@ -303,6 +304,14 @@ public class TwitchClientPoolBuilder {
     private int wsPingPeriod = 15_000;
 
     /**
+     * Websocket Close Delay in ms (0 = minimum)
+
+     * @see WebsocketConnectionConfig#closeDelay()
+     */
+    @With
+    private int wsCloseDelay = 1_000;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -458,6 +467,7 @@ public class TwitchClientPoolBuilder {
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
                         .withWsPingPeriod(wsPingPeriod)
+                        .withWsCloseDelay(wsCloseDelay)
                         .setCommandPrefixes(commandPrefixes)
                         .setBotOwnerIds(botOwnerIds)
                 )
@@ -481,6 +491,7 @@ public class TwitchClientPoolBuilder {
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
+                .withWsCloseDelay(wsCloseDelay)
                 .build();
         }
 
@@ -491,7 +502,11 @@ public class TwitchClientPoolBuilder {
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
-                .advancedConfiguration(builder -> builder.withWsPingPeriod(wsPingPeriod).setBotOwnerIds(botOwnerIds))
+                .advancedConfiguration(builder ->
+                    builder.withWsPingPeriod(wsPingPeriod)
+                        .withWsCloseDelay(wsCloseDelay)
+                        .setBotOwnerIds(botOwnerIds)
+                )
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
@@ -499,6 +514,7 @@ public class TwitchClientPoolBuilder {
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)
                 .withWsPingPeriod(wsPingPeriod)
+                .withWsCloseDelay(wsCloseDelay)
                 .setBotOwnerIds(botOwnerIds)
                 .build();
         }

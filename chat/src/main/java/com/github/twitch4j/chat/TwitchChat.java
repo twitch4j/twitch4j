@@ -31,6 +31,7 @@ import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -270,8 +271,9 @@ public class TwitchChat implements ITwitchChat {
      * @param connectionBackoffStrategy      WebSocket Connection Backoff Strategy
      * @param perChannelRateLimit            Per channel message limit
      * @param validateOnConnect              Whether token should be validated on connect
+     * @param wsCloseDelay                   Websocket Close Delay
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -304,6 +306,7 @@ public class TwitchChat implements ITwitchChat {
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
                 spec.baseUrl(baseUrl);
+                spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);
                 spec.onStateChanged((oldState, newState) -> eventManager.publish(new ChatConnectionStateEvent(oldState, newState, this)));
                 spec.onConnected(this::onConnected);
@@ -815,11 +818,12 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Close
      */
+    @SneakyThrows
     @Override
     public void close() {
         this.stopQueueThread = true;
         queueThread.cancel(false);
-        this.disconnect();
+        connection.close();
     }
 
     @Override

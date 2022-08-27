@@ -10,6 +10,7 @@ import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
+import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
@@ -286,6 +287,15 @@ public class TwitchClientBuilder {
     private int wsPingPeriod = 15_000;
 
     /**
+     * Websocket Close Delay in ms (0 = minimum)
+
+     * @see WebsocketConnectionConfig#closeDelay()
+     */
+    @With
+    private int wsCloseDelay = 1_000;
+
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -440,6 +450,7 @@ public class TwitchClientBuilder {
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
+                .withWsCloseDelay(wsCloseDelay)
                 .build();
         }
 
@@ -452,6 +463,7 @@ public class TwitchClientBuilder {
                 .withProxyConfig(proxyConfig)
                 .setBotOwnerIds(botOwnerIds)
                 .withWsPingPeriod(wsPingPeriod)
+                .withWsCloseDelay(wsCloseDelay)
                 .build();
         }
 

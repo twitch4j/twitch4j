@@ -22,9 +22,9 @@ public class TwitchAuth {
      * Twitch Identity Provider
      *
      * @param credentialManager Credential Manager
-     * @param clientId OAuth2 Client Id
-     * @param clientSecret OAuth2 Client Secret
-     * @param redirectUrl OAuth2 Redirect Url
+     * @param clientId          OAuth2 Client Id
+     * @param clientSecret      OAuth2 Client Secret
+     * @param redirectUrl       OAuth2 Redirect Url
      */
     public TwitchAuth(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
         this.credentialManager = credentialManager;
@@ -37,9 +37,13 @@ public class TwitchAuth {
         if (!ip.isPresent()) {
             // register
             IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
-            credentialManager.registerIdentityProvider(identityProvider);
+            try {
+                credentialManager.registerIdentityProvider(identityProvider);
+            } catch (Exception e) {
+                log.error("TwitchAuth: Encountered conflicting identity provider!", e);
+            }
         } else {
-            log.warn("TwitchIdentityProvider was already registered, ignoring call to TwitchAuth.registerIdentityProvider!");
+            log.debug("TwitchIdentityProvider was already registered, ignoring call to TwitchAuth.registerIdentityProvider!");
         }
     }
 }
