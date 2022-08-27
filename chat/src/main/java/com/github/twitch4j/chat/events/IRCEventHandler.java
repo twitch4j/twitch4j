@@ -78,6 +78,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-roomstate-trigger", IRCMessageEvent.class, this::onChannelState);
         eventManager.onEvent("twitch4j-chat-gift-trigger", IRCMessageEvent.class, this::onGiftReceived);
         eventManager.onEvent("twitch4j-chat-payforward-trigger", IRCMessageEvent.class, this::onPayForward);
+        eventManager.onEvent("twitch4j-chat-charity-trigger", IRCMessageEvent.class, this::onCharityDonation);
         eventManager.onEvent("twitch4j-chat-raid-trigger", IRCMessageEvent.class, this::onRaid);
         eventManager.onEvent("twitch4j-chat-unraid-trigger", IRCMessageEvent.class, this::onUnraid);
         eventManager.onEvent("twitch4j-chat-rewardgift-trigger", IRCMessageEvent.class, this::onRewardGift);
@@ -345,6 +346,13 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new PayForwardEvent(channel, user, gifter, recipient));
+        }
+    }
+
+    @Unofficial
+    public void onCharityDonation(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && "charitydonation".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+            eventManager.publish(new CharityDonationEvent(event));
         }
     }
 

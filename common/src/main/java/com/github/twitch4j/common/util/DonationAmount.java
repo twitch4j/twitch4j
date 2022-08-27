@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,6 +44,7 @@ public class DonationAmount {
      */
     @JsonIgnore
     @Getter(lazy = true)
+    @EqualsAndHashCode.Exclude
     private final Currency parsedCurrency = Currency.getInstance(getCurrency());
 
     /**
@@ -50,6 +52,7 @@ public class DonationAmount {
      */
     @JsonIgnore
     @Getter(lazy = true)
+    @EqualsAndHashCode.Exclude
     private final BigDecimal parsedValue = BigDecimal.valueOf(getValue(), getDecimalPlaces());
 
 }
