@@ -300,7 +300,7 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     default PubSubSubscription listenForLeaderboardAllTimeEvents(OAuth2Credential credential, String channelId) {
-        return listenForLeaderboardEvents(credential,  channelId, "ALLTIME");
+        return listenForLeaderboardEvents(credential, channelId, "ALLTIME");
     }
 
     @Unofficial
@@ -353,6 +353,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     @Deprecated
     default PubSubSubscription listenForChannelExtensionEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-ext-v1." + channelId);
+    }
+
+    @Unofficial
+    default PubSubSubscription listenForCharityCampaignEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "charity-campaign-donation-events-v1." + channelId);
     }
 
     @Unofficial
