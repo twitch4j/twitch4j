@@ -352,7 +352,7 @@ public class WebsocketConnection implements AutoCloseable {
         // Clean up the socket
         final WebSocket socket = this.webSocket;
         if (socket != null) {
-            // The disconnecting socket no needs to invoke this.webSocketAdapter
+            // The disconnecting socket no longer needs to invoke this.webSocketAdapter
             socket.clearListeners();
 
             // However, if a full close is requested, we should track when the underlying socket closes to release the latch.
