@@ -15,6 +15,7 @@ public enum TwitchScopes {
     HELIX_BITS_READ("bits:read"),
     HELIX_CLIPS_EDIT("clips:edit"),
     HELIX_CHANNEL_BROADCAST_MANAGE("channel:manage:broadcast"),
+    HELIX_CHANNEL_CHARITY_READ("channel:read:charity"),
     HELIX_CHANNEL_COMMERCIALS_EDIT("channel:edit:commercial"),
     HELIX_CHANNEL_EXTENSION_MANAGE("channel:manage:extensions"),
     HELIX_CHANNEL_EDITORS_READ("channel:read:editors"),

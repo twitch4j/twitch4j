@@ -22,6 +22,8 @@ import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
 import com.github.twitch4j.pubsub.domain.ChannelTermsAction;
+import com.github.twitch4j.pubsub.domain.CharityCampaignStatus;
+import com.github.twitch4j.pubsub.domain.CharityDonationData;
 import com.github.twitch4j.pubsub.domain.ChatModerationAction;
 import com.github.twitch4j.pubsub.domain.CheerbombData;
 import com.github.twitch4j.pubsub.domain.ClaimData;
@@ -73,6 +75,8 @@ import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.ChannelTermsEvent;
 import com.github.twitch4j.pubsub.events.ChannelUnbanRequestCreateEvent;
 import com.github.twitch4j.pubsub.events.ChannelUnbanRequestUpdateEvent;
+import com.github.twitch4j.pubsub.events.CharityCampaignDonationEvent;
+import com.github.twitch4j.pubsub.events.CharityCampaignStatusEvent;
 import com.github.twitch4j.pubsub.events.ChatModerationEvent;
 import com.github.twitch4j.pubsub.events.CheerbombEvent;
 import com.github.twitch4j.pubsub.events.ClaimAvailableEvent;
@@ -514,7 +518,20 @@ public class TwitchPubSub implements ITwitchPubSub {
                             log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                             break;
                     }
-
+                } else if ("charity-campaign-donation-events-v1".equals(topicName) && topicParts.length > 1) {
+                    switch (type) {
+                        case "charity_campaign_donation":
+                            CharityDonationData donation = TypeConvert.jsonToObject(rawMessage, CharityDonationData.class);
+                            eventManager.publish(new CharityCampaignDonationEvent(lastTopicIdentifier, donation));
+                            break;
+                        case "charity_campaign_status":
+                            CharityCampaignStatus status = TypeConvert.jsonToObject(rawMessage, CharityCampaignStatus.class);
+                            eventManager.publish(new CharityCampaignStatusEvent(lastTopicIdentifier, status));
+                            break;
+                        default:
+                            log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                            break;
+                    }
                 } else if ("chat_moderator_actions".equals(topicName) && topicParts.length > 1) {
                     switch (type) {
                         case "moderation_action":

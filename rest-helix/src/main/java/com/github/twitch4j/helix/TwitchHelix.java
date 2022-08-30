@@ -325,6 +325,27 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information about the charity campaign that a broadcaster is running,
+     * such as their fundraising goal and the amount that’s been donated so far.
+     * <p>
+     * The ID in the broadcaster_id query parameter must match the user ID in the access token.
+     * <p>
+     * To receive events as donations occur, use {@link com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes#CHANNEL_CHARITY_DONATE}.
+     *
+     * @param authToken     Broadcaster user access token with the channel:read:charity scope.
+     * @param broadcasterId The ID of the broadcaster that’s actively running a charity campaign.
+     * @return CharityCampaignWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CHARITY_READ
+     */
+    @Unofficial // in open beta
+    @RequestLine("GET /charity/campaigns?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CharityCampaignWrapper> getCharityCampaign(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Sends an announcement to the broadcaster’s chat room.
      *
      * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.

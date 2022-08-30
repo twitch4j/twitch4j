@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 @UtilityClass
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
+
     public final ChannelBanType CHANNEL_BAN;
+    @Unofficial public final ChannelCharityDonateType CHANNEL_CHARITY_DONATE;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
@@ -58,6 +60,7 @@ public class SubscriptionTypes {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
                 CHANNEL_BAN = new ChannelBanType(),
+                CHANNEL_CHARITY_DONATE = new ChannelCharityDonateType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
