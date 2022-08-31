@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.util.DonationAmount;
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
     /**
      * An object that contains the amount of the user’s donation.
      */
+    @JsonAlias("target_amount") // https://github.com/twitchdev/issues/issues/642
     private DonationAmount amount;
 
 }
