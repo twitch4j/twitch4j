@@ -330,7 +330,7 @@ public interface TwitchHelix {
      * <p>
      * The ID in the broadcaster_id query parameter must match the user ID in the access token.
      * <p>
-     * To receive events as donations occur, use {@link com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes#CHANNEL_CHARITY_DONATE}.
+     * To receive events as donations occur, use {@link com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes#BETA_CHANNEL_CHARITY_DONATE}.
      *
      * @param authToken     Broadcaster user access token with the channel:read:charity scope.
      * @param broadcasterId The ID of the broadcaster that’s actively running a charity campaign.

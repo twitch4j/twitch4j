@@ -14,7 +14,7 @@ import com.github.twitch4j.eventsub.events.ChannelCharityDonateEvent;
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CHARITY_READ
  */
 @Unofficial
-public class ChannelCharityDonateType implements SubscriptionType<ChannelCharityCampaignCondition, ChannelCharityCampaignCondition.ChannelCharityCampaignConditionBuilder<?, ?>, ChannelCharityDonateEvent> {
+public class BetaChannelCharityDonateType implements SubscriptionType<ChannelCharityCampaignCondition, ChannelCharityCampaignCondition.ChannelCharityCampaignConditionBuilder<?, ?>, ChannelCharityDonateEvent> {
 
     @Override
     public String getName() {
@@ -23,7 +23,7 @@ public class ChannelCharityDonateType implements SubscriptionType<ChannelCharity
 
     @Override
     public String getVersion() {
-        return "1";
+        return "beta";
     }
 
     @Override
