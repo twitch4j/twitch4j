@@ -1,5 +1,6 @@
 package com.github.twitch4j.common.util;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class DonationAmount {
      * <p>
      * For example, the minor units for USD is cents, so if the amount is $5.50 USD, value is set to 550.
      */
+    @JsonAlias({ "amount", "donation_amount" })
     private Long value;
 
     /**
@@ -32,11 +34,13 @@ public class DonationAmount {
      * <p>
      * For example, USD uses two decimal places.
      */
+    @JsonAlias("exponent")
     private Integer decimalPlaces;
 
     /**
      * The ISO-4217 three-letter currency code that identifies the type of currency in {@link #getValue()}.
      */
+    @JsonAlias({ "campaign_currency", "donation_currency" })
     private String currency;
 
     /**
