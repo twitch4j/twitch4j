@@ -24,6 +24,7 @@ public class PollData {
     private Integer totalVoters;
     private Long remainingDurationMilliseconds;
     private Contributor topContributor;
+    @Deprecated
     private Contributor topBitsContributor;
     private Contributor topChannelPointsContributor;
 
@@ -32,6 +33,7 @@ public class PollData {
         private Setting multiChoice;
         private Setting subscriberOnly;
         private Setting subscriberMultiplier;
+        @Deprecated
         private Setting bitsVotes;
         private Setting channelPointsVotes;
 
@@ -54,6 +56,7 @@ public class PollData {
     @Data
     public static class Votes {
         private Long total;
+        @Deprecated
         private Long bits;
         private Long channelPoints;
         private Long base;
@@ -61,6 +64,7 @@ public class PollData {
 
     @Data
     public static class Tokens {
+        @Deprecated
         private Long bits;
         private Long channelPoints;
     }
@@ -69,6 +73,7 @@ public class PollData {
     public static class Contributor {
         private String userId;
         private String displayName;
+        @Deprecated
         private Long bitsContributed;
         private Long channelPointsContributed;
     }
