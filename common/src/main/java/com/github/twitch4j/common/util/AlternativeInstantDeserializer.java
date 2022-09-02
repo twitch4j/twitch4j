@@ -17,6 +17,15 @@ public class AlternativeInstantDeserializer extends JsonDeserializer<Instant> {
 
         str = str.trim();
 
+        // Accounts for https://github.com/twitchdev/issues/issues/644
+        if (str.startsWith("seconds:")) {
+            int startIndex = "seconds:".length();
+            int endIndex = str.indexOf(' ', startIndex + 1);
+            String seconds = str.substring(startIndex, endIndex > 0 ? endIndex : str.length());
+            return Instant.ofEpochSecond(Integer.parseInt(seconds));
+        }
+
+        // Accounts for https://github.com/twitchdev/issues/issues/347
         if (str.endsWith(" +0000 UTC"))
             str = str.substring(0, str.length() - " +0000 UTC".length()) + "Z";
 
