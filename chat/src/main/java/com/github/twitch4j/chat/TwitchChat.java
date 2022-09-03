@@ -530,8 +530,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     protected void onTextMessage(String text) {
-        Arrays.asList(text.replace("\n\r", "\n")
-                .replace("\r", "\n").split("\n"))
+        Arrays.asList(StringUtils.split(text.replace("\r\n", "\n"), '\n'))
             .forEach(message -> {
                 if (!message.equals("")) {
                     // Handle messages
