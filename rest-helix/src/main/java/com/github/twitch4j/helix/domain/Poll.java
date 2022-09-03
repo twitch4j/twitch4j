@@ -64,14 +64,20 @@ public class Poll {
 
     /**
      * Indicates whether Bits can be used for voting. Default: false.
+     *
+     * @deprecated Twitch no longer supports bits on polls.
      */
+    @Deprecated
     @Accessors(fluent = true)
     @JsonProperty("bits_voting_enabled")
-    private Boolean isBitsVotingEnabled;
+    private Boolean isBitsVotingEnabled = false;
 
     /**
      * Number of Bits required to vote once with Bits. Minimum: 0. Maximum: 10000.
+     *
+     * @deprecated Twitch no longer supports bits on polls.
      */
+    @Deprecated
     private Integer bitsPerVote;
 
     /**

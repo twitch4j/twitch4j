@@ -45,8 +45,11 @@ public class PollChoice {
 
     /**
      * Number of votes received via Bits.
+     *
+     * @deprecated Twitch no longer supports bits on polls.
      */
     @Nullable
+    @Deprecated
     private Integer bitsVotes;
 
 }

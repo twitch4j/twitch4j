@@ -7,9 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+/**
+ * @deprecated Twitch no longer supports bits on polls.
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class BitsVoting {
 
     /**
@@ -17,11 +21,11 @@ public class BitsVoting {
      */
     @Accessors(fluent = true)
     @JsonProperty("is_enabled")
-    private Boolean isEnabled;
+    private Boolean isEnabled = false;
 
     /**
      * Number of Bits required to vote once with Bits.
      */
-    private Integer amountPerVote;
+    private Integer amountPerVote = 0;
 
 }

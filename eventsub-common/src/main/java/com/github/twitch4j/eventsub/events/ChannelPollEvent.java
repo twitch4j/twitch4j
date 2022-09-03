@@ -39,7 +39,10 @@ public abstract class ChannelPollEvent extends EventSubChannelEvent {
 
     /**
      * The Bits voting settings for the poll.
+     *
+     * @deprecated Twitch no longer supports bits on polls.
      */
+    @Deprecated
     private BitsVoting bitsVoting;
 
     /**
