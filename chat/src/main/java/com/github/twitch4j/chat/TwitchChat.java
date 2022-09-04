@@ -762,7 +762,7 @@ public class TwitchChat implements ITwitchChat {
     public boolean sendMessage(String channel, String message, Map<String, Object> tags) {
         if (message.length() > 500) {
             log.warn("Ignoring outbound chat message for channel #{} exceeding the Twitch maximum of 500 characters: {}", channel, message);
-            return;
+            return false;
         }
 
         StringBuilder sb = new StringBuilder();
