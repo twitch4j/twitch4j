@@ -530,8 +530,7 @@ public class TwitchChat implements ITwitchChat {
     }
 
     protected void onTextMessage(String text) {
-        Arrays.asList(text.replace("\n\r", "\n")
-                .replace("\r", "\n").split("\n"))
+        Arrays.asList(StringUtils.split(text.replace("\r\n", "\n"), '\n'))
             .forEach(message -> {
                 if (!message.equals("")) {
                     // Handle messages
@@ -761,6 +760,11 @@ public class TwitchChat implements ITwitchChat {
     @Override
     @SuppressWarnings("ConstantConditions")
     public boolean sendMessage(String channel, String message, Map<String, Object> tags) {
+        if (message.length() > 500) {
+            log.warn("Ignoring outbound chat message for channel #{} exceeding the Twitch maximum of 500 characters: {}", channel, message);
+            return false;
+        }
+
         StringBuilder sb = new StringBuilder();
         if (tags != null && !tags.isEmpty()) {
             sb.append('@');
