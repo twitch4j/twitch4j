@@ -23,7 +23,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
 @Value
 @EqualsAndHashCode(callSuper = false)
 @Unofficial
-public class MultiMonthGiftRedeemEvent extends AbstractChannelEvent {
+public class GiftedMultiMonthSubCourtesyEvent extends AbstractChannelEvent {
 
     /**
      * Raw message event.
@@ -75,7 +75,7 @@ public class MultiMonthGiftRedeemEvent extends AbstractChannelEvent {
      *
      * @param event the raw message event
      */
-    public MultiMonthGiftRedeemEvent(IRCMessageEvent event) {
+    public GiftedMultiMonthSubCourtesyEvent(IRCMessageEvent event) {
         super(event.getChannel());
         this.messageEvent = event;
         this.user = event.getUser();

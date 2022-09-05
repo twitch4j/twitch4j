@@ -203,7 +203,7 @@ public class IRCEventHandler {
 
             // Resub message for a multi-month gifted subscription
             if (msgId.equalsIgnoreCase("resub") && "true".equalsIgnoreCase(event.getTags().get("msg-param-was-gifted"))) {
-                eventManager.publish(new MultiMonthGiftRedeemEvent(event));
+                eventManager.publish(new GiftedMultiMonthSubCourtesyEvent(event));
             }
             // Sub
             else if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
