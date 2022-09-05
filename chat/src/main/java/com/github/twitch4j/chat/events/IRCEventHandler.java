@@ -201,8 +201,12 @@ public class IRCEventHandler {
         if (event.getCommandType().equals("USERNOTICE") && (msgId = event.getTags().get("msg-id")) != null) {
             EventChannel channel = event.getChannel();
 
+            // Resub message for a multi-month gifted subscription
+            if (msgId.equalsIgnoreCase("resub") && "true".equalsIgnoreCase(event.getTags().get("msg-param-was-gifted"))) {
+                eventManager.publish(new GiftedMultiMonthSubCourtesyEvent(event));
+            }
             // Sub
-            if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
+            else if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
