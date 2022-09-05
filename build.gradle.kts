@@ -87,10 +87,6 @@ subprojects {
 			// HTTP
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
 
-			// Event Dispatcher
-			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.11.0")
-			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.11.0")
-
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.4")
 
@@ -124,6 +120,9 @@ subprojects {
 
 		// Cache BOM
 		api(platform("io.github.xanthic.cache:cache-bom:0.1.1"))
+
+		// Events4J BOM
+		api(platform("com.github.philippheuer.events4j:events4j-bom:0.11.0"))
 
 		// Logging
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
