@@ -27,8 +27,8 @@ allprojects {
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 					"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.1.0",
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.10.0",
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.10.0",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.11.0",
+					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.11.0",
 					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.4",
 					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/11.9.1",
 					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.9.1",
@@ -88,8 +88,8 @@ subprojects {
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
 
 			// Event Dispatcher
-			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.10.0")
-			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.10.0")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-core", version = "0.11.0")
+			api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple", version = "0.11.0")
 
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.4")
