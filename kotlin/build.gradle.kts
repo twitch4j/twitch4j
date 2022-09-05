@@ -10,7 +10,7 @@ dependencies {
 	// This shouldn't be an issue as most, if not all, code are extension functions.
 	compileOnly(project(":twitch4j"))
 
-	api(group = "com.github.philippheuer.events4j", name = "events4j-kotlin", version = "0.11.0")
+	api(group = "com.github.philippheuer.events4j", name = "events4j-kotlin")
 
 	// Kotlin coroutines
 	api(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.6.4")
