@@ -8,10 +8,13 @@ import lombok.Value;
 
 /**
  * This event gets called when the user stops hosting someone.
+ *
+ * @deprecated Twitch is removing host mode on October 3, 2022
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class HostOffEvent extends AbstractChannelEvent {
 
     /**

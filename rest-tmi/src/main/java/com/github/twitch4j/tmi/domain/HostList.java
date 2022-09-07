@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class HostList {
 
     private List<Host> hosts;

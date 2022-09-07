@@ -9,10 +9,13 @@ import lombok.Value;
  * Fired when the authenticated channel to the TwitchChat instance was hosted by another user.
  * <p>
  * Not officially documented by Twitch so this could stop working at any time.
+ *
+ * @deprecated Twitch is removing host mode on October 3, 2022
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
 @Unofficial
+@Deprecated
 public class InboundHostEvent extends TwitchEvent {
 
     /**

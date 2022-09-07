@@ -8,6 +8,7 @@ import lombok.Setter;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class Host {
 
     private String hostId;
