@@ -269,11 +269,17 @@ public class ChatModerationAction {
         UNMOD,
         /**
          * Another channel was hosted
+         *
+         * @deprecated Twitch is removing host mode on October 3, 2022
          */
+        @Deprecated
         HOST,
         /**
          * Channel exited host mode
+         *
+         * @deprecated Twitch is removing host mode on October 3, 2022
          */
+        @Deprecated
         UNHOST,
         /**
          * A raid on another channel was initiated

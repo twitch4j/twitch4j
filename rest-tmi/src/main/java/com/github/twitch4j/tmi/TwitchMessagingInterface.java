@@ -94,7 +94,9 @@ public interface TwitchMessagingInterface {
      *
      * @param channelIds A list containing a user ID for each channel to check.
      * @return Host information for each channel ID passed.
+     * @deprecated Twitch is removing host mode on October 3, 2022
      */
+    @Deprecated
     @RequestLine("GET /hosts?include_logins=1&host={id}")
     HystrixCommand<HostList> getHosts(
         @Param("id") List<String> channelIds

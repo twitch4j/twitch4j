@@ -551,6 +551,7 @@ public class IRCEventHandler {
         }
     }
 
+    @Deprecated
     public void onHostOnEvent(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
@@ -565,6 +566,7 @@ public class IRCEventHandler {
         }
     }
 
+    @Deprecated
     public void onHostOffEvent(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
@@ -576,6 +578,7 @@ public class IRCEventHandler {
         }
     }
 
+    @Deprecated
     public void onInboundHostEvent(IRCMessageEvent event) {
         if ("PRIVMSG".equals(event.getCommandType()) && "jtv".equals(event.getClientName().orElse(null)) && event.getChannelName().isPresent() && event.getRawTags().isEmpty()) {
             final String hostMessage = " is now hosting you";

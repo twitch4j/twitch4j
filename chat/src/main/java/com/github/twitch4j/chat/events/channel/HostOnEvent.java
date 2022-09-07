@@ -8,10 +8,13 @@ import lombok.Value;
 
 /**
  * This event gets called when the user starts hosting someone.
+ *
+ * @deprecated Twitch is removing host mode on October 3, 2022
  */
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
+@Deprecated
 public class HostOnEvent extends AbstractChannelEvent {
 
 	/**
