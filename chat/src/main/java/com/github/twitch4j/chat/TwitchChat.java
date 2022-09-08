@@ -782,7 +782,9 @@ public class TwitchChat implements ITwitchChat {
      *
      * @param targetUser username
      * @param message    message
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#sendWhisper
      */
+    @Deprecated
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
         BucketUtils.scheduleAgainstBucket(

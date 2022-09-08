@@ -591,6 +591,7 @@ public class IRCEventHandler {
         }
     }
 
+    @Deprecated
     public void onListModsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.ROOM_MODS.toString()) || s.equals(NoticeTag.NO_MODS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
@@ -598,6 +599,7 @@ public class IRCEventHandler {
         }
     }
 
+    @Deprecated
     public void onListVipsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.VIPS_SUCCESS.toString()) || s.equals(NoticeTag.NO_VIPS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");

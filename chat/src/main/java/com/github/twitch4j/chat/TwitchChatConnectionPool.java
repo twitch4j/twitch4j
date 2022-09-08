@@ -178,7 +178,9 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * @param message                       the message to send in the whisper.
      * @return whether a {@link TwitchChat} instance was identified to send the message from.
      * @throws NullPointerException if the identified {@link TwitchChat} does not have a valid chatCredential
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     public boolean sendPrivateMessage(final String channelToIdentifyChatInstance, final String toChannel, final String message) {
         final TwitchChat chat;
         if (channelToIdentifyChatInstance == null || (chat = subscriptions.get(channelToIdentifyChatInstance.toLowerCase())) == null)
