@@ -7,6 +7,7 @@ import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
@@ -24,6 +25,7 @@ import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import com.github.twitch4j.internal.ChatCommandHelixForwarder;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.pubsub.ITwitchPubSub;
@@ -44,6 +46,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -316,6 +319,14 @@ public class TwitchClientPoolBuilder {
     private int wsCloseDelay = 1_000;
 
     /**
+     * Whether chat commands should be executed via the Helix API, if possible.
+     * <p>
+     * Must have {@link #withEnableHelix(Boolean)} set to true.
+     */
+    @With
+    private boolean chatCommandsViaHelix = Instant.now().isAfter(Instant.ofEpochSecond(1676678400L));
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -366,6 +377,7 @@ public class TwitchClientPoolBuilder {
      *
      * @return {@link TwitchClientPool} initialized class
      */
+    @SuppressWarnings("deprecation")
     public TwitchClientPool build() {
         log.debug("TwitchClientPool: Initializing ErrorTracking ...");
 
@@ -407,7 +419,7 @@ public class TwitchClientPoolBuilder {
         }
 
         // Module: Helix
-        TwitchHelix helix = null;
+        TwitchHelix helix;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
                 .withBaseUrl(helixBaseUrl)
@@ -420,6 +432,8 @@ public class TwitchClientPoolBuilder {
                 .withProxyConfig(proxyConfig)
                 .withLogLevel(feignLogLevel)
                 .build();
+        } else {
+            helix = null;
         }
 
         // Module: Kraken
@@ -470,6 +484,13 @@ public class TwitchClientPoolBuilder {
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
+                        .withOutboundCommandFilter(
+                            chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
+                                helix,
+                                chatAccount != null ? chatAccount : defaultAuthToken,
+                                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
+                            ) : null
+                        )
                         .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setCommandPrefixes(commandPrefixes)
@@ -492,6 +513,13 @@ public class TwitchClientPoolBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .withOutboundCommandFilter(
+                    chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
+                        helix,
+                        chatAccount != null ? chatAccount : defaultAuthToken,
+                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
+                    ) : null
+                )
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
