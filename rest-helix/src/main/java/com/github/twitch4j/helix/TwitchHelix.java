@@ -374,8 +374,8 @@ public interface TwitchHelix {
      * Gets a list of custom chat badges that can be used in chat for the specified channel.
      * This includes <a href="https://help.twitch.tv/s/article/subscriber-badge-guide">subscriber badges</a> and <a href="https://help.twitch.tv/s/article/custom-bit-badges-guide">Bit badges</a>.
      *
-     * @param authToken     User OAuth Token from the broadcaster.
-     * @param broadcasterId The id of the broadcaster whose chat badges are being requested. Provided broadcaster_id must match the user_id in the user OAuth token.
+     * @param authToken     App or User OAuth Token.
+     * @param broadcasterId The id of the broadcaster whose chat badges are being requested.
      * @return ChatBadgeSetList
      */
     @RequestLine("GET /chat/badges?broadcaster_id={broadcaster_id}")
