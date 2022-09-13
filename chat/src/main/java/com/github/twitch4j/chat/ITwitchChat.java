@@ -124,7 +124,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel The target channel name.
      * @param seconds The slow mode seconds.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     default boolean setSlowMode(String channel, int seconds) {
         if (seconds <= 0)
             return this.sendMessage(channel, "/slowoff");
@@ -142,7 +144,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel The target channel name.
      * @param time    The amount of time users must be followed.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     default boolean setFollowersOnly(String channel, Duration time) {
         if (time == null || time.isNegative())
             return this.sendMessage(channel, "/followersoff");
@@ -156,7 +160,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel The target channel name.
      * @param enable  Whether the setting should be enabled or disabled.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     default boolean setSubscribersOnly(String channel, boolean enable) {
         return this.sendMessage(channel, enable ? "/subscribers" : "/subscribersoff");
     }
@@ -167,7 +173,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel The target channel name.
      * @param enable  Whether the setting should be enabled or disabled.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     default boolean setUniqueChat(String channel, boolean enable) {
         return this.sendMessage(channel, enable ? "/uniquechat" : "/uniquechatoff");
     }
@@ -178,7 +186,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel The target channel name.
      * @param enable  Whether the setting should be enabled or disabled.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#updateChatSettings
      */
+    @Deprecated
     default boolean setEmoteOnly(String channel, boolean enable) {
         return this.sendMessage(channel, enable ? "/emoteonly" : "/emoteonlyoff");
     }
@@ -188,7 +198,9 @@ public interface ITwitchChat extends AutoCloseable {
      *
      * @param channel The target channel name.
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#deleteChatMessages
      */
+    @Deprecated
     default boolean clearChat(String channel) {
         return this.sendMessage(channel, "/clear");
     }
@@ -200,7 +212,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param targetMsgId the unique id of the message to be deleted.
      * @return whether the command was added to the queue
      * @see IRCMessageEvent#getMessageId()
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#deleteChatMessages
      */
+    @Deprecated
     default boolean delete(String channel, String targetMsgId) {
         return this.sendMessage(channel, String.format("/delete %s", targetMsgId));
     }
@@ -213,7 +227,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param duration duration
      * @param reason   reason
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
+    @Deprecated
     default boolean timeout(String channel, String user, Duration duration, String reason) {
         StringBuilder sb = new StringBuilder(user).append(' ').append(duration.getSeconds());
         if (reason != null) {
@@ -230,7 +246,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param user    username
      * @param reason  reason
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
+    @Deprecated
     default boolean ban(String channel, String user, String reason) {
         StringBuilder sb = new StringBuilder(user);
         if (reason != null) {
@@ -246,7 +264,9 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel channel
      * @param user    username
      * @return whether the command was added to the queue
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
+    @Deprecated
     default boolean unban(String channel, String user) {
         return this.sendMessage(channel, String.format("/unban %s", user));
     }
@@ -258,8 +278,10 @@ public interface ITwitchChat extends AutoCloseable {
      * @param message the message to be announced.
      * @return whether the command was added to the queue
      * @see <a href="https://twitter.com/TwitchSupport/status/1509634525982302208">Official Announcement</a>
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#sendChatAnnouncement
      */
     @Unofficial
+    @Deprecated
     default boolean sendAnnouncement(String channel, String message) {
         return this.sendMessage(channel, String.format("/announce %s", message));
     }

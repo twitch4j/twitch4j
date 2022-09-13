@@ -145,8 +145,12 @@ public class TwitchChatBuilder {
 
     /**
      * Custom RateLimit for Whispers
+     *
+     * @deprecated Twitch will decommission whispers over IRC on February 18, 2023;
+     * please migrate to TwitchHelix#sendWhisper and TwitchLimitRegistry#setLimit
      */
     @With
+    @Deprecated
     protected Bandwidth[] whisperRateLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
 
     /**
@@ -177,8 +181,12 @@ public class TwitchChatBuilder {
 
     /**
      * Shared bucket for whispers
+     *
+     * @deprecated Twitch will decommission whispers over IRC on February 18, 2023;
+     * please migrate to TwitchHelix#sendWhisper and TwitchLimitRegistry#setLimit
      */
     @With
+    @Deprecated
     protected Bucket ircWhisperBucket = null;
 
     /**

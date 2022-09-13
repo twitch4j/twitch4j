@@ -9,9 +9,15 @@ import lombok.Value;
 
 import java.util.List;
 
+/**
+ * Called following a /mods message.
+ *
+ * @deprecated Twitch will decommission this event on February 18, 2023; migrate to TwitchHelix#getModerators
+ */
 @Value
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class ListModsEvent extends AbstractChannelEvent {
 
     /**

@@ -9,9 +9,15 @@ import lombok.Value;
 
 import java.util.List;
 
+/**
+ * Called following a /vips message.
+ *
+ * @deprecated Twitch will decommission this event on February 18, 2023; migrate to TwitchHelix#getChannelVips
+ */
 @Value
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class ListVipsEvent extends AbstractChannelEvent {
 
     /**

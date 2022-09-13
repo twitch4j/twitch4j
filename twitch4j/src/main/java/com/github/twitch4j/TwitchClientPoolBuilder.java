@@ -199,8 +199,12 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Custom RateLimit for Whispers
+     *
+     * @deprecated Twitch will decommission whispers over IRC on February 18, 2023;
+     * please migrate to TwitchHelix#sendWhisper and TwitchLimitRegistry#setLimit
      */
     @With
+    @Deprecated
     protected Bandwidth[] chatWhisperLimit = TwitchChatLimitHelper.USER_WHISPER_LIMIT.toArray(new Bandwidth[2]);
 
     /**
