@@ -11,6 +11,9 @@ import com.netflix.config.ConfigurationManager;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Twitch GraphQL Builder
  * <p>
@@ -74,7 +77,14 @@ public class TwitchGraphQLBuilder {
     /**
      * User Agent
      */
+    @With
     private String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36";
+
+    /**
+     * Additional headers to be applied to each outbound request
+     */
+    @With
+    private Map<String, String> headers = new HashMap<>();
 
     /**
      * BaseUrl
@@ -103,7 +113,7 @@ public class TwitchGraphQLBuilder {
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
 
         // GQL
-        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, defaultFirstPartyToken, proxyConfig, enableBatching, timeout);
+        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, defaultFirstPartyToken, proxyConfig, enableBatching, timeout, headers);
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
