@@ -250,6 +250,10 @@ public class TwitchGraphQL {
         return new CommandFetchModComments(getApolloClient(auth), channelId, targetId, after);
     }
 
+    public CommandFetchMods fetchMods(OAuth2Credential auth, String channelLogin, String after, Integer limit) {
+        return new CommandFetchMods(getApolloClient(auth), channelLogin, after, limit);
+    }
+
     public CommandArchivePoll archivePoll(OAuth2Credential auth, String pollId) {
         return new CommandArchivePoll(getApolloClient(auth), pollId);
     }
@@ -337,6 +341,10 @@ public class TwitchGraphQL {
 
     public CommandFetchVideoComments fetchVideoComments(OAuth2Credential auth, String channelId, String videoId, String id, String after, String before, Integer first, Integer last) {
         return new CommandFetchVideoComments(getApolloClient(auth), channelId, videoId, id, after, before, first, last);
+    }
+
+    public CommandFetchVips fetchVips(OAuth2Credential auth, String channelLogin, String after, Integer limit) {
+        return new CommandFetchVips(getApolloClient(auth), channelLogin, after, limit);
     }
 
     /**
