@@ -312,7 +312,7 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Websocket Close Delay in ms (0 = minimum)
-
+     *
      * @see WebsocketConnectionConfig#closeDelay()
      */
     @With
@@ -466,6 +466,12 @@ public class TwitchClientPoolBuilder {
 
         // Module: Chat
         ITwitchChat chat = null;
+        ChatCommandHelixForwarder forwarder = chatCommandsViaHelix && enableHelix && (enableChat || enableChatPool) ?
+            new ChatCommandHelixForwarder(
+                helix,
+                chatAccount != null ? chatAccount : defaultAuthToken,
+                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
+            ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()
                 .eventManager(eventManager)
@@ -484,13 +490,7 @@ public class TwitchClientPoolBuilder {
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
-                        .withOutboundCommandFilter(
-                            chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
-                                helix,
-                                chatAccount != null ? chatAccount : defaultAuthToken,
-                                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
-                            ) : null
-                        )
+                        .withOutboundCommandFilter(forwarder)
                         .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setCommandPrefixes(commandPrefixes)
@@ -513,13 +513,7 @@ public class TwitchClientPoolBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
-                .withOutboundCommandFilter(
-                    chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
-                        helix,
-                        chatAccount != null ? chatAccount : defaultAuthToken,
-                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
-                    ) : null
-                )
+                .withOutboundCommandFilter(forwarder)
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
