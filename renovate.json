@@ -1,5 +1,11 @@
 {
   "extends": [
     "github>twitch4j/renovate-config:twitch4j"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["ch.qos.logback:logback-classic"],
+      "allowedVersions": "!/1\\.4\\./"
+    }
   ]
 }
