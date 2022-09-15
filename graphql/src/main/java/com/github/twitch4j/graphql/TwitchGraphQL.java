@@ -22,7 +22,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -79,18 +81,24 @@ public class TwitchGraphQL {
     private final Cache<String, ApolloClient> clientsByCredential;
 
     /**
+     * Extra user-defined headers on each request
+     */
+    private final Map<String, String> additionalHeaders;
+
+    /**
      * Constructor
      *
-     * @param baseUrl         Base Url
-     * @param userAgent       User Agent
-     * @param eventManager    Event Manager
-     * @param clientId        Client Id
-     * @param defaultToken    Default Token
-     * @param proxyConfig     Proxy Config
-     * @param batchingEnabled Query Batching
-     * @param timeout         Query Timeout
+     * @param baseUrl           Base Url
+     * @param userAgent         User Agent
+     * @param eventManager      Event Manager
+     * @param clientId          Client Id
+     * @param defaultToken      Default Token
+     * @param proxyConfig       Proxy Config
+     * @param batchingEnabled   Query Batching
+     * @param timeout           Query Timeout
+     * @param additionalHeaders Custom headers
      */
-    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, OAuth2Credential defaultToken, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout) {
+    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, OAuth2Credential defaultToken, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout, Map<String, String> additionalHeaders) {
         this.baseUrl = baseUrl;
         this.userAgent = userAgent;
         this.eventManager = eventManager;
@@ -99,6 +107,7 @@ public class TwitchGraphQL {
         this.proxyConfig = proxyConfig;
         this.batchingEnabled = batchingEnabled;
         this.timeout = timeout;
+        this.additionalHeaders = additionalHeaders != null ? additionalHeaders : Collections.emptyMap();
         this.clientsByCredential = CacheApi.create(spec -> {
             spec.maxSize(64L);
             spec.expiryType(ExpiryType.POST_ACCESS);
@@ -130,6 +139,10 @@ public class TwitchGraphQL {
                         .header("User-Agent", userAgent)
                         .header("X-Device-Id", CommandComputeId.INSTANCE.getId());
 
+                    // Apply custom headers
+                    additionalHeaders.forEach(requestBuilder::header);
+
+                    // Set auth header
                     if (!accessToken.isEmpty()) {
                         requestBuilder.header("Authorization", "OAuth " + accessToken);
                     }
