@@ -632,6 +632,11 @@ public class TwitchChat implements ITwitchChat {
      */
     @SuppressWarnings("ConstantConditions")
     public boolean sendRaw(String command) {
+        if (outboundCommandFilter.test(this, command)) {
+            // filter blocked this command from being sent to the irc server
+            return false;
+        }
+
         return BucketUtils.scheduleAgainstBucket(ircMessageBucket, taskExecutor, () -> queueCommand(command)) != null;
     }
 
@@ -641,11 +646,6 @@ public class TwitchChat implements ITwitchChat {
      * @param command Raw IRC command to be queued.
      */
     private void queueCommand(String command) {
-        if (outboundCommandFilter.test(this, command)) {
-            // filter blocked this command from being sent to the irc server
-            return;
-        }
-
         // Add command to the queue, waiting for a period of time if necessary
         if (!ircCommandQueue.offer(command)) {
             try {
@@ -802,10 +802,17 @@ public class TwitchChat implements ITwitchChat {
     @Deprecated
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
+
+        String command = String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message);
+        if (outboundCommandFilter.test(this, command)) {
+            // filter prevented this whisper from being sent via irc
+            return;
+        }
+
         BucketUtils.scheduleAgainstBucket(
             ircWhisperBucket,
             taskExecutor,
-            () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message))
+            () -> queueCommand(command)
         );
     }
 
