@@ -1,0 +1,19 @@
+query fetchVips($channelLogin: String!, $first: Int = 10, $after: Cursor) {
+	user(login: $channelLogin) {
+		id
+		vips(first: $first, after: $after) {
+			edges {
+				cursor
+				grantedAt
+				node {
+					id
+					displayName
+					login
+				}
+			}
+			pageInfo {
+				hasNextPage
+			}
+		}
+	}
+}
