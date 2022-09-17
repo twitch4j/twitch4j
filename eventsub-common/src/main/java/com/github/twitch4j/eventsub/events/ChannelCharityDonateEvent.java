@@ -20,7 +20,7 @@ public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
     /**
      * An ID that uniquely identifies the charity campaign.
      */
-    @JsonProperty("id")
+    @JsonAlias("id")
     private String campaignId;
 
     /**
