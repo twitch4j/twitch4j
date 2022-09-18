@@ -466,7 +466,8 @@ public class TwitchClientBuilder {
                     chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
                         helix,
                         chatAccount != null ? chatAccount : defaultAuthToken,
-                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
+                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                        scheduledThreadPoolExecutor
                     ) : null
                 )
                 .setBotOwnerIds(botOwnerIds)

@@ -470,7 +470,8 @@ public class TwitchClientPoolBuilder {
             new ChatCommandHelixForwarder(
                 helix,
                 chatAccount != null ? chatAccount : defaultAuthToken,
-                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null)
+                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                scheduledThreadPoolExecutor
             ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()

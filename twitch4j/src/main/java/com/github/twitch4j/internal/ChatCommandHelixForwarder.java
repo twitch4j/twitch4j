@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -49,10 +50,12 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
     private static final Cache<String, String> USER_ID_BY_LOGIN_CACHE;
     private final TwitchHelix helix;
     private final OAuth2Credential token;
+    private final ExecutorService executor;
 
-    public ChatCommandHelixForwarder(TwitchHelix helix, OAuth2Credential token, TwitchIdentityProvider identityProvider) {
+    public ChatCommandHelixForwarder(TwitchHelix helix, OAuth2Credential token, TwitchIdentityProvider identityProvider, ExecutorService executor) {
         this.helix = helix;
         this.token = token;
+        this.executor = executor;
         if (StringUtils.isEmpty(token.getUserId())) {
             TwitchIdentityProvider tip = identityProvider != null ? identityProvider : new TwitchIdentityProvider(null, null, null);
             tip.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
@@ -79,11 +82,13 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             Consumer<CommandArguments> handler = COMMAND_HANDLERS.get(command.toLowerCase());
             if (handler != null) {
                 log.trace("Handling chat command from Helix forwarder: /" + fullMessage);
-                try {
-                    handler.accept(new CommandArguments(chat, channelName, command, restOfMessage));
-                } catch (Exception e) {
-                    log.warn("Failed to execute command from Helix forwarder: /" + fullMessage, e);
-                }
+                executor.execute(() -> {
+                    try {
+                        handler.accept(new CommandArguments(chat, channelName, command, restOfMessage));
+                    } catch (Exception e) {
+                        log.warn("Failed to execute command from Helix forwarder: /" + fullMessage, e);
+                    }
+                });
                 return true;
             }
         }
