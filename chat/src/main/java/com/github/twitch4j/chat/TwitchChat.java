@@ -789,7 +789,12 @@ public class TwitchChat implements ITwitchChat {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(sb.toString())) != null;
+        String command = sb.toString();
+        if (outboundCommandFilter.test(this, command)) {
+            // filter prevented this message from being sent to the irc server
+            return false;
+        }
+        return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(command)) != null;
     }
 
     /**
