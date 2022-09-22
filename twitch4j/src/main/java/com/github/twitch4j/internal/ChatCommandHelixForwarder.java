@@ -60,14 +60,51 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
+    /**
+     * Identifies outbound raw irc messages that contain chat commands.
+     */
     private static final Pattern COMMAND_PATTERN;
+
+    /**
+     * Mapping of old chat names of common colors to their Helix equivalents.
+     */
     private static final Map<String, String> HELIX_COLORS_BY_LOWER_CHAT_NAME;
+
+    /**
+     * A registry of handlers of each chat command to be forwarded to Helix.
+     */
     private static final Map<String, CommandHandler> COMMAND_HANDLERS;
+
+    /**
+     * A cache of recent name => id queries.
+     * <p>
+     * Useful since chat typically operates on login names, while Helix operates on id's.
+     */
     private static final Cache<String, String> USER_ID_BY_LOGIN_CACHE;
+
+    /**
+     * The Helix instance for executing API calls.
+     */
     private final TwitchHelix helix;
+
+    /**
+     * The user access token to be specified in API calls.
+     */
     private final OAuth2Credential token;
+
+    /**
+     * The scheduled executor service for performing api calls asynchronously.
+     */
     private final ScheduledExecutorService executor;
+
+    /**
+     * The per channel helix bandwidth.
+     */
     private final Bandwidth channelHelixLimit;
+
+    /**
+     * The cached helix rate limit bucket for each channel.
+     */
     private final Cache<String, Bucket> bucketByChannel;
 
     /**
@@ -92,6 +129,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         if (StringUtils.isEmpty(token.getUserId())) {
             TwitchIdentityProvider tip = identityProvider != null ? identityProvider : new TwitchIdentityProvider(null, null, null);
             tip.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
+            if (StringUtils.isEmpty(token.getUserId())) log.warn("ChatCommandHelixForwarder requires a user access token to properly operate.");
         }
         log.debug("Initialized ChatCommandHelixForwarder");
     }
@@ -162,12 +200,15 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
      * @throws IndexOutOfBoundsException                             if the user was not found from an otherwise successful helix call
      */
     private static String getId(TwitchHelix helix, OAuth2Credential token, @NotNull String name, @Nullable String optimisticId) {
+        // Check optimistic id sources
         if (optimisticId != null) return optimisticId;
         if (name.equalsIgnoreCase(token.getUserName())) return token.getUserId();
 
+        // Check id cache
         String cachedId = USER_ID_BY_LOGIN_CACHE.get(name.toLowerCase());
         if (cachedId != null) return cachedId;
 
+        // Fallback to querying via helix
         User user = helix.getUsers(token.getAccessToken(), null, Collections.singletonList(name)).execute().getUsers().get(0);
         USER_ID_BY_LOGIN_CACHE.put(user.getLogin(), user.getId());
         return user.getId();
@@ -242,7 +283,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
                             if (c == ' ') continue;
                             return null; // failed to parse
                         }
-                        break;
+                        break; // ignore random letters unassociated with a number
                 }
                 part = 0;
             }
@@ -281,7 +322,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
          * @return the id of the channel associated with {@link #getChannelName()}.
          */
         String getChannelId() {
-            return getId(helix, token, channelName, chat.getChannelNameToChannelId().get(channelName));
+            return getId(helix, token, channelName, chat.getChannelNameToChannelId().get(channelName.toLowerCase()));
         }
 
         /**
@@ -401,14 +442,14 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         m.put("mod", args -> {
             String targetName = args.restOfMessage;
             if (targetName == null || targetName.isEmpty()) return;
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
             args.getHelix().addChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
         });
 
         m.put("unmod", args -> {
             String targetName = args.restOfMessage;
             if (targetName == null || targetName.isEmpty()) return;
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
             args.getHelix().removeChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
         });
 
@@ -438,7 +479,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         m.put("raid", args -> {
             String targetName = args.restOfMessage;
             if (targetName == null || targetName.isEmpty()) return;
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
             args.getHelix().startRaid(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
         });
 
@@ -491,14 +532,14 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         m.put("vip", args -> {
             String targetName = args.restOfMessage;
             if (targetName == null || targetName.isEmpty()) return;
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
             args.getHelix().addChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
         });
 
         m.put("unvip", args -> {
             String targetName = args.restOfMessage;
             if (targetName == null || targetName.isEmpty()) return;
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
             args.getHelix().removeChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
         });
 
@@ -535,7 +576,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
                 if (message == null || message.isEmpty()) return;
 
                 String targetName = whisperParts[0];
-                String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+                String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
 
                 args.getHelix().sendWhisper(args.getToken().getAccessToken(), args.getToken().getUserId(), targetId, message).execute();
             }
