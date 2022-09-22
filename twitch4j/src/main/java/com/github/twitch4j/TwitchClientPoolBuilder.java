@@ -327,6 +327,19 @@ public class TwitchClientPoolBuilder {
     private boolean chatCommandsViaHelix = Instant.now().isAfter(Instant.ofEpochSecond(1676678400L));
 
     /**
+     * The per-channel rate limit at which chat commands forwarded to helix should be executed.
+     * <p>
+     * This prevents commands to a single channel from consuming the entire helix rate limit bucket.
+     * As such, this can be restricted further or loosened, depending on how many channels the bot serves.
+     * <p>
+     * This has no effect unless {@link #isChatCommandsViaHelix()} is true.
+     * <p>
+     * Users should migrate to manual helix calls (with whatever throttling they desire) instead.
+     */
+    @With(onMethod_ = { @Deprecated })
+    private Bandwidth forwardedChatCommandHelixLimitPerChannel = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -471,7 +484,8 @@ public class TwitchClientPoolBuilder {
                 helix,
                 chatAccount != null ? chatAccount : defaultAuthToken,
                 credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
-                scheduledThreadPoolExecutor
+                scheduledThreadPoolExecutor,
+                forwardedChatCommandHelixLimitPerChannel
             ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()

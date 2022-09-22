@@ -5,7 +5,9 @@ import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.ListModsEvent;
 import com.github.twitch4j.chat.events.channel.ListVipsEvent;
+import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.events.domain.EventChannel;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.domain.AnnouncementColor;
 import com.github.twitch4j.helix.domain.BanUserInput;
@@ -18,6 +20,8 @@ import com.github.twitch4j.helix.domain.ModeratorList;
 import com.github.twitch4j.helix.domain.NamedUserChatColor;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.util.PaginationUtil;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
@@ -34,7 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -46,16 +50,24 @@ import java.util.stream.Collectors;
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
     private static final Pattern COMMAND_PATTERN;
     private static final Map<String, String> HELIX_COLORS_BY_LOWER_CHAT_NAME;
-    private static final Map<String, Consumer<CommandArguments>> COMMAND_HANDLERS;
+    private static final Map<String, CommandHandler> COMMAND_HANDLERS;
     private static final Cache<String, String> USER_ID_BY_LOGIN_CACHE;
     private final TwitchHelix helix;
     private final OAuth2Credential token;
-    private final ExecutorService executor;
+    private final ScheduledExecutorService executor;
+    private final Bandwidth channelHelixLimit;
+    private final Cache<String, Bucket> bucketByChannel;
 
-    public ChatCommandHelixForwarder(TwitchHelix helix, OAuth2Credential token, TwitchIdentityProvider identityProvider, ExecutorService executor) {
+    public ChatCommandHelixForwarder(TwitchHelix helix, OAuth2Credential token, TwitchIdentityProvider identityProvider, ScheduledExecutorService executor, Bandwidth channelHelixLimit) {
         this.helix = helix;
         this.token = token;
         this.executor = executor;
+        this.channelHelixLimit = channelHelixLimit != null ? channelHelixLimit : TwitchChatLimitHelper.MOD_MESSAGE_LIMIT;
+        this.bucketByChannel = CacheApi.create(spec -> {
+            spec.expiryType(ExpiryType.POST_ACCESS);
+            spec.expiryTime(Duration.ofNanos(this.channelHelixLimit.getRefillPeriodNanos() * 2));
+            spec.maxSize(2048L);
+        });
         if (StringUtils.isEmpty(token.getUserId())) {
             TwitchIdentityProvider tip = identityProvider != null ? identityProvider : new TwitchIdentityProvider(null, null, null);
             tip.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
@@ -79,10 +91,10 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             String restOfMessage = firstSpace > 0 ? fullMessage.substring(firstSpace + 1) : "";
 
             // Execute command handler
-            Consumer<CommandArguments> handler = COMMAND_HANDLERS.get(command.toLowerCase());
+            CommandHandler handler = COMMAND_HANDLERS.get(command.toLowerCase());
             if (handler != null) {
                 log.trace("Handling chat command from Helix forwarder: /" + fullMessage);
-                executor.execute(() -> {
+                BucketUtils.scheduleAgainstBucket(getCommandBucket(handler.getLimitKey(), channelName), executor, () -> {
                     try {
                         handler.accept(new CommandArguments(chat, channelName, command, restOfMessage));
                     } catch (Exception e) {
@@ -94,6 +106,18 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         }
 
         return false; // false => don't block the command from sending
+    }
+
+    /**
+     * Obtains the rate limit bucket for executing a command for a particular channel or user.
+     *
+     * @param limitType   the relevant key for the rate limit of this command
+     * @param channelName the login name of the channel where the command is being sent to (irrelevant for USER limit type)
+     * @return Bucket
+     */
+    private Bucket getCommandBucket(CommandRateLimitType limitType, String channelName) {
+        String key = limitType == CommandRateLimitType.CHANNEL ? channelName.toLowerCase() : ""; // empty string represents current user in token
+        return bucketByChannel.computeIfAbsent(key, k -> BucketUtils.createBucket(channelHelixLimit));
     }
 
     private static String getId(TwitchHelix helix, OAuth2Credential token, @NotNull String name, @Nullable String optimisticId) {
@@ -186,6 +210,33 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         }
     }
 
+    /**
+     * The primary key that is associated with the rate limit bucket for this (helix) command.
+     */
+    private enum CommandRateLimitType {
+        /**
+         * The command should be rate limited based on which channel it was executed in.
+         */
+        CHANNEL,
+
+        /**
+         * The command should be rate limited based on which user executed it.
+         * <p>
+         * As {@code token} is final, this assumed to be a single user.
+         */
+        USER
+    }
+
+    /**
+     * A handler of a specific command type; consumes arguments from the chat message.
+     */
+    @FunctionalInterface
+    private interface CommandHandler extends Consumer<CommandArguments> {
+        default CommandRateLimitType getLimitKey() {
+            return CommandRateLimitType.CHANNEL; // most commands should be rate limited based on which channel they were executed in
+        }
+    }
+
     static {
         COMMAND_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?PRIVMSG\\s#(?<channel>\\S*?)\\s:/(?<command>.+)$");
 
@@ -198,7 +249,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             spec.maxSize(2048L);
         });
 
-        final Map<String, Consumer<CommandArguments>> m = new HashMap<>();
+        final Map<String, CommandHandler> m = new HashMap<>();
 
         BiConsumer<CommandArguments, AnnouncementColor> announceHandler = (args, color) -> {
             if (args.restOfMessage == null || args.restOfMessage.isEmpty()) return;
@@ -217,10 +268,18 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             doBan(args.getHelix(), args.getToken(), args.getChannelId(), getId(args.getHelix(), args.getToken(), banParts[0], null), banReason, null);
         });
 
-        m.put("color", args -> {
-            String color = args.restOfMessage.startsWith("#") ? args.restOfMessage : HELIX_COLORS_BY_LOWER_CHAT_NAME.get(args.restOfMessage.toLowerCase());
-            if (color == null) return;
-            args.getHelix().updateUserChatColor(args.getToken().getAccessToken(), args.getToken().getUserId(), color).execute();
+        m.put("color", new CommandHandler() {
+            @Override
+            public void accept(CommandArguments args) {
+                String color = args.restOfMessage.startsWith("#") ? args.restOfMessage : HELIX_COLORS_BY_LOWER_CHAT_NAME.get(args.restOfMessage.toLowerCase());
+                if (color == null) return;
+                args.getHelix().updateUserChatColor(args.getToken().getAccessToken(), args.getToken().getUserId(), color).execute();
+            }
+
+            @Override
+            public CommandRateLimitType getLimitKey() {
+                return CommandRateLimitType.USER; // this helix call is associated with a user's chat color, irrespective of channel
+            }
         });
 
         m.put("commercial", args -> {
@@ -235,7 +294,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         m.put("clear", args -> deleteHandler.accept(args, null));
         m.put("delete", args -> deleteHandler.accept(args, args.restOfMessage));
 
-        Consumer<CommandArguments> unbanHandler = args -> {
+        CommandHandler unbanHandler = args -> {
             String userId = getId(args.getHelix(), args.getToken(), args.restOfMessage, null);
             args.getHelix().unbanUser(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), userId).execute();
         };
@@ -374,17 +433,25 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             args.getChat().getEventManager().publish(event);
         });
 
-        m.put("w", args -> {
-            String[] whisperParts = StringUtils.split(args.restOfMessage, " ", 2);
-            if (whisperParts.length != 2) return;
+        m.put("w", new CommandHandler() {
+            @Override
+            public void accept(CommandArguments args) {
+                String[] whisperParts = StringUtils.split(args.restOfMessage, " ", 2);
+                if (whisperParts.length != 2) return;
 
-            String message = whisperParts[1];
-            if (message == null || message.isEmpty()) return;
+                String message = whisperParts[1];
+                if (message == null || message.isEmpty()) return;
 
-            String targetName = whisperParts[0];
-            String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
+                String targetName = whisperParts[0];
+                String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName));
 
-            args.getHelix().sendWhisper(args.getToken().getAccessToken(), args.getToken().getUserId(), targetId, message).execute();
+                args.getHelix().sendWhisper(args.getToken().getAccessToken(), args.getToken().getUserId(), targetId, message).execute();
+            }
+
+            @Override
+            public CommandRateLimitType getLimitKey() {
+                return CommandRateLimitType.USER; // whisper sender matters more than the channel for rate limiting
+            }
         });
 
         COMMAND_HANDLERS = Collections.unmodifiableMap(m);
