@@ -46,6 +46,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Intercepts and forwards outbound IRC messages containing commands to the Helix API, when able.
+ * <p>
+ * Allows for a smoother transition when chat commands can no longer be sent over IRC;
+ * users simply just need to add the latest scopes to their user access token.
+ * <p>
+ * This class is marked as internal, and could face breaking changes at any time.
+ *
+ * @see <a href="https://discuss.dev.twitch.tv/t/deprecation-of-chat-commands-through-irc/40486">Announcement for the deprecation of most chat commands</a>
+ * @see com.github.twitch4j.TwitchClientBuilder#withChatCommandsViaHelix(boolean)
+ * @see #test(TwitchChat, String)
+ */
 @Slf4j
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
     private static final Pattern COMMAND_PATTERN;
@@ -58,6 +70,15 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
     private final Bandwidth channelHelixLimit;
     private final Cache<String, Bucket> bucketByChannel;
 
+    /**
+     * Constructs a forwarder of chat commands over IRC to Helix.
+     *
+     * @param helix             the helix instance to execute api calls
+     * @param token             the user access token to be specified in api calls
+     * @param identityProvider  the twitch identity provider to query token characteristics
+     * @param executor          the scheduled executor service for performing api calls asynchronously
+     * @param channelHelixLimit the per channel helix rate limit
+     */
     public ChatCommandHelixForwarder(TwitchHelix helix, OAuth2Credential token, TwitchIdentityProvider identityProvider, ScheduledExecutorService executor, Bandwidth channelHelixLimit) {
         this.helix = helix;
         this.token = token;
@@ -75,6 +96,13 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         log.debug("Initialized ChatCommandHelixForwarder");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param chat          the chat instance with the outbound message call
+     * @param rawIrcCommand the raw irc command to be sent to the server, if not intercepted
+     * @return whether the irc command was forwarded to helix, indicating it does not need to be sent via the chat socket
+     */
     @Override
     public boolean test(TwitchChat chat, String rawIrcCommand) {
         if (helix == null || token == null) return false;
@@ -120,6 +148,19 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         return bucketByChannel.computeIfAbsent(key, k -> BucketUtils.createBucket(channelHelixLimit));
     }
 
+    /**
+     * Obtains the user id associated with the passed username.
+     * <p>
+     * Before executing a helix users call, this method checks for a match in the token or final id argument.
+     *
+     * @param helix        the api instance to perform a getUsers call, if necessary
+     * @param token        a user access token that may or may not be associated with the passed username
+     * @param name         the name of the user whose id is being queried
+     * @param optimisticId the id of the user, if already known, or null
+     * @return the user id
+     * @throws com.netflix.hystrix.exception.HystrixRuntimeException if the helix call fails
+     * @throws IndexOutOfBoundsException                             if the user was not found from an otherwise successful helix call
+     */
     private static String getId(TwitchHelix helix, OAuth2Credential token, @NotNull String name, @Nullable String optimisticId) {
         if (optimisticId != null) return optimisticId;
         if (name.equalsIgnoreCase(token.getUserName())) return token.getUserId();
@@ -132,6 +173,17 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         return user.getId();
     }
 
+    /**
+     * Performs a ban or timeout via helix.
+     *
+     * @param helix     the api instance to perform the call
+     * @param token     a user access token representing a moderator in the channel
+     * @param channelId the id of the channel from which the user should be banned
+     * @param targetId  the id of the user who should be banned
+     * @param reason    the reason of the ban to be displayed to the user and other moderators
+     * @param duration  the duration of the timeout, or null for a ban
+     * @throws com.netflix.hystrix.exception.HystrixRuntimeException if the helix call fails
+     */
     private static void doBan(TwitchHelix helix, OAuth2Credential token, String channelId, String targetId, String reason, Integer duration) {
         if (channelId == null || targetId == null || (duration != null && duration == 0)) return;
         helix.banUser(
@@ -146,6 +198,16 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         ).execute();
     }
 
+    /**
+     * Parses a time string into the corresponding number of seconds.
+     * <p>
+     * Supports weeks, days, hours, minutes, seconds.
+     * Time units can be abbreviated or completely written out.
+     * Spaces and (grammatically correct) commas are ignored.
+     *
+     * @param time the user-inputted time duration string
+     * @return the seconds corresponding to the string time duration, or null if parsing failed
+     */
     private static Integer parseDuration(String time) {
         int seconds = 0;
 
@@ -190,21 +252,48 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
         return seconds;
     }
 
+    /**
+     * The parsed details from a raw irc message associated with a command to be forwarded to helix.
+     */
     @Value
     private class CommandArguments {
+        /**
+         * The chat instance where the command took place.
+         */
         TwitchChat chat;
+
+        /**
+         * The channel name where the command was to be sent.
+         */
         String channelName;
+
+        /**
+         * The command name, without a forward slash or any following arguments.
+         */
         String command;
+
+        /**
+         * The remainder of the trimmed message following the command name.
+         */
         String restOfMessage;
 
+        /**
+         * @return the id of the channel associated with {@link #getChannelName()}.
+         */
         String getChannelId() {
             return getId(helix, token, channelName, chat.getChannelNameToChannelId().get(channelName));
         }
 
+        /**
+         * @return the helix instance to be used for api calls.
+         */
         TwitchHelix getHelix() {
             return helix;
         }
 
+        /**
+         * @return the (user) access token to be used for api calls.
+         */
         OAuth2Credential getToken() {
             return token;
         }
@@ -230,8 +319,11 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
     /**
      * A handler of a specific command type; consumes arguments from the chat message.
      */
-    @FunctionalInterface
+    @FunctionalInterface // simply just need to implement #accept(CommandArguments)
     private interface CommandHandler extends Consumer<CommandArguments> {
+        /**
+         * @return the type of key that should be used for the rate limit bucket associated with this command.
+         */
         default CommandRateLimitType getLimitKey() {
             return CommandRateLimitType.CHANNEL; // most commands should be rate limited based on which channel they were executed in
         }

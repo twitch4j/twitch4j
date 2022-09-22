@@ -322,6 +322,9 @@ public class TwitchClientPoolBuilder {
      * Whether chat commands should be executed via the Helix API, if possible.
      * <p>
      * Must have {@link #withEnableHelix(Boolean)} set to true.
+     * Must have {@link #withEnableChat(Boolean)} or {@link #withEnableChatPool(Boolean)} set to true.
+     * <p>
+     * Must have  {@link #withChatAccount(OAuth2Credential)} or {@link #withDefaultAuthToken(OAuth2Credential)} specified.
      */
     @With
     private boolean chatCommandsViaHelix = Instant.now().isAfter(Instant.ofEpochSecond(1676678400L));
