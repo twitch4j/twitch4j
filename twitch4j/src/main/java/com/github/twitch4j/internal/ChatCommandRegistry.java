@@ -20,9 +20,11 @@ import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -31,9 +33,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+@Slf4j
 enum ChatCommandRegistry {
     INSTANCE;
 
@@ -133,17 +137,22 @@ enum ChatCommandRegistry {
             String channelId = args.getChannelId();
             if (args.getChannelName() == null || channelId == null) return;
 
+            AtomicBoolean failure = new AtomicBoolean();
             List<Moderator> mods = PaginationUtil.getPaginated(
                 cursor -> {
                     try {
                         return args.getHelix().getModerators(args.getToken().getAccessToken(), channelId, null, cursor, 100).execute();
                     } catch (Exception e) {
+                        failure.set(true);
+                        getLogger().warn("Failed to query moderators from Helix chat command forwarder", e);
                         return null;
                     }
                 },
                 ModeratorList::getModerators,
                 result -> result.getPagination() != null ? result.getPagination().getCursor() : null
             );
+            if (failure.get()) return;
+
             List<String> names = new ArrayList<>(mods.size());
             mods.forEach(v -> names.add(v.getUserLogin()));
 
@@ -223,17 +232,22 @@ enum ChatCommandRegistry {
             String channelId = args.getChannelId();
             if (args.getChannelName() == null || channelId == null) return;
 
+            AtomicBoolean failure = new AtomicBoolean();
             List<ChannelVip> vips = PaginationUtil.getPaginated(
                 cursor -> {
                     try {
                         return args.getHelix().getChannelVips(args.getToken().getAccessToken(), channelId, null, 100, cursor).execute();
                     } catch (Exception e) {
+                        failure.set(true);
+                        getLogger().warn("Failed to query VIPs from Helix chat command forwarder", e);
                         return null;
                     }
                 },
                 ChannelVipList::getData,
                 result -> result.getPagination() != null ? result.getPagination().getCursor() : null
             );
+            if (failure.get()) return;
+
             List<String> names = new ArrayList<>(vips.size());
             vips.forEach(v -> names.add(v.getUserLogin()));
 
@@ -264,6 +278,10 @@ enum ChatCommandRegistry {
         });
 
         this.commandHandlers = Collections.unmodifiableMap(m);
+    }
+
+    private Logger getLogger() {
+        return log;
     }
 
     /**
