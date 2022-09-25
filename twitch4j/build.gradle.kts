@@ -14,6 +14,9 @@ dependencies {
 
 	// Jackson
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
+
+	// Regex
+	api(group = "com.github.tony19", name = "named-regexp", version = "0.2.7")
 }
 
 base {

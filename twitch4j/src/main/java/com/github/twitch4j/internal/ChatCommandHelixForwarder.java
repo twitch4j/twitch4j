@@ -6,6 +6,8 @@ import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.helix.TwitchHelix;
+import com.google.code.regexp.Matcher;
+import com.google.code.regexp.Pattern;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.xanthic.cache.api.Cache;
@@ -19,8 +21,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiPredicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Intercepts and forwards outbound IRC messages containing commands to the Helix API, when able.
