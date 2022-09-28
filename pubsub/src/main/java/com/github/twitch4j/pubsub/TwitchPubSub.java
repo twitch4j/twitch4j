@@ -31,6 +31,7 @@ import com.github.twitch4j.pubsub.domain.CommerceData;
 import com.github.twitch4j.pubsub.domain.CommunityBoostProgression;
 import com.github.twitch4j.pubsub.domain.CommunityGoalContribution;
 import com.github.twitch4j.pubsub.domain.CreateNotificationData;
+import com.github.twitch4j.pubsub.domain.CreateShoutoutData;
 import com.github.twitch4j.pubsub.domain.CreatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.CreatorGoal;
 import com.github.twitch4j.pubsub.domain.FollowingData;
@@ -83,6 +84,7 @@ import com.github.twitch4j.pubsub.events.ClaimAvailableEvent;
 import com.github.twitch4j.pubsub.events.ClaimClaimedEvent;
 import com.github.twitch4j.pubsub.events.CommunityBoostProgressionEvent;
 import com.github.twitch4j.pubsub.events.CommunityGoalContributionEvent;
+import com.github.twitch4j.pubsub.events.CreateShoutoutEvent;
 import com.github.twitch4j.pubsub.events.CreatorGoalEvent;
 import com.github.twitch4j.pubsub.events.CrowdChantCreatedEvent;
 import com.github.twitch4j.pubsub.events.CustomRewardCreatedEvent;
@@ -718,6 +720,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                     }
                 } else if ("radio-events-v1".equals(topicName)) {
                     eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
+                } else if ("shoutout".equals(topicName)) {
+                    if ("create".equalsIgnoreCase(type)) {
+                        CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(msgData, CreateShoutoutData.class);
+                        eventManager.publish(new CreateShoutoutEvent(lastTopicIdentifier, shoutoutInfo));
+                    } else {
+                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
                 } else if ("channel-sub-gifts-v1".equals(topicName)) {
                     eventManager.publish(new ChannelSubGiftEvent(TypeConvert.jsonToObject(rawMessage, SubGiftData.class)));
                 } else if ("channel-cheer-events-public-v1".equals(topicName) && topicParts.length > 1) {
