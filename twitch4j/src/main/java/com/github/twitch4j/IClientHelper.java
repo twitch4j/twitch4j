@@ -41,6 +41,8 @@ public interface IClientHelper extends AutoCloseable {
 
     /**
      * Enable Follow Listener, without invoking a Helix API call
+     * <p>
+     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
      *
      * @param channelId   Channel Id
      * @param channelName Channel Name
@@ -156,7 +158,9 @@ public interface IClientHelper extends AutoCloseable {
     }
 
     /**
-     * Follow Listener
+     * Enable Follow Listener for the given channel name
+     * <p>
+     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
      *
      * @param channelName Channel Name
      */
@@ -177,6 +181,8 @@ public interface IClientHelper extends AutoCloseable {
 
     /**
      * Enable Follow Listener for the given channel names
+     * <p>
+     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
      *
      * @param channelNames the channel names to be added
      */

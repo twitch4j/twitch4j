@@ -2436,15 +2436,20 @@ public interface TwitchHelix {
     /**
      * Get Followers
      * <p>
-     * Gets information on follow relationships between two Twitch users. Information returned is sorted in order, most recent follow first. This can return information like “who is lirik following,” “who is following lirik,” or “is user X following user Y.”
-     * Using user-token or app-token to increase rate limits.
+     * Gets information on follow relationships between two Twitch users.
+     * Information returned is sorted in order, most recent follow first.
+     * <p>
+     * WARNING: This method will soon be deprecated as Twitch is imposing new auth requirements.
+     * When to_id is specified, a (scoped) broadcaster or moderator oauth token will be required.
+     * When from_id is specified, a (scoped) user access token associated with from_id will be required.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
-     * @param fromId User ID. The request returns information about users who are being followed by the from_id user.
-     * @param toId   User ID. The request returns information about users who are following the to_id user.
-     * @param after  Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit  Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param authToken User or App access Token
+     * @param fromId    User ID. The request returns information about users who are being followed by the from_id user.
+     * @param toId      User ID. The request returns information about users who are following the to_id user.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return FollowList
+     * @see <a href="https://www.twitch.tv/videos/1604648673?t=0h36m30s">Early deprecation notice</a>
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
