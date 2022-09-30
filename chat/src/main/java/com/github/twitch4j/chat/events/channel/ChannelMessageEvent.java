@@ -7,12 +7,14 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.ChatReply;
+import com.github.twitch4j.common.util.DonationAmount;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -102,6 +104,44 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
     @Unofficial
     public boolean isUserIntroduction() {
         return "user-intro".equals(getMessageEvent().getTags().get("msg-id"));
+    }
+
+    /**
+     * @return the payment amount for the user to elevate their chat message.
+     * @apiNote This method is unofficial since the experiment is not officially documented in the irc guide.
+     * @see <a href ="https://twitter.com/TwitchSupport/status/1575603152908427272">Twitch Announcement</a>
+     */
+    @Unofficial
+    public Optional<DonationAmount> getElevatedChatPayment() {
+        final Map<String, String> tags = getMessageEvent().getTags();
+
+        String amount = tags.get("pinned-chat-paid-amount");
+        if (amount == null) {
+            amount = tags.get("pinned-chat-paid-canonical-amount");
+            if (amount != null) {
+                amount += "00";
+            }
+        }
+
+        return Optional.ofNullable(amount)
+            .map(amt -> {
+                try {
+                    return Long.parseLong(amt);
+                } catch (Exception e) {
+                    return null;
+                }
+            })
+            .map(amt -> {
+                String currency = tags.getOrDefault("pinned-chat-paid-currency", "USD");
+                String exponentStr = tags.getOrDefault("pinned-chat-paid-exponent", "2");
+                int exponent;
+                try {
+                    exponent = Integer.parseInt(exponentStr);
+                } catch (Exception e) {
+                    return null;
+                }
+                return new DonationAmount(amt, exponent, currency);
+            });
     }
 
 }
