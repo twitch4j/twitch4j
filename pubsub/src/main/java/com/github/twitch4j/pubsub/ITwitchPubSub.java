@@ -136,6 +136,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param userId     The user id of the moderator.
      * @param channelId  The channel id to monitor events from.
      * @return PubSubSubscription
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_MODERATE
      */
     default PubSubSubscription listenForLowTrustUsersEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "low-trust-users." + userId + "." + channelId);
