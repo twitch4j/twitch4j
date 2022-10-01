@@ -314,6 +314,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForPinnedChatEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "pinned-chat-updates-v1." + channelId);
+    }
+
+    @Unofficial
     default PubSubSubscription listenForChannelPredictionsEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "predictions-channel-v1." + channelId);
     }

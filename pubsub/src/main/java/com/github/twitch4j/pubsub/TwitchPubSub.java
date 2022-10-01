@@ -33,6 +33,7 @@ import com.github.twitch4j.pubsub.domain.CommunityGoalContribution;
 import com.github.twitch4j.pubsub.domain.CreateNotificationData;
 import com.github.twitch4j.pubsub.domain.CreatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.CreatorGoal;
+import com.github.twitch4j.pubsub.domain.DeletePinnedChatData;
 import com.github.twitch4j.pubsub.domain.FollowingData;
 import com.github.twitch4j.pubsub.domain.FriendshipData;
 import com.github.twitch4j.pubsub.domain.HypeLevelUp;
@@ -46,6 +47,7 @@ import com.github.twitch4j.pubsub.domain.Leaderboard;
 import com.github.twitch4j.pubsub.domain.LowTrustUserNewMessage;
 import com.github.twitch4j.pubsub.domain.LowTrustUserTreatmentUpdate;
 import com.github.twitch4j.pubsub.domain.ModeratorUnbanRequestAction;
+import com.github.twitch4j.pubsub.domain.PinnedChatData;
 import com.github.twitch4j.pubsub.domain.PointsSpent;
 import com.github.twitch4j.pubsub.domain.PollData;
 import com.github.twitch4j.pubsub.domain.PresenceData;
@@ -58,6 +60,7 @@ import com.github.twitch4j.pubsub.domain.SubGiftData;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.domain.SupportActivityFeedData;
 import com.github.twitch4j.pubsub.domain.UpdateSummaryData;
+import com.github.twitch4j.pubsub.domain.UpdatedPinnedChatTiming;
 import com.github.twitch4j.pubsub.domain.UpdatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.UserAutomodCaughtMessage;
 import com.github.twitch4j.pubsub.domain.UserModerationActionData;
@@ -102,6 +105,9 @@ import com.github.twitch4j.pubsub.events.LowTrustUserNewMessageEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserTreatmentUpdateEvent;
 import com.github.twitch4j.pubsub.events.ModUnbanRequestActionEvent;
 import com.github.twitch4j.pubsub.events.OnsiteNotificationCreationEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatCreateEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatDeleteEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatTimingUpdateEvent;
 import com.github.twitch4j.pubsub.events.PointsEarnedEvent;
 import com.github.twitch4j.pubsub.events.PointsSpentEvent;
 import com.github.twitch4j.pubsub.events.PollsEvent;
@@ -745,6 +751,27 @@ public class TwitchPubSub implements ITwitchPubSub {
                         eventManager.publish(new UpdateOnsiteNotificationSummaryEvent(lastTopicIdentifier, data));
                     } else {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
+                } else if ("pinned-chat-updates-v1".equals(topicName)) {
+                    switch (type) {
+                        case "pin-message":
+                            PinnedChatData createdPin = TypeConvert.convertValue(msgData, PinnedChatData.class);
+                            eventManager.publish(new PinnedChatCreateEvent(lastTopicIdentifier, createdPin));
+                            break;
+
+                        case "update-message":
+                            UpdatedPinnedChatTiming updatedPin = TypeConvert.convertValue(msgData, UpdatedPinnedChatTiming.class);
+                            eventManager.publish(new PinnedChatTimingUpdateEvent(lastTopicIdentifier, updatedPin));
+                            break;
+
+                        case "unpin-message":
+                            DeletePinnedChatData deletePin = TypeConvert.convertValue(msgData, DeletePinnedChatData.class);
+                            eventManager.publish(new PinnedChatDeleteEvent(lastTopicIdentifier, deletePin));
+                            break;
+
+                        default:
+                            log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                            break;
                     }
                 } else if (("video-playback-by-id".equals(topicName) || "video-playback".equals(topicName)) && topicParts.length > 1) {
                     boolean hasId = topicName.endsWith("d");
