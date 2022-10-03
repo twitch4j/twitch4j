@@ -74,11 +74,13 @@ public interface TwitchMessagingInterface {
     /**
      * Get Chatters
      * <p>
-     * This endpoint returns all chatters in a channel. It's not official, bot pretty much every single bot depends on this so i doubt that they will ever remove it.
+     * This endpoint returns all chatters in a channel.
      *
      * @param channelName Channel Name
      * @return List of all Viewers/mods/...
+     * @deprecated This method will eventually be decommissioned in favor of TwitchHelix#getChatters
      */
+    @Deprecated
     @RequestLine("GET /group/user/{channel}/chatters")
     HystrixCommand<Chatters> getChatters(
         @Param("channel") String channelName

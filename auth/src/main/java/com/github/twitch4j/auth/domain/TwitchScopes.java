@@ -41,6 +41,7 @@ public enum TwitchScopes {
     HELIX_BLOCKED_TERMS_MANAGE("moderator:manage:blocked_terms"),
     HELIX_BLOCKED_TERMS_READ("moderator:read:blocked_terms"),
     HELIX_CHAT_ANNOUNCEMENTS_MANAGE("moderator:manage:announcements"),
+    HELIX_CHATTERS_READ("moderator:read:chatters"),
     HELIX_CHAT_MESSAGES_MANAGE("moderator:manage:chat_messages"),
     HELIX_CHAT_SETTINGS_MANAGE("moderator:manage:chat_settings"),
     HELIX_CHAT_SETTINGS_READ("moderator:read:chat_settings"),

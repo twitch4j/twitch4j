@@ -398,6 +398,30 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the list of users that are connected to the specified broadcaster’s chat session.
+     * <p>
+     * This endpoint is in open beta, and could face breaking changes without warning.
+     *
+     * @param authToken     User access token that includes the moderator:read:chatters scope.
+     * @param broadcasterId The ID of the broadcaster whose list of chatters you want to get.
+     * @param moderatorId   The ID of the moderator or the specified broadcaster that’s requesting the list of chatters. This ID must match the user ID associated with the user access token.
+     * @param limit         Optional: The maximum number of items to return per page in the response. Minimum: 1. Default: 100. Maximum: 1000.
+     * @param after         Optional: The cursor used to get the next page of results.
+     * @return ChattersList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHATTERS_READ
+     */
+    @Unofficial
+    @RequestLine("GET /chat/chatters?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ChattersList> getChatters(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
      * Gets the color used for the user’s name in chat.
      *
      * @param authToken App access token or user access token.
