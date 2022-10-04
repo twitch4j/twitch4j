@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode(callSuper = false)
-public class CreateShoutoutEvent extends TwitchEvent {
+public class ShoutoutCreatedEvent extends TwitchEvent {
     String channelId;
     CreateShoutoutData data;
 }

@@ -84,7 +84,6 @@ import com.github.twitch4j.pubsub.events.ClaimAvailableEvent;
 import com.github.twitch4j.pubsub.events.ClaimClaimedEvent;
 import com.github.twitch4j.pubsub.events.CommunityBoostProgressionEvent;
 import com.github.twitch4j.pubsub.events.CommunityGoalContributionEvent;
-import com.github.twitch4j.pubsub.events.CreateShoutoutEvent;
 import com.github.twitch4j.pubsub.events.CreatorGoalEvent;
 import com.github.twitch4j.pubsub.events.CrowdChantCreatedEvent;
 import com.github.twitch4j.pubsub.events.CustomRewardCreatedEvent;
@@ -118,6 +117,7 @@ import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.pubsub.events.ShoutoutCreatedEvent;
 import com.github.twitch4j.pubsub.events.SubLeaderboardEvent;
 import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
 import com.github.twitch4j.pubsub.events.UpdateOnsiteNotificationSummaryEvent;
@@ -723,7 +723,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 } else if ("shoutout".equals(topicName)) {
                     if ("create".equalsIgnoreCase(type)) {
                         CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(msgData, CreateShoutoutData.class);
-                        eventManager.publish(new CreateShoutoutEvent(lastTopicIdentifier, shoutoutInfo));
+                        eventManager.publish(new ShoutoutCreatedEvent(lastTopicIdentifier, shoutoutInfo));
                     } else {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                     }
