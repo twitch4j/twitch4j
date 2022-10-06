@@ -85,4 +85,15 @@ public class DirectCheerEvent extends CheerEvent {
         return messageEvent.getTagValue("system-msg").map(String::trim).orElse("");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated direct cheer values are not easily translatable into bit amounts, especially for non-USD currencies.
+     */
+    @Deprecated
+    @Override
+    public Integer getBits() {
+        return super.getBits();
+    }
+
 }
