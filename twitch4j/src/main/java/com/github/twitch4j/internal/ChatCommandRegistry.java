@@ -97,7 +97,10 @@ enum ChatCommandRegistry {
 
         m.put("commercial", args -> {
             if (args.getRestOfMessage() == null || args.getRestOfMessage().isEmpty()) return;
-            args.getHelix().startCommercial(args.getToken().getAccessToken(), args.getChannelId(), Integer.parseInt(args.getRestOfMessage())).execute();
+            int length = Integer.parseInt(args.getRestOfMessage());
+            length = (length / 30) * 30; // require a multiple of 30 seconds
+            length = Math.max(Math.min(length, 180), 30); // clamp to [30, 180]
+            args.getHelix().startCommercial(args.getToken().getAccessToken(), args.getChannelId(), length).execute();
         });
 
         BiConsumer<ChatCommandHelixForwarder.CommandArguments, String> deleteHandler = (args, messageId) -> {
@@ -178,22 +181,26 @@ enum ChatCommandRegistry {
         m.put("emoteonlyoff", args -> roomHandler.accept(args, ChatSettings.builder().isEmoteOnlyMode(false).build()));
         m.put("followers", args -> {
             Integer followTime = parseDuration(args.getRestOfMessage());
+            followTime = followTime != null ? followTime : 0; // default is 0
+            followTime = Math.min(Math.max(followTime, 0), 129600); // clamp to [0, 129600]
             roomHandler.accept(
                 args,
                 ChatSettings.builder()
                     .isFollowersOnlyMode(true)
-                    .followerModeDuration(followTime != null ? followTime : 0)
+                    .followerModeDuration(followTime)
                     .build()
             );
         });
         m.put("followersoff", args -> roomHandler.accept(args, ChatSettings.builder().isFollowersOnlyMode(false).build()));
         m.put("slow", args -> {
             Integer slowTime = parseDuration(args.getRestOfMessage());
+            slowTime = slowTime != null ? slowTime : 30; // default is 30 seconds
+            slowTime = Math.min(Math.max(slowTime, 3), 120); // clamp to [3, 120]
             roomHandler.accept(
                 args,
                 ChatSettings.builder()
                     .isSlowMode(true)
-                    .slowModeWaitTime(slowTime != null && slowTime > 0 ? slowTime : 30)
+                    .slowModeWaitTime(slowTime)
                     .build()
             );
         });
@@ -210,8 +217,9 @@ enum ChatCommandRegistry {
             if (timeoutParts.length < 2) return;
             String timeoutReason = timeoutParts.length >= 3 ? timeoutParts[2] : "";
             Integer seconds = parseDuration(timeoutParts[1]);
-            if (seconds != null)
-                doBan(args.getHelix(), args.getToken(), args.getChannelId(), getId(args.getHelix(), args.getToken(), timeoutParts[0], null), timeoutReason, seconds);
+            if (seconds == null) return;
+            seconds = Math.min(Math.max(seconds, 1), 1209600); // clamp to [1, 1_209_600]
+            doBan(args.getHelix(), args.getToken(), args.getChannelId(), getId(args.getHelix(), args.getToken(), timeoutParts[0], null), timeoutReason, seconds);
         });
 
         m.put("vip", args -> {

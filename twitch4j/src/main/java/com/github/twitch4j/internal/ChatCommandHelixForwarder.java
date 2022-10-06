@@ -36,6 +36,7 @@ import java.util.function.BiPredicate;
  */
 @Slf4j
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
+
     /**
      * Identifies outbound raw irc messages that contain chat commands.
      */
