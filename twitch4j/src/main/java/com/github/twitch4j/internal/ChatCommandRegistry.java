@@ -355,7 +355,8 @@ enum ChatCommandRegistry {
      * @param time the user-inputted time duration string
      * @return the seconds corresponding to the string time duration, or null if parsing failed
      */
-    private static Integer parseDuration(String time) {
+    @Nullable
+    static Integer parseDuration(@NotNull String time) {
         int seconds = 0;
 
         int part = 0;
@@ -365,7 +366,7 @@ enum ChatCommandRegistry {
                 part *= 10;
                 part += c - '0';
             } else {
-                if (i == 0)
+                if (i == 0 && c != ' ')
                     return null; // invalid format
 
                 switch (Character.toLowerCase(c)) {
