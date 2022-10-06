@@ -40,7 +40,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
     /**
      * Identifies outbound raw irc messages that contain chat commands.
      */
-    static final Pattern COMMAND_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?PRIVMSG\\s#(?<channel>\\S*?)\\s:\\s*/(?<command>.+)$");
+    static final Pattern COMMAND_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?PRIVMSG\\s#(?<channel>\\S*?)\\s:\\s*[/\\.](?<command>.+)$");
 
     /**
      * A registry of handlers of each chat command to be forwarded to Helix.

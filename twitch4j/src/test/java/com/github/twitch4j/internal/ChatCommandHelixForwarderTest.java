@@ -32,6 +32,11 @@ class ChatCommandHelixForwarderTest {
         assertTrue(matcher.matches());
         assertEquals("livagar", matcher.group("channel"));
         assertEquals("marker poggers", matcher.group("command"));
+
+        matcher.reset("PRIVMSG #keffals :.ban null");
+        assertTrue(matcher.matches());
+        assertEquals("keffals", matcher.group("channel"));
+        assertEquals("ban null", matcher.group("command"));
     }
 
 }
