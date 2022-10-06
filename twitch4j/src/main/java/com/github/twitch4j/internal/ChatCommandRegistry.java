@@ -368,21 +368,25 @@ enum ChatCommandRegistry {
                 if (i == 0)
                     return null; // invalid format
 
-                switch (c) {
+                switch (Character.toLowerCase(c)) {
                     case 's':
                         seconds += part;
                         break;
                     case 'm':
-                        seconds += part * 60;
+                        if (i + 1 < n && Character.toLowerCase(time.charAt(i + 1)) == 'o') {
+                            seconds += part * 60 * 60 * 24 * 7 * 4; // months
+                        } else {
+                            seconds += part * 60; // minutes
+                        }
                         break;
                     case 'h':
-                        seconds += part * 60 * 60;
+                        seconds += part * 60 * 60; // hours
                         break;
                     case 'd':
-                        seconds += part * 60 * 60 * 24;
+                        seconds += part * 60 * 60 * 24; // days
                         break;
                     case 'w':
-                        seconds += part * 60 * 60 * 24 * 7;
+                        seconds += part * 60 * 60 * 24 * 7; // weeks
                         break;
                     default:
                         if (part > 0) {
