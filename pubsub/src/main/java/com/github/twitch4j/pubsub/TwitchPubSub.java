@@ -105,9 +105,9 @@ import com.github.twitch4j.pubsub.events.LowTrustUserNewMessageEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserTreatmentUpdateEvent;
 import com.github.twitch4j.pubsub.events.ModUnbanRequestActionEvent;
 import com.github.twitch4j.pubsub.events.OnsiteNotificationCreationEvent;
-import com.github.twitch4j.pubsub.events.PinnedChatCreateEvent;
-import com.github.twitch4j.pubsub.events.PinnedChatDeleteEvent;
-import com.github.twitch4j.pubsub.events.PinnedChatTimingUpdateEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatCreatedEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatDeletedEvent;
+import com.github.twitch4j.pubsub.events.PinnedChatTimingUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PointsEarnedEvent;
 import com.github.twitch4j.pubsub.events.PointsSpentEvent;
 import com.github.twitch4j.pubsub.events.PollsEvent;
@@ -756,19 +756,16 @@ public class TwitchPubSub implements ITwitchPubSub {
                     switch (type) {
                         case "pin-message":
                             PinnedChatData createdPin = TypeConvert.convertValue(msgData, PinnedChatData.class);
-                            eventManager.publish(new PinnedChatCreateEvent(lastTopicIdentifier, createdPin));
+                            eventManager.publish(new PinnedChatCreatedEvent(lastTopicIdentifier, createdPin));
                             break;
-
                         case "update-message":
                             UpdatedPinnedChatTiming updatedPin = TypeConvert.convertValue(msgData, UpdatedPinnedChatTiming.class);
-                            eventManager.publish(new PinnedChatTimingUpdateEvent(lastTopicIdentifier, updatedPin));
+                            eventManager.publish(new PinnedChatTimingUpdatedEvent(lastTopicIdentifier, updatedPin));
                             break;
-
                         case "unpin-message":
                             DeletePinnedChatData deletePin = TypeConvert.convertValue(msgData, DeletePinnedChatData.class);
-                            eventManager.publish(new PinnedChatDeleteEvent(lastTopicIdentifier, deletePin));
+                            eventManager.publish(new PinnedChatDeletedEvent(lastTopicIdentifier, deletePin));
                             break;
-
                         default:
                             log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                             break;
