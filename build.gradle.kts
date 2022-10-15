@@ -36,7 +36,7 @@ allprojects {
 					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/11.10",
 					"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 					"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.13.4",
+					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.13.4.2",
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.13.4",
 					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.13.4",
 					"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
@@ -108,7 +108,7 @@ subprojects {
 					version {
 						strictly("[2.12,3-alpha[")
 						// renovate: depName=com.fasterxml.jackson:jackson-bom
-						prefer("2.13.4")
+						prefer("2.13.4.20221013")
 					}
 				}
 			}
@@ -128,7 +128,7 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.13.4"))
+		api(platform("com.fasterxml.jackson:j2.13.4.20221013:2.13.4"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.9.1"))
