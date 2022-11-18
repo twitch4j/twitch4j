@@ -129,7 +129,8 @@ public class HypeTrainEvent {
 
         public enum Type {
             BITS,
-            SUBS
+            SUBS,
+            OTHER
         }
     }
 }
