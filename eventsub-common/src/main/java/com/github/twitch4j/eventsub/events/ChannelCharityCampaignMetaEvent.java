@@ -1,7 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.DonationAmount;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -9,16 +8,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
+public abstract class ChannelCharityCampaignMetaEvent extends EventSubChannelEvent {
 
     /**
-     * An ID that uniquely identifies the charity campaign.
+     * An ID that identifies the charity campaign.
      */
     @JsonAlias("id")
     private String campaignId;
@@ -26,17 +26,25 @@ public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
     /**
      * The charity’s name.
      */
+    @Nullable // currently not on end, but staff said it should be present
     private String charityName;
 
     /**
      * A URL to an image of the charity’s logo.
+     * <p>
+     * The image’s type is PNG and its size is 100px X 100px.
      */
+    @Nullable // currently not on end, but staff said it should be present
     private String charityLogo;
 
     /**
-     * An object that contains the amount of the user’s donation.
+     * An object that contains the current amount of donations that the campaign has received.
      */
-    @JsonAlias("target_amount") // https://github.com/twitchdev/issues/issues/642
-    private DonationAmount amount;
+    private DonationAmount currentAmount;
+
+    /**
+     * An object that contains the campaign’s target fundraising goal.
+     */
+    private DonationAmount targetAmount;
 
 }

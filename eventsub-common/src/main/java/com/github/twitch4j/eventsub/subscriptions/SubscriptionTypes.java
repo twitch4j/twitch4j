@@ -15,6 +15,9 @@ public class SubscriptionTypes {
 
     public final ChannelBanType CHANNEL_BAN;
     @Unofficial public final BetaChannelCharityDonateType BETA_CHANNEL_CHARITY_DONATE;
+    @Unofficial public final BetaCharityCampaignStartType BETA_CHANNEL_CHARITY_START;
+    @Unofficial public final BetaCharityCampaignProgressType BETA_CHANNEL_CHARITY_PROGRESS;
+    @Unofficial public final BetaCharityCampaignStopType BETA_CHANNEL_CHARITY_STOP;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
@@ -61,6 +64,9 @@ public class SubscriptionTypes {
             Stream.of(
                 CHANNEL_BAN = new ChannelBanType(),
                 BETA_CHANNEL_CHARITY_DONATE = new BetaChannelCharityDonateType(),
+                BETA_CHANNEL_CHARITY_START = new BetaCharityCampaignStartType(),
+                BETA_CHANNEL_CHARITY_PROGRESS = new BetaCharityCampaignProgressType(),
+                BETA_CHANNEL_CHARITY_STOP = new BetaCharityCampaignStopType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
