@@ -34,6 +34,16 @@ public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
     private String charityLogo;
 
     /**
+     * A description of the charity.
+     */
+    private String charityDescription;
+
+    /**
+     * A URL to the charity’s website.
+     */
+    private String charityWebsite;
+
+    /**
      * An object that contains the amount of the user’s donation.
      */
     @JsonAlias("target_amount") // https://github.com/twitchdev/issues/issues/642

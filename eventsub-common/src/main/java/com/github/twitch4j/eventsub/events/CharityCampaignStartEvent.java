@@ -17,16 +17,6 @@ import java.time.Instant;
 public class CharityCampaignStartEvent extends ChannelCharityCampaignMetaEvent {
 
     /**
-     * A description of the charity.
-     */
-    private String charityDescription;
-
-    /**
-     * A URL to the charity’s website.
-     */
-    private String charityWebsite;
-
-    /**
      * The UTC timestamp (in RFC3339 format) of when the broadcaster started the campaign.
      */
     private Instant startedAt;

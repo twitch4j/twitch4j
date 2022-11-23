@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -26,7 +25,6 @@ public abstract class ChannelCharityCampaignMetaEvent extends EventSubChannelEve
     /**
      * The charity’s name.
      */
-    @Nullable // currently not on end, but staff said it should be present
     private String charityName;
 
     /**
@@ -34,8 +32,17 @@ public abstract class ChannelCharityCampaignMetaEvent extends EventSubChannelEve
      * <p>
      * The image’s type is PNG and its size is 100px X 100px.
      */
-    @Nullable // currently not on end, but staff said it should be present
     private String charityLogo;
+
+    /**
+     * A description of the charity.
+     */
+    private String charityDescription;
+
+    /**
+     * A URL to the charity’s website.
+     */
+    private String charityWebsite;
 
     /**
      * An object that contains the current amount of donations that the campaign has received.
