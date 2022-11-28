@@ -1270,21 +1270,42 @@ public interface TwitchHelix {
     );
 
     /**
-     * Gets game information by game ID or name.
-     * Using user-token or app-token to increase rate limits.
+     * Gets game information by game ID or game name or IGBD ID.
+     * <p>
+     * If specifying a combination of IDs, names, or IGDB IDs,
+     * the total count (across types) must not exceed 100.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
-     * @param id Game ID. At most 100 id values can be specified.
-     * @param name Game name. The name must be an exact match. For instance, â€œPokemonâ€� will not return a list of Pokemon games; instead, query the specific Pokemon game(s) in which you are interested. At most 100 name values can be specified.
+     * @param authToken User or App access token
+     * @param id        Game ID. At most 100 id values can be specified.
+     * @param name      Game name. The name must be an exact match. At most 100 name values can be specified.
+     * @param igdbId    The IGDB ID of the game to get. Maximum: 100.
      * @return GameList
      */
-    @RequestLine("GET /games?id={id}&name={name}")
+    @RequestLine("GET /games?id={id}&name={name}&igdb_id={igdb_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<GameList> getGames(
         @Param("token") String authToken,
         @Param("id") List<String> id,
-        @Param("name") List<String> name
+        @Param("name") List<String> name,
+        @Param("igdb_id") List<String> igdbId
     );
+
+    /**
+     * Gets game information by game ID or game name.
+     * <p>
+     * If specifying a combination of IDs and, names,
+     * the total count (across types) must not exceed 100.
+     *
+     * @param authToken User or App access token
+     * @param id        Game ID. At most 100 id values can be specified.
+     * @param name      Game name. The name must be an exact match. At most 100 name values can be specified.
+     * @return GameList
+     * @deprecated in favor of {@link #getGames(String, List, List, List)}; can simply pass null for the new fourth argument
+     */
+    @Deprecated
+    default HystrixCommand<GameList> getGames(String authToken, List<String> id, List<String> name) {
+        return getGames(authToken, id, name, null);
+    }
 
     /**
      * Gets the broadcaster’s list of active goals.

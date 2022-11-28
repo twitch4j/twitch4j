@@ -23,7 +23,7 @@ public class GamesServiceTest extends AbstractEndpointTest {
     @DisplayName("Get Games")
     public void getGames() {
         // TestCase
-        GameList resultList = testUtils.getTwitchHelixClient().getGames(null, Arrays.asList(overwatchGameId), null).execute();
+        GameList resultList = testUtils.getTwitchHelixClient().getGames(null, Arrays.asList(overwatchGameId), null, null).execute();
 
         // Test
         assertTrue(resultList.getGames().size() > 0, "Should at least find one result from the streams method!");
