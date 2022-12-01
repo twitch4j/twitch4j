@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.Map;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +36,7 @@ public class EventSubSubscription {
     /**
      * Status of the subscription.
      */
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated })
     private EventSubSubscriptionStatus status;
 
     /**

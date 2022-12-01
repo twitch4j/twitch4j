@@ -641,7 +641,7 @@ public interface TwitchHelix {
     /**
      * Creates an EventSub subscription.
      *
-     * @param authToken    Required: App access token.
+     * @param authToken    Required: App access token for Webhooks, User access token for Websockets.
      * @param subscription Required: The subscription that is being created. Must include type, version, condition, and transport.
      * @return EventSubSubscriptionList
      */

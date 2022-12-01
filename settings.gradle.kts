@@ -6,6 +6,7 @@ include(
 	":client-websocket",
 	":chat",
 	":eventsub-common",
+	":eventsub-websocket",
 	":rest-extensions",
 	":rest-helix",
 	":rest-kraken",
@@ -22,6 +23,7 @@ project(":client-websocket").name = "twitch4j-client-websocket"
 project(":auth").name = "twitch4j-auth"
 project(":chat").name = "twitch4j-chat"
 project(":eventsub-common").name = "twitch4j-eventsub-common"
+project(":eventsub-websocket").name = "twitch4j-eventsub-websocket"
 project(":rest-extensions").name = "twitch4j-extensions"
 project(":rest-helix").name = "twitch4j-helix"
 project(":rest-kraken").name = "twitch4j-kraken"

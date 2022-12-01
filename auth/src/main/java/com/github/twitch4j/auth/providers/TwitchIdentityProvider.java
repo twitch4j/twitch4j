@@ -20,6 +20,8 @@ import java.util.Optional;
 @Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
+    public static final String PROVIDER_NAME = "twitch";
+
     /**
      * Constructor
      *
@@ -28,7 +30,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @param redirectUrl  Redirect Url
      */
     public TwitchIdentityProvider(String clientId, String clientSecret, String redirectUrl) {
-        super("twitch", "oauth2", clientId, clientSecret, "https://id.twitch.tv/oauth2/authorize", "https://id.twitch.tv/oauth2/token", redirectUrl);
+        super(PROVIDER_NAME, "oauth2", clientId, clientSecret, "https://id.twitch.tv/oauth2/authorize", "https://id.twitch.tv/oauth2/token", redirectUrl);
 
         // configuration
         this.tokenEndpointPostType = "QUERY";

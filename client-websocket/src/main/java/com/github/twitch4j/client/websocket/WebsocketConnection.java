@@ -124,6 +124,11 @@ public class WebsocketConnection implements AutoCloseable {
             }
 
             @Override
+            public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) {
+                config.onCloseFrame().accept(frame.getPayloadText());
+            }
+
+            @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
                 if (connectionState.get() != WebsocketConnectionState.DISCONNECTING) {
                     closeSocket(); // avoid possible resource leak
