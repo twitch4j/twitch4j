@@ -10,7 +10,6 @@ import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
-import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -29,22 +28,20 @@ import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiPredicate;
 
 @Slf4j
 public final class TwitchEventSocket implements IEventSubSocket {
@@ -60,9 +57,6 @@ public final class TwitchEventSocket implements IEventSubSocket {
      * The WebSocket Server
      */
     public static final String WEB_SOCKET_SERVER = "wss://eventsub-beta.wss.twitch.tv/ws";
-
-    static final BiPredicate<EventSubSubscription, EventSubSubscription> EQUALS = (a, b) -> (a.getId() != null && a.getId().equals(b.getId())) ||
-        StringUtils.equals(a.getRawType(), b.getRawType()) && StringUtils.equals(a.getRawVersion(), b.getRawVersion()) && Objects.equals(a.getCondition(), b.getCondition());
 
     /**
      * Helix API instance
@@ -106,7 +100,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     private final AtomicReference<WebsocketConnection> expiringConnection = new AtomicReference<>();
 
     @NotNull
-    private final BlockingQueue<EventSubSubscription> subscriptions = new LinkedBlockingQueue<>();
+    private final Set<SubscriptionWrapper> subscriptions = ConcurrentHashMap.newKeySet(MAX_SUBSCRIPTIONS_PER_SOCKET);
 
     @NotNull
     private final String baseUrl;
@@ -119,7 +113,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     @Nullable
     private volatile String websocketId = null;
 
-    private final Cache<Pair<Pair<String, String>, EventSubCondition>, OAuth2Credential> tokenByTopic;
+    private final Cache<SubscriptionWrapper, OAuth2Credential> tokenByTopic;
 
     @Builder
     TwitchEventSocket(@Nullable String baseUrl, @Nullable String url, @Nullable String clientId, @Nullable String clientSecret, @Nullable EventManager eventManager, @Nullable ScheduledExecutorService taskExecutor,
@@ -214,10 +208,9 @@ public final class TwitchEventSocket implements IEventSubSocket {
             expiring.close();
 
         // explicitly delete the attached subscriptions
-        List<EventSubSubscription> subs = new ArrayList<>(subscriptions.size());
-        subscriptions.drainTo(subs);
-        executor.execute(() -> {
-            subs.forEach(sub -> {
+        Collection<Future<?>> futures = new LinkedBlockingQueue<>();
+        subscriptions.removeIf(sub -> futures.add(
+            executor.submit(() -> {
                 if (StringUtils.isNotBlank(sub.getId())) {
                     try {
                         api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
@@ -225,19 +218,26 @@ public final class TwitchEventSocket implements IEventSubSocket {
                         log.debug("Failed to delete event socket subscription on close: " + sub, e);
                     }
                 }
-            });
+            })
+        ));
 
-            tokenByTopic.clear();
-        });
+        // wait for delete calls to complete
+        for (Future<?> future : futures) {
+            future.get();
+        }
+
+        tokenByTopic.clear();
+        futures.clear();
     }
 
     @Override
     @Synchronized
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
-        if (subscriptions.stream().anyMatch(s -> EQUALS.test(s, sub)))
+        SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
+        if (subscriptions.contains(wrapped))
             return false; // avoid duplicates
 
-        tokenByTopic.putIfAbsent(deriveKey(sub), token);
+        tokenByTopic.putIfAbsent(wrapped, token);
 
         final boolean alreadyEnabled = StringUtils.isNotBlank(sub.getId())
             && sub.getStatus() == EventSubSubscriptionStatus.ENABLED
@@ -245,14 +245,14 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
         if (alreadyEnabled) {
             // user already manually called helix; add to our registry
-            return subscriptions.offer(sub);
+            return subscriptions.add(wrapped);
         } else {
             if (this.websocketId != null && getConnection().getConnectionState() == WebsocketConnectionState.CONNECTED) {
                 // already connected => can immediately call helix to register
                 return createSub(token, sub, augmentSub(sub, websocketId));
             } else {
                 // we're not connected yet, defer until later
-                return subscriptions.offer(sub);
+                return subscriptions.add(wrapped);
             }
         }
     }
@@ -276,7 +276,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     @Override
     public Collection<EventSubSubscription> getSubscriptions() {
-        return Collections.unmodifiableCollection(this.subscriptions);
+        return Collections.unmodifiableSet(this.subscriptions);
     }
 
     public WebsocketConnectionState getState() {
@@ -286,17 +286,17 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     @Synchronized
     private boolean unsubscribeNoHelix(EventSubSubscription remove) {
-        return subscriptions.removeIf(sub -> EQUALS.test(sub, remove));
+        return subscriptions.remove(SubscriptionWrapper.wrap(remove));
     }
 
     private void onInitialConnection(final String websocketId) {
-        final List<EventSubSubscription> oldSubs = new ArrayList<>(subscriptions.size());
-        subscriptions.drainTo(oldSubs);
+        final Collection<EventSubSubscription> oldSubs = new LinkedBlockingQueue<>();
+        subscriptions.removeIf(oldSubs::add);
 
         for (final EventSubSubscription old : oldSubs) {
             if (StringUtils.equals(old.getTransport().getSessionId(), websocketId)) {
                 // this branch shouldn't be hit, but is a performance optimization to avoid helix
-                subscriptions.add(old);
+                subscriptions.add(SubscriptionWrapper.wrap(old));
             } else {
                 executor.execute(() -> {
                     final OAuth2Credential credential = getAssociatedCredential(old);
@@ -436,21 +436,26 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     private boolean createSub(OAuth2Credential token, EventSubSubscription oldSub, EventSubSubscription newSub) {
         try {
-            EventSubSubscription sub = api.createEventSubSubscription(getAuthToken(token), newSub).execute().getSubscriptions().get(0);
-            subscriptions.add(Objects.requireNonNull(sub));
+            SubscriptionWrapper sub = SubscriptionWrapper.wrap(
+                api.createEventSubSubscription(getAuthToken(token), newSub)
+                    .execute()
+                    .getSubscriptions()
+                    .get(0)
+            );
+            subscriptions.add(sub);
             log.debug("EventSub-WS successfully created subscription {}", sub);
-            tokenByTopic.put(deriveKey(sub), token);
+            tokenByTopic.put(sub, token);
             return true;
         } catch (Exception e) {
             log.error("Failed to create EventSub-WS subscription {}", newSub, e);
             // try again on next reconnect
-            subscriptions.offer(
+            subscriptions.add(SubscriptionWrapper.wrap(
                 oldSub.toBuilder()
                     .status(null)
                     .createdAt(null)
                     .transport(oldSub.getTransport().withSessionId(null))
                     .build()
-            );
+            ));
             return false;
         }
     }
@@ -489,7 +494,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     private OAuth2Credential getAssociatedCredential(EventSubSubscription sub) {
-        OAuth2Credential associated = tokenByTopic.get(deriveKey(sub));
+        OAuth2Credential associated = tokenByTopic.get(SubscriptionWrapper.wrap(sub));
         return associated != null ? associated : defaultToken;
     }
 
@@ -499,10 +504,6 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     static String getAuthToken(OAuth2Credential token) {
         return token != null ? token.getAccessToken() : null;
-    }
-
-    private static Pair<Pair<String, String>, EventSubCondition> deriveKey(@NotNull EventSubSubscription sub) {
-        return Pair.of(Pair.of(sub.getRawType(), sub.getRawVersion()), sub.getCondition());
     }
 
     private static EventSubSubscription augmentSub(EventSubSubscription old, String newWebSocketId) {

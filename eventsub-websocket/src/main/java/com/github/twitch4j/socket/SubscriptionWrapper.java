@@ -25,6 +25,7 @@ class SubscriptionWrapper extends EventSubSubscription {
     }
 
     static SubscriptionWrapper wrap(EventSubSubscription sub) {
+        if (sub == null) return null;
         if (sub instanceof SubscriptionWrapper) return (SubscriptionWrapper) sub;
         return new SubscriptionWrapper(sub);
     }

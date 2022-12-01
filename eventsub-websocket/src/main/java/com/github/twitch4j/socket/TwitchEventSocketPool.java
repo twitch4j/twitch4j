@@ -52,7 +52,7 @@ public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<Twit
     @Builder.Default
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
-    private final Cache<EventSubSubscription, OAuth2Credential> credentials = CacheApi.create(spec -> {
+    private final Cache<SubscriptionWrapper, OAuth2Credential> credentials = CacheApi.create(spec -> {
         spec.maxSize(4096L);
         spec.expiryType(ExpiryType.POST_WRITE);
         spec.expiryTime(Duration.ofMinutes(5L));
@@ -79,13 +79,14 @@ public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<Twit
 
     @Override
     protected EventSubSubscription handleSubscription(TwitchEventSocket twitchEventSocket, EventSubSubscription eventSubSubscription) {
-        OAuth2Credential cred = credentials.remove(eventSubSubscription);
-        boolean success = twitchEventSocket.register(cred != null ? cred : getTokenForSub(eventSubSubscription), eventSubSubscription);
+        SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(eventSubSubscription);
+        OAuth2Credential cred = credentials.remove(wrapped);
+        boolean success = twitchEventSocket.register(cred != null ? cred : getTokenForSub(wrapped), wrapped);
         if (success) {
             return twitchEventSocket.getSubscriptions().stream()
-                .filter(sub -> TwitchEventSocket.EQUALS.test(sub, eventSubSubscription))
+                .filter(sub -> sub.equals(wrapped))
                 .findAny()
-                .orElse(eventSubSubscription);
+                .orElse(wrapped);
         }
         return null;
     }
