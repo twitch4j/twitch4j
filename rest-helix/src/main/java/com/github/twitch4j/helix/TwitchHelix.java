@@ -1812,6 +1812,46 @@ public interface TwitchHelix {
     }
 
     /**
+     * Gets the broadcaster’s Shield Mode activation status.
+     *
+     * @param authToken     User access token that includes the moderator:read:shield_mode or moderator:manage:shield_mode scope.
+     * @param broadcasterId The ID of the broadcaster whose Shield Mode activation status you want to get.
+     * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @return ShieldModeStatusWrapper
+     */
+    @Unofficial
+    @RequestLine("GET /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ShieldModeStatusWrapper> getShieldModeStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Activates or deactivates the broadcaster’s Shield Mode.
+     *
+     * @param authToken     User access token that includes the moderator:manage:shield_mode scope.
+     * @param broadcasterId The ID of the broadcaster whose Shield Mode you want to activate or deactivate.
+     * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @param active        A Boolean value that determines whether to activate Shield Mode.
+     * @return ShieldModeStatusWrapper
+     */
+    @Unofficial
+    @RequestLine("PUT /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"data\":%7B\"is_active\":{is_active}%7D%7D")
+    HystrixCommand<ShieldModeStatusWrapper> updateShieldModeStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("is_active") boolean active
+    );
+
+    /**
      * Get information about all polls or specific polls for a Twitch channel.
      * <p>
      * Poll information is available for 90 days.
