@@ -245,7 +245,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
             sub.setTransport(EventSubTransport.builder().method(EventSubTransportMethod.WEBSOCKET).build());
         }
 
-        tokenByTopic.putIfAbsent(wrapped, token);
+        if (token != null)
+            tokenByTopic.putIfAbsent(wrapped, token);
 
         final boolean alreadyEnabled = StringUtils.isNotBlank(sub.getId())
             && sub.getStatus() == EventSubSubscriptionStatus.ENABLED
@@ -452,7 +453,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             );
             subscriptions.put(sub, sub);
             log.debug("EventSub-WS successfully created subscription {}", sub);
-            tokenByTopic.put(sub, token);
+            if (token != null) tokenByTopic.put(sub, token);
             return true;
         } catch (Exception e) {
             log.error("Failed to create EventSub-WS subscription {}", newSub, e);
