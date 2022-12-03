@@ -61,6 +61,7 @@ public class EventSubSubscription {
      * Object indicating the notification delivery specific information.
      */
     @With
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated })
     private EventSubTransport transport;
 
     /**

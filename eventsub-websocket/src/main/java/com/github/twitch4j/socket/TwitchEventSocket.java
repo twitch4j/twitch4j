@@ -10,6 +10,8 @@ import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
+import com.github.twitch4j.eventsub.EventSubTransport;
+import com.github.twitch4j.eventsub.EventSubTransportMethod;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -236,6 +238,12 @@ public final class TwitchEventSocket implements IEventSubSocket {
         SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
         if (subscriptions.containsKey(wrapped))
             return false; // avoid duplicates
+
+        // ensure transport is not null
+        if (sub.getTransport() == null || sub.getTransport().getMethod() != EventSubTransportMethod.WEBSOCKET) {
+            // noinspection deprecation
+            sub.setTransport(EventSubTransport.builder().method(EventSubTransportMethod.WEBSOCKET).build());
+        }
 
         tokenByTopic.putIfAbsent(wrapped, token);
 
