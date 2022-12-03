@@ -2,6 +2,7 @@ package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
@@ -26,6 +27,7 @@ import java.util.Map;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventSubSubscription {
 
     /**
