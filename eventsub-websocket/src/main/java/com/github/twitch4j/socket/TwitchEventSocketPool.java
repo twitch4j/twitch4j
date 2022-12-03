@@ -98,7 +98,7 @@ public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<Twit
 
     @Override
     protected Boolean handleUnsubscription(TwitchEventSocket twitchEventSocket, EventSubSubscription eventSubSubscription) {
-        return twitchEventSocket.unregister(eventSubSubscription);
+        return twitchEventSocket != null && twitchEventSocket.unregister(eventSubSubscription);
     }
 
     @Override
