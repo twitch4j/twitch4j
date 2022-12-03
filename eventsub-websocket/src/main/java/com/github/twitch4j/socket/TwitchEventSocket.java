@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -100,7 +100,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     private final AtomicReference<WebsocketConnection> expiringConnection = new AtomicReference<>();
 
     @NotNull
-    private final Set<SubscriptionWrapper> subscriptions = ConcurrentHashMap.newKeySet(MAX_SUBSCRIPTIONS_PER_SOCKET);
+    private final Map<SubscriptionWrapper, EventSubSubscription> subscriptions = new ConcurrentHashMap<>();
 
     @NotNull
     private final String baseUrl;
@@ -209,7 +209,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
         // explicitly delete the attached subscriptions
         Collection<Future<?>> futures = new LinkedBlockingQueue<>();
-        subscriptions.removeIf(sub -> futures.add(
+        subscriptions.keySet().removeIf(sub -> futures.add(
             executor.submit(() -> {
                 if (StringUtils.isNotBlank(sub.getId())) {
                     try {
@@ -234,7 +234,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     @Synchronized
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
         SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
-        if (subscriptions.contains(wrapped))
+        if (subscriptions.containsKey(wrapped))
             return false; // avoid duplicates
 
         tokenByTopic.putIfAbsent(wrapped, token);
@@ -245,21 +245,22 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
         if (alreadyEnabled) {
             // user already manually called helix; add to our registry
-            return subscriptions.add(wrapped);
+            return subscriptions.putIfAbsent(wrapped, wrapped) == null;
         } else {
             if (this.websocketId != null && getConnection().getConnectionState() == WebsocketConnectionState.CONNECTED) {
                 // already connected => can immediately call helix to register
                 return createSub(token, sub, augmentSub(sub, websocketId));
             } else {
                 // we're not connected yet, defer until later
-                return subscriptions.add(wrapped);
+                return subscriptions.putIfAbsent(wrapped, wrapped) == null;
             }
         }
     }
 
     @Override
-    public boolean unregister(EventSubSubscription sub) {
-        if (unsubscribeNoHelix(sub)) {
+    public boolean unregister(EventSubSubscription subscription) {
+        EventSubSubscription sub = unsubscribeNoHelix(subscription);
+        if (sub != null) {
             if (StringUtils.isNotBlank(sub.getId())) {
                 executor.execute(() -> {
                     try {
@@ -276,7 +277,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     @Override
     public Collection<EventSubSubscription> getSubscriptions() {
-        return Collections.unmodifiableSet(this.subscriptions);
+        return Collections.unmodifiableSet(this.subscriptions.keySet());
     }
 
     public WebsocketConnectionState getState() {
@@ -284,19 +285,18 @@ public final class TwitchEventSocket implements IEventSubSocket {
         return ws != null ? ws.getConnectionState() : WebsocketConnectionState.DISCONNECTED;
     }
 
-    @Synchronized
-    private boolean unsubscribeNoHelix(EventSubSubscription remove) {
+    private EventSubSubscription unsubscribeNoHelix(EventSubSubscription remove) {
         return subscriptions.remove(SubscriptionWrapper.wrap(remove));
     }
 
     private void onInitialConnection(final String websocketId) {
         final Collection<EventSubSubscription> oldSubs = new LinkedBlockingQueue<>();
-        subscriptions.removeIf(oldSubs::add);
+        subscriptions.keySet().removeIf(oldSubs::add);
 
         for (final EventSubSubscription old : oldSubs) {
             if (StringUtils.equals(old.getTransport().getSessionId(), websocketId)) {
                 // this branch shouldn't be hit, but is a performance optimization to avoid helix
-                subscriptions.add(SubscriptionWrapper.wrap(old));
+                subscriptions.putIfAbsent(SubscriptionWrapper.wrap(old), old);
             } else {
                 executor.execute(() -> {
                     final OAuth2Credential credential = getAssociatedCredential(old);
@@ -365,7 +365,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     this.onInitialConnection(socket.getId());
                 } else {
                     // noinspection deprecation
-                    subscriptions.forEach(sub -> sub.getTransport().setSessionId(websocketId));
+                    subscriptions.values().forEach(sub -> sub.getTransport().setSessionId(websocketId));
                 }
 
                 // For reconnects, we can close the old connection now
@@ -419,7 +419,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
             case REVOCATION:
                 final EventSubSubscription revoked = payload.getSubscription();
-                if (unsubscribeNoHelix(revoked)) {
+                if (unsubscribeNoHelix(revoked) != null) {
                     log.debug("Removed revoked EventSub-WS subscription {}", revoked);
 
                     try {
@@ -442,20 +442,21 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     .getSubscriptions()
                     .get(0)
             );
-            subscriptions.add(sub);
+            subscriptions.put(sub, sub);
             log.debug("EventSub-WS successfully created subscription {}", sub);
             tokenByTopic.put(sub, token);
             return true;
         } catch (Exception e) {
             log.error("Failed to create EventSub-WS subscription {}", newSub, e);
             // try again on next reconnect
-            subscriptions.add(SubscriptionWrapper.wrap(
+            SubscriptionWrapper later = SubscriptionWrapper.wrap(
                 oldSub.toBuilder()
                     .status(null)
                     .createdAt(null)
                     .transport(oldSub.getTransport().withSessionId(null))
                     .build()
-            ));
+            );
+            subscriptions.putIfAbsent(later, later);
             return false;
         }
     }
@@ -474,7 +475,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     this.websocketId = null;
 
                     // noinspection deprecation
-                    subscriptions.forEach(sub -> sub.setStatus(EventSubSubscriptionStatus.WEBSOCKET_NETWORK_TIMEOUT));
+                    subscriptions.values().forEach(sub -> sub.setStatus(EventSubSubscriptionStatus.WEBSOCKET_NETWORK_TIMEOUT));
                 }
             });
             spec.onCloseFrame(data -> {
