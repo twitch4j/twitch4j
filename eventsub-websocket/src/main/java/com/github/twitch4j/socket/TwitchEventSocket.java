@@ -273,7 +273,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             if (StringUtils.isNotBlank(sub.getId())) {
                 executor.execute(() -> {
                     try {
-                        api.deleteEventSubSubscription(getAuthToken(defaultToken), sub.getId()).execute();
+                        api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
                     } catch (Exception e) {
                         log.warn("Failed to delete EventSub-WS subscription via Twitch API {}", sub, e);
                     }
