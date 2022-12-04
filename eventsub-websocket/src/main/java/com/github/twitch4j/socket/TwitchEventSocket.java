@@ -230,6 +230,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
         tokenByTopic.clear();
         futures.clear();
+        subscriptions.clear();
     }
 
     @Override
@@ -443,7 +444,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
         }
     }
 
-    private boolean createSub(OAuth2Credential token, EventSubSubscription oldSub, EventSubSubscription newSub) {
+    private boolean createSub(OAuth2Credential credential, EventSubSubscription oldSub, EventSubSubscription newSub) {
+        OAuth2Credential token = credential != null ? credential : defaultToken;
         try {
             SubscriptionWrapper sub = SubscriptionWrapper.wrap(
                 api.createEventSubSubscription(getAuthToken(token), newSub)
