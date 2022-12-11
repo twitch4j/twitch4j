@@ -40,6 +40,11 @@ public enum EventSubSubscriptionStatus {
     WEBSOCKET_CONNECTION_UNUSED,
 
     /**
+     * The client closed the connection.
+     */
+    WEBSOCKET_DISCONNECTED,
+
+    /**
      * You must respond to ping messages with a pong message.
      */
     WEBSOCKET_FAILED_PING_PONG,
