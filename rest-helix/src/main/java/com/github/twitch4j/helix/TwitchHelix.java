@@ -1843,7 +1843,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"is_active\":{is_active}%7D") // https://github.com/twitchdev/issues/issues/698
+    @Body("%7B\"is_active\":{is_active}%7D")
     HystrixCommand<ShieldModeStatusWrapper> updateShieldModeStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
