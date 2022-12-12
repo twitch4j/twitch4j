@@ -758,6 +758,10 @@ public class TwitchPubSub implements ITwitchPubSub {
                             eventManager.publish(new ShieldModeSettingsUpdateEvent(userId, channelId, shieldModeSettings));
                             break;
 
+                        case "UPDATE_CHANNEL_MODERATION_MODE_SHORTCUT":
+                            // do nothing; is_shortcut_enabled is unimportant
+                            break;
+
                         default:
                             log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                             break;
