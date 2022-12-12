@@ -16,6 +16,8 @@ import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.AliasRestrictionUpdateData;
 import com.github.twitch4j.pubsub.domain.AutomodCaughtMessageData;
 import com.github.twitch4j.pubsub.domain.AutomodLevelsModified;
+import com.github.twitch4j.pubsub.domain.BannedTermAdded;
+import com.github.twitch4j.pubsub.domain.BannedTermRemoved;
 import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.domain.ChannelBitsData;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
@@ -57,6 +59,8 @@ import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.domain.RadioData;
 import com.github.twitch4j.pubsub.domain.RedemptionProgress;
+import com.github.twitch4j.pubsub.domain.ShieldModeSettings;
+import com.github.twitch4j.pubsub.domain.ShieldModeStatus;
 import com.github.twitch4j.pubsub.domain.SubGiftData;
 import com.github.twitch4j.pubsub.domain.SubscriptionData;
 import com.github.twitch4j.pubsub.domain.SupportActivityFeedData;
@@ -123,6 +127,10 @@ import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeBanTermAddedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeBanTermRemovedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeSettingsUpdateEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.ShoutoutCreatedEvent;
 import com.github.twitch4j.pubsub.events.SubLeaderboardEvent;
 import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
@@ -726,6 +734,34 @@ public class TwitchPubSub implements ITwitchPubSub {
                     }
                 } else if ("radio-events-v1".equals(topicName)) {
                     eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
+                } else if ("shield-mode".equals(topicName) && topicParts.length == 3) {
+                    String userId = topicParts[1];
+                    String channelId = topicParts[2];
+                    switch (type) {
+                        case "ADD_AUTOBAN_TERM":
+                            BannedTermAdded termAdded = TypeConvert.convertValue(msgData, BannedTermAdded.class);
+                            eventManager.publish(new ShieldModeBanTermAddedEvent(userId, channelId, termAdded));
+                            break;
+
+                        case "REMOVE_AUTOBAN_TERM":
+                            BannedTermRemoved termRemoved = TypeConvert.convertValue(msgData, BannedTermRemoved.class);
+                            eventManager.publish(new ShieldModeBanTermRemovedEvent(userId, channelId, termRemoved));
+                            break;
+
+                        case "UPDATE_CHANNEL_MODERATION_MODE":
+                            ShieldModeStatus shieldModeStatus = TypeConvert.convertValue(msgData, ShieldModeStatus.class);
+                            eventManager.publish(new ShieldModeStatusUpdateEvent(userId, channelId, shieldModeStatus));
+                            break;
+
+                        case "UPDATE_CHANNEL_MODERATION_SETTINGS":
+                            ShieldModeSettings shieldModeSettings = TypeConvert.convertValue(msgData, ShieldModeSettings.class);
+                            eventManager.publish(new ShieldModeSettingsUpdateEvent(userId, channelId, shieldModeSettings));
+                            break;
+
+                        default:
+                            log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                            break;
+                    }
                 } else if ("shoutout".equals(topicName)) {
                     if ("create".equalsIgnoreCase(type)) {
                         CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(msgData, CreateShoutoutData.class);
