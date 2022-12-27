@@ -262,6 +262,8 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
 
     @Override
     protected TwitchChat createConnection() {
+        if (closed.get()) return null;
+
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
             TwitchChatBuilder.builder()

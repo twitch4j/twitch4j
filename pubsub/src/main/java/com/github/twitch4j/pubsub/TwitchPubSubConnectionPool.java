@@ -51,6 +51,8 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
 
     @Override
     protected TwitchPubSub createConnection() {
+        if (closed.get()) return null;
+
         // Instantiate with configuration
         TwitchPubSub client = advancedConfiguration.apply(
             TwitchPubSubBuilder.builder()

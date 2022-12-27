@@ -50,6 +50,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
 
     @Override
     protected TwitchEventSocket createConnection() {
+        if (closed.get()) return null;
         return advancedConfiguration.apply(
             TwitchEventSocket.builder()
                 .api(helix)
