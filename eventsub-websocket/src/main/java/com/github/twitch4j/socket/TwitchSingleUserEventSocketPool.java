@@ -1,13 +1,8 @@
 package com.github.twitch4j.socket;
 
-import com.github.philippheuer.credentialmanager.CredentialManager;
-import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.eventsub.EventSubSubscription;
-import com.github.twitch4j.eventsub.condition.ChannelEventSubCondition;
-import com.github.twitch4j.eventsub.condition.UserEventSubCondition;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import io.github.xanthic.cache.api.Cache;
@@ -18,7 +13,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +22,9 @@ import java.util.Collections;
 import java.util.function.Function;
 
 @SuperBuilder
-public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
+public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
-    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+    private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
 
     @Builder.Default
     public String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
@@ -48,12 +42,8 @@ public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<Twit
     @Builder.Default
     private Function<EventSubSubscription, OAuth2Credential> tokenForSubscription = x -> null;
 
-    @NotNull
-    @Builder.Default
-    private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
-
     private final Cache<SubscriptionWrapper, OAuth2Credential> credentials = CacheApi.create(spec -> {
-        spec.maxSize(4096L);
+        spec.maxSize(300L);
         spec.expiryType(ExpiryType.POST_WRITE);
         spec.expiryTime(Duration.ofMinutes(5L));
     });
@@ -147,28 +137,6 @@ public final class TwitchEventSocketPool extends TwitchModuleConnectionPool<Twit
 
     private OAuth2Credential getTokenForSub(EventSubSubscription sub) {
         OAuth2Credential token = tokenForSubscription.apply(SubscriptionWrapper.wrap(sub));
-        if (token != null)
-            return token;
-
-        String targetId;
-        if (sub.getCondition() instanceof ChannelEventSubCondition) {
-            targetId = ((ChannelEventSubCondition) sub.getCondition()).getBroadcasterUserId();
-        } else if (sub.getCondition() instanceof UserEventSubCondition) {
-            targetId = ((UserEventSubCondition) sub.getCondition()).getUserId();
-        } else {
-            targetId = null;
-        }
-
-        if (defaultToken != null && targetId == null)
-            return defaultToken;
-
-        return credentialManager.getCredentials().stream()
-            .filter(cred -> TwitchIdentityProvider.PROVIDER_NAME.equalsIgnoreCase(cred.getIdentityProvider()))
-            .filter(cred -> StringUtils.isNotEmpty(cred.getUserId()))
-            .filter(cred -> cred instanceof OAuth2Credential)
-            .map(cred -> (OAuth2Credential) cred)
-            .filter(cred -> targetId == null || cred.getUserId().equals(targetId))
-            .findAny()
-            .orElse(defaultToken);
+        return token != null ? token : defaultToken;
     }
 }

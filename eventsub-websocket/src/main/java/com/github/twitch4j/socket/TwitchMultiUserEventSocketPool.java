@@ -1,0 +1,212 @@
+package com.github.twitch4j.socket;
+
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.pool.SubscriptionConnectionPool;
+import com.github.twitch4j.eventsub.EventSubSubscription;
+import com.github.twitch4j.helix.TwitchHelix;
+import com.github.twitch4j.helix.TwitchHelixBuilder;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Synchronized;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+@Builder
+public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
+
+    private final String threadPrefix = "twitch4j-multi-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+
+    /**
+     * The default {@link EventManager} for this connection pool, if specified.
+     */
+    @Getter
+    @Builder.Default
+    private final EventManager eventManager = createEventManager();
+
+    /**
+     * The {@link ProxyConfig} to be used by connections in this pool, if specified.
+     */
+    @NotNull
+    @Builder.Default
+    private final Supplier<ProxyConfig> proxyConfig = () -> null;
+
+    /**
+     * The {@link ScheduledThreadPoolExecutor} to be used by connections in this pool, if specified.
+     */
+    @Nullable
+    private final ScheduledThreadPoolExecutor executor;
+
+    @NotNull
+    @Builder.Default
+    private final TwitchIdentityProvider identityProvider = new TwitchIdentityProvider(null, null, null);
+
+    @NotNull
+    @Builder.Default
+    public final String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
+
+    @Nullable
+    @Builder.Default
+    private TwitchHelix helix = TwitchHelixBuilder.builder().build();
+
+    @Builder.Default
+    private int maxSubscriptionsPerUser = 100 * 3; // imposed by twitch
+
+    private final Map<String, TwitchSingleUserEventSocketPool> poolByUserId = new ConcurrentHashMap<>();
+
+    private final Map<SubscriptionWrapper, TwitchSingleUserEventSocketPool> poolBySub = new ConcurrentHashMap<>();
+
+    @Override
+    public void connect() {
+        // no-op
+    }
+
+    @Override
+    public void disconnect() {
+        poolByUserId.values().forEach(IEventSubSocket::disconnect);
+    }
+
+    @Override
+    public void reconnect() {
+        poolByUserId.values().forEach(IEventSubSocket::reconnect);
+    }
+
+    @Override
+    @Synchronized
+    public boolean register(OAuth2Credential token, EventSubSubscription sub) {
+        String userId = getUserId(token);
+        if (userId == null) return false;
+
+        SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
+
+        if (poolBySub.containsKey(wrapped))
+            return false;
+
+        TwitchSingleUserEventSocketPool pool = poolByUserId.computeIfAbsent(userId,
+            id -> TwitchSingleUserEventSocketPool.builder()
+                .baseUrl(baseUrl)
+                .defaultToken(token)
+                .eventManager(eventManager)
+                .helix(helix)
+                .proxyConfig(proxyConfig)
+                .executor(() -> executor)
+                .build()
+        );
+
+        if (pool.numSubscriptions() >= maxSubscriptionsPerUser)
+            return false;
+
+        return pool.register(token, sub) && poolBySub.put(wrapped, pool) == null;
+    }
+
+    @Override
+    @Synchronized
+    public boolean unregister(EventSubSubscription sub) {
+        TwitchSingleUserEventSocketPool pool = poolBySub.get(SubscriptionWrapper.wrap(sub));
+        if (pool == null) return false;
+
+        Boolean unsubscribe = pool.unsubscribe(sub);
+
+        // cleanup if we removed the last subscription
+        if (pool.numSubscriptions() <= 0) {
+            poolByUserId.entrySet().stream()
+                .filter(e -> e.getValue() == pool)
+                .map(Map.Entry::getKey)
+                .findAny()
+                .ifPresent(userId -> {
+                    AtomicBoolean close = new AtomicBoolean();
+
+                    // noinspection resource
+                    poolByUserId.computeIfPresent(userId, (k, v) -> {
+                        if (v.numSubscriptions() <= 0) {
+                            close.set(true);
+                            return null; // remove mapping
+                        }
+                        return v;
+                    });
+
+                    if (close.get())
+                        pool.close();
+                });
+        }
+
+        return unsubscribe != null && unsubscribe;
+    }
+
+    @Override
+    public Collection<EventSubSubscription> getSubscriptions() {
+        return poolByUserId.values().stream()
+            .map(IEventSubSocket::getSubscriptions)
+            .flatMap(Collection::stream)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public void close() throws Exception {
+        poolByUserId.values().removeIf(c -> {
+            c.close();
+            return true;
+        });
+    }
+
+    @Nullable
+    @Override
+    public OAuth2Credential getDefaultToken() {
+        return poolByUserId.values().stream()
+            .filter(pool -> pool.getDefaultToken() != null)
+            .findAny()
+            .map(IEventSubSocket::getDefaultToken)
+            .orElse(null);
+    }
+
+    /**
+     * @return the number of open connections held by this pool.
+     */
+    public int numConnections() {
+        return accumulate(SubscriptionConnectionPool::numConnections);
+    }
+
+    /**
+     * @return the total number of subscriptions held by all connections.
+     */
+    public int numSubscriptions() {
+        return accumulate(SubscriptionConnectionPool::numSubscriptions);
+    }
+
+    private int accumulate(Function<@NotNull TwitchSingleUserEventSocketPool, @NotNull Integer> selector) {
+        int n = 0;
+        for (TwitchSingleUserEventSocketPool pool : poolByUserId.values()) {
+            n += selector.apply(pool);
+        }
+        return n;
+    }
+
+    private String getUserId(OAuth2Credential token) {
+        if (StringUtils.isNotEmpty(token.getUserId())) return token.getUserId();
+        identityProvider.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
+        return token.getUserId();
+    }
+
+    private static EventManager createEventManager() {
+        EventManager em = new EventManager();
+        em.autoDiscovery();
+        em.setDefaultEventHandler(SimpleEventHandler.class);
+        return em;
+    }
+}
