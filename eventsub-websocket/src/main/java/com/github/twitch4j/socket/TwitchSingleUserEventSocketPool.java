@@ -13,13 +13,12 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.function.Function;
+import java.util.Objects;
 
 @SuperBuilder
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
@@ -27,23 +26,18 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
 
     @Builder.Default
-    public String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
+    private String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
 
     @Nullable
     @Builder.Default
     private TwitchHelix helix = TwitchHelixBuilder.builder().build();
 
-    @Nullable
-    @Builder.Default
     @Getter
-    private OAuth2Credential defaultToken = null;
-
-    @NotNull
-    @Builder.Default
-    private Function<EventSubSubscription, OAuth2Credential> tokenForSubscription = x -> null;
+    @Nullable
+    private OAuth2Credential defaultToken;
 
     private final Cache<SubscriptionWrapper, OAuth2Credential> credentials = CacheApi.create(spec -> {
-        spec.maxSize(300L);
+        spec.maxSize(Runtime.getRuntime().availableProcessors() * 4L);
         spec.expiryType(ExpiryType.POST_WRITE);
         spec.expiryTime(Duration.ofMinutes(5L));
     });
@@ -72,7 +66,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     protected EventSubSubscription handleSubscription(TwitchEventSocket twitchEventSocket, EventSubSubscription eventSubSubscription) {
         SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(eventSubSubscription);
         OAuth2Credential cred = credentials.remove(wrapped);
-        boolean success = twitchEventSocket.register(cred != null ? cred : getTokenForSub(wrapped), wrapped);
+        boolean success = twitchEventSocket.register(cred != null ? cred : defaultToken, wrapped);
         if (success) {
             return twitchEventSocket.getSubscriptions().stream()
                 .filter(sub -> sub.equals(wrapped))
@@ -127,17 +121,12 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     @Override
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
         SubscriptionWrapper wrapped = new SubscriptionWrapper(sub);
-        credentials.put(wrapped, token);
+        credentials.put(wrapped, token != null ? token : Objects.requireNonNull(defaultToken));
         return subscribe(wrapped) != null;
     }
 
     @Override
     public boolean unregister(EventSubSubscription sub) {
         return this.unsubscribe(new SubscriptionWrapper(sub));
-    }
-
-    private OAuth2Credential getTokenForSub(EventSubSubscription sub) {
-        OAuth2Credential token = tokenForSubscription.apply(SubscriptionWrapper.wrap(sub));
-        return token != null ? token : defaultToken;
     }
 }

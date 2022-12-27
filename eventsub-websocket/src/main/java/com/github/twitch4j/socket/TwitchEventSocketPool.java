@@ -18,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Builder
-public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
+public final class TwitchEventSocketPool implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-multi-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
 
@@ -58,7 +60,7 @@ public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
 
     @NotNull
     @Builder.Default
-    public final String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
+    private final String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
 
     @Nullable
     @Builder.Default
@@ -88,7 +90,10 @@ public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
 
     @Override
     @Synchronized
-    public boolean register(OAuth2Credential token, EventSubSubscription sub) {
+    public boolean register(OAuth2Credential credential, EventSubSubscription sub) {
+        OAuth2Credential token = credential != null ? credential : getDefaultToken();
+        if (token == null) return false;
+
         String userId = getUserId(token);
         if (userId == null) return false;
 
@@ -158,11 +163,12 @@ public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
     }
 
     @Override
+    @Synchronized
     public void close() throws Exception {
-        poolByUserId.values().removeIf(c -> {
-            c.close();
-            return true;
-        });
+        poolBySub.clear();
+        Collection<TwitchSingleUserEventSocketPool> pools = new LinkedList<>();
+        poolByUserId.values().removeIf(pools::add);
+        pools.forEach(SubscriptionConnectionPool::close);
     }
 
     @Nullable
@@ -170,7 +176,7 @@ public final class TwitchMultiUserEventSocketPool implements IEventSubSocket {
     public OAuth2Credential getDefaultToken() {
         return poolByUserId.values().stream()
             .filter(pool -> pool.getDefaultToken() != null)
-            .findAny()
+            .min(Comparator.comparingInt(SubscriptionConnectionPool::numSubscriptions))
             .map(IEventSubSocket::getDefaultToken)
             .orElse(null);
     }
