@@ -22,7 +22,7 @@ This project provides multiple standalone modules you can use to interact with t
 
 ## Quick Start
 
-Check out the [Documentation](https://twitch4j.github.io/docs/getting-started/installation/)!
+Check out the [Documentation](https://twitch4j.github.io/getting-started/installation)!
 
 --------
 
@@ -51,7 +51,7 @@ If you discover any issues/have feature requests, then please [open an issue her
 ## Contributing
 
 We welcome contributions to the library, be it new features, bug fixes, or even small enhancements.
-Please do read the [contributing guide](https://twitch4j.github.io/docs/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
+Please do read the [contributing guide](https://twitch4j.github.io/contribution/) on the documentation site as it provides code guidelines and helpful tips for getting started.
 By contributing, you are expected to abide by our [code of conduct](https://github.com/twitch4j/.github/blob/main/CODE_OF_CONDUCT.md) and agree to the license below.
 Thank you again for your interest in improving Twitch4J!
 
