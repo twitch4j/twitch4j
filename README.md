@@ -11,7 +11,7 @@ Badges:
 
 [![Latest](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flate&label=latest)](https://search.maven.org/search?q=g:com.github.twitch4j)
 [![pipeline status](https://gitlab.com/twitch4j/twitch4j/badges/master/pipeline.svg)](https://gitlab.com/twitch4j/twitch4j/commits/master)
-[![Docs](https://img.shields.io/badge/documentation-grey.svg?style=flat)](https://twitch4j.github.io/docs/)
+[![Docs](https://img.shields.io/badge/documentation-grey.svg?style=flat)](https://twitch4j.github.io/)
 [![Docs](https://img.shields.io/badge/javadoc-brightgreen.svg?style=flat)](https://twitch4j.github.io/javadoc/)
 
 --------
