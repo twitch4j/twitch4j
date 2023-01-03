@@ -520,6 +520,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForShieldModeEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "shield-mode." + userId + '.' + channelId);
+    }
+
+    @Unofficial
     default PubSubSubscription listenForShoutoutEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "shoutout." + channelId);
     }
