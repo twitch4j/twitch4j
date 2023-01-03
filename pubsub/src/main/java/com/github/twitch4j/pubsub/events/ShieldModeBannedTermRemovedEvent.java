@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode(callSuper = false)
-public class ShieldModeBanTermRemovedEvent extends TwitchEvent {
+public class ShieldModeBannedTermRemovedEvent extends TwitchEvent {
     String userId;
     String channelId;
     BannedTermRemoved data;

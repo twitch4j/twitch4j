@@ -127,10 +127,10 @@ import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RaidUpdateEvent;
 import com.github.twitch4j.pubsub.events.RedemptionStatusUpdateEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
-import com.github.twitch4j.pubsub.events.ShieldModeBanTermAddedEvent;
-import com.github.twitch4j.pubsub.events.ShieldModeBanTermRemovedEvent;
-import com.github.twitch4j.pubsub.events.ShieldModeSettingsUpdateEvent;
-import com.github.twitch4j.pubsub.events.ShieldModeStatusUpdateEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeBannedTermAddedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeBannedTermRemovedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeSettingsUpdatedEvent;
+import com.github.twitch4j.pubsub.events.ShieldModeStatusUpdatedEvent;
 import com.github.twitch4j.pubsub.events.ShoutoutCreatedEvent;
 import com.github.twitch4j.pubsub.events.SubLeaderboardEvent;
 import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
@@ -740,22 +740,22 @@ public class TwitchPubSub implements ITwitchPubSub {
                     switch (type) {
                         case "ADD_AUTOBAN_TERM":
                             BannedTermAdded termAdded = TypeConvert.convertValue(msgData, BannedTermAdded.class);
-                            eventManager.publish(new ShieldModeBanTermAddedEvent(userId, channelId, termAdded));
+                            eventManager.publish(new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded));
                             break;
 
                         case "REMOVE_AUTOBAN_TERM":
                             BannedTermRemoved termRemoved = TypeConvert.convertValue(msgData, BannedTermRemoved.class);
-                            eventManager.publish(new ShieldModeBanTermRemovedEvent(userId, channelId, termRemoved));
+                            eventManager.publish(new ShieldModeBannedTermRemovedEvent(userId, channelId, termRemoved));
                             break;
 
                         case "UPDATE_CHANNEL_MODERATION_MODE":
                             ShieldModeStatus shieldModeStatus = TypeConvert.convertValue(msgData, ShieldModeStatus.class);
-                            eventManager.publish(new ShieldModeStatusUpdateEvent(userId, channelId, shieldModeStatus));
+                            eventManager.publish(new ShieldModeStatusUpdatedEvent(userId, channelId, shieldModeStatus));
                             break;
 
                         case "UPDATE_CHANNEL_MODERATION_SETTINGS":
                             ShieldModeSettings shieldModeSettings = TypeConvert.convertValue(msgData, ShieldModeSettings.class);
-                            eventManager.publish(new ShieldModeSettingsUpdateEvent(userId, channelId, shieldModeSettings));
+                            eventManager.publish(new ShieldModeSettingsUpdatedEvent(userId, channelId, shieldModeSettings));
                             break;
 
                         case "UPDATE_CHANNEL_MODERATION_MODE_SHORTCUT":
