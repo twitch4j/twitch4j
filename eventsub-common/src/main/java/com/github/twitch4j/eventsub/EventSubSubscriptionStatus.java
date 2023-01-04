@@ -29,7 +29,11 @@ public enum EventSubSubscriptionStatus {
     /**
      * A user in the condition of the subscription was removed.
      */
-    USER_REMOVED;
+    USER_REMOVED,
+    /**
+     * Twitch revoked your subscription because the subscribed to subscription type and version is no longer supported.
+     */
+    VERSION_REMOVED;
 
     @Override
     public String toString() {

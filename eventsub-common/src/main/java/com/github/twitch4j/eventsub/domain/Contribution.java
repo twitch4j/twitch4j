@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,10 +36,9 @@ public class Contribution {
     private Integer total;
 
     public enum Type {
-        @JsonProperty("bits")
         BITS,
-        @JsonProperty("subscription")
-        SUBSCRIPTION;
+        SUBSCRIPTION,
+        OTHER;
 
         @Override
         public String toString() {

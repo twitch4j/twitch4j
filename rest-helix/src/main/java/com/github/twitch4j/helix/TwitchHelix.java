@@ -346,6 +346,25 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the list of donations that users have made to the broadcaster’s active charity campaign.
+     *
+     * @param authToken     Broadcaster user access token with the channel:read:charity scope.
+     * @param broadcasterId The ID of the broadcaster that’s actively running a charity campaign.
+     * @param limit         The maximum number of items to return per page in the response. Minimum: 1. Maximum: 100. Default: 20.
+     * @param after         The cursor used to get the next page of results.
+     * @return CharityDonationList
+     */
+    @Unofficial // in open beta
+    @RequestLine("GET /charity/donations?broadcaster_id={broadcaster_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CharityDonationList> getCharityDonations(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
      * Sends an announcement to the broadcaster’s chat room.
      *
      * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
