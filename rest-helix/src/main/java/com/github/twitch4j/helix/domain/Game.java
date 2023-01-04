@@ -18,6 +18,11 @@ public class Game {
     /** Game ID. */
     private String id;
 
+    /**
+     * The ID that IGDB uses to identify this game, or an empty string.
+     */
+    private String igdbId;
+
     /** Game name. */
     private String name;
 

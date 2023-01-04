@@ -3,8 +3,8 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "6.5.1"
-	id("com.coditory.manifest") version "0.2.1"
+	id("io.freefair.lombok") version "6.6.1"
+	id("com.coditory.manifest") version "0.2.3"
 	id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -23,22 +23,22 @@ allprojects {
 			options {
 				this as StandardJavadocDocletOptions
 				links(
-					"https://javadoc.io/doc/org.jetbrains/annotations/23.0.0",
+					"https://javadoc.io/doc/org.jetbrains/annotations/23.1.0",
 					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 					"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.1.0",
 					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.11.0",
 					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.11.0",
 					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.4",
-					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/11.10",
-					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/11.10",
-					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/11.10",
-					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/11.10",
+					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/12.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/12.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/12.1",
+					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/12.1",
 					"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 					"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.14.0",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.14.0",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.14.0",
+					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.14.1",
+					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.14.1",
+					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.14.1",
 					"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
 					"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.12.0",
 					"https://javadoc.io/doc/org.projectlombok/lombok/1.18.24",
@@ -76,7 +76,7 @@ subprojects {
 	dependencies {
 		constraints {
 			// Annotations
-			api(group = "org.jetbrains", name = "annotations", version = "23.0.0")
+			api(group = "org.jetbrains", name = "annotations", version = "23.1.0")
 
 			// Apache Commons
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
@@ -91,10 +91,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.1.4")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "11.10")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "11.10")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "11.10")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "11.10")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "12.1")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "12.1")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "12.1")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "12.1")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -108,7 +108,7 @@ subprojects {
 					version {
 						strictly("[2.12,3-alpha[")
 						// renovate: depName=com.fasterxml.jackson:jackson-bom
-						prefer("2.14.0")
+						prefer("2.14.1")
 					}
 				}
 			}
@@ -128,17 +128,17 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.14.0"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.14.1"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.9.1"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		// - Mocking
-		testImplementation(platform("org.mockito:mockito-bom:4.9.0"))
+		testImplementation(platform("org.mockito:mockito-bom:4.11.0"))
 		// - Await
 		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.0")
 		// - Logging
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.4")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.5")
 	}
 
 	publishing {

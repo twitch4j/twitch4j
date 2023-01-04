@@ -23,6 +23,10 @@ public enum EventSubSubscriptionStatus {
      */
     AUTHORIZATION_REVOKED,
     /**
+     * The moderator that authorized the subscription is no longer one of the broadcaster’s moderators.
+     */
+    MODERATOR_REMOVED,
+    /**
      * A user in the condition of the subscription was removed.
      */
     USER_REMOVED,
