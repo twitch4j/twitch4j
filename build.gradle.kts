@@ -59,6 +59,10 @@ subprojects {
 	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
+	manifest {
+		buildAttributes = false
+	}
+
 	lombok {
 		version.set("1.18.24")
 		disableConfig.set(true)
