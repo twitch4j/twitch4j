@@ -72,7 +72,7 @@ public class ChannelInformation {
      * Tags are case-insensitive. For readability, consider using camelCasing or PascalCasing.
      * <p>
      * For {@link com.github.twitch4j.helix.TwitchHelix#updateChannelInformation(String, String, ChannelInformation)},
-     * setting this to an empty list will result in all tags being removed from the channel.
+     * setting this to an empty list <a href="https://github.com/twitchdev/issues/issues/708">should</a> result in all tags being removed from the channel.
      */
     private List<String> tags;
 
