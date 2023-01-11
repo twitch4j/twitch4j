@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -57,9 +58,19 @@ public class ChannelSearchResult {
      * Note: Category Tags are not returned
      *
      * @see <a href="https://www.twitch.tv/directory/all/tags">Tag types</a>
+     * @deprecated Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023) in favor of {@link #getTags()}
      */
+    @Nullable
+    @Deprecated
     @JsonProperty("tag_ids")
     private List<String> tagsIds;
+
+    /**
+     * The tags applied to the channel.
+     * <p>
+     * Note: Unlike {@link #getTagsIds()}, these tags <i>are</i> returned for offline channels
+     */
+    private List<String> tags;
 
     /**
      * Thumbnail URL of the stream
