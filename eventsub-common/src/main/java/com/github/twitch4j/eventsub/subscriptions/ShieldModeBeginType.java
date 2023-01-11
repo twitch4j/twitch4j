@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ShieldModeCondition;
 import com.github.twitch4j.eventsub.events.ShieldModeBeginEvent;
 
@@ -11,8 +10,7 @@ import com.github.twitch4j.eventsub.events.ShieldModeBeginEvent;
  * <p>
  * Requires the moderator:read:shield_mode or moderator:manage:shield_mode scope.
  */
-@Unofficial
-public class BetaShieldModeBeginType implements SubscriptionType<ShieldModeCondition, ShieldModeCondition.ShieldModeConditionBuilder<?, ?>, ShieldModeBeginEvent> {
+public class ShieldModeBeginType implements SubscriptionType<ShieldModeCondition, ShieldModeCondition.ShieldModeConditionBuilder<?, ?>, ShieldModeBeginEvent> {
     @Override
     public String getName() {
         return "channel.shield_mode.begin";
@@ -20,7 +18,7 @@ public class BetaShieldModeBeginType implements SubscriptionType<ShieldModeCondi
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override

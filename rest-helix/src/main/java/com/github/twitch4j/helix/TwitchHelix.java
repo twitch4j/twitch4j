@@ -1838,7 +1838,6 @@ public interface TwitchHelix {
      * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
      * @return ShieldModeStatusWrapper
      */
-    @Unofficial
     @RequestLine("GET /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ShieldModeStatusWrapper> getShieldModeStatus(
@@ -1856,7 +1855,6 @@ public interface TwitchHelix {
      * @param active        A Boolean value that determines whether to activate Shield Mode.
      * @return ShieldModeStatusWrapper
      */
-    @Unofficial
     @RequestLine("PUT /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
