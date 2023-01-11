@@ -10,6 +10,12 @@ import lombok.Setter;
 public class CharityCampaignDonation {
 
     /**
+     * An ID that identifies the donation.
+     * The ID is unique across campaigns.
+     */
+    private String id;
+
+    /**
      * An ID that identifies the charity campaign that the donation applies to.
      */
     private String campaignId;
