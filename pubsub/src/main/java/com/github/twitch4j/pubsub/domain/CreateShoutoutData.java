@@ -43,6 +43,7 @@ public class CreateShoutoutData {
 
     @JsonProperty("targetUserCTAInfo")
     private void unpackCallToAction(String ctaInfo) {
+        if (ctaInfo == null || ctaInfo.isEmpty()) return;
         this.targetStreamsInfo = TypeConvert.jsonToObject(ctaInfo, ShoutoutTargetCallToAction.class);
     }
 
