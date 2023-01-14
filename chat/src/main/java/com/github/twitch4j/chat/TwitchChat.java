@@ -633,7 +633,7 @@ public class TwitchChat implements ITwitchChat {
     @SuppressWarnings("ConstantConditions")
     public boolean sendRaw(String command) {
         if (outboundCommandFilter.test(this, command)) {
-            // filter blocked this command from being sent to the irc server
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
             return false;
         }
 
@@ -791,7 +791,7 @@ public class TwitchChat implements ITwitchChat {
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
         String command = sb.toString();
         if (outboundCommandFilter.test(this, command)) {
-            // filter prevented this message from being sent to the irc server
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
             return false;
         }
         return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(command)) != null;
@@ -810,7 +810,7 @@ public class TwitchChat implements ITwitchChat {
 
         String command = String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message);
         if (outboundCommandFilter.test(this, command)) {
-            // filter prevented this whisper from being sent via irc
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
             return;
         }
 

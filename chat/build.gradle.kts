@@ -7,7 +7,7 @@ dependencies {
 	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
 
 	// Named Capture Groups
-	api(group = "com.github.tony19", name = "named-regexp", version = "0.2.8")
+	api(group = "com.github.tony19", name = "named-regexp")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
