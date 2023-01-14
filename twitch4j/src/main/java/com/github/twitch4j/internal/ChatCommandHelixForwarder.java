@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiPredicate;
@@ -36,6 +37,11 @@ import java.util.function.BiPredicate;
  */
 @Slf4j
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
+
+    /**
+     * ChatCommandHelixForwarder will be enabled by default on 11.02.2023 (one week prior to deprecation)
+     */
+    public static final Instant ENABLE_AFTER = Instant.ofEpochSecond(1676073600L);
 
     /**
      * Identifies outbound raw irc messages that contain chat commands.
