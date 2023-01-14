@@ -309,7 +309,7 @@ public class TwitchClientBuilder {
      * Must have {@link #withChatAccount(OAuth2Credential)} or {@link #withDefaultAuthToken(OAuth2Credential)} specified.
      */
     @With
-    private boolean chatCommandsViaHelix = Instant.now().isAfter(Instant.ofEpochSecond(1676678400L));
+    private boolean chatCommandsViaHelix = Instant.now().isAfter(Instant.ofEpochSecond(1676073600L));
 
     /**
      * The per-channel rate limit at which chat commands forwarded to helix should be executed.
