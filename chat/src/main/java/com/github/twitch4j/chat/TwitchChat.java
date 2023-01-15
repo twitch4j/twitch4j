@@ -56,6 +56,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -244,6 +245,13 @@ public class TwitchChat implements ITwitchChat {
     protected final boolean validateOnConnect;
 
     /**
+     * Filter for outbound messages.
+     * The command will not be sent to the IRC server if the predicate yields true.
+     */
+    @NotNull
+    private final BiPredicate<TwitchChat, String> outboundCommandFilter;
+
+    /**
      * Constructor
      *
      * @param websocketConnection            WebsocketConnection
@@ -272,8 +280,9 @@ public class TwitchChat implements ITwitchChat {
      * @param perChannelRateLimit            Per channel message limit
      * @param validateOnConnect              Whether token should be validated on connect
      * @param wsCloseDelay                   Websocket Close Delay
+     * @param outboundCommandFilter          Outbound Command Filter
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay) {
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -294,6 +303,7 @@ public class TwitchChat implements ITwitchChat {
         this.chatJoinTimeout = chatJoinTimeout;
         this.perChannelRateLimit = perChannelRateLimit;
         this.validateOnConnect = validateOnConnect;
+        this.outboundCommandFilter = outboundCommandFilter != null ? outboundCommandFilter : (c, s) -> false;
 
         // init per channel message buckets by channel name
         this.bucketByChannelName = CacheApi.create(spec -> {
@@ -622,6 +632,11 @@ public class TwitchChat implements ITwitchChat {
      */
     @SuppressWarnings("ConstantConditions")
     public boolean sendRaw(String command) {
+        if (outboundCommandFilter.test(this, command)) {
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
+            return false;
+        }
+
         return BucketUtils.scheduleAgainstBucket(ircMessageBucket, taskExecutor, () -> queueCommand(command)) != null;
     }
 
@@ -774,7 +789,12 @@ public class TwitchChat implements ITwitchChat {
         sb.append("PRIVMSG #").append(channel.toLowerCase()).append(" :").append(message);
 
         log.debug("Adding message for channel [{}] with content [{}] to the queue.", channel.toLowerCase(), message);
-        return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(sb.toString())) != null;
+        String command = sb.toString();
+        if (outboundCommandFilter.test(this, command)) {
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
+            return false;
+        }
+        return BucketUtils.scheduleAgainstBucket(getChannelMessageBucket(channel), taskExecutor, () -> sendRaw(command)) != null;
     }
 
     /**
@@ -787,10 +807,17 @@ public class TwitchChat implements ITwitchChat {
     @Deprecated
     public void sendPrivateMessage(String targetUser, String message) {
         log.debug("Adding private message for user [{}] with content [{}] to the queue.", targetUser, message);
+
+        String command = String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message);
+        if (outboundCommandFilter.test(this, command)) {
+            log.trace("Command [{}] has been suppressed by outboundCommandFilter and will not be send to the irc server!", command);
+            return;
+        }
+
         BucketUtils.scheduleAgainstBucket(
             ircWhisperBucket,
             taskExecutor,
-            () -> queueCommand(String.format("PRIVMSG #%s :/w %s %s", chatCredential.getUserName().toLowerCase(), targetUser, message))
+            () -> queueCommand(command)
         );
     }
 

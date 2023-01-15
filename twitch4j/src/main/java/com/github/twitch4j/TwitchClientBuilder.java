@@ -7,6 +7,7 @@ import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
@@ -22,6 +23,7 @@ import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import com.github.twitch4j.internal.ChatCommandHelixForwarder;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.pubsub.TwitchPubSub;
@@ -35,6 +37,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -292,12 +295,34 @@ public class TwitchClientBuilder {
 
     /**
      * Websocket Close Delay in ms (0 = minimum)
-
+     *
      * @see WebsocketConnectionConfig#closeDelay()
      */
     @With
     private int wsCloseDelay = 1_000;
 
+    /**
+     * Whether chat commands should be executed via the Helix API, if possible.
+     * <p>
+     * Must have {@link #withEnableHelix(Boolean)} and {@link #withEnableChat(Boolean)} set to true.
+     * <p>
+     * Must have {@link #withChatAccount(OAuth2Credential)} or {@link #withDefaultAuthToken(OAuth2Credential)} specified.
+     */
+    @With
+    private boolean chatCommandsViaHelix = Instant.now().isAfter(ChatCommandHelixForwarder.ENABLE_AFTER);
+
+    /**
+     * The per-channel rate limit at which chat commands forwarded to helix should be executed.
+     * <p>
+     * This prevents commands to a single channel from consuming the entire helix rate limit bucket.
+     * As such, this can be restricted further or loosened, depending on how many channels the bot serves.
+     * <p>
+     * This has no effect unless {@link #isChatCommandsViaHelix()} is true.
+     * <p>
+     * Users should migrate to manual helix calls (with whatever throttling they desire) instead.
+     */
+    @With(onMethod_ = { @Deprecated })
+    private Bandwidth forwardedChatCommandHelixLimitPerChannel = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT;
 
     /**
      * With a Bot Owner's User ID
@@ -436,6 +461,7 @@ public class TwitchClientBuilder {
         // Module: Chat
         TwitchChat chat = null;
         if (this.enableChat) {
+            //noinspection deprecation (withOutboundCommandFilter *can* be used internally)
             chat = TwitchChatBuilder.builder()
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
@@ -451,6 +477,15 @@ public class TwitchClientBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .withOutboundCommandFilter(
+                    chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
+                        helix,
+                        chatAccount != null ? chatAccount : defaultAuthToken,
+                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                        scheduledThreadPoolExecutor,
+                        forwardedChatCommandHelixLimitPerChannel
+                    ) : null
+                )
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
