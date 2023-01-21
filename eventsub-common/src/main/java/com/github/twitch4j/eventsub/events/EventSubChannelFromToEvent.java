@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class EventSubChannelFromToEvent extends EventSubEvent {
 

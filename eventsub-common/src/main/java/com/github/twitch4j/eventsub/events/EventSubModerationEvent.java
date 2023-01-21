@@ -12,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public abstract class EventSubModerationEvent extends EventSubUserChannelEvent {
+public abstract class EventSubModerationEvent extends EventSubUserChannelEvent implements ModeratorEvent {
 
     /**
      * The user ID of the issuer of the moderation action.
