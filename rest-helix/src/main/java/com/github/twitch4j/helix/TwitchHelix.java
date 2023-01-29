@@ -520,6 +520,30 @@ public interface TwitchHelix {
     );
 
     /**
+     * Sends a Shoutout to the specified broadcaster.
+     * <p>
+     * Rate Limits: The broadcaster may send a Shoutout once every 2 minutes.
+     * They may send the same broadcaster a Shoutout once every 60 minutes.
+     * Note: these limits are not currently implemented by the library.
+     *
+     * @param authToken         A user access token that includes the moderator:manage:shoutouts scope.
+     * @param fromBroadcasterId The ID of the broadcaster that’s sending the Shoutout.
+     * @param toBroadcasterId   The ID of the broadcaster that’s receiving the Shoutout.
+     * @param moderatorId       The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHOUTOUTS_MANAGE
+     */
+    @Unofficial // in public beta
+    @RequestLine("POST /chat/shoutouts?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> sendShoutout(
+        @Param("token") String authToken,
+        @Param("from_broadcaster_id") String fromBroadcasterId,
+        @Param("to_broadcaster_id") String toBroadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
      * Gets the broadcaster’s chat settings.
      *
      * @param authToken     Required: OAuth access token. To read the non-moderator chat delay, a moderator's user access token must be specified with the moderator:read:chat_settings scope.

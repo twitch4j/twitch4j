@@ -45,6 +45,8 @@ public enum TwitchScopes {
     HELIX_CHAT_MESSAGES_MANAGE("moderator:manage:chat_messages"),
     HELIX_CHAT_SETTINGS_MANAGE("moderator:manage:chat_settings"),
     HELIX_CHAT_SETTINGS_READ("moderator:read:chat_settings"),
+    HELIX_SHOUTOUTS_MANAGE("moderator:manage:shoutouts"),
+    HELIX_SHOUTOUTS_READ("moderator:read:shoutouts"),
     HELIX_USER_COLOR_MANAGE("user:manage:chat_color"),
     HELIX_USER_EDIT("user:edit"),
     HELIX_USER_EDIT_BROADCAST("user:edit:broadcast"),
