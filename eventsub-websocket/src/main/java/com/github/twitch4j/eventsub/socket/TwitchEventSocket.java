@@ -1,4 +1,4 @@
-package com.github.twitch4j.socket;
+package com.github.twitch4j.eventsub.socket;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
@@ -13,15 +13,15 @@ import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.eventsub.EventSubTransport;
 import com.github.twitch4j.eventsub.EventSubTransportMethod;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
+import com.github.twitch4j.eventsub.socket.domain.EventSubSocketInformation;
+import com.github.twitch4j.eventsub.socket.domain.EventSubSocketMessage;
+import com.github.twitch4j.eventsub.socket.domain.SocketCloseReason;
+import com.github.twitch4j.eventsub.socket.domain.SocketMessageMetadata;
+import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
-import com.github.twitch4j.socket.domain.EventSubSocketInformation;
-import com.github.twitch4j.socket.domain.EventSubSocketMessage;
-import com.github.twitch4j.socket.domain.SocketCloseReason;
-import com.github.twitch4j.socket.domain.SocketMessageMetadata;
-import com.github.twitch4j.socket.domain.SocketPayload;
-import com.github.twitch4j.socket.enums.SocketMessageType;
+import com.github.twitch4j.eventsub.socket.domain.SocketPayload;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;

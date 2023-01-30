@@ -1,4 +1,4 @@
-package com.github.twitch4j.socket;
+package com.github.twitch4j.eventsub.socket;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;

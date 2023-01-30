@@ -1,4 +1,4 @@
-package com.github.twitch4j.socket;
+package com.github.twitch4j.eventsub.socket;
 
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;

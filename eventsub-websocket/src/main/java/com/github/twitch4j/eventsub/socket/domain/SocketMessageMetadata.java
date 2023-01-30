@@ -1,8 +1,8 @@
-package com.github.twitch4j.socket.domain;
+package com.github.twitch4j.eventsub.socket.domain;
 
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.socket.enums.SocketMessageType;
+import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;

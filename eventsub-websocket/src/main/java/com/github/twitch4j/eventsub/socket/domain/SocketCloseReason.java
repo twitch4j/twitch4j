@@ -1,4 +1,4 @@
-package com.github.twitch4j.socket.domain;
+package com.github.twitch4j.eventsub.socket.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

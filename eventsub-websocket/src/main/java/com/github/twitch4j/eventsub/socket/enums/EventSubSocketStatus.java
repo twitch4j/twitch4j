@@ -1,4 +1,4 @@
-package com.github.twitch4j.socket.enums;
+package com.github.twitch4j.eventsub.socket.enums;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 

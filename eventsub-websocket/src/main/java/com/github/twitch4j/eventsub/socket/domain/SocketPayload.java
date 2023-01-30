@@ -1,11 +1,10 @@
-package com.github.twitch4j.socket.domain;
+package com.github.twitch4j.eventsub.socket.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
-import com.github.twitch4j.socket.domain.EventSubSocketInformation;
-import com.github.twitch4j.socket.domain.SocketMessageMetadata;
+import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class SocketPayload {
      * An object that contains information about the connection.
      * <p>
      * Present if {@link SocketMessageMetadata#getMessageType()} is:
-     * {@link com.github.twitch4j.socket.enums.SocketMessageType#SESSION_WELCOME} or {@link com.github.twitch4j.socket.enums.SocketMessageType#SESSION_RECONNECT}.
+     * {@link SocketMessageType#SESSION_WELCOME} or {@link SocketMessageType#SESSION_RECONNECT}.
      */
     @Nullable
     private EventSubSocketInformation session;
@@ -31,7 +30,7 @@ public class SocketPayload {
      * An object that contains information about your subscription.
      * <p>
      * Present if {@link SocketMessageMetadata#getMessageType()} is:
-     * {@link com.github.twitch4j.socket.enums.SocketMessageType#NOTIFICATION} or {@link com.github.twitch4j.socket.enums.SocketMessageType#REVOCATION}.
+     * {@link SocketMessageType#NOTIFICATION} or {@link SocketMessageType#REVOCATION}.
      */
     @Nullable
     private EventSubSubscription subscription;
@@ -42,7 +41,7 @@ public class SocketPayload {
      * For information about the event’s data, see the subscription type’s description
      * in <a href="https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types">Subscription Types</a>.
      * <p>
-     * Present only if {@link SocketMessageMetadata#getMessageType()} is {@link com.github.twitch4j.socket.enums.SocketMessageType#NOTIFICATION}.
+     * Present only if {@link SocketMessageMetadata#getMessageType()} is {@link SocketMessageType#NOTIFICATION}.
      */
     @Nullable
     @JsonProperty("event")

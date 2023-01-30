@@ -1,7 +1,8 @@
-package com.github.twitch4j.socket.domain;
+package com.github.twitch4j.eventsub.socket.domain;
 
-import com.github.twitch4j.socket.TwitchEventSocket;
-import com.github.twitch4j.socket.enums.EventSubSocketStatus;
+import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
+import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
+import com.github.twitch4j.eventsub.socket.enums.EventSubSocketStatus;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -23,7 +24,7 @@ public class EventSubSocketInformation {
     /**
      * The connection’s status.
      * <p>
-     * Upon {@link com.github.twitch4j.socket.enums.SocketMessageType#SESSION_WELCOME}, this will be set to {@link EventSubSocketStatus#CONNECTED}.
+     * Upon {@link SocketMessageType#SESSION_WELCOME}, this will be set to {@link EventSubSocketStatus#CONNECTED}.
      */
     private EventSubSocketStatus status;
 
@@ -44,7 +45,7 @@ public class EventSubSocketInformation {
     private Instant connectedAt;
 
     /**
-     * The URL to reconnect to if you get a {@link com.github.twitch4j.socket.enums.SocketMessageType#SESSION_RECONNECT} message.
+     * The URL to reconnect to if you get a {@link SocketMessageType#SESSION_RECONNECT} message.
      * <p>
      * Note: {@link TwitchEventSocket} automatically follows these reconnect URLs.
      */
