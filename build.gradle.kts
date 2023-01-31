@@ -1,52 +1,26 @@
+import com.coditory.gradle.manifest.ManifestTask
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.freefair.gradle.plugins.lombok.LombokExtension
+import io.freefair.gradle.plugins.lombok.tasks.Delombok
+
 // Plugins
 plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok") version "6.6.1"
-	id("com.coditory.manifest") version "0.2.3"
-	id("com.github.johnrengelman.shadow") version "7.1.2"
+	id("io.freefair.lombok").version("6.6.1").apply(false)
+	id("com.coditory.manifest").version("0.2.3").apply(false)
+	id("com.github.johnrengelman.shadow").version("7.1.2").apply(false)
 }
 
 group = group
 version = version
 
-// All-Projects
+// Allprojects
 allprojects {
-	// Repositories
 	repositories {
 		mavenCentral()
-	}
-
-	tasks {
-		withType<Javadoc> {
-			options {
-				this as StandardJavadocDocletOptions
-				links(
-					"https://javadoc.io/doc/org.jetbrains/annotations/24.0.0",
-					"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
-					"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.1.0",
-					// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.11.0",
-					"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.11.0",
-					"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.2.1",
-					"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/12.1",
-					"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/12.1",
-					"https://javadoc.io/doc/io.github.openfeign/feign-jackson/12.1",
-					"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/12.1",
-					"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
-					"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.14.2",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.14.2",
-					"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.14.2",
-					"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
-					"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.12.0",
-					"https://javadoc.io/doc/org.projectlombok/lombok/1.18.24",
-					"https://twitch4j.github.io/javadoc"
-				)
-				locale = "en"
-			}
-		}
 	}
 }
 
@@ -63,7 +37,15 @@ subprojects {
 		buildAttributes = false
 	}
 
-	lombok {
+	normalization {
+		runtimeClasspath {
+			metaInf {
+				ignoreManifest()
+			}
+		}
+	}
+
+	project.extensions.getByType(LombokExtension::class).apply {
 		version.set("1.18.24")
 		disableConfig.set(true)
 	}
@@ -174,20 +156,27 @@ subprojects {
 
 	// Source encoding
 	tasks {
+
+		withType<ManifestTask> {
+			outputs.file(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
+					.withPropertyName("outputFile")
+
+		}
 		// shadowjar & relocation
-		val relocateShadowJar by creating(com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation::class) {
-			target = shadowJar.get()
+		val relocateShadowJar by creating(ConfigureShadowRelocation::class) {
+			target = named<ShadowJar>("shadowJar").get()
 			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
 		}
 
 		// jar artifact id and version
 		withType<Jar> {
-			if (this is com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+			if (this is ShadowJar) {
 				dependsOn(relocateShadowJar)
 				archiveClassifier.set("shaded")
 			}
-			dependsOn(project.tasks.manifest)
-			manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
+			val manifestTask = named("manifest")
+			dependsOn(manifestTask)
+			manifest.from(manifestTask.map { it.outputs.files.first() })
 		}
 
 		// compile options
@@ -195,16 +184,45 @@ subprojects {
 			options.encoding = "UTF-8"
 		}
 
+		withType<Javadoc> {
+			options {
+				this as StandardJavadocDocletOptions
+				links(
+						"https://javadoc.io/doc/org.jetbrains/annotations/23.1.0",
+						"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
+						"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.1.0",
+						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.9.3", // blocked by https://github.com/square/okhttp/issues/6450
+						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.11.0",
+						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.11.0",
+						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.1.4",
+						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/12.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/12.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/12.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/12.1",
+						"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
+						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.14.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.14.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.14.1",
+						"https://javadoc.io/doc/commons-io/commons-io/2.11.0",
+						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.12.0",
+						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.24",
+						"https://twitch4j.github.io/javadoc"
+				)
+				locale = "en"
+			}
+		}
+
 		// javadoc & delombok
-		val delombok by getting(io.freefair.gradle.plugins.lombok.tasks.Delombok::class)
+		val delombok by getting(Delombok::class)
 		javadoc {
-			dependsOn(delombok)
+			dependsOn(delombok, named("manifest"))
 			source(delombok)
 			options {
 				title = "${project.name} (v${project.version})"
 				windowTitle = "${project.name} (v${project.version})"
 				encoding = "UTF-8"
-				overview = file("${rootDir}/buildSrc/overview-single.html").absolutePath
+				overview = "../buildSrc/overview-single.html"
 				this as StandardJavadocDocletOptions
 				// hide javadoc warnings (a lot from delombok)
 				addStringOption("Xdoclint:none", "-quiet")
