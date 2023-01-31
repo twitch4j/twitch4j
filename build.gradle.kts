@@ -1,3 +1,4 @@
+import com.coditory.gradle.manifest.ManifestPluginExtension
 import com.coditory.gradle.manifest.ManifestTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -33,7 +34,7 @@ subprojects {
 	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
-	manifest {
+	project.extensions.getByType(ManifestPluginExtension::class.java).apply {
 		buildAttributes = false
 	}
 
