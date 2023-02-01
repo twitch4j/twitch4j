@@ -158,10 +158,9 @@ subprojects {
 	// Source encoding
 	tasks {
 
-		withType<ManifestTask> {
+		withType<ManifestTask>().configureEach {
 			outputs.file(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
 					.withPropertyName("outputFile")
-
 		}
 		// shadowjar & relocation
 		val relocateShadowJar by creating(ConfigureShadowRelocation::class) {
