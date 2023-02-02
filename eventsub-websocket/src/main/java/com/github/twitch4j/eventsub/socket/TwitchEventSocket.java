@@ -45,6 +45,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * A single EventSub websocket for a single user id.
+ */
 @Slf4j
 public final class TwitchEventSocket implements IEventSubSocket {
 
@@ -98,23 +101,47 @@ public final class TwitchEventSocket implements IEventSubSocket {
     @NotNull
     private final AtomicReference<WebsocketConnection> connection;
 
+    /**
+     * The previous websocket connection that is temporarily held when Twitch directs us to reconnect to a different edge server.
+     */
     @NotNull
-    private final AtomicReference<WebsocketConnection> expiringConnection = new AtomicReference<>();
+    private final AtomicReference<@Nullable WebsocketConnection> expiringConnection = new AtomicReference<>();
 
+    /**
+     * The eventsub subscriptions tracked by this socket (though all may not be successfully registered with the API).
+     * <p>
+     * The subscription underlying the key is exactly the same as the value.
+     * The key just avoids duplicating subscriptions (based on type/version and condition).
+     */
     @NotNull
     private final Map<SubscriptionWrapper, EventSubSubscription> subscriptions = new ConcurrentHashMap<>();
 
+    /**
+     * The base url for websocket connections.
+     *
+     * @see TwitchEventSocket#WEB_SOCKET_SERVER
+     */
     @NotNull
     private final String baseUrl;
 
+    /**
+     * The current url the websocket connection is pointed to.
+     */
     @NotNull
     @Getter(AccessLevel.PRIVATE)
     private volatile String url;
 
+    /**
+     * The Twitch-assigned id associated with this websocket,
+     * which is used when creating eventsub subscriptions via the API.
+     */
     @Getter
     @Nullable
     private volatile String websocketId = null;
 
+    /**
+     * The token associated with each eventsub subscription (in order to manage the subscription via helix).
+     */
     private final Cache<SubscriptionWrapper, OAuth2Credential> tokenByTopic;
 
     @Builder

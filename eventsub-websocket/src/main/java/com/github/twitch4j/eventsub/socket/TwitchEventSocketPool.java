@@ -27,6 +27,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+/**
+ * A pool for EventSub websocket subscriptions across multiple users.
+ */
 @Builder
 public final class TwitchEventSocketPool implements IEventSubSocket {
 
@@ -52,23 +55,43 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
     @Nullable
     private final ScheduledThreadPoolExecutor executor;
 
+    /**
+     * The {@link TwitchIdentityProvider} to enrich credentials.
+     */
     @NotNull
     @Builder.Default
     private final TwitchIdentityProvider identityProvider = new TwitchIdentityProvider(null, null, null);
 
+    /**
+     * The base url for websocket connections.
+     *
+     * @see TwitchEventSocket#WEB_SOCKET_SERVER
+     */
     @NotNull
     @Builder.Default
     private final String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
 
+    /**
+     * The {@link TwitchHelix} instance for creating eventsub subscriptions in the official API.
+     */
     @Nullable
     @Builder.Default
     private TwitchHelix helix = TwitchHelixBuilder.builder().build();
 
+    /**
+     * The maximum number of eventsub subscriptions that a single user_id can have.
+     */
     @Builder.Default
     private int maxSubscriptionsPerUser = TwitchEventSocket.MAX_SUBSCRIPTIONS_PER_SOCKET * 3; // imposed by twitch
 
+    /**
+     * A mapping of user_id's to their individual eventsocket pools.
+     */
     private final Map<String, TwitchSingleUserEventSocketPool> poolByUserId = new ConcurrentHashMap<>();
 
+    /**
+     * A mapping of eventsub subscriptions to which individual pool contains it.
+     */
     private final Map<SubscriptionWrapper, TwitchSingleUserEventSocketPool> poolBySub = new ConcurrentHashMap<>();
 
     @Override

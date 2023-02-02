@@ -20,22 +20,40 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
+/**
+ * A pool for a single user id to subscriptions spread over multiple EventSub websockets.
+ */
 @SuperBuilder
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
 
+    /**
+     * The base url for websocket connections.
+     *
+     * @see TwitchEventSocket#WEB_SOCKET_SERVER
+     */
     @Builder.Default
     private String baseUrl = TwitchEventSocket.WEB_SOCKET_SERVER;
 
+    /**
+     * The {@link TwitchHelix} instance for creating eventsub subscriptions in the official API.
+     */
     @Nullable
     @Builder.Default
     private TwitchHelix helix = TwitchHelixBuilder.builder().build();
 
+    /**
+     * The default credential (representing the single user) to create eventsub subscriptions with.
+     */
     @Getter
     @Nullable
     private OAuth2Credential defaultToken;
 
+    /**
+     * A temporary cache of what credential is used for which eventsub subscription registration request,
+     * so it can be delivered to the individual underlying socket to be used.
+     */
     private final Cache<SubscriptionWrapper, OAuth2Credential> credentials = CacheApi.create(spec -> {
         spec.maxSize(Runtime.getRuntime().availableProcessors() * 4L);
         spec.expiryType(ExpiryType.POST_WRITE);
