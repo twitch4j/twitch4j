@@ -28,9 +28,19 @@ public enum EventSubSubscriptionStatus {
     AUTHORIZATION_REVOKED,
 
     /**
+     * The moderator that authorized the subscription is no longer one of the broadcaster’s moderators.
+     */
+    MODERATOR_REMOVED,
+
+    /**
      * A user in the condition of the subscription was removed.
      */
     USER_REMOVED,
+
+    /**
+     * Twitch revoked your subscription because the subscribed to subscription type and version is no longer supported.
+     */
+    VERSION_REMOVED,
 
     /**
      * When you connect to the server, you must create a subscription within 10 seconds or the connection is closed.

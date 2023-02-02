@@ -18,22 +18,35 @@ import lombok.ToString;
 public class ChannelCharityDonateEvent extends EventSubUserChannelEvent {
 
     /**
+     * An ID that identifies the donation.
+     * The ID is unique across campaigns.
+     */
+    private String id;
+
+    /**
      * An ID that uniquely identifies the charity campaign.
      */
-    @JsonAlias("id")
     private String campaignId;
 
     /**
      * The charity’s name.
      */
-    @Unofficial
     private String charityName;
 
     /**
      * A URL to an image of the charity’s logo.
      */
-    @Unofficial
     private String charityLogo;
+
+    /**
+     * A description of the charity.
+     */
+    private String charityDescription;
+
+    /**
+     * A URL to the charity’s website.
+     */
+    private String charityWebsite;
 
     /**
      * An object that contains the amount of the user’s donation.

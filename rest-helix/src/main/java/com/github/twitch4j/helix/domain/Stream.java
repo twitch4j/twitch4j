@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -49,6 +50,7 @@ public class Stream {
     private String gameName;
 
     /** Array of community IDs. */
+    @Nullable
     @Deprecated
     private List<UUID> communityIds;
 
@@ -60,6 +62,9 @@ public class Stream {
     @NonNull
     private String title;
 
+    /** The tags applied to the stream. */
+    private List<String> tags;
+
     /** Number of viewers watching the stream at the time of the query. */
     @NonNull
     private Integer viewerCount;
@@ -69,7 +74,13 @@ public class Stream {
     @JsonProperty("started_at")
     private Instant startedAtInstant;
 
-    /** Ids of active tags on the stream */
+    /**
+     * Ids of active tags on the stream
+     *
+     * @deprecated Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023) in favor of {@link #getTags()}
+     */
+    @Nullable
+    @Deprecated
     private List<UUID> tagIds = new ArrayList<>();
 
     /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */

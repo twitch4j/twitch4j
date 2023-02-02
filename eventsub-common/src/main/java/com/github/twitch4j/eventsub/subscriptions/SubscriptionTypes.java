@@ -14,7 +14,10 @@ public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
     public final ChannelBanType CHANNEL_BAN;
-    @Unofficial public final BetaChannelCharityDonateType BETA_CHANNEL_CHARITY_DONATE;
+    public final @Unofficial BetaChannelCharityDonateType BETA_CHANNEL_CHARITY_DONATE;
+    public final @Unofficial BetaCharityCampaignStartType BETA_CHANNEL_CHARITY_START;
+    public final @Unofficial BetaCharityCampaignProgressType BETA_CHANNEL_CHARITY_PROGRESS;
+    public final @Unofficial BetaCharityCampaignStopType BETA_CHANNEL_CHARITY_STOP;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
@@ -46,6 +49,10 @@ public class SubscriptionTypes {
     public final PredictionProgressType PREDICTION_PROGRESS;
     public final PredictionLockType PREDICTION_LOCK;
     public final PredictionEndType PREDICTION_END;
+    public final ShieldModeBeginType SHIELD_MODE_BEGIN_TYPE;
+    public final ShieldModeEndType SHIELD_MODE_END_TYPE;
+    public final @Unofficial BetaShoutoutCreateType BETA_SHOUTOUT_CREATE_TYPE;
+    public final @Unofficial BetaShoutoutReceiveType BETA_SHOUTOUT_RECEIVE_TYPE;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
@@ -61,6 +68,9 @@ public class SubscriptionTypes {
             Stream.of(
                 CHANNEL_BAN = new ChannelBanType(),
                 BETA_CHANNEL_CHARITY_DONATE = new BetaChannelCharityDonateType(),
+                BETA_CHANNEL_CHARITY_START = new BetaCharityCampaignStartType(),
+                BETA_CHANNEL_CHARITY_PROGRESS = new BetaCharityCampaignProgressType(),
+                BETA_CHANNEL_CHARITY_STOP = new BetaCharityCampaignStopType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
@@ -92,6 +102,10 @@ public class SubscriptionTypes {
                 PREDICTION_PROGRESS = new PredictionProgressType(),
                 PREDICTION_LOCK = new PredictionLockType(),
                 PREDICTION_END = new PredictionEndType(),
+                SHIELD_MODE_BEGIN_TYPE = new ShieldModeBeginType(),
+                SHIELD_MODE_END_TYPE = new ShieldModeEndType(),
+                BETA_SHOUTOUT_CREATE_TYPE = new BetaShoutoutCreateType(),
+                BETA_SHOUTOUT_RECEIVE_TYPE = new BetaShoutoutReceiveType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),

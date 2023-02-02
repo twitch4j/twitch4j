@@ -127,6 +127,22 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     /**
+     * Event Listener: Suspicious user events.
+     * <p>
+     * This includes when a chatter's treatment status changes (e.g., monitored or restricted),
+     * and when a treated user sends a chat message.
+     *
+     * @param credential Moderator's user access token (scope: channel:moderate) associated with the specified user id.
+     * @param userId     The user id of the moderator.
+     * @param channelId  The channel id to monitor events from.
+     * @return PubSubSubscription
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_MODERATE
+     */
+    default PubSubSubscription listenForLowTrustUsersEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "low-trust-users." + userId + "." + channelId);
+    }
+
+    /**
      * Event Listener: A moderator performs an action in the channel
      *
      * @param credential Credential (for channelId, scope: channel:moderate)
@@ -488,11 +504,6 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
-    default PubSubSubscription listenForLowTrustUsersEvents(OAuth2Credential credential, String userId, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "low-trust-users." + userId + "." + channelId);
-    }
-
-    @Unofficial
     default PubSubSubscription listenForOnsiteNotificationEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "onsite-notifications." + userId);
     }
@@ -517,6 +528,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     @Unofficial
     default PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
+    }
+
+    @Unofficial
+    default PubSubSubscription listenForShieldModeEvents(OAuth2Credential credential, String userId, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "shield-mode." + userId + '.' + channelId);
     }
 
     @Unofficial

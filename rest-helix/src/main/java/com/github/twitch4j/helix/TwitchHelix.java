@@ -346,6 +346,25 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the list of donations that users have made to the broadcaster’s active charity campaign.
+     *
+     * @param authToken     Broadcaster user access token with the channel:read:charity scope.
+     * @param broadcasterId The ID of the broadcaster that’s actively running a charity campaign.
+     * @param limit         The maximum number of items to return per page in the response. Minimum: 1. Maximum: 100. Default: 20.
+     * @param after         The cursor used to get the next page of results.
+     * @return CharityDonationList
+     */
+    @Unofficial // in open beta
+    @RequestLine("GET /charity/donations?broadcaster_id={broadcaster_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CharityDonationList> getCharityDonations(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
      * Sends an announcement to the broadcaster’s chat room.
      *
      * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
@@ -498,6 +517,30 @@ public interface TwitchHelix {
     HystrixCommand<EmoteList> getEmoteSets(
         @Param("token") String authToken,
         @Param("emote_set_id") Collection<String> ids
+    );
+
+    /**
+     * Sends a Shoutout to the specified broadcaster.
+     * <p>
+     * Rate Limits: The broadcaster may send a Shoutout once every 2 minutes.
+     * They may send the same broadcaster a Shoutout once every 60 minutes.
+     * Note: these limits are not currently implemented by the library.
+     *
+     * @param authToken         A user access token that includes the moderator:manage:shoutouts scope.
+     * @param fromBroadcasterId The ID of the broadcaster that’s sending the Shoutout.
+     * @param toBroadcasterId   The ID of the broadcaster that’s receiving the Shoutout.
+     * @param moderatorId       The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHOUTOUTS_MANAGE
+     */
+    @Unofficial // in public beta
+    @RequestLine("POST /chat/shoutouts?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> sendShoutout(
+        @Param("token") String authToken,
+        @Param("from_broadcaster_id") String fromBroadcasterId,
+        @Param("to_broadcaster_id") String toBroadcasterId,
+        @Param("moderator_id") String moderatorId
     );
 
     /**
@@ -1812,6 +1855,44 @@ public interface TwitchHelix {
     }
 
     /**
+     * Gets the broadcaster’s Shield Mode activation status.
+     *
+     * @param authToken     User access token that includes the moderator:read:shield_mode or moderator:manage:shield_mode scope.
+     * @param broadcasterId The ID of the broadcaster whose Shield Mode activation status you want to get.
+     * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @return ShieldModeStatusWrapper
+     */
+    @RequestLine("GET /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ShieldModeStatusWrapper> getShieldModeStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Activates or deactivates the broadcaster’s Shield Mode.
+     *
+     * @param authToken     User access token that includes the moderator:manage:shield_mode scope.
+     * @param broadcasterId The ID of the broadcaster whose Shield Mode you want to activate or deactivate.
+     * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
+     * @param active        A Boolean value that determines whether to activate Shield Mode.
+     * @return ShieldModeStatusWrapper
+     */
+    @RequestLine("PUT /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"is_active\":{is_active}%7D")
+    HystrixCommand<ShieldModeStatusWrapper> updateShieldModeStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("is_active") boolean active
+    );
+
+    /**
      * Get information about all polls or specific polls for a Twitch channel.
      * <p>
      * Poll information is available for 90 days.
@@ -2481,15 +2562,20 @@ public interface TwitchHelix {
     /**
      * Get Followers
      * <p>
-     * Gets information on follow relationships between two Twitch users. Information returned is sorted in order, most recent follow first. This can return information like “who is lirik following,” “who is following lirik,” or “is user X following user Y.”
-     * Using user-token or app-token to increase rate limits.
+     * Gets information on follow relationships between two Twitch users.
+     * Information returned is sorted in order, most recent follow first.
+     * <p>
+     * WARNING: This method will soon be deprecated as Twitch is imposing new auth requirements.
+     * When to_id is specified, a (scoped) broadcaster or moderator oauth token will be required.
+     * When from_id is specified, a (scoped) user access token associated with from_id will be required.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
-     * @param fromId User ID. The request returns information about users who are being followed by the from_id user.
-     * @param toId   User ID. The request returns information about users who are following the to_id user.
-     * @param after  Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
-     * @param limit  Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param authToken User or App access Token
+     * @param fromId    User ID. The request returns information about users who are being followed by the from_id user.
+     * @param toId      User ID. The request returns information about users who are following the to_id user.
+     * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return FollowList
+     * @see <a href="https://www.twitch.tv/videos/1604648673?t=0h36m30s">Early deprecation notice</a>
      */
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")

@@ -7,6 +7,7 @@ import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
@@ -24,6 +25,7 @@ import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.graphql.TwitchGraphQLBuilder;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import com.github.twitch4j.internal.ChatCommandHelixForwarder;
 import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.kraken.TwitchKrakenBuilder;
 import com.github.twitch4j.pubsub.ITwitchPubSub;
@@ -44,6 +46,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -309,11 +312,35 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Websocket Close Delay in ms (0 = minimum)
-
+     *
      * @see WebsocketConnectionConfig#closeDelay()
      */
     @With
     private int wsCloseDelay = 1_000;
+
+    /**
+     * Whether chat commands should be executed via the Helix API, if possible.
+     * <p>
+     * Must have {@link #withEnableHelix(Boolean)} set to true.
+     * Must have {@link #withEnableChat(Boolean)} or {@link #withEnableChatPool(Boolean)} set to true.
+     * <p>
+     * Must have  {@link #withChatAccount(OAuth2Credential)} or {@link #withDefaultAuthToken(OAuth2Credential)} specified.
+     */
+    @With
+    private boolean chatCommandsViaHelix = Instant.now().isAfter(ChatCommandHelixForwarder.ENABLE_AFTER);
+
+    /**
+     * The per-channel rate limit at which chat commands forwarded to helix should be executed.
+     * <p>
+     * This prevents commands to a single channel from consuming the entire helix rate limit bucket.
+     * As such, this can be restricted further or loosened, depending on how many channels the bot serves.
+     * <p>
+     * This has no effect unless {@link #isChatCommandsViaHelix()} is true.
+     * <p>
+     * Users should migrate to manual helix calls (with whatever throttling they desire) instead.
+     */
+    @With(onMethod_ = { @Deprecated })
+    private Bandwidth forwardedChatCommandHelixLimitPerChannel = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT;
 
     /**
      * With a Bot Owner's User ID
@@ -366,6 +393,7 @@ public class TwitchClientPoolBuilder {
      *
      * @return {@link TwitchClientPool} initialized class
      */
+    @SuppressWarnings("deprecation")
     public TwitchClientPool build() {
         log.debug("TwitchClientPool: Initializing ErrorTracking ...");
 
@@ -407,7 +435,7 @@ public class TwitchClientPoolBuilder {
         }
 
         // Module: Helix
-        TwitchHelix helix = null;
+        TwitchHelix helix;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
                 .withBaseUrl(helixBaseUrl)
@@ -420,6 +448,8 @@ public class TwitchClientPoolBuilder {
                 .withProxyConfig(proxyConfig)
                 .withLogLevel(feignLogLevel)
                 .build();
+        } else {
+            helix = null;
         }
 
         // Module: Kraken
@@ -452,6 +482,14 @@ public class TwitchClientPoolBuilder {
 
         // Module: Chat
         ITwitchChat chat = null;
+        ChatCommandHelixForwarder forwarder = chatCommandsViaHelix && enableHelix && (enableChat || enableChatPool) ?
+            new ChatCommandHelixForwarder(
+                helix,
+                chatAccount != null ? chatAccount : defaultAuthToken,
+                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                scheduledThreadPoolExecutor,
+                forwardedChatCommandHelixLimitPerChannel
+            ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()
                 .eventManager(eventManager)
@@ -470,6 +508,7 @@ public class TwitchClientPoolBuilder {
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
                         .withMaxJoinRetries(chatMaxJoinRetries)
+                        .withOutboundCommandFilter(forwarder)
                         .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setCommandPrefixes(commandPrefixes)
@@ -492,6 +531,7 @@ public class TwitchClientPoolBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .withOutboundCommandFilter(forwarder)
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)
                 .withWsPingPeriod(wsPingPeriod)
