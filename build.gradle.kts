@@ -24,8 +24,13 @@ allprojects {
 	}
 }
 
-val enableManifest = project.gradle.startParameter.taskNames
-		.any { s -> s.startsWith("publish") }
+/**
+ * Enables com.coditory.manifest plugin for `publish` tasks or if `-PenableManifest` is supplied trough cli
+ */
+val enableManifest = with(project) {
+	gradle.startParameter.taskNames.any { s -> s.startsWith("publish") }
+			|| properties.containsKey("enableManifest")
+}
 
 // Subprojects
 subprojects {
