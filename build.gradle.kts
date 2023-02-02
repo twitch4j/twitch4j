@@ -1,5 +1,4 @@
 import com.coditory.gradle.manifest.ManifestPluginExtension
-import com.coditory.gradle.manifest.ManifestTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.freefair.gradle.plugins.lombok.LombokExtension
@@ -25,25 +24,22 @@ allprojects {
 	}
 }
 
+val enableManifest = project.gradle.startParameter.taskNames
+		.any { s -> s.startsWith("publish") }
+
 // Subprojects
 subprojects {
 	apply(plugin = "signing")
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
 	apply(plugin = "io.freefair.lombok")
-	apply(plugin = "com.coditory.manifest")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
-	project.extensions.getByType(ManifestPluginExtension::class.java).apply {
-		buildAttributes = false
-	}
-
-	normalization {
-		runtimeClasspath {
-			metaInf {
-				ignoreManifest()
-			}
-		}
+	if (enableManifest) {
+		apply(plugin = "com.coditory.manifest")
+		project.extensions
+				.getByType(ManifestPluginExtension::class.java)
+				.apply { buildAttributes = false }
 	}
 
 	project.extensions.getByType(LombokExtension::class).apply {
@@ -158,10 +154,6 @@ subprojects {
 	// Source encoding
 	tasks {
 
-		withType<ManifestTask>().configureEach {
-			outputs.file(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
-					.withPropertyName("outputFile")
-		}
 		// shadowjar & relocation
 		val relocateShadowJar by creating(ConfigureShadowRelocation::class) {
 			target = named<ShadowJar>("shadowJar").get()
@@ -174,9 +166,9 @@ subprojects {
 				dependsOn(relocateShadowJar)
 				archiveClassifier.set("shaded")
 			}
-			val manifestTask = named("manifest")
-			dependsOn(manifestTask)
-			manifest.from(manifestTask.map { it.outputs.files.first() })
+			if (enableManifest) {
+				manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
+			}
 		}
 
 		// compile options
@@ -216,7 +208,7 @@ subprojects {
 		// javadoc & delombok
 		val delombok by getting(Delombok::class)
 		javadoc {
-			dependsOn(delombok, named("manifest"))
+			dependsOn(delombok)
 			source(delombok)
 			options {
 				title = "${project.name} (v${project.version})"
