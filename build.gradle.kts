@@ -125,7 +125,7 @@ subprojects {
 		testImplementation(platform("org.junit:junit-bom:5.9.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		// - Mocking
-		testImplementation(platform("org.mockito:mockito-bom:5.1.0"))
+		testImplementation(platform("org.mockito:mockito-bom:5.1.1"))
 		// - Await
 		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.0")
 		// - Logging
