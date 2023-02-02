@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +41,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -210,7 +210,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             expiring.close();
 
         // explicitly delete the attached subscriptions
-        Collection<Future<?>> futures = new LinkedBlockingQueue<>();
+        Collection<Future<?>> futures = new ArrayDeque<>(subscriptions.size());
         subscriptions.keySet().removeIf(sub -> futures.add(
             executor.submit(() -> {
                 if (StringUtils.isNotBlank(sub.getId())) {
@@ -295,12 +295,13 @@ public final class TwitchEventSocket implements IEventSubSocket {
         return ws != null ? ws.getConnectionState() : WebsocketConnectionState.DISCONNECTED;
     }
 
-    private EventSubSubscription unsubscribeNoHelix(EventSubSubscription remove) {
+    @Nullable
+    private EventSubSubscription unsubscribeNoHelix(@NotNull EventSubSubscription remove) {
         return subscriptions.remove(SubscriptionWrapper.wrap(remove));
     }
 
     private void onInitialConnection(final String websocketId) {
-        final Collection<EventSubSubscription> oldSubs = new LinkedBlockingQueue<>();
+        final Collection<EventSubSubscription> oldSubs = new ArrayDeque<>(subscriptions.size());
         subscriptions.keySet().removeIf(oldSubs::add);
 
         for (final EventSubSubscription old : oldSubs) {
@@ -312,6 +313,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     final OAuth2Credential credential = getAssociatedCredential(old);
                     final EventSubSubscription newSub = augmentSub(old, websocketId);
 
+                    // clean up subscription pointing at another websocket id (likely dead)
                     if (StringUtils.isNotEmpty(old.getId())) {
                         try {
                             api.deleteEventSubSubscription(getAuthToken(credential), old.getId()).execute();
@@ -350,6 +352,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
             } else if (messageType == SocketMessageType.NOTIFICATION) {
                 Objects.requireNonNull(metadata.getSubscriptionType());
                 Objects.requireNonNull(metadata.getSubscriptionVersion());
+            } else if (messageType == SocketMessageType.REVOCATION) {
+                Objects.requireNonNull(payload.getSubscription());
             }
         } catch (Exception e) {
             log.error("Failed to parse EventSub-WS message", e);
@@ -519,6 +523,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     private static EventSubSubscription augmentSub(EventSubSubscription old, String newWebSocketId) {
+        assert old.getTransport() != null;
         return EventSubSubscription.builder()
             .type(old.getType())
             .condition(old.getCondition())

@@ -18,16 +18,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Builder
 public final class TwitchEventSocketPool implements IEventSubSocket {
@@ -67,7 +65,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
     private TwitchHelix helix = TwitchHelixBuilder.builder().build();
 
     @Builder.Default
-    private int maxSubscriptionsPerUser = 100 * 3; // imposed by twitch
+    private int maxSubscriptionsPerUser = TwitchEventSocket.MAX_SUBSCRIPTIONS_PER_SOCKET * 3; // imposed by twitch
 
     private final Map<String, TwitchSingleUserEventSocketPool> poolByUserId = new ConcurrentHashMap<>();
 
@@ -155,11 +153,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
 
     @Override
     public Collection<EventSubSubscription> getSubscriptions() {
-        return poolByUserId.values().stream()
-            .map(IEventSubSocket::getSubscriptions)
-            .flatMap(Collection::stream)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return Collections.unmodifiableSet(poolBySub.keySet());
     }
 
     @Override
@@ -185,22 +179,18 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
      * @return the number of open connections held by this pool.
      */
     public int numConnections() {
-        return accumulate(SubscriptionConnectionPool::numConnections);
+        int n = 0;
+        for (TwitchSingleUserEventSocketPool pool : poolByUserId.values()) {
+            n += pool.numConnections();
+        }
+        return n;
     }
 
     /**
      * @return the total number of subscriptions held by all connections.
      */
     public int numSubscriptions() {
-        return accumulate(SubscriptionConnectionPool::numSubscriptions);
-    }
-
-    private int accumulate(Function<@NotNull TwitchSingleUserEventSocketPool, @NotNull Integer> selector) {
-        int n = 0;
-        for (TwitchSingleUserEventSocketPool pool : poolByUserId.values()) {
-            n += selector.apply(pool);
-        }
-        return n;
+        return getSubscriptions().size();
     }
 
     private String getUserId(OAuth2Credential token) {
