@@ -18,6 +18,10 @@ import com.github.twitch4j.eventsub.socket.domain.EventSubSocketMessage;
 import com.github.twitch4j.eventsub.socket.domain.SocketCloseReason;
 import com.github.twitch4j.eventsub.socket.domain.SocketMessageMetadata;
 import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
+import com.github.twitch4j.eventsub.socket.events.EventSocketClosedByTwitchEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketConnectionStateEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
@@ -487,6 +491,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             subscriptions.put(sub, sub);
             log.debug("EventSub-WS successfully created subscription {}", sub);
             if (token != null) tokenByTopic.put(sub, token);
+            eventManager.publish(new EventSocketSubscriptionSuccessEvent(sub, this));
             return true;
         } catch (Exception e) {
             log.error("Failed to create EventSub-WS subscription {}", newSub, e);
@@ -499,6 +504,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     .build()
             );
             subscriptions.putIfAbsent(later, later);
+            eventManager.publish(new EventSocketSubscriptionFailureEvent(later, this, e));
             return false;
         }
     }
@@ -508,7 +514,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     private WebsocketConnection buildConnection() {
-        return new WebsocketConnection(spec -> {
+        AtomicReference<WebsocketConnection> wsRef = new AtomicReference<>();
+        WebsocketConnection ws = new WebsocketConnection(spec -> {
             spec.baseUrl(url);
             spec.taskExecutor(executor);
             spec.onTextMessage(this::onTextMessage);
@@ -519,6 +526,9 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     // noinspection deprecation
                     subscriptions.values().forEach(sub -> sub.setStatus(EventSubSubscriptionStatus.WEBSOCKET_NETWORK_TIMEOUT));
                 }
+
+                if (wsRef.get() == connection.get())
+                    eventManager.publish(new EventSocketConnectionStateEvent(oldState, newState, this));
             });
             spec.onCloseFrame(data -> {
                 SocketCloseReason reason = null;
@@ -531,9 +541,14 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
                 log.debug("Twitch disconnected the EventSub-WS connection {} because {}", websocketId, reason);
                 executor.execute(this::connect);
+
+                if (wsRef.get() == connection.get())
+                    eventManager.publish(new EventSocketClosedByTwitchEvent(reason, this));
             });
             if (proxyConfig != null) spec.proxyConfig(proxyConfig);
         });
+        wsRef.set(ws);
+        return ws;
     }
 
     private OAuth2Credential getAssociatedCredential(EventSubSubscription sub) {
