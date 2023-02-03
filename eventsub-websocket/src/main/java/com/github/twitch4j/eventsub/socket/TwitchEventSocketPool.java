@@ -6,6 +6,7 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.pool.SubscriptionConnectionPool;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
@@ -40,7 +41,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
      */
     @Getter
     @Builder.Default
-    private final EventManager eventManager = createEventManager();
+    private final EventManager eventManager = EventManagerUtils.initializeEventManager(SimpleEventHandler.class);
 
     /**
      * The {@link ProxyConfig} to be used by connections in this pool, if specified.
@@ -220,12 +221,5 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         if (StringUtils.isNotEmpty(token.getUserId())) return token.getUserId();
         identityProvider.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
         return token.getUserId();
-    }
-
-    private static EventManager createEventManager() {
-        EventManager em = new EventManager();
-        em.autoDiscovery();
-        em.setDefaultEventHandler(SimpleEventHandler.class);
-        return em;
     }
 }
