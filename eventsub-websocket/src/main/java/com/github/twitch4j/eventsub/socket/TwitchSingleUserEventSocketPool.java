@@ -62,7 +62,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
 
     @Override
     protected TwitchEventSocket createConnection() {
-        if (closed.get()) return null;
+        if (closed.get()) throw new IllegalStateException("EventSocket cannot be created after pool was closed!");
         return advancedConfiguration.apply(
             TwitchEventSocket.builder()
                 .api(helix)

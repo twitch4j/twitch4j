@@ -262,7 +262,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
 
     @Override
     protected TwitchChat createConnection() {
-        if (closed.get()) return null;
+        if (closed.get()) throw new IllegalStateException("Chat socket cannot be created after pool was closed!");
 
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
