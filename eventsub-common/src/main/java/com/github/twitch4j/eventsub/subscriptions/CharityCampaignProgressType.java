@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ChannelCharityCampaignCondition;
 import com.github.twitch4j.eventsub.events.CharityCampaignProgressEvent;
 
@@ -15,8 +14,7 @@ import com.github.twitch4j.eventsub.events.CharityCampaignProgressEvent;
  * <p>
  * Requires the channel:read:charity scope.
  */
-@Unofficial
-public class BetaCharityCampaignProgressType implements SubscriptionType<ChannelCharityCampaignCondition, ChannelCharityCampaignCondition.ChannelCharityCampaignConditionBuilder<?, ?>, CharityCampaignProgressEvent> {
+public class CharityCampaignProgressType implements SubscriptionType<ChannelCharityCampaignCondition, ChannelCharityCampaignCondition.ChannelCharityCampaignConditionBuilder<?, ?>, CharityCampaignProgressEvent> {
 
     @Override
     public String getName() {
@@ -25,7 +23,7 @@ public class BetaCharityCampaignProgressType implements SubscriptionType<Channel
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override

@@ -11,7 +11,12 @@ import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.interceptor.EventSubSubscriptionNameExpander;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
 import com.netflix.hystrix.HystrixCommand;
-import feign.*;
+import feign.Body;
+import feign.CollectionFormat;
+import feign.Headers;
+import feign.Param;
+import feign.RequestLine;
+import feign.Response;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -330,14 +335,13 @@ public interface TwitchHelix {
      * <p>
      * The ID in the broadcaster_id query parameter must match the user ID in the access token.
      * <p>
-     * To receive events as donations occur, use {@link com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes#BETA_CHANNEL_CHARITY_DONATE}.
+     * To receive events as donations occur, use {@link com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes#CHANNEL_CHARITY_DONATE}.
      *
      * @param authToken     Broadcaster user access token with the channel:read:charity scope.
      * @param broadcasterId The ID of the broadcaster that’s actively running a charity campaign.
      * @return CharityCampaignWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CHARITY_READ
      */
-    @Unofficial // in open beta
     @RequestLine("GET /charity/campaigns?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CharityCampaignWrapper> getCharityCampaign(
@@ -354,7 +358,6 @@ public interface TwitchHelix {
      * @param after         The cursor used to get the next page of results.
      * @return CharityDonationList
      */
-    @Unofficial // in open beta
     @RequestLine("GET /charity/donations?broadcaster_id={broadcaster_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CharityDonationList> getCharityDonations(

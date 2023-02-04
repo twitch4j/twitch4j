@@ -14,10 +14,10 @@ public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
     public final ChannelBanType CHANNEL_BAN;
-    public final @Unofficial BetaChannelCharityDonateType BETA_CHANNEL_CHARITY_DONATE;
-    public final @Unofficial BetaCharityCampaignStartType BETA_CHANNEL_CHARITY_START;
-    public final @Unofficial BetaCharityCampaignProgressType BETA_CHANNEL_CHARITY_PROGRESS;
-    public final @Unofficial BetaCharityCampaignStopType BETA_CHANNEL_CHARITY_STOP;
+    public final ChannelCharityDonateType CHANNEL_CHARITY_DONATE;
+    public final CharityCampaignStartType CHANNEL_CHARITY_START;
+    public final CharityCampaignProgressType CHANNEL_CHARITY_PROGRESS;
+    public final CharityCampaignStopType CHANNEL_CHARITY_STOP;
     public final ChannelCheerType CHANNEL_CHEER;
     public final ChannelFollowType CHANNEL_FOLLOW;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
@@ -67,10 +67,10 @@ public class SubscriptionTypes {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
                 CHANNEL_BAN = new ChannelBanType(),
-                BETA_CHANNEL_CHARITY_DONATE = new BetaChannelCharityDonateType(),
-                BETA_CHANNEL_CHARITY_START = new BetaCharityCampaignStartType(),
-                BETA_CHANNEL_CHARITY_PROGRESS = new BetaCharityCampaignProgressType(),
-                BETA_CHANNEL_CHARITY_STOP = new BetaCharityCampaignStopType(),
+                CHANNEL_CHARITY_DONATE = new ChannelCharityDonateType(),
+                CHANNEL_CHARITY_START = new CharityCampaignStartType(),
+                CHANNEL_CHARITY_PROGRESS = new CharityCampaignProgressType(),
+                CHANNEL_CHARITY_STOP = new CharityCampaignStopType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
