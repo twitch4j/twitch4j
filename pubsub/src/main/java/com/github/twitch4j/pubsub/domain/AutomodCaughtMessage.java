@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -58,10 +59,19 @@ public class AutomodCaughtMessage {
     @Setter(AccessLevel.PRIVATE)
     public static class Fragment {
 
+        /**
+         * Plain text fragment of the message sent.
+         */
         private String text;
 
         @Nullable
         private FragmentFlags automod;
+
+        /**
+         * Information about an emote if present in the message.
+         */
+        @Nullable
+        private FragmentEmote emoticon;
 
         @Nullable
         @Unofficial
@@ -94,6 +104,22 @@ public class AutomodCaughtMessage {
             return getUserMention() != null && getUserMention().getUserId() != null;
         }
 
+    }
+
+    @Data
+    @Setter(AccessLevel.PRIVATE)
+    public static class FragmentEmote {
+        /**
+         * An ID that identifies this emote.
+         */
+        @JsonAlias("emoticonID")
+        private String emoticonId;
+
+        /**
+         * An ID that identifies the emote set that the emote belongs to.
+         */
+        @JsonAlias("emoticonSetID")
+        private String emoticonSetId;
     }
 
     @Data
@@ -144,6 +170,7 @@ public class AutomodCaughtMessage {
         /**
          * Chat color of the sender.
          */
+        @Unofficial
         private String chatColor;
 
         @Unofficial
