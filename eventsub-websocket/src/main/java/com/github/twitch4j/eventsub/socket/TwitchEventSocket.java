@@ -200,9 +200,22 @@ public final class TwitchEventSocket implements IEventSubSocket {
     @SuppressWarnings("resource")
     public void connect() {
         WebsocketConnection socket = connection.updateAndGet(conn -> {
-            if (conn == null) return buildConnection();
-            if (StringUtils.equals(url, conn.getConfig().baseUrl())) return conn;
-            if (expiringConnection.updateAndGet(c -> c == null ? conn : c) == conn) return buildConnection();
+            // No connection outstanding, build a new one
+            if (conn == null)
+                return buildConnection();
+
+            // Current connection is pointed at wrong url, build a new one
+            if (!StringUtils.equals(url, conn.getConfig().baseUrl())) {
+                executor.execute(() -> attemptClose(conn)); // avoid resource leak
+                return buildConnection();
+            }
+
+            // Current connection is expiring, build a new one
+            if (conn == expiringConnection.get()) {
+                return buildConnection();
+            }
+
+            // Otherwise, existing connection is appropriate to continue using
             return conn;
         });
         socket.connect();
@@ -215,7 +228,10 @@ public final class TwitchEventSocket implements IEventSubSocket {
     public void disconnect() {
         this.websocketId = null;
         this.url = baseUrl;
-        getConnection().disconnect();
+
+        WebsocketConnection socket = connection.get();
+        if (socket != null)
+            socket.disconnect();
     }
 
     /**
@@ -223,9 +239,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
      */
     @Override
     public void reconnect() {
-        this.websocketId = null;
-        this.url = baseUrl;
-        getConnection().reconnect();
+        this.disconnect();
+        this.connect();
     }
 
     @Override
@@ -520,15 +535,26 @@ public final class TwitchEventSocket implements IEventSubSocket {
             spec.taskExecutor(executor);
             spec.onTextMessage(this::onTextMessage);
             spec.onStateChanged((oldState, newState) -> {
-                if (newState == WebsocketConnectionState.LOST && spec.baseUrl().equals(this.getUrl())) {
-                    this.websocketId = null;
+                WebsocketConnection thisSocket = wsRef.get();
+                if (thisSocket != null && thisSocket == connection.get()) {
+                    boolean lost = newState == WebsocketConnectionState.LOST;
 
-                    // noinspection deprecation
-                    subscriptions.values().forEach(sub -> sub.setStatus(EventSubSubscriptionStatus.WEBSOCKET_NETWORK_TIMEOUT));
-                }
+                    if (lost) {
+                        this.websocketId = null;
 
-                if (wsRef.get() == connection.get())
+                        // noinspection deprecation
+                        subscriptions.values().forEach(sub -> sub.setStatus(EventSubSubscriptionStatus.WEBSOCKET_NETWORK_TIMEOUT));
+                    }
+
                     eventManager.publish(new EventSocketConnectionStateEvent(oldState, newState, this));
+
+                    // If connection is lost, make sure outstanding socket points to base url
+                    if (lost && !spec.baseUrl().equals(this.getUrl())) {
+                        wsRef.lazySet(null);
+                        executor.execute(this::reconnect); // will create new socket at correct url
+                        thisSocket.disconnect();
+                    }
+                }
             });
             spec.onCloseFrame(data -> {
                 SocketCloseReason reason = null;
