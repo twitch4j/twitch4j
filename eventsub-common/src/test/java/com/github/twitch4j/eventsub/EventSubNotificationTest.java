@@ -1,7 +1,7 @@
 package com.github.twitch4j.eventsub;
 
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.eventsub.condition.ChannelFollowCondition;
+import com.github.twitch4j.eventsub.condition.ChannelFollowV2Condition;
 import com.github.twitch4j.eventsub.condition.DropEntitlementGrantCondition;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.DropEntitlementGrantEvent;
@@ -35,9 +35,10 @@ public class EventSubNotificationTest {
     @DisplayName("Deserialize Follow Notification")
     public void deserializeFollowNotification() {
         EventSubNotification notif = TypeConvert.jsonToObject(
-            "{\"subscription\":{\"id\":\"f1c2a387-161a-49f9-a165-0f21d7a4e1c4\",\"type\":\"channel.follow\",\"version\":\"1\",\"status\":\"enabled\",\"condition\":{\"broadcaster_user_id\":\"1337\"},\"transport\":{\"method\":\"webhook\"," +
-                "\"callback\":\"https://example.com/webhooks/callback\"},\"created_at\":\"2019-11-16T10:11:12.123Z\"},\"event\":{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\"," +
-                "\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\",\"followed_at\":\"2020-07-15T18:16:11.17106713Z\"}}",
+            "{\"subscription\":{\"id\":\"f1c2a387-161a-49f9-a165-0f21d7a4e1c4\",\"type\":\"channel.follow\",\"version\":\"2\",\"status\":\"enabled\",\"condition\":{\"broadcaster_user_id\":\"1337\",\"moderator_user_id\":\"1234\"}," +
+                "\"transport\":{\"method\":\"webhook\",\"callback\":\"https://example.com/webhooks/callback\"},\"created_at\":\"2019-11-16T10:11:12.123Z\"}," +
+                "\"event\":{\"user_id\":\"1234\",\"user_login\":\"cool_user\",\"user_name\":\"Cool_User\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cooler_user\",\"broadcaster_user_name\":\"Cooler_User\"," +
+                "\"followed_at\":\"2020-07-15T18:16:11.17106713Z\"}}",
             EventSubNotification.class
         );
 
@@ -45,8 +46,8 @@ public class EventSubNotificationTest {
         assertNotNull(notif.getSubscription());
         assertEquals("f1c2a387-161a-49f9-a165-0f21d7a4e1c4", notif.getSubscription().getId());
         assertEquals(EventSubSubscriptionStatus.ENABLED, notif.getSubscription().getStatus());
-        assertEquals(SubscriptionTypes.CHANNEL_FOLLOW, notif.getSubscription().getType());
-        assertEquals(ChannelFollowCondition.builder().broadcasterUserId("1337").build(), notif.getSubscription().getCondition());
+        assertEquals(SubscriptionTypes.CHANNEL_FOLLOW_V2, notif.getSubscription().getType());
+        assertEquals(ChannelFollowV2Condition.builder().broadcasterUserId("1337").moderatorUserId("1234").build(), notif.getSubscription().getCondition());
         assertNotNull(notif.getSubscription().getTransport());
         assertEquals(EventSubTransportMethod.WEBHOOK, notif.getSubscription().getTransport().getMethod());
         assertEquals("https://example.com/webhooks/callback", notif.getSubscription().getTransport().getCallback());

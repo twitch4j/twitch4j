@@ -7,7 +7,12 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
  * A specified channel receives a follow.
  * <p>
  * No authorization required.
+ *
+ * @see <a href="https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322">Deprecation Announcement</a>
+ * @deprecated Twitch will shutdown this topic on 2023-08-03 in favor of {@link ChannelFollowTypeV2} (which has the same event data but more stringent auth).
  */
+@Deprecated
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class ChannelFollowType implements SubscriptionType<ChannelFollowCondition, ChannelFollowCondition.ChannelFollowConditionBuilder<?, ?>, ChannelFollowEvent> {
 
     @Override

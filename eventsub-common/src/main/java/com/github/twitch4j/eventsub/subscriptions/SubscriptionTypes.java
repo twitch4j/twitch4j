@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @UtilityClass
+@SuppressWarnings({ "deprecation", "DeprecatedIsStillUsed" })
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
@@ -19,7 +20,9 @@ public class SubscriptionTypes {
     public final CharityCampaignProgressType CHANNEL_CHARITY_PROGRESS;
     public final CharityCampaignStopType CHANNEL_CHARITY_STOP;
     public final ChannelCheerType CHANNEL_CHEER;
-    public final ChannelFollowType CHANNEL_FOLLOW;
+    public final @Unofficial BetaChannelFollowType BETA_CHANNEL_FOLLOW;
+    public final @Deprecated ChannelFollowType CHANNEL_FOLLOW;
+    public final ChannelFollowTypeV2 CHANNEL_FOLLOW_V2;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
     public final ChannelGoalProgressType CHANNEL_GOAL_PROGRESS;
     public final ChannelGoalEndType CHANNEL_GOAL_END;
@@ -72,7 +75,9 @@ public class SubscriptionTypes {
                 CHANNEL_CHARITY_PROGRESS = new CharityCampaignProgressType(),
                 CHANNEL_CHARITY_STOP = new CharityCampaignStopType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
+                BETA_CHANNEL_FOLLOW = new BetaChannelFollowType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
+                CHANNEL_FOLLOW_V2 = new ChannelFollowTypeV2(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
                 CHANNEL_GOAL_PROGRESS = new ChannelGoalProgressType(),
                 CHANNEL_GOAL_END = new ChannelGoalEndType(),
