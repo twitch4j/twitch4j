@@ -1200,6 +1200,60 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of broadcasters that the specified user follows.
+     * <p>
+     * You can also use this endpoint to see whether a user follows a specific broadcaster.
+     * <p>
+     * Requires a user access token that includes the user:read:follows scope.
+     *
+     * @param authToken     User access token (scope: user:read:follows) that matches the specified userId.
+     * @param userId        Required: A user’s ID. Returns the list of broadcasters that this user follows.
+     * @param broadcasterId Optional: The ID of a channel to see whether this user follows the channel. If not specified, the response contains all broadcasters that the user follows.
+     * @param limit         Optional: The maximum number of items to return per page in the response. Default: 20. Minimum: 1. Maximum: 100.
+     * @param after         Optional: The cursor used to get the next page of results.
+     * @return OutboundFollowing
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_FOLLOWS_READ
+     */
+    @Unofficial // in public beta
+    @RequestLine("GET /channels/followed?user_id={user_id}&broadcaster_id={broadcaster_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<OutboundFollowing> getFollowedChannels(
+        @Param("token") String authToken,
+        @NotNull @Param("user_id") String userId,
+        @Nullable @Param("broadcaster_id") String broadcasterId,
+        @Nullable @Param("first") Integer limit,
+        @Nullable @Param("after") String after
+    );
+
+    /**
+     * Gets a list of users that follow the specified broadcaster.
+     * <p>
+     * You can also use this endpoint to see whether a specific user follows the broadcaster.
+     * <p>
+     * Requires a user access token that includes the moderator:read:followers scope.
+     * The user ID in the access token must match the ID in the broadcaster_id query parameter or the ID of a moderator for the specified broadcaster.
+     * If a scope is not provided, only the total follower account will be included in the response.
+     *
+     * @param authToken     User access token (scope: moderator:read:followers) from the broadcaster or their moderator
+     * @param broadcasterId Required: The broadcaster's ID whose list of followers is being queried.
+     * @param userId        Optional: The ID of a user to see whether the user follows this broadcaster. If not specified, the response contains all users that follow the broadcaster.
+     * @param limit         Optional: The maximum number of items to return per page in the response. Default: 20. Minimum: 1. Maximum: 100.
+     * @param after         Optional: The cursor used to get the next page of results.
+     * @return InboundFollowers
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ
+     */
+    @Unofficial // in public beta
+    @RequestLine("GET /channels/followers?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<InboundFollowers> getChannelFollowers(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @Nullable @Param("user_id") String userId,
+        @Nullable @Param("first") Integer limit,
+        @Nullable @Param("after") String after
+    );
+
+    /**
      * Gets a list of the channel’s VIPs.
      *
      * @param authToken     Broadcaster's user access token that includes the channel:read:vips scope.
@@ -2578,8 +2632,11 @@ public interface TwitchHelix {
      * @param after     Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return FollowList
-     * @see <a href="https://www.twitch.tv/videos/1604648673?t=0h36m30s">Early deprecation notice</a>
+     * @see <a href="https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322">Deprecation Announcement</a>
+     * @deprecated Twitch will shutdown this endpoint on 2023-08-03 in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
      */
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<FollowList> getFollowers(
