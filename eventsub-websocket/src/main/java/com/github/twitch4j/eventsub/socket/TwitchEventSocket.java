@@ -26,6 +26,7 @@ import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import com.github.twitch4j.eventsub.socket.domain.SocketPayload;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;
@@ -100,6 +101,12 @@ public final class TwitchEventSocket implements IEventSubSocket {
     private final ProxyConfig proxyConfig;
 
     /**
+     * Backoff Strategy Configuration
+     */
+    @Nullable
+    private final IBackoffStrategy backoffStrategy;
+
+    /**
      * WebSocket Connection
      */
     @NotNull
@@ -150,13 +157,14 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     @Builder
     TwitchEventSocket(@Nullable String baseUrl, @Nullable String url, @Nullable String clientId, @Nullable String clientSecret, @Nullable EventManager eventManager, @Nullable ScheduledExecutorService taskExecutor,
-                      @Nullable ProxyConfig proxyConfig, @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken) {
+                      @Nullable ProxyConfig proxyConfig, @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken, @Nullable IBackoffStrategy backoffStrategy) {
         this.baseUrl = baseUrl != null ? baseUrl : WEB_SOCKET_SERVER;
         this.url = url != null ? url : this.baseUrl;
         this.eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, SimpleEventHandler.class);
         this.executor = taskExecutor != null ? taskExecutor : Executors.newScheduledThreadPool(REQUIRED_THREAD_COUNT);
         this.proxyConfig = proxyConfig;
         this.defaultToken = defaultToken;
+        this.backoffStrategy = backoffStrategy;
 
         // init token map
         this.tokenByTopic = CacheApi.create(spec -> {
@@ -572,6 +580,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     eventManager.publish(new EventSocketClosedByTwitchEvent(reason, this));
             });
             if (proxyConfig != null) spec.proxyConfig(proxyConfig);
+            if (backoffStrategy != null) spec.backoffStrategy(backoffStrategy);
         });
         wsRef.set(ws);
         return ws;

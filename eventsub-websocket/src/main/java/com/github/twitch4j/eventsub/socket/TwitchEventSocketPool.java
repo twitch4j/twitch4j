@@ -10,6 +10,7 @@ import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Synchronized;
@@ -55,6 +56,12 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
      */
     @Nullable
     private final ScheduledThreadPoolExecutor executor;
+
+    /**
+     * The {@link IBackoffStrategy} to be used by connections in this pool, if specified.
+     */
+    @Nullable
+    private final IBackoffStrategy backoffStrategy;
 
     /**
      * The {@link TwitchIdentityProvider} to enrich credentials.
@@ -130,6 +137,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
                 .defaultToken(token)
                 .eventManager(eventManager)
                 .helix(helix)
+                .backoffStrategy(backoffStrategy)
                 .proxyConfig(proxyConfig)
                 .executor(() -> executor)
                 .build()

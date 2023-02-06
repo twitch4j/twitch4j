@@ -5,6 +5,7 @@ import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
@@ -51,6 +52,12 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     private OAuth2Credential defaultToken;
 
     /**
+     * The {@link IBackoffStrategy} to be used by connections in this pool, if specified.
+     */
+    @Nullable
+    private final IBackoffStrategy backoffStrategy;
+
+    /**
      * A temporary cache of what credential is used for which eventsub subscription registration request,
      * so it can be delivered to the individual underlying socket to be used.
      */
@@ -69,6 +76,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
                 .baseUrl(baseUrl)
                 .defaultToken(defaultToken)
                 .eventManager(getConnectionEventManager())
+                .backoffStrategy(backoffStrategy)
                 .proxyConfig(proxyConfig.get())
                 .taskExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchEventSocket.REQUIRED_THREAD_COUNT))
         ).build();
