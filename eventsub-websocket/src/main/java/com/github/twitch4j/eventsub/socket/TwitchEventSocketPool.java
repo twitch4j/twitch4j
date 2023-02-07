@@ -14,6 +14,7 @@ import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,7 @@ import java.util.function.Supplier;
 /**
  * A pool for EventSub websocket subscriptions across multiple users.
  */
+@Slf4j
 @Builder
 public final class TwitchEventSocketPool implements IEventSubSocket {
 
@@ -143,8 +145,10 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
                 .build()
         );
 
-        if (pool.numSubscriptions() >= maxSubscriptionsPerUser)
+        if (pool.numSubscriptions() >= maxSubscriptionsPerUser) {
+            log.debug("Skipping eventsocket subscription registration because pool is already at capacity for user {}: {}", userId, sub);
             return false;
+        }
 
         return pool.register(token, sub) && poolBySub.put(wrapped, pool) == null;
     }
@@ -225,6 +229,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         return getSubscriptions().size();
     }
 
+    @Nullable
     private String getUserId(OAuth2Credential token) {
         if (StringUtils.isNotEmpty(token.getUserId())) return token.getUserId();
         identityProvider.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
