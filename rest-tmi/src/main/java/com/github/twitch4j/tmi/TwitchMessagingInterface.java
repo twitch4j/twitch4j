@@ -78,9 +78,11 @@ public interface TwitchMessagingInterface {
      *
      * @param channelName Channel Name
      * @return List of all Viewers/mods/...
-     * @deprecated This method will eventually be decommissioned in favor of TwitchHelix#getChatters
+     * @see <a href="https://discuss.dev.twitch.tv/t/legacy-chatters-endpoint-shutdown-details-and-timeline-april-2023/">Shutdown Announcement</a>
+     * @deprecated This method will be permanently shutdown by Twitch on 2023-04-03 in favor of TwitchHelix#getChatters
      */
     @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /group/user/{channel}/chatters")
     HystrixCommand<Chatters> getChatters(
         @Param("channel") String channelName
