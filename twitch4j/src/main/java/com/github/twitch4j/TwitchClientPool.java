@@ -3,6 +3,7 @@ package com.github.twitch4j;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.extensions.TwitchExtensions;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -50,6 +52,12 @@ public class TwitchClientPool implements ITwitchClient {
      * Chat
      */
     private final ITwitchChat chat;
+
+    /**
+     * EventSub over Websocket (public beta)
+     */
+    @ApiStatus.Experimental
+    private final IEventSubSocket eventSocket;
 
     /**
      * PubSub
@@ -91,15 +99,17 @@ public class TwitchClientPool implements ITwitchClient {
      * @param chat               TwitchChat
      * @param pubsub             TwitchPubSub
      * @param graphql            TwitchGraphQL
+     * @param eventSocket        Twitch EventSub over WebSocket
      * @param threadPoolExecutor ScheduledThreadPoolExecutor
      */
-    public TwitchClientPool(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, ITwitchChat chat, ITwitchPubSub pubsub, TwitchGraphQL graphql, ScheduledThreadPoolExecutor threadPoolExecutor) {
+    public TwitchClientPool(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, ITwitchChat chat, ITwitchPubSub pubsub, TwitchGraphQL graphql, IEventSubSocket eventSocket, ScheduledThreadPoolExecutor threadPoolExecutor) {
         this.eventManager = eventManager;
         this.extensions = extensions;
         this.helix = helix;
         this.kraken = kraken;
         this.messagingInterface = messagingInterface;
         this.chat = chat;
+        this.eventSocket = eventSocket;
         this.pubsub = pubsub;
         this.graphql = graphql;
         this.clientHelper = new TwitchClientHelper(helix, eventManager, threadPoolExecutor);
@@ -178,6 +188,15 @@ public class TwitchClientPool implements ITwitchClient {
         }
 
         return this.chat;
+    }
+
+    @Override
+    public IEventSubSocket getEventSocket() {
+        if (this.eventSocket == null) {
+            throw new RuntimeException("You have not enabled the EventSub over WebSocket Module! Please check out the documentation on Twitch4J -> EventSub.");
+        }
+
+        return this.eventSocket;
     }
 
     /**
