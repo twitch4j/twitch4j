@@ -15,7 +15,7 @@ public class IncrementalReusableIdProvider implements IntSupplier {
         if (reused != null)
             return reused;
 
-        return counter.incrementAndGet();
+        return counter.getAndIncrement();
     }
 
     public void release(Integer i) {

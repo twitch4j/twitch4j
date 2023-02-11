@@ -41,6 +41,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.With;
 import lombok.experimental.Accessors;
@@ -98,6 +99,14 @@ public class TwitchClientBuilder {
      */
     @With
     private Integer timeout = 5000;
+
+    /**
+     * Specifies the name of this instance for identification in metrics and logging
+     * It is recommended to change the connectionName if multiple instances of TwitchClient are used to avoid confusion.
+     */
+    @With
+    @NonNull
+    private String connectionName = "t4j-client";
 
     /**
      * Enabled: Extensions
@@ -492,6 +501,7 @@ public class TwitchClientBuilder {
         if (this.enableChat) {
             //noinspection deprecation (withOutboundCommandFilter *can* be used internally)
             chat = TwitchChatBuilder.builder()
+                .withConnectionName(connectionName)
                 .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
@@ -540,6 +550,7 @@ public class TwitchClientBuilder {
         TwitchPubSub pubSub = null;
         if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
+                .withConnectionName(connectionName)
                 .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)

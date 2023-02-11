@@ -45,6 +45,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.With;
 import lombok.experimental.Accessors;
@@ -102,6 +103,14 @@ public class TwitchClientPoolBuilder {
      */
     @With
     private Integer timeout = 5000;
+
+    /**
+     * Specifies the name of this instance for identification in metrics and logging
+     * It is recommended to change the connectionName if multiple instances of TwitchClient are used to avoid confusion.
+     */
+    @With
+    @NonNull
+    private String connectionName = "t4j-client";
 
     /**
      * Enabled: Extensions
@@ -516,6 +525,7 @@ public class TwitchClientPoolBuilder {
             ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()
+                .connectionName(connectionName)
                 .meterRegistry(meterRegistry)
                 .eventManager(eventManager)
                 .chatAccount(() -> chatAccount)
@@ -529,6 +539,7 @@ public class TwitchClientPoolBuilder {
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
                 .advancedConfiguration(builder ->
                     builder
+                        .withConnectionName(connectionName)
                         .withMeterRegistry(meterRegistry)
                         .withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
@@ -544,6 +555,7 @@ public class TwitchClientPoolBuilder {
                 .build();
         } else if (this.enableChat) {
             chat = TwitchChatBuilder.builder()
+                .withConnectionName(connectionName)
                 .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
@@ -584,11 +596,14 @@ public class TwitchClientPoolBuilder {
         ITwitchPubSub pubSub = null;
         if (this.enablePubSubPool) {
             pubSub = TwitchPubSubConnectionPool.builder()
+                .connectionName(connectionName)
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .advancedConfiguration(builder ->
-                    builder.withWsPingPeriod(wsPingPeriod)
+                    builder
+                        .withConnectionName(connectionName)
+                        .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setBotOwnerIds(botOwnerIds)
                         .withMeterRegistry(meterRegistry)
@@ -596,6 +611,7 @@ public class TwitchClientPoolBuilder {
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
+                .withConnectionName(connectionName)
                 .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
