@@ -77,12 +77,6 @@ subprojects {
 			// Credential Manager
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.2.1")
 
-			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "12.2")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "12.2")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "12.2")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "12.2")
-
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
 
@@ -121,7 +115,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.14.2"))
 
 		// Feign BOM
-		api(platform("io.github.openfeign:feign-bom:11.9.1"))
+		api(platform("io.github.openfeign:feign-bom:12.1"))
 
 		// Micrometer BOM
 		api(platform("io.micrometer:micrometer-bom:1.9.1"))
