@@ -516,6 +516,7 @@ public class TwitchClientPoolBuilder {
             ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()
+                .meterRegistry(meterRegistry)
                 .eventManager(eventManager)
                 .chatAccount(() -> chatAccount)
                 .chatRateLimit(chatRateLimit)

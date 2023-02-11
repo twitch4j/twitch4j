@@ -13,6 +13,9 @@ dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
 
+	// Metrics
+	api("io.micrometer:micrometer-core")
+
 	// Rate-limit buckets for registry
 	compileOnly(group = "com.bucket4j", name = "bucket4j_jdk8-core")
 

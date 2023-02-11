@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -54,14 +53,6 @@ import java.util.function.Supplier;
 @Slf4j
 public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> implements ITwitchChat {
     private final IncrementalReusableIdProvider connectionIdProvider = new IncrementalReusableIdProvider();
-
-    /**
-     * The name of this connection pool
-     * This name will be used in metrics / logging to identify this connection.
-     */
-    @NonNull
-    @Builder.Default
-    private String connectionName = RandomStringUtils.random(8, true, true);
 
     /**
      * Provides a chat account to be used when constructing a new {@link TwitchChat} instance.
