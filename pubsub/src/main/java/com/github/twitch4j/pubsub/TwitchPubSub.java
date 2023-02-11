@@ -307,7 +307,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
                     spec.backoffStrategy(connectionBackoffStrategy);
-                spec.onLatencyUpdate(latency -> meterRegistry.gauge("twitch4j_pubsub_latency",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency));
+                spec.onLatencyUpdate(latency -> updateMetrics(latency));
             });
         } else {
             this.connection = websocketConnection;
@@ -965,6 +965,12 @@ public class TwitchPubSub implements ITwitchPubSub {
         return connection.getLatency();
     }
 
+    private void updateMetrics(Long latency) {
+        meterRegistry.gauge("twitch4j_pubsub_latency",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency);
+        meterRegistry.gauge("twitch4j_pubsub_topic_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), subscribedTopics.size());
+        meterRegistry.gauge("twitch4j_pubsub_queue_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), commandQueue.size());
+    }
+
     /**
      * Close
      */
@@ -978,5 +984,4 @@ public class TwitchPubSub implements ITwitchPubSub {
             connection.close();
         }
     }
-
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntSupplier;
 
 public class IncrementalReusableIdProvider implements IntSupplier {
-    private final AtomicInteger counter = new AtomicInteger();
+    private final AtomicInteger counter = new AtomicInteger(0);
     private final Queue<Integer> released = new ConcurrentLinkedQueue<>();
 
     @Override
