@@ -194,6 +194,12 @@ public class WebsocketConnectionConfig {
     private BiConsumer<@NotNull Integer, @Nullable String> onCloseFrame = (code, reason) -> {};
 
     /**
+     * called when updating the connection latency
+     */
+    @NotNull
+    private Consumer<Long> onLatencyUpdate = (latency) -> {};
+
+    /**
      * proxy config
      */
     private ProxyConfig proxyConfig;

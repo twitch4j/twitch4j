@@ -181,6 +181,7 @@ public class WebsocketConnection implements AutoCloseable {
                 if (last > 0) {
                     latency = System.currentTimeMillis() - last;
                     log.trace("T4J Websocket: Round-trip socket latency recorded at {} ms.", latency);
+                    config.onLatencyUpdate().accept(latency);
                 }
             }
 

@@ -124,7 +124,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(connectionName, String.valueOf(this.connectionId), this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
+        return new TwitchPubSub(connectionName, String.valueOf(this.connectionId), meterRegistry, this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
     }
 
     /**

@@ -28,10 +28,10 @@ import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -347,6 +347,7 @@ public class TwitchChat implements ITwitchChat {
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
                     spec.backoffStrategy(connectionBackoffStrategy);
+                spec.onLatencyUpdate(latency -> meterRegistry.gauge("twitch4j_chat_latency",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency));
             });
         } else {
             this.connection = websocketConnection;
