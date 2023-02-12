@@ -597,18 +597,32 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     }
                 }
             });
-            spec.onCloseFrame(data -> {
-                SocketCloseReason reason = null;
-                try {
-                    int code = Integer.parseInt(Objects.requireNonNull(data));
-                    reason = Objects.requireNonNull(SocketCloseReason.MAPPINGS.get(code));
-                } catch (Exception e) {
-                    log.warn("Failed to parse eventsub websocket close frame reason: " + data, e);
+            spec.onCloseFrame((code, payload) -> {
+                SocketCloseReason reason = SocketCloseReason.MAPPINGS.get(code);
+                if (reason == null) {
+                    log.warn("Failed to parse eventsub websocket close frame payload: {} = {}", code, payload);
+                } else {
+                    log.debug("Twitch disconnected the EventSub-WS connection {} because {}", websocketId, reason);
                 }
 
-                log.debug("Twitch disconnected the EventSub-WS connection {} because {}", websocketId, reason);
-                executor.execute(this::connect);
+                if (reason == SocketCloseReason.RECONNECT_GRACE_TIME_EXPIRED) {
+                    // ignore events from expiring connection
+                    return;
+                }
 
+                if (reason == SocketCloseReason.INVALID_RECONNECT) {
+                    // avoid bad reconnect url
+                    this.url = baseUrl;
+                }
+
+                if (reason == SocketCloseReason.CONNECTION_UNUSED && subscriptions.isEmpty()) {
+                    // avoid infinite reconnect loop
+                    executor.execute(this::disconnect);
+                } else {
+                    executor.execute(this::connect);
+                }
+
+                // fire meta event
                 if (wsRef.get() == connection.get())
                     eventManager.publish(new EventSocketClosedByTwitchEvent(reason, this));
             });
