@@ -28,6 +28,7 @@ import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import com.github.twitch4j.eventsub.socket.domain.SocketPayload;
 import com.github.twitch4j.util.IBackoffStrategy;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;
@@ -36,6 +37,7 @@ import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ContextedRuntimeException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,6 +110,11 @@ public final class TwitchEventSocket implements IEventSubSocket {
     private final IBackoffStrategy backoffStrategy;
 
     /**
+     * Whether subscriptions that fail creation due to a 4xx error should be retried on next reconnect.
+     */
+    private final boolean avoidRetryFailedSubscription;
+
+    /**
      * WebSocket Connection
      */
     @NotNull
@@ -157,8 +164,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
     private final Cache<SubscriptionWrapper, OAuth2Credential> tokenByTopic;
 
     @Builder
-    TwitchEventSocket(@Nullable String baseUrl, @Nullable String url, @Nullable String clientId, @Nullable String clientSecret, @Nullable EventManager eventManager, @Nullable ScheduledExecutorService taskExecutor,
-                      @Nullable ProxyConfig proxyConfig, @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken, @Nullable IBackoffStrategy backoffStrategy) {
+    TwitchEventSocket(@Nullable String baseUrl, @Nullable String url, @Nullable String clientId, @Nullable String clientSecret, @Nullable EventManager eventManager, @Nullable ScheduledExecutorService taskExecutor, @Nullable ProxyConfig proxyConfig,
+                      @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken, @Nullable IBackoffStrategy backoffStrategy, @Nullable Boolean avoidRetryFailedSubscription) {
         this.baseUrl = baseUrl != null ? baseUrl : WEB_SOCKET_SERVER;
         this.url = url != null ? url : this.baseUrl;
         this.eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, SimpleEventHandler.class);
@@ -166,6 +173,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         this.proxyConfig = proxyConfig;
         this.defaultToken = defaultToken;
         this.backoffStrategy = backoffStrategy;
+        this.avoidRetryFailedSubscription = avoidRetryFailedSubscription != null ? avoidRetryFailedSubscription : true;
 
         // init token map
         this.tokenByTopic = CacheApi.create(spec -> {
@@ -522,16 +530,35 @@ public final class TwitchEventSocket implements IEventSubSocket {
             return true;
         } catch (Exception e) {
             log.error("Failed to create EventSub-WS subscription {}", newSub, e);
+
+            // skip retry on confirmed bad subscriptions
+            boolean retry = true;
+            if (avoidRetryFailedSubscription && e instanceof HystrixRuntimeException && e.getCause() instanceof ContextedRuntimeException) {
+                ContextedRuntimeException cause = (ContextedRuntimeException) e.getCause();
+                String status = String.valueOf(cause.getFirstContextValue("errorStatus"));
+                try {
+                    int code = Integer.parseInt(status);
+                    if (code >= 400 && code < 500 && code != 429) {
+                        retry = false;
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
             // try again on next reconnect
-            SubscriptionWrapper later = SubscriptionWrapper.wrap(
-                oldSub.toBuilder()
-                    .status(null)
-                    .createdAt(null)
-                    .transport(oldSub.getTransport().withSessionId(null))
-                    .build()
-            );
-            subscriptions.putIfAbsent(later, later);
-            eventManager.publish(new EventSocketSubscriptionFailureEvent(later, this, e));
+            if (retry) {
+                SubscriptionWrapper later = SubscriptionWrapper.wrap(
+                    oldSub.toBuilder()
+                        .status(null)
+                        .createdAt(null)
+                        .transport(oldSub.getTransport().withSessionId(null))
+                        .build()
+                );
+                subscriptions.putIfAbsent(later, later);
+            }
+
+            // fire meta event
+            eventManager.publish(new EventSocketSubscriptionFailureEvent(newSub, this, e));
             return false;
         }
     }
