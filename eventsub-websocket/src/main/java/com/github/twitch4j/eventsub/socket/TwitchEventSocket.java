@@ -555,6 +555,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
                         .build()
                 );
                 subscriptions.putIfAbsent(later, later);
+            } else {
+                log.warn("Will not retry subscription due to creation failure: {}", newSub);
             }
 
             // fire meta event
