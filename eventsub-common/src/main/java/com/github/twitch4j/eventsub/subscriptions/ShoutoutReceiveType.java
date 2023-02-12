@@ -7,7 +7,7 @@ import com.github.twitch4j.eventsub.events.ShoutoutReceiveEvent;
 /**
  * Sends a notification when the specified broadcaster receives a Shoutout.
  * <p>
- * NOTE Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
+ * Note: Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
  * <p>
  * Requires the moderator:read:shoutouts or moderator:manage:shoutouts scope.
  * <p>
@@ -17,8 +17,8 @@ import com.github.twitch4j.eventsub.events.ShoutoutReceiveEvent;
  *
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHOUTOUTS_READ
  */
-@Unofficial // in public beta
-public class BetaShoutoutReceiveType implements SubscriptionType<ChannelShoutoutCondition, ChannelShoutoutCondition.ChannelShoutoutConditionBuilder<?, ?>, ShoutoutReceiveEvent> {
+public class ShoutoutReceiveType implements SubscriptionType<ChannelShoutoutCondition, ChannelShoutoutCondition.ChannelShoutoutConditionBuilder<?, ?>, ShoutoutReceiveEvent> {
+
     @Override
     public String getName() {
         return "channel.shoutout.receive";
@@ -26,7 +26,7 @@ public class BetaShoutoutReceiveType implements SubscriptionType<ChannelShoutout
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
@@ -38,4 +38,5 @@ public class BetaShoutoutReceiveType implements SubscriptionType<ChannelShoutout
     public Class<ShoutoutReceiveEvent> getEventClass() {
         return ShoutoutReceiveEvent.class;
     }
+
 }

@@ -536,7 +536,6 @@ public interface TwitchHelix {
      * @return 204 No Content upon a successful request
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHOUTOUTS_MANAGE
      */
-    @Unofficial // in public beta
     @RequestLine("POST /chat/shoutouts?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> sendShoutout(
