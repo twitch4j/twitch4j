@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.condition.ChannelShoutoutCondition;
 import com.github.twitch4j.eventsub.events.ShoutoutCreateEvent;
 
@@ -16,8 +15,7 @@ import com.github.twitch4j.eventsub.events.ShoutoutCreateEvent;
  *
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHOUTOUTS_READ
  */
-@Unofficial // in public beta
-public class BetaShoutoutCreateType implements SubscriptionType<ChannelShoutoutCondition, ChannelShoutoutCondition.ChannelShoutoutConditionBuilder<?, ?>, ShoutoutCreateEvent> {
+public class ShoutoutCreateType implements SubscriptionType<ChannelShoutoutCondition, ChannelShoutoutCondition.ChannelShoutoutConditionBuilder<?, ?>, ShoutoutCreateEvent> {
 
     @Override
     public String getName() {
@@ -26,7 +24,7 @@ public class BetaShoutoutCreateType implements SubscriptionType<ChannelShoutoutC
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override

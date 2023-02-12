@@ -54,8 +54,8 @@ public class SubscriptionTypes {
     public final PredictionEndType PREDICTION_END;
     public final ShieldModeBeginType SHIELD_MODE_BEGIN_TYPE;
     public final ShieldModeEndType SHIELD_MODE_END_TYPE;
-    public final @Unofficial BetaShoutoutCreateType BETA_SHOUTOUT_CREATE_TYPE;
-    public final @Unofficial BetaShoutoutReceiveType BETA_SHOUTOUT_RECEIVE_TYPE;
+    public final ShoutoutCreateType SHOUTOUT_CREATE_TYPE;
+    public final ShoutoutReceiveType SHOUTOUT_RECEIVE_TYPE;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
@@ -109,8 +109,8 @@ public class SubscriptionTypes {
                 PREDICTION_END = new PredictionEndType(),
                 SHIELD_MODE_BEGIN_TYPE = new ShieldModeBeginType(),
                 SHIELD_MODE_END_TYPE = new ShieldModeEndType(),
-                BETA_SHOUTOUT_CREATE_TYPE = new BetaShoutoutCreateType(),
-                BETA_SHOUTOUT_RECEIVE_TYPE = new BetaShoutoutReceiveType(),
+                SHOUTOUT_CREATE_TYPE = new ShoutoutCreateType(),
+                SHOUTOUT_RECEIVE_TYPE = new ShoutoutReceiveType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),
