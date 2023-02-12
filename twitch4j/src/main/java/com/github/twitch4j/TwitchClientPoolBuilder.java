@@ -559,9 +559,11 @@ public class TwitchClientPoolBuilder {
         if (this.enableEventSocket) {
             eventSocket = TwitchEventSocketPool.builder()
                 .eventManager(eventManager)
-                .proxyConfig(() -> proxyConfig)
                 .executor(scheduledThreadPoolExecutor)
                 .helix(helix)
+                .advancedConfiguration(builder ->
+                    builder.proxyConfig(() -> proxyConfig)
+                )
                 .build();
         }
 
