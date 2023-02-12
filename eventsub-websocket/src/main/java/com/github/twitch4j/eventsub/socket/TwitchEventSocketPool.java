@@ -4,13 +4,11 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.pool.SubscriptionConnectionPool;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
-import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Synchronized;
@@ -28,7 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * A pool for EventSub websocket subscriptions across multiple users.
@@ -47,23 +45,10 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
     private final EventManager eventManager = EventManagerUtils.initializeEventManager(SimpleEventHandler.class);
 
     /**
-     * The {@link ProxyConfig} to be used by connections in this pool, if specified.
-     */
-    @NotNull
-    @Builder.Default
-    private final Supplier<ProxyConfig> proxyConfig = () -> null;
-
-    /**
      * The {@link ScheduledThreadPoolExecutor} to be used by connections in this pool, if specified.
      */
     @Nullable
     private final ScheduledThreadPoolExecutor executor;
-
-    /**
-     * The {@link IBackoffStrategy} to be used by connections in this pool, if specified.
-     */
-    @Nullable
-    private final IBackoffStrategy backoffStrategy;
 
     /**
      * The {@link TwitchIdentityProvider} to enrich credentials.
@@ -93,6 +78,12 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
      */
     @Builder.Default
     private int maxSubscriptionsPerUser = TwitchEventSocket.MAX_SUBSCRIPTIONS_PER_SOCKET * 3; // imposed by twitch
+
+    /**
+     * Further configuration that should be applied to the builder when creating new EventSocket (single-user) pools.
+     */
+    @Builder.Default
+    private final UnaryOperator<TwitchSingleUserEventSocketPool.TwitchSingleUserEventSocketPoolBuilder<?, ?>> advancedConfiguration = b -> b;
 
     /**
      * A mapping of user_id's to their individual eventsocket pools.
@@ -134,15 +125,14 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
             return false;
 
         TwitchSingleUserEventSocketPool pool = poolByUserId.computeIfAbsent(userId,
-            id -> TwitchSingleUserEventSocketPool.builder()
-                .baseUrl(baseUrl)
-                .defaultToken(token)
-                .eventManager(eventManager)
-                .helix(helix)
-                .backoffStrategy(backoffStrategy)
-                .proxyConfig(proxyConfig)
-                .executor(() -> executor)
-                .build()
+            id -> advancedConfiguration.apply(
+                TwitchSingleUserEventSocketPool.builder()
+                    .baseUrl(baseUrl)
+                    .defaultToken(token)
+                    .eventManager(eventManager)
+                    .helix(helix)
+                    .executor(() -> executor)
+            ).build()
         );
 
         if (pool.numSubscriptions() >= maxSubscriptionsPerUser) {
