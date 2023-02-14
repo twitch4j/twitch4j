@@ -560,7 +560,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             }
 
             // fire meta event
-            eventManager.publish(new EventSocketSubscriptionFailureEvent(newSub, this, e));
+            eventManager.publish(new EventSocketSubscriptionFailureEvent(newSub, this, e, retry));
             return false;
         }
     }
