@@ -9,7 +9,7 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok").version("6.6.1").apply(false)
+	id("io.freefair.lombok").version("6.6.2").apply(false)
 	id("com.coditory.manifest").version("0.2.3").apply(false)
 	id("com.github.johnrengelman.shadow").version("7.1.2").apply(false)
 }
