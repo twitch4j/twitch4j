@@ -39,7 +39,7 @@ import java.util.function.BiPredicate;
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
 
     /**
-     * The forwarder will be enabled by default on 2023-02-24 (shortly before the 24-hour brown-out period, and three days before complete shutdown).
+     * The forwarder will be enabled by default on 2023-02-21 (shortly before the 24-hour brown-out period, and three days before complete shutdown).
      */
     public static final Instant ENABLE_AFTER = Instant.ofEpochSecond(1677000000L);
 
