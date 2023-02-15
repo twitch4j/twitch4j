@@ -39,9 +39,9 @@ import java.util.function.BiPredicate;
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
 
     /**
-     * ChatCommandHelixForwarder will be enabled by default on 11.02.2023 (one week prior to deprecation)
+     * The forwarder will be enabled by default on 2023-02-24 (shortly before the 24-hour brown-out period, and three days before complete shutdown).
      */
-    public static final Instant ENABLE_AFTER = Instant.ofEpochSecond(1676073600L);
+    public static final Instant ENABLE_AFTER = Instant.ofEpochSecond(1677000000L);
 
     /**
      * Identifies outbound raw irc messages that contain chat commands.
