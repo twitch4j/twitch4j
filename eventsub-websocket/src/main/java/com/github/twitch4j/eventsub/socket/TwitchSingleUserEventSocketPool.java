@@ -11,6 +11,7 @@ import io.github.xanthic.cache.core.CacheApi;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -115,6 +116,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     }
 
     @Override
+    @Synchronized
     public void connect() {
         if (saturatedConnections.isEmpty() && unsaturatedConnections.isEmpty()) {
             unsaturatedConnections.put(createConnection(), 0);

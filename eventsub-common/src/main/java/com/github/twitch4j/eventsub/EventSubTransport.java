@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
 import lombok.extern.jackson.Jacksonized;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +55,7 @@ public class EventSubTransport {
      */
     @With
     @Nullable
-    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated })
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated, @ApiStatus.Internal })
     private String sessionId;
 
     /**

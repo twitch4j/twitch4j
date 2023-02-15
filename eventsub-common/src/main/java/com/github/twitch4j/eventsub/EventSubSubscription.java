@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.With;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class EventSubSubscription {
     /**
      * Status of the subscription.
      */
-    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated })
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated, @ApiStatus.Internal })
     private EventSubSubscriptionStatus status;
 
     /**
@@ -63,7 +64,7 @@ public class EventSubSubscription {
      * Object indicating the notification delivery specific information.
      */
     @With
-    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated })
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated, @ApiStatus.Internal })
     private EventSubTransport transport;
 
     /**
