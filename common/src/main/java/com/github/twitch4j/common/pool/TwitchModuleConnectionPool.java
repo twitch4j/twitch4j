@@ -3,6 +3,7 @@ package com.github.twitch4j.common.pool;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public abstract class TwitchModuleConnectionPool<C, X, Y, Z, B> extends Subscrip
      */
     @Getter
     @Builder.Default
-    private final EventManager eventManager = createEventManager();
+    private final EventManager eventManager = EventManagerUtils.initializeEventManager(SimpleEventHandler.class);
 
     /**
      * The {@link EventManager} to be used by connections in this pool.
@@ -83,13 +84,6 @@ public abstract class TwitchModuleConnectionPool<C, X, Y, Z, B> extends Subscrip
      */
     protected EventManager getDefaultConnectionEventManager() {
         return this.getEventManager();
-    }
-
-    protected static EventManager createEventManager() {
-        EventManager em = new EventManager();
-        em.autoDiscovery();
-        em.setDefaultEventHandler(SimpleEventHandler.class); // Unfortunately hard-coded due to the static nature of @Builder.Default; the user can override later
-        return em;
     }
 
 }

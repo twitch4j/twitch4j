@@ -60,8 +60,14 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
      */
     protected final ConcurrentMap<S, C> subscriptions = new ConcurrentHashMap<>();
 
+    /**
+     * Tracks whether the pool has been closed.
+     */
+    protected final AtomicBoolean closed = new AtomicBoolean();
+
     @Override
     public T subscribe(S s) {
+        if (closed.get()) throw new IllegalStateException("Subscription cannot be created after pool was closed!");
         C prevConnection = subscriptions.get(s);
         if (prevConnection != null) return handleDuplicateSubscription(null, prevConnection, s);
         final int size = getSubscriptionSize(s);
@@ -83,7 +89,7 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
         final S request = getRequestFromSubscription(t);
         final C connection = subscriptions.remove(request);
         final U u = handleUnsubscription(connection, t);
-        if (connection != null)
+        if (connection != null && !closed.get())
             decrementSubscriptions(connection, getSubscriptionSize(request));
         return u;
     }
@@ -99,6 +105,17 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
         connections.addAll(saturatedConnections);
         connections.addAll(unsaturatedConnections.keySet());
         return Collections.unmodifiableCollection(connections);
+    }
+
+    @Override
+    public void close() {
+        if (!closed.getAndSet(true)) {
+            Collection<C> drained = new ArrayList<>(numConnections());
+            saturatedConnections.removeIf(drained::add);
+            unsaturatedConnections.keySet().removeIf(drained::add);
+            drained.forEach(this::disposeConnection);
+            subscriptions.clear();
+        }
     }
 
     /**

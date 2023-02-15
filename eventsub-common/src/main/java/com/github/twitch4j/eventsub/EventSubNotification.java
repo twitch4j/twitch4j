@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -26,7 +27,10 @@ public class EventSubNotification {
 
     /**
      * The value of challenge from the callback verification request must be returned to complete the verification process.
+     * <p>
+     * Note: websocket subscriptions do not involve a challenge handshake.
      */
+    @Nullable
     private String challenge;
 
 }

@@ -17,6 +17,9 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
+import com.github.twitch4j.eventsub.socket.IEventSubSocket;
+import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
+import com.github.twitch4j.eventsub.socket.TwitchEventSocketPool;
 import com.github.twitch4j.extensions.TwitchExtensions;
 import com.github.twitch4j.extensions.TwitchExtensionsBuilder;
 import com.github.twitch4j.graphql.TwitchGraphQL;
@@ -36,6 +39,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -158,6 +162,15 @@ public class TwitchClientBuilder {
      */
     @With
     private OAuth2Credential chatAccount;
+
+    /**
+     * Enabled: EventSub over WebSocket
+     * <p>
+     * This transport is currently in public beta from Twitch.
+     */
+    @With
+    @ApiStatus.Experimental
+    private Boolean enableEventSocket = false;
 
     /**
      * EventManager
@@ -390,6 +403,8 @@ public class TwitchClientBuilder {
             poolSize = poolSize + TwitchChat.REQUIRED_THREAD_COUNT;
         if (enablePubSub)
             poolSize = poolSize + TwitchPubSub.REQUIRED_THREAD_COUNT;
+        if (enableEventSocket)
+            poolSize = poolSize + TwitchEventSocket.REQUIRED_THREAD_COUNT;
 
         // check a provided threadPool or initialize a default one
         if (scheduledThreadPoolExecutor != null && scheduledThreadPoolExecutor.getCorePoolSize() < poolSize) {
@@ -493,6 +508,19 @@ public class TwitchClientBuilder {
                 .build();
         }
 
+        // Module: EventSub over WebSocket
+        IEventSubSocket eventSocket = null;
+        if (this.enableEventSocket) {
+            eventSocket = TwitchEventSocketPool.builder()
+                .eventManager(eventManager)
+                .executor(scheduledThreadPoolExecutor)
+                .helix(helix)
+                .advancedConfiguration(builder ->
+                    builder.proxyConfig(() -> proxyConfig)
+                )
+                .build();
+        }
+
         // Module: PubSub
         TwitchPubSub pubSub = null;
         if (this.enablePubSub) {
@@ -518,7 +546,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: TwitchClient & ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, scheduledThreadPoolExecutor);
+        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, eventSocket, scheduledThreadPoolExecutor);
         client.getClientHelper().setThreadDelay(helperThreadDelay);
 
         // Return new Client Instance

@@ -51,6 +51,8 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
 
     @Override
     protected TwitchPubSub createConnection() {
+        if (closed.get()) throw new IllegalStateException("PubSub connection cannot be created after pool was closed!");
+
         // Instantiate with configuration
         TwitchPubSub client = advancedConfiguration.apply(
             TwitchPubSubBuilder.builder()

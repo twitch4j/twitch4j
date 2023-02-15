@@ -2,6 +2,7 @@ package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
@@ -17,15 +18,17 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.With;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.Map;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventSubSubscription {
 
     /**
@@ -36,6 +39,7 @@ public class EventSubSubscription {
     /**
      * Status of the subscription.
      */
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated, @ApiStatus.Internal })
     private EventSubSubscriptionStatus status;
 
     /**
@@ -60,6 +64,7 @@ public class EventSubSubscription {
      * Object indicating the notification delivery specific information.
      */
     @With
+    @Setter(value = AccessLevel.PUBLIC, onMethod_ = { @Deprecated, @ApiStatus.Internal })
     private EventSubTransport transport;
 
     /**

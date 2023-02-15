@@ -7,6 +7,8 @@ import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -56,6 +58,7 @@ public class WebsocketConnectionConfig {
         Objects.requireNonNull(onDisconnecting, "onDisconnecting may not be null!");
         Objects.requireNonNull(onPreDisconnect, "onPreDisconnect may not be null!");
         Objects.requireNonNull(onPostDisconnect, "onPostDisconnect may not be null!");
+        Objects.requireNonNull(onCloseFrame, "onCloseFrame may not be null!");
     }
 
     /**
@@ -148,6 +151,11 @@ public class WebsocketConnectionConfig {
      * called after the disconnect
      */
     private Runnable onPostDisconnect = () -> {};
+
+    /**
+     * called after receiving a close frame from the server
+     */
+    private BiConsumer<@NotNull Integer, @Nullable String> onCloseFrame = (code, reason) -> {};
 
     /**
      * proxy config

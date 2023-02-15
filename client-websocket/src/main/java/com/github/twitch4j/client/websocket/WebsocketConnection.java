@@ -124,6 +124,11 @@ public class WebsocketConnection implements AutoCloseable {
             }
 
             @Override
+            public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) {
+                config.onCloseFrame().accept(frame.getCloseCode(), frame.getCloseReason());
+            }
+
+            @Override
             public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
                 if (connectionState.get() != WebsocketConnectionState.DISCONNECTING) {
                     closeSocket(); // avoid possible resource leak
@@ -248,6 +253,11 @@ public class WebsocketConnection implements AutoCloseable {
      */
     @Synchronized
     public void disconnect() {
+        // Cancel any outstanding reconnect task
+        Future<?> reconnector = reconnectTask.getAndSet(null);
+        if (reconnector != null)
+            reconnector.cancel(false);
+
         WebsocketConnectionState connectionState = this.connectionState.get();
 
         if (connectionState == WebsocketConnectionState.DISCONNECTED) {
@@ -318,11 +328,6 @@ public class WebsocketConnection implements AutoCloseable {
         // Cancel backoff clear task, if outstanding
         if (backoffClearer != null)
             backoffClearer.cancel(false);
-
-        // Cancel any outstanding reconnect task
-        Future<?> reconnector = reconnectTask.getAndSet(null);
-        if (reconnector != null)
-            reconnector.cancel(false);
 
         // Disconnect from socket
         try {

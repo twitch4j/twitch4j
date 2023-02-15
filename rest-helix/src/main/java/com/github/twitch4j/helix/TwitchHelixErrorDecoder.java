@@ -64,17 +64,20 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                 ex = new UnauthorizedException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);
+                    .addContextValue("responseBody", responseBody)
+                    .addContextValue("errorStatus", response.status());
             } else if (response.status() == 404) {
                 ex = new NotFoundException()
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);
+                    .addContextValue("responseBody", responseBody)
+                    .addContextValue("errorStatus", response.status());
             } else if (response.status() == 429) {
                 ex = new ContextedRuntimeException("Too many requests!")
                     .addContextValue("requestUrl", response.request().url())
                     .addContextValue("requestMethod", response.request().httpMethod())
-                    .addContextValue("responseBody", responseBody);
+                    .addContextValue("responseBody", responseBody)
+                    .addContextValue("errorStatus", response.status());
 
                 // Deplete ban bucket on 429 (to be safe)
                 RequestTemplate template = response.request().requestTemplate();
