@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.AUTH_HEADER;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.BEARER_PREFIX;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor.CLIENT_HEADER;
+import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getFirst;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getFirstHeader;
 import static com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient.getFirstParam;
 
@@ -32,7 +33,7 @@ public class TwitchHelixDecoder extends JacksonDecoder {
         String token = getFirstHeader(AUTH_HEADER, request);
         if (token != null && token.startsWith(BEARER_PREFIX)) {
             // Parse remaining
-            String remainingStr = getFirstHeader(REMAINING_HEADER, request);
+            String remainingStr = getFirst(REMAINING_HEADER, response.headers());
             Integer remaining;
             try {
                 remaining = Integer.parseInt(remainingStr);
