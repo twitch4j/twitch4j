@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ContextedRuntimeException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -101,8 +100,10 @@ public class TwitchHelixErrorDecoder implements ErrorDecoder {
                     .addContextValue("errorType", error.getMessage())
                     .addContextValue("errorMessage", error.getMessage());
             }
-        } catch (IOException fallbackToDefault) {
+        } catch (Exception fallbackToDefault) {
             ex = defaultDecoder.decode(methodKey, response);
+        } finally {
+            response.close();
         }
 
         return ex;
