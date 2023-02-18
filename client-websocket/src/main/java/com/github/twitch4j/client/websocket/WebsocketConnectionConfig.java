@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 @Accessors(chain = true, fluent = true, prefix = "")
 @Setter
@@ -197,7 +198,7 @@ public class WebsocketConnectionConfig {
      * called when updating the connection latency
      */
     @NotNull
-    private Consumer<Long> onLatencyUpdate = (latency) -> {};
+    private LongConsumer onLatencyUpdate = (latency) -> {};
 
     /**
      * proxy config
