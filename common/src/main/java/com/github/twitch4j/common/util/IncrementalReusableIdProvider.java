@@ -3,22 +3,21 @@ package com.github.twitch4j.common.util;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntSupplier;
 
-public class IncrementalReusableIdProvider implements IntSupplier {
+public class IncrementalReusableIdProvider {
     private final AtomicInteger counter = new AtomicInteger(0);
-    private final Queue<Integer> released = new ConcurrentLinkedQueue<>();
+    private final Queue<String> released = new ConcurrentLinkedQueue<>();
 
-    @Override
-    public int getAsInt() {
-        Integer reused = released.poll();
-        if (reused != null)
+    public String get() {
+        String reused = released.poll();
+        if (reused != null) {
             return reused;
+        }
 
-        return counter.getAndIncrement();
+        return String.valueOf(counter.getAndIncrement());
     }
 
-    public void release(Integer i) {
-        released.offer(i);
+    public void release(String id) {
+        released.offer(id);
     }
 }

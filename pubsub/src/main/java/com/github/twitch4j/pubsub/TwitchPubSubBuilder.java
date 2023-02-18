@@ -41,7 +41,7 @@ public class TwitchPubSubBuilder {
     private String connectionName = RandomStringUtils.random(8, true, true);
 
     @With
-    private int connectionId = 0;
+    private String connectionId = "0";
 
     /**
      * WebsocketConnection
@@ -124,7 +124,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(connectionName, String.valueOf(this.connectionId), meterRegistry, this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
+        return new TwitchPubSub(this.connectionName, this.connectionId, meterRegistry, this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
     }
 
     /**

@@ -63,7 +63,7 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected TwitchPubSub createConnection() {
         if (closed.get()) throw new IllegalStateException("PubSub connection cannot be created after pool was closed!");
-        int connId = connectionIdProvider.getAsInt();
+        String connId = connectionIdProvider.get();
 
         // Instantiate with configuration
         TwitchPubSub client = advancedConfiguration.apply(
@@ -90,11 +90,7 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected void disposeConnection(TwitchPubSub connection) {
         connection.close();
-        try {
-            connectionIdProvider.release(Integer.parseInt(connection.connectionId));
-        } catch (NumberFormatException ex) {
-            log.error("Failed to parse connection id, this error should never occur.", ex);
-        }
+        connectionIdProvider.release(connection.connectionId);
     }
 
     @Override

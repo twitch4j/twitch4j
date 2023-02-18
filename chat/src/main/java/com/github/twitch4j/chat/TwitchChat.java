@@ -347,7 +347,7 @@ public class TwitchChat implements ITwitchChat {
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
                     spec.backoffStrategy(connectionBackoffStrategy);
-                spec.onLatencyUpdate(latency -> updateMetrics(latency));
+                spec.onLatencyUpdate(this::updateMetrics);
             });
         } else {
             this.connection = websocketConnection;

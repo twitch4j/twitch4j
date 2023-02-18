@@ -67,7 +67,7 @@ public class TwitchChatBuilder {
     private String connectionName = RandomStringUtils.random(8, true, true);
 
     @With
-    private int connectionId = 0;
+    private String connectionId = "0";
 
     /**
      * WebsocketConnection
@@ -372,7 +372,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(connectionName, String.valueOf(this.connectionId), this.meterRegistry, this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect, this.wsCloseDelay, this.outboundCommandFilter);
+        return new TwitchChat(this.connectionName, this.connectionId, this.meterRegistry, this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect, this.wsCloseDelay, this.outboundCommandFilter);
     }
 
     /**

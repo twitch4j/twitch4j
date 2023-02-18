@@ -264,7 +264,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected TwitchChat createConnection() {
         if (closed.get()) throw new IllegalStateException("Chat socket cannot be created after pool was closed!");
-        int connId = connectionIdProvider.getAsInt();
+        String connId = connectionIdProvider.get();
 
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
@@ -301,11 +301,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     @Override
     protected void disposeConnection(TwitchChat connection) {
         connection.close();
-        try {
-            connectionIdProvider.release(Integer.parseInt(connection.connectionId));
-        } catch (NumberFormatException ex) {
-            log.error("Failed to parse connection id, this error should never occur.", ex);
-        }
+        connectionIdProvider.release(connection.connectionId);
     }
 
     @Override
