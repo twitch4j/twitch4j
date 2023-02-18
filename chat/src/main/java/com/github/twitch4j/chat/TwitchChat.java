@@ -69,9 +69,11 @@ public class TwitchChat implements ITwitchChat {
     public static final int REQUIRED_THREAD_COUNT = 2;
 
     @NotNull
+    @Getter
     protected final String connectionName;
 
     @NotNull
+    @Getter
     protected final String connectionId;
 
     @NotNull
@@ -463,14 +465,16 @@ public class TwitchChat implements ITwitchChat {
         });
 
         // channel event metrics
-        eventManager.onEvent(TwitchEvent.class, metricEvent -> {
-            if (metricEvent instanceof AbstractChannelEvent) {
-                String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
-                if (StringUtils.isNotEmpty(channelId)) {
-                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+        eventManager.onEvent("twitch4j-chat-event-metrics", TwitchEvent.class, metricEvent -> {
+            if (metricEvent.getTwitchChat() != null) {
+                if (metricEvent instanceof AbstractChannelEvent) {
+                    String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
+                    if (StringUtils.isNotEmpty(channelId)) {
+                        meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", metricEvent.getTwitchChat().getConnectionName()), Tag.of("connection_id", metricEvent.getTwitchChat().getConnectionId()), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+                    }
+                } else {
+                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", metricEvent.getTwitchChat().getConnectionName()), Tag.of("connection_id", metricEvent.getTwitchChat().getConnectionId()), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
                 }
-            } else {
-                meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
             }
         });
 
@@ -601,6 +605,7 @@ public class TwitchChat implements ITwitchChat {
                     else {
                         try {
                             IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
+                            event.setTwitchChat(this);
 
                             if (event.isValid()) {
                                 meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("status", "ok"))).increment();
