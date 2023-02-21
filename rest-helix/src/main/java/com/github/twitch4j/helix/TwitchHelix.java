@@ -1325,6 +1325,7 @@ public interface TwitchHelix {
 
     /**
      * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
+     * <p>
      * For clips returned by game_id or broadcaster_id, the list is in descending order by view count.
      * For lists returned by id, the list is in the same order as the input IDs.
      *
