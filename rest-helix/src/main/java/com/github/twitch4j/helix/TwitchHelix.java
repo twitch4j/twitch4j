@@ -1326,10 +1326,12 @@ public interface TwitchHelix {
     /**
      * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
      * Using user-token or app-token to increase rate limits.
+     * For clips returned by game_id or broadcaster_id, the list is in descending order by view count.
+     * For lists returned by id, the list is in the same order as the input IDs.
      *
      * @param authToken User or App auth Token, for increased rate-limits
-     * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
-     * @param gameId        ID of the game for which clips are returned. The number of clips returned is determined by the first query-string parameter (default: 20). Results are ordered by view count.
+     * @param broadcasterId ID of the broadcaster for whom clips are returned. The number of clips returned is determined by the limit parameter.
+     * @param gameId        ID of the game for which clips are returned. The number of clips returned is determined by the limit parameter.
      * @param id            ID of the clip being queried. Limit: 100.
      * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param before        Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
