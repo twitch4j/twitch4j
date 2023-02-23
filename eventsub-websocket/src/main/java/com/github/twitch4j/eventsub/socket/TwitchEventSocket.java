@@ -21,6 +21,7 @@ import com.github.twitch4j.eventsub.socket.enums.SocketMessageType;
 import com.github.twitch4j.eventsub.socket.events.EventSocketClosedByTwitchEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketConnectionStateEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketDeleteSubscriptionFailureEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketDeleteSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
@@ -279,6 +280,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                 if (StringUtils.isNotBlank(sub.getId())) {
                     try {
                         api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
+                        eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(sub, this));
                     } catch (Exception e) {
                         log.debug("Failed to delete event socket subscription on close: " + sub, e);
                         eventManager.publish(new EventSocketDeleteSubscriptionFailureEvent(sub, this, e));
@@ -339,6 +341,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                 executor.execute(() -> {
                     try {
                         api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
+                        eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(sub, this));
                     } catch (Exception e) {
                         log.warn("Failed to delete EventSub-WS subscription via Twitch API {}", sub, e);
                         eventManager.publish(new EventSocketDeleteSubscriptionFailureEvent(sub, this, e));
@@ -383,6 +386,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                         try {
                             api.deleteEventSubSubscription(getAuthToken(credential), old.getId()).execute();
                             log.trace("EventSub-WS deleted subscription {}", old);
+                            eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(old, this));
                         } catch (Exception e) {
                             log.debug("Could not delete old EventSub-WS subscription {}", old, e);
                             eventManager.publish(new EventSocketDeleteSubscriptionFailureEvent(old, this, e));
