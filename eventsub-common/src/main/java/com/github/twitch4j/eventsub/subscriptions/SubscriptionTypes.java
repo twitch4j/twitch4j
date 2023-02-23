@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collections;
@@ -20,7 +19,6 @@ public class SubscriptionTypes {
     public final CharityCampaignProgressType CHANNEL_CHARITY_PROGRESS;
     public final CharityCampaignStopType CHANNEL_CHARITY_STOP;
     public final ChannelCheerType CHANNEL_CHEER;
-    public final @Unofficial BetaChannelFollowType BETA_CHANNEL_FOLLOW;
     public final @Deprecated ChannelFollowType CHANNEL_FOLLOW;
     public final ChannelFollowTypeV2 CHANNEL_FOLLOW_V2;
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
@@ -75,7 +73,6 @@ public class SubscriptionTypes {
                 CHANNEL_CHARITY_PROGRESS = new CharityCampaignProgressType(),
                 CHANNEL_CHARITY_STOP = new CharityCampaignStopType(),
                 CHANNEL_CHEER = new ChannelCheerType(),
-                BETA_CHANNEL_FOLLOW = new BetaChannelFollowType(),
                 CHANNEL_FOLLOW = new ChannelFollowType(),
                 CHANNEL_FOLLOW_V2 = new ChannelFollowTypeV2(),
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
