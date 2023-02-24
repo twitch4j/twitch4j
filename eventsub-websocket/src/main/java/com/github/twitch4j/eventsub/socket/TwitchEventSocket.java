@@ -261,6 +261,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     @Override
+    @Synchronized
     public void close() throws Exception {
         this.websocketId = null;
 
