@@ -140,13 +140,13 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
 
     @Override
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
-        SubscriptionWrapper wrapped = new SubscriptionWrapper(sub);
+        SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
         credentials.put(wrapped, token != null ? token : Objects.requireNonNull(defaultToken));
         return subscribe(wrapped) != null;
     }
 
     @Override
     public boolean unregister(EventSubSubscription sub) {
-        return this.unsubscribe(new SubscriptionWrapper(sub));
+        return this.unsubscribe(SubscriptionWrapper.wrap(sub));
     }
 }

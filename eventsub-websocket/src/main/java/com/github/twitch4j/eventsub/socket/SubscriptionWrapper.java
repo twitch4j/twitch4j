@@ -14,7 +14,7 @@ class SubscriptionWrapper extends EventSubSubscription {
     String rawVersion;
     EventSubCondition condition;
 
-    SubscriptionWrapper(EventSubSubscription sub) {
+    private SubscriptionWrapper(EventSubSubscription sub) {
         super(sub.getId(), sub.getStatus(), sub.getType(), sub.getCondition(),
             sub.getCreatedAt(), sub.getTransport(), sub.getCost(), sub.isBatchingEnabled(),
             sub.getRawType(), sub.getRawVersion());
