@@ -146,10 +146,11 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
     @Override
     @Synchronized
     public boolean unregister(EventSubSubscription sub) {
-        TwitchSingleUserEventSocketPool pool = poolBySub.get(SubscriptionWrapper.wrap(sub));
+        SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
+        TwitchSingleUserEventSocketPool pool = poolBySub.get(wrapped);
         if (pool == null) return false;
 
-        Boolean unsubscribe = pool.unsubscribe(sub);
+        Boolean unsubscribe = pool.unsubscribe(wrapped);
 
         // cleanup if we removed the last subscription
         if (pool.numSubscriptions() <= 0) {
@@ -174,7 +175,8 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
                 });
         }
 
-        return unsubscribe != null && unsubscribe;
+        // noinspection resource
+        return unsubscribe != null && unsubscribe && poolBySub.remove(wrapped) != null;
     }
 
     @Override
