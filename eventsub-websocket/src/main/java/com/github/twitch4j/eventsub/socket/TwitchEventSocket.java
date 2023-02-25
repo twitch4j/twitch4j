@@ -333,6 +333,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     @Override
+    @Synchronized
     public boolean unregister(EventSubSubscription subscription) {
         EventSubSubscription sub = unsubscribeNoHelix(subscription);
         if (sub != null) {
