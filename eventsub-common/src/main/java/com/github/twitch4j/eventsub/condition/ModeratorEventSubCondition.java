@@ -2,15 +2,15 @@ package com.github.twitch4j.eventsub.condition;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @SuperBuilder
-@EqualsAndHashCode(callSuper = false)
 @Jacksonized
 public class ModeratorEventSubCondition extends ChannelEventSubCondition {
 
@@ -22,4 +22,18 @@ public class ModeratorEventSubCondition extends ChannelEventSubCondition {
      */
     private String moderatorUserId;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ModeratorEventSubCondition)) return false;
+        if (!super.equals(o)) return false;
+
+        ModeratorEventSubCondition that = (ModeratorEventSubCondition) o;
+        return defaultString(moderatorUserId).equals(defaultString(that.moderatorUserId));
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 31 + defaultString(moderatorUserId).hashCode();
+    }
 }

@@ -2,10 +2,13 @@ package com.github.twitch4j.eventsub.condition;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+
+import java.util.Objects;
+
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 /**
  * Generic condition when a broadcaster can be either on the receiving or giving end of the event type.
@@ -13,7 +16,6 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @SuperBuilder
-@EqualsAndHashCode(callSuper = false)
 @Jacksonized
 public class ChannelFromToEventSubCondition extends EventSubCondition {
 
@@ -27,4 +29,18 @@ public class ChannelFromToEventSubCondition extends EventSubCondition {
      */
     private String toBroadcasterUserId;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChannelFromToEventSubCondition)) return false;
+
+        ChannelFromToEventSubCondition that = (ChannelFromToEventSubCondition) o;
+        return defaultString(fromBroadcasterUserId).equals(defaultString(that.fromBroadcasterUserId))
+            && defaultString(toBroadcasterUserId).equals(defaultString(that.toBroadcasterUserId));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(defaultString(fromBroadcasterUserId), defaultString(toBroadcasterUserId));
+    }
 }
