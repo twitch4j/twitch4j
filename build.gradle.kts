@@ -11,7 +11,7 @@ plugins {
 	`maven-publish`
 	id("io.freefair.lombok").version("6.6.3").apply(false)
 	id("com.coditory.manifest").version("0.2.3").apply(false)
-	id("com.github.johnrengelman.shadow").version("7.1.2").apply(false)
+	id("com.github.johnrengelman.shadow").version("8.0.0").apply(false)
 }
 
 group = group
