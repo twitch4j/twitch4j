@@ -262,6 +262,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     @Override
+    @Synchronized
     public void close() throws Exception {
         this.websocketId = null;
 
@@ -334,6 +335,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     @Override
+    @Synchronized
     public boolean unregister(EventSubSubscription subscription) {
         EventSubSubscription sub = unsubscribeNoHelix(subscription);
         if (sub != null) {
