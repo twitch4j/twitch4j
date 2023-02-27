@@ -1210,10 +1210,9 @@ public interface TwitchHelix {
      * @param broadcasterId Optional: The ID of a channel to see whether this user follows the channel. If not specified, the response contains all broadcasters that the user follows.
      * @param limit         Optional: The maximum number of items to return per page in the response. Default: 20. Minimum: 1. Maximum: 100.
      * @param after         Optional: The cursor used to get the next page of results.
-     * @return OutboundFollowing
+     * @return {@link OutboundFollowing}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_FOLLOWS_READ
      */
-    @Unofficial // in public beta
     @RequestLine("GET /channels/followed?user_id={user_id}&broadcaster_id={broadcaster_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<OutboundFollowing> getFollowedChannels(
@@ -1238,10 +1237,9 @@ public interface TwitchHelix {
      * @param userId        Optional: The ID of a user to see whether the user follows this broadcaster. If not specified, the response contains all users that follow the broadcaster.
      * @param limit         Optional: The maximum number of items to return per page in the response. Default: 20. Minimum: 1. Maximum: 100.
      * @param after         Optional: The cursor used to get the next page of results.
-     * @return InboundFollowers
+     * @return {@link InboundFollowers}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ
      */
-    @Unofficial // in public beta
     @RequestLine("GET /channels/followers?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<InboundFollowers> getChannelFollowers(
@@ -2634,7 +2632,8 @@ public interface TwitchHelix {
      * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return FollowList
      * @see <a href="https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322">Deprecation Announcement</a>
-     * @deprecated Twitch will shutdown this endpoint on 2023-08-03 in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
+     * @deprecated Without prior notice, Twitch has restricted this endpoint to client_id's that were using it before 2023-02-18.
+     * Further, Twitch will shutdown this endpoint on 2023-08-03 in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
      */
     @Deprecated
     @SuppressWarnings("DeprecatedIsStillUsed")
