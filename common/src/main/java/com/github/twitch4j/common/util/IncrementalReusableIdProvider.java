@@ -3,8 +3,9 @@ package com.github.twitch4j.common.util;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
-public class IncrementalReusableIdProvider {
+public class IncrementalReusableIdProvider implements Supplier<String> {
     private final AtomicInteger counter = new AtomicInteger(0);
     private final Queue<String> released = new ConcurrentLinkedQueue<>();
 
