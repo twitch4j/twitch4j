@@ -23,7 +23,6 @@ import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,7 +55,7 @@ import java.util.function.BiPredicate;
 public class TwitchChatBuilder {
 
     @With
-    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
+    private MeterRegistry meterRegistry;
 
     /**
      * The name of this connection

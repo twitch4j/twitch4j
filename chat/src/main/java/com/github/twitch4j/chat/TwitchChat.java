@@ -25,6 +25,7 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -302,7 +303,7 @@ public class TwitchChat implements ITwitchChat {
     public TwitchChat(@NotNull String connectionName, @NotNull String connectionId, @NotNull MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
         this.connectionName = connectionName;
         this.connectionId = connectionId;
-        this.meterRegistry = meterRegistry;
+        this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;

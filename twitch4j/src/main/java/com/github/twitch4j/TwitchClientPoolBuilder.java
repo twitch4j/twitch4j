@@ -18,6 +18,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
@@ -40,7 +41,6 @@ import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import feign.Logger;
 import io.github.bucket4j.Bandwidth;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -201,7 +201,7 @@ public class TwitchClientPoolBuilder {
     private OAuth2Credential chatAccount;
 
     @With
-    private MeterRegistry meterRegistry = new CompositeMeterRegistry();
+    private MeterRegistry meterRegistry;
 
     /**
      * EventManager
@@ -429,6 +429,7 @@ public class TwitchClientPoolBuilder {
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
+        meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
 
         // Determinate required threadPool size
         int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;

@@ -10,6 +10,7 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.CryptoUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
@@ -154,6 +155,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -282,10 +284,10 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      * @param wsCloseDelay              Websocket Close Delay
      */
-    public TwitchPubSub(@NotNull String connectionName, @NotNull String connectionId, @NotNull MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
+    public TwitchPubSub(@NotNull String connectionName, @NotNull String connectionId, @Nullable MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
         this.connectionName = connectionName;
         this.connectionId = connectionId;
-        this.meterRegistry = meterRegistry;
+        this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
