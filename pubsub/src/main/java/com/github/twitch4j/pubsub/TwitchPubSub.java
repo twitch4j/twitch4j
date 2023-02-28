@@ -297,6 +297,7 @@ public class TwitchPubSub implements ITwitchPubSub {
             this.connection = new WebsocketConnection(spec -> {
                 spec.connectionName(connectionName);
                 spec.connectionId(connectionId);
+                spec.meterRegistry(this.meterRegistry);
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);

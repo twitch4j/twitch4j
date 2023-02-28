@@ -39,6 +39,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -300,7 +301,7 @@ public class TwitchChat implements ITwitchChat {
      * @param wsCloseDelay                   Websocket Close Delay
      * @param outboundCommandFilter          Outbound Command Filter
      */
-    public TwitchChat(@NotNull String connectionName, @NotNull String connectionId, @NotNull MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+    public TwitchChat(@NotNull String connectionName, @NotNull String connectionId, @Nullable MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
         this.connectionName = connectionName;
         this.connectionId = connectionId;
         this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
@@ -338,7 +339,7 @@ public class TwitchChat implements ITwitchChat {
             this.connection = new WebsocketConnection(spec -> {
                 spec.connectionName(connectionName);
                 spec.connectionId(connectionId);
-                spec.meterRegistry(meterRegistry);
+                spec.meterRegistry(this.meterRegistry);
                 spec.baseUrl(baseUrl);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);
@@ -963,13 +964,13 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void updateMetrics(Long latency) {
-        meterRegistry.gauge("twitch4j_chat_latency",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency);
-        meterRegistry.gauge("twitch4j_chat_channel_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), getChannels().size());
-        meterRegistry.gauge("twitch4j_chat_bucket",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "irc_message")), ircMessageBucket.getAvailableTokens());
-        meterRegistry.gauge("twitch4j_chat_bucket",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "whisper_message")), ircWhisperBucket.getAvailableTokens());
-        meterRegistry.gauge("twitch4j_chat_bucket",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "auth")), ircAuthBucket.getAvailableTokens());
-        meterRegistry.gauge("twitch4j_chat_bucket",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "join")), ircJoinBucket.getAvailableTokens());
-        meterRegistry.gauge("twitch4j_chat_message_queue_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), ircCommandQueue.size());
+        meterRegistry.gauge("twitch4j_chat_latency", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency);
+        meterRegistry.gauge("twitch4j_chat_channel_count", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), getChannels().size());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "irc_message")), ircMessageBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "whisper_message")), ircWhisperBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "auth")), ircAuthBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "join")), ircJoinBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_message_queue_count", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), ircCommandQueue.size());
     }
 
     @SneakyThrows

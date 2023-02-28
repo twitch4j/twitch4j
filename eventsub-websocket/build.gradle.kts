@@ -3,6 +3,9 @@ dependencies {
 	api(project(":twitch4j-eventsub-common"))
 	api(project(":twitch4j-helix"))
 	api(project(":twitch4j-client-websocket"))
+
+	// Metrics
+	api("io.micrometer:micrometer-core")
 }
 
 tasks.javadoc {

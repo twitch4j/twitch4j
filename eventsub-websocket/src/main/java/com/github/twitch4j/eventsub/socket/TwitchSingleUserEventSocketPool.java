@@ -2,21 +2,24 @@ package com.github.twitch4j.eventsub.socket;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
+import com.github.twitch4j.common.util.IncrementalReusableIdProvider;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -28,6 +31,19 @@ import java.util.Objects;
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+    private final IncrementalReusableIdProvider connectionIdProvider = new IncrementalReusableIdProvider();
+
+    /**
+     * Micrometer MeterRegistry
+     */
+    @Getter
+    private final MeterRegistry meterRegistry;
+
+    /**
+     * The user id
+     */
+    @Getter
+    private String userId;
 
     /**
      * The base url for websocket connections.
@@ -66,6 +82,9 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
         if (closed.get()) throw new IllegalStateException("EventSocket cannot be created after pool was closed!");
         return advancedConfiguration.apply(
             TwitchEventSocket.builder()
+                .meterRegistry(meterRegistry)
+                .connectionName(connectionName)
+                .connectionId(connectionIdProvider.get())
                 .api(helix)
                 .baseUrl(baseUrl)
                 .defaultToken(defaultToken)
@@ -76,9 +95,14 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     }
 
     @Override
-    @SneakyThrows
     protected void disposeConnection(TwitchEventSocket connection) {
-        connection.close();
+        try {
+            connection.close();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            connectionIdProvider.release(connection.connectionId);
+        }
     }
 
     @Override
@@ -142,11 +166,18 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
         SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
         credentials.put(wrapped, token != null ? token : Objects.requireNonNull(defaultToken));
-        return subscribe(wrapped) != null;
+        return updateMetrics() && subscribe(wrapped) != null;
     }
 
     @Override
     public boolean unregister(EventSubSubscription sub) {
-        return this.unsubscribe(SubscriptionWrapper.wrap(sub));
+        return updateMetrics() && this.unsubscribe(SubscriptionWrapper.wrap(sub));
+    }
+
+    private Boolean updateMetrics() {
+        // TODO: remove? metrics by user id might be a bad idea because of cardinality
+        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_connection_count", Arrays.asList(Tag.of("connectionName", connectionName), Tag.of("userId", userId)), numConnections());
+        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_subscription_count", Arrays.asList(Tag.of("connectionName", connectionName), Tag.of("userId", userId)), numSubscriptions());
+        return true;
     }
 }
