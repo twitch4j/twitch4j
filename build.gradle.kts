@@ -115,7 +115,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.14.2"))
 
 		// Feign BOM
-		api(platform("io.github.openfeign:feign-bom:12.1"))
+		api(platform("io.github.openfeign:feign-bom:12.2"))
 
 		// Micrometer BOM
 		api(platform("io.micrometer:micrometer-bom:1.9.1"))
