@@ -1,5 +1,4 @@
 import com.coditory.gradle.manifest.ManifestPluginExtension
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.freefair.gradle.plugins.lombok.LombokExtension
 import io.freefair.gradle.plugins.lombok.tasks.Delombok
@@ -158,18 +157,12 @@ subprojects {
 
 	// Source encoding
 	tasks {
-
-		// shadowjar & relocation
-		val relocateShadowJar by creating(ConfigureShadowRelocation::class) {
-			target = named<ShadowJar>("shadowJar").get()
-			prefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
-		}
-
 		// jar artifact id and version
 		withType<Jar> {
 			if (this is ShadowJar) {
-				dependsOn(relocateShadowJar)
 				archiveClassifier.set("shaded")
+				isEnableRelocation = true
+				relocationPrefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
 			}
 			if (enableManifest) {
 				manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
