@@ -157,8 +157,6 @@ subprojects {
 
 	// Source encoding
 	tasks {
-
-		// shadowjar & relocation
 		// jar artifact id and version
 		withType<Jar> {
 			if (this is ShadowJar) {
