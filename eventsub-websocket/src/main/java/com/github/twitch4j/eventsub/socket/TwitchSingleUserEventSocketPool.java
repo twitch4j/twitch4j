@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.socket;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
-import com.github.twitch4j.common.util.IncrementalReusableIdProvider;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
@@ -13,6 +12,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -31,7 +31,6 @@ import java.util.Objects;
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
-    private final IncrementalReusableIdProvider connectionIdProvider = new IncrementalReusableIdProvider();
 
     /**
      * Micrometer MeterRegistry
@@ -84,7 +83,6 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
             TwitchEventSocket.builder()
                 .meterRegistry(meterRegistry)
                 .connectionName(connectionName)
-                .connectionId(connectionIdProvider.get())
                 .api(helix)
                 .baseUrl(baseUrl)
                 .defaultToken(defaultToken)
@@ -95,14 +93,9 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     }
 
     @Override
+    @SneakyThrows
     protected void disposeConnection(TwitchEventSocket connection) {
-        try {
-            connection.close();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            connectionIdProvider.release(connection.connectionId);
-        }
+        connection.close();
     }
 
     @Override

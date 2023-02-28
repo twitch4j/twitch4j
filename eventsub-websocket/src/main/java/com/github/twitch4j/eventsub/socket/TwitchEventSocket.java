@@ -7,6 +7,7 @@ import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
+import com.github.twitch4j.common.util.IncrementalReusableIdProvider;
 import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.eventsub.EventSubSubscription;
@@ -63,7 +64,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public final class TwitchEventSocket implements IEventSubSocket {
-
+    private static final Map<String, IncrementalReusableIdProvider> connectionIdProvider = new ConcurrentHashMap<>();
     public static final int REQUIRED_THREAD_COUNT = 1;
 
     /**
@@ -181,7 +182,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
     @Builder
     TwitchEventSocket(@Nullable String baseUrl, @Nullable String url, @Nullable String clientId, @Nullable String clientSecret, @Nullable EventManager eventManager, @Nullable ScheduledExecutorService taskExecutor, @Nullable ProxyConfig proxyConfig,
-                      @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken, @Nullable IBackoffStrategy backoffStrategy, @Nullable Boolean avoidRetryFailedSubscription, @Nullable MeterRegistry meterRegistry, @Nullable String connectionName, @Nullable String connectionId) {
+                      @Nullable WebsocketConnection connection, @Nullable TwitchHelix api, @Nullable OAuth2Credential defaultToken, @Nullable IBackoffStrategy backoffStrategy, @Nullable Boolean avoidRetryFailedSubscription, @Nullable MeterRegistry meterRegistry, @Nullable String connectionName) {
         this.baseUrl = baseUrl != null ? baseUrl : WEB_SOCKET_SERVER;
         this.url = url != null ? url : this.baseUrl;
         this.eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, SimpleEventHandler.class);
@@ -192,7 +193,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         this.avoidRetryFailedSubscription = avoidRetryFailedSubscription != null ? avoidRetryFailedSubscription : true;
         this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
         this.connectionName = StringUtils.defaultString(connectionName, "default");
-        this.connectionId = StringUtils.defaultString(connectionId, "0");
+        this.connectionId = connectionIdProvider.computeIfAbsent(this.connectionName, p -> new IncrementalReusableIdProvider()).get();
 
         // init token map
         this.tokenByTopic = CacheApi.create(spec -> {
@@ -316,6 +317,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         tokenByTopic.clear();
         futures.clear();
         subscriptions.clear();
+        connectionIdProvider.get(this.connectionName).release(this.connectionId);
     }
 
     @Override

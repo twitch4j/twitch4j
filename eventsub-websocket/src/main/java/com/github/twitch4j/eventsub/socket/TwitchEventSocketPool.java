@@ -45,7 +45,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
      */
     @NonNull
     @Builder.Default
-    private String connectionName = "main";
+    private String connectionName = "socket-multi-pool";
 
     /**
      * Micrometer MeterRegistry
