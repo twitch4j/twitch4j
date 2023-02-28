@@ -3,28 +3,23 @@ package com.github.twitch4j.helix;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.ThreadUtils;
 import feign.Logger;
 import io.github.bucket4j.Bandwidth;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.With;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
-/**
- * Twitch API - Helix
- */
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(chain = true, fluent = true, prefix = "")
+@Setter
 @Getter
-@Deprecated
-public class TwitchHelixBuilder {
-
+public class TwitchHelixAPIConfig {
     /**
      * The official base URL used by production Twitch Helix API servers.
      */
@@ -42,98 +37,81 @@ public class TwitchHelixBuilder {
      */
     public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
 
+    public static TwitchHelixAPIConfig process(Consumer<TwitchHelixAPIConfig> spec) {
+        TwitchHelixAPIConfig data = new TwitchHelixAPIConfig();
+        spec.accept(data);
+        data.validate();
+        return data;
+    }
+
+    /**
+     * validate the config
+     */
+    public void validate() {
+        Objects.requireNonNull(baseUrl, "baseUrl may not be null!");
+
+        // scheduledThreadPoolExecutor is required
+        if (scheduledThreadPoolExecutor == null)
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 1);
+
+        // Enforce non-null rate limit bandwidth
+        if (apiRateLimit == null)
+            apiRateLimit = DEFAULT_BANDWIDTH;
+    }
+
     /**
      * Client Id
      */
-    @With
     private String clientId = Twitch4JGlobal.clientId;
 
     /**
      * Client Secret
      */
-    @With
     private String clientSecret = Twitch4JGlobal.clientSecret;
 
     /**
      * User Agent
      */
-    @With
     private String userAgent = Twitch4JGlobal.userAgent;
 
     /**
      * Default Auth Token for API Requests
      */
-    @With
     private OAuth2Credential defaultAuthToken = null;
 
     /**
      * HTTP Request Queue Size
      */
-    @With
     private Integer requestQueueSize = -1;
 
     /**
      * BaseUrl
      */
-    @With
     private String baseUrl = OFFICIAL_BASE_URL;
 
     /**
      * Default Timeout
      */
-    @With
     private Integer timeout = 5000;
 
     /**
      * you can overwrite the feign loglevel to print the full requests + responses if needed
      */
-    @With
     private Logger.Level logLevel = Logger.Level.NONE;
 
     /**
      * Proxy Configuration
      */
-    @With
     private ProxyConfig proxyConfig = null;
 
     /**
      * Scheduler Thread Pool Executor
      */
-    @With
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;
 
     /**
      * Custom Rate Limit to use for Helix calls
      */
-    @With
     private Bandwidth apiRateLimit = DEFAULT_BANDWIDTH;
 
-    /**
-     * Initialize the builder
-     *
-     * @return Twitch Helix Builder
-     */
-    public static TwitchHelixBuilder builder() {
-        return new TwitchHelixBuilder();
-    }
-
-    /**
-     * Twitch API Client (Helix)
-     *
-     * @return TwitchHelix
-     */
-    public TwitchHelix build() {
-        return new TwitchHelixAPI(spec -> {
-            spec.clientId(clientId);
-            spec.clientSecret(clientSecret);
-            spec.userAgent(userAgent);
-            spec.defaultAuthToken(defaultAuthToken);
-            spec.requestQueueSize(requestQueueSize);
-            spec.timeout(timeout);
-            spec.logLevel(logLevel);
-            spec.proxyConfig(proxyConfig);
-            spec.scheduledThreadPoolExecutor(scheduledThreadPoolExecutor);
-            spec.apiRateLimit(apiRateLimit);
-        }).getHelix();
-    }
 }
