@@ -5,9 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * @deprecated Twitch decommissioned entitlement code related endpoints on 2023-02-27.
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class CodeStatus {
     /**
      * The code to check the status of or to redeem.

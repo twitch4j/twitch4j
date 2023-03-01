@@ -9,9 +9,13 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * @deprecated Twitch decommissioned entitlement code related endpoints on 2023-02-27.
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class CodeStatusList {
 
     @NonNull
