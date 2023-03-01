@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
 /**
  * Twitch API - Helix
+ * @deprecated deprecated in favor of {@link TwitchHelixAPI#build(Consumer)}
  */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -123,7 +125,7 @@ public class TwitchHelixBuilder {
      * @return TwitchHelix
      */
     public TwitchHelix build() {
-        return new TwitchHelixAPI(spec -> {
+        return TwitchHelixAPI.build(spec -> {
             spec.clientId(clientId);
             spec.clientSecret(clientSecret);
             spec.userAgent(userAgent);
@@ -134,6 +136,6 @@ public class TwitchHelixBuilder {
             spec.proxyConfig(proxyConfig);
             spec.scheduledThreadPoolExecutor(scheduledThreadPoolExecutor);
             spec.apiRateLimit(apiRateLimit);
-        }).getHelix();
+        });
     }
 }

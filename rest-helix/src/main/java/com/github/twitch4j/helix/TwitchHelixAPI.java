@@ -18,29 +18,24 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
-import lombok.Getter;
-import lombok.experimental.Delegate;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Slf4j
+@UtilityClass
 public class TwitchHelixAPI {
-    private final TwitchHelixAPIConfig config;
-
-    @Delegate
-    @Getter(onMethod_ = { @Deprecated, @ApiStatus.Internal })
-    private final TwitchHelix helix;
 
     /**
-     * TwitchWebsocketConnection
+     * Constructs a Twitch API client instance.
      *
-     * @param configSpec the websocket connection configuration
+     * @param configSpec the Helix API configuration
+     * @return {@link TwitchHelix}
      */
-    public TwitchHelixAPI(Consumer<TwitchHelixAPIConfig> configSpec) {
-        config = TwitchHelixAPIConfig.process(configSpec);
+    public TwitchHelix build(Consumer<TwitchHelixAPIConfig> configSpec) {
+        TwitchHelixAPIConfig config = TwitchHelixAPIConfig.process(configSpec);
 
         // Hystrix
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", config.timeout());
@@ -69,7 +64,7 @@ public class TwitchHelixAPI {
         // Feign
         TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(config.clientId(), config.clientSecret(), config.defaultAuthToken());
         TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(config.apiRateLimit(), tokenManager);
-        helix = HystrixFeign.builder()
+        return HystrixFeign.builder()
                 .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), config.scheduledThreadPoolExecutor(), tokenManager, rateLimitTracker, config.timeout()))
                 .encoder(new JacksonEncoder(serializer))
                 .decoder(new TwitchHelixDecoder(mapper, rateLimitTracker))
