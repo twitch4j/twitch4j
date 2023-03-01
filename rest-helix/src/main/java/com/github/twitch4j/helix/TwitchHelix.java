@@ -593,7 +593,9 @@ public interface TwitchHelix {
      * @param code      The code to get the status of. 1-20 code parameters are allowed.
      * @param userId    Represents a numeric Twitch user ID. The user account which is going to receive the entitlement associated with the code.
      * @return CodeStatusList
+     * @deprecated Twitch decommissioned this endpoint on 2023-02-27.
      */
+    @Deprecated
     @RequestLine("GET /entitlements/codes?code={code}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CodeStatusList> getCodeStatus(
@@ -611,7 +613,9 @@ public interface TwitchHelix {
      * @param code      The code to redeem to the authenticated user’s account. 1-20 code parameters are allowed.
      * @param userId    Represents a numeric Twitch user ID. The user account which is going to receive the entitlement associated with the code.
      * @return CodeStatusList
+     * @deprecated Twitch decommissioned this endpoint on 2023-02-27.
      */
+    @Deprecated
     @RequestLine("POST /entitlements/codes?code={code}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CodeStatusList> redeemCode(
