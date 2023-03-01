@@ -57,8 +57,8 @@ public class ChannelSearchResult {
      * <p>
      * Note: Category Tags are not returned
      *
-     * @see <a href="https://www.twitch.tv/directory/all/tags">Tag types</a>
-     * @deprecated Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023) in favor of {@link #getTags()}
+     * @see <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Announcement</a>
+     * @deprecated Twitch has deprecated tag ids in favor of {@link #getTags()} due to the latest custom tags system
      */
     @Nullable
     @Deprecated

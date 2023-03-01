@@ -2346,14 +2346,17 @@ public interface TwitchHelix {
      * @param limit     Maximum number of objects to return. Maximum: 100. Default: 20.
      * @param tagIds    Returns tags by one or more specified tag IDs. You can specify up to 100 IDs. If you search by tagIds, no pagination is used.
      * @return StreamTagList
+     * @see <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Information</a>
+     * @deprecated Twitch will decommission this endpoint on 2023-07-13 due to the latest custom tags system.
      */
+    @Deprecated
     @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getAllStreamTags(
-            @Param("token") String authToken,
-            @Param("after") String after,
-            @Param("first") Integer limit,
-            @Param("tag_id") List<UUID> tagIds
+        @Param("token") String authToken,
+        @Param("after") String after,
+        @Param("first") Integer limit,
+        @Param("tag_id") List<UUID> tagIds
     );
 
     /**
@@ -2362,12 +2365,15 @@ public interface TwitchHelix {
      * @param authToken     User Token or App auth Token, for increased rate-limits
      * @param broadcasterId ID of the stream to fetch current tags from
      * @return StreamTagList
+     * @see <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Information</a>
+     * @deprecated Twitch will decommission this endpoint on 2023-07-13 in favor of {@link #getChannelInformation(String, List)} due to the latest custom tags system.
      */
+    @Deprecated
     @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<StreamTagList> getStreamTags(
-            @Param("token") String authToken,
-            @Param("broadcaster_id") String broadcasterId
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
     );
 
     /**
@@ -2378,7 +2384,10 @@ public interface TwitchHelix {
      * @param broadcasterId ID of the stream to replace tags for
      * @param tagIds        Tag ids to replace the current stream tags with. Maximum: 100. If empty, all tags are cleared from the stream. Tags currently expire 72 hours after they are applied, unless the stream is live within that time period.
      * @return Object       nothing
+     * @see <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Information</a>
+     * @deprecated Twitch has decommissioned this endpoint in favor of {@link #updateChannelInformation(String, String, ChannelInformation)} due to the latest custom tags system.
      */
+    @Deprecated
     @RequestLine("PUT /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers({
         "Authorization: Bearer {token}",
@@ -2386,9 +2395,9 @@ public interface TwitchHelix {
     })
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
     HystrixCommand<Void> replaceStreamTags(
-            @Param("token") String authToken,
-            @Param("broadcaster_id") String broadcasterId,
-            @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
     );
 
     /**
