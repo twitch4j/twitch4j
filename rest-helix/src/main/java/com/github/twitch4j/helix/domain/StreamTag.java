@@ -7,13 +7,22 @@ import java.util.UUID;
 
 /**
  * Stream Tags (LiveStream)
+ *
+ * @deprecated <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Information</a>
  */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class StreamTag {
-    /** Tag ID. */
+    /**
+     * Tag ID.
+     *
+     * @see ChannelInformation#getTags()
+     * @deprecated Twitch has deprecated UUID-based tags with the latest custom tags system.
+     */
     @NonNull
+    @Deprecated
     private UUID tagId;
 
     /** Whether the tag is automatically set by Twitch (meaning that it cannot be set manually) */

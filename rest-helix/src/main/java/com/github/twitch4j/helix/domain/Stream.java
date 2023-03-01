@@ -77,11 +77,12 @@ public class Stream {
     /**
      * Ids of active tags on the stream
      *
-     * @deprecated Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023) in favor of {@link #getTags()}
+     * @see <a href="https://discuss.dev.twitch.tv/t/adding-customizable-tags-to-the-twitch-api/42921">Deprecation Announcement</a>
+     * @deprecated Twitch has deprecated tag ids in favor of {@link #getTags()} due to the latest custom tags system
      */
     @Nullable
     @Deprecated
-    private List<UUID> tagIds = new ArrayList<>();
+    private List<UUID> tagIds;
 
     /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */
     @Accessors(fluent = true)
