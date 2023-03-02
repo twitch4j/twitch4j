@@ -467,8 +467,8 @@ public class TwitchChat implements ITwitchChat {
         });
 
         // channel event metrics
-        eventManager.onEvent("twitch4j-chat-event-metrics", TwitchEvent.class, metricEvent -> {
-            if (metricEvent.getTwitchChat() != null) {
+        eventManager.onEvent(TwitchEvent.class, metricEvent -> {
+            if (metricEvent.getTwitchChat() != null && metricEvent.getTwitchChat() == this) {
                 if (metricEvent instanceof AbstractChannelEvent) {
                     String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
                     if (StringUtils.isNotEmpty(channelId)) {
