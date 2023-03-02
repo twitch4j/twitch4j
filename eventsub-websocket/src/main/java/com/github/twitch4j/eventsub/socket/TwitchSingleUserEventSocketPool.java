@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -169,8 +170,9 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
 
     private Boolean updateMetrics() {
         // TODO: remove? metrics by user id might be a bad idea because of cardinality
-        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_connection_count", Arrays.asList(Tag.of("connectionName", connectionName), Tag.of("userId", userId)), numConnections());
-        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_subscription_count", Arrays.asList(Tag.of("connectionName", connectionName), Tag.of("userId", userId)), numSubscriptions());
+        List<Tag> connectionNameUserIdTags = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("userId", userId));
+        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_connection_count", connectionNameUserIdTags, numConnections());
+        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_subscription_count", connectionNameUserIdTags, numSubscriptions());
         return true;
     }
 }

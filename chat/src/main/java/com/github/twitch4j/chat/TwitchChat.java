@@ -964,13 +964,14 @@ public class TwitchChat implements ITwitchChat {
     }
 
     private void updateMetrics(Long latency) {
-        meterRegistry.gauge("twitch4j_chat_latency", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency);
-        meterRegistry.gauge("twitch4j_chat_channel_count", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), getChannels().size());
+        List<Tag> connectionNameIdTags = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId));
+        meterRegistry.gauge("twitch4j_chat_latency", connectionNameIdTags, latency);
+        meterRegistry.gauge("twitch4j_chat_channel_count", connectionNameIdTags, getChannels().size());
         meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "irc_message")), ircMessageBucket.getAvailableTokens());
         meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "whisper_message")), ircWhisperBucket.getAvailableTokens());
         meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "auth")), ircAuthBucket.getAvailableTokens());
         meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "join")), ircJoinBucket.getAvailableTokens());
-        meterRegistry.gauge("twitch4j_chat_message_queue_count", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), ircCommandQueue.size());
+        meterRegistry.gauge("twitch4j_chat_message_queue_count", connectionNameIdTags, ircCommandQueue.size());
     }
 
     @SneakyThrows

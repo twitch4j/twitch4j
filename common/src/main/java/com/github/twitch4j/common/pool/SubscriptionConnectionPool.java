@@ -10,6 +10,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -228,7 +229,8 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
     }
 
     private void updateMetrics() {
-        meterRegistry.gauge("twitch4j_chat_pool_connection_count", Collections.singletonList(Tag.of("connection_name", connectionName)), numConnections());
-        meterRegistry.gauge("twitch4j_chat_pool_subscription_count", Collections.singletonList(Tag.of("connection_name", connectionName)), numSubscriptions());
+        List<Tag> connectionNameTag = Collections.singletonList(Tag.of("connection_name", connectionName));
+        meterRegistry.gauge("twitch4j_chat_pool_connection_count", connectionNameTag, numConnections());
+        meterRegistry.gauge("twitch4j_chat_pool_subscription_count", connectionNameTag, numSubscriptions());
     }
 }

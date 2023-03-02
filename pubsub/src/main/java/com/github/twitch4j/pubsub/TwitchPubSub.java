@@ -162,6 +162,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -969,9 +970,10 @@ public class TwitchPubSub implements ITwitchPubSub {
     }
 
     private void updateMetrics(Long latency) {
-        meterRegistry.gauge("twitch4j_pubsub_latency",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), latency);
-        meterRegistry.gauge("twitch4j_pubsub_topic_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), subscribedTopics.size());
-        meterRegistry.gauge("twitch4j_pubsub_queue_count",  Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId)), commandQueue.size());
+        List<Tag> connectionNameIdTag = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId));
+        meterRegistry.gauge("twitch4j_pubsub_latency", connectionNameIdTag, latency);
+        meterRegistry.gauge("twitch4j_pubsub_topic_count", connectionNameIdTag, subscribedTopics.size());
+        meterRegistry.gauge("twitch4j_pubsub_queue_count", connectionNameIdTag, commandQueue.size());
     }
 
     /**
