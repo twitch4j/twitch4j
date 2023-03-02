@@ -603,11 +603,11 @@ public class TwitchClientPoolBuilder {
                 .proxyConfig(() -> proxyConfig)
                 .advancedConfiguration(builder ->
                     builder
+                        .withMeterRegistry(meterRegistry)
                         .withConnectionName(connectionName)
                         .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setBotOwnerIds(botOwnerIds)
-                        .withMeterRegistry(meterRegistry)
                 )
                 .build();
         } else if (this.enablePubSub) {

@@ -4,7 +4,6 @@ import com.github.philippheuer.events4j.core.domain.Event;
 import com.github.twitch4j.chat.TwitchChat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -19,7 +18,19 @@ public abstract class TwitchEvent extends Event {
 		super();
 	}
 
-    @Getter
     @Setter(onMethod_ = { @ApiStatus.Internal })
     private TwitchChat twitchChat;
+
+	/**
+	 * Get TwitchChat
+	 *
+	 * @return TwitchChat Instance
+	 */
+	public TwitchChat getTwitchChat() {
+		if (twitchChat != null) {
+			return twitchChat;
+		}
+
+		return getServiceMediator().getService(TwitchChat.class, "twitch4j-chat");
+	}
 }
