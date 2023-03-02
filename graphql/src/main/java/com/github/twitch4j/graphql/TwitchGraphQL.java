@@ -3,10 +3,55 @@ package com.github.twitch4j.graphql;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.internal.batch.BatchConfig;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.annotation.Unofficial;
-import com.github.twitch4j.common.config.ProxyConfig;
-import com.github.twitch4j.graphql.command.*;
+import com.github.twitch4j.graphql.command.CommandAcceptFriendRequest;
+import com.github.twitch4j.graphql.command.CommandAddChannelBlockedTerm;
+import com.github.twitch4j.graphql.command.CommandAddChannelPermittedTerm;
+import com.github.twitch4j.graphql.command.CommandApproveUnbanRequest;
+import com.github.twitch4j.graphql.command.CommandArchivePoll;
+import com.github.twitch4j.graphql.command.CommandBanUser;
+import com.github.twitch4j.graphql.command.CommandBulkApproveUnbanRequest;
+import com.github.twitch4j.graphql.command.CommandBulkDenyUnbanRequest;
+import com.github.twitch4j.graphql.command.CommandCancelPrediction;
+import com.github.twitch4j.graphql.command.CommandComputeId;
+import com.github.twitch4j.graphql.command.CommandCreateClip;
+import com.github.twitch4j.graphql.command.CommandCreateCommunityPointsGoal;
+import com.github.twitch4j.graphql.command.CommandCreateModComment;
+import com.github.twitch4j.graphql.command.CommandCreatePoll;
+import com.github.twitch4j.graphql.command.CommandCreatePrediction;
+import com.github.twitch4j.graphql.command.CommandDeleteChannelBlockedTerm;
+import com.github.twitch4j.graphql.command.CommandDeleteChannelPermittedTerm;
+import com.github.twitch4j.graphql.command.CommandDeleteClips;
+import com.github.twitch4j.graphql.command.CommandDeleteCommunityPointsGoal;
+import com.github.twitch4j.graphql.command.CommandDenyUnbanRequest;
+import com.github.twitch4j.graphql.command.CommandFetchActivePredictions;
+import com.github.twitch4j.graphql.command.CommandFetchBanStatus;
+import com.github.twitch4j.graphql.command.CommandFetchChatHistory;
+import com.github.twitch4j.graphql.command.CommandFetchChatters;
+import com.github.twitch4j.graphql.command.CommandFetchCommunityPointsSettings;
+import com.github.twitch4j.graphql.command.CommandFetchLastBroadcast;
+import com.github.twitch4j.graphql.command.CommandFetchLockedPredictions;
+import com.github.twitch4j.graphql.command.CommandFetchModComments;
+import com.github.twitch4j.graphql.command.CommandFetchMods;
+import com.github.twitch4j.graphql.command.CommandFetchPoll;
+import com.github.twitch4j.graphql.command.CommandFetchPrediction;
+import com.github.twitch4j.graphql.command.CommandFetchSquadStream;
+import com.github.twitch4j.graphql.command.CommandFetchUnbanRequests;
+import com.github.twitch4j.graphql.command.CommandFetchUser;
+import com.github.twitch4j.graphql.command.CommandFetchUserEmoteSets;
+import com.github.twitch4j.graphql.command.CommandFetchUserSubscriptions;
+import com.github.twitch4j.graphql.command.CommandFetchVideoComments;
+import com.github.twitch4j.graphql.command.CommandFetchVips;
+import com.github.twitch4j.graphql.command.CommandFollowUser;
+import com.github.twitch4j.graphql.command.CommandLockPrediction;
+import com.github.twitch4j.graphql.command.CommandRejectFriendRequest;
+import com.github.twitch4j.graphql.command.CommandResolvePrediction;
+import com.github.twitch4j.graphql.command.CommandTerminatePoll;
+import com.github.twitch4j.graphql.command.CommandUnfollowUser;
+import com.github.twitch4j.graphql.command.CommandUpdateClip;
+import com.github.twitch4j.graphql.command.CommandUpdateCommunityPointsGoal;
+import com.github.twitch4j.graphql.command.CommandUpdateCustomRedemptionStatus;
+import com.github.twitch4j.graphql.command.CommandUpdateCustomRedemptionStatuses;
 import com.github.twitch4j.graphql.internal.type.CommunityPointsCustomRewardRedemptionStatus;
 import com.github.twitch4j.graphql.internal.type.CreateCommunityPointsCommunityGoalInput;
 import com.github.twitch4j.graphql.internal.type.CreatePollInput;
@@ -22,10 +67,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * This is an unofficial API that is not intended for third-party use. Use at your own risk. Methods could change or stop working at any time.
@@ -35,45 +79,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class TwitchGraphQL {
 
-    /**
-     * Base Url
-     */
-    private final String baseUrl;
-
-    /**
-     * User Agent
-     */
-    private final String userAgent;
-
-    /**
-     * Event Manager
-     */
-    private final EventManager eventManager;
-
-    /**
-     * Client Id
-     */
-    private final String clientId;
-
-    /**
-     * Default Token
-     */
-    private final OAuth2Credential defaultToken;
-
-    /**
-     * Proxy Configuration
-     */
-    private final ProxyConfig proxyConfig;
-
-    /**
-     * Whether GraphQL Queries should be batched
-     */
-    private final boolean batchingEnabled;
-
-    /**
-     * Timeout
-     */
-    private final Integer timeout;
+    private final TwitchGraphQLConfig config;
 
     /**
      * Caches an {@link ApolloClient} instance for various access tokens
@@ -81,33 +87,12 @@ public class TwitchGraphQL {
     private final Cache<String, ApolloClient> clientsByCredential;
 
     /**
-     * Extra user-defined headers on each request
-     */
-    private final Map<String, String> additionalHeaders;
-
-    /**
      * Constructor
      *
-     * @param baseUrl           Base Url
-     * @param userAgent         User Agent
-     * @param eventManager      Event Manager
-     * @param clientId          Client Id
-     * @param defaultToken      Default Token
-     * @param proxyConfig       Proxy Config
-     * @param batchingEnabled   Query Batching
-     * @param timeout           Query Timeout
-     * @param additionalHeaders Custom headers
+     * @param configSpec configuration
      */
-    public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, OAuth2Credential defaultToken, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout, Map<String, String> additionalHeaders) {
-        this.baseUrl = baseUrl;
-        this.userAgent = userAgent;
-        this.eventManager = eventManager;
-        this.clientId = clientId;
-        this.defaultToken = defaultToken;
-        this.proxyConfig = proxyConfig;
-        this.batchingEnabled = batchingEnabled;
-        this.timeout = timeout;
-        this.additionalHeaders = additionalHeaders != null ? additionalHeaders : Collections.emptyMap();
+    public TwitchGraphQL(Consumer<TwitchGraphQLConfig> configSpec) {
+        this.config = TwitchGraphQLConfig.process(configSpec);
         this.clientsByCredential = CacheApi.create(spec -> {
             spec.maxSize(64L);
             spec.expiryType(ExpiryType.POST_ACCESS);
@@ -122,25 +107,25 @@ public class TwitchGraphQL {
      * @return ApolloClient
      */
     private ApolloClient getApolloClient(OAuth2Credential credential) {
-        if (credential == null) credential = defaultToken;
+        if (credential == null) credential = config.defaultToken();
         final String accessToken = credential != null && credential.getAccessToken() != null ? credential.getAccessToken() : "";
         return clientsByCredential.computeIfAbsent(accessToken, s -> {
             // Http Client
             OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
-                .callTimeout(timeout, TimeUnit.MILLISECONDS)
-                .connectTimeout(timeout / 3, TimeUnit.MILLISECONDS)
+                .callTimeout(config.timeout(), TimeUnit.MILLISECONDS)
+                .connectTimeout(config.timeout() / 3, TimeUnit.MILLISECONDS)
                 .addInterceptor(chain -> {
                     Request original = chain.request();
 
                     Request.Builder requestBuilder = original
                         .newBuilder()
                         .header("Accept", "*/*")
-                        .header("Client-Id", clientId)
-                        .header("User-Agent", userAgent)
+                        .header("Client-Id", config.clientId())
+                        .header("User-Agent", config.userAgent())
                         .header("X-Device-Id", CommandComputeId.INSTANCE.getId());
 
                     // Apply custom headers
-                    additionalHeaders.forEach(requestBuilder::header);
+                    config.additionalHeaders().forEach(requestBuilder::header);
 
                     // Set auth header
                     if (!accessToken.isEmpty()) {
@@ -152,14 +137,14 @@ public class TwitchGraphQL {
                 });
 
             // Apply proxy settings to Http Client
-            if (proxyConfig != null)
-                proxyConfig.apply(clientBuilder);
+            if (config.proxyConfig() != null)
+                config.proxyConfig().apply(clientBuilder);
 
             // Apollo Client
             return ApolloClient.builder()
-                .serverUrl(baseUrl)
+                .serverUrl(config.baseUrl())
                 .okHttpClient(clientBuilder.build())
-                .batchingConfiguration(new BatchConfig(batchingEnabled, 10L, 10))
+                .batchingConfiguration(new BatchConfig(config.batchingEnabled(), 10L, 10))
                 .build();
         });
     }

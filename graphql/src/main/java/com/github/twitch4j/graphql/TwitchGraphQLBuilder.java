@@ -3,12 +3,15 @@ package com.github.twitch4j.graphql;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.service.IEventHandler;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
-import com.github.twitch4j.common.util.EventManagerUtils;
 import com.netflix.config.ConfigurationManager;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -106,21 +109,21 @@ public class TwitchGraphQLBuilder {
      * @return TwitchGraphQL
      */
     public TwitchGraphQL build() {
-        log.debug("GraphQL: Initializing Module ...");
         log.warn("GraphQL: GraphQL is a experimental module not intended for third-party use, please take care as some features might break unannounced.");
 
         // Hystrix
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
 
         // GQL
-        TwitchGraphQL client = new TwitchGraphQL(baseUrl, userAgent, eventManager, clientId, defaultFirstPartyToken, proxyConfig, enableBatching, timeout, headers);
-
-        // Initialize/Check EventManager
-        eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
-
-        // register with serviceMediator
-        this.eventManager.getServiceMediator().addService("twitch4j-graphql", client);
-
-        return client;
+        return new TwitchGraphQL(spec -> {
+            spec.baseUrl(baseUrl);
+            spec.userAgent(userAgent);
+            spec.clientId(clientId);
+            spec.defaultToken(defaultFirstPartyToken);
+            spec.proxyConfig(proxyConfig);
+            spec.batchingEnabled(enableBatching);
+            spec.timeout(timeout);
+            spec.additionalHeaders(headers);
+        });
     }
 }
