@@ -468,14 +468,14 @@ public class TwitchChat implements ITwitchChat {
 
         // channel event metrics
         eventManager.onEvent(TwitchEvent.class, metricEvent -> {
-            if (metricEvent.getTwitchChat() != null && metricEvent.getTwitchChat() == this) {
+            if (metricEvent.getTwitchChat() == this) {
                 if (metricEvent instanceof AbstractChannelEvent) {
                     String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
                     if (StringUtils.isNotEmpty(channelId)) {
-                        meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", metricEvent.getTwitchChat().getConnectionName()), Tag.of("connection_id", metricEvent.getTwitchChat().getConnectionId()), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+                        meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
                     }
                 } else {
-                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", metricEvent.getTwitchChat().getConnectionName()), Tag.of("connection_id", metricEvent.getTwitchChat().getConnectionId()), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
+                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
                 }
             }
         });
