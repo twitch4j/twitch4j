@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class VideoServiceTest extends AbstractEndpointTest {
 
     /** Overwatch GameId */
-    private static String overwatchGameId = "488552";
+    private static final String overwatchGameId = "488552";
 
     /**
      * Get Videos
@@ -28,7 +28,7 @@ public class VideoServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch videos")
     public void getVideos() {
         // TestCase
-        VideoList resultList = testUtils.getTwitchHelixClient().getVideos(TestUtils.getCredential().getAccessToken(), null, null, overwatchGameId, null, null, null, null, null, null, 100).execute();
+        VideoList resultList = TestUtils.getTwitchHelixClient().getVideos(TestUtils.getCredential().getAccessToken(), null, null, overwatchGameId, null, null, null, null, 100, null, null).execute();
 
         // Test
         assertTrue(resultList.getVideos().size() > 0, "Should at least find one result from the videos method!");
