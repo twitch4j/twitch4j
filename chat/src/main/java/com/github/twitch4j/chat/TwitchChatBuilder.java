@@ -32,6 +32,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -294,7 +295,7 @@ public class TwitchChatBuilder {
      * Only intended for internal use by twitch4j.
      */
     @Getter(AccessLevel.PRIVATE)
-    @With(onMethod_ = { @Deprecated }) // try to discourage calls from outside the library
+    @With(onMethod_ = { @Deprecated, @ApiStatus.Internal }) // try to discourage calls from outside the library
     private BiPredicate<TwitchChat, String> outboundCommandFilter = null;
 
     /**
