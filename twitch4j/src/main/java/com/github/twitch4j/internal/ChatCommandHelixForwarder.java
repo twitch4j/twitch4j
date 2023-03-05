@@ -97,7 +97,7 @@ public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, 
             spec.expiryTime(Duration.ofNanos(this.channelHelixLimit.getRefillPeriodNanos() * 2));
             spec.maxSize(2048L);
         });
-        if (StringUtils.isEmpty(token.getUserId())) {
+        if (token != null && StringUtils.isEmpty(token.getUserId())) {
             TwitchIdentityProvider tip = identityProvider != null ? identityProvider : new TwitchIdentityProvider(null, null, null);
             tip.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
             if (StringUtils.isEmpty(token.getUserId())) log.warn("ChatCommandHelixForwarder requires a valid user access token to function correctly.");

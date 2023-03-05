@@ -497,7 +497,7 @@ public class TwitchClientPoolBuilder {
 
         // Module: Chat
         ITwitchChat chat = null;
-        ChatCommandHelixForwarder forwarder = chatCommandsViaHelix && enableHelix && (enableChat || enableChatPool) ?
+        ChatCommandHelixForwarder forwarder = chatCommandsViaHelix && enableHelix && (enableChat || enableChatPool) && (chatAccount != null || defaultAuthToken != null) ?
             new ChatCommandHelixForwarder(
                 helix,
                 chatAccount != null ? chatAccount : defaultAuthToken,

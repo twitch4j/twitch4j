@@ -493,7 +493,7 @@ public class TwitchClientBuilder {
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
                 .withOutboundCommandFilter(
-                    chatCommandsViaHelix && enableHelix ? new ChatCommandHelixForwarder(
+                    chatCommandsViaHelix && enableHelix && (chatAccount != null || defaultAuthToken != null) ? new ChatCommandHelixForwarder(
                         helix,
                         chatAccount != null ? chatAccount : defaultAuthToken,
                         credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
