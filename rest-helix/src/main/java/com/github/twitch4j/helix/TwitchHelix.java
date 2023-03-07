@@ -2805,9 +2805,9 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("game_id") String gameId,
         @Param("language") String language,
-        @Param("period") String period,
-        @Param("sort") String sort,
-        @Param("type") String type,
+        @Param("period") Video.SearchPeriod period,
+        @Param("sort") Video.SearchOrder sort,
+        @Param("type") Video.Type type,
         @Param("first") Integer limit,
         @Param("after") String after,
         @Param("before") String before
@@ -2831,7 +2831,7 @@ public interface TwitchHelix {
      * @param before    Optional: Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit     Optional: Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return VideoList
-     * @deprecated in favor of {@link #getVideos(String, List, String, String, String, String, String, String, Integer, String, String)}, which supports multiple video IDs
+     * @deprecated in favor of {@link #getVideos(String, List, String, String, String, Video.SearchPeriod, Video.SearchOrder, Video.Type, Integer, String, String)}, which supports multiple video IDs
      */
     @Deprecated
     default HystrixCommand<VideoList> getVideos(
@@ -2847,7 +2847,10 @@ public interface TwitchHelix {
         @Param("before") String before,
         @Param("first") Integer limit
     ) {
-        return getVideos(authToken, Collections.singletonList(id), userId, gameId, language, period, sort, type, limit, after, before);
+        Video.SearchPeriod time = Video.SearchPeriod.MAPPINGS.get(period);
+        Video.SearchOrder order = Video.SearchOrder.MAPPINGS.get(sort);
+        Video.Type vidType = Video.Type.MAPPINGS.get(type);
+        return getVideos(authToken, Collections.singletonList(id), userId, gameId, language, time, order, vidType, limit, after, before);
     }
 
     /**
