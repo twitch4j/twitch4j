@@ -26,7 +26,7 @@ public class EnumUtil {
      * @implNote Enum#values is used instead of {@link Class#getEnumConstants()} to avoid reflection overhead.
      */
     public <E extends Enum<E>, K, V> Map<K, V> buildMapping(@NotNull E[] values, @NotNull Function<E, K> keySelector, @NotNull Function<E, V> valueMapper) {
-        final Map<K, V> map = new HashMap<>();
+        final Map<K, V> map = new HashMap<>((values.length * 4 + 2) / 3);
         for (E e : values) {
             map.putIfAbsent(keySelector.apply(e), valueMapper.apply(e));
         }
