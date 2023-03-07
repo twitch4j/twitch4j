@@ -3,12 +3,10 @@ package com.github.twitch4j.util;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @UtilityClass
 public class EnumUtil {
@@ -28,11 +26,11 @@ public class EnumUtil {
      * @implNote Enum#values is used instead of {@link Class#getEnumConstants()} to avoid reflection overhead.
      */
     public <E extends Enum<E>, K, V> Map<K, V> buildMapping(@NotNull E[] values, @NotNull Function<E, K> keySelector, @NotNull Function<E, V> valueMapper) {
-        return Collections.unmodifiableMap(
-            Arrays.stream(values).collect(
-                Collectors.toMap(keySelector, valueMapper, (a, b) -> a, HashMap::new)
-            )
-        );
+        final Map<K, V> map = new HashMap<>();
+        for (E e : values) {
+            map.putIfAbsent(keySelector.apply(e), valueMapper.apply(e));
+        }
+        return Collections.unmodifiableMap(map);
     }
 
     /**
