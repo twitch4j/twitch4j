@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.util.EnumUtil;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,11 +9,8 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -60,7 +58,7 @@ public class Cheermote {
             return this.name().toLowerCase();
         }
 
-        private static final Map<String, Type> MAPPINGS = Arrays.stream(Type.values()).collect(Collectors.toMap(Type::toString, Function.identity()));
+        private static final Map<String, Type> MAPPINGS = EnumUtil.buildMapping(values());
 
         @Deprecated
         public static Type fromString(String type) {

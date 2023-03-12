@@ -2,13 +2,11 @@ package com.github.twitch4j.pubsub.events;
 
 import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.pubsub.domain.PollData;
+import com.github.twitch4j.util.EnumUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,6 +26,6 @@ public class PollsEvent extends TwitchEvent {
         POLL_ARCHIVE,
         POLL_TERMINATE;
 
-        private static final Map<String, EventType> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(Enum::toString, Function.identity()));
+        private static final Map<String, EventType> MAPPINGS = EnumUtil.buildMapping(values());
     }
 }

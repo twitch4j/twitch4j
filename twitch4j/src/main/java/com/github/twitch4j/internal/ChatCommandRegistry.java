@@ -15,6 +15,7 @@ import com.github.twitch4j.helix.domain.Moderator;
 import com.github.twitch4j.helix.domain.ModeratorList;
 import com.github.twitch4j.helix.domain.NamedUserChatColor;
 import com.github.twitch4j.helix.domain.User;
+import com.github.twitch4j.util.EnumUtil;
 import com.github.twitch4j.util.PaginationUtil;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
@@ -28,14 +29,12 @@ import org.slf4j.Logger;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 @Slf4j
 enum ChatCommandRegistry {
@@ -44,8 +43,7 @@ enum ChatCommandRegistry {
     /**
      * Mapping of old chat names of common colors to their Helix equivalents.
      */
-    private static final Map<String, String> HELIX_COLORS_BY_LOWER_CHAT_NAME = Arrays.stream(NamedUserChatColor.values())
-        .collect(Collectors.toMap(c -> c.toString().replace("_", ""), NamedUserChatColor::toString));
+    private static final Map<String, String> HELIX_COLORS_BY_LOWER_CHAT_NAME = EnumUtil.buildMapping(NamedUserChatColor.values(), c -> c.toString().replace("_", ""), Enum::toString);
 
     /**
      * A cache of recent name => id queries.

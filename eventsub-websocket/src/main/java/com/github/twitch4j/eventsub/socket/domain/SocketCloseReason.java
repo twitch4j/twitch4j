@@ -1,13 +1,10 @@
 package com.github.twitch4j.eventsub.socket.domain;
 
+import com.github.twitch4j.util.EnumUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * The reasons for closing the eventsub websocket connection.
@@ -56,15 +53,9 @@ public enum SocketCloseReason {
      */
     INVALID_RECONNECT(4007);
 
-    public static final Map<Integer, SocketCloseReason> MAPPINGS;
+    public static final Map<Integer, SocketCloseReason> MAPPINGS = EnumUtil.buildMapping(values(), SocketCloseReason::getCode);
 
     @Getter
     private final int code;
 
-    static {
-        MAPPINGS = Collections.unmodifiableMap(
-            Arrays.stream(values())
-                .collect(Collectors.toMap(SocketCloseReason::getCode, Function.identity()))
-        );
-    }
 }

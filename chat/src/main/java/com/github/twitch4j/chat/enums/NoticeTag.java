@@ -2,12 +2,10 @@ package com.github.twitch4j.chat.enums;
 
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.util.EnumUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 // This class was largely auto-generated via:
 // Array.from(tbody.children).slice(1).map(o => {
@@ -826,7 +824,7 @@ public enum NoticeTag {
      */
     WHISPER_RESTRICTED_RECIPIENT;
 
-    private static final Map<String, NoticeTag> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(NoticeTag::toString, Function.identity()));
+    private static final Map<String, NoticeTag> MAPPINGS = EnumUtil.buildMapping(values());
 
     @Override
     public String toString() {
