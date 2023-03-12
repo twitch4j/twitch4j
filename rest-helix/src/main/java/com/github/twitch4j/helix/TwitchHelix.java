@@ -2775,10 +2775,51 @@ public interface TwitchHelix {
      * Get Videos
      * <p>
      * Gets video information by video ID (one or more), user ID (one only), or game ID (one only).
-     * The response has a JSON payload with a data field containing an array of video elements. For lookup by user or game, pagination is available, along with several filters that can be specified as query string parameters.
-     * Using user-token or app-token to increase rate limits.
+     * The response has a JSON payload with a data field containing an array of video elements.
+     * For lookup by user or game, pagination is available, along with several filters that can be specified as query string parameters.
+     * <p>
+     * The id, user_id, and game_id parameters are mutually exclusive (but exactly one must be specified).
+     * <p>
+     * You may apply several filters to get a subset of the videos.
+     * The filters are applied as an AND operation to each video.
+     * The filters apply only if you get videos by user ID or game ID.
      *
-     * @param authToken User or App auth Token, for increased rate-limits
+     * @param authToken User or App Access Token
+     * @param id        Required: A list of IDs that identify the videos you want to get. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
+     * @param userId    Required: The ID of the user whose list of videos you want to get.
+     * @param gameId    Required: A category or game ID. The response contains a maximum of 500 videos that show this content.
+     * @param language  Optional: Language of the video being queried (ISO 639-1 two-letter code, or "other" if the language is not supported by Twitch).
+     * @param period    Optional: Period during which the video was created. Valid values: "all", "day", "week", "month". Default: "all".
+     * @param sort      Optional: Sort order of the videos. Valid values: "time", "trending", "views". Default: "time".
+     * @param type      Optional: Type of video. Valid values: "all", "upload", "archive", "highlight". Default: "all".
+     * @param limit     Optional: Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
+     * @param after     Optional: The cursor used to get the next page of results.
+     * @param before    Optional: The cursor used to get the previous page of results.
+     * @return {@link VideoList}
+     */
+    @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<VideoList> getVideos(
+        @Param("token") String authToken,
+        @Param("id") List<String> id,
+        @Param("user_id") String userId,
+        @Param("game_id") String gameId,
+        @Param("language") String language,
+        @Param("period") Video.SearchPeriod period,
+        @Param("sort") Video.SearchOrder sort,
+        @Param("type") Video.Type type,
+        @Param("first") Integer limit,
+        @Param("after") String after,
+        @Param("before") String before
+    );
+
+    /**
+     * Get Videos
+     * <p>
+     * Gets video information by video ID (one or more), user ID (one only), or game ID (one only).
+     * The response has a JSON payload with a data field containing an array of video elements. For lookup by user or game, pagination is available, along with several filters that can be specified as query string parameters.
+     *
+     * @param authToken User or App Access Token
      * @param id        Required: ID of the video being queried. Limit: 100. If this is specified, you cannot use any of the optional query string parameters below.
      * @param userId    Required: ID of the user who owns the video. Limit 1.
      * @param gameId    Required: ID of the game the video is of. Limit 1.
@@ -2790,10 +2831,10 @@ public interface TwitchHelix {
      * @param before    Optional: Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit     Optional: Number of values to be returned when getting videos by user or game ID. Limit: 100. Default: 20.
      * @return VideoList
+     * @deprecated in favor of {@link #getVideos(String, List, String, String, String, Video.SearchPeriod, Video.SearchOrder, Video.Type, Integer, String, String)}, which supports multiple video IDs
      */
-    @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<VideoList> getVideos(
+    @Deprecated
+    default HystrixCommand<VideoList> getVideos(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
@@ -2805,7 +2846,12 @@ public interface TwitchHelix {
         @Param("after") String after,
         @Param("before") String before,
         @Param("first") Integer limit
-    );
+    ) {
+        Video.SearchPeriod time = Video.SearchPeriod.MAPPINGS.get(period);
+        Video.SearchOrder order = Video.SearchOrder.MAPPINGS.get(sort);
+        Video.Type vidType = Video.Type.MAPPINGS.get(type);
+        return getVideos(authToken, Collections.singletonList(id), userId, gameId, language, time, order, vidType, limit, after, before);
+    }
 
     /**
      * Deletes one or more videos. Videos are past broadcasts, Highlights, or uploads.

@@ -1,20 +1,24 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.util.EnumUtil;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Follow
+ * Video
  */
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -77,6 +81,13 @@ public class Video {
     private List<MutedSegment> mutedSegments;
 
     /**
+     * @return the {@link Type} of the video
+     */
+    public Type getParsedType() {
+        return Type.MAPPINGS.get(this.type);
+    }
+
+    /**
      * Gets the thumbnail url for specific dimensions.
      *
      * @param width  Thumbnail width.
@@ -124,6 +135,90 @@ public class Video {
          * Offset in the video at which the muted segment begins.
          */
         Integer offset;
+    }
+
+    /**
+     * The video's type.
+     */
+    public enum Type {
+
+        /**
+         * The default is “all,” which returns all video types.
+         */
+        @JsonEnumDefaultValue
+        ALL,
+
+        /**
+         * On-demand videos (VODs) of past streams.
+         */
+        ARCHIVE,
+
+        /**
+         * Highlight reels of past streams.
+         */
+        HIGHLIGHT,
+
+        /**
+         * External videos that the broadcaster uploaded using the Video Producer.
+         */
+        UPLOAD;
+
+        @ApiStatus.Internal
+        public static final Map<String, Type> MAPPINGS = EnumUtil.buildMapping(values());
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
+    }
+
+    /**
+     * The order to sort the returned videos in.
+     */
+    public enum SearchOrder {
+
+        /**
+         * Sort the results in descending order by when they were created (i.e., latest video first).
+         */
+        @JsonEnumDefaultValue
+        TIME,
+
+        /**
+         * Sort the results in descending order by biggest gains in viewership (i.e., highest trending video first).
+         */
+        TRENDING,
+
+        /**
+         * Sort the results in descending order by most views (i.e., highest number of views first).
+         */
+        VIEWS;
+
+        @ApiStatus.Internal
+        public static final Map<String, SearchOrder> MAPPINGS = EnumUtil.buildMapping(values());
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
+    }
+
+    /**
+     * A filter used to filter the list of videos by when they were published.
+     */
+    public enum SearchPeriod {
+        @JsonEnumDefaultValue
+        ALL,
+        DAY,
+        MONTH,
+        WEEK;
+
+        @ApiStatus.Internal
+        public static final Map<String, SearchPeriod> MAPPINGS = EnumUtil.buildMapping(values());
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
     }
 
 }
