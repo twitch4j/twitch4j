@@ -85,6 +85,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
         eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
         eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
+        eventManager.onEvent("twitch4j-chat-viewermilestone-trigger", IRCMessageEvent.class, this::onViewerMilestone);
     }
 
     @Unofficial
@@ -682,6 +683,13 @@ public class IRCEventHandler {
     public void onGlobalUserState(IRCMessageEvent event) {
         if ("GLOBALUSERSTATE".equals(event.getCommandType())) {
             eventManager.publish(new GlobalUserStateEvent(event));
+        }
+    }
+
+    @Unofficial
+    private void onViewerMilestone(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && ViewerMilestoneEvent.USERNOTICE_ID.equals(event.getTags().get("msg-id"))) {
+            eventManager.publish(new ViewerMilestoneEvent(event));
         }
     }
 
