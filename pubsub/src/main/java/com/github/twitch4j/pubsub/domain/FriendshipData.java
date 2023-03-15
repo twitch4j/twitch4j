@@ -1,11 +1,9 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.github.twitch4j.util.EnumUtil;
 import lombok.Data;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @deprecated Friends are being removed by <a href="https://help.twitch.tv/s/article/how-to-use-the-friends-feature">Twitch</a> on 2022-05-25
@@ -36,7 +34,7 @@ public class FriendshipData {
             return this.name().toLowerCase();
         }
 
-        private static final Map<String, Change> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(Enum::toString, Function.identity()));
+        private static final Map<String, Change> MAPPINGS = EnumUtil.buildMapping(values());
 
         @Deprecated
         public static Change fromString(String change) {

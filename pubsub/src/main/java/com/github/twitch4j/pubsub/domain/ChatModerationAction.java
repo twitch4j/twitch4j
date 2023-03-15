@@ -1,18 +1,16 @@
 package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.github.twitch4j.util.EnumUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -361,8 +359,7 @@ public class ChatModerationAction {
             this.twitchString = twitchString;
         }
 
-        private static final Map<String, ModerationAction> MAPPINGS = Arrays.stream(ModerationAction.values())
-            .collect(Collectors.toMap(ModerationAction::getTwitchString, Function.identity()));
+        private static final Map<String, ModerationAction> MAPPINGS = EnumUtil.buildMapping(values(), ModerationAction::getTwitchString);
 
         @JsonCreator
         public static ModerationAction fromString(String action) {

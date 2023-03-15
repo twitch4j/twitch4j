@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.util.EnumUtil;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -9,10 +10,7 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -64,13 +62,13 @@ public class CommunityPointsGoal {
     public enum Type {
         BOOST, CREATOR, @JsonEnumDefaultValue UNKNOWN;
 
-        static final Map<String, Type> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(Enum::toString, Function.identity()));
+        static final Map<String, Type> MAPPINGS = EnumUtil.buildMapping(values());
     }
 
     public enum Status {
         ARCHIVED, ENDED, FULFILLED, STARTED, @JsonEnumDefaultValue UNKNOWN, UNSTARTED;
 
-        static final Map<String, Status> MAPPINGS = Arrays.stream(values()).collect(Collectors.toMap(Enum::toString, Function.identity()));
+        static final Map<String, Status> MAPPINGS = EnumUtil.buildMapping(values());
     }
 
 }
