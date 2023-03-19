@@ -271,7 +271,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return the exact number of months the user has been a subscriber, or empty if they are not subscribed
      */
     public OptionalInt getSubscriberMonths() {
-        final String monthsStr = badgeInfo.get("subscriber");
+        final String monthsStr = badgeInfo.getOrDefault("subscriber", badgeInfo.get("founder"));
 
         if (monthsStr != null) {
             try {
@@ -284,7 +284,7 @@ public class IRCMessageEvent extends TwitchEvent {
     }
 
     /**
-     * @return the tier at which the user is subscribed, or empty if they are not subscribed
+     * @return the tier at which the user is subscribed, or empty if they are not subscribed or have the founders badge equipped
      */
     public OptionalInt getSubscriptionTier() {
         final String subscriber = badges.get("subscriber");
