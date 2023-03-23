@@ -5,6 +5,7 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.feign.interceptor.JsonContentTypeHeaderInterceptor;
 import com.github.twitch4j.common.feign.interceptor.TwitchClientIdInterceptor;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
@@ -13,8 +14,10 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +37,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Deprecated
 public class TwitchKrakenBuilder {
+
+    @With
+    private MeterRegistry meterRegistry;
 
     /**
      * Client Id
@@ -104,7 +110,9 @@ public class TwitchKrakenBuilder {
     public TwitchKraken build() {
         log.warn("Kraken is deprecated and has been shut down on Febuary 28, 2022.");
         log.warn("More details about the decommission are available here: https://blog.twitch.tv/en/2021/07/15/legacy-twitch-api-v5-shutdown-details-and-timeline");
-        log.debug("Kraken: Initializing Module ...");
+
+        // init
+        meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
 
         // Hystrix
         ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
@@ -140,6 +148,7 @@ public class TwitchKrakenBuilder {
             .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchKrakenErrorDecoder(new JacksonDecoder()))
             .requestInterceptor(new TwitchClientIdInterceptor(this.clientId, this.userAgent))
             .requestInterceptor(t -> t.header("Accept", "application/vnd.twitchtv.v5+json"))

@@ -1,11 +1,16 @@
 package com.github.twitch4j.common.pool;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -21,6 +26,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SuperBuilder
 public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractConnectionPool<C> implements TransactionalSubscriber<S, T, U> {
+
+    @NonNull
+    protected MeterRegistry meterRegistry;
+
+    /**
+     * The name of this connection pool
+     * This name will be used in metrics / logging to identify this connection.
+     */
+    @NonNull
+    @Builder.Default
+    protected String connectionName = RandomStringUtils.random(8, true, true);
 
     /**
      * Whether connections without subscriptions should be disposed of. Default: true.
@@ -81,6 +97,7 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
                 return dupeResponse;
             }
         }
+        updateMetrics();
         return handleSubscription(connection, s);
     }
 
@@ -91,6 +108,7 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
         final U u = handleUnsubscription(connection, t);
         if (connection != null && !closed.get())
             decrementSubscriptions(connection, getSubscriptionSize(request));
+        updateMetrics();
         return u;
     }
 
@@ -210,4 +228,9 @@ public abstract class SubscriptionConnectionPool<C, S, T, U> extends AbstractCon
             disposeConnection(connection);
     }
 
+    private void updateMetrics() {
+        List<Tag> connectionNameTag = Collections.singletonList(Tag.of("connection_name", connectionName));
+        meterRegistry.gauge("twitch4j_chat_pool_connection_count", connectionNameTag, numConnections());
+        meterRegistry.gauge("twitch4j_chat_pool_subscription_count", connectionNameTag, numSubscriptions());
+    }
 }

@@ -1,12 +1,15 @@
 package com.github.twitch4j.pubsub;
 
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
+import com.github.twitch4j.common.util.IncrementalReusableIdProvider;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,9 +24,17 @@ import java.util.stream.StreamSupport;
  * at will. If enough connections are made, this could pollute one's runtime environment.
  */
 @SuperBuilder
+@Slf4j
 public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<TwitchPubSub, PubSubRequest, PubSubSubscription, Boolean, TwitchPubSubBuilder> implements ITwitchPubSub {
+    private final IncrementalReusableIdProvider connectionIdProvider = new IncrementalReusableIdProvider();
 
-    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-pubsub-";
+    /**
+     * The name of this connection
+     * This name will be used in metrics / logging to identify this connection.
+     */
+    @NonNull
+    @Builder.Default
+    private String connectionName = RandomStringUtils.random(8, true, true);
 
     /**
      * WebSocket Connection Backoff Strategy
@@ -52,12 +63,15 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected TwitchPubSub createConnection() {
         if (closed.get()) throw new IllegalStateException("PubSub connection cannot be created after pool was closed!");
+        String connId = connectionIdProvider.get();
 
         // Instantiate with configuration
         TwitchPubSub client = advancedConfiguration.apply(
             TwitchPubSubBuilder.builder()
+                .withConnectionName(connectionName)
+                .withConnectionId(connId)
                 .withEventManager(getConnectionEventManager())
-                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchPubSub.REQUIRED_THREAD_COUNT))
+                .withScheduledThreadPoolExecutor(getExecutor("twitch4j-pubsub-pool-" + connectionName + "-" + connId, TwitchPubSub.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
                 .withConnectionBackoffStrategy(connectionBackoffStrategy)
         ).build();
@@ -76,6 +90,7 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
     @Override
     protected void disposeConnection(TwitchPubSub connection) {
         connection.close();
+        connectionIdProvider.release(connection.connectionId);
     }
 
     @Override

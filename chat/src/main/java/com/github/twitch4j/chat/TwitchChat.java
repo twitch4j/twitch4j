@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.chat.events.ChatConnectionStateEvent;
 import com.github.twitch4j.chat.events.CommandEvent;
 import com.github.twitch4j.chat.events.IRCEventHandler;
+import com.github.twitch4j.chat.events.TwitchEvent;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
@@ -24,17 +25,21 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EscapeUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -64,6 +69,17 @@ import java.util.function.Consumer;
 public class TwitchChat implements ITwitchChat {
 
     public static final int REQUIRED_THREAD_COUNT = 2;
+
+    @NotNull
+    @Getter
+    protected final String connectionName;
+
+    @NotNull
+    @Getter
+    protected final String connectionId;
+
+    @NotNull
+    private final MeterRegistry meterRegistry;
 
     /**
      * EventManager
@@ -254,6 +270,9 @@ public class TwitchChat implements ITwitchChat {
     /**
      * Constructor
      *
+     * @param connectionName                 Connection Name
+     * @param connectionId                   Connection Id
+     * @param meterRegistry                  Micrometer MeterRegistry
      * @param websocketConnection            WebsocketConnection
      * @param eventManager                   EventManager
      * @param credentialManager              CredentialManager
@@ -282,7 +301,10 @@ public class TwitchChat implements ITwitchChat {
      * @param wsCloseDelay                   Websocket Close Delay
      * @param outboundCommandFilter          Outbound Command Filter
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+    public TwitchChat(@NotNull String connectionName, @NotNull String connectionId, @Nullable MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+        this.connectionName = connectionName;
+        this.connectionId = connectionId;
+        this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -315,6 +337,9 @@ public class TwitchChat implements ITwitchChat {
         // init connection
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
+                spec.connectionName(connectionName);
+                spec.connectionId(connectionId);
+                spec.meterRegistry(this.meterRegistry);
                 spec.baseUrl(baseUrl);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);
@@ -326,6 +351,7 @@ public class TwitchChat implements ITwitchChat {
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
                     spec.backoffStrategy(connectionBackoffStrategy);
+                spec.onLatencyUpdate(this::updateMetrics);
             });
         } else {
             this.connection = websocketConnection;
@@ -436,6 +462,20 @@ public class TwitchChat implements ITwitchChat {
                     } finally {
                         channelCacheLock.unlock();
                     }
+                }
+            }
+        });
+
+        // channel event metrics
+        eventManager.onEvent(TwitchEvent.class, metricEvent -> {
+            if (metricEvent.getTwitchChat() == this) {
+                if (metricEvent instanceof AbstractChannelEvent) {
+                    String channelId = ((AbstractChannelEvent) metricEvent).getChannel().getId();
+                    if (StringUtils.isNotEmpty(channelId)) {
+                        meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()), Tag.of("channel_id", channelId))).increment();
+                    }
+                } else {
+                    meterRegistry.counter("twitch4j_chat_event", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("type", metricEvent.getClass().getSimpleName()))).increment();
                 }
             }
         });
@@ -567,10 +607,13 @@ public class TwitchChat implements ITwitchChat {
                     else {
                         try {
                             IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
+                            event.setTwitchChat(this);
 
                             if (event.isValid()) {
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("status", "ok"))).increment();
                                 eventManager.publish(event);
                             } else {
+                                meterRegistry.counter("twitch4j_chat_raw_received", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("status", "parse_error"))).increment();
                                 log.trace("Can't parse {}", event.getRawMessage());
                             }
                         } catch (Exception ex) {
@@ -848,17 +891,6 @@ public class TwitchChat implements ITwitchChat {
         }
     }
 
-    /**
-     * Close
-     */
-    @SneakyThrows
-    @Override
-    public void close() {
-        this.stopQueueThread = true;
-        queueThread.cancel(false);
-        connection.close();
-    }
-
     @Override
     public boolean isChannelJoined(String channelName) {
         return currentChannels.contains(channelName.toLowerCase());
@@ -931,4 +963,24 @@ public class TwitchChat implements ITwitchChat {
         return bucketByChannelName.computeIfAbsent(channelName.toLowerCase(), k -> BucketUtils.createBucket(perChannelRateLimit));
     }
 
+    private void updateMetrics(Long latency) {
+        List<Tag> connectionNameIdTags = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId));
+        if (latency > 0) {
+            meterRegistry.gauge("twitch4j_chat_latency", connectionNameIdTags, latency);
+        }
+        meterRegistry.gauge("twitch4j_chat_channel_count", connectionNameIdTags, getChannels().size());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "irc_message")), ircMessageBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "whisper_message")), ircWhisperBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "auth")), ircAuthBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_bucket", Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId), Tag.of("bucket", "join")), ircJoinBucket.getAvailableTokens());
+        meterRegistry.gauge("twitch4j_chat_message_queue_count", connectionNameIdTags, ircCommandQueue.size());
+    }
+
+    @SneakyThrows
+    @Override
+    public void close() {
+        this.stopQueueThread = true;
+        queueThread.cancel(false);
+        connection.close();
+    }
 }

@@ -10,6 +10,7 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.CryptoUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.common.util.TypeConvert;
@@ -146,16 +147,22 @@ import com.github.twitch4j.pubsub.events.UserPresenceEvent;
 import com.github.twitch4j.pubsub.events.UserUnbanRequestUpdateEvent;
 import com.github.twitch4j.pubsub.events.VideoPlaybackEvent;
 import com.github.twitch4j.util.IBackoffStrategy;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -175,10 +182,17 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class TwitchPubSub implements ITwitchPubSub {
-
     public static final int REQUIRED_THREAD_COUNT = 1;
-
     private static final Pattern LISTEN_AUTH_TOKEN = Pattern.compile("(\\{.*\"type\"\\s*?:\\s*?\"LISTEN\".*\"data\"\\s*?:\\s*?\\{.*\"auth_token\"\\s*?:\\s*?\").+(\".*}\\s*?})");
+
+    @NotNull
+    protected final String connectionName;
+
+    @NotNull
+    protected final String connectionId;
+
+    @NotNull
+    private final MeterRegistry meterRegistry;
 
     /**
      * EventManager
@@ -259,6 +273,9 @@ public class TwitchPubSub implements ITwitchPubSub {
     /**
      * Constructor
      *
+     * @param connectionName            Connection Name
+     * @param connectionId              Connection Id
+     * @param meterRegistry                  Micrometer MeterRegistry
      * @param websocketConnection       WebsocketConnection
      * @param eventManager              EventManager
      * @param taskExecutor              ScheduledThreadPoolExecutor
@@ -268,7 +285,10 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      * @param wsCloseDelay              Websocket Close Delay
      */
-    public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
+    public TwitchPubSub(@NotNull String connectionName, @NotNull String connectionId, @Nullable MeterRegistry meterRegistry, WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
+        this.connectionName = connectionName;
+        this.connectionId = connectionId;
+        this.meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;
         this.botOwnerIds = botOwnerIds;
@@ -276,6 +296,9 @@ public class TwitchPubSub implements ITwitchPubSub {
         // init connection
         if (websocketConnection == null) {
             this.connection = new WebsocketConnection(spec -> {
+                spec.connectionName(connectionName);
+                spec.connectionId(connectionId);
+                spec.meterRegistry(this.meterRegistry);
                 spec.baseUrl(WEB_SOCKET_SERVER);
                 spec.closeDelay(wsCloseDelay);
                 spec.wsPingPeriod(wsPingPeriod);
@@ -288,6 +311,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                 spec.proxyConfig(proxyConfig);
                 if (connectionBackoffStrategy != null)
                     spec.backoffStrategy(connectionBackoffStrategy);
+                spec.onLatencyUpdate(this::updateMetrics);
             });
         } else {
             this.connection = websocketConnection;
@@ -945,6 +969,15 @@ public class TwitchPubSub implements ITwitchPubSub {
         return connection.getLatency();
     }
 
+    private void updateMetrics(Long latency) {
+        List<Tag> connectionNameIdTag = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId));
+        if (latency > 0) {
+            meterRegistry.gauge("twitch4j_pubsub_latency", connectionNameIdTag, latency);
+        }
+        meterRegistry.gauge("twitch4j_pubsub_topic_count", connectionNameIdTag, subscribedTopics.size());
+        meterRegistry.gauge("twitch4j_pubsub_queue_count", connectionNameIdTag, commandQueue.size());
+    }
+
     /**
      * Close
      */
@@ -958,5 +991,4 @@ public class TwitchPubSub implements ITwitchPubSub {
             connection.close();
         }
     }
-
 }

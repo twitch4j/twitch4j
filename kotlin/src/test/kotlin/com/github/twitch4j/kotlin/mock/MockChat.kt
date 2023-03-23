@@ -5,11 +5,15 @@ import com.github.philippheuer.events4j.core.EventManager
 import com.github.twitch4j.chat.TwitchChat
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper
 import com.github.twitch4j.common.util.ThreadUtils
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry
 
 /**
  * The bare minimum we need to test the TwitchChat extensions
  */
 class MockChat : TwitchChat(
+    "test-connection",
+    "0",
+    CompositeMeterRegistry(),
     null,
     EventManager().apply { autoDiscovery() },
     CredentialManagerBuilder.builder().build(),

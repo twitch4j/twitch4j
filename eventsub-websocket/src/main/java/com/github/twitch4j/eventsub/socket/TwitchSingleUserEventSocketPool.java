@@ -8,6 +8,7 @@ import com.github.twitch4j.helix.TwitchHelixBuilder;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -28,6 +29,18 @@ import java.util.Objects;
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+
+    /**
+     * Micrometer MeterRegistry
+     */
+    @Getter
+    private final MeterRegistry meterRegistry;
+
+    /**
+     * The user id
+     */
+    @Getter
+    private String userId;
 
     /**
      * The base url for websocket connections.
@@ -66,6 +79,8 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
         if (closed.get()) throw new IllegalStateException("EventSocket cannot be created after pool was closed!");
         return advancedConfiguration.apply(
             TwitchEventSocket.builder()
+                .meterRegistry(meterRegistry)
+                .connectionName(connectionName)
                 .api(helix)
                 .baseUrl(baseUrl)
                 .defaultToken(defaultToken)

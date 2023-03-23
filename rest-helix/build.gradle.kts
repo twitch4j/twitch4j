@@ -5,6 +5,7 @@ dependencies {
 	api(group = "io.github.openfeign", name = "feign-jackson")
 	api(group = "io.github.openfeign", name = "feign-slf4j")
 	api(group = "io.github.openfeign", name = "feign-hystrix")
+	api(group = "io.github.openfeign", name = "feign-micrometer")
 	api(group = "commons-configuration", name = "commons-configuration")
 
 	// Rate Limiting
@@ -15,6 +16,9 @@ dependencies {
 
 	// Cache
 	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
+
+	// Metrics
+	api("io.micrometer:micrometer-core")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))

@@ -18,6 +18,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
@@ -39,10 +40,12 @@ import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import feign.Logger;
 import io.github.bucket4j.Bandwidth;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.With;
 import lombok.experimental.Accessors;
@@ -100,6 +103,14 @@ public class TwitchClientPoolBuilder {
      */
     @With
     private Integer timeout = 5000;
+
+    /**
+     * Specifies the name of this instance for identification in metrics and logging
+     * It is recommended to change the connectionName if multiple instances of TwitchClient are used to avoid confusion.
+     */
+    @With
+    @NonNull
+    private String connectionName = "t4j-client";
 
     /**
      * Enabled: Extensions
@@ -188,6 +199,9 @@ public class TwitchClientPoolBuilder {
      */
     @With
     private OAuth2Credential chatAccount;
+
+    @With
+    private MeterRegistry meterRegistry;
 
     /**
      * EventManager
@@ -415,6 +429,7 @@ public class TwitchClientPoolBuilder {
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
+        meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
 
         // Determinate required threadPool size
         int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;
@@ -439,6 +454,7 @@ public class TwitchClientPoolBuilder {
         TwitchExtensions extensions = null;
         if (this.enableExtensions) {
             extensions = TwitchExtensionsBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -453,6 +469,7 @@ public class TwitchClientPoolBuilder {
         TwitchHelix helix;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
@@ -471,6 +488,7 @@ public class TwitchClientPoolBuilder {
         TwitchKraken kraken = null;
         if (this.enableKraken) {
             kraken = TwitchKrakenBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -485,6 +503,7 @@ public class TwitchClientPoolBuilder {
         TwitchMessagingInterface tmi = null;
         if (this.enableTMI) {
             tmi = TwitchMessagingInterfaceBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -507,6 +526,8 @@ public class TwitchClientPoolBuilder {
             ) : null;
         if (this.enableChatPool) {
             chat = TwitchChatConnectionPool.builder()
+                .connectionName(connectionName)
+                .meterRegistry(meterRegistry)
                 .eventManager(eventManager)
                 .chatAccount(() -> chatAccount)
                 .chatRateLimit(chatRateLimit)
@@ -518,7 +539,10 @@ public class TwitchClientPoolBuilder {
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
                 .advancedConfiguration(builder ->
-                    builder.withCredentialManager(credentialManager)
+                    builder
+                        .withConnectionName(connectionName)
+                        .withMeterRegistry(meterRegistry)
+                        .withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
                         .withBaseUrl(chatServer)
                         .withChatQueueTimeout(chatQueueTimeout)
@@ -532,6 +556,8 @@ public class TwitchClientPoolBuilder {
                 .build();
         } else if (this.enableChat) {
             chat = TwitchChatBuilder.builder()
+                .withConnectionName(connectionName)
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
@@ -571,17 +597,23 @@ public class TwitchClientPoolBuilder {
         ITwitchPubSub pubSub = null;
         if (this.enablePubSubPool) {
             pubSub = TwitchPubSubConnectionPool.builder()
+                .connectionName(connectionName)
                 .eventManager(eventManager)
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .advancedConfiguration(builder ->
-                    builder.withWsPingPeriod(wsPingPeriod)
+                    builder
+                        .withMeterRegistry(meterRegistry)
+                        .withConnectionName(connectionName)
+                        .withWsPingPeriod(wsPingPeriod)
                         .withWsCloseDelay(wsCloseDelay)
                         .setBotOwnerIds(botOwnerIds)
                 )
                 .build();
         } else if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
+                .withConnectionName(connectionName)
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)

@@ -3,6 +3,7 @@ package com.github.twitch4j.extensions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.extensions.compat.TwitchExtensionsCompatibilityLayer;
 import com.github.twitch4j.extensions.util.TwitchExtensionsClientIdInterceptor;
@@ -14,9 +15,15 @@ import feign.Retryer;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+import feign.micrometer.MicrometerCapability;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -33,6 +40,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Deprecated
 public class TwitchExtensionsBuilder {
+
+    @With
+    private MeterRegistry meterRegistry;
 
     /**
      * Base Url
@@ -97,7 +107,8 @@ public class TwitchExtensionsBuilder {
      */
     @Deprecated
     public TwitchExtensions build() {
-        log.debug("Extensions: Initializing Module ...");
+        // init
+        meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
 
         // Helix Compatibility Layer
         if (helixForwarding) {
@@ -138,6 +149,7 @@ public class TwitchExtensionsBuilder {
             .decoder(new JacksonDecoder(mapper))
             .logger(new Slf4jLogger())
             .logLevel(logLevel)
+            .addCapability(new MicrometerCapability(meterRegistry))
             .errorDecoder(new TwitchExtensionsErrorDecoder(mapper, new JacksonDecoder()))
             .requestInterceptor(new TwitchExtensionsClientIdInterceptor(this))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))

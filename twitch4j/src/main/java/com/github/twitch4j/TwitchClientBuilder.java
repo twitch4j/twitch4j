@@ -16,6 +16,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.EventManagerUtils;
+import com.github.twitch4j.common.util.MetricUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
@@ -35,7 +36,14 @@ import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import com.github.twitch4j.tmi.TwitchMessagingInterfaceBuilder;
 import feign.Logger;
 import io.github.bucket4j.Bandwidth;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -91,6 +99,14 @@ public class TwitchClientBuilder {
      */
     @With
     private Integer timeout = 5000;
+
+    /**
+     * Specifies the name of this instance for identification in metrics and logging
+     * It is recommended to change the connectionName if multiple instances of TwitchClient are used to avoid confusion.
+     */
+    @With
+    @NonNull
+    private String connectionName = "t4j-client";
 
     /**
      * Enabled: Extensions
@@ -264,6 +280,9 @@ public class TwitchClientBuilder {
     @With
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
+    @With
+    private MeterRegistry meterRegistry;
+
     /**
      * Scheduler Thread Pool Executor
      */
@@ -396,6 +415,7 @@ public class TwitchClientBuilder {
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
+        meterRegistry = MetricUtils.getMeterRegistry(meterRegistry);
 
         // Determinate required threadPool size
         int poolSize = TwitchClientHelper.REQUIRED_THREAD_COUNT;
@@ -418,6 +438,7 @@ public class TwitchClientBuilder {
         TwitchExtensions extensions = null;
         if (this.enableExtensions) {
             extensions = TwitchExtensionsBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -432,6 +453,7 @@ public class TwitchClientBuilder {
         TwitchHelix helix = null;
         if (this.enableHelix) {
             helix = TwitchHelixBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
@@ -449,6 +471,7 @@ public class TwitchClientBuilder {
         TwitchKraken kraken = null;
         if (this.enableKraken) {
             kraken = TwitchKrakenBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -463,6 +486,7 @@ public class TwitchClientBuilder {
         TwitchMessagingInterface tmi = null;
         if (this.enableTMI) {
             tmi = TwitchMessagingInterfaceBuilder.builder()
+                .withMeterRegistry(meterRegistry)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
                 .withUserAgent(userAgent)
@@ -478,6 +502,8 @@ public class TwitchClientBuilder {
         if (this.enableChat) {
             //noinspection deprecation (withOutboundCommandFilter *can* be used internally)
             chat = TwitchChatBuilder.builder()
+                .withConnectionName(connectionName)
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withCredentialManager(credentialManager)
                 .withChatAccount(chatAccount)
@@ -525,6 +551,8 @@ public class TwitchClientBuilder {
         TwitchPubSub pubSub = null;
         if (this.enablePubSub) {
             pubSub = TwitchPubSubBuilder.builder()
+                .withConnectionName(connectionName)
+                .withMeterRegistry(meterRegistry)
                 .withEventManager(eventManager)
                 .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
                 .withProxyConfig(proxyConfig)

@@ -9,7 +9,14 @@ import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
-import lombok.*;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -26,6 +33,20 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TwitchPubSubBuilder {
+
+    @With
+    private MeterRegistry meterRegistry;
+
+    /**
+     * The name of this connection
+     * This name will be used in metrics / logging to identify this connection.
+     */
+    @With
+    @NonNull
+    private String connectionName = RandomStringUtils.random(8, true, true);
+
+    @With
+    private String connectionId = "0";
 
     /**
      * WebsocketConnection
@@ -108,7 +129,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
+        return new TwitchPubSub(this.connectionName, this.connectionId, this.meterRegistry, this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
     }
 
     /**

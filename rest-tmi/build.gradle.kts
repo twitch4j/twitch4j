@@ -5,10 +5,14 @@ dependencies {
 	api(group = "io.github.openfeign", name = "feign-jackson")
 	api(group = "io.github.openfeign", name = "feign-slf4j")
 	api(group = "io.github.openfeign", name = "feign-hystrix")
+	api(group = "io.github.openfeign", name = "feign-micrometer")
 	api(group = "commons-configuration", name = "commons-configuration")
 
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
+
+	// Metrics
+	api("io.micrometer:micrometer-core")
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))

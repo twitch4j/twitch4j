@@ -9,8 +9,11 @@ import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -36,6 +40,19 @@ import java.util.function.UnaryOperator;
 public final class TwitchEventSocketPool implements IEventSubSocket {
 
     private final String threadPrefix = "twitch4j-multi-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+
+    /**
+     * The name of this connection pool
+     */
+    @NonNull
+    @Builder.Default
+    private String connectionName = "socket-multi-pool";
+
+    /**
+     * Micrometer MeterRegistry
+     */
+    @Getter
+    private final MeterRegistry meterRegistry;
 
     /**
      * The default {@link EventManager} for this connection pool, if specified.
@@ -127,6 +144,9 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         TwitchSingleUserEventSocketPool pool = poolByUserId.computeIfAbsent(userId,
             id -> advancedConfiguration.apply(
                 TwitchSingleUserEventSocketPool.builder()
+                    .meterRegistry(meterRegistry)
+                    .connectionName(connectionName)
+                    .userId(userId)
                     .baseUrl(baseUrl)
                     .defaultToken(token)
                     .eventManager(eventManager)
@@ -140,7 +160,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
             return false;
         }
 
-        return pool.register(token, sub) && poolBySub.put(wrapped, pool) == null;
+        return updateMetrics() && pool.register(token, sub) && poolBySub.put(wrapped, pool) == null;
     }
 
     @Override
@@ -176,7 +196,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         }
 
         // noinspection resource
-        return unsubscribe != null && unsubscribe && poolBySub.remove(wrapped) != null;
+        return updateMetrics() && unsubscribe != null && unsubscribe && poolBySub.remove(wrapped) != null;
     }
 
     @Override
@@ -226,5 +246,12 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         if (StringUtils.isNotEmpty(token.getUserId())) return token.getUserId();
         identityProvider.getAdditionalCredentialInformation(token).ifPresent(token::updateCredential);
         return token.getUserId();
+    }
+
+    private Boolean updateMetrics() {
+        List<Tag> connectionNameTag = Collections.singletonList(Tag.of("connection_name", connectionName));
+        meterRegistry.gauge("twitch4j_eventsub_ws_pool_connection_count", connectionNameTag, numConnections());
+        meterRegistry.gauge("twitch4j_eventsub_ws_pool_subscription_count", connectionNameTag, numSubscriptions());
+        return true;
     }
 }
