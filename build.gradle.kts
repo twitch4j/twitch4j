@@ -118,7 +118,7 @@ subprojects {
 		api(platform("io.github.openfeign:feign-bom:12.2"))
 
 		// Micrometer BOM
-		api(platform("io.micrometer:micrometer-bom:1.9.1"))
+		api(platform("io.micrometer:micrometer-bom:1.10.5"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.9.2"))
