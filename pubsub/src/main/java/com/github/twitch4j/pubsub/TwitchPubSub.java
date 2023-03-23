@@ -971,7 +971,9 @@ public class TwitchPubSub implements ITwitchPubSub {
 
     private void updateMetrics(Long latency) {
         List<Tag> connectionNameIdTag = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("connection_id", connectionId));
-        meterRegistry.gauge("twitch4j_pubsub_latency", connectionNameIdTag, latency);
+        if (latency > 0) {
+            meterRegistry.gauge("twitch4j_pubsub_latency", connectionNameIdTag, latency);
+        }
         meterRegistry.gauge("twitch4j_pubsub_topic_count", connectionNameIdTag, subscribedTopics.size());
         meterRegistry.gauge("twitch4j_pubsub_queue_count", connectionNameIdTag, commandQueue.size());
     }
