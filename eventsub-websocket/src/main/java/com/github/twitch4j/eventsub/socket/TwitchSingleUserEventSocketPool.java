@@ -9,7 +9,6 @@ import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -19,10 +18,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -160,19 +157,11 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     public boolean register(OAuth2Credential token, EventSubSubscription sub) {
         SubscriptionWrapper wrapped = SubscriptionWrapper.wrap(sub);
         credentials.put(wrapped, token != null ? token : Objects.requireNonNull(defaultToken));
-        return updateMetrics() && subscribe(wrapped) != null;
+        return subscribe(wrapped) != null;
     }
 
     @Override
     public boolean unregister(EventSubSubscription sub) {
-        return updateMetrics() && this.unsubscribe(SubscriptionWrapper.wrap(sub));
-    }
-
-    private Boolean updateMetrics() {
-        // TODO: remove? metrics by user id might be a bad idea because of cardinality
-        List<Tag> connectionNameUserIdTags = Arrays.asList(Tag.of("connection_name", connectionName), Tag.of("userId", userId));
-        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_connection_count", connectionNameUserIdTags, numConnections());
-        meterRegistry.gauge("twitch4j_eventsub_ws_unitarypool_subscription_count", connectionNameUserIdTags, numSubscriptions());
-        return true;
+        return this.unsubscribe(SubscriptionWrapper.wrap(sub));
     }
 }
