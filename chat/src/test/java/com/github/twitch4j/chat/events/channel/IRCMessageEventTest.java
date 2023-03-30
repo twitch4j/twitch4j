@@ -142,6 +142,19 @@ public class IRCMessageEventTest {
         assertTrue(e.getBadgeInfo() == null || e.getBadgeInfo().isEmpty());
     }
 
+    @Test
+    @DisplayName("Test that 353 NAMES response is parsed by IRCMessageEvent")
+    void parseNamesResponse() {
+        IRCMessageEvent e = build(":justinfan77645.tmi.twitch.tv 353 justinfan77645 = #pajlada :vissb ogprodigy supabridge zneix suslada beatz pajbot");
+
+        assertEquals("353", e.getCommandType());
+        assertEquals("pajlada", e.getChannelName().orElse(null));
+        assertEquals("vissb ogprodigy supabridge zneix suslada beatz pajbot", e.getMessage().orElse(null));
+        assertTrue(e.getClientName().isPresent());
+        assertTrue(e.getBadges().isEmpty());
+        assertTrue(e.getBadgeInfo().isEmpty());
+    }
+
     private static IRCMessageEvent build(String raw) {
         return new IRCMessageEvent(raw, Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
     }
