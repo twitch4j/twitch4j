@@ -11,12 +11,16 @@ import java.util.List;
 public class ChatBadgeSet {
 
     /**
-     * ID for the chat badge set.
+     * An ID that identifies this set of chat badges.
+     * <p>
+     * For example, Bits or Subscriber.
      */
     private String setId;
 
     /**
      * Contains chat badge objects for the set.
+     * <p>
+     * The list is sorted in ascending order by {@link ChatBadge#getId()}.
      */
     private List<ChatBadge> versions;
 

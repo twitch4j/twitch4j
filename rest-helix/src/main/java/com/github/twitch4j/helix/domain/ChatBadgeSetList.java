@@ -13,6 +13,8 @@ public class ChatBadgeSetList {
 
     /**
      * The chat badge sets.
+     * <p>
+     * The list is sorted in ascending order by {@link ChatBadgeSet#getSetId()}.
      */
     @JsonProperty("data")
     private List<ChatBadgeSet> badgeSets;
