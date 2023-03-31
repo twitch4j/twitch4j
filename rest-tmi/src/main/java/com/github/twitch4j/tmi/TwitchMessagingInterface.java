@@ -14,13 +14,20 @@ import java.util.function.Supplier;
 
 /**
  * Twitch - Messaging Interface
+ *
+ * @deprecated All of these endpoints have been (or will be) decommissioned by Twitch.
  */
+@SuppressWarnings("DeprecatedIsStillUsed")
+@Deprecated
 public interface TwitchMessagingInterface {
 
     /**
      * The default baseUrl to pass to {@link #getGlobalBadges(URI, String)} and {@link #getChannelBadges(URI, String, String)}
+     *
+     * @deprecated Twitch will decommission this namespace on 2023-06-01
      */
     @Unofficial
+    @Deprecated
     URI BADGES_BASE_URL = ((Supplier<URI>) () -> {
         try {
             return new URI("https://badges.twitch.tv/v1");
@@ -31,7 +38,6 @@ public interface TwitchMessagingInterface {
 
     @Unofficial
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /badges/global/display?language={language}")
     HystrixCommand<BadgeSets> getGlobalBadges(
         URI baseUrl,
@@ -43,15 +49,17 @@ public interface TwitchMessagingInterface {
      *
      * @param language Two-letter language code. Default: en.
      * @return BadgeSets
+     * @see <a href="https://discuss.dev.twitch.tv/t/legacy-badges-endpoint-shutdown-details-and-timeline-june-2023/44621">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission this endpoint on 2023-06-01; do migrate to {@code TwitchHelix#getGlobalChatBadges(String)}
      */
     @Unofficial
+    @Deprecated
     default HystrixCommand<BadgeSets> getGlobalBadges(String language) {
         return getGlobalBadges(BADGES_BASE_URL, language);
     }
 
     @Unofficial
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /badges/channels/{channel_id}/display?language={language}")
     HystrixCommand<BadgeSets> getChannelBadges(
         URI baseUrl,
@@ -65,8 +73,11 @@ public interface TwitchMessagingInterface {
      * @param channelId The ID of the channel to query the badges of.
      * @param language  Two-letter language code. Default: en.
      * @return BadgeSets
+     * @see <a href="https://discuss.dev.twitch.tv/t/legacy-badges-endpoint-shutdown-details-and-timeline-june-2023/44621">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission this endpoint on 2023-06-01; do migrate to {@code TwitchHelix#getChannelChatBadges(String, String)}
      */
     @Unofficial
+    @Deprecated
     default HystrixCommand<BadgeSets> getChannelBadges(String channelId, String language) {
         return getChannelBadges(BADGES_BASE_URL, channelId, language);
     }

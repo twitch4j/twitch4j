@@ -88,7 +88,9 @@ public class TwitchMessagingInterfaceBuilder {
      * Twitch API Client (Helix)
      *
      * @return TwitchHelix
+     * @deprecated All of the {@link TwitchMessagingInterfaceBuilder} endpoints have been (or will be) decommissioned by Twitch.
      */
+    @Deprecated
     public TwitchMessagingInterface build() {
         log.debug("TMI: Initializing Module ...");
 
