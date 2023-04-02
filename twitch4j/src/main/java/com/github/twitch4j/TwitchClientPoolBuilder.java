@@ -119,14 +119,20 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Enabled: Kraken
+     *
+     * @deprecated Twitch shutdown the Kraken API in 2022.
      */
     @With
+    @Deprecated
     private Boolean enableKraken = false;
 
     /**
      * Enabled: TMI
+     *
+     * @deprecated All of the {@link TwitchMessagingInterfaceBuilder} endpoints have been (or will be) decommissioned by Twitch.
      */
     @With
+    @Deprecated
     private Boolean enableTMI = false;
 
     /**

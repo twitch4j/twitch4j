@@ -120,8 +120,11 @@ public class TwitchClientBuilder {
 
     /**
      * Enabled: TMI
+     *
+     * @deprecated All of the {@link TwitchMessagingInterfaceBuilder} endpoints have been (or will be) decommissioned by Twitch.
      */
     @With
+    @Deprecated
     private Boolean enableTMI = false;
 
     /**

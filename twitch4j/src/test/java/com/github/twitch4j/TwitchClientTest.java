@@ -31,7 +31,6 @@ public class TwitchClientTest {
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(eventManager)
             .withEnableHelix(true)
-            .withEnableKraken(true)
             .withEnableChat(false)
             .build();
     }
@@ -57,7 +56,6 @@ public class TwitchClientTest {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEnableHelix(true)
-            .withEnableKraken(true)
             .withEnableChat(false)
             .withScheduledThreadPoolExecutor(scheduledThreadPoolExecutor)
             .build();
@@ -74,7 +72,6 @@ public class TwitchClientTest {
         // construct twitchClient
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEnableHelix(true)
-            .withEnableKraken(true)
             .withEnableChat(false)
             .withScheduledThreadPoolExecutor(new ScheduledThreadPoolExecutor(1))
             .build();
@@ -94,8 +91,6 @@ public class TwitchClientTest {
         TwitchClient twitchClient = TwitchClientBuilder.builder()
             .withEventManager(null)
             .withEnableHelix(true)
-            .withEnableKraken(false)
-            .withEnableTMI(false)
             .withEnableChat(true)
             .withChatAccount(TestUtils.getCredential())
             .withDefaultAuthToken(TestUtils.getCredential())
