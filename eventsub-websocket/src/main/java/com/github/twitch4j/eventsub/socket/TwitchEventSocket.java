@@ -70,7 +70,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
     /**
      * The WebSocket Server
      */
-    public static final String WEB_SOCKET_SERVER = "wss://eventsub-beta.wss.twitch.tv/ws";
+    public static final String WEB_SOCKET_SERVER = "wss://eventsub.wss.twitch.tv/ws";
 
     /**
      * Helix API instance
