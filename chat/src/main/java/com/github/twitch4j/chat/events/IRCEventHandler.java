@@ -66,6 +66,7 @@ public class IRCEventHandler {
         eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
         eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
         eventManager.onEvent("twitch4j-chat-clearmsg-trigger", IRCMessageEvent.class, this::onClearMsg);
+        eventManager.onEvent("twitch4j-chat-names-trigger", IRCMessageEvent.class, this::onNames);
         eventManager.onEvent("twitch4j-chat-join-trigger", IRCMessageEvent.class, this::onChannnelClientJoinEvent);
         eventManager.onEvent("twitch4j-chat-leave-trigger", IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
         eventManager.onEvent("twitch4j-chat-mod-trigger", IRCMessageEvent.class, this::onChannelModChange);
@@ -487,6 +488,27 @@ public class IRCEventHandler {
             boolean wasActionMessage = message.startsWith("\u0001ACTION ") && message.endsWith("\u0001");
             String trimmedMsg = wasActionMessage ? message.substring("\u0001ACTION ".length(), message.length() - "\u0001".length()) : message;
             eventManager.publish(new DeleteMessageEvent(channel, userName, msgId, trimmedMsg, wasActionMessage));
+        }
+    }
+
+    /**
+     * Names list is received upon initial channel join
+     *
+     * @param event {@link IRCMessageEvent}
+     */
+    public void onNames(IRCMessageEvent event) {
+        if ("353".equals(event.getCommandType()) && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
+            EventChannel channel = event.getChannel();
+            event.getMessage()
+                .map(String::trim)
+                .map(names -> StringUtils.split(names, ' '))
+                .ifPresent(names ->
+                    Arrays.stream(names)
+                        .map(String::trim)
+                        .filter(StringUtils::isNotEmpty)
+                        .map(login -> new EventUser(null, login))
+                        .forEach(user -> eventManager.publish(new ChannelJoinEvent(channel, user)))
+                );
         }
     }
 

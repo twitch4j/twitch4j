@@ -25,7 +25,7 @@ import com.google.code.regexp.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class IRCMessageEvent extends TwitchEvent {
 
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?(?<clientName>\\S+?)\\s(?<command>[A-Z0-9]+)\\s?(?:#(?<channel>\\S*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
+    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?(?<clientName>\\S+?)\\s(?<command>[A-Z0-9]+)\\s?(?:(?<login>\\S+)\\s=\\s)?(?:#(?<channel>\\S*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
     private static final Pattern WHISPER_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?:(?<clientName>\\S+?)!.+?\\s(?<command>[A-Z0-9]+)\\s(?:(?<channel>\\S*?)\\s?)??(?<payload>[:\\-+](?<message>.+))$");
     private static final Pattern CLIENT_PATTERN = Pattern.compile("^:(.*?)!(.*?)@(.*?).tmi.twitch.tv$");
 
