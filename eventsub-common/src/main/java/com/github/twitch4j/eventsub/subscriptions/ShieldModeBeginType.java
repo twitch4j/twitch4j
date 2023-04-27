@@ -9,6 +9,9 @@ import com.github.twitch4j.eventsub.events.ShieldModeBeginEvent;
  * This event informs the subscriber that the broadcaster’s moderation settings were changed based on the broadcaster’s Shield Mode configuration settings.
  * <p>
  * Requires the moderator:read:shield_mode or moderator:manage:shield_mode scope.
+ *
+ * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHIELD_MODE_READ
+ * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHIELD_MODE_MANAGE
  */
 public class ShieldModeBeginType implements SubscriptionType<ShieldModeCondition, ShieldModeCondition.ShieldModeConditionBuilder<?, ?>, ShieldModeBeginEvent> {
     @Override
