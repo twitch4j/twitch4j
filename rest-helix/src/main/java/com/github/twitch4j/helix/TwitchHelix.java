@@ -1921,6 +1921,8 @@ public interface TwitchHelix {
      * @param broadcasterId The ID of the broadcaster whose Shield Mode activation status you want to get.
      * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
      * @return ShieldModeStatusWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHIELD_MODE_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHIELD_MODE_MANAGE
      */
     @RequestLine("GET /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
@@ -1938,6 +1940,7 @@ public interface TwitchHelix {
      * @param moderatorId   The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token.
      * @param active        A Boolean value that determines whether to activate Shield Mode.
      * @return ShieldModeStatusWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SHIELD_MODE_MANAGE
      */
     @RequestLine("PUT /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
