@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,12 +14,6 @@ import org.jetbrains.annotations.Nullable;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class ChannelGuestStarSlotEvent extends EventSubModerationEvent {
-
-    /**
-     * Unique identifier of the event.
-     */
-    @Unofficial
-    private String id;
 
     /**
      * The ID of the slot that was updated, or null
