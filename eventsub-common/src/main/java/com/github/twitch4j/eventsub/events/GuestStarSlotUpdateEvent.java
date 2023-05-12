@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,11 +23,13 @@ public class GuestStarSlotUpdateEvent extends ChannelGuestStarSlotEvent {
     /**
      * Whether the host is allowing the slot’s video to be seen by participants within the session.
      */
+    @JsonAlias("is_host_video_enabled")
     private Boolean hostVideoEnabled;
 
     /**
      * Whether the host is allowing the slot’s audio to be heard by participants within the session.
      */
+    @JsonAlias("is_host_audio_enabled")
     private Boolean hostAudioEnabled;
 
     /**
