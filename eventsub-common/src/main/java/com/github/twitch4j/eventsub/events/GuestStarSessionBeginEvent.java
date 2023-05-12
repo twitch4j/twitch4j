@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,12 +15,6 @@ import java.time.Instant;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class GuestStarSessionBeginEvent extends ChannelGuestStarSessionEvent {
-
-    /**
-     * Unique identifier of the event.
-     */
-    @Unofficial
-    private String id;
 
     /**
      * RFC3339 timestamp indicating the time the session began.
