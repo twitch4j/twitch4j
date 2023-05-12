@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.domain.GuestStarLayout;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -15,7 +16,13 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class GuestStarSettingsUpdateEvent extends ChannelGuestStarSessionEvent {
+public class GuestStarSettingsUpdateEvent extends EventSubChannelEvent {
+
+    /**
+     * Unique identifier of the event.
+     */
+    @Unofficial
+    private String id;
 
     /**
      * Whether Guest Star moderators have access to control whether a guest is live once assigned to a slot.
