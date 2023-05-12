@@ -21,6 +21,8 @@ public enum TwitchScopes {
     HELIX_CHANNEL_EDITORS_READ("channel:read:editors"),
     HELIX_CHANNEL_FOLLOWERS_READ("moderator:read:followers"),
     HELIX_CHANNEL_GOALS_READ("channel:read:goals"),
+    HELIX_CHANNEL_GUEST_STAR_MANAGE("channel:manage:guest_star"),
+    HELIX_CHANNEL_GUEST_STAR_READ("channel:read:guest_star"),
     HELIX_CHANNEL_HYPE_TRAIN_READ("channel:read:hype_train"),
     HELIX_CHANNEL_MODS_MANAGE("channel:manage:moderators"),
     HELIX_CHANNEL_POLLS_MANAGE("channel:manage:polls"),
