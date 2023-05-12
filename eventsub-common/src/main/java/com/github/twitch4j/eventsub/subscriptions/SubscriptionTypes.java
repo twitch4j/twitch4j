@@ -41,6 +41,7 @@ public class SubscriptionTypes {
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
+    public final @ApiStatus.Experimental BetaGuestStarGuestUpdateType BETA_GUEST_STAR_GUEST_UPDATE;
     public final @ApiStatus.Experimental BetaGuestStarSessionBeginType BETA_GUEST_STAR_SESSION_BEGIN;
     public final @ApiStatus.Experimental BetaGuestStarSessionEndType BETA_GUEST_STAR_SESSION_END;
     public final @ApiStatus.Experimental BetaGuestStarSettingsUpdateType BETA_GUEST_STAR_SETTINGS_UPDATE;
@@ -98,6 +99,7 @@ public class SubscriptionTypes {
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
+                BETA_GUEST_STAR_GUEST_UPDATE = new BetaGuestStarGuestUpdateType(),
                 BETA_GUEST_STAR_SESSION_BEGIN = new BetaGuestStarSessionBeginType(),
                 BETA_GUEST_STAR_SESSION_END = new BetaGuestStarSessionEndType(),
                 BETA_GUEST_STAR_SETTINGS_UPDATE = new BetaGuestStarSettingsUpdateType(),
