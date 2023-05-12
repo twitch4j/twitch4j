@@ -48,6 +48,8 @@ public enum TwitchScopes {
     HELIX_CHAT_MESSAGES_MANAGE("moderator:manage:chat_messages"),
     HELIX_CHAT_SETTINGS_MANAGE("moderator:manage:chat_settings"),
     HELIX_CHAT_SETTINGS_READ("moderator:read:chat_settings"),
+    HELIX_GUEST_STAR_MANAGE("moderator:manage:guest_star"),
+    HELIX_GUEST_STAR_READ("moderator:read:guest_star"),
     HELIX_SHIELD_MODE_MANAGE("moderator:manage:shield_mode"),
     HELIX_SHIELD_MODE_READ("moderator:read:shield_mode"),
     HELIX_SHOUTOUTS_MANAGE("moderator:manage:shoutouts"),

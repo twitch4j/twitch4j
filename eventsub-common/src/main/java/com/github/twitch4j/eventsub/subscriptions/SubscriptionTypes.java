@@ -43,6 +43,7 @@ public class SubscriptionTypes {
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
     public final @ApiStatus.Experimental BetaGuestStarSessionBeginType BETA_GUEST_STAR_SESSION_BEGIN;
     public final @ApiStatus.Experimental BetaGuestStarSessionEndType BETA_GUEST_STAR_SESSION_END;
+    public final @ApiStatus.Experimental BetaGuestStarSettingsUpdateType BETA_GUEST_STAR_SETTINGS_UPDATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
     public final HypeTrainEndType HYPE_TRAIN_END;
     public final HypeTrainProgressType HYPE_TRAIN_PROGRESS;
@@ -99,6 +100,7 @@ public class SubscriptionTypes {
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
                 BETA_GUEST_STAR_SESSION_BEGIN = new BetaGuestStarSessionBeginType(),
                 BETA_GUEST_STAR_SESSION_END = new BetaGuestStarSessionEndType(),
+                BETA_GUEST_STAR_SETTINGS_UPDATE = new BetaGuestStarSettingsUpdateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
                 HYPE_TRAIN_END = new HypeTrainEndType(),
                 HYPE_TRAIN_PROGRESS = new HypeTrainProgressType(),
