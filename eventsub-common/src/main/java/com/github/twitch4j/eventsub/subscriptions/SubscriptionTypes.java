@@ -41,7 +41,8 @@ public class SubscriptionTypes {
     public final ChannelUpdateType CHANNEL_UPDATE;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
-    public final @ApiStatus.Experimental BetaGuestStarSessionBeginType GUEST_STAR_SESSION_BEGIN_TYPE;
+    public final @ApiStatus.Experimental BetaGuestStarSessionBeginType BETA_GUEST_STAR_SESSION_BEGIN;
+    public final @ApiStatus.Experimental BetaGuestStarSessionEndType BETA_GUEST_STAR_SESSION_END;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
     public final HypeTrainEndType HYPE_TRAIN_END;
     public final HypeTrainProgressType HYPE_TRAIN_PROGRESS;
@@ -96,7 +97,8 @@ public class SubscriptionTypes {
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
-                GUEST_STAR_SESSION_BEGIN_TYPE = new BetaGuestStarSessionBeginType(),
+                BETA_GUEST_STAR_SESSION_BEGIN = new BetaGuestStarSessionBeginType(),
+                BETA_GUEST_STAR_SESSION_END = new BetaGuestStarSessionEndType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
                 HYPE_TRAIN_END = new HypeTrainEndType(),
                 HYPE_TRAIN_PROGRESS = new HypeTrainProgressType(),
