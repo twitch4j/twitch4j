@@ -1681,7 +1681,7 @@ public interface TwitchHelix {
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
      */
     @ApiStatus.Experimental // in open beta
-    @RequestLine("PATCH /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&slot_id={slot_id}&is_audio_enabled={is_audio_enabled}&is_video_enabled={is_video_enabled}&is_live={is_live}&volume={volume}")
+    @RequestLine("PATCH /guest_star/slot_settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&slot_id={slot_id}&is_audio_enabled={is_audio_enabled}&is_video_enabled={is_video_enabled}&is_live={is_live}&volume={volume}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> updateGuestStarSlotSettings(
         @Param("token") String authToken,
