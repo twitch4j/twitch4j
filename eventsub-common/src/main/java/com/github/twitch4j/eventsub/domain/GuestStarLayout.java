@@ -18,6 +18,22 @@ public enum GuestStarLayout {
      * If there is an active screen share, it is sized larger than the other guests.
      */
     @JsonAlias("screenshare")
-    SCREENSHARE_LAYOUT
+    SCREENSHARE_LAYOUT,
+
+    /**
+     * All live guests are arranged in a horizontal bar within the browser source.
+     * <p>
+     * Only used in {@code TwitchHelix#updateChannelGuestStarSettings}
+     */
+    @JsonAlias("horizontal")
+    HORIZONTAL_LAYOUT,
+
+    /**
+     * All live guests are arranged in a vertical bar within the browser source.
+     * <p>
+     * Only used in {@code TwitchHelix#updateChannelGuestStarSettings}
+     */
+    @JsonAlias("vertical")
+    VERTICAL_LAYOUT
 
 }

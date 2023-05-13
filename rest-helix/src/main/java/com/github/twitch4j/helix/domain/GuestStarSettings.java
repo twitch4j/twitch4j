@@ -1,14 +1,26 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.GuestStarLayout;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 import lombok.experimental.Accessors;
+import lombok.extern.jackson.Jacksonized;
 
+@With
 @Data
 @Setter(AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
+@Jacksonized
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GuestStarSettings {
 
     /**

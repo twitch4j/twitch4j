@@ -1433,7 +1433,7 @@ public interface TwitchHelix {
     /**
      * Gets the channel settings for configuration of the Guest Star feature for a particular host.
      *
-     * @param authToken     User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster
+     * @param authToken     User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster.
      * @param broadcasterId The ID of the broadcaster you want to get guest star settings for.
      * @return GuestStarSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
@@ -1445,6 +1445,28 @@ public interface TwitchHelix {
     HystrixCommand<GuestStarSettingsWrapper> getChannelGuestStarSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * @param authToken                User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster.
+     * @param broadcasterId            The ID of the broadcaster you want to update Guest Star settings for.
+     * @param regenerateBrowserSources Whether Guest Star should regenerate the auth token associated with the channel’s browser sources,
+     *                                 immediately invalidating all browser sources previously configured in the streaming software.
+     * @param settings                 The updated Guest Star settings.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("PUT /guest_star/channel_settings?broadcaster_id={broadcaster_id}&regenerate_browser_sources={regenerate_browser_sources}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateChannelGuestStarSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("regenerate_browser_sources") Boolean regenerateBrowserSources,
+        GuestStarSettings settings // POJO body
     );
 
     /**
