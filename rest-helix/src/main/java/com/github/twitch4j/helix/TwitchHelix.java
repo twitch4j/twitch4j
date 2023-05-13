@@ -1568,7 +1568,7 @@ public interface TwitchHelix {
      * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
      * @param sessionId     The session ID for the invite to be sent on behalf of the broadcaster.
      * @param guestId       Twitch User ID for the guest to invite to the Guest Star session.
-     * @return 204 No Content upon a successful request
+     * @return 204 No Content upon a successful request or 403 Forbidden if the guest was already invited
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
      */
@@ -1576,6 +1576,29 @@ public interface TwitchHelix {
     @RequestLine("POST /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> sendGuestStarInvite(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId
+    );
+
+    /**
+     * Revokes a previously sent invite for a Guest Star session.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The ID of the session for the invite to be revoked on behalf of the broadcaster.
+     * @param guestId       Twitch User ID for the guest to revoke the Guest Star session invite from.
+     * @return 204 No Content upon a successful request, or 404 Not Found if no invite exists for specified guest_id
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteGuestStarInvite(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
