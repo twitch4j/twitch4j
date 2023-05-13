@@ -1561,6 +1561,29 @@ public interface TwitchHelix {
     );
 
     /**
+     * Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The session ID for the invite to be sent on behalf of the broadcaster.
+     * @param guestId       Twitch User ID for the guest to invite to the Guest Star session.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> sendGuestStarInvite(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
