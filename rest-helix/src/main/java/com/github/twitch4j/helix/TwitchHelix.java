@@ -1632,6 +1632,34 @@ public interface TwitchHelix {
     );
 
     /**
+     * Allows a caller to remove a slot assignment from a user participating in an active Guest Star session.
+     * This revokes their access to the session immediately and disables their access to publish or subscribe to media within the session.
+     *
+     * @param authToken           User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId       Required: The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId         Required: The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @param sessionId           Required: The ID of the Guest Star session in which to remove the slot assignment.
+     * @param guestId             Required: The Twitch User ID corresponding to the guest to remove from the session.
+     * @param slotId              Required: The slot ID representing the slot assignment to remove from the session.
+     * @param shouldReinviteGuest Optional: Whether the guest should be reinvited. Default: false.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}&slot_id={slot_id}&should_reinvite_guest={should_reinvite_guest}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteGuestStarSlot(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId,
+        @Param("slot_id") String slotId,
+        @Param("should_reinvite_guest") @Nullable Boolean shouldReinviteGuest
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
