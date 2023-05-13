@@ -1607,6 +1607,31 @@ public interface TwitchHelix {
     );
 
     /**
+     * Allows a previously invited user to be assigned a slot within the active Guest Star session, once that guest has indicated they are ready to join.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The ID of the Guest Star session in which to assign the slot.
+     * @param guestId       The Twitch User ID corresponding to the guest to assign a slot in the session. This user must already have an invite to this session, and have indicated that they are ready to join.
+     * @param slotId        The slot assignment to give to the user. Must be a numeric identifier between “1” and “N” where N is the max number of slots for the session.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}&slot_id={slot_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> assignGuestStarSlot(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId,
+        @Param("slot_id") String slotId
+    );
+
+    /**
      * Allows a user to update the assigned slot for a particular user within the active Guest Star session.
      *
      * @param authToken         User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
