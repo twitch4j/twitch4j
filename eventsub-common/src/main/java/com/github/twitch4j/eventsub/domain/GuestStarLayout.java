@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.github.twitch4j.common.annotation.Unofficial;
 
 /**
  * How the guests within a session should be laid out within a group browser source.
@@ -23,16 +24,20 @@ public enum GuestStarLayout {
     /**
      * All live guests are arranged in a horizontal bar within the browser source.
      * <p>
-     * Only used in {@code TwitchHelix#updateChannelGuestStarSettings}
+     * This value is only documented for {@code TwitchHelix#updateChannelGuestStarSettings},
+     * but does not work (possibly leaking future functionality).
      */
+    @Unofficial
     @JsonAlias("horizontal")
     HORIZONTAL_LAYOUT,
 
     /**
      * All live guests are arranged in a vertical bar within the browser source.
      * <p>
-     * Only used in {@code TwitchHelix#updateChannelGuestStarSettings}
+     * This value is only documented for {@code TwitchHelix#updateChannelGuestStarSettings},
+     * but does not work (possibly leaking future functionality).
      */
+    @Unofficial
     @JsonAlias("vertical")
     VERTICAL_LAYOUT
 
