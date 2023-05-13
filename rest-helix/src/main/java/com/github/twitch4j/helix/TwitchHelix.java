@@ -1497,6 +1497,24 @@ public interface TwitchHelix {
     );
 
     /**
+     * Programmatically creates a Guest Star session on behalf of the broadcaster.
+     * <p>
+     * Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster
+     * @param broadcasterId The ID of the broadcaster you want to create a Guest Star session for.
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/session?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> createGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *

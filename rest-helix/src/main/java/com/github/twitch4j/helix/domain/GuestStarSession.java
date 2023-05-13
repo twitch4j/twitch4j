@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -13,6 +14,7 @@ public class GuestStarSession {
     /**
      * ID uniquely representing the Guest Star session.
      */
+    @JsonAlias("session_id")
     private String id;
 
     /**
