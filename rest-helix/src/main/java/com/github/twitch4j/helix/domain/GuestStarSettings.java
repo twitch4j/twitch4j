@@ -1,21 +1,15 @@
-package com.github.twitch4j.eventsub.events;
+package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.GuestStarLayout;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@NoArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class GuestStarSettingsUpdateEvent extends EventSubChannelEvent {
+public class GuestStarSettings {
 
     /**
      * Whether Guest Star moderators have access to control whether a guest is live once assigned to a slot.
@@ -26,6 +20,7 @@ public class GuestStarSettingsUpdateEvent extends EventSubChannelEvent {
 
     /**
      * The number of slots the Guest Star call interface will allow the host to add to a call.
+     * Required to be between 1 and 6.
      */
     private Integer slotCount;
 
@@ -37,8 +32,13 @@ public class GuestStarSettingsUpdateEvent extends EventSubChannelEvent {
     private Boolean isBrowserSourceAudioEnabled;
 
     /**
-     * How the guests within a session should be laid out within a group browser source.
+     * How the guests within a session should be laid out within the group browser source.
      */
     private GuestStarLayout groupLayout;
+
+    /**
+     * View only token to generate browser source URLs.
+     */
+    private String browserSourceToken;
 
 }

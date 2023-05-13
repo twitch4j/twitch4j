@@ -18,6 +18,7 @@ import feign.Param;
 import feign.RequestLine;
 import feign.Response;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1425,6 +1426,23 @@ public interface TwitchHelix {
     @RequestLine("GET /goals?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CreatorGoalsList> getCreatorGoals(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Gets the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * @param authToken     User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster
+     * @param broadcasterId The ID of the broadcaster you want to get guest star settings for.
+     * @return GuestStarSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /guest_star/channel_settings?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSettingsWrapper> getChannelGuestStarSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
