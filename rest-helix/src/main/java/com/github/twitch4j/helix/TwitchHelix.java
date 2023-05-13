@@ -1500,8 +1500,10 @@ public interface TwitchHelix {
      * Programmatically creates a Guest Star session on behalf of the broadcaster.
      * <p>
      * Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+     * <p>
+     * Requires phone verification (to avoid 401 Unauthorized response).
      *
-     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster
+     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster.
      * @param broadcasterId The ID of the broadcaster you want to create a Guest Star session for.
      * @return GuestStarSessionList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
@@ -1512,6 +1514,26 @@ public interface TwitchHelix {
     HystrixCommand<GuestStarSessionList> createGuestStarSession(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Programmatically ends a Guest Star session on behalf of the broadcaster.
+     * <p>
+     * Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster.
+     * @param broadcasterId The ID of the broadcaster you want to end a Guest Star session for.
+     * @param sessionId     ID for the session to end on behalf of the broadcaster.
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/session?broadcaster_id={broadcaster_id}&session_id={session_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> endGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("session_id") String sessionId
     );
 
     /**
