@@ -1660,6 +1660,42 @@ public interface TwitchHelix {
     );
 
     /**
+     * Allows a user to update slot settings for a particular guest within a Guest Star session,
+     * such as allowing the user to share audio or video within the call as a host.
+     * <p>
+     * These settings will be broadcasted to all subscribers which control their view of the guest in that slot.
+     * <p>
+     * One or more of the optional parameters to this API can be specified at any time.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId Required: The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   Required: The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @param sessionId     Required: The ID of the Guest Star session in which to update a slot’s settings.
+     * @param slotId        Required: The slot assignment that has previously been assigned to a user.
+     * @param audioEnabled  Optional: Whether the slot is allowed to share their audio with the rest of the session.
+     * @param videoEnabled  Optional: Whether the slot is allowed to share their video with the rest of the session.
+     * @param live          Optional: Whether the user assigned to this slot is visible/can be heard from any public subscriptions.
+     * @param volume        Optional: Value from 0-100 that controls the audio volume for shared views containing the slot.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("PATCH /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&slot_id={slot_id}&is_audio_enabled={is_audio_enabled}&is_video_enabled={is_video_enabled}&is_live={is_live}&volume={volume}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateGuestStarSlotSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("slot_id") String slotId,
+        @Param("is_audio_enabled") @Nullable Boolean audioEnabled,
+        @Param("is_video_enabled") @Nullable Boolean videoEnabled,
+        @Param("is_live") @Nullable Boolean live,
+        @Param("volume") @Nullable Integer volume
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
