@@ -1470,6 +1470,33 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information about an ongoing Guest Star session for a particular channel.
+     * <p>
+     * You may retrieve the session by a broadcaster channel ID, or by a previously retrieved session ID.
+     * <p>
+     * Guests must be either invited or assigned a slot within the session.
+     *
+     * @param authToken     User access token (scope: channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star) from broadcaster or Guest Star moderator
+     * @param broadcasterId ID for the user hosting the Guest Star session. Must be provided if session_id is missing.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @param sessionId     The ID of the session to query (optional, unless broadcaster_id is not specified).
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /guest_star/session?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> getGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
