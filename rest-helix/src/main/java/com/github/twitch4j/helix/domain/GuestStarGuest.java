@@ -1,8 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -34,14 +32,11 @@ public class GuestStarGuest {
     /**
      * Login name of the guest assigned to this slot.
      */
-    @Unofficial // not in example response
     private String userLogin;
 
     /**
      * Display name of the guest assigned to this slot.
      */
-    @Unofficial // not in example response
-    @JsonAlias("userName") // for consistency with other endpoints
     private String userDisplayName;
 
     /**
@@ -64,13 +59,11 @@ public class GuestStarGuest {
     /**
      * Information about the guest’s audio settings.
      */
-    @JsonAlias("audio") // docs and example have naming discrepancy
     private GuestStarMediaSettings audioSettings;
 
     /**
      * Information about the guest’s video settings.
      */
-    @JsonAlias("video") // docs and example have naming discrepancy
     private GuestStarMediaSettings videoSettings;
 
 }
