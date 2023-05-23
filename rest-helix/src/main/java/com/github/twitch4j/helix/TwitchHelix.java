@@ -1433,18 +1433,22 @@ public interface TwitchHelix {
     /**
      * Gets the channel settings for configuration of the Guest Star feature for a particular host.
      *
-     * @param authToken     User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster.
+     * @param authToken     User access token (scope: channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star) from a Guest Star moderator.
      * @param broadcasterId The ID of the broadcaster you want to get guest star settings for.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
      * @return GuestStarSettingsWrapper
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
      */
     @ApiStatus.Experimental // in open beta
-    @RequestLine("GET /guest_star/channel_settings?broadcaster_id={broadcaster_id}")
+    @RequestLine("GET /guest_star/channel_settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<GuestStarSettingsWrapper> getChannelGuestStarSettings(
         @Param("token") String authToken,
-        @Param("broadcaster_id") String broadcasterId
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
     );
 
     /**
