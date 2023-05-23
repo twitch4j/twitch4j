@@ -1666,7 +1666,7 @@ public interface TwitchHelix {
      * @param sessionId           Required: The ID of the Guest Star session in which to remove the slot assignment.
      * @param guestId             Required: The Twitch User ID corresponding to the guest to remove from the session.
      * @param slotId              Required: The slot ID representing the slot assignment to remove from the session.
-     * @param shouldReinviteGuest Optional: Whether the guest should be reinvited. Default: false.
+     * @param shouldReinviteGuest Optional: Whether the guest should be reinvited to the session, sending them back to the invite queue. Default: false.
      * @return 204 No Content upon a successful request
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
