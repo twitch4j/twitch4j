@@ -243,6 +243,13 @@ public class IRCMessageEvent extends TwitchEvent {
     }
 
     /**
+     * @return hexadecimal RGB color code of the user's chat color, or empty if it is never set.
+     */
+    public Optional<String> getUserChatColor() {
+        return getTagValue("color");
+    }
+
+    /**
      * Gets the Target User Id (from Tags)
      *
      * @return Long targetUserId

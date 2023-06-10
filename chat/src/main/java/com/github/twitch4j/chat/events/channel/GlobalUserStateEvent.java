@@ -38,7 +38,7 @@ public class GlobalUserStateEvent extends TwitchEvent {
      * @return hexadecimal RGB color code, or empty if it is never set.
      */
     public Optional<String> getColor() {
-        return messageEvent.getTagValue("color");
+        return messageEvent.getUserChatColor();
     }
 
     /**

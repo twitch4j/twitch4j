@@ -46,8 +46,8 @@ public class UserStateEvent extends AbstractChannelEvent {
     /**
      * @return Hexadecimal RGB color code, or empty if it is never set
      */
-    public Optional<String> getColor(){
-        return messageEvent.getTagValue("color");
+    public Optional<String> getColor() {
+        return messageEvent.getUserChatColor();
     }
 
     /**
