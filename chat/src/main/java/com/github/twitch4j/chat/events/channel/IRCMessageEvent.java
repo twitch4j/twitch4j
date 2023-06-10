@@ -113,7 +113,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		this.parseRawMessage();
 
         // set channel id
-        if (tags.containsKey("room-id")) {
+        if (channelId == null) {
             channelId = tags.get("room-id");
         }
 
@@ -215,11 +215,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long userId
 	 */
 	public String getUserId() {
-		if (tags.containsKey("user-id")) {
-			return tags.get("user-id");
-		}
-
-		return null;
+		return tags.get("user-id");
 	}
 
 	/**
@@ -228,8 +224,9 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String userName
 	 */
 	public String getUserName() {
-		if (tags.containsKey("login")) {
-			return tags.get("login");
+        String login = tags.get("login");
+		if (login != null) {
+			return login;
 		}
 
 		return getClientName()
@@ -250,11 +247,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long targetUserId
      */
     public String getTargetUserId() {
-        if (tags.containsKey("target-user-id")) {
-            return tags.get("target-user-id");
-        }
-
-        return null;
+        return tags.get("target-user-id");
     }
 
     /**
