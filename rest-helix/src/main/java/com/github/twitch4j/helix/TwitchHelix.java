@@ -1117,8 +1117,9 @@ public interface TwitchHelix {
      * @param authToken     App access token or User access token.
      * @param broadcasterId The ID of the broadcaster that’s playing a Soundtrack track.
      * @return SoundtrackCurrentTrackWrapper
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
-    @Unofficial // beta
+    @Deprecated
     @RequestLine("GET /soundtrack/current_track?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackCurrentTrackWrapper> getSoundtrackCurrentTrack(
@@ -1134,8 +1135,9 @@ public interface TwitchHelix {
      * @param limit     Optional: The maximum number of tracks to return for this playlist in the response. The minimum number of tracks is 1 and the maximum is 50. The default is 20.
      * @param after     Optional: The cursor used to get the next page of tracks for this playlist. The Pagination object in the response contains the cursor’s value.
      * @return SoundtrackPlaylistTracksList
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
-    @Unofficial // beta
+    @Deprecated
     @RequestLine("GET /soundtrack/playlist?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackPlaylistTracksList> getSoundtrackPlaylist(
@@ -1156,8 +1158,9 @@ public interface TwitchHelix {
      * @param limit     Optional: The maximum number of playlists to return in the response. The minimum number of playlists is 1 and the maximum is 50. The default is 20.
      * @param after     Optional: The cursor used to get the next page of playlists. The Pagination object in the response contains the cursor’s value.
      * @return SoundtrackPlaylistMetadataList
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
-    @Unofficial // beta
+    @Deprecated
     @RequestLine("GET /soundtrack/playlists?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(
