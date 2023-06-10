@@ -218,11 +218,12 @@ public class IRCMessageEvent extends TwitchEvent {
 		return tags.get("user-id");
 	}
 
-	/**
-	 * Gets the User Name (from Tags)
+    /**
+     * Gets the User Name (from Tags)
      *
      * @return String userName
-	 */
+     * @apiNote This getter returns the login name when available
+     */
 	public String getUserName() {
         String login = tags.get("login");
 		if (login != null) {
