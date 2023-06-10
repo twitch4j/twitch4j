@@ -18,6 +18,7 @@ import feign.Param;
 import feign.RequestLine;
 import feign.Response;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1120,6 +1121,7 @@ public interface TwitchHelix {
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/current_track?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackCurrentTrackWrapper> getSoundtrackCurrentTrack(
@@ -1138,6 +1140,7 @@ public interface TwitchHelix {
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/playlist?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackPlaylistTracksList> getSoundtrackPlaylist(
@@ -1161,6 +1164,7 @@ public interface TwitchHelix {
      * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/playlists?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(

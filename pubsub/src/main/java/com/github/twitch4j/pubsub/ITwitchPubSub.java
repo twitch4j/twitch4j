@@ -6,6 +6,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.enums.PubSubType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -535,6 +536,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval
     default PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
