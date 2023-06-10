@@ -88,7 +88,6 @@ public class TwitchUtils {
             // Founder
             if (badges.containsKey("founder")) {
                 permissionSet.add(CommandPermission.FOUNDER);
-                permissionSet.add(CommandPermission.SUBSCRIBER);
 
                 // also contains info about the tier if needed
                 /*

@@ -125,9 +125,13 @@ public class IRCMessageEvent extends TwitchEvent {
         }
 
         // permissions and badges
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
-		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
-	}
+        getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
+        getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
+        if ("1".equals(tags.get("subscriber"))) {
+            // allows for accurate sub detection when user has founder badge equipped
+            clientPermissions.add(CommandPermission.SUBSCRIBER);
+        }
+    }
 
 	/**
 	 * Checks if the Event was parsed correctly.
