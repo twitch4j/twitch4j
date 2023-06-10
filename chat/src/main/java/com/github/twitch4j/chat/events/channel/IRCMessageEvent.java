@@ -234,8 +234,15 @@ public class IRCMessageEvent extends TwitchEvent {
 
 		return getClientName()
             .filter(StringUtils::isNotBlank)
-            .orElseGet(() -> getTagValue("display-name").orElse(null));
+            .orElseGet(() -> getUserDisplayName().orElse(null));
 	}
+
+    /**
+     * @return the display name of the user who sent this message, if applicable
+     */
+    public Optional<String> getUserDisplayName() {
+        return getTagValue("display-name");
+    }
 
     /**
      * Gets the Target User Id (from Tags)
