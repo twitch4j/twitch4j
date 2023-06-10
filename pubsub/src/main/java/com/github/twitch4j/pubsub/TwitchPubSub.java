@@ -733,6 +733,7 @@ public class TwitchPubSub implements ITwitchPubSub {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                     }
                 } else if ("radio-events-v1".equals(topicName)) {
+                    // noinspection deprecation
                     eventManager.publish(new RadioEvent(TypeConvert.jsonToObject(rawMessage, RadioData.class)));
                 } else if ("shield-mode".equals(topicName) && topicParts.length == 3) {
                     String userId = topicParts[1];

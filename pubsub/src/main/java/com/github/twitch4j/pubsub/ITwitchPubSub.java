@@ -525,7 +525,16 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
     }
 
+    /**
+     * Unofficial: Listen for soundtrack events
+     *
+     * @param credential User Access Token
+     * @param channelId  Target Channel Id
+     * @return PubSubSubscription
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
+     */
     @Unofficial
+    @Deprecated
     default PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
