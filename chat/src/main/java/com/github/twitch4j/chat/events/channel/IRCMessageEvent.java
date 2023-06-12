@@ -113,7 +113,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		this.parseRawMessage();
 
         // set channel id
-        if (tags.containsKey("room-id")) {
+        if (channelId == null) {
             channelId = tags.get("room-id");
         }
 
@@ -215,27 +215,39 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long userId
 	 */
 	public String getUserId() {
-		if (tags.containsKey("user-id")) {
-			return tags.get("user-id");
-		}
-
-		return null;
+		return tags.get("user-id");
 	}
 
-	/**
-	 * Gets the User Name (from Tags)
+    /**
+     * Gets the User Name (from Tags)
      *
      * @return String userName
-	 */
+     * @apiNote This getter returns the login name when available
+     */
 	public String getUserName() {
-		if (tags.containsKey("login")) {
-			return tags.get("login");
+        String login = tags.get("login");
+		if (login != null) {
+			return login;
 		}
 
 		return getClientName()
             .filter(StringUtils::isNotBlank)
-            .orElseGet(() -> getTagValue("display-name").orElse(null));
+            .orElseGet(() -> getUserDisplayName().orElse(null));
 	}
+
+    /**
+     * @return the display name of the user who sent this message, if applicable
+     */
+    public Optional<String> getUserDisplayName() {
+        return getTagValue("display-name");
+    }
+
+    /**
+     * @return hexadecimal RGB color code of the user's chat color, or empty if it is never set.
+     */
+    public Optional<String> getUserChatColor() {
+        return getTagValue("color");
+    }
 
     /**
      * Gets the Target User Id (from Tags)
@@ -243,11 +255,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long targetUserId
      */
     public String getTargetUserId() {
-        if (tags.containsKey("target-user-id")) {
-            return tags.get("target-user-id");
-        }
-
-        return null;
+        return tags.get("target-user-id");
     }
 
     /**
