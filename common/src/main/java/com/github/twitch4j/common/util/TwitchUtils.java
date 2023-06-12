@@ -32,7 +32,12 @@ public class TwitchUtils {
     public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges, String userId, Collection<String> botOwnerIds) {
         Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
 
-        // Check for Permissions
+        // check tags
+        if ("1".equals(tags.get("subscriber"))) { // allows for accurate sub detection when user has the founder badge equipped
+            permissionSet.add(CommandPermission.SUBSCRIBER);
+        }
+
+        // check badges
         if (tags.containsKey("badges")) {
             if (tags.get("badges") instanceof String) {
                 // needed for irc
