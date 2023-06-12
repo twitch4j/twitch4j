@@ -9,12 +9,24 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.EscapeUtils;
 import com.github.twitch4j.common.util.TwitchUtils;
-import lombok.*;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.*;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
 
 /**
  * This event gets called when we receive a raw irc message.
@@ -125,9 +137,9 @@ public class IRCMessageEvent extends TwitchEvent {
         }
 
         // permissions and badges
-		getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
-		getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
-	}
+        getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
+        getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
+    }
 
 	/**
 	 * Checks if the Event was parsed correctly.
