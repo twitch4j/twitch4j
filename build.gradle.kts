@@ -128,7 +128,7 @@ subprojects {
 		// - Await
 		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.0")
 		// - Logging
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.7")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.8")
 	}
 
 	publishing {
