@@ -1,7 +1,5 @@
 package com.github.twitch4j.common.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class EscapeUtils {
 
     /**
@@ -68,23 +66,46 @@ public class EscapeUtils {
      * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Official spec</a>
      */
     public static String unescapeTagValue(String value) {
-        return StringUtils.replaceEach(
-            value,
-            new String[] {
-                "\\:",
-                "\\s",
-                "\\\\",
-                "\\r",
-                "\\n"
-            },
-            new String[] {
-                ";",
-                " ",
-                "\\",
-                "\r",
-                "\n"
+        final int start;
+        if (value == null || (start = value.indexOf('\\')) < 0)
+            return value;
+
+        final int len = value.length();
+        final StringBuilder sb = new StringBuilder(len - 1);
+        sb.append(value, 0, start);
+
+        boolean escapeNext = true;
+        for (int i = start + 1; i < len; i++) {
+            char c = value.charAt(i);
+            if (escapeNext) {
+                switch (c) {
+                    case ':':
+                        sb.append(';');
+                        break;
+                    case 's':
+                        sb.append(' ');
+                        break;
+                    case 'r':
+                        sb.append('\r');
+                        break;
+                    case 'n':
+                        sb.append('\n');
+                        break;
+                    default:
+                        sb.append(c);
+                        break;
+                }
+                escapeNext = false;
+            } else {
+                if (c == '\\') {
+                    escapeNext = true;
+                } else {
+                    sb.append(c);
+                }
             }
-        );
+        }
+
+        return sb.toString();
     }
 
 }
