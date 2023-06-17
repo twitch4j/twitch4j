@@ -119,6 +119,7 @@ import com.github.twitch4j.pubsub.events.PollsEvent;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PresenceSettingsEvent;
+import com.github.twitch4j.pubsub.events.PubSubAuthRevokeEvent;
 import com.github.twitch4j.pubsub.events.PubSubConnectionStateEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RadioEvent;
@@ -156,6 +157,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -876,6 +878,39 @@ public class TwitchPubSub implements ITwitchPubSub {
             } else if (message.getType().equals(PubSubType.RECONNECT)) {
                 log.warn("PubSub: Server instance we're connected to will go down for maintenance soon, reconnecting to obtain a new connection!");
                 reconnect();
+            } else if (message.getType() == PubSubType.AUTH_REVOKED) {
+                PubSubRequest revocation = TypeConvert.jsonToObject(text, PubSubRequest.class);
+                Object topicsObj = revocation.getData().get("topics");
+                if (topicsObj instanceof Collection) {
+                    Set<String> names = new HashSet<>();
+
+                    // Read topic names
+                    for (Object topicObj : (Collection<?>) topicsObj) {
+                        if (topicObj instanceof String) {
+                            names.add((String) topicObj);
+                        } else {
+                            log.warn("Unparsable Revocation Topic: {}", topicObj);
+                        }
+                    }
+
+                    if (names.isEmpty())
+                        return; // should not occur
+
+                    // Fire event
+                    eventManager.publish(new PubSubAuthRevokeEvent(this, Collections.unmodifiableSet(names)));
+
+                    // Unsubscribe
+                    subscribedTopics.removeIf(req -> {
+                        Object topics = req.getData().get("topics");
+                        if (topics instanceof Collection && ((Collection<?>) topics).size() == 1) {
+                            Object topic = ((Collection<?>) topics).iterator().next();
+                            return topic instanceof String && names.contains(topic);
+                        }
+                        return false;
+                    });
+                } else {
+                    log.warn("Unparsable Revocation: {}", text);
+                }
             } else {
                 // unknown message
                 log.debug("PubSub: Unknown Message Type: " + message);
