@@ -3,6 +3,7 @@ package com.github.twitch4j.pubsub;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
+import com.github.twitch4j.pubsub.events.PubSubAuthRevokeEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Builder;
@@ -67,6 +68,14 @@ public class TwitchPubSubConnectionPool extends TwitchModuleConnectionPool<Twitc
             if (e.hasError()) {
                 e.getListenRequest().map(PubSubSubscription::new).ifPresent(this::unsubscribe);
             }
+        });
+
+        // Reclaim topic headroom upon revoked subscriptions
+        client.getEventManager().onEvent(threadPrefix + "revocation-tracker", PubSubAuthRevokeEvent.class, e -> {
+            // technically this causes warning logs because the underlying socket has already cleaned up
+            // but, we still want SubscriptionConnectionPool#decrementSubscriptions to be called (hence this call)
+            e.getRevokedListensByTopic().values()
+                .forEach(req -> unsubscribe(new PubSubSubscription(req)));
         });
 
         // Return pubsub client
