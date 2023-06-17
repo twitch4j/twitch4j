@@ -882,32 +882,32 @@ public class TwitchPubSub implements ITwitchPubSub {
                 PubSubRequest revocation = TypeConvert.jsonToObject(text, PubSubRequest.class);
                 Object topicsObj = revocation.getData().get("topics");
                 if (topicsObj instanceof Collection) {
-                    Set<String> names = new HashSet<>();
+                    Map<String, PubSubRequest> revoked = new HashMap<>(); // allows for null values
 
                     // Read topic names
                     for (Object topicObj : (Collection<?>) topicsObj) {
                         if (topicObj instanceof String) {
-                            names.add((String) topicObj);
+                            revoked.put((String) topicObj, null);
                         } else {
                             log.warn("Unparsable Revocation Topic: {}", topicObj);
                         }
                     }
 
-                    if (names.isEmpty())
+                    if (revoked.isEmpty())
                         return; // should not occur
-
-                    // Fire event
-                    eventManager.publish(new PubSubAuthRevokeEvent(this, Collections.unmodifiableSet(names)));
 
                     // Unsubscribe
                     subscribedTopics.removeIf(req -> {
                         Object topics = req.getData().get("topics");
                         if (topics instanceof Collection && ((Collection<?>) topics).size() == 1) {
                             Object topic = ((Collection<?>) topics).iterator().next();
-                            return topic instanceof String && names.contains(topic);
+                            return topic instanceof String && revoked.replace((String) topic, null, req);
                         }
                         return false;
                     });
+
+                    // Fire event
+                    eventManager.publish(new PubSubAuthRevokeEvent(this, Collections.unmodifiableMap(revoked)));
                 } else {
                     log.warn("Unparsable Revocation: {}", text);
                 }
