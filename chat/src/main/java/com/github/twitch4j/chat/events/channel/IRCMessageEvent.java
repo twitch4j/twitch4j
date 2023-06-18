@@ -45,10 +45,12 @@ public class IRCMessageEvent extends TwitchEvent {
     @Unofficial
     public static final String NONCE_TAG_NAME = "client-nonce";
 
-	/**
-	 * Tags
-	 */
-	private Map<String, String> tags = new HashMap<>();
+    /**
+     * Tags
+     * <p>
+     * Most applications should utilize {@link #getTagValue(String)} rather than accessing this map directly.
+     */
+    private Map<String, String> tags = new HashMap<>();
 
 	/**
 	 * Badges
