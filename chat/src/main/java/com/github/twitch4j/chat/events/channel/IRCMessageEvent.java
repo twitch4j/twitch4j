@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -48,11 +49,6 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * Tags
 	 */
 	private Map<String, String> tags = new HashMap<>();
-
-    /**
-     * Raw Tags
-     */
-    private Map<String, Object> rawTags = new HashMap<>();
 
 	/**
 	 * Badges
@@ -159,7 +155,6 @@ public class IRCMessageEvent extends TwitchEvent {
 		if (matcher.matches()) {
 			// Parse Tags
 			tags = parseTags(matcher.group("tags"));
-            rawTags = parseTags(matcher.group("tags"));
 			clientName = parseClientName(matcher.group("clientName"));
 			commandType = matcher.group("command");
 			channelName = Optional.ofNullable(matcher.group("channel"));
@@ -173,7 +168,6 @@ public class IRCMessageEvent extends TwitchEvent {
 		if (matcherPM.matches()) {
 			// Parse Tags
 			tags = parseTags(matcherPM.group("tags"));
-			rawTags = parseTags(matcherPM.group("tags"));
 			clientName = parseClientName(matcherPM.group("clientName"));
 			commandType = matcherPM.group("command");
 			channelName = Optional.ofNullable(matcherPM.group("channel"));
@@ -188,7 +182,8 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * @param raw The raw list of tags.
 	 * @return A key-value map of the tags.
 	 */
-	public Map parseTags(String raw) {
+    @ApiStatus.Internal
+	public Map<String, String> parseTags(String raw) {
 		Map<String, String> map = new HashMap<>();
 		if(StringUtils.isBlank(raw)) return map;
 
@@ -402,5 +397,14 @@ public class IRCMessageEvent extends TwitchEvent {
 	public EventChannel getChannel() {
 		return new EventChannel(getChannelId(), getChannelName().get());
 	}
+
+    /**
+     * @return IRCv3 tags
+     * @deprecated in favor of {@link #getTags()}
+     */
+    @Deprecated
+    public Map<String, Object> getRawTags() {
+        return Collections.unmodifiableMap(tags);
+    }
 
 }
