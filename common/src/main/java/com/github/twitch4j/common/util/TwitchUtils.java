@@ -158,8 +158,8 @@ public class TwitchUtils {
         // Fix Whitespaces
         raw = EscapeUtils.unescapeTagValue(raw);
 
-        for (String tag : StringUtils.split(raw, ',')) {
-            String[] val = StringUtils.split(tag, "/", 2);
+        for (String tag : raw.split(",")) {
+            String[] val = tag.split("/", 2);
             final String key = val[0];
             String value = (val.length > 1) ? val[1] : null;
             map.put(key, value);
