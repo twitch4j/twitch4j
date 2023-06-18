@@ -188,7 +188,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		if(StringUtils.isBlank(raw)) return map;
 
 		for (String tag: raw.split(";")) {
-			String[] val = tag.split("=");
+			String[] val = tag.split("=", 2);
 			final String key = val[0];
 			String value = (val.length > 1) ? val[1] : null;
 			map.put(key, value);
