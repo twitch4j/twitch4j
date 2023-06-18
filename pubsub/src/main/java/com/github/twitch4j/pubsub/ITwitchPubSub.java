@@ -6,6 +6,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.enums.PubSubType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -525,7 +526,17 @@ public interface ITwitchPubSub extends AutoCloseable {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
     }
 
+    /**
+     * Unofficial: Listen for soundtrack events
+     *
+     * @param credential User Access Token
+     * @param channelId  Target Channel Id
+     * @return PubSubSubscription
+     * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
+     */
     @Unofficial
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval
     default PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }

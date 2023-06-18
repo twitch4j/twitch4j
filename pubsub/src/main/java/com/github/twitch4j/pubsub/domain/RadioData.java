@@ -9,8 +9,12 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+/**
+ * @deprecated <a href="https://discuss.dev.twitch.tv/t/withdrawal-of-twitch-api-endpoints-for-soundtrack/">Twitch is decommissioning Soundtrack on 2023-07-17</a>
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
+@Deprecated
 public class RadioData {
 
     @JsonProperty("userID")
