@@ -62,7 +62,7 @@ public class IRCMessageEvent extends TwitchEvent {
     /**
      * Metadata related to the chat badges in the badges tag
      */
-    private Map<String, String> badgeInfo = new HashMap<>();
+    private Map<String, String> badgeInfo = null;
 
 	/**
 	 * Client
@@ -138,7 +138,18 @@ public class IRCMessageEvent extends TwitchEvent {
 
         // permissions and badges
         getClientPermissions().addAll(TwitchUtils.getPermissionsFromTags(getRawTags(), badges, botOwnerIds != null ? getUserId() : null, botOwnerIds));
-        getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
+    }
+
+    /**
+     * @return metadata related to the chat badges in the badges tag
+     */
+    public Map<String, String> getBadgeInfo() {
+        Map<String, String> info = badgeInfo;
+        if (info == null) {
+            this.badgeInfo = info = new HashMap<>();
+            getTagValue("badge-info").map(TwitchUtils::parseBadges).ifPresent(map -> badgeInfo.putAll(map));
+        }
+        return info;
     }
 
 	/**
@@ -291,6 +302,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return the exact number of months the user has been a subscriber, or empty if they are not subscribed
      */
     public OptionalInt getSubscriberMonths() {
+        Map<String, String> badgeInfo = getBadgeInfo();
         final String monthsStr = badgeInfo.getOrDefault("subscriber", badgeInfo.get("founder"));
 
         if (monthsStr != null) {
@@ -356,7 +368,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return the title of the choice this user is predicting, in an optional wrapper
      */
     public Optional<String> getPredictedChoiceTitle() {
-        return Optional.ofNullable(badgeInfo.get("predictions")).map(EscapeUtils::unescapeTagValue);
+        return Optional.ofNullable(getBadgeInfo().get("predictions")).map(EscapeUtils::unescapeTagValue);
     }
 
 	/**
