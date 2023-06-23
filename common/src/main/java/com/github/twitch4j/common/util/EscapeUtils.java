@@ -1,5 +1,7 @@
 package com.github.twitch4j.common.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class EscapeUtils {
 
     /**
@@ -65,10 +67,13 @@ public class EscapeUtils {
      * @return the unescaped value
      * @see <a href="https://ircv3.net/specs/extensions/message-tags.html">Official spec</a>
      */
-    public static String unescapeTagValue(String value) {
-        final int start;
-        if (value == null || (start = value.indexOf('\\')) < 0)
-            return value;
+    public static String unescapeTagValue(CharSequence value) {
+        if (value == null)
+            return null;
+
+        final int start = StringUtils.indexOf(value, '\\');
+        if (start < 0)
+            return value.toString();
 
         final int len = value.length();
         final StringBuilder sb = new StringBuilder(len - 1);
