@@ -413,18 +413,34 @@ public class IRCMessageEvent extends TwitchEvent {
 		return new EventChannel(getChannelId(), getChannelName().get());
 	}
 
+    /**
+     * @param name the tag key
+     * @return the (not escaped) tag value associated with the specified key, in {@link CharSequence} form
+     * @implNote This method is faster than {@link #getRawTagString(String)}
+     * @apiNote This method is primarily intended for internal use by the library; please open an issue if a common tag is missing.
+     */
     @Nullable
     @ApiStatus.Internal
     public CharSequence getRawTag(@NotNull String name) {
         return escapedTags.get(name);
     }
 
+    /**
+     * @param name the tag key
+     * @return the (not escaped) tag value associated with the specified key, in {@link String} form
+     * @implNote This method is slower than {@link #getRawTag(String)}
+     * @apiNote This method is primarily intended for internal use by the library; please open an issue if a common tag is missing.
+     */
     @Nullable
     @ApiStatus.Internal
     public String getRawTagString(@NotNull String name) {
         return Objects.toString(getRawTag(name), null);
     }
 
+    /**
+     * @return raw (i.e., not unescaped) IRCv3 tags
+     * @deprecated in favor of {@link #getTagValue(String)} or {@link #getEscapedTags()}
+     */
     @Deprecated
     public Map<String, String> getTags() {
         final Map<String, String> t = new HashMap<>(escapedTags.size() * 4 / 3 + 1);
