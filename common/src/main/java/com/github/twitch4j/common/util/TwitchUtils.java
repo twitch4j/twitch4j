@@ -4,8 +4,15 @@ import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class TwitchUtils {
 
@@ -21,34 +28,57 @@ public class TwitchUtils {
      */
     public static final EventUser ANONYMOUS_CHEERER = new EventUser("407665396", "ananonymouscheerer");
 
+    @Deprecated // not used by twitch4j
     public static Set<CommandPermission> getPermissionsFromTags(Map<String, Object> tags) {
         return getPermissionsFromTags(tags, new HashMap<>());
     }
 
+    @Deprecated // not used by twitch4j
     public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges) {
         return getPermissionsFromTags(tags, badges, null, null);
     }
 
+    @ApiStatus.Internal
     public static Set<CommandPermission> getPermissionsFromTags(@NonNull Map<String, Object> tags, @NonNull Map<String, String> badges, String userId, Collection<String> botOwnerIds) {
-        Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
-
-        // check tags
-        if ("1".equals(tags.get("subscriber"))) { // allows for accurate sub detection when user has the founder badge equipped
-            permissionSet.add(CommandPermission.SUBSCRIBER);
+        // allows for accurate sub detection when user has the founder badge equipped
+        Object subscriber = tags.get("subscriber");
+        if (subscriber instanceof CharSequence && !StringUtils.equals("0", (CharSequence) subscriber)) {
+            badges.put("subscriber", subscriber.toString());
         }
 
-        // check badges
-        if (tags.containsKey("badges")) {
-            if (tags.get("badges") instanceof String) {
-                // needed for irc
-                badges.putAll(parseBadges((String) tags.get("badges")));
-            } else {
-                List<Map<String, String>> badgeList = (List<Map<String, String>>) tags.get("badges");
-                if (badgeList != null) {
-                    badgeList.forEach(badge -> badges.put(badge.get("id"), "1"));
+        // irc parsing branch
+        Object inputBadges = tags.get("badges");
+        if (inputBadges instanceof CharSequence) {
+            return getPermissionsFromTags((CharSequence) inputBadges, userId, botOwnerIds, badges);
+        }
+
+        // otherwise: handle pubsub whispers topic
+        if (inputBadges instanceof Collection) {
+            Collection<?> list = (Collection<?>) inputBadges;
+            for (Object badgeObj : list) {
+                if (badgeObj instanceof Map) {
+                    Map<?, ?> badge = (Map<?, ?>) badgeObj;
+                    Object badgeId = badge.get("id");
+                    if (badgeId instanceof String) {
+                        Object badgeVersion = badge.get("version");
+                        badges.put((String) badgeId, badgeVersion instanceof String ? (String) badgeVersion : null);
+                    }
                 }
             }
+        }
+        return getPermissionsFromTags(null, userId, botOwnerIds, badges);
+    }
 
+    private static Set<CommandPermission> getPermissionsFromTags(@Nullable CharSequence badgesTag, String userId, Collection<String> botOwnerIds, @NonNull Map<String, String> badges) {
+        Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
+
+        // Parse badges tag
+        if (badgesTag != null) {
+            badges.putAll(parseBadges(badgesTag.toString()));
+        }
+
+        // Check for Permissions
+        if (!badges.isEmpty()) {
             // Broadcaster
             if (badges.containsKey("broadcaster")) {
                 permissionSet.add(CommandPermission.BROADCASTER);

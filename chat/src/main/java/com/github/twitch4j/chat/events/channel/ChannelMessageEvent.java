@@ -31,7 +31,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Nullable
     @Getter(lazy = true)
-    ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
+    ChatReply replyInfo = ChatReply.parse(getMessageEvent().getEscapedTags());
 
     /**
      * Information regarding any associated Crowd Chant for this message, if applicable.

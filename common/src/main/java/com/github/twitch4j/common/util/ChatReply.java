@@ -2,8 +2,10 @@ package com.github.twitch4j.common.util;
 
 import lombok.NonNull;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static com.github.twitch4j.common.util.EscapeUtils.unescapeTagValue;
 
@@ -47,16 +49,17 @@ public class ChatReply {
      * @param tags the message tags associated with a reply.
      * @return the parsed {@link ChatReply}, or null if unsuccessful
      */
-    public static ChatReply parse(final Map<String, String> tags) {
-        final String msgId;
-        if (tags == null || (msgId = tags.get(REPLY_MSG_ID_TAG_NAME)) == null || msgId.isEmpty())
+    @ApiStatus.Internal
+    public static ChatReply parse(final Map<String, CharSequence> tags) {
+        final CharSequence msgId;
+        if (tags == null || (msgId = tags.get(REPLY_MSG_ID_TAG_NAME)) == null || msgId.length() == 0)
             return null;
 
         return new ChatReply(
-            msgId,
+            msgId.toString(),
             unescapeTagValue(tags.get("reply-parent-msg-body")),
-            tags.get("reply-parent-user-id"),
-            tags.get("reply-parent-user-login"),
+            Objects.toString(tags.get("reply-parent-user-id"), null),
+            Objects.toString(tags.get("reply-parent-user-login"), null),
             unescapeTagValue(tags.get("reply-parent-display-name"))
         );
     }

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_CHEERER;
@@ -91,7 +92,7 @@ public class IRCEventHandler {
 
     @Unofficial
     public void onAnnouncement(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "announcement".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("announcement", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -109,7 +110,7 @@ public class IRCEventHandler {
      */
     public void onChannelMessage(IRCMessageEvent event) {
         if(event.getCommandType().equals("PRIVMSG")) {
-            if(!event.getTags().containsKey("bits") && event.getMessage().isPresent()) {
+            if (event.getRawTag("bits") == null && event.getMessage().isPresent()) {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
@@ -147,12 +148,12 @@ public class IRCEventHandler {
      * @param event the {@link IRCMessageEvent} to be checked
      */
     public void onBitsBadgeTier(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "bitsbadgetier".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("bitsbadgetier", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
 
-            String thresholdParam = event.getTags().get("msg-param-threshold");
+            String thresholdParam = event.getRawTagString("msg-param-threshold");
             int bitsThreshold = thresholdParam != null ? Integer.parseInt(thresholdParam) : -1;
 
             // Dispatch Event
@@ -166,12 +167,13 @@ public class IRCEventHandler {
      */
     public void onChannelCheer(IRCMessageEvent event) {
         if(event.getCommandType().equals("PRIVMSG")) {
-            if(event.getTags().containsKey("bits")) {
+            String rawBits = event.getRawTagString("bits");
+            if (rawBits != null) {
                 // Load Info
                 EventChannel channel = event.getChannel();
                 EventUser user = event.getUser();
                 String message = event.getMessage().orElse("");
-                Integer bits = Integer.parseInt(event.getTags().get("bits"));
+                Integer bits = Integer.parseInt(rawBits);
                 int subMonths = event.getSubscriberMonths().orElse(0);
                 int subTier = event.getSubscriptionTier().orElse(0);
 
@@ -188,7 +190,7 @@ public class IRCEventHandler {
      */
     @Unofficial
     public void onDirectCheer(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "midnightsquid".equals(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals("midnightsquid", event.getRawTag("msg-id"))) {
             eventManager.publish(new DirectCheerEvent(event));
         }
     }
@@ -200,11 +202,11 @@ public class IRCEventHandler {
      */
     public void onChannelSubscription(IRCMessageEvent event) {
         final String msgId;
-        if (event.getCommandType().equals("USERNOTICE") && (msgId = event.getTags().get("msg-id")) != null) {
+        if (event.getCommandType().equals("USERNOTICE") && (msgId = Objects.toString(event.getRawTag("msg-id"), null)) != null) {
             EventChannel channel = event.getChannel();
 
             // Resub message for a multi-month gifted subscription
-            if (msgId.equalsIgnoreCase("resub") && "true".equalsIgnoreCase(event.getTags().get("msg-param-was-gifted"))) {
+            if (msgId.equalsIgnoreCase("resub") && StringUtils.equalsIgnoreCase("true", event.getRawTag("msg-param-was-gifted"))) {
                 eventManager.publish(new GiftedMultiMonthSubCourtesyEvent(event));
             }
             // Sub
@@ -212,7 +214,7 @@ public class IRCEventHandler {
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                int cumulativeMonths = event.getTags().containsKey("msg-param-cumulative-months") ? Integer.parseInt(event.getTags().get("msg-param-cumulative-months")) : 0;
+                int cumulativeMonths = event.getTagValue("msg-param-cumulative-months").map(Integer::parseInt).orElse(0);
                 //according to the Twitch docs, msg-param-months is used only for giftsubs, which are handled below
 
                 // twitch sometimes returns 0 months for new subs
@@ -222,11 +224,11 @@ public class IRCEventHandler {
 
                 // check user's sub streak
                 // Twitch API specifies that 0 is returned if the user chooses not to share their streak
-                Integer streak = event.getTags().containsKey("msg-param-streak-months") ? Integer.parseInt(event.getTags().get("msg-param-streak-months")) : 0;
+                Integer streak = event.getTagValue("msg-param-streak-months").map(Integer::parseInt).orElse(0);
 
                 // unofficial: multi month tags
-                Integer multiMonthDuration = Math.max(Integer.parseInt(event.getTags().getOrDefault("msg-param-multimonth-duration", "1")), 1);
-                Integer multiMonthTenure = Integer.parseInt(event.getTags().getOrDefault("msg-param-multimonth-tenure", "0"));
+                Integer multiMonthDuration = Math.max(Integer.parseInt(event.getTagValue("msg-param-multimonth-duration").orElse("1")), 1);
+                Integer multiMonthTenure = Integer.parseInt(event.getTagValue("msg-param-multimonth-tenure").orElse("0"));
 
                 // Dispatch Event
                 eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
@@ -237,7 +239,7 @@ public class IRCEventHandler {
                 EventUser user = new EventUser(event.getTagValue("msg-param-recipient-id").get(), event.getTagValue("msg-param-recipient-user-name").get());
                 EventUser giftedBy = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                int subStreak = event.getTags().containsKey("msg-param-months") ? Integer.parseInt(event.getTags().get("msg-param-months")) : 1;
+                int subStreak = event.getTagValue("msg-param-months").map(Integer::parseInt).orElse(1);
 
                 // twitch sometimes returns 0 months for new subs
                 if (subStreak == 0) {
@@ -245,10 +247,10 @@ public class IRCEventHandler {
                 }
 
                 // Handle multi-month gifts
-                String giftMonthsParam = event.getTags().get("msg-param-gift-months");
+                String giftMonthsParam = event.getRawTagString("msg-param-gift-months");
                 int giftMonths = giftMonthsParam != null ? Integer.parseInt(giftMonthsParam) : 1;
                 // unofficial: plausible, but hasn't been observed in the wild for this msg-id
-                String multiTenureParam = event.getTags().get("msg-param-multimonth-tenure");
+                String multiTenureParam = event.getRawTagString("msg-param-multimonth-tenure");
                 Integer multiMonthTenure = StringUtils.isEmpty(multiTenureParam) ? null : Integer.parseInt(multiTenureParam);
 
                 // Dispatch Event
@@ -259,8 +261,8 @@ public class IRCEventHandler {
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                Integer subsGifted = (event.getTags().containsKey("msg-param-mass-gift-count")) ? Integer.parseInt(event.getTags().get("msg-param-mass-gift-count")) : 0;
-                Integer subsGiftedTotal = (event.getTags().containsKey("msg-param-sender-count")) ? Integer.parseInt(event.getTags().get("msg-param-sender-count")) : 0;
+                Integer subsGifted = event.getTagValue("msg-param-mass-gift-count").map(Integer::parseInt).orElse(0);
+                Integer subsGiftedTotal = event.getTagValue("msg-param-sender-count").map(Integer::parseInt).orElse(0);
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
@@ -270,7 +272,7 @@ public class IRCEventHandler {
                 // Load Info
                 EventUser user = event.getUser();
                 String promoName = event.getTagValue("msg-param-promo-name").orElse(null);
-                String giftTotalParam = event.getTags().get("msg-param-promo-gift-total");
+                String giftTotalParam = event.getRawTagString("msg-param-promo-gift-total");
                 Integer giftTotal = giftTotalParam != null ? Integer.parseInt(giftTotalParam) : null;
                 String senderLogin = event.getTagValue("msg-param-sender-login").orElse(null);
                 String senderName = event.getTagValue("msg-param-sender-name").orElse(null);
@@ -293,10 +295,10 @@ public class IRCEventHandler {
                 EventUser user = event.getUser();
                 SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);
 
-                String cumMonthsParam = event.getTags().get("msg-param-cumulative-months");
+                String cumMonthsParam = event.getRawTagString("msg-param-cumulative-months");
                 int cumulativeMonths = cumMonthsParam != null ? Math.max(Integer.parseInt(cumMonthsParam), 1) : 1;
 
-                String endMonthParam = event.getTags().get("msg-param-sub-benefit-end-month");
+                String endMonthParam = event.getRawTagString("msg-param-sub-benefit-end-month");
                 Month endMonth = endMonthParam != null ? Month.of(Integer.parseInt(endMonthParam)) : null;
 
                 // Dispatch Event
@@ -311,7 +313,7 @@ public class IRCEventHandler {
      * @param event the {@link IRCMessageEvent} to be checked
      */
     public void onGiftReceived(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "primecommunitygiftreceived".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("primecommunitygiftreceived", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -329,9 +331,9 @@ public class IRCEventHandler {
      * @param event the {@link IRCMessageEvent} to be checked
      */
     public void onPayForward(IRCMessageEvent event) {
-        String msgId;
-        if ("USERNOTICE".equals(event.getCommandType()) && (msgId = event.getTags().get("msg-id")) != null
-            && (msgId.equalsIgnoreCase("standardpayforward") || msgId.equalsIgnoreCase("communitypayforward"))) {
+        CharSequence msgId;
+        if ("USERNOTICE".equals(event.getCommandType()) && (msgId = event.getRawTag("msg-id")) != null
+            && (StringUtils.equalsIgnoreCase(msgId, "standardpayforward") || StringUtils.equalsIgnoreCase(msgId,"communitypayforward"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -357,7 +359,7 @@ public class IRCEventHandler {
 
     @Unofficial
     public void onCharityDonation(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "charitydonation".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("charitydonation", event.getRawTag("msg-id"))) {
             eventManager.publish(new CharityDonationEvent(event));
         }
     }
@@ -367,14 +369,13 @@ public class IRCEventHandler {
      * @param event IRCMessageEvent
      */
     public void onRaid(IRCMessageEvent event) {
-        if (event.getCommandType().equals("USERNOTICE") && event.getTags().containsKey("msg-id") && event.getTags().get("msg-id").equalsIgnoreCase("raid")) {
+        if (event.getCommandType().equals("USERNOTICE") && StringUtils.equalsIgnoreCase("raid", event.getRawTag("msg-id"))) {
             EventChannel channel = event.getChannel();
             EventUser raider = event.getUser();
             Integer viewers;
             try {
-                viewers = Integer.parseInt(event.getTags().get("msg-param-viewerCount"));
-            }
-            catch(NumberFormatException ex) {
+                viewers = Integer.parseInt(event.getTagValue("msg-param-viewerCount").orElse("0"));
+            } catch (NumberFormatException ex) {
                 viewers = 0;
             }
             eventManager.publish(new RaidEvent(channel, raider, viewers));
@@ -387,7 +388,7 @@ public class IRCEventHandler {
      * @param event the {@link IRCMessageEvent} to be checked
      */
     public void onUnraid(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "unraid".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("unraid", event.getRawTag("msg-id"))) {
             eventManager.publish(new RaidCancellationEvent(event.getChannel()));
         }
     }
@@ -398,20 +399,20 @@ public class IRCEventHandler {
      * @param event the {@link IRCMessageEvent} to be checked
      */
     public void onRewardGift(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "rewardgift".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("rewardgift", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
             String domain = event.getTagValue("msg-param-domain").orElse(null);
             String triggerType = event.getTagValue("msg-param-trigger-type").orElse(null);
 
-            String selectedCountParam = event.getTags().get("msg-param-selected-count");
+            String selectedCountParam = event.getRawTagString("msg-param-selected-count");
             Integer selectedCount = selectedCountParam != null ? Integer.parseInt(selectedCountParam) : null;
 
-            String totalRewardCountParam = event.getTags().get("msg-param-total-reward-count");
+            String totalRewardCountParam = event.getRawTagString("msg-param-total-reward-count");
             Integer totalRewardCount = totalRewardCountParam != null ? Integer.parseInt(totalRewardCountParam) : null;
 
-            String triggerAmountParam = event.getTags().get("msg-param-trigger-amount");
+            String triggerAmountParam = event.getRawTagString("msg-param-trigger-amount");
             Integer triggerAmount = triggerAmountParam != null ? Integer.parseInt(triggerAmountParam) : null;
 
             // Dispatch Event
@@ -428,7 +429,7 @@ public class IRCEventHandler {
      */
     @Deprecated
     public void onRitual(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && "ritual".equalsIgnoreCase(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("ritual", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -446,12 +447,12 @@ public class IRCEventHandler {
     public void onClearChat(IRCMessageEvent event) {
         if (event.getCommandType().equals("CLEARCHAT")) {
             EventChannel channel = event.getChannel();
-            if (event.getTags().containsKey("target-user-id")) { // ban or timeout
-                if (event.getTags().containsKey("ban-duration")) { // timeout
+            if (event.getRawTag("target-user-id") != null) { // ban or timeout
+                if (event.getRawTag("ban-duration") != null) { // timeout
                     // Load Info
                     EventUser user = event.getTargetUser();
                     Integer duration = Integer.parseInt(event.getTagValue("ban-duration").get());
-                    String banReason = event.getTags().get("ban-reason") != null ? event.getTags().get("ban-reason").toString() : "";
+                    String banReason = event.getTagValue("ban-reason").orElse("");
                     banReason = banReason.replaceAll("\\\\s", " ");
                     UserTimeoutEvent timeoutEvent = new UserTimeoutEvent(channel, user, duration, banReason);
 
@@ -635,40 +636,40 @@ public class IRCEventHandler {
             // getting Status on channel
             EventChannel channel = event.getChannel();
             Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<>();
-            if (event.getTags().size() > 2) {
-                event.getTags().forEach((k, v) -> {
+            if (event.getEscapedTags().size() > 2) {
+                event.getEscapedTags().forEach((k, v) -> {
                     switch (k) {
                         case "broadcaster-lang":
-                            Locale locale = v != null ? Locale.forLanguageTag(v) : null;
+                            Locale locale = v != null ? Locale.forLanguageTag(v.toString()) : null;
                             states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, locale);
                             eventManager.publish(new BroadcasterLanguageEvent(channel, locale));
                             break;
                         case "emote-only":
-                            boolean eoActive = "1".equals(v);
+                            boolean eoActive = StringUtils.equals("1", v);
                             states.put(ChannelStateEvent.ChannelState.EMOTE, eoActive);
                             eventManager.publish(new EmoteOnlyEvent(channel, eoActive));
                             break;
                         case "followers-only":
-                            long followDelay = Long.parseLong(v);
+                            long followDelay = Long.parseLong(v.toString());
                             states.put(ChannelStateEvent.ChannelState.FOLLOWERS, followDelay);
                             eventManager.publish(new FollowersOnlyEvent(channel, followDelay));
                             break;
                         case "r9k":
-                            boolean uniqActive = "1".equals(v);
+                            boolean uniqActive = StringUtils.equals("1", v);
                             states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
                             eventManager.publish(new Robot9000Event(channel, uniqActive));
                             break;
                         case "rituals":
-                            boolean ritualsActive = "1".equals(v);
+                            boolean ritualsActive = StringUtils.equals("1", v);
                             states.put(ChannelStateEvent.ChannelState.RITUALS, ritualsActive);
                             break;
                         case "slow":
-                            long slowDelay = Long.parseLong(v);
+                            long slowDelay = Long.parseLong(v.toString());
                             states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
                             eventManager.publish(new SlowModeEvent(channel, slowDelay));
                             break;
                         case "subs-only":
-                            boolean subActive = "1".equals(v);
+                            boolean subActive = StringUtils.equals("1", v);
                             states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, subActive);
                             eventManager.publish(new SubscribersOnlyEvent(channel, subActive));
                             break;
@@ -710,7 +711,7 @@ public class IRCEventHandler {
 
     @Unofficial
     private void onViewerMilestone(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && ViewerMilestoneEvent.USERNOTICE_ID.equals(event.getTags().get("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals(ViewerMilestoneEvent.USERNOTICE_ID, event.getRawTag("msg-id"))) {
             eventManager.publish(new ViewerMilestoneEvent(event));
         }
     }
