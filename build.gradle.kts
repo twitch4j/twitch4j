@@ -2,6 +2,7 @@ import com.coditory.gradle.manifest.ManifestPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.freefair.gradle.plugins.lombok.LombokExtension
 import io.freefair.gradle.plugins.lombok.tasks.Delombok
+import me.champeau.jmh.JmhParameters
 
 // Plugins
 plugins {
@@ -10,6 +11,7 @@ plugins {
 	`maven-publish`
 	id("io.freefair.lombok").version("8.0.1").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
+	id("me.champeau.jmh").version("0.7.1").apply(false)
 	id("com.github.johnrengelman.shadow").version("8.1.1").apply(false)
 }
 
@@ -37,6 +39,7 @@ subprojects {
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
 	apply(plugin = "io.freefair.lombok")
+	apply(plugin = "me.champeau.jmh")
 	apply(plugin = "com.github.johnrengelman.shadow")
 
 	if (enableManifest) {
@@ -49,6 +52,11 @@ subprojects {
 	project.extensions.getByType(LombokExtension::class).apply {
 		version.set("1.18.28")
 		disableConfig.set(true)
+	}
+
+	project.extensions.getByType(JmhParameters::class).apply {
+		iterations.set(1)
+		fork.set(1)
 	}
 
 	// Source Compatibility
