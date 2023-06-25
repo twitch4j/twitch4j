@@ -94,7 +94,7 @@ public class TwitchChatTest {
         Assertions.assertTrue(event.getPermissions().contains(CommandPermission.EVERYONE));
         Assertions.assertEquals("twitch4j", event.getChannel().getName());
         Assertions.assertEquals("twitch4j", event.getUser().getName());
-        Assertions.assertEquals("Twitch4J", event.getMessageEvent().getTags().get("display-name"));
+        Assertions.assertEquals("Twitch4J", event.getMessageEvent().getRawTagString("display-name"));
         Assertions.assertEquals("hello world", event.getMessage());
     }
 
