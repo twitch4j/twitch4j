@@ -196,7 +196,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * @return A key-value map of the tags.
 	 */
     @ApiStatus.Internal
-	public Map<String, String> parseTags(String raw) {
+	public static Map<String, String> parseTags(String raw) {
 		Map<String, String> map = new HashMap<>();
 		if(StringUtils.isBlank(raw)) return map;
 
