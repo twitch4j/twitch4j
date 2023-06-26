@@ -27,7 +27,8 @@ class TwitchUtilsTest {
         assertEquals(singletonMap("a b", "c d"), parseBadges("a\\sb/c\\sd"));
 
         assertEquals(mapOf("subscriber", "18", "no_audio", "1"), parseBadges("subscriber/18,no_audio/1"));
-        assertEquals(mapOf("subscriber", "19", "no_audio", null), parseBadges("subscriber/19,no_audio/"));
+        assertEquals(mapOf("subscriber", "19", "no_audio", null), parseBadges("subscriber/19,no_audio"));
+        assertEquals(mapOf("subscriber", "19", "no_audio", ""), parseBadges("subscriber/19,no_audio/"));
         assertEquals(mapOf("follower", "20", "no_video", null), parseBadges("follower/20,no_video"));
     }
 
