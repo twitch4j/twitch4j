@@ -55,7 +55,7 @@ subprojects {
 	}
 
 	project.extensions.getByType(JmhParameters::class).apply {
-		iterations.set(1)
+		iterations.set(4)
 		fork.set(1)
 	}
 
