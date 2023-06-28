@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Nullable
     @Getter(lazy = true)
-    ChatReply replyInfo = ChatReply.parse(getMessageEvent().getTags());
+    ChatReply replyInfo = ChatReply.parse(getMessageEvent().getEscapedTags());
 
     /**
      * Information regarding any associated Crowd Chant for this message, if applicable.
@@ -67,7 +68,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Unofficial
     public boolean isHighlightedMessage() {
-        return "highlighted-message".equals(getMessageEvent().getTags().get("msg-id"));
+        return StringUtils.equals("highlighted-message", getMessageEvent().getRawTag("msg-id"));
     }
 
     /**
@@ -75,7 +76,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Unofficial
     public boolean isSkipSubsModeMessage() {
-        return "skip-subs-mode-message".equals(getMessageEvent().getTags().get("msg-id"));
+        return StringUtils.equals("skip-subs-mode-message", getMessageEvent().getRawTag("msg-id"));
     }
 
     /**
@@ -93,7 +94,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Unofficial
     public boolean isDesignatedFirstMessage() {
-        return "1".equals(getMessageEvent().getTags().get("first-msg"));
+        return StringUtils.equals("1", getMessageEvent().getRawTag("first-msg"));
     }
 
     /**
@@ -103,7 +104,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Unofficial
     public boolean isUserIntroduction() {
-        return "user-intro".equals(getMessageEvent().getTags().get("msg-id"));
+        return StringUtils.equals("user-intro", getMessageEvent().getRawTag("msg-id"));
     }
 
     /**
@@ -113,27 +114,24 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      */
     @Unofficial
     public Optional<DonationAmount> getElevatedChatPayment() {
-        final Map<String, String> tags = getMessageEvent().getTags();
+        final Map<String, CharSequence> tags = getMessageEvent().getEscapedTags();
 
-        String amount = tags.get("pinned-chat-paid-amount");
+        CharSequence amount = tags.get("pinned-chat-paid-amount");
         if (amount == null) {
             amount = tags.get("pinned-chat-paid-canonical-amount");
-            if (amount != null) {
-                amount += "00";
-            }
         }
 
         return Optional.ofNullable(amount)
             .map(amt -> {
                 try {
-                    return Long.parseLong(amt);
+                    return Long.parseLong(amt.toString());
                 } catch (Exception e) {
                     return null;
                 }
             })
             .map(amt -> {
-                String currency = tags.getOrDefault("pinned-chat-paid-currency", "USD");
-                String exponentStr = tags.getOrDefault("pinned-chat-paid-exponent", "2");
+                String currency = tags.getOrDefault("pinned-chat-paid-currency", "USD").toString();
+                String exponentStr = tags.getOrDefault("pinned-chat-paid-exponent", "2").toString();
                 int exponent;
                 try {
                     exponent = Integer.parseInt(exponentStr);

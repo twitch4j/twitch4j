@@ -7,6 +7,7 @@ import com.github.twitch4j.common.util.CryptoUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
@@ -79,7 +80,7 @@ public class ChatCrowdChant {
         String message = event.getMessage().orElse(null);
         if (message == null) return null;
 
-        if ("crowd-chant".equals(event.getTags().get("msg-id"))) {
+        if (StringUtils.equals("crowd-chant", event.getRawTag("msg-id"))) {
             return event.getMessageId()
                 .map(id -> new ChatCrowdChant(id, message, true, channelName))
                 .orElse(null);

@@ -43,9 +43,9 @@ public class CharityDonationEvent extends AbstractChannelEvent {
         this.badges = rawEvent.getClientPermissions();
         this.charityName = rawEvent.getTagValue("msg-param-charity-name").orElse(null);
 
-        Long amount = Long.parseLong(rawEvent.getTags().get("msg-param-donation-amount"));
+        Long amount = Long.parseLong(rawEvent.getTagValue("msg-param-donation-amount").orElse("0"));
         String currency = rawEvent.getTagValue("msg-param-donation-currency").orElse("USD");
-        Integer decimals = Integer.parseInt(rawEvent.getTags().getOrDefault("msg-param-exponent", "2"));
+        Integer decimals = Integer.parseInt(rawEvent.getTagValue("msg-param-exponent").orElse("2"));
         this.amount = new DonationAmount(amount, decimals, currency);
 
         this.systemMessage = rawEvent.getTagValue("system-msg").orElseGet(

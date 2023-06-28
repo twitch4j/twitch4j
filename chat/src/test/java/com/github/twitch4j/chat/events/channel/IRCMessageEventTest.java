@@ -74,7 +74,7 @@ public class IRCMessageEventTest {
 
         assertEquals("NOTICE", e.getCommandType());
         assertEquals("bar", e.getChannelName().orElse(null));
-        assertEquals("delete_message_success", e.getTags().get("msg-id"));
+        assertEquals("delete_message_success", e.getRawTagString("msg-id"));
         assertEquals("The message from foo is now deleted.", e.getMessage().orElse(null));
     }
 
@@ -92,8 +92,8 @@ public class IRCMessageEventTest {
         assertEquals("ROOMSTATE", e.getCommandType());
         assertEquals("bar", e.getChannelName().orElse(null));
         assertEquals("12345678", e.getChannelId());
-        assertEquals("0", e.getTags().get("emote-only"));
-        assertEquals("-1", e.getTags().get("followers-only"));
+        assertEquals("0", e.getRawTagString("emote-only"));
+        assertEquals("-1", e.getRawTagString("followers-only"));
     }
 
     @Test

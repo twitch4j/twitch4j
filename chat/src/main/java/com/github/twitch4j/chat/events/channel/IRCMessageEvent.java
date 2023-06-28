@@ -18,6 +18,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -50,7 +53,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * <p>
      * Most applications should utilize {@link #getTagValue(String)} rather than accessing this map directly.
      */
-    private Map<String, String> tags = new HashMap<>();
+    private Map<String, CharSequence> escapedTags = Collections.emptyMap();
 
 	/**
 	 * Badges
@@ -123,9 +126,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		this.parseRawMessage();
 
         // set channel id
-        if (channelId == null) {
-            channelId = tags.get("room-id");
-        }
+        channelId = getRawTagString("room-id");
 
         // provide channel id or name from cache if the event was missing one
         if (!channelName.isPresent() && channelId != null) {
@@ -167,7 +168,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		Matcher matcher = MESSAGE_PATTERN.matcher(rawMessage);
 		if (matcher.matches()) {
 			// Parse Tags
-			tags = parseTags(matcher.group("tags"));
+            escapedTags = parseTags(matcher.group("tags"));
 			clientName = parseClientName(matcher.group("clientName"));
 			commandType = matcher.group("command");
 			channelName = Optional.ofNullable(matcher.group("channel"));
@@ -180,7 +181,7 @@ public class IRCMessageEvent extends TwitchEvent {
 		Matcher matcherPM = WHISPER_PATTERN.matcher(rawMessage);
 		if (matcherPM.matches()) {
 			// Parse Tags
-			tags = parseTags(matcherPM.group("tags"));
+            escapedTags = parseTags(matcherPM.group("tags"));
 			clientName = parseClientName(matcherPM.group("clientName"));
 			commandType = matcherPM.group("command");
 			channelName = Optional.ofNullable(matcherPM.group("channel"));
@@ -196,8 +197,8 @@ public class IRCMessageEvent extends TwitchEvent {
 	 * @return A key-value map of the tags.
 	 */
     @ApiStatus.Internal
-	public static Map<String, String> parseTags(String raw) {
-		Map<String, String> map = new HashMap<>();
+	public static Map<String, CharSequence> parseTags(String raw) {
+		Map<String, CharSequence> map = new HashMap<>();
 		if(StringUtils.isBlank(raw)) return map;
 
 		for (String tag: raw.split(";")) {
@@ -235,7 +236,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long userId
 	 */
 	public String getUserId() {
-		return tags.get("user-id");
+		return getRawTagString("user-id");
 	}
 
     /**
@@ -245,7 +246,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @apiNote This getter returns the login name when available
      */
 	public String getUserName() {
-        String login = tags.get("login");
+        String login = getRawTagString("login");
 		if (login != null) {
 			return login;
 		}
@@ -275,7 +276,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return Long targetUserId
      */
     public String getTargetUserId() {
-        return tags.get("target-user-id");
+        return getRawTagString("target-user-id");
     }
 
     /**
@@ -375,7 +376,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String tagValue
 	 */
 	public Optional<String> getTagValue(String tagName) {
-	    return Optional.ofNullable(tags.get(tagName))
+	    return Optional.ofNullable(getRawTag(tagName))
             .filter(StringUtils::isNotBlank)
             .map(EscapeUtils::unescapeTagValue);
 	}
@@ -413,12 +414,47 @@ public class IRCMessageEvent extends TwitchEvent {
 	}
 
     /**
+     * @param name the tag key
+     * @return the (not escaped) tag value associated with the specified key, in {@link CharSequence} form
+     * @implNote This method is faster than {@link #getRawTagString(String)}
+     * @apiNote This method is primarily intended for internal use by the library; please open an issue if a common tag is missing.
+     */
+    @Nullable
+    @ApiStatus.Internal
+    public CharSequence getRawTag(@NotNull String name) {
+        return escapedTags.get(name);
+    }
+
+    /**
+     * @param name the tag key
+     * @return the (not escaped) tag value associated with the specified key, in {@link String} form
+     * @implNote This method is slower than {@link #getRawTag(String)}
+     * @apiNote This method is primarily intended for internal use by the library; please open an issue if a common tag is missing.
+     */
+    @Nullable
+    @ApiStatus.Internal
+    public String getRawTagString(@NotNull String name) {
+        return Objects.toString(getRawTag(name), null);
+    }
+
+    /**
+     * @return raw (i.e., not unescaped) IRCv3 tags
+     * @deprecated in favor of {@link #getTagValue(String)} or {@link #getEscapedTags()}
+     */
+    @Deprecated
+    public Map<String, String> getTags() {
+        final Map<String, String> t = new HashMap<>(escapedTags.size() * 4 / 3 + 1);
+        escapedTags.forEach((k, v) -> t.put(k, Objects.toString(v, null)));
+        return Collections.unmodifiableMap(t);
+    }
+
+    /**
      * @return IRCv3 tags
-     * @deprecated in favor of {@link #getTags()}
+     * @deprecated in favor of {@link #getEscapedTags()}
      */
     @Deprecated
     public Map<String, Object> getRawTags() {
-        return Collections.unmodifiableMap(tags);
+        return Collections.unmodifiableMap(escapedTags);
     }
 
 }
