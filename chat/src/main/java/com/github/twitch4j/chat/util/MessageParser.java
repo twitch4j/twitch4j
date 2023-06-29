@@ -97,28 +97,32 @@ public class MessageParser {
     public int parseTags(String input, Map<String, CharSequence> output) {
         final int len = input.length();
         int i = 0;
+        int delim = -1;
         for (int j = i + 1; j < len; j++) {
             final char c = input.charAt(j);
-            final boolean delim = c == ';';
-            if (delim || c == ' ') {
-                final CharSequence tag = CharBuffer.wrap(input, i + 1, j);
-                parseTag(output, tag);
+            final boolean boundary = c == ';';
+            if (boundary || c == ' ') {
+                final int tagStart = i + 1;
+                final CharSequence tag = CharBuffer.wrap(input, tagStart, j);
+                parseTag(output, tag, delim - tagStart);
                 i = j;
-                if (!delim) break;
+                delim = -1;
+                if (!boundary) break;
+            } else if (c == '=' && delim < 0) {
+                delim = j;
             }
         }
         return ++i;
     }
 
-    private void parseTag(Map<String, CharSequence> tags, CharSequence tag) {
-        final int i = StringUtils.indexOf(tag, '=');
+    private void parseTag(Map<String, CharSequence> tags, CharSequence tag, int delim) {
         final CharSequence key, value;
-        if (i < 0) {
+        if (delim < 0) {
             key = tag;
             value = null;
         } else {
-            key = tag.subSequence(0, i);
-            value = tag.subSequence(i + 1, tag.length());
+            key = tag.subSequence(0, delim);
+            value = tag.subSequence(delim + 1, tag.length());
         }
         tags.put(key.toString(), value);
     }
