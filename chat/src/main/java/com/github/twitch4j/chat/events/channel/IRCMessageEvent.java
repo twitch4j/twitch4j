@@ -217,7 +217,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @deprecated This method is no longer used by twitch4j
      */
     @Deprecated
-    @ApiStatus.ScheduledForRemoval
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public static Map<String, CharSequence> parseTags(String raw) {
         Map<String, CharSequence> map = new HashMap<>();
         if (StringUtils.isBlank(raw)) return map;
@@ -240,7 +240,7 @@ public class IRCMessageEvent extends TwitchEvent {
      * @deprecated This method is no longer used by twitch4j
      */
     @Deprecated
-    @ApiStatus.ScheduledForRemoval
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public static Optional<String> parseClientName(String raw) {
         if (raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
             return Optional.empty();
