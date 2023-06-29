@@ -5,6 +5,8 @@ import com.github.twitch4j.chat.TwitchChat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.Instant;
+
 @Data
 @EqualsAndHashCode(callSuper=false)
 public abstract class TwitchEvent extends Event {
@@ -15,6 +17,16 @@ public abstract class TwitchEvent extends Event {
 	public TwitchEvent() {
 		super();
 	}
+
+    /**
+     * Constructor
+     *
+     * @param eventId Unique event id
+     * @param firedAt Timestamp of the event firing
+     */
+    public TwitchEvent(String eventId, Instant firedAt) {
+        super(eventId, firedAt);
+    }
 
 	/**
      * Get TwitchChat

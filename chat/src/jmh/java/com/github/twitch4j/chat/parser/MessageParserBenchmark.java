@@ -2,6 +2,7 @@ package com.github.twitch4j.chat.parser;
 
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.BenchmarkFileUtils;
+import com.github.twitch4j.chat.util.MessageParser;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -19,17 +20,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @State(Scope.Thread)
 public class MessageParserBenchmark {
     private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?(?<clientName>\\S+?)\\s(?<command>[A-Z0-9]+)\\s?(?:(?<login>\\S+)\\s=\\s)?(?:#(?<channel>\\S*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
 
+    private Map<String, String> idToName;
+    private Map<String, String> nameToId;
+
     private String[] rawMessages;
     private String[] rawTags;
 
     @Setup
     public void setupBenchmark() throws IOException {
+        idToName = Collections.singletonMap("22484632", "forsen");
+        nameToId = Collections.singletonMap("forsen", "22484632");
+
         // download files if missing
         BenchmarkFileUtils.downloadFile("benchmark-chat-jprochazk.txt", "https://github.com/jprochazk/twitch-irc-benchmarks/raw/cb2aee5ef8157e5ac7132fbdfb6c17cf59da098a/data.txt");
 
@@ -53,7 +62,17 @@ public class MessageParserBenchmark {
     @OperationsPerInvocation(1000)
     public void parse1kMessages(Blackhole bh) {
         for (int i = 0; i < 1000; i++) {
-            bh.consume(new IRCMessageEvent(rawMessages[i], Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet()));
+            bh.consume(MessageParser.parse(rawMessages[i], idToName, nameToId, null));
+        }
+    }
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.MICROSECONDS)
+    @OperationsPerInvocation(1000)
+    public void parse1kTagsOld(Blackhole bh) {
+        for (int i = 0; i < 1000; i++) {
+            bh.consume(IRCMessageEvent.parseTags(rawTags[i]));
         }
     }
 
@@ -63,7 +82,7 @@ public class MessageParserBenchmark {
     @OperationsPerInvocation(1000)
     public void parse1kTags(Blackhole bh) {
         for (int i = 0; i < 1000; i++) {
-            bh.consume(IRCMessageEvent.parseTags(rawTags[i]));
+            bh.consume(MessageParser.parseTags(rawTags[i], new HashMap<>(32)));
         }
     }
 
