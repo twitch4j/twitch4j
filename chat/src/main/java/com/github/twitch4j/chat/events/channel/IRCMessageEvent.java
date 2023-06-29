@@ -55,52 +55,52 @@ public class IRCMessageEvent extends TwitchEvent {
      */
     private final Map<String, CharSequence> escapedTags;
 
-	/**
-	 * Badges
-	 */
-	private Map<String, String> badges = null;
+    /**
+     * Badges
+     */
+    private Map<String, String> badges = null;
 
     /**
      * Metadata related to the chat badges in the badges tag
      */
     private Map<String, String> badgeInfo = null;
 
-	/**
-	 * Client
-	 */
-	private final CharSequence clientName;
+    /**
+     * Client
+     */
+    private final CharSequence clientName;
 
-	/**
-	 * Message Type
-	 */
-	private final String commandType;
+    /**
+     * Message Type
+     */
+    private final String commandType;
 
     /**
      * Channel Id
      */
     private String channelId;
 
-	/**
-	 * Channel Name
-	 */
+    /**
+     * Channel Name
+     */
     @Nullable
-	private String channelName;
+    private String channelName;
 
-	/**
-	 * Message
-	 */
+    /**
+     * Message
+     */
     @Nullable
-	private final String message;
+    private final String message;
 
-	/**
-	 * IRC Command Payload
-	 */
-	private final CharSequence payload;
+    /**
+     * IRC Command Payload
+     */
+    private final CharSequence payload;
 
-	/**
-	 * Client Permissions
-	 */
-	private Set<CommandPermission> clientPermissions = null;
+    /**
+     * Client Permissions
+     */
+    private Set<CommandPermission> clientPermissions = null;
 
     /**
      * AutoMod Message Flag Indicators, relevant for PRIVMSG and USERNOTICE
@@ -109,10 +109,10 @@ public class IRCMessageEvent extends TwitchEvent {
     @Getter(lazy = true)
     private final List<AutoModFlag> flags = FlagParser.parseFlags(this);
 
-	/**
-	 * RAW Message
-	 */
-	private final String rawMessage;
+    /**
+     * RAW Message
+     */
+    private final String rawMessage;
 
     @Nullable
     @Getter(AccessLevel.NONE)
@@ -146,15 +146,15 @@ public class IRCMessageEvent extends TwitchEvent {
     /**
      * Event Constructor
      *
-     * @param rawMessage  The raw message.
+     * @param rawMessage             The raw message.
      * @param channelIdToChannelName Mapping used to lookup a missing channel name in the event
      * @param channelNameToChannelId Mapping used to lookup a missing channel id in the event
-     * @param botOwnerIds The bot owner ids.
+     * @param botOwnerIds            The bot owner ids.
      * @deprecated Use {@link MessageParser#parse(String, Map, Map, Collection)} to create {@link IRCMessageEvent} instances
      */
     @Deprecated
-	public IRCMessageEvent(String rawMessage, Map<String, String> channelIdToChannelName, Map<String, String> channelNameToChannelId, Collection<String> botOwnerIds) {
-		this(Optional.ofNullable(MessageParser.parse(rawMessage, channelIdToChannelName, channelNameToChannelId, botOwnerIds)).orElse(failure(rawMessage)), channelIdToChannelName, channelNameToChannelId, botOwnerIds);
+    public IRCMessageEvent(String rawMessage, Map<String, String> channelIdToChannelName, Map<String, String> channelNameToChannelId, Collection<String> botOwnerIds) {
+        this(Optional.ofNullable(MessageParser.parse(rawMessage, channelIdToChannelName, channelNameToChannelId, botOwnerIds)).orElse(failure(rawMessage)), channelIdToChannelName, channelNameToChannelId, botOwnerIds);
     }
 
     private IRCMessageEvent(@NotNull IRCMessageEvent copy, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
@@ -198,69 +198,70 @@ public class IRCMessageEvent extends TwitchEvent {
         return clientPermissions;
     }
 
-	/**
-	 * Checks if the Event was parsed correctly.
-	 * @return Is the Event valid?
+    /**
+     * Checks if the Event was parsed correctly.
+     *
+     * @return Is the Event valid?
      * @deprecated {@link MessageParser#parse(String)} yields null for invalid messages
-	 */
+     */
     @Deprecated
-	public Boolean isValid() {
-		return !getCommandType().equals("UNKNOWN");
-	}
+    public Boolean isValid() {
+        return !getCommandType().equals("UNKNOWN");
+    }
 
-	/**
-	 * Parse Tags from raw list
-	 *
-	 * @param raw The raw list of tags.
-	 * @return A key-value map of the tags.
+    /**
+     * Parse Tags from raw list
+     *
+     * @param raw The raw list of tags.
+     * @return A key-value map of the tags.
      * @deprecated This method is no longer used by twitch4j
-	 */
+     */
     @Deprecated
     @ApiStatus.ScheduledForRemoval
-	public static Map<String, CharSequence> parseTags(String raw) {
-		Map<String, CharSequence> map = new HashMap<>();
-		if(StringUtils.isBlank(raw)) return map;
+    public static Map<String, CharSequence> parseTags(String raw) {
+        Map<String, CharSequence> map = new HashMap<>();
+        if (StringUtils.isBlank(raw)) return map;
 
-		for (String tag: raw.split(";")) {
-			String[] val = tag.split("=", 2);
-			final String key = val[0];
-			String value = (val.length > 1) ? val[1] : null;
-			map.put(key, value);
-		}
+        for (String tag : raw.split(";")) {
+            String[] val = tag.split("=", 2);
+            final String key = val[0];
+            String value = (val.length > 1) ? val[1] : null;
+            map.put(key, value);
+        }
 
-		return Collections.unmodifiableMap(map); // formatting to Read-Only Map
-	}
+        return Collections.unmodifiableMap(map); // formatting to Read-Only Map
+    }
 
-	/**
-	 * Gets the ClientName from the IRC User Identifier (:user!user@user.tmi.twitch.tv)
-	 *
-	 * @param raw Raw ClientName
-	 * @return Client name, or empty.
+    /**
+     * Gets the ClientName from the IRC User Identifier (:user!user@user.tmi.twitch.tv)
+     *
+     * @param raw Raw ClientName
+     * @return Client name, or empty.
      * @deprecated This method is no longer used by twitch4j
-	 */
+     */
     @Deprecated
     @ApiStatus.ScheduledForRemoval
-	public static Optional<String> parseClientName(String raw) {
-		if(raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
-			return Optional.empty();
-		}
+    public static Optional<String> parseClientName(String raw) {
+        if (raw.equals(":tmi.twitch.tv") || raw.equals(":jtv")) {
+            return Optional.empty();
+        }
 
-		Matcher matcher = CLIENT_PATTERN.matcher(raw);
-		if(matcher.matches()) {
-			return Optional.ofNullable(matcher.group(1));
-		}
+        Matcher matcher = CLIENT_PATTERN.matcher(raw);
+        if (matcher.matches()) {
+            return Optional.ofNullable(matcher.group(1));
+        }
 
-		return Optional.ofNullable(raw);
-	}
+        return Optional.ofNullable(raw);
+    }
 
-	/**
-	 * Gets the User Id (from Tags)
+    /**
+     * Gets the User Id (from Tags)
      *
      * @return Long userId
-	 */
-	public String getUserId() {
-		return getRawTagString("user-id");
-	}
+     */
+    public String getUserId() {
+        return getRawTagString("user-id");
+    }
 
     /**
      * Gets the User Name (from Tags)
@@ -268,16 +269,16 @@ public class IRCMessageEvent extends TwitchEvent {
      * @return String userName
      * @apiNote This getter returns the login name when available
      */
-	public String getUserName() {
+    public String getUserName() {
         String login = getRawTagString("login");
-		if (login != null) {
-			return login;
-		}
+        if (login != null) {
+            return login;
+        }
 
-		return getClientName()
+        return getClientName()
             .filter(StringUtils::isNotBlank)
             .orElseGet(() -> getUserDisplayName().orElse(null));
-	}
+    }
 
     /**
      * @return the display name of the user who sent this message, if applicable
@@ -392,30 +393,30 @@ public class IRCMessageEvent extends TwitchEvent {
         return Optional.ofNullable(getBadgeInfo().get("predictions")).map(EscapeUtils::unescapeTagValue);
     }
 
-	/**
-	 * Gets a optional tag from the irc message
+    /**
+     * Gets a optional tag from the irc message
      *
      * @param tagName The tag of the irc message
      * @return String tagValue
-	 */
-	public Optional<String> getTagValue(String tagName) {
-	    return Optional.ofNullable(getRawTag(tagName))
+     */
+    public Optional<String> getTagValue(String tagName) {
+        return Optional.ofNullable(getRawTag(tagName))
             .filter(StringUtils::isNotBlank)
             .map(EscapeUtils::unescapeTagValue);
-	}
+    }
 
-	/**
-	 * Get User
+    /**
+     * Get User
      *
      * @return ChatUser
-	 */
-	public EventUser getUser() {
-	    if (getUserId() != null || getUserName() != null) {
+     */
+    public EventUser getUser() {
+        if (getUserId() != null || getUserName() != null) {
             return new EventUser(getUserId(), getUserName());
         }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
      * Get Target User
@@ -426,14 +427,14 @@ public class IRCMessageEvent extends TwitchEvent {
         return new EventUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
     }
 
-	/**
-	 * Get ChatChannel
+    /**
+     * Get ChatChannel
      *
      * @return ChatChannel
-	 */
-	public EventChannel getChannel() {
-		return new EventChannel(getChannelId(), channelName);
-	}
+     */
+    public EventChannel getChannel() {
+        return new EventChannel(getChannelId(), channelName);
+    }
 
     /**
      * @return the channel name associated with this event, if applicable
