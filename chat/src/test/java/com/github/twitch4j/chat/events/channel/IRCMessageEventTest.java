@@ -154,4 +154,22 @@ public class IRCMessageEventTest {
         assertTrue(e.getBadgeInfo().isEmpty());
     }
 
+    @Test
+    @DisplayName("Test that JOIN is parsed by IRCMessageEvent")
+    void parseJoin() {
+        IRCMessageEvent e = parse(":ogprodigy!ogprodigy@ogprodigy.tmi.twitch.tv JOIN #twitchdev");
+        assertEquals("JOIN", e.getCommandType());
+        assertEquals("twitchdev", e.getChannelName().orElse(null));
+        assertEquals("ogprodigy", e.getUserName());
+    }
+
+    @Test
+    @DisplayName("Test that PART is parsed by IRCMessageEvent")
+    void parsePart() {
+        IRCMessageEvent e = parse(":ogprodigy!ogprodigy@ogprodigy.tmi.twitch.tv PART #twitchdev");
+        assertEquals("PART", e.getCommandType());
+        assertEquals("twitchdev", e.getChannelName().orElse(null));
+        assertEquals("ogprodigy", e.getUserName());
+    }
+
 }
