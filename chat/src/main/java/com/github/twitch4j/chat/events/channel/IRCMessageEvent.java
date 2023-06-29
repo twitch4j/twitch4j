@@ -115,6 +115,7 @@ public class IRCMessageEvent extends TwitchEvent {
 	private final String rawMessage;
 
     @Nullable
+    @Getter(AccessLevel.NONE)
     private final Collection<String> botOwnerIds;
 
     @ApiStatus.Internal
@@ -424,7 +425,6 @@ public class IRCMessageEvent extends TwitchEvent {
     public EventUser getTargetUser() {
         return new EventUser(getTargetUserId(), getCommandType().equalsIgnoreCase("CLEARCHAT") ? getMessage().get() : null);
     }
-
 
 	/**
 	 * Get ChatChannel
