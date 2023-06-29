@@ -95,15 +95,16 @@ public class MessageParser {
 
     @VisibleForTesting
     public int parseTags(String input, Map<String, CharSequence> output) {
-        final int len = input.length();
+        final char[] inputChars = input.toCharArray(); // more memory yet 20% faster (HeapCharBuffer vs StringCharBuffer)
+        final int len = inputChars.length;
         int i = 0;
         int delim = -1;
         for (int j = i + 1; j < len; j++) {
-            final char c = input.charAt(j);
+            final char c = inputChars[j];
             final boolean boundary = c == ';';
             if (boundary || c == ' ') {
                 final int tagStart = i + 1;
-                final CharSequence tag = CharBuffer.wrap(input, tagStart, j);
+                final CharSequence tag = CharBuffer.wrap(inputChars, tagStart, j - tagStart);
                 parseTag(output, tag, delim - tagStart);
                 i = j;
                 delim = -1;
