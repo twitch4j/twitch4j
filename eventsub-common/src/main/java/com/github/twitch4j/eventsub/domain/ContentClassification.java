@@ -30,7 +30,7 @@ public enum ContentClassification {
      * This tag is automatically applied based on the stream category.
      */
     @JsonProperty("MatureGame")
-    MATURE,
+    MATURE_GAME,
 
     /**
      * Prolonged, and repeated use of obscenities, profanities, and vulgarities,
