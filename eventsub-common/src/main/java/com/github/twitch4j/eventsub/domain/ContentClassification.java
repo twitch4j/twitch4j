@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -48,6 +49,13 @@ public enum ContentClassification {
      * Simulations and/or depictions of realistic violence, gore, extreme injury, or death.
      */
     @JsonProperty("ViolentGraphic")
-    VIOLENCE
+    VIOLENCE,
+
+    /**
+     * The channel has a content classification label that is unrecognized by the library;
+     * Please file an issue on our GitHub repository.
+     */
+    @JsonEnumDefaultValue
+    UNKNOWN;
 
 }
