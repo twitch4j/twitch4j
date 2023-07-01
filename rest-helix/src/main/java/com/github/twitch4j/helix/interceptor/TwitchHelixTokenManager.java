@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Objects;
 
 @Slf4j
 public final class TwitchHelixTokenManager {
@@ -62,7 +63,7 @@ public final class TwitchHelixTokenManager {
         this.defaultAuthToken = defaultAuthToken;
 
         if (defaultAuthToken != null) {
-            this.defaultClientId = defaultAuthToken.getContext().getOrDefault(CLIENT_ID_CONTEXT, clientId).toString();
+            this.defaultClientId = Objects.toString(defaultAuthToken.getContext().getOrDefault(CLIENT_ID_CONTEXT, clientId), null);
             twitchIdentityProvider.getAdditionalCredentialInformation(defaultAuthToken).ifPresent(oauth -> {
                 populateCache(oauth);
                 this.defaultClientId = extractClientId(oauth);
