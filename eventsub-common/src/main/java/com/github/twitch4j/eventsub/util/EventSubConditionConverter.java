@@ -20,7 +20,7 @@ public class EventSubConditionConverter {
     }
 
     public EventSubCondition getCondition(SubscriptionType<?, ?, ?> type, Map<String, Object> condition) {
-        return getCondition(type.getConditionClass(), condition);
+        return getCondition(type != null ? type.getConditionClass() : null, condition);
     }
 
 }
