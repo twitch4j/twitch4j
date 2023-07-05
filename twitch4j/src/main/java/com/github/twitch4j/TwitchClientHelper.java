@@ -297,7 +297,12 @@ public class TwitchClientHelper implements IClientHelper {
                     }
 
                     // Individual Follow Events
-                    if (followList != null) {
+                    if (followList == null || (followList.isEmpty() && followCount != null && followCount > 0)) {
+                        log.trace("Unable to read individual followers of {} due to insufficient authorization " +
+                                "(token does not represent a moderator of the channel or lacks 'moderator:read:followers' scope)",
+                            channel
+                        );
+                    } else {
                         for (InboundFollow follow : followList) {
                             // update lastFollowDate
                             if (lastFollowDate == null || follow.getFollowedAt().isAfter(lastFollowDate)) {
@@ -311,11 +316,6 @@ public class TwitchClientHelper implements IClientHelper {
                                 eventManager.publish(event);
                             }
                         }
-                    } else {
-                        log.trace("Unable to read individual followers of {} due to insufficient authorization " +
-                                "(token does not represent a moderator of the channel or lacks 'moderator:read:followers' scope)",
-                            channel
-                        );
                     }
                 } else {
                     nextRequestCanBeImmediate = true; // No API call was made
