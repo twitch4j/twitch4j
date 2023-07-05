@@ -4,7 +4,7 @@ import com.github.twitch4j.helix.TestUtils;
 import com.github.twitch4j.helix.domain.BlockedUserList;
 import com.github.twitch4j.helix.domain.ExtensionActiveList;
 import com.github.twitch4j.helix.domain.ExtensionList;
-import com.github.twitch4j.helix.domain.FollowList;
+import com.github.twitch4j.helix.domain.OutboundFollowing;
 import com.github.twitch4j.helix.domain.UserList;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
@@ -52,16 +52,16 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch followers")
     public void getFollowers() {
         // TestCase
-        FollowList resultList = testUtils.getTwitchHelixClient().getFollowers(testUtils.getCredential().getAccessToken(), twitchUserId, null, null, 100).execute();
+        OutboundFollowing resultList = testUtils.getTwitchHelixClient().getFollowedChannels(testUtils.getCredential().getAccessToken(), twitchUserId, null, 100, null).execute();
 
         // Test
-        assertTrue(resultList.getFollows().size() > 0, "Should at least find one result from the followers method!");
-        resultList.getFollows().forEach(follow -> {
-            assertNotNull(follow.getFromId(), "FromId should not be null!");
-            assertNotNull(follow.getFromName(), "FromName should not be null!");
-            assertNotNull(follow.getToId(), "ToId should not be null!");
-            assertNotNull(follow.getToName(), "ToName should not be null!");
-        });
+        assertTrue(resultList.getTotal() > 0, "Should at least find one result from the followers method!");
+        if (resultList.getFollows() != null) {
+            resultList.getFollows().forEach(follow -> {
+                assertNotNull(follow.getBroadcasterId(), "ToId should not be null!");
+                assertNotNull(follow.getBroadcasterLogin(), "ToName should not be null!");
+            });
+        }
     }
 
     /**

@@ -7,6 +7,8 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
+import com.github.twitch4j.helix.domain.InboundFollow;
+import com.github.twitch4j.helix.domain.InboundFollowers;
 import com.github.twitch4j.util.PaginationUtil;
 import com.github.twitch4j.domain.ChannelCache;
 import com.github.twitch4j.events.ChannelChangeGameEvent;
@@ -19,8 +21,6 @@ import com.github.twitch4j.events.ChannelViewerCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.domain.Clip;
 import com.github.twitch4j.helix.domain.ClipList;
-import com.github.twitch4j.helix.domain.Follow;
-import com.github.twitch4j.helix.domain.FollowList;
 import com.github.twitch4j.helix.domain.Stream;
 import com.github.twitch4j.helix.domain.StreamList;
 import com.netflix.hystrix.HystrixCommand;
@@ -273,7 +273,7 @@ public class TwitchClientHelper implements IClientHelper {
         };
         this.followerEventTask = channelId -> {
             // check follow events
-            HystrixCommand<FollowList> commandGetFollowers = twitchHelix.getFollowers(null, null, channelId, null, MAX_LIMIT);
+            HystrixCommand<InboundFollowers> commandGetFollowers = twitchHelix.getChannelFollowers(null, channelId, null, MAX_LIMIT, null);
             try {
                 ChannelCache currentChannelCache = channelInformation.computeIfAbsent(channelId, s -> new ChannelCache());
                 Instant lastFollowDate = currentChannelCache.getLastFollowCheck();
@@ -281,16 +281,12 @@ public class TwitchClientHelper implements IClientHelper {
                 boolean nextRequestCanBeImmediate = false;
 
                 if (lastFollowDate != null) {
-                    FollowList executionResult = commandGetFollowers.execute();
-                    List<Follow> followList = executionResult.getFollows();
+                    InboundFollowers executionResult = commandGetFollowers.execute();
+                    List<InboundFollow> followList = executionResult.getFollows();
                     followBackoff.get().reset(); // API call was successful
 
                     // Prepare EventChannel
                     String channelName = currentChannelCache.getUserName();
-                    if (channelName == null && !followList.isEmpty()) {
-                        channelName = followList.get(0).getToLogin();
-                        currentChannelCache.setUserName(channelName);
-                    }
                     EventChannel channel = new EventChannel(channelId, channelName);
 
                     // Follow Count Event
@@ -301,18 +297,25 @@ public class TwitchClientHelper implements IClientHelper {
                     }
 
                     // Individual Follow Events
-                    for (Follow follow : followList) {
-                        // update lastFollowDate
-                        if (lastFollowDate == null || follow.getFollowedAtInstant().isAfter(lastFollowDate)) {
-                            lastFollowDate = follow.getFollowedAtInstant();
-                        }
+                    if (followList != null) {
+                        for (InboundFollow follow : followList) {
+                            // update lastFollowDate
+                            if (lastFollowDate == null || follow.getFollowedAt().isAfter(lastFollowDate)) {
+                                lastFollowDate = follow.getFollowedAt();
+                            }
 
-                        // is new follower?
-                        if (follow.getFollowedAtInstant().isAfter(currentChannelCache.getLastFollowCheck())) {
-                            // dispatch event
-                            FollowEvent event = new FollowEvent(channel, new EventUser(follow.getFromId(), follow.getFromName()));
-                            eventManager.publish(event);
+                            // is new follower?
+                            if (follow.getFollowedAt().isAfter(currentChannelCache.getLastFollowCheck())) {
+                                // dispatch event
+                                FollowEvent event = new FollowEvent(channel, new EventUser(follow.getUserId(), follow.getUserLogin()));
+                                eventManager.publish(event);
+                            }
                         }
+                    } else {
+                        log.trace("Unable to read individual followers of {} due to insufficient authorization " +
+                                "(token does not represent a moderator of the channel or lacks 'moderator:read:followers' scope)",
+                            channel
+                        );
                     }
                 } else {
                     nextRequestCanBeImmediate = true; // No API call was made

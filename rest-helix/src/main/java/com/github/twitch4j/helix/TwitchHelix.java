@@ -2659,7 +2659,6 @@ public interface TwitchHelix {
      * Further, Twitch will shutdown this endpoint on 2023-08-03 in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
      */
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<FollowList> getFollowers(
