@@ -18,6 +18,7 @@ import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
 import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.UserStateEvent;
+import com.github.twitch4j.chat.util.MessageParser;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
@@ -566,12 +567,12 @@ public class TwitchChat implements ITwitchChat {
                     // - Parse IRC Message
                     else {
                         try {
-                            IRCMessageEvent event = new IRCMessageEvent(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
+                            IRCMessageEvent event = MessageParser.parse(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
-                            if (event.isValid()) {
+                            if (event != null) {
                                 eventManager.publish(event);
                             } else {
-                                log.trace("Can't parse {}", event.getRawMessage());
+                                log.trace("Can't parse {}", message);
                             }
                         } catch (Exception ex) {
                             log.error(ex.getMessage(), ex);

@@ -3,7 +3,7 @@ package com.github.twitch4j.kotlin.chat
 import com.github.twitch4j.chat.events.AbstractChannelEvent
 import com.github.twitch4j.chat.events.channel.ChannelJoinEvent
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent
-import com.github.twitch4j.chat.events.channel.IRCMessageEvent
+import com.github.twitch4j.chat.util.MessageParser
 import com.github.twitch4j.common.events.domain.EventChannel
 import com.github.twitch4j.common.events.domain.EventUser
 import com.github.twitch4j.kotlin.mock.MockChat
@@ -171,12 +171,12 @@ class ChatExtensionsTest {
     private val testChannel2 = EventChannel(testChannelId2, testChannelName2)
     private val testUser = EventUser("testUserId", "testUserName")
 
-    private val testMessage = "TestMessage"
-    private val testIrcMessageEvent = IRCMessageEvent(testMessage, emptyMap(), emptyMap(), mutableListOf())
+    private val testMessage = ":awakenedredstone PRIVMSG #twitch4j :TestMessage"
+    private val testIrcMessageEvent = MessageParser.parse(testMessage)
     private val testChannelJoinEvent1 = ChannelJoinEvent(testChannel1, testUser)
     private val testChannelJoinEvent2 = ChannelJoinEvent(testChannel2, testUser)
     private val testChannelMessageEvent1 =
-        ChannelMessageEvent(testChannel1, testIrcMessageEvent, testUser, testMessage, emptySet())
+        ChannelMessageEvent(testChannel1, testIrcMessageEvent, testUser, "TestMessage", emptySet())
     private val testChannelMessageEvent2 =
-        ChannelMessageEvent(testChannel2, testIrcMessageEvent, testUser, testMessage, emptySet())
+        ChannelMessageEvent(testChannel2, testIrcMessageEvent, testUser, "TestMessage", emptySet())
 }

@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.util.MessageParser;
 import com.github.twitch4j.chat.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +43,7 @@ public class ChatJoinRetryTest {
     }
 
     private static IRCMessageEvent testIRCMessageEvent(String raw) {
-        return new IRCMessageEvent(raw, Collections.singletonMap("149223493", FAKE_CHANNEL_NAME), Collections.singletonMap(FAKE_CHANNEL_NAME, "149223493"), null);
+        return MessageParser.parse(raw, Collections.singletonMap("149223493", FAKE_CHANNEL_NAME), Collections.singletonMap(FAKE_CHANNEL_NAME, "149223493"), null);
     }
 
     @Test
