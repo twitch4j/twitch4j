@@ -1,7 +1,11 @@
 package com.github.twitch4j;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.core.domain.Event;
+import com.github.twitch4j.auth.domain.TwitchScopes;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -29,6 +33,8 @@ import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.Getter;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +42,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,13 +160,23 @@ public class TwitchClientHelper implements IClientHelper {
     private final AtomicReference<ExponentialBackoffStrategy> clipBackoff;
 
     /**
+     * Message to log upon {@link #enableFollowEventListener(String, String)} if the default auth token
+     * is not a user access token with the {@link TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope
+     */
+    @Nullable
+    private String followListenerWarning = null;
+
+    /**
      * Constructor
      *
-     * @param twitchHelix  TwitchHelix
-     * @param eventManager EventManager
-     * @param executor     ScheduledThreadPoolExecutor
+     * @param twitchHelix       TwitchHelix
+     * @param eventManager      EventManager
+     * @param executor          ScheduledThreadPoolExecutor
+     * @param credentialManager CredentialManager
+     * @param defaultToken      OAuth2Credential
      */
-    public TwitchClientHelper(TwitchHelix twitchHelix, EventManager eventManager, ScheduledThreadPoolExecutor executor) {
+    @ApiStatus.Internal
+    public TwitchClientHelper(TwitchHelix twitchHelix, EventManager eventManager, ScheduledThreadPoolExecutor executor, CredentialManager credentialManager, OAuth2Credential defaultToken) {
         this.twitchHelix = twitchHelix;
         this.executor = executor;
 
@@ -381,6 +398,26 @@ public class TwitchClientHelper implements IClientHelper {
 
             return nextRequestCanBeImmediate;
         };
+
+        final String warningPrefix = "The client helper can only fire ChannelFollowCountUpdateEvent; ";
+        if (defaultToken == null) {
+            this.followListenerWarning = warningPrefix + "the automatic app access token is insufficient to fire FollowEvent due to Twitch API changes.";
+        } else {
+            credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class)
+                .orElseGet(() -> new TwitchIdentityProvider(null, null, null))
+                .getAdditionalCredentialInformation(defaultToken)
+                .ifPresent(cred -> {
+                    if (cred.getUserId() == null || cred.getUserId().isEmpty()) {
+                        this.followListenerWarning = warningPrefix + "the provided app access token is insufficient to fire FollowEvent due to Twitch API changes.";
+                    } else {
+                        Collection<String> scopes = cred.getScopes();
+                        if (scopes == null || !scopes.contains(TwitchScopes.HELIX_CHANNEL_FOLLOWERS_READ.toString())) {
+                            this.followListenerWarning = warningPrefix + "the provided user access token lacks the 'moderator:read:followers' scope " +
+                                "(and must represent a moderator of the target channel) to fire FollowEvent due to Twitch API changes.";
+                        }
+                    }
+                });
+        }
     }
 
     @Override
@@ -427,6 +464,11 @@ public class TwitchClientHelper implements IClientHelper {
         } else {
             // initialize cache
             channelInformation.computeIfAbsent(channelId, s -> new ChannelCache(channelName));
+
+            // log for limited authorization: https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/
+            if (followListenerWarning != null) {
+                log.info(followListenerWarning);
+            }
         }
         startOrStopEventGenerationThread();
         return add;
