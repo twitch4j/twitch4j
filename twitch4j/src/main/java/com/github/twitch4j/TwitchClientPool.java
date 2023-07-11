@@ -1,5 +1,7 @@
 package com.github.twitch4j;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -101,8 +103,11 @@ public class TwitchClientPool implements ITwitchClient {
      * @param graphql            TwitchGraphQL
      * @param eventSocket        Twitch EventSub over WebSocket
      * @param threadPoolExecutor ScheduledThreadPoolExecutor
+     * @param credentialManager  CredentialManager
+     * @param defaultAuthToken   OAuth2Credential
      */
-    public TwitchClientPool(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, ITwitchChat chat, ITwitchPubSub pubsub, TwitchGraphQL graphql, IEventSubSocket eventSocket, ScheduledThreadPoolExecutor threadPoolExecutor) {
+    @ApiStatus.Internal
+    public TwitchClientPool(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, ITwitchChat chat, ITwitchPubSub pubsub, TwitchGraphQL graphql, IEventSubSocket eventSocket, ScheduledThreadPoolExecutor threadPoolExecutor, CredentialManager credentialManager, OAuth2Credential defaultAuthToken) {
         this.eventManager = eventManager;
         this.extensions = extensions;
         this.helix = helix;
@@ -112,7 +117,7 @@ public class TwitchClientPool implements ITwitchClient {
         this.eventSocket = eventSocket;
         this.pubsub = pubsub;
         this.graphql = graphql;
-        this.clientHelper = new TwitchClientHelper(helix, eventManager, threadPoolExecutor);
+        this.clientHelper = new TwitchClientHelper(helix, eventManager, threadPoolExecutor, credentialManager, defaultAuthToken);
         this.scheduledThreadPoolExecutor = threadPoolExecutor;
 
         // module loader

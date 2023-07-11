@@ -40,6 +40,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -265,6 +266,7 @@ public class TwitchClientBuilder {
      * CredentialManager
      */
     @With
+    @NotNull
     private CredentialManager credentialManager = CredentialManagerBuilder.builder().build();
 
     /**
@@ -549,7 +551,7 @@ public class TwitchClientBuilder {
         }
 
         // Module: TwitchClient & ClientHelper
-        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, eventSocket, scheduledThreadPoolExecutor);
+        final TwitchClient client = new TwitchClient(eventManager, extensions, helix, kraken, tmi, chat, pubSub, graphql, eventSocket, scheduledThreadPoolExecutor, credentialManager, defaultAuthToken);
         client.getClientHelper().setThreadDelay(helperThreadDelay);
 
         // Return new Client Instance

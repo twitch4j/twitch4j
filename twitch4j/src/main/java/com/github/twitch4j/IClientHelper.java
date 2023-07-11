@@ -1,8 +1,10 @@
 package com.github.twitch4j;
 
+import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.util.CollectionUtils;
 import com.github.twitch4j.common.util.ExponentialBackoffStrategy;
 import com.github.twitch4j.domain.ChannelCache;
+import com.github.twitch4j.events.ChannelFollowCountUpdateEvent;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
@@ -42,7 +44,10 @@ public interface IClientHelper extends AutoCloseable {
     /**
      * Enable Follow Listener, without invoking a Helix API call
      * <p>
-     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
+     * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
+     * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
+     * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
+     * due to Twitch restrictions implemented on 2023-08-03.
      *
      * @param channelId   Channel Id
      * @param channelName Channel Name
@@ -160,7 +165,10 @@ public interface IClientHelper extends AutoCloseable {
     /**
      * Enable Follow Listener for the given channel name
      * <p>
-     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
+     * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
+     * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
+     * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
+     * due to Twitch restrictions implemented on 2023-08-03.
      *
      * @param channelName Channel Name
      */
@@ -182,7 +190,10 @@ public interface IClientHelper extends AutoCloseable {
     /**
      * Enable Follow Listener for the given channel names
      * <p>
-     * WARNING: This will eventually require defaultAuthToken to represent the channel (or a moderator), due to Twitch scope changes.
+     * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
+     * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
+     * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
+     * due to Twitch restrictions implemented on 2023-08-03.
      *
      * @param channelNames the channel names to be added
      */
