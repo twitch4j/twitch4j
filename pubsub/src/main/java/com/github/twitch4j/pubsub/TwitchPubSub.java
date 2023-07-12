@@ -949,8 +949,10 @@ public class TwitchPubSub implements ITwitchPubSub {
 
     @Override
     public PubSubSubscription listenOnTopic(PubSubRequest request) {
-        if (subscribedTopics.add(request))
+        if (subscribedTopics.add(request)) {
+            checkListenCount(request);
             queueRequest(request);
+        }
         return new PubSubSubscription(request);
     }
 
@@ -991,6 +993,14 @@ public class TwitchPubSub implements ITwitchPubSub {
             heartbeatTask.cancel(false);
             queueTask.cancel(false);
             connection.close();
+        }
+    }
+
+    private void checkListenCount(PubSubRequest request) {
+        Object topics = request.getData().get("topics");
+        if (topics instanceof Collection && ((Collection<?>) topics).size() > 1) {
+            log.warn("Listening to multiple PubSub topics in a single request is not recommended; " +
+                "automatic topic management can degrade upon PubSubAuthRevokeEvent");
         }
     }
 
