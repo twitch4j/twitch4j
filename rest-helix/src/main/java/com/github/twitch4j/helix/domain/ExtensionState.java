@@ -1,39 +1,37 @@
 package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public enum ExtensionState {
 
     @JsonAlias({ "Testing", "HostedTest" }) // undocumented, but have observed "Testing"
-    @JsonProperty("InTest")
-    IN_TEST,
+    IN_TEST("InTest"),
 
     @JsonAlias({ "Reviewing", "ReadyForReview" }) // undocumented, unobserved
-    @JsonProperty("InReview")
-    IN_REVIEW,
+    IN_REVIEW("InReview"),
 
-    @JsonProperty("Rejected")
-    REJECTED,
+    REJECTED("Rejected"),
 
-    @JsonProperty("Approved")
-    APPROVED,
+    APPROVED("Approved"),
 
-    @JsonProperty("Released")
-    RELEASED,
+    RELEASED("Released"),
 
-    @JsonProperty("Deprecated")
-    DEPRECATED,
+    DEPRECATED("Deprecated"),
 
     @JsonAlias("Pending") // undocumented, unobserved
-    @JsonProperty("PendingAction")
-    PENDING_ACTION,
+    PENDING_ACTION("PendingAction"),
 
     @JsonAlias("Uploading") // undocumented, unobserved
-    @JsonProperty("AssetsUploaded")
-    ASSETS_UPLOADED,
+    ASSETS_UPLOADED("AssetsUploaded"),
 
-    @JsonProperty("Deleted")
-    DELETED
+    DELETED("Deleted");
 
+    private final String twitchString;
+
+    @Override
+    public String toString() {
+        return this.twitchString;
+    }
 }
