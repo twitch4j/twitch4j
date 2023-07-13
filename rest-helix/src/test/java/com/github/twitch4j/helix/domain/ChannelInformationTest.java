@@ -38,4 +38,13 @@ class ChannelInformationTest {
         assertEquals(expected, TypeConvert.objectToJson(info));
     }
 
+    @Test
+    void serializeWithoutMature() {
+        ChannelInformation info = ChannelInformation.builder()
+            .contentClassificationLabel(new ContentClassificationState(ContentClassification.MATURE_GAME, true))
+            .build();
+        String expected = "{\"content_classification_labels\":[]}";
+        assertEquals(expected, TypeConvert.objectToJson(info));
+    }
+
 }

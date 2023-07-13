@@ -2,7 +2,9 @@ package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
+import com.github.twitch4j.helix.interceptor.ContentClassificationStateListSerializer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -90,6 +92,7 @@ public class ChannelInformation {
      * The CCLs applied to the channel.
      */
     @Singular
+    @JsonSerialize(using = ContentClassificationStateListSerializer.class)
     private Collection<ContentClassificationState> contentClassificationLabels;
 
     /**
