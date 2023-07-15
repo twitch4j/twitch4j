@@ -102,6 +102,15 @@ public class ChannelInformation {
     @JsonProperty("is_branded_content")
     private Boolean isBrandedContent;
 
+    /**
+     * Converts the {@code content_classification_labels} list from {@link com.github.twitch4j.helix.TwitchHelix#getChannelInformation(String, List)}
+     * into a list of {@link ContentClassificationState}, so that {@link ChannelInformation} can be passed to
+     * {@link com.github.twitch4j.helix.TwitchHelix#updateChannelInformation(String, String, ChannelInformation)},
+     * since the PATCH endpoint expects an array of objects (with {@code is_enabled} boolean flag)
+     * rather than an array of strings (that the GET endpoint yields).
+     *
+     * @param labels collection of {@link ContentClassification}'s
+     */
     @JsonProperty("content_classification_labels")
     private void setContentClassificationLabels(Collection<ContentClassification> labels) {
         if (labels == null) return;
