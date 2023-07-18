@@ -9,11 +9,15 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+/**
+ * @deprecated in favor of {@link ChannelUpdateV2Event}
+ */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class ChannelUpdateEvent extends EventSubChannelEvent {
 
     /**

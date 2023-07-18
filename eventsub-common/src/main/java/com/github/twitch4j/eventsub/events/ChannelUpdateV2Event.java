@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class BetaChannelUpdateEvent extends EventSubChannelEvent {
+public class ChannelUpdateV2Event extends EventSubChannelEvent {
 
     /**
      * The channel’s stream title.
