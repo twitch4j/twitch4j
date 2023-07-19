@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Month;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
  */
 @Getter
 @Slf4j
+@ApiStatus.Internal
 public class IRCEventHandler {
 
     /**
@@ -53,6 +55,7 @@ public class IRCEventHandler {
      *
      * @param twitchChat The Twitch Chat instance
      */
+    @ApiStatus.Internal
     public IRCEventHandler(TwitchChat twitchChat) {
         this.twitchChat = twitchChat;
         this.eventManager = twitchChat.getEventManager();
