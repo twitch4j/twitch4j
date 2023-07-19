@@ -201,6 +201,7 @@ public class IRCEventHandler {
      */
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onDirectCheer(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals("midnightsquid", event.getRawTag("msg-id"))) {
             eventManager.publish(new DirectCheerEvent(event));
@@ -461,6 +462,7 @@ public class IRCEventHandler {
      * @deprecated no longer sent by twitch.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onRitual(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("ritual", event.getRawTag("msg-id"))) {
             // Load Info
@@ -597,6 +599,7 @@ public class IRCEventHandler {
      * @param event IRCMessageEvent
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public boolean onChannelModChange(IRCMessageEvent event) {
         if(event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
             // Receiving Mod Status
@@ -626,6 +629,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onHostOnEvent(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
@@ -641,6 +645,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onHostOffEvent(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
@@ -653,6 +658,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onInboundHostEvent(IRCMessageEvent event) {
         if ("PRIVMSG".equals(event.getCommandType()) && "jtv".equals(event.getClientName().orElse(null)) && event.getChannelName().isPresent() && event.getRawTags().isEmpty()) {
             final String hostMessage = " is now hosting you";
@@ -666,6 +672,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onListModsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.ROOM_MODS.toString()) || s.equals(NoticeTag.NO_MODS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The moderators of this channel are: ", ", ");
@@ -674,6 +681,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onListVipsEvent(IRCMessageEvent event) {
         if ("NOTICE".equals(event.getCommandType()) && event.getTagValue("msg-id").filter(s -> s.equals(NoticeTag.VIPS_SUCCESS.toString()) || s.equals(NoticeTag.NO_VIPS.toString())).isPresent()) {
             List<String> names = extractItemsFromDelimitedList(event.getMessage(), "The VIPs of this channel are: ", ", ");
@@ -735,6 +743,7 @@ public class IRCEventHandler {
     }
 
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.17.0")
     public void onMessageDeleteResponse(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();

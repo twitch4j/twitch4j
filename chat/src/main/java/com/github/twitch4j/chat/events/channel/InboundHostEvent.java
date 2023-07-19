@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.TwitchEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fired when the authenticated channel to the TwitchChat instance was hosted by another user.
@@ -16,6 +17,7 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 @Unofficial
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class InboundHostEvent extends TwitchEvent {
 
     /**

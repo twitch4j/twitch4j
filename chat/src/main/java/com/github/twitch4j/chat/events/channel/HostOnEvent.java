@@ -5,6 +5,7 @@ import com.github.twitch4j.common.events.domain.EventChannel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * This event gets called when the user starts hosting someone.
@@ -15,6 +16,7 @@ import lombok.Value;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class HostOnEvent extends AbstractChannelEvent {
 
 	/**

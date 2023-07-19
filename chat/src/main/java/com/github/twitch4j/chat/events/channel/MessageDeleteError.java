@@ -6,14 +6,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Failed to delete a message
+ *
+ * @deprecated With chat commands decommissioned, this event is no longer fired; migrate to {@code TwitchHelix#deleteChatMessages}.
  */
 @Value
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class MessageDeleteError extends AbstractChannelEvent {
 
     /**
