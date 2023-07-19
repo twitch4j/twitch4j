@@ -41,7 +41,9 @@ public class AbstractChannelEvent extends TwitchEvent {
      * @param user     username
      * @param duration duration
      * @param reason   reason
+     * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
+    @Deprecated
     public void timeout(String user, Duration duration, String reason) {
         StringBuilder sb = new StringBuilder()
             .append(duration.getSeconds());
@@ -56,7 +58,9 @@ public class AbstractChannelEvent extends TwitchEvent {
      *
      * @param user   username
      * @param reason reason
+     * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
+    @Deprecated
     public void ban(String user, String reason) {
         StringBuilder sb = new StringBuilder(user);
         if (reason != null) {
@@ -70,7 +74,9 @@ public class AbstractChannelEvent extends TwitchEvent {
      * Unban a user
      *
      * @param user username
+     * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#unbanUser
      */
+    @Deprecated
     public void unban(String user) {
         getTwitchChat().sendMessage(channel.getName(), String.format("/unban %s", user));
     }

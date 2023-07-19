@@ -264,7 +264,7 @@ public interface ITwitchChat extends AutoCloseable {
      * @param channel channel
      * @param user    username
      * @return whether the command was added to the queue
-     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#banUser
+     * @deprecated Twitch will decommission this method on February 18, 2023; migrate to TwitchHelix#unbanUser
      */
     @Deprecated
     default boolean unban(String channel, String user) {
