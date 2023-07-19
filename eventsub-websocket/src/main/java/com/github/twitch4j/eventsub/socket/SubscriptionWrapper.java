@@ -11,7 +11,7 @@ import lombok.Value;
 import java.time.Instant;
 
 @Value
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false, cacheStrategy = EqualsAndHashCode.CacheStrategy.LAZY)
 class SubscriptionWrapper extends EventSubSubscription {
     EventSubSubscription subscription;
 
