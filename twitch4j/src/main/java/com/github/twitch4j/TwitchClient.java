@@ -54,7 +54,7 @@ public class TwitchClient implements ITwitchClient {
     private final TwitchChat chat;
 
     /**
-     * EventSub over Websocket (public beta)
+     * EventSub over Websocket
      */
     private final IEventSubSocket eventSocket;
 
@@ -202,12 +202,11 @@ public class TwitchClient implements ITwitchClient {
     }
 
     /**
-     * Get EventSocket (in public beta)
+     * Get EventSocket
      *
      * @return IEventSubSocket
      * @implNote the underlying implementation allows for multiple users and multiple sockets per user.
      */
-    @ApiStatus.Experimental
     public IEventSubSocket getEventSocket() {
         if (this.eventSocket == null) {
             throw new RuntimeException("You have not enabled the EventSub over WebSocket Module! Please check out the documentation on Twitch4J -> EventSub.");

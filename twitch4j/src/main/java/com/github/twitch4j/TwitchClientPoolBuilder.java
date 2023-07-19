@@ -48,7 +48,6 @@ import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
@@ -144,11 +143,8 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Enabled: EventSub over WebSocket
-     * <p>
-     * This transport is currently in public beta from Twitch.
      */
     @With
-    @ApiStatus.Experimental
     private Boolean enableEventSocket = false;
 
     @With
