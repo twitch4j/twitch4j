@@ -6,6 +6,7 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Called when a ritual takes place in chat.
@@ -20,6 +21,7 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class RitualEvent extends AbstractChannelEvent {
     /**
      * The user involved in the ritual.

@@ -4,6 +4,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.DonationAmount;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -12,10 +13,13 @@ import java.util.Currency;
  * This event gets called when a user does a direct cheer in an eligible channel for this experiment.
  *
  * @see <a href="https://help.twitch.tv/s/article/cheering-experiment-2022">Twitch Information</a>
+ * @deprecated in favor of {@link ChannelMessageEvent#getElevatedChatPayment()}
  */
 @Value
 @Unofficial
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class DirectCheerEvent extends CheerEvent {
 
     /**
@@ -34,7 +38,9 @@ public class DirectCheerEvent extends CheerEvent {
      * Event Constructor
      *
      * @param event The raw message event.
+     * @deprecated This experiment is no longer running.
      */
+    @Deprecated
     public DirectCheerEvent(IRCMessageEvent event) {
         this(
             event,
