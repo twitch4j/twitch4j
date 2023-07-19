@@ -41,13 +41,6 @@ local.properties
 !gradle/wrapper/*.jar
 gradle.properties
 
-# Logs / Save Files
-config/*
-client.log
-
-# Example Code
-src/*/java/twitch4j/example/*
-
 # Modules
 /modules/
 
@@ -58,5 +51,5 @@ src/*/java/twitch4j/example/*
 docs/
 
 # Pipeline
-dist/*
-tmp/*
+.dist/*
+.tmp/*

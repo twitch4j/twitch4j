@@ -14,7 +14,9 @@ public class Twitch4JGlobal {
 
     /**
      * Default UserAgent
+     * <p>
+     * NOTE: The Twitch4JBuildConstants class is generated / updated during the build process.
      */
-    public static String userAgent = "Twitch4J/1.2.0";
+    public static String userAgent = "Twitch4J/" + Twitch4JBuildConstants.VERSION;
 
 }

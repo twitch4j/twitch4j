@@ -4,7 +4,6 @@ import io.freefair.gradle.plugins.lombok.LombokExtension
 import io.freefair.gradle.plugins.lombok.tasks.Delombok
 import me.champeau.jmh.JmhParameters
 
-// Plugins
 plugins {
 	signing
 	`java-library`
@@ -13,12 +12,12 @@ plugins {
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.1").apply(false)
 	id("com.github.johnrengelman.shadow").version("8.1.1").apply(false)
+	id("com.github.gmazzo.buildconfig").version("4.1.2").apply(false)
 }
 
 group = group
 version = version
 
-// Allprojects
 allprojects {
 	repositories {
 		mavenCentral()

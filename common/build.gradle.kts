@@ -1,4 +1,9 @@
-// In this section you declare the dependencies for your production and test code
+import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+
+plugins {
+	id("com.github.gmazzo.buildconfig")
+}
+
 dependencies {
 	// Event Manager
 	api(group = "com.github.philippheuer.events4j", name = "events4j-core")
@@ -19,6 +24,25 @@ dependencies {
 	// Twitch4J Modules
 	api(project(":twitch4j-auth"))
 	api(project(":twitch4j-util"))
+}
+
+project.extensions.getByType(BuildConfigExtension::class.java).apply {
+	packageName("com.github.twitch4j.common.config")
+	className("Twitch4JBuildConstants")
+
+	useJavaOutput {
+		defaultVisibility = true // this removes the public modifier from the generated class
+	}
+
+	forClass(packageName = "com.github.twitch4j.common.config", className = "Twitch4JBuildConstants") {
+		buildConfigField("String", "VERSION", provider { "\"${project.version}\"" })
+	}
+}
+
+sourceSets {
+	main {
+		java.srcDir("build/generated/sources/buildConfig/main")
+	}
 }
 
 tasks.javadoc {
