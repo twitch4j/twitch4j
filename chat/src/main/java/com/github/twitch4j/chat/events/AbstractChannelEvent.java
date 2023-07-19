@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
 
@@ -44,6 +45,7 @@ public class AbstractChannelEvent extends TwitchEvent {
      * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public void timeout(String user, Duration duration, String reason) {
         StringBuilder sb = new StringBuilder()
             .append(duration.getSeconds());
@@ -61,6 +63,7 @@ public class AbstractChannelEvent extends TwitchEvent {
      * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#banUser
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public void ban(String user, String reason) {
         StringBuilder sb = new StringBuilder(user);
         if (reason != null) {
@@ -77,6 +80,7 @@ public class AbstractChannelEvent extends TwitchEvent {
      * @deprecated Twitch decommissioned this method on February 18, 2023; migrate to TwitchHelix#unbanUser
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public void unban(String user) {
         getTwitchChat().sendMessage(channel.getName(), String.format("/unban %s", user));
     }
