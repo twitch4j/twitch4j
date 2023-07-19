@@ -11,20 +11,31 @@ import lombok.Value;
 import java.time.Instant;
 
 @Value
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 class SubscriptionWrapper extends EventSubSubscription {
-    @EqualsAndHashCode.Exclude
     EventSubSubscription subscription;
-    String rawType;
-    String rawVersion;
-    EventSubCondition condition;
 
     private SubscriptionWrapper(EventSubSubscription sub) {
         super();
         this.subscription = sub;
-        this.rawType = sub.getRawType();
-        this.rawVersion = sub.getRawVersion();
-        this.condition = sub.getCondition();
+    }
+
+    @Override
+    @EqualsAndHashCode.Include
+    public String getRawType() {
+        return subscription.getRawType();
+    }
+
+    @Override
+    @EqualsAndHashCode.Include
+    public String getRawVersion() {
+        return subscription.getRawVersion();
+    }
+
+    @Override
+    @EqualsAndHashCode.Include
+    public EventSubCondition getCondition() {
+        return subscription.getCondition();
     }
 
     @Override
