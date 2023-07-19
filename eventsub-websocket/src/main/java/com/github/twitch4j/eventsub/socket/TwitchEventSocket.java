@@ -63,9 +63,9 @@ public final class TwitchEventSocket implements IEventSubSocket {
     public static final int REQUIRED_THREAD_COUNT = 1;
 
     /**
-     * Each WebSocket connection may create a maximum of 100 enabled subscriptions (disabled subscriptions don't count against the limit).
+     * Each WebSocket connection may create a maximum of 300 enabled subscriptions (disabled subscriptions don't count against the limit).
      */
-    public static final int MAX_SUBSCRIPTIONS_PER_SOCKET = 100;
+    public static final int MAX_SUBSCRIPTIONS_PER_SOCKET = 300;
 
     /**
      * The WebSocket Server

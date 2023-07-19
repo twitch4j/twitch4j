@@ -56,9 +56,8 @@ public class TwitchClientPool implements ITwitchClient {
     private final ITwitchChat chat;
 
     /**
-     * EventSub over Websocket (public beta)
+     * EventSub over Websocket
      */
-    @ApiStatus.Experimental
     private final IEventSubSocket eventSocket;
 
     /**
