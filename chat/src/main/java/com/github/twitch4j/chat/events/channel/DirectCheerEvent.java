@@ -12,10 +12,12 @@ import java.util.Currency;
  * This event gets called when a user does a direct cheer in an eligible channel for this experiment.
  *
  * @see <a href="https://help.twitch.tv/s/article/cheering-experiment-2022">Twitch Information</a>
+ * @deprecated in favor of {@link ChannelMessageEvent#getElevatedChatPayment()}
  */
 @Value
 @Unofficial
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class DirectCheerEvent extends CheerEvent {
 
     /**

@@ -31,7 +31,7 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
 
 /**
  * IRC Event Handler
- *
+ * <p>
  * Listens for any irc triggered events and created the corresponding events for the EventDispatcher.
  */
 @Getter
@@ -58,40 +58,37 @@ public class IRCEventHandler {
         this.eventManager = twitchChat.getEventManager();
 
         // register event handlers
-        eventManager.onEvent("twitch4j-chat-message-trigger", IRCMessageEvent.class, this::onChannelMessage);
-        eventManager.onEvent("twitch4j-chat-whisper-trigger", IRCMessageEvent.class, this::onWhisper);
-        eventManager.onEvent("twitch4j-chat-announcement-trigger", IRCMessageEvent.class, this::onAnnouncement);
-        eventManager.onEvent("twitch4j-chat-bits-badge-trigger", IRCMessageEvent.class, this::onBitsBadgeTier);
-        eventManager.onEvent("twitch4j-chat-cheer-trigger", IRCMessageEvent.class, this::onChannelCheer);
-        eventManager.onEvent("twitch4j-chat-direct-cheer-trigger", IRCMessageEvent.class, this::onDirectCheer);
-        eventManager.onEvent("twitch4j-chat-sub-trigger", IRCMessageEvent.class, this::onChannelSubscription);
-        eventManager.onEvent("twitch4j-chat-clearchat-trigger", IRCMessageEvent.class, this::onClearChat);
-        eventManager.onEvent("twitch4j-chat-clearmsg-trigger", IRCMessageEvent.class, this::onClearMsg);
-        eventManager.onEvent("twitch4j-chat-names-trigger", IRCMessageEvent.class, this::onNames);
-        eventManager.onEvent("twitch4j-chat-join-trigger", IRCMessageEvent.class, this::onChannnelClientJoinEvent);
-        eventManager.onEvent("twitch4j-chat-leave-trigger", IRCMessageEvent.class, this::onChannnelClientLeaveEvent);
-        eventManager.onEvent("twitch4j-chat-mod-trigger", IRCMessageEvent.class, this::onChannelModChange);
-        eventManager.onEvent("twitch4j-chat-notice-trigger", IRCMessageEvent.class, this::onNoticeEvent);
-        eventManager.onEvent("twitch4j-chat-host-on-trigger", IRCMessageEvent.class, this::onHostOnEvent);
-        eventManager.onEvent("twitch4j-chat-host-off-trigger", IRCMessageEvent.class, this::onHostOffEvent);
-        eventManager.onEvent("twitch4j-chat-inbound-host-trigger", IRCMessageEvent.class, this::onInboundHostEvent);
-        eventManager.onEvent("twitch4j-chat-list-mods-trigger", IRCMessageEvent.class, this::onListModsEvent);
-        eventManager.onEvent("twitch4j-chat-list-vips-trigger", IRCMessageEvent.class, this::onListVipsEvent);
-        eventManager.onEvent("twitch4j-chat-roomstate-trigger", IRCMessageEvent.class, this::onChannelState);
-        eventManager.onEvent("twitch4j-chat-gift-trigger", IRCMessageEvent.class, this::onGiftReceived);
-        eventManager.onEvent("twitch4j-chat-payforward-trigger", IRCMessageEvent.class, this::onPayForward);
-        eventManager.onEvent("twitch4j-chat-charity-trigger", IRCMessageEvent.class, this::onCharityDonation);
-        eventManager.onEvent("twitch4j-chat-raid-trigger", IRCMessageEvent.class, this::onRaid);
-        eventManager.onEvent("twitch4j-chat-unraid-trigger", IRCMessageEvent.class, this::onUnraid);
-        eventManager.onEvent("twitch4j-chat-rewardgift-trigger", IRCMessageEvent.class, this::onRewardGift);
-        eventManager.onEvent("twitch4j-chat-delete-trigger", IRCMessageEvent.class, this::onMessageDeleteResponse);
-        eventManager.onEvent("twitch4j-chat-userstate-trigger", IRCMessageEvent.class, this::onUserState);
-        eventManager.onEvent("twitch4j-chat-globaluserstate-trigger", IRCMessageEvent.class, this::onGlobalUserState);
-        eventManager.onEvent("twitch4j-chat-viewermilestone-trigger", IRCMessageEvent.class, this::onViewerMilestone);
+        eventManager.onEvent("twitch4j-chat-event-trigger", IRCMessageEvent.class, this::handle);
+    }
+
+    private void handle(IRCMessageEvent e) {
+        if (onChannelMessage(e)) return;
+        if (onChannelCheer(e)) return;
+        if (onChannelSubscription(e)) return;
+        if (onWhisper(e)) return;
+        if (onUserState(e)) return;
+        if (onChannnelClientJoinEvent(e)) return;
+        if (onChannnelClientLeaveEvent(e)) return;
+        if (onClearChat(e)) return;
+        if (onChannelState(e)) return;
+        if (onClearMsg(e)) return;
+        if (onAnnouncement(e)) return;
+        if (onCharityDonation(e)) return;
+        if (onGlobalUserState(e)) return;
+        if (onNoticeEvent(e)) return;
+        if (onViewerMilestone(e)) return;
+        if (onRaid(e)) return;
+        if (onNames(e)) return;
+        if (onPayForward(e)) return;
+        if (onBitsBadgeTier(e)) return;
+        if (onRewardGift(e)) return;
+        if (onChannelModChange(e)) return;
+        if (onUnraid(e)) return;
+        if (onGiftReceived(e)) return;
     }
 
     @Unofficial
-    public void onAnnouncement(IRCMessageEvent event) {
+    public boolean onAnnouncement(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("announcement", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -101,14 +98,16 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new ModAnnouncementEvent(event, channel, user, message, AnnouncementColor.parseColor(color)));
+            return true;
         }
+        return false;
     }
 
     /**
      * ChatChannel Message Event
      * @param event IRCMessageEvent
      */
-    public void onChannelMessage(IRCMessageEvent event) {
+    public boolean onChannelMessage(IRCMessageEvent event) {
         if(event.getCommandType().equals("PRIVMSG")) {
             if (event.getRawTag("bits") == null && event.getMessage().isPresent()) {
                 // Load Info
@@ -120,26 +119,31 @@ public class IRCEventHandler {
                 if (message.startsWith("\u0001ACTION ") && message.endsWith("\u0001")) {
                     // Action
                     eventManager.publish(new ChannelMessageActionEvent(channel, event, user, message.substring(8, message.length() - 1), event.getClientPermissions()));
+                    return true;
                 } else {
                     // Regular Message
                     eventManager.publish(new ChannelMessageEvent(channel, event, user, message, event.getClientPermissions()));
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /**
      * Whisper Event
      * @param event IRCMessageEvent
      */
-    public void onWhisper(IRCMessageEvent event) {
+    public boolean onWhisper(IRCMessageEvent event) {
         if(event.getCommandType().equals("WHISPER")) {
             // Load Info
             EventUser user = event.getUser();
 
             // Dispatch Event
             eventManager.publish(new PrivateMessageEvent(user, event.getMessage().get(), event.getClientPermissions()));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -147,7 +151,7 @@ public class IRCEventHandler {
      *
      * @param event the {@link IRCMessageEvent} to be checked
      */
-    public void onBitsBadgeTier(IRCMessageEvent event) {
+    public boolean onBitsBadgeTier(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("bitsbadgetier", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -158,14 +162,16 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new BitsBadgeEarnedEvent(channel, user, bitsThreshold));
+            return true;
         }
+        return false;
     }
 
     /**
      * ChatChannel Cheer (Bits) Event
      * @param event IRCMessageEvent
      */
-    public void onChannelCheer(IRCMessageEvent event) {
+    public boolean onChannelCheer(IRCMessageEvent event) {
         if(event.getCommandType().equals("PRIVMSG")) {
             String rawBits = event.getRawTagString("bits");
             if (rawBits != null) {
@@ -179,8 +185,10 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new CheerEvent(event, channel, user != null ? user : ANONYMOUS_CHEERER, message, bits, subMonths, subTier, event.getFlags()));
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -189,6 +197,7 @@ public class IRCEventHandler {
      * @param event IRCMessageEvent
      */
     @Unofficial
+    @Deprecated
     public void onDirectCheer(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals("midnightsquid", event.getRawTag("msg-id"))) {
             eventManager.publish(new DirectCheerEvent(event));
@@ -200,7 +209,7 @@ public class IRCEventHandler {
      *
      * @param event IRCMessageEvent
      */
-    public void onChannelSubscription(IRCMessageEvent event) {
+    public boolean onChannelSubscription(IRCMessageEvent event) {
         final String msgId;
         if (event.getCommandType().equals("USERNOTICE") && (msgId = Objects.toString(event.getRawTag("msg-id"), null)) != null) {
             EventChannel channel = event.getChannel();
@@ -208,6 +217,7 @@ public class IRCEventHandler {
             // Resub message for a multi-month gifted subscription
             if (msgId.equalsIgnoreCase("resub") && StringUtils.equalsIgnoreCase("true", event.getRawTag("msg-param-was-gifted"))) {
                 eventManager.publish(new GiftedMultiMonthSubCourtesyEvent(event));
+                return true;
             }
             // Sub
             else if (msgId.equalsIgnoreCase("sub") || msgId.equalsIgnoreCase("resub")) {
@@ -232,6 +242,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
+                return true;
             }
             // Receive Gifted Sub
             else if (msgId.equalsIgnoreCase("subgift") || msgId.equalsIgnoreCase("anonsubgift")) {
@@ -255,6 +266,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
+                return true;
             }
             // Gift X Subs
             else if (msgId.equalsIgnoreCase("submysterygift") || msgId.equalsIgnoreCase("anonsubmysterygift")) {
@@ -266,6 +278,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
+                return true;
             }
             // Upgrading from a gifted sub
             else if (msgId.equalsIgnoreCase("giftpaidupgrade") || msgId.equalsIgnoreCase("anongiftpaidupgrade")) {
@@ -279,6 +292,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new GiftSubUpgradeEvent(channel, user, promoName, giftTotal, senderLogin, senderName));
+                return true;
             }
             // Upgrading from a Prime sub to a normal one
             else if (msgId.equalsIgnoreCase("primepaidupgrade")) {
@@ -288,6 +302,7 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new PrimeSubUpgradeEvent(channel, user, subPlan));
+                return true;
             }
             // Extend Subscription
             else if (msgId.equalsIgnoreCase("extendsub")) {
@@ -303,8 +318,10 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new ExtendSubscriptionEvent(channel, user, subPlan, cumulativeMonths, endMonth));
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -312,7 +329,8 @@ public class IRCEventHandler {
      *
      * @param event the {@link IRCMessageEvent} to be checked
      */
-    public void onGiftReceived(IRCMessageEvent event) {
+    @Unofficial
+    public boolean onGiftReceived(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("primecommunitygiftreceived", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -322,7 +340,9 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new PrimeGiftReceivedEvent(channel, user, giftName, recipientName));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -330,7 +350,7 @@ public class IRCEventHandler {
      *
      * @param event the {@link IRCMessageEvent} to be checked
      */
-    public void onPayForward(IRCMessageEvent event) {
+    public boolean onPayForward(IRCMessageEvent event) {
         CharSequence msgId;
         if ("USERNOTICE".equals(event.getCommandType()) && (msgId = event.getRawTag("msg-id")) != null
             && (StringUtils.equalsIgnoreCase(msgId, "standardpayforward") || StringUtils.equalsIgnoreCase(msgId,"communitypayforward"))) {
@@ -354,21 +374,25 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new PayForwardEvent(channel, user, gifter, recipient));
+            return true;
         }
+        return false;
     }
 
     @Unofficial
-    public void onCharityDonation(IRCMessageEvent event) {
+    public boolean onCharityDonation(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("charitydonation", event.getRawTag("msg-id"))) {
             eventManager.publish(new CharityDonationEvent(event));
+            return true;
         }
+        return false;
     }
 
     /**
      * ChatChannel Raid Event (receiving)
      * @param event IRCMessageEvent
      */
-    public void onRaid(IRCMessageEvent event) {
+    public boolean onRaid(IRCMessageEvent event) {
         if (event.getCommandType().equals("USERNOTICE") && StringUtils.equalsIgnoreCase("raid", event.getRawTag("msg-id"))) {
             EventChannel channel = event.getChannel();
             EventUser raider = event.getUser();
@@ -379,7 +403,9 @@ public class IRCEventHandler {
                 viewers = 0;
             }
             eventManager.publish(new RaidEvent(channel, raider, viewers));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -387,10 +413,12 @@ public class IRCEventHandler {
      *
      * @param event the {@link IRCMessageEvent} to be checked
      */
-    public void onUnraid(IRCMessageEvent event) {
+    public boolean onUnraid(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("unraid", event.getRawTag("msg-id"))) {
             eventManager.publish(new RaidCancellationEvent(event.getChannel()));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -398,7 +426,7 @@ public class IRCEventHandler {
      *
      * @param event the {@link IRCMessageEvent} to be checked
      */
-    public void onRewardGift(IRCMessageEvent event) {
+    public boolean onRewardGift(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("rewardgift", event.getRawTag("msg-id"))) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -417,7 +445,9 @@ public class IRCEventHandler {
 
             // Dispatch Event
             eventManager.publish(new RewardGiftEvent(channel, user, domain, triggerType, selectedCount, totalRewardCount, triggerAmount));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -444,7 +474,7 @@ public class IRCEventHandler {
      * ChatChannel clearing chat, timeouting or banning user Event
      * @param event IRCMessageEvent
      */
-    public void onClearChat(IRCMessageEvent event) {
+    public boolean onClearChat(IRCMessageEvent event) {
         if (event.getCommandType().equals("CLEARCHAT")) {
             EventChannel channel = event.getChannel();
             if (event.getRawTag("target-user-id") != null) { // ban or timeout
@@ -458,6 +488,7 @@ public class IRCEventHandler {
 
                     // Dispatch Event
                     eventManager.publish(timeoutEvent);
+                    return true;
                 } else { // ban
                     // Load Info
                     EventUser user = event.getTargetUser();
@@ -467,11 +498,14 @@ public class IRCEventHandler {
 
                     // Dispatch Event
                     eventManager.publish(banEvent);
+                    return true;
                 }
             } else { // Clear chat event
                 eventManager.publish(new ClearChatEvent(channel));
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -480,7 +514,7 @@ public class IRCEventHandler {
      * @param event IRCMessageEvent
      * @see <a href="https://dev.twitch.tv/docs/irc/tags#clearmsg-twitch-tags">Official documentation</a>
      */
-    public void onClearMsg(IRCMessageEvent event) {
+    public boolean onClearMsg(IRCMessageEvent event) {
         if ("CLEARMSG".equals(event.getCommandType())) {
             EventChannel channel = event.getChannel();
             String userName = event.getUserName();
@@ -489,7 +523,9 @@ public class IRCEventHandler {
             boolean wasActionMessage = message.startsWith("\u0001ACTION ") && message.endsWith("\u0001");
             String trimmedMsg = wasActionMessage ? message.substring("\u0001ACTION ".length(), message.length() - "\u0001".length()) : message;
             eventManager.publish(new DeleteMessageEvent(channel, userName, msgId, trimmedMsg, wasActionMessage));
+            return true;
         }
+        return false;
     }
 
     /**
@@ -497,7 +533,7 @@ public class IRCEventHandler {
      *
      * @param event {@link IRCMessageEvent}
      */
-    public void onNames(IRCMessageEvent event) {
+    public boolean onNames(IRCMessageEvent event) {
         if ("353".equals(event.getCommandType()) && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
             EventChannel channel = event.getChannel();
             event.getMessage()
@@ -510,14 +546,16 @@ public class IRCEventHandler {
                         .map(login -> new EventUser(null, login))
                         .forEach(user -> eventManager.publish(new ChannelJoinEvent(channel, user)))
                 );
+            return true;
         }
+        return false;
     }
 
     /**
      * User Joins ChatChannel Event
      * @param event IRCMessageEvent
      */
-    public void onChannnelClientJoinEvent(IRCMessageEvent event) {
+    public boolean onChannnelClientJoinEvent(IRCMessageEvent event) {
         if(event.getCommandType().equals("JOIN") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -526,15 +564,17 @@ public class IRCEventHandler {
             // Dispatch Event
             if (channel != null && user != null) {
                 eventManager.publish(new ChannelJoinEvent(channel, user));
+                return true;
             }
         }
+        return false;
     }
 
     /**
      * User Leaves ChatChannel Event
      * @param event IRCMessageEvent
      */
-    public void onChannnelClientLeaveEvent(IRCMessageEvent event) {
+    public boolean onChannnelClientLeaveEvent(IRCMessageEvent event) {
         if(event.getCommandType().equals("PART") && event.getChannelName().isPresent() && event.getClientName().isPresent()) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -543,15 +583,18 @@ public class IRCEventHandler {
             // Dispatch Event
             if (channel != null && user != null) {
                 eventManager.publish(new ChannelLeaveEvent(channel, user));
+                return true;
             }
         }
+        return false;
     }
 
     /**
      * Mod Status Change Event
      * @param event IRCMessageEvent
      */
-    public void onChannelModChange(IRCMessageEvent event) {
+    @Deprecated
+    public boolean onChannelModChange(IRCMessageEvent event) {
         if(event.getCommandType().equals("MODE") && event.getPayload().isPresent()) {
             // Receiving Mod Status
             if(event.getPayload().get().substring(1).startsWith("o")) {
@@ -561,18 +604,22 @@ public class IRCEventHandler {
 
                 // Dispatch Event
                 eventManager.publish(new ChannelModEvent(channel, user, event.getPayload().get().startsWith("+")));
+                return true;
             }
         }
+        return false;
     }
 
-    public void onNoticeEvent(IRCMessageEvent event) {
+    public boolean onNoticeEvent(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
             String messageId = event.getTagValue("msg-id").get();
             String message = event.getMessage().orElse(null); // can be null, ie. bad_delete_message_error
 
             eventManager.publish(new ChannelNoticeEvent(channel, messageId, message));
+            return true;
         }
+        return false;
     }
 
     @Deprecated
@@ -631,7 +678,7 @@ public class IRCEventHandler {
         }
     }
 
-    public void onChannelState(IRCMessageEvent event) {
+    public boolean onChannelState(IRCMessageEvent event) {
         if (event.getCommandType().equals("ROOMSTATE")) {
             // getting Status on channel
             EventChannel channel = event.getChannel();
@@ -679,9 +726,12 @@ public class IRCEventHandler {
                 });
             }
             eventManager.publish(new ChannelStateEvent(channel, states));
+            return true;
         }
+        return false;
     }
 
+    @Deprecated
     public void onMessageDeleteResponse(IRCMessageEvent event) {
         if (event.getCommandType().equals("NOTICE")) {
             EventChannel channel = event.getChannel();
@@ -697,23 +747,29 @@ public class IRCEventHandler {
         }
     }
 
-    public void onUserState(IRCMessageEvent event) {
+    public boolean onUserState(IRCMessageEvent event) {
         if (event.getCommandType().equals("USERSTATE")) {
             eventManager.publish(new UserStateEvent(event));
+            return true;
         }
+        return false;
     }
 
-    public void onGlobalUserState(IRCMessageEvent event) {
+    public boolean onGlobalUserState(IRCMessageEvent event) {
         if ("GLOBALUSERSTATE".equals(event.getCommandType())) {
             eventManager.publish(new GlobalUserStateEvent(event));
+            return true;
         }
+        return false;
     }
 
     @Unofficial
-    private void onViewerMilestone(IRCMessageEvent event) {
+    private boolean onViewerMilestone(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals(ViewerMilestoneEvent.USERNOTICE_ID, event.getRawTag("msg-id"))) {
             eventManager.publish(new ViewerMilestoneEvent(event));
+            return true;
         }
+        return false;
     }
 
     @NonNull
