@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.ContentClassification;
 import com.github.twitch4j.eventsub.domain.Contribution;
 import com.github.twitch4j.eventsub.domain.PollStatus;
 import com.github.twitch4j.eventsub.domain.PredictionColor;
@@ -13,6 +14,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.github.twitch4j.common.util.TypeConvert.jsonToObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -292,11 +297,11 @@ public class EventSubEventTest {
     }
 
     @Test
-    @DisplayName("Deserialize ChannelUpdateEvent")
+    @DisplayName("Deserialize ChannelUpdateV2Event")
     public void deserializeComplexChannelEvent() {
-        ChannelUpdateEvent event = jsonToObject(
-            "{\"broadcaster_user_id\":\"1337\",\"broadcaster_user_name\":\"cool_user\",\"title\":\"Best Stream Ever\",\"language\":\"en\",\"category_id\":\"21779\",\"category_name\":\"Fortnite\",\"is_mature\":false}",
-            ChannelUpdateEvent.class
+        ChannelUpdateV2Event event = jsonToObject(
+            "{\"broadcaster_user_id\":\"1337\",\"broadcaster_user_name\":\"cool_user\",\"title\":\"Best Stream Ever\",\"language\":\"en\",\"category_id\":\"21779\",\"category_name\":\"Fortnite\",\"content_classification_labels\":[\"MatureGame\"]}",
+            ChannelUpdateV2Event.class
         );
 
         assertEquals("1337", event.getBroadcasterUserId());
@@ -305,7 +310,7 @@ public class EventSubEventTest {
         assertEquals("en", event.getLanguage());
         assertEquals("21779", event.getCategoryId());
         assertEquals("Fortnite", event.getCategoryName());
-        assertEquals(false, event.isMature());
+        assertEquals(new HashSet<>(Collections.singletonList(ContentClassification.MATURE_GAME)), event.getContentClassificationLabels());
     }
 
     @Test

@@ -1,18 +1,14 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelUpdateCondition;
-import com.github.twitch4j.eventsub.events.BetaChannelUpdateEvent;
-import org.jetbrains.annotations.ApiStatus;
+import com.github.twitch4j.eventsub.events.ChannelUpdateV2Event;
 
 /**
  * A broadcaster updates their channel properties e.g., category, title, content classification labels, or broadcast language.
  * <p>
  * No authorization required.
- * <p>
- * This subscription type is in open beta since 2023-06-29.
  */
-@ApiStatus.Experimental
-public class BetaChannelUpdateType implements SubscriptionType<ChannelUpdateCondition, ChannelUpdateCondition.ChannelUpdateConditionBuilder<?, ?>, BetaChannelUpdateEvent> {
+public class ChannelUpdateV2Type implements SubscriptionType<ChannelUpdateCondition, ChannelUpdateCondition.ChannelUpdateConditionBuilder<?, ?>, ChannelUpdateV2Event> {
 
     @Override
     public String getName() {
@@ -21,7 +17,7 @@ public class BetaChannelUpdateType implements SubscriptionType<ChannelUpdateCond
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "2";
     }
 
     @Override
@@ -30,8 +26,8 @@ public class BetaChannelUpdateType implements SubscriptionType<ChannelUpdateCond
     }
 
     @Override
-    public Class<BetaChannelUpdateEvent> getEventClass() {
-        return BetaChannelUpdateEvent.class;
+    public Class<ChannelUpdateV2Event> getEventClass() {
+        return ChannelUpdateV2Event.class;
     }
 
 }
