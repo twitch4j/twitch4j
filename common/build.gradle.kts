@@ -39,12 +39,6 @@ project.extensions.getByType(BuildConfigExtension::class.java).apply {
 	}
 }
 
-sourceSets {
-	main {
-		java.srcDir("build/generated/sources/buildConfig/main")
-	}
-}
-
 tasks.javadoc {
 	options {
 		title = "Twitch4J (v${version}) - Common Module API"
