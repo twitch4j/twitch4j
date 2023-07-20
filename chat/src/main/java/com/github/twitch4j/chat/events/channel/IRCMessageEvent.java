@@ -134,7 +134,7 @@ public class IRCMessageEvent extends TwitchEvent {
         // set channel id and name from tags or cache
         if (channelName == null) {
             this.channelId = getRawTagString("room-id");
-            this.channelName = channelIdToChannelName.get(channelId);
+            this.channelName = channelId == null ? null : channelIdToChannelName.get(channelId);
         } else {
             this.channelId = channelNameToChannelId.get(channelName);
             if (channelId == null) {

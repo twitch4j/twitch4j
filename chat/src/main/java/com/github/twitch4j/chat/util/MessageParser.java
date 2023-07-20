@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @UtilityClass
 public class MessageParser {
@@ -20,7 +21,7 @@ public class MessageParser {
     @Nullable
     @VisibleForTesting
     public IRCMessageEvent parse(@NotNull String rawMessage) {
-        return parse(rawMessage, Collections.emptyMap(), Collections.emptyMap(), null);
+        return parse(rawMessage, new ConcurrentHashMap<>(0), new ConcurrentHashMap<>(0), null);
     }
 
     @Nullable
