@@ -41,14 +41,14 @@ public enum HypeChatLevel {
     }
 
     /**
-     * @return the maximum number of characters that can be in a hype chat contribution at this level.
+     * @return the maximum number of characters that can be in a hype chat message at this level.
      */
     public int getCharacterLimit() {
         return getLevel() * 50;
     }
 
     /**
-     * @return whether the Hype Chat contribution has a colored gradient.
+     * @return whether the Hype Chat contribution has a colored gradient in the official chat interface.
      */
     public boolean hasGradient() {
         return this.ordinal() >= SIX.ordinal();
