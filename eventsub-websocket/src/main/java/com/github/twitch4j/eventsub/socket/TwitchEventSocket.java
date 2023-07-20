@@ -370,6 +370,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         return subscriptions.remove(SubscriptionWrapper.wrap(remove));
     }
 
+    @Synchronized
     private void onInitialConnection(final String websocketId) {
         final Collection<EventSubSubscription> oldSubs = new ArrayDeque<>(subscriptions.size());
         subscriptions.keySet().removeIf(oldSubs::add);
