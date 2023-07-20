@@ -119,6 +119,7 @@ import com.github.twitch4j.pubsub.events.PollsEvent;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
 import com.github.twitch4j.pubsub.events.PresenceSettingsEvent;
+import com.github.twitch4j.pubsub.events.PubSubAuthRevokeEvent;
 import com.github.twitch4j.pubsub.events.PubSubConnectionStateEvent;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RadioEvent;
@@ -156,6 +157,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -877,6 +879,39 @@ public class TwitchPubSub implements ITwitchPubSub {
             } else if (message.getType().equals(PubSubType.RECONNECT)) {
                 log.warn("PubSub: Server instance we're connected to will go down for maintenance soon, reconnecting to obtain a new connection!");
                 reconnect();
+            } else if (message.getType() == PubSubType.AUTH_REVOKED) {
+                PubSubRequest revocation = TypeConvert.jsonToObject(text, PubSubRequest.class);
+                Object topicsObj = revocation.getData().get("topics");
+                if (topicsObj instanceof Collection) {
+                    Map<String, PubSubRequest> revoked = new HashMap<>(); // allows for null values
+
+                    // Read topic names
+                    for (Object topicObj : (Collection<?>) topicsObj) {
+                        if (topicObj instanceof String) {
+                            revoked.put((String) topicObj, null);
+                        } else {
+                            log.warn("Unparsable Revocation Topic: {}", topicObj);
+                        }
+                    }
+
+                    if (revoked.isEmpty())
+                        return; // should not occur
+
+                    // Unsubscribe
+                    subscribedTopics.removeIf(req -> {
+                        Object topics = req.getData().get("topics");
+                        if (topics instanceof Collection && ((Collection<?>) topics).size() == 1) {
+                            Object topic = ((Collection<?>) topics).iterator().next();
+                            return topic instanceof String && revoked.replace((String) topic, null, req);
+                        }
+                        return false;
+                    });
+
+                    // Fire event
+                    eventManager.publish(new PubSubAuthRevokeEvent(this, Collections.unmodifiableMap(revoked)));
+                } else {
+                    log.warn("Unparsable Revocation: {}", text);
+                }
             } else {
                 // unknown message
                 log.debug("PubSub: Unknown Message Type: " + message);
@@ -915,8 +950,10 @@ public class TwitchPubSub implements ITwitchPubSub {
 
     @Override
     public PubSubSubscription listenOnTopic(PubSubRequest request) {
-        if (subscribedTopics.add(request))
+        if (subscribedTopics.add(request)) {
+            checkListenCount(request);
             queueRequest(request);
+        }
         return new PubSubSubscription(request);
     }
 
@@ -957,6 +994,14 @@ public class TwitchPubSub implements ITwitchPubSub {
             heartbeatTask.cancel(false);
             queueTask.cancel(false);
             connection.close();
+        }
+    }
+
+    private void checkListenCount(PubSubRequest request) {
+        Object topics = request.getData().get("topics");
+        if (topics instanceof Collection && ((Collection<?>) topics).size() > 1) {
+            log.warn("Listening to multiple PubSub topics in a single request is not recommended; " +
+                "automatic topic management can degrade upon PubSubAuthRevokeEvent");
         }
     }
 

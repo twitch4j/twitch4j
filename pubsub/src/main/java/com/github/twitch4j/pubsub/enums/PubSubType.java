@@ -8,4 +8,5 @@ public enum PubSubType {
     UNLISTEN,
     RESPONSE,
     MESSAGE,
+    AUTH_REVOKED,
 }
