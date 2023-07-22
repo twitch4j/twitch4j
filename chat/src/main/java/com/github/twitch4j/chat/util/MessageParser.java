@@ -132,21 +132,18 @@ public class MessageParser {
 
     @ApiStatus.Internal
     public void consumeLines(@NotNull String source, @NotNull Consumer<String> consumer) {
+        int len = source.length();
         int start = 0;
         int i;
-        while (true) {
-            i = source.indexOf('\n', start);
-            if (i < 0) {
-                if (start < source.length()) {
-                    consumer.accept(source.substring(start));
-                }
-                break;
-            } else {
-                boolean carriage = i > 0 && source.charAt(i - 1) == '\r';
-                consumer.accept(source.substring(start, carriage ? i - 1 : i));
-                start = i + 1;
-            }
+
+        while ((i = source.indexOf('\n', start)) >= 0) {
+            boolean carriage = i > 0 && source.charAt(i - 1) == '\r';
+            consumer.accept(source.substring(start, carriage ? i - 1 : i));
+            start = i + 1;
+        }
+
+        if (start < len) {
+            consumer.accept(source.substring(start));
         }
     }
-
 }
