@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @UtilityClass
 public class MessageParser {
@@ -127,6 +128,25 @@ public class MessageParser {
             value = tag.subSequence(delim + 1, tag.length());
         }
         tags.put(key.toString(), value);
+    }
+
+    @ApiStatus.Internal
+    public void consumeLines(@NotNull String source, @NotNull Consumer<String> consumer) {
+        int start = 0;
+        int i;
+        while (true) {
+            i = source.indexOf('\n', start);
+            if (i < 0) {
+                if (start < source.length()) {
+                    consumer.accept(source.substring(start));
+                }
+                break;
+            } else {
+                boolean carriage = i > 0 && source.charAt(i - 1) == '\r';
+                consumer.accept(source.substring(start, carriage ? i - 1 : i));
+                start = i + 1;
+            }
+        }
     }
 
 }

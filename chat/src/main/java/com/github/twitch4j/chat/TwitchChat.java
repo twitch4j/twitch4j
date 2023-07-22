@@ -541,8 +541,8 @@ public class TwitchChat implements ITwitchChat {
     }
 
     protected void onTextMessage(String text) {
-        Arrays.asList(StringUtils.split(text.replace("\r\n", "\n"), '\n'))
-            .forEach(message -> {
+        MessageParser.consumeLines(text,
+            message -> {
                 if (!message.equals("")) {
                     // Handle messages
                     log.trace("Received WebSocketMessage: " + message);
