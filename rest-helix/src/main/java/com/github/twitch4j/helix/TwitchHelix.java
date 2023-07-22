@@ -2206,7 +2206,7 @@ public interface TwitchHelix {
      *
      * @param authToken     User OAuth Token of the broadcaster (scope: "channel:manage:schedule").
      * @param broadcasterId User ID of the broadcaster who owns the channel streaming schedule. Provided broadcaster_id must match the user_id in the user OAuth token.
-     * @param segment       Properties of the scheduled broadcast (required: start_time, timezone, is_recurring).
+     * @param segment       Properties of the scheduled broadcast (required: start_time, timezone, duration).
      * @return StreamScheduleResponse
      */
     @RequestLine("POST /schedule/segment?broadcaster_id={broadcaster_id}")
