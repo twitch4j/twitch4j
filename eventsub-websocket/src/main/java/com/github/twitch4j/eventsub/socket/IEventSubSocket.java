@@ -70,6 +70,11 @@ public interface IEventSubSocket extends AutoCloseable {
     boolean unregister(EventSubSubscription sub);
 
     /**
+     * @return the most recently measured round-trip latency for the socket(s) in milliseconds, or -1 if unknown
+     */
+    long getLatency();
+
+    /**
      * Creates (or schedules) an eventsub subscription for this socket, using {@link #getDefaultToken()}.
      *
      * @param sub the eventsub subscription to be created

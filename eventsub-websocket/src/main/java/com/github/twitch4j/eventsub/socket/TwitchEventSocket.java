@@ -360,6 +360,12 @@ public final class TwitchEventSocket implements IEventSubSocket {
         return Collections.unmodifiableSet(this.subscriptions.keySet());
     }
 
+    @Override
+    public long getLatency() {
+        WebsocketConnection ws = connection.get();
+        return ws != null ? ws.getLatency() : -1L;
+    }
+
     public WebsocketConnectionState getState() {
         WebsocketConnection ws = connection.get();
         return ws != null ? ws.getConnectionState() : WebsocketConnectionState.DISCONNECTED;
@@ -581,6 +587,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         WebsocketConnection ws = new WebsocketConnection(spec -> {
             spec.baseUrl(url);
             spec.taskExecutor(executor);
+            spec.wsPingPeriod(15_000);
             spec.onTextMessage(this::onTextMessage);
             spec.onStateChanged((oldState, newState) -> {
                 WebsocketConnection thisSocket = wsRef.get();
