@@ -149,4 +149,18 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
     public boolean unregister(EventSubSubscription sub) {
         return this.unsubscribe(SubscriptionWrapper.wrap(sub));
     }
+
+    @Override
+    public long getLatency() {
+        long sum = 0;
+        int count = 0;
+        for (TwitchEventSocket ws : getConnections()) {
+            long latency = ws.getLatency();
+            if (latency >= 0) {
+                sum += latency;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : -1L;
+    }
 }

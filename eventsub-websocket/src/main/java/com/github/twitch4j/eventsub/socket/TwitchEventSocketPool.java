@@ -203,6 +203,21 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
             .orElse(null);
     }
 
+    @Override
+    public long getLatency() {
+        long sum = 0;
+        int count = 0;
+        for (TwitchSingleUserEventSocketPool pool : poolByUserId.values()) {
+            int n = pool.numConnections();
+            long latency = pool.getLatency();
+            if (latency >= 0) {
+                sum += latency * n;
+                count += n;
+            }
+        }
+        return count > 0 ? sum / count : -1L;
+    }
+
     /**
      * @return the number of open connections held by this pool.
      */
