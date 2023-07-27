@@ -68,6 +68,12 @@ subprojects {
 
 	// Dependency Management for Subprojects
 	dependencies {
+		// bom
+		api(platform("io.github.xanthic.cache:cache-bom:0.3.0"))
+		api(platform("com.github.philippheuer.events4j:events4j-bom:0.12.1"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.15.2"))
+
+		// constraints
 		constraints {
 			// Annotations
 			api(group = "org.jetbrains", name = "annotations", version = "24.0.1")
@@ -115,17 +121,8 @@ subprojects {
 		api(group = "commons-io", name = "commons-io", version = "2.13.0")
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.13.0")
 
-		// Cache BOM
-		api(platform("io.github.xanthic.cache:cache-bom:0.3.0"))
-
-		// Events4J BOM
-		api(platform("com.github.philippheuer.events4j:events4j-bom:0.12.1"))
-
 		// Logging
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
-
-		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.15.2"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.10.0"))

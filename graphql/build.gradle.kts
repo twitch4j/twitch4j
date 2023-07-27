@@ -15,7 +15,8 @@ dependencies {
 	// Caching
 	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
 
-	// Twitch4J Modules
+	// internal modules
+	api(project(":twitch4j-api"))
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
 }

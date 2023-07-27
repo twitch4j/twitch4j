@@ -1,5 +1,6 @@
 package com.github.twitch4j.common.config;
 
+import com.github.twitch4j.util.config.ProxySpec;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NonNull;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -80,5 +82,15 @@ public class ProxyConfig {
 
     private SocketAddress buildAddress() {
         return new InetSocketAddress(hostname, port);
+    }
+
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    public static ProxyConfig ofProxySpec(ProxySpec proxySpec) {
+        if (proxySpec == null) {
+            return null;
+        }
+
+        return new ProxyConfig(proxySpec.host(), proxySpec.port(), proxySpec.username(), proxySpec.password());
     }
 }

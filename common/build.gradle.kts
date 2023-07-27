@@ -6,22 +6,20 @@ plugins {
 
 dependencies {
 	// Event Manager
-	api(group = "com.github.philippheuer.events4j", name = "events4j-core")
-	api(group = "com.github.philippheuer.events4j", name = "events4j-handler-simple")
-
-	// HTTP Client (for common feign extensions/interceptors/...)
-	compileOnly(group = "io.github.openfeign", name = "feign-okhttp")
-	compileOnly(group = "io.github.openfeign", name = "feign-jackson")
-	compileOnly(group = "io.github.openfeign", name = "feign-slf4j")
-	compileOnly(group = "io.github.openfeign", name = "feign-hystrix")
+	api("com.github.philippheuer.events4j:events4j-core")
+	api("com.github.philippheuer.events4j:events4j-handler-simple")
 
 	// Jackson (JSON)
-	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
+	api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+	// HTTP Client (for common feign extensions/interceptors/...)
+	compileOnly("io.github.openfeign:feign-core")
 
 	// Rate-limit buckets for registry
-	compileOnly(group = "com.bucket4j", name = "bucket4j_jdk8-core")
+	compileOnly("com.bucket4j:bucket4j_jdk8-core")
 
 	// Twitch4J Modules
+	api(project(":twitch4j-api"))
 	api(project(":twitch4j-auth"))
 	api(project(":twitch4j-util"))
 }

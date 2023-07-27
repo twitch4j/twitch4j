@@ -152,6 +152,7 @@ import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -270,6 +271,7 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      * @param wsCloseDelay              Websocket Close Delay
      */
+    @ApiStatus.Internal
     public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay) {
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;

@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public class TypeConvert {
 
     /**

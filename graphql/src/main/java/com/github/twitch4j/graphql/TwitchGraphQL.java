@@ -20,6 +20,7 @@ import io.github.xanthic.cache.core.CacheApi;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -98,6 +99,7 @@ public class TwitchGraphQL {
      * @param timeout           Query Timeout
      * @param additionalHeaders Custom headers
      */
+    @ApiStatus.Internal
     public TwitchGraphQL(String baseUrl, String userAgent, EventManager eventManager, String clientId, OAuth2Credential defaultToken, ProxyConfig proxyConfig, boolean batchingEnabled, Integer timeout, Map<String, String> additionalHeaders) {
         this.baseUrl = baseUrl;
         this.userAgent = userAgent;

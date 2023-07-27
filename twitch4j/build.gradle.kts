@@ -4,7 +4,7 @@ dependencies {
 	val thatProject = project
 	rootProject.subprojects
 		.filter { it != thatProject }
-		.filter { it.name != "twitch4j-kotlin" }
+		.filter { it.name != "twitch4j-kotlin" && !it.name.startsWith("twitch4j-extension-") }
 		.forEach {
 			api(it)
 		}

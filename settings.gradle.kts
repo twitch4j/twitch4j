@@ -1,6 +1,7 @@
 rootProject.name = "Twitch4J"
 
 include(
+	":api",
 	":common",
 	":auth",
 	":client-websocket",
@@ -15,9 +16,11 @@ include(
 	":graphql",
 	":util",
 	":twitch4j",
-	":kotlin"
+	":kotlin",
+	":extension-resilience4j",
 )
 
+project(":api").name = "twitch4j-api"
 project(":common").name = "twitch4j-common"
 project(":client-websocket").name = "twitch4j-client-websocket"
 project(":auth").name = "twitch4j-auth"
@@ -33,3 +36,4 @@ project(":graphql").name = "twitch4j-graphql"
 project(":util").name = "twitch4j-util"
 project(":twitch4j").name = "twitch4j"
 project(":kotlin").name = "twitch4j-kotlin"
+project(":extension-resilience4j").name = "twitch4j-extension-resilience4j"
