@@ -1,4 +1,3 @@
-// In this section you declare the dependencies for your production and test code
 dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")

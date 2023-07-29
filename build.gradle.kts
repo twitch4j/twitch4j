@@ -39,7 +39,6 @@ subprojects {
 	apply(plugin = "maven-publish")
 	apply(plugin = "io.freefair.lombok")
 	apply(plugin = "me.champeau.jmh")
-	apply(plugin = "com.github.johnrengelman.shadow")
 
 	if (enableManifest) {
 		apply(plugin = "com.coditory.manifest")

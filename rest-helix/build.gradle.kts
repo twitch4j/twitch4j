@@ -1,4 +1,7 @@
-// In this section you declare the dependencies for your production and test code
+plugins {
+	id("com.github.johnrengelman.shadow")
+}
+
 dependencies {
 	// HTTP Client
 	api(group = "io.github.openfeign", name = "feign-okhttp")
