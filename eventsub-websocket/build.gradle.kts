@@ -5,6 +5,13 @@ dependencies {
 	api(project(":twitch4j-client-websocket"))
 }
 
+tasks.withType<Jar> {
+	if (this is com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+		// Avoid com.github.twitch4j.eventsub.socket relocation due to eventsub-common being relocated
+		relocate("com.github.twitch4j.eventsub.socket", "com.github.twitch4j.eventsub.socket")
+	}
+}
+
 tasks.javadoc {
 	options {
 		title = "Twitch4J (v${version}) - EventSub WebSocket Module"
