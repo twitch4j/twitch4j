@@ -112,7 +112,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      * Hype Chat Contribution
      *
      * @return the payment information related to this hype chat, if applicable.
-     * @see <a href ="https://blog.twitch.tv/en/2023/06/22/introducing-hype-chat-a-new-way-to-stand-out/">Twitch Announcement</a>
+     * @see <a href="https://blog.twitch.tv/en/2023/06/22/introducing-hype-chat-a-new-way-to-stand-out/">Twitch Announcement</a>
      */
     public Optional<DonationAmount> getElevatedChatPayment() {
         final Map<String, CharSequence> tags = getMessageEvent().getEscapedTags();
