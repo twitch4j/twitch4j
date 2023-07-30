@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.AbstractChannelMessageEvent;
 import com.github.twitch4j.chat.util.ChatCrowdChant;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.enums.HypeChatLevel;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.util.ChatReply;
@@ -108,11 +109,11 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
     }
 
     /**
-     * @return the payment amount for the user to elevate their chat message.
-     * @apiNote This method is unofficial since the experiment is not officially documented in the irc guide.
-     * @see <a href ="https://twitter.com/TwitchSupport/status/1575603152908427272">Twitch Announcement</a>
+     * Hype Chat Contribution
+     *
+     * @return the payment information related to this hype chat, if applicable.
+     * @see <a href="https://blog.twitch.tv/en/2023/06/22/introducing-hype-chat-a-new-way-to-stand-out/">Twitch Announcement</a>
      */
-    @Unofficial
     public Optional<DonationAmount> getElevatedChatPayment() {
         final Map<String, CharSequence> tags = getMessageEvent().getEscapedTags();
 
@@ -140,6 +141,16 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
                 }
                 return new DonationAmount(amt, exponent, currency);
             });
+    }
+
+    /**
+     * @return the {@link HypeChatLevel} associated with the hype chat contribution.
+     * @see #getElevatedChatPayment()
+     */
+    public Optional<HypeChatLevel> getHypeChatLevel() {
+        return getMessageEvent()
+            .getTagValue("pinned-chat-paid-level")
+            .map(HypeChatLevel.MAPPINGS::get);
     }
 
 }
