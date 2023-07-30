@@ -3,6 +3,7 @@ package com.github.twitch4j.api;
 import feign.InvocationHandlerFactory;
 import feign.Target;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -22,7 +23,8 @@ public interface TwitchExtension {
      * @param target the target
      * @return the decorated method handler
      */
+    @NotNull
     default ThrowingFunction<Object[], Object, Throwable> decorateFeignInvocation(String backendName, ThrowingFunction<Object[], Object, Throwable> function, Map<Method, InvocationHandlerFactory.MethodHandler> dispatch, Target<?> target) {
-        return null;
+        return function;
     }
 }

@@ -1,5 +1,7 @@
 package com.github.twitch4j.api;
 
+import lombok.SneakyThrows;
+
 import java.util.function.Function;
 
 /**
@@ -16,22 +18,9 @@ import java.util.function.Function;
 public interface ThrowingFunction<T, R, E extends Throwable> extends Function<T, R> {
     R invoke(T t) throws E;
 
-    default R apply (T t) {
-        return unchecked().apply(t);
-    }
-
-    default Function<T, R> unchecked() {
-        return input -> {
-            try {
-                return invoke(input);
-            } catch (Throwable t) {
-                return sneakyThrow(t);
-            }
-        };
-    }
-
-    @SuppressWarnings("unchecked")
-    static <T extends Throwable, R> R sneakyThrow(Throwable t) throws T {
-        throw (T) t;
+    @Override
+    @SneakyThrows
+    default R apply(T t) {
+        return invoke(t);
     }
 }

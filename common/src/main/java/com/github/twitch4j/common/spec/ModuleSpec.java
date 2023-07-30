@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 @Data
 @Accessors(fluent = true)
 @ApiStatus.Experimental
-public class ModuleSpec<T> {
+public class ModuleSpec<T extends ModuleSpec<T>> {
 
     /**
      * Proxy Configuration

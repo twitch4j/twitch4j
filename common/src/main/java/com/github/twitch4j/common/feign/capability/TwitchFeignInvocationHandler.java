@@ -42,13 +42,7 @@ public class TwitchFeignInvocationHandler implements InvocationHandler {
         decoratedDispatch = new HashMap<>(dispatch.size());
         dispatch.forEach((method, methodHandler) -> {
             // wrap method invocation in ThrowingFunction
-            ThrowingFunction<Object[], Object, Throwable> decoratedFunction = args -> {
-                try {
-                    return methodHandler.invoke(args);
-                } catch (Throwable ex) {
-                    throw new RuntimeException(ex);
-                }
-            };
+            ThrowingFunction<Object[], Object, Throwable> decoratedFunction = methodHandler::invoke;
 
             // decorate method invocations
             for (TwitchExtension extension : extensions) {

@@ -24,6 +24,7 @@ import io.github.resilience4j.retry.RetryRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Builder;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -47,8 +48,7 @@ public class TwitchResilienceExtension implements TwitchExtension {
     private final ConcurrentHashMap<String, RateLimiter> rateLimiterCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, CircuitBreaker> circuitBreakerCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Retry> retryCache = new ConcurrentHashMap<>();
-
-    private MeterRegistry meterRegistry = null;
+    private final MeterRegistry meterRegistry;
 
     public TwitchResilienceExtension() {
         this(null, null, null, null, null);
@@ -74,7 +74,7 @@ public class TwitchResilienceExtension implements TwitchExtension {
     }
 
     @Override
-    public ThrowingFunction<Object[], Object, Throwable> decorateFeignInvocation(String backendName, ThrowingFunction<Object[], Object, Throwable> function, Map<Method, InvocationHandlerFactory.MethodHandler> dispatch, Target<?> target) {
+    public @NotNull ThrowingFunction<Object[], Object, Throwable> decorateFeignInvocation(String backendName, ThrowingFunction<Object[], Object, Throwable> function, Map<Method, InvocationHandlerFactory.MethodHandler> dispatch, Target<?> target) {
         // get or create Resilience4J instances for current backend
         Bulkhead bulkhead = bulkheadCache.computeIfAbsent(backendName, bulkheadRegistry::bulkhead);
         RateLimiter rateLimiter = rateLimiterCache.computeIfAbsent(backendName, rateLimiterRegistry::rateLimiter);
