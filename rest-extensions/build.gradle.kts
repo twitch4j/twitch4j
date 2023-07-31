@@ -1,4 +1,3 @@
-// In this section you declare the dependencies for your production and test code
 dependencies {
 	// HTTP Client
 	api(group = "io.github.openfeign", name = "feign-okhttp")

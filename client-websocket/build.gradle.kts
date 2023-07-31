@@ -1,4 +1,3 @@
-// In this section you declare the dependencies for your production and test code
 dependencies {
 	// Common
 	api(project(":twitch4j-util"))

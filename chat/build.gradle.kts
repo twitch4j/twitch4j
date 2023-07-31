@@ -1,4 +1,7 @@
-// In this section you declare the dependencies for your production and test code
+plugins {
+	id("com.github.johnrengelman.shadow")
+}
+
 dependencies {
 	// Rate Limiting
 	api(group = "com.bucket4j", name = "bucket4j_jdk8-core")
