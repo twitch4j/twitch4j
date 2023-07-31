@@ -1364,6 +1364,23 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets information about Twitch content classification labels.
+     *
+     * @param authToken App Access Token or User Access Token.
+     * @param locale    Locale for the Content Classification Labels. Default: "en-US".
+     *                  Supported locales: "bg-BG", "cs-CZ", "da-DK", "da-DK", "de-DE", "el-GR", "en-GB", "en-US", "es-ES", "es-MX",
+     *                  "fi-FI", "fr-FR", "hu-HU", "it-IT", "ja-JP", "ko-KR", "nl-NL", "no-NO", "pl-PL", "pt-BT", "pt-PT",
+     *                  "ro-RO", "ru-RU", "sk-SK", "sv-SE", "th-TH", "tr-TR", "vi-VN", "zh-CN", "zh-TW"
+     * @return ContentClassificationList
+     */
+    @RequestLine("GET /content_classification_labels?locale={locale}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ContentClassificationList> getContentClassificationLabels(
+        @Param("token") String authToken,
+        @Param("locale") String locale
+    );
+
+    /**
      * Creates a URL where you can upload a manifest file and notify users that they have an entitlement
      *
      * @param authToken App access token
