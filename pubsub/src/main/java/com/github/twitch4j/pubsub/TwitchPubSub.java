@@ -16,6 +16,7 @@ import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.AliasRestrictionUpdateData;
 import com.github.twitch4j.pubsub.domain.AutomodCaughtMessageData;
 import com.github.twitch4j.pubsub.domain.AutomodLevelsModified;
+import com.github.twitch4j.pubsub.domain.BanSharingSettings;
 import com.github.twitch4j.pubsub.domain.BannedTermAdded;
 import com.github.twitch4j.pubsub.domain.BannedTermRemoved;
 import com.github.twitch4j.pubsub.domain.BitsBadgeData;
@@ -74,6 +75,7 @@ import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.events.AliasRestrictionUpdateEvent;
 import com.github.twitch4j.pubsub.events.AutomodCaughtMessageEvent;
 import com.github.twitch4j.pubsub.events.AutomodLevelsModifiedEvent;
+import com.github.twitch4j.pubsub.events.BanSharingSettingsUpdateEvent;
 import com.github.twitch4j.pubsub.events.BitsLeaderboardEvent;
 import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
 import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
@@ -157,7 +159,6 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -792,6 +793,8 @@ public class TwitchPubSub implements ITwitchPubSub {
                         eventManager.publish(new LowTrustUserNewMessageEvent(userId, channelId, TypeConvert.convertValue(msgData, LowTrustUserNewMessage.class)));
                     } else if ("low_trust_user_treatment_update".equals(type)) {
                         eventManager.publish(new LowTrustUserTreatmentUpdateEvent(userId, channelId, TypeConvert.convertValue(msgData, LowTrustUserTreatmentUpdate.class)));
+                    } else if ("bans_sharing_settings_update".equals(type)) {
+                        eventManager.publish(new BanSharingSettingsUpdateEvent(userId, channelId, TypeConvert.convertValue(msgData, BanSharingSettings.class)));
                     } else {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                     }
