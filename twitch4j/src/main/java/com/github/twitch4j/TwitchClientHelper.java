@@ -201,9 +201,10 @@ public class TwitchClientHelper implements IClientHelper {
                         return;
 
                     ChannelCache currentChannelCache = channelInformation.computeIfAbsent(userId, s -> new ChannelCache());
-                    // Disabled name updates while Helix returns display name https://github.com/twitchdev/issues/issues/3
-                    if (stream != null && currentChannelCache.getUserName() == null)
-                        currentChannelCache.setUserName(stream.getUserName());
+                    if (stream != null) {
+                        // gracefully support name changes
+                        currentChannelCache.setUserName(stream.getUserLogin());
+                    }
                     final EventChannel channel = new EventChannel(userId, currentChannelCache.getUserName());
 
                     boolean dispatchGoLiveEvent = false;
