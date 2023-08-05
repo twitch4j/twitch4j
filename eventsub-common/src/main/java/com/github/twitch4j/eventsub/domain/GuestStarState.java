@@ -14,6 +14,11 @@ public enum GuestStarState {
     INVITED,
 
     /**
+     * The guest has accepted the invite and is currently in the process of setting up to join the session.
+     */
+    ACCEPTED,
+
+    /**
      * The guest has signaled they are ready and can be assigned a slot.
      */
     READY,
