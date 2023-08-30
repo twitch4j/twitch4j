@@ -2,6 +2,7 @@ package com.github.twitch4j.chat.util;
 
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -27,25 +28,27 @@ public class MessageParser {
 
     @Nullable
     @ApiStatus.Internal
-    public IRCMessageEvent parse(@NotNull String raw, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
+    public IRCMessageEvent parse(String raw, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
         final int len = raw.length();
+        if (len == 0) return null;
+        final char[] chars = raw.toCharArray();
         int i = 0;
 
         // Tags
         final Map<String, CharSequence> tags;
-        if (raw.startsWith("@")) {
+        if (chars[0] == '@') {
             tags = new HashMap<>(32);
-            i = parseTags(raw, tags);
+            i = parseTags(chars, tags);
         } else {
             tags = Collections.emptyMap();
         }
 
         // Client
-        if (raw.charAt(i) == ':') i++;
+        if (chars[i] == ':') i++;
         int exclamation = -1;
         int space = -1;
         for (int j = i; j < len; j++) {
-            final char c = raw.charAt(j);
+            final char c = chars[j];
             if (c == '!') {
                 if (exclamation < 0)
                     exclamation = j;
@@ -56,11 +59,11 @@ public class MessageParser {
         }
         if (space < 0 || space + 1 >= len) return null;
         final int clientNameEnd = exclamation > 0 ? exclamation : space;
-        final CharSequence clientName = CharBuffer.wrap(raw, i, clientNameEnd);
+        final CharSequence clientName = CharBuffer.wrap(chars, i, clientNameEnd - i);
         i = space + 1;
 
         // Command
-        int commandEnd = raw.indexOf(' ', i);
+        int commandEnd = ArrayUtils.indexOf(chars, ' ', i);
         if (commandEnd < 0) {
             commandEnd = len;
         }
@@ -76,7 +79,7 @@ public class MessageParser {
         if (messageStart < 0) {
             messageStart = len;
         }
-        final CharSequence channel = CharBuffer.wrap(raw, i, messageStart);
+        final CharSequence channel = CharBuffer.wrap(chars, i, messageStart - i);
         final int chanDelim = StringUtils.indexOf(channel, " = "); // handle 353 NAMES
         final CharSequence channelPart = chanDelim < 0 ? channel : channel.subSequence(chanDelim + " = ".length(), channel.length());
         final String channelName = (
@@ -90,14 +93,13 @@ public class MessageParser {
         if (messageStart >= len) {
             return new IRCMessageEvent(raw, tags, clientName, commandType, channelName, null, null, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
         }
-        final CharSequence payload = CharBuffer.wrap(raw, messageStart, len);
+        final CharSequence payload = CharBuffer.wrap(chars, messageStart, len - messageStart);
         final String message = raw.substring(messageStart + 1);
         return new IRCMessageEvent(raw, tags, clientName, commandType, channelName, payload, message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
     }
 
     @VisibleForTesting
-    public int parseTags(String input, Map<String, CharSequence> output) {
-        final char[] inputChars = input.toCharArray(); // more memory yet 20% faster (HeapCharBuffer vs StringCharBuffer)
+    public int parseTags(char[] inputChars, Map<String, CharSequence> output) {
         final int len = inputChars.length;
         int i = 0;
         int delim = -1;
