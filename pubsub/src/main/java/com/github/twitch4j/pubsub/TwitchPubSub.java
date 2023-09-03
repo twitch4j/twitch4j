@@ -60,6 +60,7 @@ import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.domain.PubSubResponse;
 import com.github.twitch4j.pubsub.domain.RadioData;
 import com.github.twitch4j.pubsub.domain.RedemptionProgress;
+import com.github.twitch4j.pubsub.domain.ScheduleUpdate;
 import com.github.twitch4j.pubsub.domain.ShieldModeSettings;
 import com.github.twitch4j.pubsub.domain.ShieldModeStatus;
 import com.github.twitch4j.pubsub.domain.SubGiftData;
@@ -72,6 +73,7 @@ import com.github.twitch4j.pubsub.domain.UserAutomodCaughtMessage;
 import com.github.twitch4j.pubsub.domain.UserModerationActionData;
 import com.github.twitch4j.pubsub.domain.VideoPlaybackData;
 import com.github.twitch4j.pubsub.enums.PubSubType;
+import com.github.twitch4j.pubsub.events.AdsScheduleUpdateEvent;
 import com.github.twitch4j.pubsub.events.AliasRestrictionUpdateEvent;
 import com.github.twitch4j.pubsub.events.AutomodCaughtMessageEvent;
 import com.github.twitch4j.pubsub.events.AutomodLevelsModifiedEvent;
@@ -460,6 +462,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                     if (topicParts.length == 3 && "automod_caught_message".equalsIgnoreCase(type)) {
                         AutomodCaughtMessageData data = TypeConvert.convertValue(msgData, AutomodCaughtMessageData.class);
                         eventManager.publish(new AutomodCaughtMessageEvent(topicParts[2], data));
+                    } else {
+                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
+                } else if ("ads-manager".equals(topicName)) {
+                    if ("ads-schedule-update".equals(type)) {
+                        ScheduleUpdate data = TypeConvert.jsonToObject(rawMessage, ScheduleUpdate.class);
+                        eventManager.publish(new AdsScheduleUpdateEvent(lastTopicIdentifier, data));
                     } else {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                     }
