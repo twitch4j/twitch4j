@@ -71,6 +71,7 @@ import com.github.twitch4j.pubsub.domain.UpdatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.UserAutomodCaughtMessage;
 import com.github.twitch4j.pubsub.domain.UserModerationActionData;
 import com.github.twitch4j.pubsub.domain.VideoPlaybackData;
+import com.github.twitch4j.pubsub.domain.WhisperThread;
 import com.github.twitch4j.pubsub.enums.PubSubType;
 import com.github.twitch4j.pubsub.events.AliasRestrictionUpdateEvent;
 import com.github.twitch4j.pubsub.events.AutomodCaughtMessageEvent;
@@ -148,6 +149,7 @@ import com.github.twitch4j.pubsub.events.UserPredictionResultEvent;
 import com.github.twitch4j.pubsub.events.UserPresenceEvent;
 import com.github.twitch4j.pubsub.events.UserUnbanRequestUpdateEvent;
 import com.github.twitch4j.pubsub.events.VideoPlaybackEvent;
+import com.github.twitch4j.pubsub.events.WhisperThreadUpdateEvent;
 import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -432,23 +434,30 @@ public class TwitchPubSub implements ITwitchPubSub {
                     eventManager.publish(new ChannelSubscribeEvent(TypeConvert.jsonToObject(rawMessage, SubscriptionData.class)));
                 } else if ("channel-commerce-events-v1".equals(topicName)) {
                     eventManager.publish(new ChannelCommerceEvent(TypeConvert.jsonToObject(rawMessage, CommerceData.class)));
-                } else if ("whispers".equals(topicName) && (type.equals("whisper_sent") || type.equals("whisper_received"))) {
+                } else if ("whispers".equals(topicName)) {
                     // Whisper data is escaped Json cast into a String
                     JsonNode msgDataParsed = TypeConvert.jsonToObject(msgData.asText(), JsonNode.class);
 
-                    //TypeReference<T> allows type parameters (unlike Class<T>) and avoids needing @SuppressWarnings("unchecked")
-                    Map<String, Object> tags = TypeConvert.convertValue(msgDataParsed.path("tags"), new TypeReference<Map<String, Object>>() {});
+                    if (type.equals("whisper_sent") || type.equals("whisper_received")) {
+                        //TypeReference<T> allows type parameters (unlike Class<T>) and avoids needing @SuppressWarnings("unchecked")
+                        Map<String, Object> tags = TypeConvert.convertValue(msgDataParsed.path("tags"), new TypeReference<Map<String, Object>>() {});
 
-                    String fromId = msgDataParsed.get("from_id").asText();
-                    String displayName = (String) tags.get("display_name");
-                    EventUser eventUser = new EventUser(fromId, displayName);
+                        String fromId = msgDataParsed.get("from_id").asText();
+                        String displayName = (String) tags.get("display_name");
+                        EventUser eventUser = new EventUser(fromId, displayName);
 
-                    String body = msgDataParsed.get("body").asText();
+                        String body = msgDataParsed.get("body").asText();
 
-                    Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags, new HashMap<>(), fromId, botOwnerIds);
+                        Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags, new HashMap<>(), fromId, botOwnerIds);
 
-                    PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
-                    eventManager.publish(privateMessageEvent);
+                        PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
+                        eventManager.publish(privateMessageEvent);
+                    } else if ("thread".equals(type)) {
+                        WhisperThread thread = TypeConvert.convertValue(msgDataParsed, WhisperThread.class);
+                        eventManager.publish(new WhisperThreadUpdateEvent(lastTopicIdentifier, thread));
+                    } else {
+                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
                 } else if ("automod-levels-modification".equals(topicName) && topicParts.length > 1) {
                     if ("automod_levels_modified".equals(type)) {
                         AutomodLevelsModified data = TypeConvert.convertValue(msgData, AutomodLevelsModified.class);
