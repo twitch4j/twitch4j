@@ -28,7 +28,7 @@ public class MessageParser {
 
     @Nullable
     @ApiStatus.Internal
-    public IRCMessageEvent parse(String raw, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
+    public IRCMessageEvent parse(@NotNull String raw, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
         final int len = raw.length();
         if (len == 0) return null;
         final char[] chars = raw.toCharArray();
