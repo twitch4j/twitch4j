@@ -1,5 +1,7 @@
 package com.github.twitch4j.eventsub;
 
+import com.github.twitch4j.common.annotation.Unofficial;
+
 public enum EventSubSubscriptionStatus {
 
     /**
@@ -41,6 +43,12 @@ public enum EventSubSubscriptionStatus {
      * Twitch revoked your subscription because the subscribed to subscription type and version is no longer supported.
      */
     VERSION_REMOVED,
+
+    /**
+     * A beta eventsub subscription is temporarily not enabled due to maintenance.
+     */
+    @Unofficial
+    BETA_MAINTENANCE,
 
     /**
      * When you connect to the server, you must create a subscription within 10 seconds or the connection is closed.
