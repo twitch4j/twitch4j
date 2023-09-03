@@ -185,6 +185,7 @@ public class TwitchHelixBuilder {
             .requestInterceptor(new TwitchHelixClientIdInterceptor(userAgent, tokenManager))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
             .retryer(new Retryer.Default(500, timeout, 2))
+            .decodeVoid()
             .target(TwitchHelix.class, baseUrl);
     }
 }
