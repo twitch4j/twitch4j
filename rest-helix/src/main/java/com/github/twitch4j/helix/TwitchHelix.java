@@ -1091,7 +1091,17 @@ public interface TwitchHelix {
     );
 
     /**
-     * Returns a list of channels (those that have streamed within the past 6 months) that match the query either entirely or partially
+     * Gets the channels that match the specified query and have streamed content within the past 6 months.
+     * <p>
+     * The fields that the API uses for comparison depends on the value that the {@code live_only} query parameter is set to.
+     * If live_only is false, the API matches on the broadcaster’s login name.
+     * However, if {@code live_only} is true, the API matches on the broadcaster’s name and category name.
+     * <p>
+     * To match, the beginning of the broadcaster’s name or category must match the query string.
+     * The comparison is case-insensitive. If the query string is angel_of_death, it matches all names that begin with angel_of_death.
+     * However, if the query string is a phrase like angel of death, it matches to names starting with angelofdeath or names starting with angel_of_death.
+     * <p>
+     * At the time of writing, {@code query} does <a href="https://github.com/twitchdev/issues/issues/545">not</a> search stream titles.
      *
      * @param authToken Auth Token
      * @param query the search query
