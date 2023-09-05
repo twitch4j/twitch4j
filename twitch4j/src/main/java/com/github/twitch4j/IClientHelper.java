@@ -47,7 +47,7 @@ public interface IClientHelper extends AutoCloseable {
      * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
      * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
      * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
-     * due to Twitch restrictions implemented on 2023-08-03.
+     * due to Twitch restrictions implemented on 2023-09-12.
      *
      * @param channelId   Channel Id
      * @param channelName Channel Name
@@ -168,7 +168,7 @@ public interface IClientHelper extends AutoCloseable {
      * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
      * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
      * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
-     * due to Twitch restrictions implemented on 2023-08-03.
+     * due to Twitch restrictions implemented on 2023-09-12.
      *
      * @param channelName Channel Name
      */
@@ -193,7 +193,7 @@ public interface IClientHelper extends AutoCloseable {
      * For {@link FollowEvent} to fire, defaultAuthToken must be a user access token from a moderator of the channel
      * with the {@link com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_FOLLOWERS_READ} scope.
      * Otherwise, the client helper can only fire {@link ChannelFollowCountUpdateEvent}
-     * due to Twitch restrictions implemented on 2023-08-03.
+     * due to Twitch restrictions implemented on 2023-09-12.
      *
      * @param channelNames the channel names to be added
      */
