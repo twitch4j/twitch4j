@@ -2683,7 +2683,8 @@ public interface TwitchHelix {
      * @return FollowList
      * @see <a href="https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322">Deprecation Announcement</a>
      * @deprecated Without prior notice, Twitch has restricted this endpoint to client_id's that were using it before 2023-02-18.
-     * Further, Twitch will shutdown this endpoint on 2023-08-03 in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
+     * Further, Twitch will shutdown this endpoint on <a href="https://discuss.dev.twitch.tv/t/legacy-follows-api-and-eventsub-shutdown-timeline-updated">2023-09-12</a>
+     * in favor of {@link #getChannelFollowers(String, String, String, Integer, String)} and {@link #getFollowedChannels(String, String, String, Integer, String)}.
      */
     @Deprecated
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
