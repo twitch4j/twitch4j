@@ -95,6 +95,12 @@ public class Video {
      * @return String
      */
     public String getThumbnailUrl(int width, int height) {
+        // https://github.com/twitchdev/issues/issues/822
+        if (thumbnailUrl.contains("_404/404_processing_")) {
+            width = 320;
+            height = 180;
+        }
+
         return StringUtils.replaceEach(
             this.getThumbnailUrl(),
             new String[] { "%{width}", "%{height}" },
