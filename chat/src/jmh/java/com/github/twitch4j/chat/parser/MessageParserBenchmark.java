@@ -1,10 +1,7 @@
 package com.github.twitch4j.chat.parser;
 
-import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.BenchmarkFileUtils;
 import com.github.twitch4j.chat.util.MessageParser;
-import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -26,13 +23,10 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Thread)
 public class MessageParserBenchmark {
-    private static final Pattern MESSAGE_PATTERN = Pattern.compile("^(?:@(?<tags>\\S+?)\\s)?(?<clientName>\\S+?)\\s(?<command>[A-Z0-9]+)\\s?(?:(?<login>\\S+)\\s=\\s)?(?:#(?<channel>\\S*?)\\s?)?(?<payload>[:\\-+](?<message>.+))?$");
-
     private Map<String, String> idToName;
     private Map<String, String> nameToId;
 
     private String[] rawMessages;
-    private String[] rawTags;
 
     @Setup
     public void setupBenchmark() throws IOException {
@@ -45,14 +39,6 @@ public class MessageParserBenchmark {
         // parse raw messages
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(BenchmarkFileUtils.resolveFilePath("benchmark-chat-jprochazk.txt").toPath())))) {
             rawMessages = reader.lines().limit(1000).toArray(String[]::new);
-            rawTags = reader.lines().limit(1000).map(input -> {
-                Matcher matcher = MESSAGE_PATTERN.matcher(input);
-                if (matcher.matches()) {
-                    return matcher.group("tags");
-                } else {
-                    return "";
-                }
-            }).toArray(String[]::new);
         }
     }
 
@@ -70,19 +56,9 @@ public class MessageParserBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @OutputTimeUnit(TimeUnit.MICROSECONDS)
     @OperationsPerInvocation(1000)
-    public void parse1kTagsOld(Blackhole bh) {
-        for (int i = 0; i < 1000; i++) {
-            bh.consume(IRCMessageEvent.parseTags(rawTags[i]));
-        }
-    }
-
-    @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MICROSECONDS)
-    @OperationsPerInvocation(1000)
     public void parse1kTags(Blackhole bh) {
         for (int i = 0; i < 1000; i++) {
-            bh.consume(MessageParser.parseTags(rawTags[i], new HashMap<>(32)));
+            bh.consume(MessageParser.parseTags(rawMessages[i].toCharArray(), new HashMap<>(32)));
         }
     }
 
