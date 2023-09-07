@@ -18,30 +18,40 @@ public class ChatReply {
     public static final String REPLY_MSG_ID_TAG_NAME = "reply-parent-msg-id";
 
     /**
-     * The msgId of the original message being replied to.
+     * An ID that uniquely identifies the direct parent message that this message is replying to.
      */
     @NonNull
     String messageId;
 
     /**
-     * The text of the original message being replied to.
+     * The text of the direct parent message.
      */
     String messageBody;
 
     /**
-     * The id of the user who originally sent the message being replied to.
+     * An ID that identifies the sender of the direct parent message.
      */
     String userId;
 
     /**
-     * The login name of the user who originally sent the message being replied to.
+     * The login name of the sender of the direct parent message.
      */
     String userLogin;
 
     /**
-     * The display name of the user who originally sent the message being replied to.
+     * The display name of the sender of the direct parent message.
      */
     String displayName;
+
+    /**
+     * An ID that uniquely identifies the top-level parent message of the reply thread that this message is replying to.
+     */
+    String threadMessageId;
+
+    /**
+     * The login name of the sender of the top-level parent message.
+     */
+    String threadUserLogin;
 
     /**
      * Attempts to parse a {@link ChatReply} instance from chat tags.
@@ -60,7 +70,9 @@ public class ChatReply {
             unescapeTagValue(tags.get("reply-parent-msg-body")),
             Objects.toString(tags.get("reply-parent-user-id"), null),
             Objects.toString(tags.get("reply-parent-user-login"), null),
-            unescapeTagValue(tags.get("reply-parent-display-name"))
+            unescapeTagValue(tags.get("reply-parent-display-name")),
+            Objects.toString(tags.get("reply-thread-parent-msg-id"), null),
+            Objects.toString(tags.get("reply-thread-parent-user-login"), null)
         );
     }
 }
