@@ -646,7 +646,7 @@ public class TwitchClientHelper implements IClientHelper {
     private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
         return PaginationUtil.getPaginated(
             cursor -> {
-                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt);
+                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt, null);
                 try {
                     ClipList result = commandGetClips.execute();
                     clipBackoff.get().reset(); // successful api call
