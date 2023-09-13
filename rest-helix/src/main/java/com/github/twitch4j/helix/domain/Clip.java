@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.time.Instant;
 import java.util.Date;
@@ -66,6 +67,11 @@ public class Clip {
 
     /** The zero-based offset, in seconds, to where the clip starts in the video (VOD) or stream. */
     private Integer vodOffset;
+
+    /** Whether the clip is featured. */
+    @Accessors(fluent = true)
+    @JsonProperty("is_featured")
+    private Boolean isFeatured;
 
     /**
      * @return the timestamp for the clip's creation

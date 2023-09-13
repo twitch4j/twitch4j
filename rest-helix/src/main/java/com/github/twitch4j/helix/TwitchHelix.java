@@ -1345,23 +1345,55 @@ public interface TwitchHelix {
     /**
      * Gets clip information by clip ID (one or more), broadcaster ID (one only), or game ID (one only).
      * <p>
+     * The id, game_id, and broadcaster_id query parameters are mutually exclusive, and at least one must be specified.
+     * <p>
      * For clips returned by game_id or broadcaster_id, the list is in descending order by view count.
      * For lists returned by id, the list is in the same order as the input IDs.
      *
      * @param authToken User or App access token.
      * @param broadcasterId ID of the broadcaster for whom clips are returned.
      * @param gameId        ID of the game for which clips are returned.
-     * @param id            ID of the clip being queried. Limit: 100.
+     * @param ids           ID of the clip being queried. Limit: 100.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param before        Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param startedAt     Starting date/time for returned clips, in RFC3339 format.
+     * @param endedAt       Ending date/time for returned clips, in RFC3339 format. If not specified, the time window is the start date plus one week.
+     * @param isFeatured    Whether the response includes featured clips. If true, returns only clips that are featured. If false, returns only clips that aren’t featured. All clips are returned if this parameter is not present.
+     * @return {@link ClipList}
+     */
+    @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}&is_featured={is_featured}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ClipList> getClips(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("game_id") String gameId,
+        @Param("id") List<String> ids,
+        @Param("after") String after,
+        @Param("before") String before,
+        @Param("first") Integer limit,
+        @Param("started_at") Instant startedAt,
+        @Param("ended_at") Instant endedAt,
+        @Param("is_featured") Boolean isFeatured
+    );
+
+    /**
+     * Gets one or more video clips that were captured from streams.
+     *
+     * @param authToken User or App access token.
+     * @param broadcasterId ID of the broadcaster for whom clips are returned.
+     * @param gameId        ID of the game for which clips are returned.
+     * @param id            ID of the clip being queried.
      * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param before        Cursor for backward pagination: tells the server where to start fetching the next set of results, in a multi-page response.
      * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @param startedAt     Starting date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
      * @param endedAt       Ending date/time for returned clips, in RFC3339 format. (Note that the seconds value is ignored.)
      * @return ClipList Clip List
+     * @deprecated in favor of {@link #getClips(String, String, String, List, String, String, Integer, Instant, Instant, Boolean)}
      */
-    @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}")
-    @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ClipList> getClips(
+    @Deprecated
+    default HystrixCommand<ClipList> getClips(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
@@ -1371,7 +1403,9 @@ public interface TwitchHelix {
         @Param("first") Integer limit,
         @Param("started_at") Instant startedAt,
         @Param("ended_at") Instant endedAt
-    );
+    ) {
+        return getClips(authToken, broadcasterId, gameId, Collections.singletonList(id), after, before, limit, startedAt, endedAt, null);
+    }
 
     /**
      * Gets information about Twitch content classification labels.
