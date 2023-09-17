@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.github.twitch4j.common.util.DonationAmount;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class CharityCampaignDonation {
     /**
      * An object that contains the amount of money that the user donated.
      */
+    @JsonAlias("target_amount") // https://github.com/twitchdev/issues/issues/838
     private DonationAmount amount;
 
 }
