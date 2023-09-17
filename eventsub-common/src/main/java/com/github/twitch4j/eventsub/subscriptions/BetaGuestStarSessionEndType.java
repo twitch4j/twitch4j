@@ -7,8 +7,12 @@ import org.jetbrains.annotations.ApiStatus;
 /**
  * The running Guest Star session is ended by the host, or automatically by the system.
  * <p>
- * Must have channel:read:guest_star or channel:manage:guest_star scope, from the channel owner.
+ * Must have channel:read:guest_star, channel:manage:guest_star,
+ * moderator:read:guest_star or moderator:manage:guest_star
+ * scope from the channel owner or a guest star moderator.
  *
+ * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+ * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
  */
