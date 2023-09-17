@@ -5,7 +5,7 @@ import com.github.twitch4j.eventsub.events.GuestStarGuestUpdateEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Notifies when a guest moves between interaction states in an active Guest Star session.
+ * Notifies when a guest or a slot is updated in an active Guest Star session.
  * <p>
  * Must have channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star scope.
  *

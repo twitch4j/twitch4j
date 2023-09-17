@@ -16,8 +16,9 @@ import org.jetbrains.annotations.Nullable;
 public abstract class ChannelGuestStarSlotEvent extends EventSubModerationEvent {
 
     /**
-     * The ID of the slot that was updated, or null
-     * if the guest is in the {@link com.github.twitch4j.eventsub.domain.GuestStarState#INVITED} state.
+     * The ID of the slot assignment the guest is assigned to, or null if the guest is <i>not</i> in the
+     * {@link com.github.twitch4j.eventsub.domain.GuestStarState#LIVE} or
+     * {@link com.github.twitch4j.eventsub.domain.GuestStarState#BACKSTAGE} state.
      *
      * @see GuestStarGuestUpdateEvent#getState()
      */
