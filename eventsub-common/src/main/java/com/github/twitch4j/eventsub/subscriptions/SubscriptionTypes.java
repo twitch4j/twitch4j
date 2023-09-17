@@ -45,7 +45,6 @@ public class SubscriptionTypes {
     public final @ApiStatus.Experimental BetaGuestStarSessionBeginType BETA_GUEST_STAR_SESSION_BEGIN;
     public final @ApiStatus.Experimental BetaGuestStarSessionEndType BETA_GUEST_STAR_SESSION_END;
     public final @ApiStatus.Experimental BetaGuestStarSettingsUpdateType BETA_GUEST_STAR_SETTINGS_UPDATE;
-    public final @ApiStatus.Experimental BetaGuestStarSlotUpdateType BETA_GUEST_STAR_SLOT_UPDATE;
     public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
     public final HypeTrainEndType HYPE_TRAIN_END;
     public final HypeTrainProgressType HYPE_TRAIN_PROGRESS;
@@ -104,7 +103,6 @@ public class SubscriptionTypes {
                 BETA_GUEST_STAR_SESSION_BEGIN = new BetaGuestStarSessionBeginType(),
                 BETA_GUEST_STAR_SESSION_END = new BetaGuestStarSessionEndType(),
                 BETA_GUEST_STAR_SETTINGS_UPDATE = new BetaGuestStarSettingsUpdateType(),
-                BETA_GUEST_STAR_SLOT_UPDATE = new BetaGuestStarSlotUpdateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
                 HYPE_TRAIN_END = new HypeTrainEndType(),
                 HYPE_TRAIN_PROGRESS = new HypeTrainProgressType(),
