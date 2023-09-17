@@ -198,7 +198,6 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
 
     @Unofficial
-    @Deprecated
     default PubSubSubscription listenForAdsEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "ads." + channelId);
     }

@@ -50,6 +50,7 @@ import com.github.twitch4j.pubsub.domain.HypeTrainStart;
 import com.github.twitch4j.pubsub.domain.Leaderboard;
 import com.github.twitch4j.pubsub.domain.LowTrustUserNewMessage;
 import com.github.twitch4j.pubsub.domain.LowTrustUserTreatmentUpdate;
+import com.github.twitch4j.pubsub.domain.MidrollRequest;
 import com.github.twitch4j.pubsub.domain.ModeratorUnbanRequestAction;
 import com.github.twitch4j.pubsub.domain.PinnedChatData;
 import com.github.twitch4j.pubsub.domain.PointsSpent;
@@ -113,6 +114,7 @@ import com.github.twitch4j.pubsub.events.HypeTrainRewardsEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserNewMessageEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserTreatmentUpdateEvent;
+import com.github.twitch4j.pubsub.events.MidrollRequestEvent;
 import com.github.twitch4j.pubsub.events.ModUnbanRequestActionEvent;
 import com.github.twitch4j.pubsub.events.OnsiteNotificationCreationEvent;
 import com.github.twitch4j.pubsub.events.PinnedChatCreatedEvent;
@@ -471,6 +473,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                     if (topicParts.length == 3 && "automod_caught_message".equalsIgnoreCase(type)) {
                         AutomodCaughtMessageData data = TypeConvert.convertValue(msgData, AutomodCaughtMessageData.class);
                         eventManager.publish(new AutomodCaughtMessageEvent(topicParts[2], data));
+                    } else {
+                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
+                } else if ("ads".equals(topicName)) {
+                    if ("midroll_request".equals(type)) {
+                        MidrollRequest midroll = TypeConvert.convertValue(msgData, MidrollRequest.class);
+                        eventManager.publish(new MidrollRequestEvent(lastTopicIdentifier, midroll));
                     } else {
                         log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
                     }
