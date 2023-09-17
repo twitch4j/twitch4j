@@ -90,6 +90,7 @@ import com.github.twitch4j.pubsub.events.ChannelUnbanRequestCreateEvent;
 import com.github.twitch4j.pubsub.events.ChannelUnbanRequestUpdateEvent;
 import com.github.twitch4j.pubsub.events.CharityCampaignDonationEvent;
 import com.github.twitch4j.pubsub.events.CharityCampaignStatusEvent;
+import com.github.twitch4j.pubsub.events.ChatHighlightEvent;
 import com.github.twitch4j.pubsub.events.ChatModerationEvent;
 import com.github.twitch4j.pubsub.events.CheerbombEvent;
 import com.github.twitch4j.pubsub.events.ClaimAvailableEvent;
@@ -847,6 +848,12 @@ public class TwitchPubSub implements ITwitchPubSub {
                     boolean hasId = topicName.endsWith("d");
                     VideoPlaybackData data = TypeConvert.jsonToObject(rawMessage, VideoPlaybackData.class);
                     eventManager.publish(new VideoPlaybackEvent(hasId ? lastTopicIdentifier : null, hasId ? null : lastTopicIdentifier, data));
+                } else if ("channel-chat-highlights".equals(topicName)) {
+                    if ("chat-highlight".equals(type)) {
+                        eventManager.publish(TypeConvert.convertValue(msgData, ChatHighlightEvent.class));
+                    } else {
+                        log.warn("Unparsable Message: " + message.getType() + "|" + message.getData());
+                    }
                 } else if ("channel-unban-requests".equals(topicName) && topicParts.length == 3) {
                     String userId = topicParts[1];
                     String channelId = topicParts[2];
