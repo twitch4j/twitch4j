@@ -18,7 +18,6 @@ public enum HandlerRegistry {
         Map<String, TopicHandler> map = new HashMap<>();
         Stream.of(
             // official topics
-            new AutoModLevelHandler(),
             new AutoModQueueHandler(),
             new BitsHandler(),
             new BitsBadgeHandler(),
@@ -32,6 +31,7 @@ public enum HandlerRegistry {
             // unofficial topics
             new AdsHandler(),
             new AdsManagerHandler(),
+            new AutoModLevelHandler(),
             new BoostHandler(),
             new CharityHandler(),
             new ChatroomHandler(),
