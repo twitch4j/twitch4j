@@ -37,11 +37,6 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
     private String message;
 
     /**
-     * Permissions of the user
-     */
-    private Set<CommandPermission> permissions;
-
-    /**
      * The exact number of months the user has been a subscriber, or zero if not subscribed
      */
     private int subscriberMonths;
@@ -58,14 +53,20 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
     @Getter(lazy = true)
     private final String nonce = getMessageEvent().getNonce().orElse(null);
 
-    public AbstractChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message, Set<CommandPermission> permissions) {
+    public AbstractChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message) {
         super(channel);
         this.messageEvent = messageEvent;
         this.user = user;
         this.message = message;
-        this.permissions = permissions;
         this.subscriberMonths = messageEvent.getSubscriberMonths().orElse(0);
         this.subscriptionTier = messageEvent.getSubscriptionTier().orElse(0);
+    }
+
+    /**
+     * Permissions of the user
+     */
+    public Set<CommandPermission> getPermissions() {
+        return messageEvent.getClientPermissions();
     }
 
     /**

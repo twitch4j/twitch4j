@@ -121,11 +121,11 @@ public class IRCEventHandler {
                 // Dispatch Event
                 if (message.startsWith("\u0001ACTION ") && message.endsWith("\u0001")) {
                     // Action
-                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, message.substring(8, message.length() - 1), event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageActionEvent(channel, event, user, message.substring(8, message.length() - 1)));
                     return true;
                 } else {
                     // Regular Message
-                    eventManager.publish(new ChannelMessageEvent(channel, event, user, message, event.getClientPermissions()));
+                    eventManager.publish(new ChannelMessageEvent(channel, event, user, message));
                     return true;
                 }
             }
