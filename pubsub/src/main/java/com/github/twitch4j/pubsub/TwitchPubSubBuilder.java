@@ -8,6 +8,7 @@ import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
+import com.github.twitch4j.pubsub.domain.PubSubResponsePayload;
 import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
 /**
  * Twitch PubSub Builder
@@ -87,6 +89,15 @@ public class TwitchPubSubBuilder {
     private IBackoffStrategy connectionBackoffStrategy = null;
 
     /**
+     * Consumer of PubSub messages for topics that did not match internal handlers.
+     * <p>
+     * By default, Twitch4J simply logs these payloads, but this consumer can be utilized by users
+     * to implement new logic, such as support for more undocumented topics.
+     */
+    @With
+    private Consumer<PubSubResponsePayload> fallbackTopicHandler = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch PubSub Builder
@@ -108,7 +119,7 @@ public class TwitchPubSubBuilder {
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
 
-        return new TwitchPubSub(this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay);
+        return new TwitchPubSub(this.websocketConnection, this.eventManager, scheduledThreadPoolExecutor, this.proxyConfig, this.botOwnerIds, this.wsPingPeriod, this.connectionBackoffStrategy, this.wsCloseDelay, this.fallbackTopicHandler);
     }
 
     /**
