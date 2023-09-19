@@ -176,7 +176,7 @@ class ChatExtensionsTest {
     private val testChannelJoinEvent1 = ChannelJoinEvent(testChannel1, testUser)
     private val testChannelJoinEvent2 = ChannelJoinEvent(testChannel2, testUser)
     private val testChannelMessageEvent1 =
-        ChannelMessageEvent(testChannel1, testIrcMessageEvent, testUser, "TestMessage", emptySet())
+        ChannelMessageEvent(testChannel1, testIrcMessageEvent, testUser, "TestMessage")
     private val testChannelMessageEvent2 =
-        ChannelMessageEvent(testChannel2, testIrcMessageEvent, testUser, "TestMessage", emptySet())
+        ChannelMessageEvent(testChannel2, testIrcMessageEvent, testUser, "TestMessage")
 }

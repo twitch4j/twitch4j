@@ -3,7 +3,6 @@ package com.github.twitch4j.chat.events.channel;
 import com.github.twitch4j.chat.events.AbstractChannelMessageEvent;
 import com.github.twitch4j.chat.util.ChatCrowdChant;
 import com.github.twitch4j.common.annotation.Unofficial;
-import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.enums.HypeChatLevel;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * This event gets called when a message is received in a channel.
@@ -53,15 +51,14 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
      * @param messageEvent The raw message event
      * @param user         The user who triggered the event.
      * @param message      The plain text of the message.
-     * @param permissions  The permissions of the triggering user.
      */
     public ChannelMessageEvent(
         EventChannel channel,
         IRCMessageEvent messageEvent,
-        EventUser user, String message,
-        Set<CommandPermission> permissions
+        EventUser user,
+        String message
     ) {
-        super(channel, messageEvent, user, message, permissions);
+        super(channel, messageEvent, user, message);
     }
 
     /**
