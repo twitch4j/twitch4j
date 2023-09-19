@@ -25,6 +25,8 @@ public enum HandlerRegistry {
             new ChannelPointsHandler(),
             new ModeratorHandler(),
             new SubscriptionHandler(),
+            new SuspiciousHandler(),
+            new UserModeratedHandler(),
             new WhispersHandler(),
 
             // unofficial topics
@@ -47,10 +49,8 @@ public enum HandlerRegistry {
             new RaidHandler(),
             new ShieldHandler(),
             new ShoutoutHandler(),
-            new SuspiciousHandler(),
             new TrainHandler(),
             new UnbanRequestHandler(),
-            new UserModeratedHandler(),
             new UserPointsHandler(),
             new UserPredictionHandler(),
             new UserUnbanRequestHandler()
