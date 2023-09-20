@@ -48,7 +48,7 @@ subprojects {
 	}
 
 	project.extensions.getByType(LombokExtension::class).apply {
-		version.set("1.18.28")
+		version.set("1.18.30")
 		disableConfig.set(true)
 	}
 
