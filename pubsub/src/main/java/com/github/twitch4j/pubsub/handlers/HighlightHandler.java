@@ -1,11 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
-import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.events.ChatHighlightEvent;
-
-import java.util.Collection;
 
 class HighlightHandler implements TopicHandler {
     @Override
@@ -14,9 +10,9 @@ class HighlightHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        if ("chat-highlight".equals(message.getType())) {
-            eventManager.publish(TypeConvert.convertValue(message.getMessageData(), ChatHighlightEvent.class));
+    public boolean handle(Args args) {
+        if ("chat-highlight".equals(args.getType())) {
+            args.getEventManager().publish(TypeConvert.convertValue(args.getData(), ChatHighlightEvent.class));
             return true;
         }
         return false;

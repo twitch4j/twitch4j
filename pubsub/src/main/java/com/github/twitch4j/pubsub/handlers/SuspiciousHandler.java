@@ -3,15 +3,12 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.BanSharingSettings;
 import com.github.twitch4j.pubsub.domain.LowTrustUserNewMessage;
 import com.github.twitch4j.pubsub.domain.LowTrustUserTreatmentUpdate;
 import com.github.twitch4j.pubsub.events.BanSharingSettingsUpdateEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserNewMessageEvent;
 import com.github.twitch4j.pubsub.events.LowTrustUserTreatmentUpdateEvent;
-
-import java.util.Collection;
 
 class SuspiciousHandler implements TopicHandler {
     @Override
@@ -20,12 +17,14 @@ class SuspiciousHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
+    public boolean handle(Args args) {
+        String[] topicParts = args.getTopicParts();
         if (topicParts.length != 3) return false;
         String userId = topicParts[1];
         String channelId = topicParts[2];
-        String type = message.getType();
-        JsonNode msgData = message.getMessageData();
+        String type = args.getType();
+        JsonNode msgData = args.getData();
+        IEventManager eventManager = args.getEventManager();
         if ("low_trust_user_new_message".equals(type)) {
             eventManager.publish(new LowTrustUserNewMessageEvent(userId, channelId, TypeConvert.convertValue(msgData, LowTrustUserNewMessage.class)));
             return true;

@@ -1,6 +1,5 @@
 package com.github.twitch4j.pubsub;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
@@ -299,17 +298,13 @@ public class TwitchPubSub implements ITwitchPubSub {
                 String topic = message.getData().getTopic();
                 String[] topicParts = StringUtils.split(topic, '.');
                 String topicName = topicParts[0];
-                String lastTopicIdentifier = topicParts[topicParts.length - 1];
-                String type = message.getData().getMessage().getType();
-                JsonNode msgData = message.getData().getMessage().getMessageData();
-                String rawMessage = message.getData().getMessage().getRawMessage();
 
                 // Handle Messages
                 TopicHandler handler = HandlerRegistry.INSTANCE.getHandlers().get(topicName);
-                boolean fallback = false;
+                boolean fallback;
                 if (handler != null) {
                     try {
-                        fallback = !handler.handle(eventManager, topicParts, message.getData().getMessage(), botOwnerIds);
+                        fallback = !handler.handle(new TopicHandler.Args(eventManager, topicParts, message.getData().getMessage(), botOwnerIds));
                     } catch (Exception e) {
                         fallback = true;
                         log.warn("PubSub: Encountered exception when parsing message", e);

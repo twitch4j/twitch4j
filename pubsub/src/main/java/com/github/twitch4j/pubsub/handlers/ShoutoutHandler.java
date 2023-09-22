@@ -1,12 +1,8 @@
 package com.github.twitch4j.pubsub.handlers;
 
-import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.CreateShoutoutData;
 import com.github.twitch4j.pubsub.events.ShoutoutCreatedEvent;
-
-import java.util.Collection;
 
 class ShoutoutHandler implements TopicHandler {
     @Override
@@ -15,10 +11,10 @@ class ShoutoutHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        if ("create".equalsIgnoreCase(message.getType())) {
-            CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(message.getMessageData(), CreateShoutoutData.class);
-            eventManager.publish(new ShoutoutCreatedEvent(topicParts[topicParts.length - 1], shoutoutInfo));
+    public boolean handle(Args args) {
+        if ("create".equalsIgnoreCase(args.getType())) {
+            CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(args.getData(), CreateShoutoutData.class);
+            args.getEventManager().publish(new ShoutoutCreatedEvent(args.getLastTopicPart(), shoutoutInfo));
             return true;
         }
         return false;

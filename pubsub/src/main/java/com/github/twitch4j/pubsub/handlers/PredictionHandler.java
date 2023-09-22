@@ -1,12 +1,8 @@
 package com.github.twitch4j.pubsub.handlers;
 
-import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
-
-import java.util.Collection;
 
 class PredictionHandler implements TopicHandler {
     @Override
@@ -15,12 +11,12 @@ class PredictionHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        if ("event-created".equals(message.getType())) {
-            eventManager.publish(TypeConvert.convertValue(message.getMessageData(), PredictionCreatedEvent.class));
+    public boolean handle(Args args) {
+        if ("event-created".equals(args.getType())) {
+            args.getEventManager().publish(TypeConvert.convertValue(args.getData(), PredictionCreatedEvent.class));
             return true;
-        } else if ("event-updated".equals(message.getType())) {
-            eventManager.publish(TypeConvert.convertValue(message.getMessageData(), PredictionUpdatedEvent.class));
+        } else if ("event-updated".equals(args.getType())) {
+            args.getEventManager().publish(TypeConvert.convertValue(args.getData(), PredictionUpdatedEvent.class));
             return true;
         }
         return false;

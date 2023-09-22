@@ -3,7 +3,6 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.BannedTermAdded;
 import com.github.twitch4j.pubsub.domain.BannedTermRemoved;
 import com.github.twitch4j.pubsub.domain.ShieldModeSettings;
@@ -13,8 +12,6 @@ import com.github.twitch4j.pubsub.events.ShieldModeBannedTermRemovedEvent;
 import com.github.twitch4j.pubsub.events.ShieldModeSettingsUpdatedEvent;
 import com.github.twitch4j.pubsub.events.ShieldModeStatusUpdatedEvent;
 
-import java.util.Collection;
-
 class ShieldHandler implements TopicHandler {
     @Override
     public String topicName() {
@@ -22,12 +19,14 @@ class ShieldHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
+    public boolean handle(Args args) {
+        String[] topicParts = args.getTopicParts();
         if (topicParts.length != 3) return false;
         String userId = topicParts[1];
         String channelId = topicParts[2];
-        JsonNode msgData = message.getMessageData();
-        switch (message.getType()) {
+        JsonNode msgData = args.getData();
+        IEventManager eventManager = args.getEventManager();
+        switch (args.getType()) {
             case "ADD_AUTOBAN_TERM":
                 BannedTermAdded termAdded = TypeConvert.convertValue(msgData, BannedTermAdded.class);
                 eventManager.publish(new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded));

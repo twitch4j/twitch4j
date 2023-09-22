@@ -3,7 +3,6 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ClaimData;
@@ -17,7 +16,6 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.github.twitch4j.pubsub.events.UserCommunityGoalContributionEvent;
 
 import java.time.Instant;
-import java.util.Collection;
 
 class UserPointsHandler implements TopicHandler {
     @Override
@@ -26,9 +24,10 @@ class UserPointsHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        JsonNode msgData = message.getMessageData();
-        switch (message.getType()) {
+    public boolean handle(Args args) {
+        JsonNode msgData = args.getData();
+        IEventManager eventManager = args.getEventManager();
+        switch (args.getType()) {
             case "points-earned":
                 final ChannelPointsEarned pointsEarned = TypeConvert.convertValue(msgData, ChannelPointsEarned.class);
                 eventManager.publish(new PointsEarnedEvent(pointsEarned));
@@ -52,7 +51,7 @@ class UserPointsHandler implements TopicHandler {
             case "community-goal-contribution":
                 CommunityGoalContribution goal = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
                 Instant instant = Instant.parse(msgData.path("timestamp").textValue());
-                eventManager.publish(new UserCommunityGoalContributionEvent(topicParts[topicParts.length - 1], instant, goal));
+                eventManager.publish(new UserCommunityGoalContributionEvent(args.getLastTopicPart(), instant, goal));
                 return true;
             case "global-last-viewed-content-updated":
             case "channel-last-viewed-content-updated":

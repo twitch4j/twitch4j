@@ -3,7 +3,6 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
 import com.github.twitch4j.pubsub.domain.CommunityGoalContribution;
@@ -33,12 +32,13 @@ class ChannelPointsHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        JsonNode msgData = message.getMessageData();
+    public boolean handle(Args args) {
+        JsonNode msgData = args.getData();
         String timestampText = msgData.path("timestamp").asText();
         Instant instant = Instant.parse(timestampText);
+        IEventManager eventManager = args.getEventManager();
 
-        switch (message.getType()) {
+        switch (args.getType()) {
             case "reward-redeemed":
                 ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
                 eventManager.publish(new RewardRedeemedEvent(instant, redemption));

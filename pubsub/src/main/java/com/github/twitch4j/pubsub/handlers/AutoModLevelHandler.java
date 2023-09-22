@@ -1,12 +1,8 @@
 package com.github.twitch4j.pubsub.handlers;
 
-import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.AutomodLevelsModified;
 import com.github.twitch4j.pubsub.events.AutomodLevelsModifiedEvent;
-
-import java.util.Collection;
 
 class AutoModLevelHandler implements TopicHandler {
     @Override
@@ -15,10 +11,10 @@ class AutoModLevelHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
-        if (topicParts.length > 1 && "automod_levels_modified".equals(message.getType())) {
-            AutomodLevelsModified data = TypeConvert.convertValue(message.getMessageData(), AutomodLevelsModified.class);
-            eventManager.publish(new AutomodLevelsModifiedEvent(topicParts[topicParts.length - 1], data));
+    public boolean handle(Args args) {
+        if (args.getTopicParts().length > 1 && "automod_levels_modified".equals(args.getType())) {
+            AutomodLevelsModified data = TypeConvert.convertValue(args.getData(), AutomodLevelsModified.class);
+            args.getEventManager().publish(new AutomodLevelsModifiedEvent(args.getLastTopicPart(), data));
             return true;
         }
         return false;

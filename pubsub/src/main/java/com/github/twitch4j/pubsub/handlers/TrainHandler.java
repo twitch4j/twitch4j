@@ -3,7 +3,6 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.twitch4j.common.util.TypeConvert;
-import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import com.github.twitch4j.pubsub.domain.HypeLevelUp;
 import com.github.twitch4j.pubsub.domain.HypeProgression;
 import com.github.twitch4j.pubsub.domain.HypeTrainApproaching;
@@ -22,8 +21,6 @@ import com.github.twitch4j.pubsub.events.HypeTrainRewardsEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
 import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
 
-import java.util.Collection;
-
 class TrainHandler implements TopicHandler {
     @Override
     public String topicName() {
@@ -31,14 +28,16 @@ class TrainHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(IEventManager eventManager, String[] topicParts, PubSubResponsePayloadMessage message, Collection<String> botOwnerIds) {
+    public boolean handle(Args args) {
+        String[] topicParts = args.getTopicParts();
+        IEventManager eventManager = args.getEventManager();
         if (topicParts.length > 2 && "rewards".equals(topicParts[1])) {
-            eventManager.publish(new HypeTrainRewardsEvent(TypeConvert.convertValue(message.getMessageData(), HypeTrainRewardsData.class)));
+            eventManager.publish(new HypeTrainRewardsEvent(TypeConvert.convertValue(args.getData(), HypeTrainRewardsData.class)));
             return true;
         }
-        JsonNode msgData = message.getMessageData();
-        String lastTopicIdentifier = topicParts[topicParts.length - 1];
-        switch (message.getType()) {
+        JsonNode msgData = args.getData();
+        String lastTopicIdentifier = args.getLastTopicPart();
+        switch (args.getType()) {
             case "hype-train-approaching":
                 final HypeTrainApproaching approachData = TypeConvert.convertValue(msgData, HypeTrainApproaching.class);
                 eventManager.publish(new HypeTrainApproachingEvent(approachData));
