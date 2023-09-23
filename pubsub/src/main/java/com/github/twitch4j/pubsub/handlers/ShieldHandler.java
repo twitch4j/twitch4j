@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.BannedTermAdded;
 import com.github.twitch4j.pubsub.domain.BannedTermRemoved;
@@ -19,40 +19,35 @@ class ShieldHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         String[] topicParts = args.getTopicParts();
-        if (topicParts.length != 3) return false;
+        if (topicParts.length != 3) return null;
         String userId = topicParts[1];
         String channelId = topicParts[2];
         JsonNode msgData = args.getData();
-        IEventManager eventManager = args.getEventManager();
         switch (args.getType()) {
             case "ADD_AUTOBAN_TERM":
                 BannedTermAdded termAdded = TypeConvert.convertValue(msgData, BannedTermAdded.class);
-                eventManager.publish(new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded));
-                return true;
+                return (new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded));
 
             case "REMOVE_AUTOBAN_TERM":
                 BannedTermRemoved termRemoved = TypeConvert.convertValue(msgData, BannedTermRemoved.class);
-                eventManager.publish(new ShieldModeBannedTermRemovedEvent(userId, channelId, termRemoved));
-                return true;
+                return (new ShieldModeBannedTermRemovedEvent(userId, channelId, termRemoved));
 
             case "UPDATE_CHANNEL_MODERATION_MODE":
                 ShieldModeStatus shieldModeStatus = TypeConvert.convertValue(msgData, ShieldModeStatus.class);
-                eventManager.publish(new ShieldModeStatusUpdatedEvent(userId, channelId, shieldModeStatus));
-                return true;
+                return (new ShieldModeStatusUpdatedEvent(userId, channelId, shieldModeStatus));
 
             case "UPDATE_CHANNEL_MODERATION_SETTINGS":
                 ShieldModeSettings shieldModeSettings = TypeConvert.convertValue(msgData, ShieldModeSettings.class);
-                eventManager.publish(new ShieldModeSettingsUpdatedEvent(userId, channelId, shieldModeSettings));
-                return true;
+                return (new ShieldModeSettingsUpdatedEvent(userId, channelId, shieldModeSettings));
 
             case "UPDATE_CHANNEL_MODERATION_MODE_SHORTCUT":
                 // do nothing; is_shortcut_enabled is unimportant
-                return true;
+                return new TwitchEvent() {};
 
             default:
-                return false;
+                return null;
         }
     }
 }

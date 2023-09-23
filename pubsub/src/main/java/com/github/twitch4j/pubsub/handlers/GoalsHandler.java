@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.CreatorGoal;
 import com.github.twitch4j.pubsub.events.CreatorGoalEvent;
@@ -11,9 +12,8 @@ class GoalsHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         CreatorGoal creatorGoal = TypeConvert.convertValue(args.getData().path("goal"), CreatorGoal.class);
-        args.getEventManager().publish(new CreatorGoalEvent(args.getLastTopicPart(), args.getType(), creatorGoal));
-        return true;
+        return new CreatorGoalEvent(args.getLastTopicPart(), args.getType(), creatorGoal);
     }
 }

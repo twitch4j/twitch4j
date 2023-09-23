@@ -1,6 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.events.RaidCancelEvent;
 import com.github.twitch4j.pubsub.events.RaidGoEvent;
@@ -13,20 +13,16 @@ class RaidHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
-        IEventManager eventManager = args.getEventManager();
+    public TwitchEvent apply(Args args) {
         switch (args.getType()) {
             case "raid_go_v2":
-                eventManager.publish(TypeConvert.jsonToObject(args.getRawMessage(), RaidGoEvent.class));
-                return true;
+                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidGoEvent.class));
             case "raid_update_v2":
-                eventManager.publish(TypeConvert.jsonToObject(args.getRawMessage(), RaidUpdateEvent.class));
-                return true;
+                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidUpdateEvent.class));
             case "raid_cancel_v2":
-                eventManager.publish(TypeConvert.jsonToObject(args.getRawMessage(), RaidCancelEvent.class));
-                return true;
+                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidCancelEvent.class));
             default:
-                return false;
+                return null;
         }
     }
 }

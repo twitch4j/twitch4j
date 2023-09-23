@@ -4,6 +4,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.config.ProxyConfig;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.TimeUtils;
 import com.github.twitch4j.common.util.TypeConvert;
@@ -301,16 +302,23 @@ public class TwitchPubSub implements ITwitchPubSub {
 
                 // Handle Messages
                 TopicHandler handler = HandlerRegistry.INSTANCE.getHandlers().get(topicName);
-                boolean fallback;
+                boolean fallback = true;
                 if (handler != null) {
+                    TwitchEvent event = null;
                     try {
-                        fallback = !handler.handle(new TopicHandler.Args(eventManager, topicParts, message.getData().getMessage(), botOwnerIds));
+                        event = handler.apply(new TopicHandler.Args(topicParts, message.getData().getMessage(), botOwnerIds));
                     } catch (Exception e) {
-                        fallback = true;
                         log.warn("PubSub: Encountered exception when parsing message", e);
                     }
-                } else {
-                    fallback = true;
+
+                    if (event != null) {
+                        fallback = false;
+                        try {
+                            eventManager.publish(event);
+                        } catch (Exception e) {
+                            log.warn("An event consumer threw an exception while processing a PubSub event", e);
+                        }
+                    }
                 }
                 if (fallback) {
                     fallbackTopicHandler.accept(message.getData());

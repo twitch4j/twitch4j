@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.VideoPlaybackData;
 import com.github.twitch4j.pubsub.events.VideoPlaybackEvent;
@@ -19,11 +20,10 @@ class PlaybackHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         boolean hasId = args.getTopicParts()[0].endsWith("d");
         String lastTopicIdentifier = args.getLastTopicPart();
         VideoPlaybackData data = TypeConvert.jsonToObject(args.getRawMessage(), VideoPlaybackData.class);
-        args.getEventManager().publish(new VideoPlaybackEvent(hasId ? lastTopicIdentifier : null, hasId ? null : lastTopicIdentifier, data));
-        return true;
+        return (new VideoPlaybackEvent(hasId ? lastTopicIdentifier : null, hasId ? null : lastTopicIdentifier, data));
     }
 }

@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.Leaderboard;
 import com.github.twitch4j.pubsub.events.BitsLeaderboardEvent;
@@ -12,17 +13,15 @@ class LeaderboardHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         Leaderboard leaderboard = TypeConvert.jsonToObject(args.getRawMessage(), Leaderboard.class);
         switch (leaderboard.getIdentifier().getDomain()) {
             case "bits-usage-by-channel-v1":
-                args.getEventManager().publish(new BitsLeaderboardEvent(leaderboard));
-                return true;
+                return new BitsLeaderboardEvent(leaderboard);
             case "sub-gifts-sent":
-                args.getEventManager().publish(new SubLeaderboardEvent(leaderboard));
-                return true;
+                return new SubLeaderboardEvent(leaderboard);
             default:
-                return false;
+                return null;
         }
     }
 }

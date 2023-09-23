@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.events.PredictionCreatedEvent;
 import com.github.twitch4j.pubsub.events.PredictionUpdatedEvent;
@@ -11,14 +12,12 @@ class PredictionHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         if ("event-created".equals(args.getType())) {
-            args.getEventManager().publish(TypeConvert.convertValue(args.getData(), PredictionCreatedEvent.class));
-            return true;
+            return (TypeConvert.convertValue(args.getData(), PredictionCreatedEvent.class));
         } else if ("event-updated".equals(args.getType())) {
-            args.getEventManager().publish(TypeConvert.convertValue(args.getData(), PredictionUpdatedEvent.class));
-            return true;
+            return (TypeConvert.convertValue(args.getData(), PredictionUpdatedEvent.class));
         }
-        return false;
+        return null;
     }
 }

@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.CreateShoutoutData;
 import com.github.twitch4j.pubsub.events.ShoutoutCreatedEvent;
@@ -11,12 +12,11 @@ class ShoutoutHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         if ("create".equalsIgnoreCase(args.getType())) {
             CreateShoutoutData shoutoutInfo = TypeConvert.convertValue(args.getData(), CreateShoutoutData.class);
-            args.getEventManager().publish(new ShoutoutCreatedEvent(args.getLastTopicPart(), shoutoutInfo));
-            return true;
+            return new ShoutoutCreatedEvent(args.getLastTopicPart(), shoutoutInfo);
         }
-        return false;
+        return null;
     }
 }

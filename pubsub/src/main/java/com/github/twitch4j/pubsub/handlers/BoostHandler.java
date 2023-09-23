@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.CommunityBoostProgression;
 import com.github.twitch4j.pubsub.events.CommunityBoostProgressionEvent;
@@ -11,12 +12,11 @@ class BoostHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         if ("community-boost-progression".equals(args.getType())) {
             CommunityBoostProgression progression = TypeConvert.convertValue(args.getData(), CommunityBoostProgression.class);
-            args.getEventManager().publish(new CommunityBoostProgressionEvent(progression));
-            return true;
+            return new CommunityBoostProgressionEvent(progression);
         }
-        return false;
+        return null;
     }
 }

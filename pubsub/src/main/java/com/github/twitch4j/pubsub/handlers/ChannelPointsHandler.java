@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
@@ -32,47 +32,38 @@ class ChannelPointsHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         JsonNode msgData = args.getData();
         String timestampText = msgData.path("timestamp").asText();
         Instant instant = Instant.parse(timestampText);
-        IEventManager eventManager = args.getEventManager();
 
         switch (args.getType()) {
             case "reward-redeemed":
                 ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                eventManager.publish(new RewardRedeemedEvent(instant, redemption));
-                return true;
+                return new RewardRedeemedEvent(instant, redemption);
             case "redemption-status-update":
                 ChannelPointsRedemption updatedRedemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                eventManager.publish(new RedemptionStatusUpdateEvent(instant, updatedRedemption));
-                return true;
+                return new RedemptionStatusUpdateEvent(instant, updatedRedemption);
             case "custom-reward-created":
                 ChannelPointsReward newReward = TypeConvert.convertValue(msgData.path("new_reward"), ChannelPointsReward.class);
-                eventManager.publish(new CustomRewardCreatedEvent(instant, newReward));
-                return true;
+                return new CustomRewardCreatedEvent(instant, newReward);
             case "custom-reward-updated":
                 ChannelPointsReward updatedReward = TypeConvert.convertValue(msgData.path("updated_reward"), ChannelPointsReward.class);
-                eventManager.publish(new CustomRewardUpdatedEvent(instant, updatedReward));
-                return true;
+                return new CustomRewardUpdatedEvent(instant, updatedReward);
             case "custom-reward-deleted":
                 ChannelPointsReward deletedReward = TypeConvert.convertValue(msgData.path("deleted_reward"), ChannelPointsReward.class);
-                eventManager.publish(new CustomRewardDeletedEvent(instant, deletedReward));
-                return true;
+                return new CustomRewardDeletedEvent(instant, deletedReward);
             case "update-redemption-statuses-progress":
                 RedemptionProgress redemptionProgress = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
-                eventManager.publish(new UpdateRedemptionProgressEvent(instant, redemptionProgress));
-                return true;
+                return new UpdateRedemptionProgressEvent(instant, redemptionProgress);
             case "update-redemption-statuses-finished":
                 RedemptionProgress redemptionFinished = TypeConvert.convertValue(msgData.path("progress"), RedemptionProgress.class);
-                eventManager.publish(new UpdateRedemptionFinishedEvent(instant, redemptionFinished));
-                return true;
+                return new UpdateRedemptionFinishedEvent(instant, redemptionFinished);
             case "community-goal-contribution":
                 CommunityGoalContribution contribution = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
-                eventManager.publish(new CommunityGoalContributionEvent(instant, contribution));
-                return true;
+                return new CommunityGoalContributionEvent(instant, contribution);
             default:
-                return false;
+                return null;
         }
     }
 }

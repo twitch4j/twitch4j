@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.DeletePinnedChatData;
 import com.github.twitch4j.pubsub.domain.PinnedChatData;
@@ -17,24 +17,20 @@ class PinHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         JsonNode msgData = args.getData();
-        IEventManager eventManager = args.getEventManager();
         switch (args.getType()) {
             case "pin-message":
                 PinnedChatData createdPin = TypeConvert.convertValue(msgData, PinnedChatData.class);
-                eventManager.publish(new PinnedChatCreatedEvent(args.getLastTopicPart(), createdPin));
-                return true;
+                return (new PinnedChatCreatedEvent(args.getLastTopicPart(), createdPin));
             case "update-message":
                 UpdatedPinnedChatTiming updatedPin = TypeConvert.convertValue(msgData, UpdatedPinnedChatTiming.class);
-                eventManager.publish(new PinnedChatTimingUpdatedEvent(args.getLastTopicPart(), updatedPin));
-                return true;
+                return (new PinnedChatTimingUpdatedEvent(args.getLastTopicPart(), updatedPin));
             case "unpin-message":
                 DeletePinnedChatData deletePin = TypeConvert.convertValue(msgData, DeletePinnedChatData.class);
-                eventManager.publish(new PinnedChatDeletedEvent(args.getLastTopicPart(), deletePin));
-                return true;
+                return (new PinnedChatDeletedEvent(args.getLastTopicPart(), deletePin));
             default:
-                return false;
+                return null;
         }
     }
 }

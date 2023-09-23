@@ -3,6 +3,7 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.events.domain.EventUser;
 import com.github.twitch4j.common.events.user.PrivateMessageEvent;
 import com.github.twitch4j.common.util.TwitchUtils;
@@ -21,7 +22,7 @@ class WhispersHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         // Whisper data is escaped Json cast into a String
         JsonNode msgDataParsed = TypeConvert.jsonToObject(args.getData().asText(), JsonNode.class);
         String type = args.getType();
@@ -36,16 +37,12 @@ class WhispersHandler implements TopicHandler {
             String body = msgDataParsed.get("body").asText();
 
             Set<CommandPermission> permissions = TwitchUtils.getPermissionsFromTags(tags, new HashMap<>(), fromId, args.getBotOwnerIds());
-
-            PrivateMessageEvent privateMessageEvent = new PrivateMessageEvent(eventUser, body, permissions);
-            args.getEventManager().publish(privateMessageEvent);
-            return true;
+            return new PrivateMessageEvent(eventUser, body, permissions);
         }
         if ("thread".equals(type)) {
             WhisperThread thread = TypeConvert.convertValue(msgDataParsed, WhisperThread.class);
-            args.getEventManager().publish(new WhisperThreadUpdateEvent(args.getLastTopicPart(), thread));
-            return true;
+            return new WhisperThreadUpdateEvent(args.getLastTopicPart(), thread);
         }
-        return false;
+        return null;
     }
 }

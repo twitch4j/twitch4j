@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.ChannelPointsEarned;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
@@ -24,41 +24,34 @@ class UserPointsHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         JsonNode msgData = args.getData();
-        IEventManager eventManager = args.getEventManager();
         switch (args.getType()) {
             case "points-earned":
                 final ChannelPointsEarned pointsEarned = TypeConvert.convertValue(msgData, ChannelPointsEarned.class);
-                eventManager.publish(new PointsEarnedEvent(pointsEarned));
-                return true;
+                return new PointsEarnedEvent(pointsEarned);
             case "claim-available":
                 final ClaimData claimAvailable = TypeConvert.convertValue(msgData, ClaimData.class);
-                eventManager.publish(new ClaimAvailableEvent(claimAvailable));
-                return true;
+                return new ClaimAvailableEvent(claimAvailable);
             case "claim-claimed":
                 final ClaimData claimClaimed = TypeConvert.convertValue(msgData, ClaimData.class);
-                eventManager.publish(new ClaimClaimedEvent(claimClaimed));
-                return true;
+                return new ClaimClaimedEvent(claimClaimed);
             case "points-spent":
                 final PointsSpent pointsSpent = TypeConvert.convertValue(msgData, PointsSpent.class);
-                eventManager.publish(new PointsSpentEvent(pointsSpent));
-                return true;
+                return new PointsSpentEvent(pointsSpent);
             case "reward-redeemed":
                 final ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
-                eventManager.publish(new RewardRedeemedEvent(Instant.parse(msgData.path("timestamp").asText()), redemption));
-                return true;
+                return new RewardRedeemedEvent(Instant.parse(msgData.path("timestamp").asText()), redemption);
             case "community-goal-contribution":
                 CommunityGoalContribution goal = TypeConvert.convertValue(msgData.path("contribution"), CommunityGoalContribution.class);
                 Instant instant = Instant.parse(msgData.path("timestamp").textValue());
-                eventManager.publish(new UserCommunityGoalContributionEvent(args.getLastTopicPart(), instant, goal));
-                return true;
+                return new UserCommunityGoalContributionEvent(args.getLastTopicPart(), instant, goal);
             case "global-last-viewed-content-updated":
             case "channel-last-viewed-content-updated":
                 // unimportant
-                return true;
+                return new TwitchEvent() {};
             default:
-                return false;
+                return null;
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.HypeLevelUp;
 import com.github.twitch4j.pubsub.domain.HypeProgression;
@@ -28,50 +28,40 @@ class TrainHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         String[] topicParts = args.getTopicParts();
-        IEventManager eventManager = args.getEventManager();
         if (topicParts.length > 2 && "rewards".equals(topicParts[1])) {
-            eventManager.publish(new HypeTrainRewardsEvent(TypeConvert.convertValue(args.getData(), HypeTrainRewardsData.class)));
-            return true;
+            return new HypeTrainRewardsEvent(TypeConvert.convertValue(args.getData(), HypeTrainRewardsData.class));
         }
         JsonNode msgData = args.getData();
         String lastTopicIdentifier = args.getLastTopicPart();
         switch (args.getType()) {
             case "hype-train-approaching":
                 final HypeTrainApproaching approachData = TypeConvert.convertValue(msgData, HypeTrainApproaching.class);
-                eventManager.publish(new HypeTrainApproachingEvent(approachData));
-                return true;
+                return new HypeTrainApproachingEvent(approachData);
             case "hype-train-start":
                 final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
-                eventManager.publish(new HypeTrainStartEvent(startData));
-                return true;
+                return new HypeTrainStartEvent(startData);
             case "hype-train-progression":
                 final HypeProgression progressionData = TypeConvert.convertValue(msgData, HypeProgression.class);
-                eventManager.publish(new HypeTrainProgressionEvent(lastTopicIdentifier, progressionData));
-                return true;
+                return new HypeTrainProgressionEvent(lastTopicIdentifier, progressionData);
             case "hype-train-level-up":
                 final HypeLevelUp levelUpData = TypeConvert.convertValue(msgData, HypeLevelUp.class);
-                eventManager.publish(new HypeTrainLevelUpEvent(lastTopicIdentifier, levelUpData));
-                return true;
+                return new HypeTrainLevelUpEvent(lastTopicIdentifier, levelUpData);
             case "hype-train-end":
                 final HypeTrainEnd endData = TypeConvert.convertValue(msgData, HypeTrainEnd.class);
-                eventManager.publish(new HypeTrainEndEvent(lastTopicIdentifier, endData));
-                return true;
+                return new HypeTrainEndEvent(lastTopicIdentifier, endData);
             case "hype-train-conductor-update":
                 final HypeTrainConductor conductorData = TypeConvert.convertValue(msgData, HypeTrainConductor.class);
-                eventManager.publish(new HypeTrainConductorUpdateEvent(lastTopicIdentifier, conductorData));
-                return true;
+                return new HypeTrainConductorUpdateEvent(lastTopicIdentifier, conductorData);
             case "hype-train-cooldown-expiration":
-                eventManager.publish(new HypeTrainCooldownExpirationEvent(lastTopicIdentifier));
-                return true;
+                return new HypeTrainCooldownExpirationEvent(lastTopicIdentifier);
             case "last-x-experiment-event":
                 // note: this isn't a true hype train event (it can be fired with no train active), but twitch hacked together the feature to use the hype pubsub infrastructure
                 final SupportActivityFeedData lastData = TypeConvert.convertValue(msgData, SupportActivityFeedData.class);
-                eventManager.publish(new SupportActivityFeedEvent(lastTopicIdentifier, lastData));
-                return true;
+                return new SupportActivityFeedEvent(lastTopicIdentifier, lastData);
             default:
-                return false;
+                return null;
         }
     }
 }

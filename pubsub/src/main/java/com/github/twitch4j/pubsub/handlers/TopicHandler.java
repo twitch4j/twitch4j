@@ -1,18 +1,17 @@
 package com.github.twitch4j.pubsub.handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.philippheuer.events4j.api.IEventManager;
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.pubsub.PubSubResponsePayloadMessage;
 import lombok.Value;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Function;
 
-public interface TopicHandler {
+public interface TopicHandler extends Function<TopicHandler.Args, TwitchEvent> {
 
     String topicName();
-
-    boolean handle(Args args);
 
     default Collection<String> topicNames() {
         return Collections.singletonList(topicName());
@@ -20,7 +19,6 @@ public interface TopicHandler {
 
     @Value
     class Args {
-        IEventManager eventManager;
         String[] topicParts;
         PubSubResponsePayloadMessage message;
         Collection<String> botOwnerIds;

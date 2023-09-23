@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.CreatedUnbanRequest;
 import com.github.twitch4j.pubsub.domain.UpdatedUnbanRequest;
@@ -13,20 +14,18 @@ class UnbanRequestHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         String[] topicParts = args.getTopicParts();
-        if (topicParts.length != 3) return false;
+        if (topicParts.length != 3) return null;
         String userId = topicParts[1];
         String channelId = topicParts[2];
         if ("create_unban_request".equals(args.getType())) {
             CreatedUnbanRequest request = TypeConvert.convertValue(args.getData(), CreatedUnbanRequest.class);
-            args.getEventManager().publish(new ChannelUnbanRequestCreateEvent(userId, channelId, request));
-            return true;
+            return new ChannelUnbanRequestCreateEvent(userId, channelId, request);
         } else if ("update_unban_request".equals(args.getType())) {
             UpdatedUnbanRequest request = TypeConvert.convertValue(args.getData(), UpdatedUnbanRequest.class);
-            args.getEventManager().publish(new ChannelUnbanRequestUpdateEvent(userId, channelId, request));
-            return true;
+            return new ChannelUnbanRequestUpdateEvent(userId, channelId, request);
         }
-        return false;
+        return null;
     }
 }

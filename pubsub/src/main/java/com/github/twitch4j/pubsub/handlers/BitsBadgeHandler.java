@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.handlers;
 
+import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.domain.BitsBadgeData;
 import com.github.twitch4j.pubsub.events.ChannelBitsBadgeUnlockEvent;
@@ -11,9 +12,8 @@ class BitsBadgeHandler implements TopicHandler {
     }
 
     @Override
-    public boolean handle(Args args) {
+    public TwitchEvent apply(Args args) {
         BitsBadgeData data = TypeConvert.jsonToObject(args.getRawMessage(), BitsBadgeData.class);
-        args.getEventManager().publish(new ChannelBitsBadgeUnlockEvent(data));
-        return true;
+        return (new ChannelBitsBadgeUnlockEvent(data));
     }
 }
