@@ -560,6 +560,11 @@ public class TwitchChat implements ITwitchChat {
                         sendTextToWebSocket("PONG :tmi.twitch.tv", true);
                         log.debug("Responding to PING request!");
                     }
+                    // - Reconnect
+                    else if (message.equalsIgnoreCase(":tmi.twitch.tv RECONNECT")) {
+                        log.debug("Received RECONNECT request");
+                        this.reconnect();
+                    }
                     // - Login failed.
                     else if (message.equalsIgnoreCase(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
                         log.error("Invalid IRC Credentials. Login failed!");
