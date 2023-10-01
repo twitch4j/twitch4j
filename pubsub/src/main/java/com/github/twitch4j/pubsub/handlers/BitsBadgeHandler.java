@@ -14,6 +14,6 @@ class BitsBadgeHandler implements TopicHandler {
     @Override
     public TwitchEvent apply(Args args) {
         BitsBadgeData data = TypeConvert.jsonToObject(args.getRawMessage(), BitsBadgeData.class);
-        return (new ChannelBitsBadgeUnlockEvent(data));
+        return new ChannelBitsBadgeUnlockEvent(data);
     }
 }

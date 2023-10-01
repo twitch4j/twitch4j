@@ -14,6 +14,6 @@ class PollsHandler implements TopicHandler {
     @Override
     public TwitchEvent apply(Args args) {
         PollData pollData = TypeConvert.convertValue(args.getData().path("poll"), PollData.class);
-        return (new PollsEvent(args.getType(), pollData));
+        return new PollsEvent(args.getType(), pollData);
     }
 }

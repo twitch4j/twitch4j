@@ -24,6 +24,6 @@ class PlaybackHandler implements TopicHandler {
         boolean hasId = args.getTopicParts()[0].endsWith("d");
         String lastTopicIdentifier = args.getLastTopicPart();
         VideoPlaybackData data = TypeConvert.jsonToObject(args.getRawMessage(), VideoPlaybackData.class);
-        return (new VideoPlaybackEvent(hasId ? lastTopicIdentifier : null, hasId ? null : lastTopicIdentifier, data));
+        return new VideoPlaybackEvent(hasId ? lastTopicIdentifier : null, hasId ? null : lastTopicIdentifier, data);
     }
 }

@@ -22,13 +22,13 @@ class PinHandler implements TopicHandler {
         switch (args.getType()) {
             case "pin-message":
                 PinnedChatData createdPin = TypeConvert.convertValue(msgData, PinnedChatData.class);
-                return (new PinnedChatCreatedEvent(args.getLastTopicPart(), createdPin));
+                return new PinnedChatCreatedEvent(args.getLastTopicPart(), createdPin);
             case "update-message":
                 UpdatedPinnedChatTiming updatedPin = TypeConvert.convertValue(msgData, UpdatedPinnedChatTiming.class);
-                return (new PinnedChatTimingUpdatedEvent(args.getLastTopicPart(), updatedPin));
+                return new PinnedChatTimingUpdatedEvent(args.getLastTopicPart(), updatedPin);
             case "unpin-message":
                 DeletePinnedChatData deletePin = TypeConvert.convertValue(msgData, DeletePinnedChatData.class);
-                return (new PinnedChatDeletedEvent(args.getLastTopicPart(), deletePin));
+                return new PinnedChatDeletedEvent(args.getLastTopicPart(), deletePin);
             default:
                 return null;
         }

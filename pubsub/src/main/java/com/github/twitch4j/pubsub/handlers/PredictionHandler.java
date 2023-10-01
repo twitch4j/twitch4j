@@ -14,9 +14,9 @@ class PredictionHandler implements TopicHandler {
     @Override
     public TwitchEvent apply(Args args) {
         if ("event-created".equals(args.getType())) {
-            return (TypeConvert.convertValue(args.getData(), PredictionCreatedEvent.class));
+            return TypeConvert.convertValue(args.getData(), PredictionCreatedEvent.class);
         } else if ("event-updated".equals(args.getType())) {
-            return (TypeConvert.convertValue(args.getData(), PredictionUpdatedEvent.class));
+            return TypeConvert.convertValue(args.getData(), PredictionUpdatedEvent.class);
         }
         return null;
     }

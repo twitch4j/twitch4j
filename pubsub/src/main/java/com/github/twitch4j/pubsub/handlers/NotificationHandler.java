@@ -17,10 +17,10 @@ class NotificationHandler implements TopicHandler {
     public TwitchEvent apply(Args args) {
         if ("create-notification".equalsIgnoreCase(args.getType())) {
             CreateNotificationData data = TypeConvert.convertValue(args.getData(), CreateNotificationData.class);
-            return (new OnsiteNotificationCreationEvent(data));
+            return new OnsiteNotificationCreationEvent(data);
         } else if ("update-summary".equalsIgnoreCase(args.getType())) {
             UpdateSummaryData data = TypeConvert.convertValue(args.getData(), UpdateSummaryData.class);
-            return (new UpdateOnsiteNotificationSummaryEvent(args.getLastTopicPart(), data));
+            return new UpdateOnsiteNotificationSummaryEvent(args.getLastTopicPart(), data);
         }
         return null;
     }

@@ -28,19 +28,19 @@ class ShieldHandler implements TopicHandler {
         switch (args.getType()) {
             case "ADD_AUTOBAN_TERM":
                 BannedTermAdded termAdded = TypeConvert.convertValue(msgData, BannedTermAdded.class);
-                return (new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded));
+                return new ShieldModeBannedTermAddedEvent(userId, channelId, termAdded);
 
             case "REMOVE_AUTOBAN_TERM":
                 BannedTermRemoved termRemoved = TypeConvert.convertValue(msgData, BannedTermRemoved.class);
-                return (new ShieldModeBannedTermRemovedEvent(userId, channelId, termRemoved));
+                return new ShieldModeBannedTermRemovedEvent(userId, channelId, termRemoved);
 
             case "UPDATE_CHANNEL_MODERATION_MODE":
                 ShieldModeStatus shieldModeStatus = TypeConvert.convertValue(msgData, ShieldModeStatus.class);
-                return (new ShieldModeStatusUpdatedEvent(userId, channelId, shieldModeStatus));
+                return new ShieldModeStatusUpdatedEvent(userId, channelId, shieldModeStatus);
 
             case "UPDATE_CHANNEL_MODERATION_SETTINGS":
                 ShieldModeSettings shieldModeSettings = TypeConvert.convertValue(msgData, ShieldModeSettings.class);
-                return (new ShieldModeSettingsUpdatedEvent(userId, channelId, shieldModeSettings));
+                return new ShieldModeSettingsUpdatedEvent(userId, channelId, shieldModeSettings);
 
             case "UPDATE_CHANNEL_MODERATION_MODE_SHORTCUT":
                 // do nothing; is_shortcut_enabled is unimportant

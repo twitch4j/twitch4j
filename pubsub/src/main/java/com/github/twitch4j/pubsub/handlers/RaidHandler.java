@@ -16,11 +16,11 @@ class RaidHandler implements TopicHandler {
     public TwitchEvent apply(Args args) {
         switch (args.getType()) {
             case "raid_go_v2":
-                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidGoEvent.class));
+                return TypeConvert.jsonToObject(args.getRawMessage(), RaidGoEvent.class);
             case "raid_update_v2":
-                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidUpdateEvent.class));
+                return TypeConvert.jsonToObject(args.getRawMessage(), RaidUpdateEvent.class);
             case "raid_cancel_v2":
-                return (TypeConvert.jsonToObject(args.getRawMessage(), RaidCancelEvent.class));
+                return TypeConvert.jsonToObject(args.getRawMessage(), RaidCancelEvent.class);
             default:
                 return null;
         }
