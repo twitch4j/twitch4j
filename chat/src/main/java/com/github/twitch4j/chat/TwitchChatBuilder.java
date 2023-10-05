@@ -34,6 +34,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -173,7 +174,7 @@ public class TwitchChatBuilder {
      * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
      */
     @With
-    protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+    protected Bandwidth perChannelRateLimit = BucketUtils.simple(100, Duration.ofSeconds(30), "per-channel-limit");
 
     /**
      * Shared bucket for messages

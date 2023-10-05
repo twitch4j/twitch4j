@@ -7,8 +7,8 @@ import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.TwitchLimitRegistry;
 import com.github.twitch4j.helix.domain.SendPubSubMessageInput;
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
@@ -34,52 +34,55 @@ public final class TwitchHelixRateLimitTracker {
      * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
      */
     public static final List<Bandwidth> AUTOMOD_STATUS_NORMAL_BANDWIDTH = Arrays.asList(
-        Bandwidth.simple(5, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
-        Bandwidth.simple(50, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+        BucketUtils.simple(5, Duration.ofMinutes(1L), AUTOMOD_STATUS_MINUTE_ID),
+        BucketUtils.simple(50, Duration.ofHours(1L), AUTOMOD_STATUS_HOUR_ID)
     );
 
     /**
      * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
      */
     public static final List<Bandwidth> AUTOMOD_STATUS_AFFILIATE_BANDWIDTH = Arrays.asList(
-        Bandwidth.simple(10, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
-        Bandwidth.simple(100, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+        BucketUtils.simple(10, Duration.ofMinutes(1L), AUTOMOD_STATUS_MINUTE_ID),
+        BucketUtils.simple(100, Duration.ofHours(1L), AUTOMOD_STATUS_HOUR_ID)
     );
 
     /**
      * @see TwitchLimitType#HELIX_AUTOMOD_STATUS_LIMIT
      */
     public static final List<Bandwidth> AUTOMOD_STATUS_PARTNER_BANDWIDTH = Arrays.asList(
-        Bandwidth.simple(30, Duration.ofMinutes(1L)).withId(AUTOMOD_STATUS_MINUTE_ID),
-        Bandwidth.simple(300, Duration.ofHours(1L)).withId(AUTOMOD_STATUS_HOUR_ID)
+        BucketUtils.simple(30, Duration.ofMinutes(1L), AUTOMOD_STATUS_MINUTE_ID),
+        BucketUtils.simple(300, Duration.ofHours(1L), AUTOMOD_STATUS_HOUR_ID)
     );
 
     /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelModerator(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelModerator(String, String, String)}
      */
-    private static final Bandwidth MOD_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
+    private static final Bandwidth MOD_BANDWIDTH = BucketUtils.simple(10, Duration.ofSeconds(10));
 
     /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#startRaid(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#cancelRaid(String, String)}
      */
-    private static final Bandwidth RAIDS_BANDWIDTH = Bandwidth.simple(10, Duration.ofMinutes(10));
+    private static final Bandwidth RAIDS_BANDWIDTH = BucketUtils.simple(10, Duration.ofMinutes(10));
 
     /**
      * Officially documented per-channel rate limit on {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionChatMessage(String, String, String, String, String)}
      */
-    private static final Bandwidth EXT_CHAT_BANDWIDTH = Bandwidth.simple(12, Duration.ofMinutes(1L));
+    private static final Bandwidth EXT_CHAT_BANDWIDTH = BucketUtils.simple(12, Duration.ofMinutes(1L));
 
     /**
      * Officially documented bucket size (but unofficial refill rate) for {@link com.github.twitch4j.helix.TwitchHelix#sendExtensionPubSubMessage(String, String, SendPubSubMessageInput)}
      *
      * @see <a href="https://github.com/twitchdev/issues/issues/612">Issue report</a>
      */
-    private static final Bandwidth EXT_PUBSUB_BANDWIDTH = Bandwidth.classic(100, Refill.greedy(1, Duration.ofSeconds(1L)));
+    private static final Bandwidth EXT_PUBSUB_BANDWIDTH = BandwidthBuilder.builder()
+        .capacity(100)
+        .refillGreedy(1, Duration.ofSeconds(1L))
+        .build();
 
     /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#addChannelVip(String, String, String)} and {@link com.github.twitch4j.helix.TwitchHelix#removeChannelVip(String, String, String)}
      */
-    private static final Bandwidth VIP_BANDWIDTH = Bandwidth.simple(10, Duration.ofSeconds(10));
+    private static final Bandwidth VIP_BANDWIDTH = BucketUtils.simple(10, Duration.ofSeconds(10));
 
     /**
      * Officially documented rate limit for {@link com.github.twitch4j.helix.TwitchHelix#sendWhisper(String, String, String, String)}
@@ -87,27 +90,27 @@ public final class TwitchHelixRateLimitTracker {
      * @see TwitchLimitType#CHAT_WHISPER_LIMIT
      */
     private static final List<Bandwidth> WHISPERS_BANDWIDTH = Arrays.asList(
-        Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
-        Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+        BucketUtils.simple(100, Duration.ofSeconds(60), WHISPER_MINUTE_BANDWIDTH_ID),
+        BucketUtils.simple(3, Duration.ofSeconds(1), WHISPER_SECOND_BANDWIDTH_ID)
     );
 
     /**
      * Empirically determined rate limit on helix bans and unbans, per channel
      */
     @Unofficial
-    private static final Bandwidth BANS_BANDWIDTH = Bandwidth.simple(100, Duration.ofSeconds(30));
+    private static final Bandwidth BANS_BANDWIDTH = BucketUtils.simple(100, Duration.ofSeconds(30));
 
     /**
      * Empirically determined rate limit on the helix create clip endpoint, per user
      */
     @Unofficial
-    private static final Bandwidth CLIPS_BANDWIDTH = Bandwidth.simple(600, Duration.ofSeconds(60));
+    private static final Bandwidth CLIPS_BANDWIDTH = BucketUtils.simple(600, Duration.ofSeconds(60));
 
     /**
      * Empirically determined rate limit on helix add and remove block term, per channel
      */
     @Unofficial
-    private static final Bandwidth TERMS_BANDWIDTH = Bandwidth.simple(60, Duration.ofSeconds(60));
+    private static final Bandwidth TERMS_BANDWIDTH = BucketUtils.simple(60, Duration.ofSeconds(60));
 
     /**
      * Rate limit buckets by user/app

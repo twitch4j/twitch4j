@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
@@ -55,7 +56,7 @@ public class TwitchHelixBuilder {
     /**
      * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
      */
-    public static final Bandwidth DEFAULT_BANDWIDTH = Bandwidth.simple(800, Duration.ofMinutes(1));
+    public static final Bandwidth DEFAULT_BANDWIDTH = BucketUtils.simple(800, Duration.ofMinutes(1));
 
     /**
      * Client Id

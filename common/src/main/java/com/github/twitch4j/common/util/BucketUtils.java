@@ -1,15 +1,29 @@
 package com.github.twitch4j.common.util;
 
 import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.local.LocalBucketBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class BucketUtils {
+
+    public static Bandwidth simple(long capacity, Duration greedyRefillPeriod) {
+        return simple(capacity, greedyRefillPeriod, Bandwidth.UNDEFINED_ID);
+    }
+
+    public static Bandwidth simple(long capacity, Duration greedyRefillPeriod, String id) {
+        return BandwidthBuilder.builder()
+            .capacity(capacity)
+            .refillGreedy(capacity, greedyRefillPeriod)
+            .id(id)
+            .build();
+    }
 
     /**
      * Creates a bucket with the specified bandwidth.
