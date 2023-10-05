@@ -13,10 +13,26 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class BucketUtils {
 
+    /**
+     * @param capacity           the bandwidth capacity
+     * @param greedyRefillPeriod the amount of time for the bucket bandwidth to be completely refilled
+     * @return {@link Bandwidth}
+     * @see #simple(long, Duration, String)
+     */
     public static Bandwidth simple(long capacity, Duration greedyRefillPeriod) {
         return simple(capacity, greedyRefillPeriod, Bandwidth.UNDEFINED_ID);
     }
 
+    /**
+     * Creates a bandwidth with the specified capacity and refill rate.
+     * <p>
+     * Note: the greedy refill algorithm allows for exceeding the specified capacity within the refill period.
+     *
+     * @param capacity           the bandwidth capacity
+     * @param greedyRefillPeriod the amount of time for the bucket bandwidth to be completely refilled
+     * @param id                 the bandwidth id
+     * @return {@link Bandwidth}
+     */
     public static Bandwidth simple(long capacity, Duration greedyRefillPeriod, String id) {
         return BandwidthBuilder.builder()
             .capacity(capacity)
