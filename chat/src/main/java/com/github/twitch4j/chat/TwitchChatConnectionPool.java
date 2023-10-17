@@ -8,6 +8,7 @@ import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.ChatReply;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
@@ -17,6 +18,7 @@ import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -102,7 +104,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
      */
     @Builder.Default
-    protected Bandwidth perChannelRateLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+    protected Bandwidth perChannelRateLimit = BucketUtils.simple(100, Duration.ofSeconds(30), "per-channel-limit");
 
     /**
      * WebSocket Connection Backoff Strategy

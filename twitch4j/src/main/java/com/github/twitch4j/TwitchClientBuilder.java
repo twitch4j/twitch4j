@@ -15,6 +15,7 @@ import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
@@ -224,7 +226,7 @@ public class TwitchClientBuilder {
      * For example, this can restrict messages per channel at 100/30 (for a verified bot that has a global 7500/30 message limit).
      */
     @With
-    protected Bandwidth chatChannelMessageLimit = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT.withId("per-channel-limit");
+    protected Bandwidth chatChannelMessageLimit = BucketUtils.simple(100, Duration.ofSeconds(30), "per-channel-limit");
 
     /**
      * Wait time for taking items off chat queue in milliseconds. Default recommended

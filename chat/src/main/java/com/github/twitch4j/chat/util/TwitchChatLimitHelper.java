@@ -5,6 +5,7 @@ import com.github.twitch4j.common.util.BucketUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -28,22 +29,22 @@ public class TwitchChatLimitHelper {
     /**
      * Users sending commands or messages to channels in which they do not have Moderator or Operator status
      */
-    public final Bandwidth USER_MESSAGE_LIMIT = Bandwidth.simple(20, Duration.ofSeconds(30)).withId(MESSAGE_BANDWIDTH_ID);
+    public final Bandwidth USER_MESSAGE_LIMIT = BucketUtils.simple(20, Duration.ofSeconds(30), MESSAGE_BANDWIDTH_ID);
 
     /**
      * Users sending commands or messages to channels in which they have Moderator or Operator status
      */
-    public final Bandwidth MOD_MESSAGE_LIMIT = Bandwidth.simple(100, Duration.ofSeconds(30)).withId(MESSAGE_BANDWIDTH_ID);
+    public final Bandwidth MOD_MESSAGE_LIMIT = BucketUtils.simple(100, Duration.ofSeconds(30), MESSAGE_BANDWIDTH_ID);
 
     /**
      * Known bots
      */
-    public final Bandwidth KNOWN_MESSAGE_LIMIT = Bandwidth.simple(50, Duration.ofSeconds(30)).withId(MESSAGE_BANDWIDTH_ID);
+    public final Bandwidth KNOWN_MESSAGE_LIMIT = BucketUtils.simple(50, Duration.ofSeconds(30), MESSAGE_BANDWIDTH_ID);
 
     /**
      * Verified bots
      */
-    public final Bandwidth VERIFIED_MESSAGE_LIMIT = Bandwidth.simple(7500, Duration.ofSeconds(30)).withId(MESSAGE_BANDWIDTH_ID);
+    public final Bandwidth VERIFIED_MESSAGE_LIMIT = BucketUtils.simple(7500, Duration.ofSeconds(30), MESSAGE_BANDWIDTH_ID);
 
     /**
      * Users (not bots)
@@ -52,8 +53,8 @@ public class TwitchChatLimitHelper {
      */
     public final List<Bandwidth> USER_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(
-            Bandwidth.simple(100, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
-            Bandwidth.simple(3, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+            BucketUtils.simple(100, Duration.ofSeconds(60), WHISPER_MINUTE_BANDWIDTH_ID),
+            BucketUtils.simple(3, Duration.ofSeconds(1), WHISPER_SECOND_BANDWIDTH_ID)
         )
     );
 
@@ -64,8 +65,8 @@ public class TwitchChatLimitHelper {
      */
     public final List<Bandwidth> KNOWN_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(
-            Bandwidth.simple(200, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
-            Bandwidth.simple(10, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+            BucketUtils.simple(200, Duration.ofSeconds(60), WHISPER_MINUTE_BANDWIDTH_ID),
+            BucketUtils.simple(10, Duration.ofSeconds(1), WHISPER_SECOND_BANDWIDTH_ID)
         )
     );
 
@@ -78,30 +79,30 @@ public class TwitchChatLimitHelper {
      */
     public final List<Bandwidth> VERIFIED_WHISPER_LIMIT = Collections.unmodifiableList(
         Arrays.asList(
-            Bandwidth.simple(1200, Duration.ofSeconds(60)).withId(WHISPER_MINUTE_BANDWIDTH_ID),
-            Bandwidth.simple(20, Duration.ofSeconds(1)).withId(WHISPER_SECOND_BANDWIDTH_ID)
+            BucketUtils.simple(1200, Duration.ofSeconds(60), WHISPER_MINUTE_BANDWIDTH_ID),
+            BucketUtils.simple(20, Duration.ofSeconds(1), WHISPER_SECOND_BANDWIDTH_ID)
         )
     );
 
     /**
      * Join rate for users
      */
-    public final Bandwidth USER_JOIN_LIMIT = Bandwidth.simple(20, Duration.ofSeconds(10)).withId(JOIN_BANDWIDTH_ID);
+    public final Bandwidth USER_JOIN_LIMIT = BucketUtils.simple(20, Duration.ofSeconds(10), JOIN_BANDWIDTH_ID);
 
     /**
      * Join rate for verified bots
      */
-    public final Bandwidth VERIFIED_JOIN_LIMIT = Bandwidth.simple(2000, Duration.ofSeconds(10)).withId(JOIN_BANDWIDTH_ID);
+    public final Bandwidth VERIFIED_JOIN_LIMIT = BucketUtils.simple(2000, Duration.ofSeconds(10), JOIN_BANDWIDTH_ID);
 
     /**
      * Authentication rate for users
      */
-    public final Bandwidth USER_AUTH_LIMIT = Bandwidth.simple(20, Duration.ofSeconds(10)).withId(AUTH_BANDWIDTH_ID);
+    public final Bandwidth USER_AUTH_LIMIT = BucketUtils.simple(20, Duration.ofSeconds(10), AUTH_BANDWIDTH_ID);
 
     /**
      * Authentication rate for verified bots
      */
-    public final Bandwidth VERIFIED_AUTH_LIMIT = Bandwidth.simple(200, Duration.ofSeconds(10)).withId(AUTH_BANDWIDTH_ID);
+    public final Bandwidth VERIFIED_AUTH_LIMIT = BucketUtils.simple(200, Duration.ofSeconds(10), AUTH_BANDWIDTH_ID);
 
     /**
      * @param limit bandwidth
@@ -109,6 +110,7 @@ public class TwitchChatLimitHelper {
      * @deprecated in favor of BucketUtils
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public Bucket createBucket(Bandwidth limit) {
         return BucketUtils.createBucket(limit);
     }
@@ -119,6 +121,7 @@ public class TwitchChatLimitHelper {
      * @deprecated in favor of BucketUtils
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public Bucket createBucket(Bandwidth... limits) {
         return BucketUtils.createBucket(limits);
     }
@@ -129,6 +132,7 @@ public class TwitchChatLimitHelper {
      * @deprecated in favor of BucketUtils
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public Bucket createBucket(Iterable<Bandwidth> limits) {
         return BucketUtils.createBucket(limits);
     }
