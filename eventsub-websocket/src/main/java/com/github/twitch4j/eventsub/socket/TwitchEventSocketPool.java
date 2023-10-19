@@ -58,6 +58,12 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
     private final TwitchIdentityProvider identityProvider = new TwitchIdentityProvider(null, null, null);
 
     /**
+     * The default {@link OAuth2Credential} to use when initially creating an EventSub subscription.
+     */
+    @Nullable
+    private final OAuth2Credential fallbackToken;
+
+    /**
      * The base url for websocket connections.
      *
      * @see TwitchEventSocket#WEB_SOCKET_SERVER
@@ -200,7 +206,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
             .filter(pool -> pool.getDefaultToken() != null)
             .min(Comparator.comparingInt(SubscriptionConnectionPool::numSubscriptions))
             .map(IEventSubSocket::getDefaultToken)
-            .orElse(null);
+            .orElse(fallbackToken);
     }
 
     @Override

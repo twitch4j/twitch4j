@@ -566,6 +566,7 @@ public class TwitchClientPoolBuilder {
             eventSocket = TwitchEventSocketPool.builder()
                 .eventManager(eventManager)
                 .executor(scheduledThreadPoolExecutor)
+                .fallbackToken(defaultAuthToken)
                 .helix(helix)
                 .advancedConfiguration(builder ->
                     builder.proxyConfig(() -> proxyConfig)
