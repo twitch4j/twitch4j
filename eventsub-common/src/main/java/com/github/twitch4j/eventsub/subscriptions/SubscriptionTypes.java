@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
+    public final @ApiStatus.Experimental BetaChannelAdBreakBeginType BETA_CHANNEL_AD_BREAK_BEGIN;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelCharityDonateType CHANNEL_CHARITY_DONATE;
     public final CharityCampaignStartType CHANNEL_CHARITY_START;
@@ -68,6 +70,7 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
+                BETA_CHANNEL_AD_BREAK_BEGIN = new BetaChannelAdBreakBeginType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHARITY_DONATE = new ChannelCharityDonateType(),
                 CHANNEL_CHARITY_START = new CharityCampaignStartType(),
