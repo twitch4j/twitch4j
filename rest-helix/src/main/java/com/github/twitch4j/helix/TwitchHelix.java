@@ -1185,6 +1185,45 @@ public interface TwitchHelix {
     );
 
     /**
+     * Obtains ad schedule related information, including snooze, when the last ad was run,
+     * when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     *
+     * @param authToken     User access token with the channel:read:ads scope from the broadcaster.
+     * @param broadcasterId The user id that corresponds with the user access token.
+     * @return {@link AdScheduleWrapper}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_ADS_READ
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /channels/ads?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<AdScheduleWrapper> getAdSchedule(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes.
+     * This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+     * <p>
+     * If the channel is not currently live or the channel does not have an upcoming scheduled ad break,
+     * this endpoint will return Error 400: Bad Request.
+     * <p>
+     * If the channel has no snoozes left, this endpoint will return Error 429: Too Many Requests.
+     *
+     * @param authToken     User access token with the channel:manage:ads scope from the broadcaster.
+     * @param broadcasterId The user id that corresponds with the user access token.
+     * @return {@link SnoozedAdWrapper}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_ADS_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /channels/ads/schedule/snooze?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SnoozedAdWrapper> snoozeNextAd(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Starts a commercial on a specified channel
      *
      * @param authToken Auth Token (scope: channel:edit:commercial)
