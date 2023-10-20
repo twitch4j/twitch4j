@@ -175,6 +175,12 @@ subprojects {
 			}
 		}
 
+		// reproducible builds
+		withType<AbstractArchiveTask>().configureEach {
+			isPreserveFileTimestamps = false
+			isReproducibleFileOrder = true
+		}
+
 		// compile options
 		withType<JavaCompile> {
 			options.encoding = "UTF-8"
