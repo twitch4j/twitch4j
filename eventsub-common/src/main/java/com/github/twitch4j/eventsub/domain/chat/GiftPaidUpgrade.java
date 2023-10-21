@@ -16,7 +16,7 @@ public class GiftPaidUpgrade {
      */
     @Accessors(fluent = true)
     @JsonProperty("gifter_is_anonymous")
-    private Boolean isGifterAnonymous;
+    private Boolean wasGifterAnonymous;
 
     /**
      * The user ID of the user who gifted the subscription. Null if anonymous.
