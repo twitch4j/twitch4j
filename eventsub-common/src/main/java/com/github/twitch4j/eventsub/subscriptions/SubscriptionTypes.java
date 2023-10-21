@@ -17,6 +17,7 @@ public class SubscriptionTypes {
     public final ChannelBanType CHANNEL_BAN;
     public final @ApiStatus.Experimental BetaChannelChatClearType BETA_CHANNEL_CHAT_CLEAR;
     public final @ApiStatus.Experimental BetaChannelClearUserMessagesType BETA_CHANNEL_CLEAR_USER_MESSAGES;
+    public final @ApiStatus.Experimental BetaChannelMessageDeleteType BETA_CHANNEL_CHAT_MESSAGE_DELETE;
     public final ChannelCharityDonateType CHANNEL_CHARITY_DONATE;
     public final CharityCampaignStartType CHANNEL_CHARITY_START;
     public final CharityCampaignProgressType CHANNEL_CHARITY_PROGRESS;
@@ -74,6 +75,7 @@ public class SubscriptionTypes {
                 CHANNEL_BAN = new ChannelBanType(),
                 BETA_CHANNEL_CHAT_CLEAR = new BetaChannelChatClearType(),
                 BETA_CHANNEL_CLEAR_USER_MESSAGES = new BetaChannelClearUserMessagesType(),
+                BETA_CHANNEL_CHAT_MESSAGE_DELETE = new BetaChannelMessageDeleteType(),
                 CHANNEL_CHARITY_DONATE = new ChannelCharityDonateType(),
                 CHANNEL_CHARITY_START = new CharityCampaignStartType(),
                 CHANNEL_CHARITY_PROGRESS = new CharityCampaignProgressType(),
