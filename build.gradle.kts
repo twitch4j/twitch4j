@@ -10,7 +10,7 @@ plugins {
 	`maven-publish`
 	id("io.freefair.lombok").version("8.4").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
-	id("me.champeau.jmh").version("0.7.1").apply(false)
+	id("me.champeau.jmh").version("0.7.2").apply(false)
 	id("com.github.johnrengelman.shadow").version("8.1.1").apply(false)
 	id("com.github.gmazzo.buildconfig").version("4.1.2").apply(false)
 }
