@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class AdSchedule {
     /**
      * The length in seconds of the scheduled upcoming ad break.
      */
+    @JsonAlias("lengths_seconds") // docs are incorrect
     private Integer lengthSeconds;
 
     /**
