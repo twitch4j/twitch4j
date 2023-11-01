@@ -3,6 +3,7 @@ package com.github.twitch4j.eventsub.domain.chat;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +15,14 @@ public class Fragment {
     /**
      * The type of message fragment.
      */
-    @NotNull
+    @Getter(onMethod_ = { @NotNull })
     private Type type;
+
+    /**
+     * Message text in fragment.
+     */
+    @Getter(onMethod_ = { @NotNull })
+    private String text;
 
     /**
      * Optional: Metadata pertaining to the cheermote.

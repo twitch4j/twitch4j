@@ -9,15 +9,17 @@ import com.github.twitch4j.eventsub.domain.PredictionOutcome;
 import com.github.twitch4j.eventsub.domain.PredictionStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.StreamType;
+import com.github.twitch4j.eventsub.domain.chat.Fragment;
+import com.github.twitch4j.eventsub.domain.chat.Message;
+import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static com.github.twitch4j.common.util.TypeConvert.jsonToObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -392,6 +394,28 @@ public class EventSubEventTest {
         assertEquals("user@email.com", event.getEmail());
         assertTrue(event.isEmailVerified());
         assertEquals("cool description", event.getDescription());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelChatNotificationEvent where notice_type is announcement")
+    public void deserializeChatAnnouncement() {
+        ChannelChatNotificationEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"53888434\",\"broadcaster_user_login\":\"ogprodigy\",\"broadcaster_user_name\":\"OGprodigy\",\"chatter_user_id\":\"53888434\",\"chatter_user_login\":\"ogprodigy\",\"chatter_user_name\":\"OGprodigy\",\"chatter_is_anonymous\":false,\"color\":\"#00FF7F\",\"system_message\":\"\",\"message_id\":\"032cffb0-99ba-47cc-a903-23555b6137e2\",\"message\":{\"text\":\"test\",\"fragments\":[{\"type\":\"text\",\"text\":\"test\",\"cheermote\":null,\"emote\":null,\"mention\":null}]},\"notice_type\":\"announcement\",\"sub\":null,\"resub\":null,\"sub_gift\":null,\"community_sub_gift\":null,\"gift_paid_upgrade\":null,\"prime_paid_upgrade\":null,\"pay_it_forward\":null,\"raid\":null,\"unraid\":null,\"announcement\":{\"color\":\"PRIMARY\"},\"bits_badge_tier\":null,\"charity_donation\":null}",
+            ChannelChatNotificationEvent.class
+        );
+
+        assertEquals(NoticeType.ANNOUNCEMENT, event.getNoticeType());
+        assertFalse(event.isChatterAnonymous());
+        assertEquals("53888434", event.getBroadcasterUserId());
+        Message message = event.getMessage();
+        assertNotNull(message);
+        assertEquals("test", message.getText());
+        List<Fragment> fragments = message.getFragments();
+        assertNotNull(fragments);
+        assertEquals(1, fragments.size());
+        Fragment fragment = fragments.get(0);
+        assertEquals(Fragment.Type.TEXT, fragment.getType());
+        assertEquals("test", fragment.getText());
     }
 
 }
