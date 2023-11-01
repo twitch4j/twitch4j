@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
+import com.github.twitch4j.common.enums.AnnouncementColor;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -11,6 +12,6 @@ public class Announcement {
     /**
      * Color of the announcement.
      */
-    private String color;
+    private AnnouncementColor color;
 
 }

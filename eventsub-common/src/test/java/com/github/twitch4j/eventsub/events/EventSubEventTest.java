@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
 import com.github.twitch4j.eventsub.domain.Contribution;
@@ -420,7 +421,7 @@ public class EventSubEventTest {
         assertEquals("test", fragment.getText());
         Announcement announcement = event.getAnnouncement();
         assertNotNull(announcement);
-        assertEquals("PRIMARY", announcement.getColor());
+        assertEquals(AnnouncementColor.PRIMARY, announcement.getColor());
     }
 
     @Test
