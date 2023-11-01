@@ -9,9 +9,11 @@ import com.github.twitch4j.eventsub.domain.PredictionOutcome;
 import com.github.twitch4j.eventsub.domain.PredictionStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.StreamType;
+import com.github.twitch4j.eventsub.domain.chat.Announcement;
 import com.github.twitch4j.eventsub.domain.chat.Fragment;
 import com.github.twitch4j.eventsub.domain.chat.Message;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
+import com.github.twitch4j.eventsub.domain.chat.Resubscription;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -416,6 +418,31 @@ public class EventSubEventTest {
         Fragment fragment = fragments.get(0);
         assertEquals(Fragment.Type.TEXT, fragment.getType());
         assertEquals("test", fragment.getText());
+        Announcement announcement = event.getAnnouncement();
+        assertNotNull(announcement);
+        assertEquals("PRIMARY", announcement.getColor());
+    }
+
+    @Test
+    @DisplayName("Deserialize ChannelChatNotificationEvent where notice_type is resub")
+    public void deserializeChatPrimeResub() {
+        ChannelChatNotificationEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"207813352\",\"broadcaster_user_login\":\"hasanabi\",\"broadcaster_user_name\":\"HasanAbi\",\"chatter_user_id\":\"47525664\",\"chatter_user_login\":\"deetmonster\",\"chatter_user_name\":\"deetmonster\",\"chatter_is_anonymous\":false,\"color\":\"#0000FF\",\"system_message\":\"deetmonster subscribed with Prime. They've subscribed for 50 months, currently on a 12 month streak!\",\"message_id\":\"2e96f15c-db41-45f6-8e76-1d773ef3c47f\",\"message\":{\"text\":\"\",\"fragments\":[]},\"notice_type\":\"resub\",\"sub\":null,\"resub\":{\"cumulative_months\":50,\"duration_months\":0,\"streak_months\":12,\"sub_plan\":\"Prime\",\"is_gift\":false,\"gifter_is_anonymous\":null,\"gifter_user_id\":null,\"gifter_user_name\":null,\"gifter_user_login\":null},\"sub_gift\":null,\"community_sub_gift\":null,\"gift_paid_upgrade\":null,\"prime_paid_upgrade\":null,\"pay_it_forward\":null,\"raid\":null,\"unraid\":null,\"announcement\":null,\"bits_badge_tier\":null,\"charity_donation\":null}",
+            ChannelChatNotificationEvent.class
+        );
+
+        assertEquals(NoticeType.RESUB, event.getNoticeType());
+        assertEquals("207813352", event.getBroadcasterUserId());
+        assertEquals("47525664", event.getChatterUserId());
+        assertFalse(event.isChatterAnonymous());
+        assertEquals("deetmonster subscribed with Prime. They've subscribed for 50 months, currently on a 12 month streak!", event.getSystemMessage());
+        Resubscription resub = event.getResub();
+        assertNotNull(resub);
+        assertEquals(50, resub.getCumulativeMonths());
+        assertEquals(1, resub.getDurationMonths()); // we convert 0 to 1 intentionally
+        assertEquals(12, resub.getStreakMonths());
+        assertEquals(SubscriptionPlan.TWITCH_PRIME, resub.getSubPlan());
+        assertFalse(resub.isGift());
     }
 
 }

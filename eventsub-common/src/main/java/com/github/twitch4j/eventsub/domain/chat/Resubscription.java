@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import lombok.AccessLevel;
@@ -20,6 +21,7 @@ public class Resubscription {
     /**
      * The number of months the subscription is for.
      */
+    @JsonProperty("duration_months")
     private Integer durationMonths;
 
     /**
@@ -66,4 +68,11 @@ public class Resubscription {
     @Nullable
     private String gifterUserLogin;
 
+    /**
+     * @return the number of months the subscription is for.
+     */
+    @JsonIgnore
+    public int getDurationMonths() {
+        return Math.max(durationMonths, 1);
+    }
 }
