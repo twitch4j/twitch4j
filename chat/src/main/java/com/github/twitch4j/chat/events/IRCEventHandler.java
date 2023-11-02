@@ -2,11 +2,11 @@ package com.github.twitch4j.chat.events;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
-import com.github.twitch4j.chat.enums.AnnouncementColor;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
