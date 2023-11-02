@@ -390,8 +390,25 @@ public interface TwitchHelix {
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
         @NotNull @Param(value = "message", expander = JsonStringExpander.class) String message,
-        @NotNull @Param("color") AnnouncementColor color
+        @NotNull @Param("color") com.github.twitch4j.common.enums.AnnouncementColor color
     );
+
+    /**
+     * Sends an announcement to the broadcaster’s chat room.
+     *
+     * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
+     * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.
+     * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token, which can be a moderator or the broadcaster.
+     * @param message       The announcement to make in the broadcaster’s chat room. Announcements are limited to a maximum of 500 characters.
+     * @param color         The color used to highlight the announcement.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
+     * @deprecated in favor of {@link #sendChatAnnouncement(String, String, String, String, com.github.twitch4j.common.enums.AnnouncementColor)}
+     */
+    @Deprecated
+    default HystrixCommand<Void> sendChatAnnouncement(String authToken, String broadcasterId, String moderatorId, String message, AnnouncementColor color) {
+        return sendChatAnnouncement(authToken, broadcasterId, moderatorId, message, color.converted());
+    }
 
     /**
      * Gets a list of custom chat badges that can be used in chat for the specified channel.
