@@ -84,10 +84,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.2.2")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "12.5")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "12.5")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "12.5")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "12.5")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.0")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.0")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.0")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.0")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -105,6 +105,15 @@ subprojects {
 						strictly("[2.15,3-alpha[")
 						// renovate: depName=com.fasterxml.jackson:jackson-bom
 						prefer("2.15.3")
+					}
+				}
+			}
+
+			listOf("io.github.openfeign:feign-slf4j", "io.github.openfeign:feign-okhttp", "io.github.openfeign:feign-jackson", "io.github.openfeign:feign-hystrix").forEach { dep ->
+				add("api", dep) {
+					version {
+						// lower bound on accepted feign version; synced with current major version used by twitch4j
+						require("13.0")
 					}
 				}
 			}
@@ -197,10 +206,10 @@ subprojects {
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.2.2",
-						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/12.5",
-						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/12.5",
-						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/12.5",
-						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/12.5",
+						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.0",
+						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.0",
+						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.0",
+						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.0",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.15.3",
