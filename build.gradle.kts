@@ -108,6 +108,15 @@ subprojects {
 					}
 				}
 			}
+
+			listOf("io.github.openfeign:feign-slf4j", "io.github.openfeign:feign-okhttp", "io.github.openfeign:feign-jackson", "io.github.openfeign:feign-hystrix").forEach { dep ->
+				add("api", dep) {
+					version {
+						// lower bound on accepted feign version; synced with current major version used by twitch4j
+						require("13.0")
+					}
+				}
+			}
 		}
 
 		// Apache Commons
