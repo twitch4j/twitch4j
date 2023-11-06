@@ -1,13 +1,14 @@
 package com.github.twitch4j.chat.events.channel;
 
-import com.github.twitch4j.chat.enums.AnnouncementColor;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fired when the broadcaster or a moderator publishes an accented message via {@code /announce}.
@@ -41,7 +42,7 @@ public class ModAnnouncementEvent extends AbstractChannelEvent {
     /**
      * The color accent for the announcement.
      */
-    AnnouncementColor color;
+    AnnouncementColor accentColor;
 
     /**
      * Event Constructor
@@ -52,12 +53,21 @@ public class ModAnnouncementEvent extends AbstractChannelEvent {
      * @param message      The message being announced.
      * @param color        The color accent for the announcement.
      */
+    @ApiStatus.Internal
     public ModAnnouncementEvent(IRCMessageEvent messageEvent, EventChannel channel, EventUser announcer, String message, AnnouncementColor color) {
         super(channel);
         this.messageEvent = messageEvent;
         this.announcer = announcer;
         this.message = message;
-        this.color = color;
+        this.accentColor = color;
     }
 
+    /**
+     * @return the color accent for the announcement.
+     * @deprecated in favor of {@link #getAccentColor()}
+     */
+    @Deprecated
+    public com.github.twitch4j.chat.enums.AnnouncementColor getColor() {
+        return com.github.twitch4j.chat.enums.AnnouncementColor.from(accentColor);
+    }
 }
