@@ -35,6 +35,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class EventSubEventTest {
 
     @Test
+    @DisplayName("Deserialize ChannelAdBreakBeginEvent")
+    public void deserializeAdBreakEvent() {
+        ChannelAdBreakBeginEvent event = jsonToObject(
+            "{\"length_seconds\":\"60\",\"started_at\":\"2019-11-16T10:11:12.634234626Z\",\"is_automatic\":\"false\",\"broadcaster_user_id\":\"1337\",\"requester_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\"}",
+            ChannelAdBreakBeginEvent.class
+        );
+        assertFalse(event.isAutomatic());
+        assertEquals(60, event.getLengthSeconds());
+        assertEquals("1337", event.getBroadcasterUserId());
+        assertEquals("1337", event.getRequesterUserId());
+        assertEquals(Instant.parse("2019-11-16T10:11:12.634234626Z"), event.getStartedAt());
+    }
+
+    @Test
     @DisplayName("Deserialize ChannelBanEvent: Timeout")
     public void deserializeModerationEvent() {
         ChannelBanEvent event = jsonToObject(
