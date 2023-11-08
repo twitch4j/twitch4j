@@ -12,6 +12,21 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class AdScheduleTest {
 
     @Test
+    void deserializePartner() {
+        // actual example from a partner in early November 2023 (epoch seconds are sent instead of rfc3339 strings)
+        AdSchedule ads = TypeConvert.jsonToObject(
+            "{\"snooze_count\":3,\"snooze_refresh_at\":0,\"next_ad_at\":1698437870,\"length_seconds\":90,\"last_ad_at\":1698429628,\"preroll_free_time_seconds\":0}",
+            AdSchedule.class
+        );
+        assertNotNull(ads);
+        assertEquals(3, ads.getSnoozeCount());
+        assertEquals(Instant.ofEpochSecond(1698437870L), ads.getNextAdAt());
+        assertEquals(Instant.ofEpochSecond(1698429628L), ads.getLastAdAt());
+        assertEquals(90, ads.getLengthSeconds());
+        assertEquals(0, ads.getPrerollFreeTimeSeconds());
+    }
+
+    @Test
     void deserializeActual() {
         // actual example from 2023-11-03 for a non-affiliate
         AdSchedule ads = TypeConvert.jsonToObject(
