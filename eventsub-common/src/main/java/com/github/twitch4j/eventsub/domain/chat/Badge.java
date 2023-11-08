@@ -9,13 +9,17 @@ import lombok.Setter;
 public class Badge {
 
     /**
-     * An ID that identifies this set of chat badges. For example, Bits or Subscriber.
+     * An ID that identifies this set of chat badges.
+     * <p>
+     * For example: "bits", "subscriber", "vip", "moderator", "broadcaster", "partner", "ambassador", "turbo",
+     * "hype-train", "no_audio", "no_video", "sub-gifter", "sub-gift-leader", "premium" (i.e., twitch prime)
      */
     private String setId;
 
     /**
      * An ID that identifies this version of the badge.
      * The ID can be any value.
+     * <p>
      * For example, for Bits, the ID is the Bits tier level,
      * but for World of Warcraft, it could be Alliance or Horde.
      */
