@@ -11,6 +11,8 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -26,9 +28,14 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private Boolean isChatterAnonymous;
 
     /**
-     * The color of the user’s name in the chat room.
+     * The color of the user's name in the chat room.
      */
     private String color;
+
+    /**
+     * The user's visible badges in the chat room.
+     */
+    private List<Badge> badges;
 
     /**
      * The message Twitch shows in the chat room for this notice.
