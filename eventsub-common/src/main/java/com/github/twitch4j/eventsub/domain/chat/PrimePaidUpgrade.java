@@ -11,7 +11,9 @@ public class PrimePaidUpgrade {
 
     /**
      * The type of subscription plan being used.
+     * <p>
+     * Cannot be {@link SubscriptionPlan#TWITCH_PRIME}.
      */
-    private SubscriptionPlan subPlan;
+    private SubscriptionPlan subTier;
 
 }

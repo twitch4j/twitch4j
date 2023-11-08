@@ -32,8 +32,17 @@ public class Resubscription {
 
     /**
      * The type of subscription plan being used.
+     * <p>
+     * Does not contain {@link SubscriptionPlan#TWITCH_PRIME}; use {@link #isPrime()} instead.
      */
-    private SubscriptionPlan subPlan;
+    private SubscriptionPlan subTier;
+
+    /**
+     * Indicates if the subscription was obtained through Amazon Prime.
+     */
+    @Accessors(fluent = true)
+    @JsonProperty("is_prime")
+    private Boolean isPrime;
 
     /**
      * Whether or not the resub was a result of a gift.

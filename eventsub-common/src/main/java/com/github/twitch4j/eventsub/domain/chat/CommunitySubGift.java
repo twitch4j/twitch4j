@@ -24,8 +24,10 @@ public class CommunitySubGift {
 
     /**
      * The type of subscription plan being used.
+     * <p>
+     * Cannot be {@link SubscriptionPlan#TWITCH_PRIME}.
      */
-    private SubscriptionPlan subPlan;
+    private SubscriptionPlan subTier;
 
     /**
      * The amount of gifts the gifter has given in this channel.
