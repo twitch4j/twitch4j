@@ -39,8 +39,10 @@ public class SubGift {
 
     /**
      * The type of subscription plan being used.
+     * <p>
+     * Cannot be {@link SubscriptionPlan#TWITCH_PRIME}.
      */
-    private SubscriptionPlan subPlan;
+    private SubscriptionPlan subTier;
 
     /**
      * The ID of the associated community gift.
