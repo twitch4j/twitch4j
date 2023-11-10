@@ -1,6 +1,8 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.util.TwitchUtils;
 import com.github.twitch4j.eventsub.domain.chat.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -11,6 +13,9 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -19,16 +24,21 @@ import org.jetbrains.annotations.Nullable;
 public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
 
     /**
-     * Whether or not the chatter is anonymous.
+     * Whether the chatter is anonymous.
      */
     @Accessors(fluent = true)
     @JsonProperty("chatter_is_anonymous")
     private Boolean isChatterAnonymous;
 
     /**
-     * The color of the user’s name in the chat room.
+     * The color of the user's name in the chat room.
      */
     private String color;
+
+    /**
+     * The user's visible badges in the chat room.
+     */
+    private List<Badge> badges;
 
     /**
      * The message Twitch shows in the chat room for this notice.
@@ -133,5 +143,13 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      */
     @Nullable
     private BitsBadge bitsBadgeTier;
+
+    /**
+     * @return {@link #getBadges()} as {@link CommandPermission}, if {@link #getBadges()} is not null.
+     */
+    @Nullable
+    public Set<CommandPermission> getPermissions() {
+        return badges != null ? TwitchUtils.getPermissions(badges, Badge::getSetId, Badge::getId) : null;
+    }
 
 }

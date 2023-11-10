@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public class TwitchUtils {
 
@@ -69,105 +70,112 @@ public class TwitchUtils {
         return getPermissionsFromTags(null, userId, botOwnerIds, badges);
     }
 
-    private static Set<CommandPermission> getPermissionsFromTags(@Nullable CharSequence badgesTag, String userId, Collection<String> botOwnerIds, @NonNull Map<String, String> badges) {
-        Set<CommandPermission> permissionSet = EnumSet.of(CommandPermission.EVERYONE);
+    @ApiStatus.Internal
+    public static <T> Set<CommandPermission> getPermissions(Iterable<T> badges, Function<T, String> badgeName, Function<T, String> badgeValue) {
+        Set<CommandPermission> perms = EnumSet.of(CommandPermission.EVERYONE);
+        for (T badge : badges) {
+            String key = badgeName.apply(badge);
+            switch (key) {
+                case "premium":
+                case "turbo":
+                    perms.add(CommandPermission.PRIME_TURBO);
+                    break;
 
+                case "partner":
+                case "ambassador":
+                    perms.add(CommandPermission.PARTNER);
+                    break;
+
+                case "subscriber":
+                    perms.add(CommandPermission.SUBSCRIBER);
+                    break;
+
+                case "founder":
+                    // note: value contains tier
+                    perms.add(CommandPermission.FOUNDER);
+                    break;
+
+                case "sub-gifter":
+                case "sub-gift-leader":
+                    perms.add(CommandPermission.SUBGIFTER);
+                    break;
+
+                case "bits":
+                case "bits-leader":
+                case "anonymous-cheerer":
+                    perms.add(CommandPermission.BITS_CHEERER);
+                    break;
+
+                case "hype-train":
+                    String hypeBadge = badgeValue.apply(badge);
+                    if ("1".equals(hypeBadge)) {
+                        perms.add(CommandPermission.CURRENT_HYPE_TRAIN_CONDUCTOR);
+                    } else if ("2".equals(hypeBadge)) {
+                        perms.add(CommandPermission.FORMER_HYPE_TRAIN_CONDUCTOR);
+                    }
+                    break;
+
+                case "predictions":
+                    String predictionBadge = badgeValue.apply(badge);
+                    if (predictionBadge != null && !predictionBadge.isEmpty()) {
+                        char first = predictionBadge.charAt(0);
+                        if (first == 'b') {
+                            perms.add(CommandPermission.PREDICTIONS_BLUE);
+                        } else if (first == 'p') {
+                            perms.add(CommandPermission.PREDICTIONS_PINK);
+                        }
+                    }
+                    break;
+
+                case "no_audio":
+                    perms.add(CommandPermission.NO_AUDIO);
+                    break;
+
+                case "no_video":
+                    perms.add(CommandPermission.NO_VIDEO);
+                    break;
+
+                case "moments":
+                    perms.add(CommandPermission.MOMENTS);
+                    break;
+
+                case "artist-badge":
+                    perms.add(CommandPermission.ARTIST);
+                    break;
+
+                case "vip":
+                    perms.add(CommandPermission.VIP);
+                    break;
+
+                case "staff":
+                case "admin":
+                    perms.add(CommandPermission.TWITCHSTAFF);
+                    break;
+
+                case "moderator":
+                    perms.add(CommandPermission.MODERATOR);
+                    break;
+
+                case "broadcaster":
+                    perms.add(CommandPermission.BROADCASTER);
+                    perms.add(CommandPermission.MODERATOR);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        return perms;
+    }
+
+    private static Set<CommandPermission> getPermissionsFromTags(@Nullable CharSequence badgesTag, String userId, Collection<String> botOwnerIds, @NonNull Map<String, String> badges) {
         // Parse badges tag
         if (badgesTag != null) {
             badges.putAll(parseBadges(badgesTag.toString()));
         }
 
         // Check for Permissions
-        if (!badges.isEmpty()) {
-            // Broadcaster
-            if (badges.containsKey("broadcaster")) {
-                permissionSet.add(CommandPermission.BROADCASTER);
-                permissionSet.add(CommandPermission.MODERATOR);
-            }
-            // Twitch Prime
-            if (badges.containsKey("premium") || badges.containsKey("turbo")) {
-                permissionSet.add(CommandPermission.PRIME_TURBO);
-            }
-            // Moderator
-            if (badges.containsKey("moderator")) {
-                permissionSet.add(CommandPermission.MODERATOR);
-            }
-            // Partner
-            if (badges.containsKey("partner") || badges.containsKey("ambassador")) {
-                permissionSet.add(CommandPermission.PARTNER);
-            }
-            // VIP
-            if (badges.containsKey("vip")) {
-                permissionSet.add(CommandPermission.VIP);
-            }
-            // Turbo
-            if (badges.containsKey("turbo")) {
-                permissionSet.add(CommandPermission.PRIME_TURBO);
-            }
-            // Twitch Staff
-            if (badges.containsKey("staff") || badges.containsKey("admin")) {
-                permissionSet.add(CommandPermission.TWITCHSTAFF);
-            }
-            // Subscriber
-            if (badges.containsKey("subscriber")) {
-                permissionSet.add(CommandPermission.SUBSCRIBER);
-            }
-            // SubGifter
-            if (badges.containsKey("sub-gifter") || badges.containsKey("sub-gift-leader")) {
-                permissionSet.add(CommandPermission.SUBGIFTER);
-            }
-            // Cheerer
-            if (badges.containsKey("bits") || badges.containsKey("bits-leader") || badges.containsKey("anonymous-cheerer")) {
-                permissionSet.add(CommandPermission.BITS_CHEERER);
-            }
-            // Founder
-            if (badges.containsKey("founder")) {
-                permissionSet.add(CommandPermission.FOUNDER);
-
-                // also contains info about the tier if needed
-                /*
-                if (badges.get("founder").equals("0")) {
-                    // Tier 1 Founder
-                } else if (badges.get("founder").equals("1")) {
-                    // Tier 2 Founder
-                } else if (badges.get("founder").equals("2")) {
-                    // Tier 3 Founder
-                }
-                */
-            }
-            // Hype Train Conductor
-            String hypeBadge = badges.get("hype-train");
-            if ("1".equals(hypeBadge)) {
-                permissionSet.add(CommandPermission.CURRENT_HYPE_TRAIN_CONDUCTOR);
-            } else if ("2".equals(hypeBadge)) {
-                permissionSet.add(CommandPermission.FORMER_HYPE_TRAIN_CONDUCTOR);
-            }
-            // Predictions Participation
-            String predictionBadge = badges.get("predictions");
-            if (StringUtils.isNotEmpty(predictionBadge)) {
-                char first = predictionBadge.charAt(0);
-                if (first == 'b') {
-                    permissionSet.add(CommandPermission.PREDICTIONS_BLUE);
-                } else if (first == 'p') {
-                    permissionSet.add(CommandPermission.PREDICTIONS_PINK);
-                }
-            }
-            // Accessibility
-            if (badges.containsKey("no_audio")) {
-                permissionSet.add(CommandPermission.NO_AUDIO);
-            }
-            if (badges.containsKey("no_video")) {
-                permissionSet.add(CommandPermission.NO_VIDEO);
-            }
-            // Present for Channel Moment
-            if (badges.containsKey("moments")) {
-                permissionSet.add(CommandPermission.MOMENTS);
-            }
-            // Channel Emote Artist
-            if (badges.containsKey("artist-badge")) {
-                permissionSet.add(CommandPermission.ARTIST);
-            }
-        }
+        Set<CommandPermission> permissionSet = getPermissions(badges.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
 
         if (userId != null && botOwnerIds != null && botOwnerIds.contains(userId))
             permissionSet.add(CommandPermission.OWNER);
