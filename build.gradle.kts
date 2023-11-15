@@ -104,7 +104,7 @@ subprojects {
 					version {
 						strictly("[2.15,3-alpha[")
 						// renovate: depName=com.fasterxml.jackson:jackson-bom
-						prefer("2.15.3")
+						prefer("2.16.0")
 					}
 				}
 			}
@@ -133,7 +133,7 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "1.7.36")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.15.3"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.16.0"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.10.1"))
