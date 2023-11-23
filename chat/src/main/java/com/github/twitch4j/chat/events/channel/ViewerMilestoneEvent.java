@@ -34,6 +34,8 @@ public class ViewerMilestoneEvent extends AbstractChannelEvent {
 
     String milestoneValue; // e.g., "3"
 
+    Integer earnedChannelPoints; // e.g., 450
+
     @ApiStatus.Internal
     public ViewerMilestoneEvent(@NotNull IRCMessageEvent messageEvent) {
         super(messageEvent.getChannel());
@@ -43,6 +45,17 @@ public class ViewerMilestoneEvent extends AbstractChannelEvent {
         this.milestoneUniqueId = messageEvent.getTagValue("msg-param-id").orElse(null);
         this.milestoneCategory = messageEvent.getTagValue("msg-param-category").orElse(null);
         this.milestoneValue = messageEvent.getTagValue("msg-param-value").orElse(null);
+        this.earnedChannelPoints = messageEvent.getTagValue("msg-param-copoReward").map(points -> {
+            try {
+                return Integer.parseInt(points);
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
+        }).orElse(null);
+    }
+
+    public String getUserMessage() {
+        return messageEvent.getMessage().orElse("");
     }
 
     public boolean isWatchStreak() {
