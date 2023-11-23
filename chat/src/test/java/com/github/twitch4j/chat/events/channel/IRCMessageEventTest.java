@@ -1,5 +1,6 @@
 package com.github.twitch4j.chat.events.channel;
 
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.twitch4j.chat.util.MessageParser.parse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("unittest")
@@ -170,6 +172,28 @@ public class IRCMessageEventTest {
         assertEquals("PART", e.getCommandType());
         assertEquals("twitchdev", e.getChannelName().orElse(null));
         assertEquals("ogprodigy", e.getUserName());
+    }
+
+    @Test
+    @DisplayName("Test that watch-streak viewermilestone USERNOTICE is parsed by IRCMessageEvent and sub-event")
+    @Unofficial
+    void parseMilestone() {
+        IRCMessageEvent rawEvent = parse("@msg-param-id=11439a09-3c9f-4701-9552-bba21f2028d2;" +
+            "rm-received-ts=1700717888176;room-id=39842292;badge-info=subscriber/3;msg-param-category=watch-streak;" +
+            "badges=subscriber/3;msg-param-value=7;subscriber=1;vip=0;user-type=;user-id=531667091;flags=;" +
+            "msg-id=viewermilestone;display-name=Baughbby;login=baughbby;msg-param-copoReward=450;emotes=;" +
+            "color=#DAA520;tmi-sent-ts=1700717888068;mod=0;system-msg=Baughbby\\swatched\\s7\\sconsecutive\\sstreams" +
+            "\\sthis\\smonth\\sand\\ssparked\\sa\\swatch\\sstreak!;id=107473b2-01c2-49a5-9fe5-a4d7ffe54e5f " +
+            ":tmi.twitch.tv USERNOTICE #nandre :ive done it");
+        assertNotNull(rawEvent);
+        ViewerMilestoneEvent event = new ViewerMilestoneEvent(rawEvent);
+        assertEquals("531667091", event.getUser().getId());
+        assertEquals("39842292", event.getChannel().getId());
+        assertEquals("11439a09-3c9f-4701-9552-bba21f2028d2", event.getMilestoneUniqueId());
+        assertEquals("watch-streak", event.getMilestoneCategory());
+        assertEquals(7, event.parseValue().orElse(-1));
+        assertEquals(450, event.getEarnedChannelPoints());
+        assertEquals("ive done it", event.getUserMessage());
     }
 
 }
