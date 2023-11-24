@@ -12,11 +12,6 @@ import lombok.experimental.Accessors;
 public class Subscription {
 
     /**
-     * The total number of months the user has subscribed.
-     */
-    private Integer cumulativeMonths;
-
-    /**
      * The number of months the subscription is for.
      */
     private Integer durationMonths;

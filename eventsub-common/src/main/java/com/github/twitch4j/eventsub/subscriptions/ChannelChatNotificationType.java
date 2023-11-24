@@ -1,11 +1,11 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelChatCondition;
-import com.github.twitch4j.eventsub.events.ChannelChatMessageDeleteEvent;
-import org.jetbrains.annotations.ApiStatus;
+import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 
 /**
- * Sends a notification when a moderator removes a specific message.
+ * Sends a notification when a USERNOTICE event that appears in chat occurs,
+ * such as someone subscribing to the channel or a subscription is gifted.
  * <p>
  * Requires user:read:chat scope from chatting user.
  * If app access token used, then additionally requires user:bot scope from chatting user,
@@ -15,16 +15,15 @@ import org.jetbrains.annotations.ApiStatus;
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_USER_BOT
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_BOT
  */
-@ApiStatus.Experimental // in open beta
-public class BetaChannelMessageDeleteType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatMessageDeleteEvent> {
+public class ChannelChatNotificationType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatNotificationEvent> {
     @Override
     public String getName() {
-        return "channel.chat.message_delete";
+        return "channel.chat.notification";
     }
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
@@ -33,7 +32,7 @@ public class BetaChannelMessageDeleteType implements SubscriptionType<ChannelCha
     }
 
     @Override
-    public Class<ChannelChatMessageDeleteEvent> getEventClass() {
-        return ChannelChatMessageDeleteEvent.class;
+    public Class<ChannelChatNotificationEvent> getEventClass() {
+        return ChannelChatNotificationEvent.class;
     }
 }

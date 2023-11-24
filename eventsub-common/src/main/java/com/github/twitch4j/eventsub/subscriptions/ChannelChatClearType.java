@@ -1,12 +1,10 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelChatCondition;
-import com.github.twitch4j.eventsub.events.ChannelChatClearUserMessagesEvent;
-import org.jetbrains.annotations.ApiStatus;
+import com.github.twitch4j.eventsub.events.ChannelChatClearEvent;
 
 /**
- * Sends a notification when a moderator or bot clears all messages for a specific user,
- * which occurs when the user has been timed out or banned.
+ * Sends a notification when a moderator or bot clears all messages from the chat room.
  * <p>
  * Requires user:read:chat scope from chatting user.
  * If app access token used, then additionally requires user:bot scope from chatting user,
@@ -16,16 +14,15 @@ import org.jetbrains.annotations.ApiStatus;
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_USER_BOT
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_BOT
  */
-@ApiStatus.Experimental // in open beta
-public class BetaChannelClearUserMessagesType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatClearUserMessagesEvent> {
+public class ChannelChatClearType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatClearEvent> {
     @Override
     public String getName() {
-        return "channel.chat.clear_user_messages";
+        return "channel.chat.clear";
     }
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
@@ -34,7 +31,7 @@ public class BetaChannelClearUserMessagesType implements SubscriptionType<Channe
     }
 
     @Override
-    public Class<ChannelChatClearUserMessagesEvent> getEventClass() {
-        return ChannelChatClearUserMessagesEvent.class;
+    public Class<ChannelChatClearEvent> getEventClass() {
+        return ChannelChatClearEvent.class;
     }
 }
