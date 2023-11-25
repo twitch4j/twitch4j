@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -38,5 +39,29 @@ public class GiftPayForward {
      */
     @Nullable
     private String gifterUserLogin;
+
+    /**
+     * The user id of the recipient of the paid-forward gift sub.
+     * Null if gifted to the broad community, rather than a specific target.
+     */
+    @Nullable
+    @Unofficial // https://github.com/twitchdev/issues/issues/868
+    private String recipientUserId;
+
+    /**
+     * The user name of the recipient of the paid-forward gift sub.
+     * Null if gifted to the broad community, rather than a specific target.
+     */
+    @Nullable
+    @Unofficial // https://github.com/twitchdev/issues/issues/868
+    private String recipientUserName;
+
+    /**
+     * The user login of the recipient of the paid-forward gift sub.
+     * Null if gifted to the broad community, rather than a specific target.
+     */
+    @Nullable
+    @Unofficial // https://github.com/twitchdev/issues/issues/868
+    private String recipientUserLogin;
 
 }
