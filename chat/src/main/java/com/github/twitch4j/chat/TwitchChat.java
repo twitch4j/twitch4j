@@ -563,7 +563,7 @@ public class TwitchChat implements ITwitchChat {
                     // - Reconnect
                     else if (message.equalsIgnoreCase(":tmi.twitch.tv RECONNECT")) {
                         log.debug("Received RECONNECT request");
-                        this.reconnect();
+                        taskExecutor.execute(this::reconnect);
                     }
                     // - Login failed.
                     else if (message.equalsIgnoreCase(":tmi.twitch.tv NOTICE * :Login authentication failed")) {
