@@ -5,7 +5,7 @@ import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.TestUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.enums.PubSubType;
-import com.github.twitch4j.pubsub.events.FollowingEvent;
+import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ public class PooledTwitchPubSubTest {
             .maxSubscriptionsPerConnection(3) // excessively low just for testing purposes
             .build();
 
-        pool.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(FollowingEvent.class, System.out::println);
+        pool.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(RaidGoEvent.class, System.out::println);
     }
 
     @Test
