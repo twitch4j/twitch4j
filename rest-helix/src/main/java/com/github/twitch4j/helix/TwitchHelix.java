@@ -1210,7 +1210,6 @@ public interface TwitchHelix {
      * @return {@link AdScheduleWrapper}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_ADS_READ
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("GET /channels/ads?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<AdScheduleWrapper> getAdSchedule(
@@ -1232,7 +1231,6 @@ public interface TwitchHelix {
      * @return {@link SnoozedAdWrapper}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_ADS_MANAGE
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("POST /channels/ads/schedule/snooze?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<SnoozedAdWrapper> snoozeNextAd(

@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
-    public final @ApiStatus.Experimental BetaChannelAdBreakBeginType BETA_CHANNEL_AD_BREAK_BEGIN;
+    public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelChatClearType CHANNEL_CHAT_CLEAR;
     public final ChannelClearUserMessagesType CHANNEL_CLEAR_USER_MESSAGES;
@@ -74,7 +74,7 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
-                BETA_CHANNEL_AD_BREAK_BEGIN = new BetaChannelAdBreakBeginType(),
+                CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHAT_CLEAR = new ChannelChatClearType(),
                 CHANNEL_CLEAR_USER_MESSAGES = new ChannelClearUserMessagesType(),

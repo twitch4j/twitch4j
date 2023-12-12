@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -28,12 +29,14 @@ public class AdSchedule {
     /**
      * The length in seconds of the scheduled upcoming ad break.
      */
+    @JsonAlias({"duration", "duration_seconds"})
     private Integer lengthSeconds;
 
     /**
      * The amount of pre-roll free time remaining for the channel in seconds.
      * Returns 0 if they are currently not pre-roll free.
      */
+    @JsonAlias("preroll_free_time")
     private Integer prerollFreeTimeSeconds;
 
     /**

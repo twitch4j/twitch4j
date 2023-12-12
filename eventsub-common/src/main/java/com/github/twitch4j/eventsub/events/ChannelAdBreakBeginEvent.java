@@ -20,9 +20,9 @@ import java.time.Instant;
 public class ChannelAdBreakBeginEvent extends EventSubChannelEvent {
 
     /**
-     * Length in seconds of the mid-roll ad break requested
+     * Length in seconds of the mid-roll ad break requested.
      */
-    @JsonAlias("duration") // https://github.com/twitchdev/issues/issues/850
+    @JsonAlias({"duration", "duration_seconds"}) // https://github.com/twitchdev/issues/issues/850
     private Integer lengthSeconds;
 
     /**
@@ -35,7 +35,7 @@ public class ChannelAdBreakBeginEvent extends EventSubChannelEvent {
     private Instant startedAt;
 
     /**
-     * Indicates if the ad was automatically scheduled via Ads Manager
+     * Indicates if the ad was automatically scheduled via Ads Manager.
      */
     @Accessors(fluent = true)
     @JsonProperty("is_automatic")
@@ -46,5 +46,15 @@ public class ChannelAdBreakBeginEvent extends EventSubChannelEvent {
      * For automatic ads, this will be the ID of the broadcaster.
      */
     private String requesterUserId;
+
+    /**
+     * The login of the user that requested the ad.
+     */
+    private String requesterUserLogin;
+
+    /**
+     * The display name of the user that requested the ad.
+     */
+    private String requesterUserName;
 
 }
