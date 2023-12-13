@@ -5,7 +5,7 @@ import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.TestUtils;
 import com.github.twitch4j.pubsub.domain.PubSubRequest;
 import com.github.twitch4j.pubsub.enums.PubSubType;
-import com.github.twitch4j.pubsub.events.FollowingEvent;
+import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ public class PooledTwitchPubSubTest {
             .maxSubscriptionsPerConnection(3) // excessively low just for testing purposes
             .build();
 
-        pool.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(FollowingEvent.class, System.out::println);
+        pool.getEventManager().getEventHandler(SimpleEventHandler.class).onEvent(RaidGoEvent.class, System.out::println);
     }
 
     @Test
@@ -39,31 +39,31 @@ public class PooledTwitchPubSubTest {
         assertEquals(0, pool.numConnections());
         assertEquals(0, pool.numSubscriptions());
 
-        PubSubSubscription f1 = pool.listenForFollowingEvents(null, "207813352");
+        PubSubSubscription f1 = pool.listenForRaidEvents(null, "207813352");
         assertEquals(1, pool.numConnections());
         assertEquals(1, pool.numSubscriptions());
 
-        PubSubSubscription f2 = pool.listenForFollowingEvents(null, "22025290");
+        PubSubSubscription f2 = pool.listenForRaidEvents(null, "22025290");
         assertEquals(1, pool.numConnections());
         assertEquals(2, pool.numSubscriptions());
 
-        PubSubSubscription f3 = pool.listenForFollowingEvents(null, "35759863");
+        PubSubSubscription f3 = pool.listenForRaidEvents(null, "35759863");
         assertEquals(1, pool.numConnections());
         assertEquals(3, pool.numSubscriptions());
 
-        PubSubSubscription f4 = pool.listenForFollowingEvents(null, "468488256");
+        PubSubSubscription f4 = pool.listenForRaidEvents(null, "468488256");
         assertEquals(2, pool.numConnections());
         assertEquals(4, pool.numSubscriptions());
 
-        PubSubSubscription f5 = pool.listenForFollowingEvents(null, "269275547");
+        PubSubSubscription f5 = pool.listenForRaidEvents(null, "269275547");
         assertEquals(2, pool.numConnections());
         assertEquals(5, pool.numSubscriptions());
 
-        PubSubSubscription f6 = pool.listenForFollowingEvents(null, "450107466");
+        PubSubSubscription f6 = pool.listenForRaidEvents(null, "450107466");
         assertEquals(2, pool.numConnections());
         assertEquals(6, pool.numSubscriptions());
 
-        PubSubSubscription f7 = pool.listenForFollowingEvents(null, "40197643");
+        PubSubSubscription f7 = pool.listenForRaidEvents(null, "40197643");
         assertEquals(3, pool.numConnections());
         assertEquals(7, pool.numSubscriptions());
 
@@ -97,7 +97,7 @@ public class PooledTwitchPubSubTest {
         assertEquals(0, pool.numConnections());
         assertEquals(0, pool.numSubscriptions());
 
-        PubSubSubscription f8 = pool.subscribe(createListenToFollowsReq("134214675", "91693482"));
+        PubSubSubscription f8 = pool.subscribe(createListenToRaidsReq("134214675", "91693482"));
         assertEquals(1, pool.numConnections());
         assertEquals(2, pool.numSubscriptions());
 
@@ -110,11 +110,11 @@ public class PooledTwitchPubSubTest {
         TestUtils.sleepFor(5000);
     }
 
-    private static PubSubRequest createListenToFollowsReq(String... channelIds) {
+    private static PubSubRequest createListenToRaidsReq(String... channelIds) {
         PubSubRequest req = new PubSubRequest();
         req.setType(PubSubType.LISTEN);
         req.setNonce(CryptoUtils.generateNonce(30));
-        req.getData().put("topics", Arrays.stream(channelIds).map(id -> "following." + id).collect(Collectors.toList()));
+        req.getData().put("topics", Arrays.stream(channelIds).map(id -> "raid." + id).collect(Collectors.toList()));
         return req;
     }
 

@@ -495,8 +495,11 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential {@link OAuth2Credential}
      * @param channelId  the id for the channel
      * @return PubSubSubscription
+     * @deprecated Twitch has silently disabled this topic, even for first-party moderator tokens.
+     * You should migrate to eventsub (websocket) channel.follow v2 subscription type.
      */
     @Unofficial
+    @Deprecated // https://github.com/twitchdev/issues/issues/843
     default PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "following." + channelId);
     }
