@@ -1,4 +1,4 @@
-import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import com.github.gmazzo.buildconfig.BuildConfigExtension
 
 plugins {
 	id("com.github.gmazzo.buildconfig")
