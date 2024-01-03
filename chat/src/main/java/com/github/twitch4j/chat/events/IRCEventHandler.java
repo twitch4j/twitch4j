@@ -694,48 +694,46 @@ public class IRCEventHandler {
             // getting Status on channel
             EventChannel channel = event.getChannel();
             Map<ChannelStateEvent.ChannelState, Object> states = new HashMap<>();
-            if (event.getEscapedTags().size() > 2) {
-                event.getEscapedTags().forEach((k, v) -> {
-                    switch (k) {
-                        case "broadcaster-lang":
-                            Locale locale = v != null ? Locale.forLanguageTag(v.toString()) : null;
-                            states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, locale);
-                            eventManager.publish(new BroadcasterLanguageEvent(channel, locale));
-                            break;
-                        case "emote-only":
-                            boolean eoActive = StringUtils.equals("1", v);
-                            states.put(ChannelStateEvent.ChannelState.EMOTE, eoActive);
-                            eventManager.publish(new EmoteOnlyEvent(channel, eoActive));
-                            break;
-                        case "followers-only":
-                            long followDelay = Long.parseLong(v.toString());
-                            states.put(ChannelStateEvent.ChannelState.FOLLOWERS, followDelay);
-                            eventManager.publish(new FollowersOnlyEvent(channel, followDelay));
-                            break;
-                        case "r9k":
-                            boolean uniqActive = StringUtils.equals("1", v);
-                            states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
-                            eventManager.publish(new Robot9000Event(channel, uniqActive));
-                            break;
-                        case "rituals":
-                            boolean ritualsActive = StringUtils.equals("1", v);
-                            states.put(ChannelStateEvent.ChannelState.RITUALS, ritualsActive);
-                            break;
-                        case "slow":
-                            long slowDelay = Long.parseLong(v.toString());
-                            states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
-                            eventManager.publish(new SlowModeEvent(channel, slowDelay));
-                            break;
-                        case "subs-only":
-                            boolean subActive = StringUtils.equals("1", v);
-                            states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, subActive);
-                            eventManager.publish(new SubscribersOnlyEvent(channel, subActive));
-                            break;
-                        default:
-                            break;
-                    }
-                });
-            }
+            event.getEscapedTags().forEach((k, v) -> {
+                switch (k) {
+                    case "broadcaster-lang":
+                        Locale locale = v != null ? Locale.forLanguageTag(v.toString()) : null;
+                        states.put(ChannelStateEvent.ChannelState.BROADCAST_LANG, locale);
+                        eventManager.publish(new BroadcasterLanguageEvent(channel, locale));
+                        break;
+                    case "emote-only":
+                        boolean eoActive = StringUtils.equals("1", v);
+                        states.put(ChannelStateEvent.ChannelState.EMOTE, eoActive);
+                        eventManager.publish(new EmoteOnlyEvent(channel, eoActive));
+                        break;
+                    case "followers-only":
+                        long followDelay = Long.parseLong(v.toString());
+                        states.put(ChannelStateEvent.ChannelState.FOLLOWERS, followDelay);
+                        eventManager.publish(new FollowersOnlyEvent(channel, followDelay));
+                        break;
+                    case "r9k":
+                        boolean uniqActive = StringUtils.equals("1", v);
+                        states.put(ChannelStateEvent.ChannelState.R9K, uniqActive);
+                        eventManager.publish(new Robot9000Event(channel, uniqActive));
+                        break;
+                    case "rituals":
+                        boolean ritualsActive = StringUtils.equals("1", v);
+                        states.put(ChannelStateEvent.ChannelState.RITUALS, ritualsActive);
+                        break;
+                    case "slow":
+                        long slowDelay = Long.parseLong(v.toString());
+                        states.put(ChannelStateEvent.ChannelState.SLOW, slowDelay);
+                        eventManager.publish(new SlowModeEvent(channel, slowDelay));
+                        break;
+                    case "subs-only":
+                        boolean subActive = StringUtils.equals("1", v);
+                        states.put(ChannelStateEvent.ChannelState.SUBSCRIBERS, subActive);
+                        eventManager.publish(new SubscribersOnlyEvent(channel, subActive));
+                        break;
+                    default:
+                        break;
+                }
+            });
             eventManager.publish(new ChannelStateEvent(channel, states));
             return true;
         }
