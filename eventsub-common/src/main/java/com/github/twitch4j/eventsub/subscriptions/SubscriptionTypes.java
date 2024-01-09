@@ -20,6 +20,7 @@ public class SubscriptionTypes {
     public final ChannelClearUserMessagesType CHANNEL_CLEAR_USER_MESSAGES;
     public final ChannelMessageDeleteType CHANNEL_CHAT_MESSAGE_DELETE;
     public final ChannelChatNotificationType CHANNEL_CHAT_NOTIFICATION;
+    public final @ApiStatus.Experimental BetaChannelChatSettingsUpdateType BETA_CHANNEL_CHAT_SETTINGS_UPDATE;
     public final ChannelCharityDonateType CHANNEL_CHARITY_DONATE;
     public final CharityCampaignStartType CHANNEL_CHARITY_START;
     public final CharityCampaignProgressType CHANNEL_CHARITY_PROGRESS;
@@ -80,6 +81,7 @@ public class SubscriptionTypes {
                 CHANNEL_CLEAR_USER_MESSAGES = new ChannelClearUserMessagesType(),
                 CHANNEL_CHAT_MESSAGE_DELETE = new ChannelMessageDeleteType(),
                 CHANNEL_CHAT_NOTIFICATION = new ChannelChatNotificationType(),
+                BETA_CHANNEL_CHAT_SETTINGS_UPDATE = new BetaChannelChatSettingsUpdateType(),
                 CHANNEL_CHARITY_DONATE = new ChannelCharityDonateType(),
                 CHANNEL_CHARITY_START = new CharityCampaignStartType(),
                 CHANNEL_CHARITY_PROGRESS = new CharityCampaignProgressType(),
