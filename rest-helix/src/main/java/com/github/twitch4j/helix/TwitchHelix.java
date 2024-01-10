@@ -1960,7 +1960,7 @@ public interface TwitchHelix {
     /**
      * Removes a moderator from the broadcaster’s chat room.
      *
-     * @param authToken     Broadcaster's user access token that includes the channel:manage:moderators scope.
+     * @param authToken     User access token (scope: channel:manage:moderators) of the broadcaster or target moderator.
      * @param broadcasterId The ID of the broadcaster that owns the chat room.
      * @param userId        The ID of the user to remove as a moderator from the broadcaster’s chat room.
      * @return 204 No Content upon a successful call
