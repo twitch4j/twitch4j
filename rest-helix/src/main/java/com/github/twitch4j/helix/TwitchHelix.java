@@ -1870,6 +1870,26 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of channels that the specified user has moderator privileges in.
+     *
+     * @param authToken User access token (scope: user:read:moderated_channels)
+     * @param userId    The user id associated with the user access token
+     * @param limit     The maximum number of items to return per page in the response. Default: 20. Minimum: 1. Maximum: 100.
+     * @param after     The cursor used to get the next page of results.
+     * @return {@link ModeratedChannelList}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_MODERATED_READ
+     */
+    @ApiStatus.Experimental // open beta since 2024-01-08
+    @RequestLine("GET /moderation/channels?user_id={user_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ModeratedChannelList> getModeratedChannels(
+        @Param("token") String authToken,
+        @Param("user_id") String userId,
+        @Param("first") Integer limit,
+        @Param("after") String after
+    );
+
+    /**
      * Removes a single chat message or all chat messages from the broadcaster’s chat room.
      * <p>
      * The ID in the moderator_id query parameter must match the user ID in the access token.

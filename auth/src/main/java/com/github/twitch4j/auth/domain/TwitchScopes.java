@@ -64,6 +64,7 @@ public enum TwitchScopes {
     HELIX_USER_FOLLOWS_READ("user:read:follows"),
     HELIX_USER_SUBSCRIPTIONS_READ("user:read:subscriptions"),
     HELIX_USER_EMAIL("user:read:email"),
+    HELIX_USER_MODERATED_READ("user:read:moderated_channels"),
     HELIX_USER_BLOCKS_MANAGE("user:manage:blocked_users"),
     HELIX_USER_WHISPERS_MANAGE("user:manage:whispers"),
     KRAKEN_CHANNEL_CHECK_SUBSCRIPTION("channel_check_subscription"),
