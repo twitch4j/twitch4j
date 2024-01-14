@@ -81,7 +81,7 @@ subprojects {
 			api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0")
 
 			// Credential Manager
-			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.2.2")
+			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.3.0")
 
 			// HTTP Client
 			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.1")
@@ -205,7 +205,7 @@ subprojects {
 						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.1",
-						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.2.2",
+						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.3.0",
 						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.1",
 						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.1",
 						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.1",

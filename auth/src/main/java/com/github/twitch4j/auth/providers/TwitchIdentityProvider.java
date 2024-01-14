@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
+import com.github.philippheuer.credentialmanager.util.ProxyHelper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
@@ -30,7 +31,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @param redirectUrl  Redirect Url
      */
     public TwitchIdentityProvider(String clientId, String clientSecret, String redirectUrl) {
-        super(PROVIDER_NAME, "oauth2", clientId, clientSecret, "https://id.twitch.tv/oauth2/authorize", "https://id.twitch.tv/oauth2/token", redirectUrl);
+        super(PROVIDER_NAME, "oauth2", clientId, clientSecret, "https://id.twitch.tv/oauth2/authorize", "https://id.twitch.tv/oauth2/token", "https://id.twitch.tv/oauth2/device", redirectUrl, ProxyHelper.selectProxy());
 
         // configuration
         this.tokenEndpointPostType = "QUERY";
