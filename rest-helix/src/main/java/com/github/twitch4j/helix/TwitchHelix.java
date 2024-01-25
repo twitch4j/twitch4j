@@ -541,6 +541,29 @@ public interface TwitchHelix {
     );
 
     /**
+     * Sends a message to the broadcaster’s chat room.
+     * <p>
+     * If an app access token is used, the chatting user must have authorized to the Client ID with the user:bot scope,
+     * and the broadcaster or a moderator must have authorized to the Client ID with the channel:bot scope.
+     *
+     * @param authToken User access token (scope: user:write:chat) or App access token (with Client ID authorized).
+     * @param message   The message to be sent, including the source and target user IDs.
+     * @return metadata about the send message attempt
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_CHAT_WRITE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_BOT
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_USER_BOT
+     */
+    @RequestLine("POST /chat/messages")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<SentChatMessageWrapper> sendChatMessage(
+        @Param("token") String authToken,
+        ChatMessage message
+    );
+
+    /**
      * Sends a Shoutout to the specified broadcaster.
      * <p>
      * Rate Limits: The broadcaster may send a Shoutout once every 2 minutes.
