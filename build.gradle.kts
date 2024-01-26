@@ -84,10 +84,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.3.0")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.1")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.1")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.1")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.1")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.2")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.2")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.2")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.2")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -206,10 +206,10 @@ subprojects {
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.3.0",
-						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.2",
+						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.2",
+						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.2",
+						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.2",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/1.7.36",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.16.1",
