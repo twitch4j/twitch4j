@@ -55,6 +55,8 @@ public enum TwitchScopes {
     HELIX_SHIELD_MODE_READ("moderator:read:shield_mode"),
     HELIX_SHOUTOUTS_MANAGE("moderator:manage:shoutouts"),
     HELIX_SHOUTOUTS_READ("moderator:read:shoutouts"),
+    HELIX_UNBAN_REQUESTS_MANAGE("moderator:manage:unban_requests"),
+    HELIX_UNBAN_REQUESTS_READ("moderator:read:unban_requests"),
     HELIX_USER_COLOR_MANAGE("user:manage:chat_color"),
     HELIX_USER_EDIT("user:edit"),
     HELIX_USER_EDIT_BROADCAST("user:edit:broadcast"),
