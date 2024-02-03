@@ -93,7 +93,7 @@ subprojects {
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
 
 			// Regex
-			api(group = "com.github.tony19", name = "named-regexp", version = "0.2.8")
+			api(group = "com.github.tony19", name = "named-regexp", version = "1.0.0")
 
 			// Hystrix
 			api(group = "com.netflix.hystrix", name = "hystrix-core", version = "1.5.18")
