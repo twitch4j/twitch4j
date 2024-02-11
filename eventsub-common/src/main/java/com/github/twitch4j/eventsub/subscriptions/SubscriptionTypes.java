@@ -18,6 +18,7 @@ public class SubscriptionTypes {
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelChatClearType CHANNEL_CHAT_CLEAR;
     public final ChannelClearUserMessagesType CHANNEL_CLEAR_USER_MESSAGES;
+    public final ChannelChatMessageType CHANNEL_CHAT_MESSAGE;
     public final ChannelMessageDeleteType CHANNEL_CHAT_MESSAGE_DELETE;
     public final ChannelChatNotificationType CHANNEL_CHAT_NOTIFICATION;
     public final @ApiStatus.Experimental BetaChannelChatSettingsUpdateType BETA_CHANNEL_CHAT_SETTINGS_UPDATE;
@@ -79,6 +80,7 @@ public class SubscriptionTypes {
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHAT_CLEAR = new ChannelChatClearType(),
                 CHANNEL_CLEAR_USER_MESSAGES = new ChannelClearUserMessagesType(),
+                CHANNEL_CHAT_MESSAGE = new ChannelChatMessageType(),
                 CHANNEL_CHAT_MESSAGE_DELETE = new ChannelMessageDeleteType(),
                 CHANNEL_CHAT_NOTIFICATION = new ChannelChatNotificationType(),
                 BETA_CHANNEL_CHAT_SETTINGS_UPDATE = new BetaChannelChatSettingsUpdateType(),
