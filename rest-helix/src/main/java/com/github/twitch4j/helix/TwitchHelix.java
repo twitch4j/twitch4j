@@ -1902,7 +1902,6 @@ public interface TwitchHelix {
      * @return {@link ModeratedChannelList}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_MODERATED_READ
      */
-    @ApiStatus.Experimental // open beta since 2024-01-08
     @RequestLine("GET /moderation/channels?user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ModeratedChannelList> getModeratedChannels(
@@ -2118,6 +2117,57 @@ public interface TwitchHelix {
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
         @Param("is_active") boolean active
+    );
+
+    /**
+     * Gets a list of unban requests for a broadcaster’s channel.
+     *
+     * @param authToken     User access token (scope: moderator:read:unban_requests or moderator:manage:unban_requests) of a channel moderator.
+     * @param broadcasterId The ID of the broadcaster whose channel is receiving unban requests.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s unban requests. This ID must match the user ID in the user access token.
+     * @param status        Filter by a status.
+     * @param userId        Optional: Filter by a user ID of an unban request submitter (i.e., someone who was banned).
+     * @param after         Optional: Cursor used to get next page of results.
+     * @param limit         Optional: The maximum number of items to return per page in response.
+     * @return UnbanRequestList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_MANAGE
+     */
+    @ApiStatus.Experimental
+    @RequestLine("GET /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&status={status}&user_id={user_id}&after={after}&first={first}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UnbanRequestList> getUnbanRequests(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @NotNull @Param("status") UnbanRequestStatus status,
+        @Nullable @Param("user_id") String userId,
+        @Nullable @Param("after") String after,
+        @Nullable @Param("first") Integer limit
+    );
+
+    /**
+     * Resolve an unban request by approving or denying it.
+     *
+     * @param authToken      User access token (scope: moderator:manage:unban_requests) from a channel moderator.
+     * @param broadcasterId  The ID of the broadcaster whose channel is approving or denying the unban request.
+     * @param moderatorId    The ID of the broadcaster or a user that has permission to moderate the broadcaster’s unban requests. This ID must match the user ID in the user access token.
+     * @param unbanRequestId The ID of the unban request to resolve; {@link UnbanRequest#getId()}.
+     * @param status         Resolution status; should be {@link UnbanRequestStatus#APPROVED} or {@link UnbanRequestStatus#DENIED}.
+     * @param resolutionText Optional: Message supplied by the unban request resolver to be shown to the requestor.
+     * @return UnbanRequestList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_MANAGE
+     */
+    @ApiStatus.Experimental
+    @RequestLine("PATCH /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&unban_request_id={unban_request_id}&status={status}&resolution_text={resolution_text}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UnbanRequestList> resolveUnbanRequest(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @NotNull @Param("unban_request_id") String unbanRequestId,
+        @NotNull @Param("status") UnbanRequestStatus status,
+        @Nullable @Param("resolution_text") String resolutionText
     );
 
     /**
