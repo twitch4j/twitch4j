@@ -1963,14 +1963,15 @@ public interface TwitchHelix {
     /**
      * Returns all moderators in a channel.
      *
-     * @param authToken User Token for the broadcaster
+     * @param authToken     User Token for the broadcaster (scope: moderation:read or channel:manage:moderators),
      * @param broadcasterId Provided broadcaster_id must match the user_id in the auth token.
-     * @param userIds Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
-     * @param after Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
-     * @param limit Maximum number of objects to return. Maximum: 100. Default: 20.
+     * @param userIds       Filters the results and only returns a status object for users who are moderators in this channel and have a matching user_id.
+     * @param after         Cursor for forward pagination: tells the server where to start fetching the next set of results, in a multi-page response. The cursor value specified here is from the pagination response field of a prior query.
+     * @param limit         Maximum number of objects to return. Maximum: 100. Default: 20.
      * @return ModeratorList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_MODERATION_READ
      */
-    @RequestLine(value = "GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
+    @RequestLine("GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ModeratorList> getModerators(
         @Param("token") String authToken,
