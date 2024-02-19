@@ -21,10 +21,18 @@ import com.github.twitch4j.pubsub.events.HypeTrainRewardsEvent;
 import com.github.twitch4j.pubsub.events.HypeTrainStartEvent;
 import com.github.twitch4j.pubsub.events.SupportActivityFeedEvent;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 class TrainHandler implements TopicHandler {
     @Override
     public String topicName() {
-        return "hype-train-events-v1";
+        return "hype-train-events-v2";
+    }
+
+    @Override
+    public Collection<String> topicNames() {
+        return Arrays.asList(topicName(), "hype-train-events-v1");
     }
 
     @Override

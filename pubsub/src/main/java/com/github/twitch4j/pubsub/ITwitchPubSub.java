@@ -394,10 +394,12 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     default PubSubSubscription listenForHypeTrainEvents(OAuth2Credential credential, String channelId) {
-        return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1." + channelId);
+        return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v2." + channelId);
     }
 
     @Unofficial
+    @Deprecated // implemented, but no longer used by first-party
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForHypeTrainRewardEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "hype-train-events-v1.rewards." + channelId);
     }

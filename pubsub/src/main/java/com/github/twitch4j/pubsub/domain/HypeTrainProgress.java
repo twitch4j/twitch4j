@@ -9,4 +9,9 @@ public class HypeTrainProgress {
     private Integer goal;
     private Integer total;
     private Integer remainingSeconds;
+    private String allTimeHighState; // e.g., "NONE", "APPROACHING", "REACHED"
+
+    public boolean isAllTimeHigh() {
+        return "REACHED".equals(allTimeHighState);
+    }
 }

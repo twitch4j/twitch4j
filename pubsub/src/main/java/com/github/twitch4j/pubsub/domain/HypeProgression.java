@@ -7,6 +7,9 @@ import lombok.experimental.Accessors;
 @Data
 public class HypeProgression {
     private String userId;
+    private String userLogin;
+    private String userDisplayName;
+    private String userProfileImageUrl;
     private Integer sequenceId;
     private String action;
     private String source;
@@ -15,4 +18,6 @@ public class HypeProgression {
     @Accessors(fluent = true)
     @JsonProperty("is_boost_train")
     private Boolean isBoostTrain;
+    @JsonProperty("is_large_event")
+    private boolean largeEvent;
 }
