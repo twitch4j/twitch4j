@@ -138,6 +138,18 @@ public class TwitchHelixHttpClient implements Client {
                 return executeAgainstBucket(modsBucket, () -> client.execute(request, options));
         }
 
+        // Chat API: sendChatMessage has a stricter bucket that applies per sender
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/chat/messages")) {
+            // Obtain user id
+            String token = Objects.requireNonNull(getFirstHeader(AUTH_HEADER, request)).substring(BEARER_PREFIX.length());
+            OAuth2Credential cred = tokenManager.getIfPresent(token);
+            String userId = cred != null ? cred.getUserId() : "";
+
+            // Conform to endpoint-specific bucket
+            Bucket chatBucket = rateLimitTracker.getChatBucket(userId != null ? userId : "");
+            return executeAgainstBucket(chatBucket, () -> client.execute(request, options));
+        }
+
         // Clips API: createClip has a stricter bucket that applies per user id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/clips")) {
             // Obtain user id

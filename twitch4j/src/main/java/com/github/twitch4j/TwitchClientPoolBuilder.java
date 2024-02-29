@@ -468,6 +468,7 @@ public class TwitchClientPoolBuilder {
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
                 .withLogLevel(feignLogLevel)
+                .withChatRateLimit(chatRateLimit)
                 .build();
         } else {
             helix = null;

@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -219,6 +220,11 @@ public final class TwitchHelixRateLimitTracker {
     private final Bandwidth apiRateLimit;
 
     /**
+     * The rate limit for sending chat messages
+     */
+    private final Bandwidth chatRateLimit;
+
+    /**
      * Twitch Helix Token Manager
      */
     private final TwitchHelixTokenManager tokenManager;
@@ -245,6 +251,11 @@ public final class TwitchHelixRateLimitTracker {
     /*
      * Secondary (endpoint-specific) rate limit buckets
      */
+
+    @NotNull
+    Bucket getChatBucket(@NotNull String userId) {
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(userId, TwitchLimitType.CHAT_MESSAGE_LIMIT, Collections.singletonList(chatRateLimit));
+    }
 
     @NotNull
     Bucket getExtensionChatBucket(@NotNull String clientId, @NotNull String channelId) {

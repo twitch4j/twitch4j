@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
+import com.github.twitch4j.common.enums.TwitchLimitType;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +59,13 @@ public class TwitchHelixBuilder {
      * @see <a href="https://dev.twitch.tv/docs/api/guide#rate-limits">Helix Rate Limit Reference</a>
      */
     public static final Bandwidth DEFAULT_BANDWIDTH = BucketUtils.simple(800, Duration.ofMinutes(1));
+
+    /**
+     * Not officially documented for helix, but the API endpoint shares the same bucket as IRC.
+     *
+     * @see <a href="https://dev.twitch.tv/docs/irc/#rate-limits">IRC Rate Limit Documentation</a>
+     */
+    private static final Bandwidth DEFAULT_CHAT_BANDWIDTH = BucketUtils.simple(20, Duration.ofSeconds(30), TwitchLimitType.CHAT_MESSAGE_LIMIT.getBandwidthId());
 
     /**
      * Client Id
@@ -125,6 +134,15 @@ public class TwitchHelixBuilder {
     private Bandwidth apiRateLimit = DEFAULT_BANDWIDTH;
 
     /**
+     * Custom Rate Limit to use for Helix Send Chat Message endpoint.
+     * <p>
+     * To customize the rate-limit for different user IDs,
+     * utilize {@link com.github.twitch4j.common.util.TwitchLimitRegistry#setLimit(String, TwitchLimitType, List)}.
+     */
+    @With
+    private Bandwidth chatRateLimit = DEFAULT_CHAT_BANDWIDTH;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -173,9 +191,12 @@ public class TwitchHelixBuilder {
         if (apiRateLimit == null)
             apiRateLimit = DEFAULT_BANDWIDTH;
 
+        if (chatRateLimit == null)
+            chatRateLimit = DEFAULT_CHAT_BANDWIDTH;
+
         // Feign
         TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(clientId, clientSecret, defaultAuthToken);
-        TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
+        TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, chatRateLimit, tokenManager);
         return HystrixFeign.builder()
             .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
             .encoder(new JacksonEncoder(serializer))

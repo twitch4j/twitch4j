@@ -445,6 +445,7 @@ public class TwitchClientBuilder {
                 .withTimeout(timeout)
                 .withProxyConfig(proxyConfig)
                 .withLogLevel(feignLogLevel)
+                .withChatRateLimit(chatRateLimit)
                 .build();
         }
 
