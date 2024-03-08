@@ -27,6 +27,13 @@ public class EmoteList {
     private String template;
 
     /**
+     * Contains the information used to page through the list of results.
+     * <p>
+     * The object is empty if there are no more pages left to page through.
+     */
+    private HelixPagination pagination;
+
+    /**
      * Uses the values from id, format, scale, and theme_mode to replace the like-named placeholder strings in the templated URL to create a CDN (content delivery network) URL that you use to fetch the emote.
      *
      * @param id     The emote’s ID.
