@@ -141,7 +141,7 @@ subprojects {
 		// - Mocking
 		testImplementation(platform("org.mockito:mockito-bom:5.11.0"))
 		// - Await
-		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.0")
+		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.1")
 		// - Logging
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.14")
 	}
