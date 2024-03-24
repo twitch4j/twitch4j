@@ -23,7 +23,7 @@ public class NotificationDeserializer extends JsonDeserializer<EventSubNotificat
         final EventSubSubscription sub = getObject(p.getCodec(), root, "subscription", EventSubSubscription.class);
         if (sub == null) return null;
 
-        final String challenge = root.path("challenge").asText(null);
+        final String challenge = root.path("challenge").textValue();
 
         final SubscriptionType<?, ?, ?> type = sub.getType();
         final EventSubEvent event;
