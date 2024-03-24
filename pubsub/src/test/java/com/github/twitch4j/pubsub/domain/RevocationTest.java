@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.pubsub.enums.PubSubType;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Tag("unittest")
 class RevocationTest {
 
     @Test

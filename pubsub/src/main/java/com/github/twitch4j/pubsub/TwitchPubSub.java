@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
 import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
@@ -413,6 +414,13 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param request PubSub request (or Topic)
      */
     private void queueRequest(PubSubRequest request) {
+        // use latest token (in case of expiry)
+        OAuth2Credential credential = request.getCredential();
+        if (credential != null) {
+            request.getData().put("auth_token", credential.getAccessToken());
+        }
+
+        // queue the request
         commandQueue.add(TypeConvert.objectToJson(request));
 
         // Expedite command execution if we aren't already flushing the queue and another expedition hasn't already been requested

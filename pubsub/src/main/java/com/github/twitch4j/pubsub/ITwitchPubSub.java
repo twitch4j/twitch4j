@@ -45,7 +45,7 @@ public interface ITwitchPubSub extends AutoCloseable {
         PubSubRequest request = new PubSubRequest();
         request.setType(type);
         request.setNonce(CryptoUtils.generateNonce(30));
-        request.getData().put("auth_token", credential != null ? credential.getAccessToken() : "");
+        request.setCredential(credential);
         request.getData().put("topics", topics);
 
         return listenOnTopic(request);

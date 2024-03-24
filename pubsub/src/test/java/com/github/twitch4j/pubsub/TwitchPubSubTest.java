@@ -6,6 +6,7 @@ import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.test.TestEventManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,6 +18,7 @@ import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.times;
 
 @Slf4j
+@Tag("unittest")
 public class TwitchPubSubTest {
     private WebsocketConnection connection;
 
@@ -55,9 +57,9 @@ public class TwitchPubSubTest {
         await().atMost(Duration.ofSeconds(1)).until(() -> pubSub.commandQueue.size() == 0);
 
         // verify
-        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"channel-bits-events-v2.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
-        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"channel-subscribe-events-v1.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
-        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"topics\":[\"whispers.149223493\"],\"auth_token\":\"my-secret-token\"}}")));
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"auth_token\":\"my-secret-token\",\"topics\":[\"channel-bits-events-v2.149223493\"]}}")));
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"auth_token\":\"my-secret-token\",\"topics\":[\"channel-subscribe-events-v1.149223493\"]}}")));
+        Mockito.verify(connection, times(1)).sendText(matches(noncePattern("{\"type\":\"LISTEN\",\"nonce\":\"NONCE_ANY\",\"data\":{\"auth_token\":\"my-secret-token\",\"topics\":[\"whispers.149223493\"]}}")));
     }
 
     private String noncePattern(String input) {
