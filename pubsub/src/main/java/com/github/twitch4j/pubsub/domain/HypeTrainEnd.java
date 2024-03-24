@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class HypeTrainEnd {
@@ -16,4 +17,6 @@ public class HypeTrainEnd {
     @Accessors(fluent = true)
     @JsonProperty("is_boost_train")
     private Boolean isBoostTrain;
+    private List<HypeTrainParticipation> participationTotals;
+    private List<HypeReward> rewards;
 }
