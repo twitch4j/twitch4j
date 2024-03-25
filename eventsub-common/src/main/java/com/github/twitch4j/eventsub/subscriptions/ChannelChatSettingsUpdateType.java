@@ -14,7 +14,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatSettingsUpdateEvent;
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_USER_BOT
  * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_BOT
  */
-public class BetaChannelChatSettingsUpdateType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatSettingsUpdateEvent> {
+public class ChannelChatSettingsUpdateType implements SubscriptionType<ChannelChatCondition, ChannelChatCondition.ChannelChatConditionBuilder<?, ?>, ChannelChatSettingsUpdateEvent> {
     @Override
     public String getName() {
         return "channel.chat_settings.update";
@@ -22,7 +22,7 @@ public class BetaChannelChatSettingsUpdateType implements SubscriptionType<Chann
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
