@@ -405,7 +405,6 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
-    @Deprecated
     default PubSubSubscription listenForBroadcastSettingUpdateEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "broadcast-settings-update." + channelId);
     }
