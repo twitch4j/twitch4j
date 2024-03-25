@@ -3,6 +3,7 @@ package com.github.twitch4j.helix.domain;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -84,11 +85,13 @@ public class UnbanRequest {
     /**
      * Timestamp of when moderator/broadcaster approved or denied the request.
      */
+    @Nullable
     private Instant resolvedAt;
 
     /**
      * Text input by the resolver (moderator) of the unban request.
      */
+    @Nullable
     private String resolutionText;
 
 }
