@@ -35,14 +35,20 @@ public class Emote {
 
     /**
      * The image URLs for the emote.
+     * <p>
+     * This is <i>not</i> present for {@link TwitchHelix#getUserEmotes(String, String, String, String)};
+     * use {@link EmoteList#getPopulatedTemplateUrl(String, Format, Theme, Scale)}.
      */
+    @Nullable
     private Images images;
 
     /**
      * ID of the emote set the emote belongs to.
      * <p>
      * This is <i>not</i> present for {@link TwitchHelix#getGlobalEmotes(String)}.
-     * This <i>is</i> present for {@link TwitchHelix#getChannelEmotes(String, String)} and {@link TwitchHelix#getEmoteSets(String, Collection)}.
+     * This <i>is</i> present for {@link TwitchHelix#getChannelEmotes(String, String)},
+     * {@link TwitchHelix#getEmoteSets(String, Collection)},
+     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
      */
     @Nullable
     private String emoteSetId;
@@ -68,7 +74,8 @@ public class Emote {
     /**
      * User ID of the broadcaster who owns the emote.
      * <p>
-     * This is <i>only</i> present for {@link TwitchHelix#getEmoteSets(String, Collection)}.
+     * This is <i>only</i> present for {@link TwitchHelix#getEmoteSets(String, Collection)}
+     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
      */
     @Nullable
     private String ownerId;
@@ -76,7 +83,9 @@ public class Emote {
     /**
      * The type of emote.
      * <p>
-     * This is <i>only</i> present for {@link TwitchHelix#getChannelEmotes(String, String)} and {@link TwitchHelix#getEmoteSets(String, Collection)}.
+     * This is <i>only</i> present for {@link TwitchHelix#getChannelEmotes(String, String)}
+     * {@link TwitchHelix#getEmoteSets(String, Collection)},
+     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
      */
     @Nullable
     private String emoteType;
