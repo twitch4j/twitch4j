@@ -6,7 +6,9 @@ public enum EventSubTransportMethod {
     @JsonProperty("webhook")
     WEBHOOK,
     @JsonProperty("websocket")
-    WEBSOCKET;
+    WEBSOCKET,
+    @JsonProperty("conduit")
+    CONDUIT;
 
     @Override
     public String toString() {

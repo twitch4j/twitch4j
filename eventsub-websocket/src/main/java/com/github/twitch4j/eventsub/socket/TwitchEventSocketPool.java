@@ -30,6 +30,8 @@ import java.util.function.UnaryOperator;
 
 /**
  * A pool for EventSub websocket subscriptions across multiple users.
+ * <p>
+ * Should <i>not</i> be used with the "conduit" transport type.
  */
 @Slf4j
 @Builder
