@@ -64,6 +64,7 @@ public enum TwitchScopes {
     HELIX_USER_BLOCKS_READ("user:read:blocked_users"),
     HELIX_USER_READ_BROADCAST("user:read:broadcast"),
     HELIX_USER_CHAT_WRITE("user:write:chat"),
+    HELIX_USER_EMOTES_READ("user:read:emotes"),
     HELIX_USER_FOLLOWS_READ("user:read:follows"),
     HELIX_USER_SUBSCRIPTIONS_READ("user:read:subscriptions"),
     HELIX_USER_EMAIL("user:read:email"),

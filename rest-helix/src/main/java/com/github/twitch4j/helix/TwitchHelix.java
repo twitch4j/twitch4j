@@ -541,6 +541,27 @@ public interface TwitchHelix {
     );
 
     /**
+     * Retrieves emotes available to the user across all channels.
+     *
+     * @param authToken     User access token (scope: user:read:emotes).
+     * @param userId        The ID of the user. This ID must match the user ID in the user access token.
+     * @param broadcasterId Returns all emotes available to the user within the chat owned by the specified broadcaster.
+     *                      This includes the Global and Subscriber Emotes the user has access to,
+     *                      as well as channel-only specific emotes such as Follower Emotes.
+     * @param cursor        The cursor used to get the next page of results.
+     * @return {@link EmoteList}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_EMOTES_READ
+     */
+    @RequestLine("GET /chat/emotes/user?user_id={user_id}&broadcaster_id={broadcaster_id}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EmoteList> getUserEmotes(
+        @Param("token") String authToken,
+        @NotNull @Param("user_id") String userId,
+        @Nullable @Param("broadcaster_id") String broadcasterId,
+        @Nullable @Param("after") String cursor
+    );
+
+    /**
      * Sends a message to the broadcaster’s chat room.
      * <p>
      * If an app access token is used, the chatting user must have authorized to the Client ID with the user:bot scope,
