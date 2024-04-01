@@ -552,7 +552,6 @@ public interface TwitchHelix {
      * @return {@link EmoteList}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_EMOTES_READ
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("GET /chat/emotes/user?user_id={user_id}&broadcaster_id={broadcaster_id}&after={after}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<EmoteList> getUserEmotes(
