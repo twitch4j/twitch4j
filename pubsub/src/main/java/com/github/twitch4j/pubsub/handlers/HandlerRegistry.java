@@ -33,6 +33,7 @@ public enum HandlerRegistry {
             new AdsManagerHandler(),
             new AutoModLevelHandler(),
             new BoostHandler(),
+            new BroadcastSettingsHandler(),
             new CharityHandler(),
             new ChatroomHandler(),
             new CheerbombHandler(),
