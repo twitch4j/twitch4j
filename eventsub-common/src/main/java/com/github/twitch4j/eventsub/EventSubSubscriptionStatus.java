@@ -73,7 +73,7 @@ public enum EventSubSubscriptionStatus {
     WEBSOCKET_FAILED_PING_PONG,
 
     /**
-     * A websocket conduit shard did not reconnect to a Twitch-specified url upon their request.
+     * A websocket conduit shard did not reconnect after being disconnected.
      */
     @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
     WEBSOCKET_FAILED_TO_RECONNECT,
