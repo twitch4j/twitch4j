@@ -223,7 +223,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                 return buildConnection();
 
             // Current connection is pointed at wrong url, build a new one
-            if (!StringUtils.equals(url, conn.getConfig().baseUrl())) {
+            if (!Objects.equals(url, conn.getConfig().baseUrl())) {
                 executor.execute(() -> attemptClose(conn)); // avoid resource leak
                 return buildConnection();
             }
@@ -308,7 +308,8 @@ public final class TwitchEventSocket implements IEventSubSocket {
             return false; // avoid duplicates
 
         // ensure transport is not null
-        if (sub.getTransport() == null || sub.getTransport().getMethod() != EventSubTransportMethod.WEBSOCKET) {
+        EventSubTransportMethod method = sub.getTransport() != null ? sub.getTransport().getMethod() : null;
+        if (method != EventSubTransportMethod.WEBSOCKET && method != EventSubTransportMethod.CONDUIT) {
             // noinspection deprecation
             sub.setTransport(EventSubTransport.builder().method(EventSubTransportMethod.WEBSOCKET).build());
         }
@@ -316,9 +317,10 @@ public final class TwitchEventSocket implements IEventSubSocket {
         if (token != null)
             tokenByTopic.putIfAbsent(wrapped, token);
 
-        final boolean alreadyEnabled = StringUtils.isNotBlank(sub.getId())
-            && sub.getStatus() == EventSubSubscriptionStatus.ENABLED
-            && StringUtils.equals(sub.getTransport().getSessionId(), websocketId);
+        final boolean alreadyEnabled = StringUtils.isNotBlank(sub.getTransport().getConduitId()) ||
+            (StringUtils.isNotBlank(sub.getId())
+                && sub.getStatus() == EventSubSubscriptionStatus.ENABLED
+                && Objects.equals(sub.getTransport().getSessionId(), websocketId));
 
         if (alreadyEnabled) {
             // user already manually called helix; add to our registry
@@ -377,13 +379,13 @@ public final class TwitchEventSocket implements IEventSubSocket {
     }
 
     @Synchronized
-    private void onInitialConnection(final String websocketId) {
+    private void onInitialConnection(@NotNull final String websocketId) {
         final Collection<EventSubSubscription> oldSubs = new ArrayDeque<>(subscriptions.size());
         subscriptions.keySet().removeIf(oldSubs::add);
 
         for (final EventSubSubscription old : oldSubs) {
-            if (StringUtils.equals(old.getTransport().getSessionId(), websocketId)) {
-                // this branch shouldn't be hit, but is a performance optimization to avoid helix
+            EventSubTransport transport = old.getTransport();
+            if (websocketId.equals(transport.getSessionId()) || StringUtils.isNotBlank(transport.getConduitId())) {
                 subscriptions.putIfAbsent(SubscriptionWrapper.wrap(old), old);
             } else {
                 executor.execute(() -> {
@@ -457,8 +459,12 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     // If this is not a reconnect, let's create the eventsub subscriptions
                     this.onInitialConnection(socket.getId());
                 } else {
-                    // noinspection deprecation
-                    subscriptions.values().forEach(sub -> sub.getTransport().setSessionId(websocketId));
+                    subscriptions.values().forEach(sub -> {
+                        if (StringUtils.isBlank(sub.getTransport().getConduitId())) {
+                            // noinspection deprecation
+                            sub.getTransport().setSessionId(websocketId);
+                        }
+                    });
                 }
 
                 // For reconnects, we can close the old connection now

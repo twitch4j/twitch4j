@@ -47,8 +47,13 @@ public enum EventSubSubscriptionStatus {
     /**
      * A beta eventsub subscription is temporarily not enabled due to maintenance.
      */
-    @Unofficial
     BETA_MAINTENANCE,
+
+    /**
+     * Twitch revoked your subscription to a chat topic because your chatter user was banned by a moderator of the channel.
+     */
+    @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
+    CHAT_USER_BANNED,
 
     /**
      * When you connect to the server, you must create a subscription within 10 seconds or the connection is closed.
@@ -66,6 +71,12 @@ public enum EventSubSubscriptionStatus {
      * You must respond to ping messages with a pong message.
      */
     WEBSOCKET_FAILED_PING_PONG,
+
+    /**
+     * A websocket conduit shard did not reconnect after being disconnected.
+     */
+    @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
+    WEBSOCKET_FAILED_TO_RECONNECT,
 
     /**
      * Indicates a problem with the server (similar to an HTTP 500 status code).

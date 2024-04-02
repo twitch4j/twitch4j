@@ -5,6 +5,7 @@ import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
+import com.github.twitch4j.eventsub.ShardStatus;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.domain.*;
@@ -747,6 +748,114 @@ public interface TwitchHelix {
     HystrixCommand<UpdatedDropEntitlementsList> updateDropsEntitlements(
         @Param("token") String authToken,
         UpdateDropEntitlementInput input
+    );
+
+    /**
+     * Creates a new EventSub conduit.
+     *
+     * @param authToken  App access token.
+     * @param shardCount The number of shards to create for this conduit.
+     * @return ConduitList
+     */
+    @RequestLine("POST /eventsub/conduits")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"shard_count\":{shard_count}%7D")
+    HystrixCommand<ConduitList> createConduit(
+        @Param("token") String authToken,
+        @Param("shard_count") int shardCount
+    );
+
+    /**
+     * Gets the conduits for a client ID.
+     *
+     * @param authToken App access token.
+     * @return ConduitList
+     */
+    @RequestLine("GET /eventsub/conduits")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ConduitList> getConduits(
+        @Param("token") String authToken
+    );
+
+    /**
+     * Updates a conduit’s shard count.
+     * <p>
+     * To delete shards, update the count to a lower number, and the shards above the count will be deleted.
+     * For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+     *
+     * @param authToken  App access token.
+     * @param conduitId  The ID of the conduit to update.
+     * @param shardCount The updated shard count for the conduit.
+     * @return ConduitList
+     */
+    @RequestLine("PATCH /eventsub/conduits")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"id\":\"{id}\",\"shard_count\":{shard_count}%7D")
+    HystrixCommand<ConduitList> updateConduit(
+        @Param("token") String authToken,
+        @NotNull @Param("id") String conduitId,
+        @Param("shard_count") int shardCount
+    );
+
+    /**
+     * Deletes a specified conduit.
+     * <p>
+     * Note that it may take some time for Eventsub subscriptions on a deleted conduit
+     * to show as disabled when calling Get Eventsub Subscriptions.
+     *
+     * @param authToken App access token.
+     * @param conduitId The ID of the conduit to delete.
+     * @return 204 No Content upon a successful deletion.
+     */
+    @RequestLine("DELETE /eventsub/conduits?id={id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteConduit(
+        @Param("token") String authToken,
+        @NotNull @Param("id") String conduitId
+    );
+
+    /**
+     * Gets a lists of all shards for a conduit.
+     *
+     * @param authToken App access token.
+     * @param conduitId The Conduit ID.
+     * @param status    Status to filter by.
+     * @param after     The cursor used to get the next page of results.
+     * @return ConduitShardList
+     */
+    @RequestLine("GET /eventsub/conduits/shards?conduit_id={conduit_id}&status={status}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ConduitShardList> getConduitShards(
+        @Param("token") String authToken,
+        @NotNull @Param("conduit_id") String conduitId,
+        @Nullable @Param("status") ShardStatus status,
+        @Nullable @Param("after") String after
+    );
+
+    /**
+     * Updates shard(s) for a conduit.
+     * <p>
+     * NOTE: Shard IDs are indexed starting at 0,
+     * so a conduit with a {@code shard_count} of 5 will have shards with IDs 0 through 4.
+     *
+     * @param authToken App access token.
+     * @param shards    The shards to update.
+     * @return ConduitShardList
+     */
+    @RequestLine("PATCH /eventsub/conduits/shards")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    HystrixCommand<ConduitShardList> updateConduitShards(
+        @Param("token") String authToken,
+        @NotNull ShardsInput shards
     );
 
     /**

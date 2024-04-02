@@ -49,6 +49,16 @@ public class EventSubTransport {
     private String secret;
 
     /**
+     * An ID that identifies the conduit to send notifications to.
+     * <p>
+     * When you create a conduit, the server returns the conduit ID.
+     * <p>
+     * Specify this field only if method is set to conduit.
+     */
+    @Nullable
+    private String conduitId;
+
+    /**
      * An ID that identifies the WebSocket that notifications are sent to.
      * <p>
      * Specify this field only if method is set to websocket.
