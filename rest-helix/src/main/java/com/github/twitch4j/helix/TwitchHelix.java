@@ -778,7 +778,7 @@ public interface TwitchHelix {
     @Body("%7B\"id\":\"{id}\",\"shard_count\":{shard_count}%7D")
     HystrixCommand<ConduitList> updateConduit(
         @Param("token") String authToken,
-        @Param("id") String conduitId,
+        @NotNull @Param("id") String conduitId,
         @Param("shard_count") int shardCount
     );
 
@@ -796,7 +796,7 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> deleteConduit(
         @Param("token") String authToken,
-        @Param("id") String conduitId
+        @NotNull @Param("id") String conduitId
     );
 
     /**
@@ -812,9 +812,9 @@ public interface TwitchHelix {
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ConduitShardList> getConduitShards(
         @Param("token") String authToken,
-        @Param("conduit_id") String conduitId,
-        @Param("status") @Nullable ShardStatus status,
-        @Param("after") @Nullable String after
+        @NotNull @Param("conduit_id") String conduitId,
+        @Nullable @Param("status") ShardStatus status,
+        @Nullable @Param("after") String after
     );
 
     /**
@@ -834,7 +834,7 @@ public interface TwitchHelix {
     })
     HystrixCommand<ConduitShardList> updateConduitShards(
         @Param("token") String authToken,
-        ShardsInput shards
+        @NotNull ShardsInput shards
     );
 
     /**
