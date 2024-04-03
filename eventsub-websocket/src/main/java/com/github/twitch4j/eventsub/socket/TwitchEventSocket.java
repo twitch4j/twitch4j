@@ -24,6 +24,7 @@ import com.github.twitch4j.eventsub.socket.events.EventSocketDeleteSubscriptionF
 import com.github.twitch4j.eventsub.socket.events.EventSocketDeleteSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketWelcomedEvent;
 import com.github.twitch4j.eventsub.util.EventSubVerifier;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
@@ -473,6 +474,9 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
                 // Post-reconnect we should use the standard wss url going forward
                 this.url = baseUrl;
+
+                // fire meta event
+                eventManager.publish(new EventSocketWelcomedEvent(this, socket.getId()));
                 break;
 
             case SESSION_KEEPALIVE:
