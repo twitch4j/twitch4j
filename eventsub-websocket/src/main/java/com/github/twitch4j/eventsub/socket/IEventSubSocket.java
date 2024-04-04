@@ -9,6 +9,7 @@ import com.github.twitch4j.eventsub.EventSubTransportMethod;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.function.Function;
@@ -103,8 +104,11 @@ public interface IEventSubSocket extends AutoCloseable {
 
     /**
      * Helper method for {@link #register(SubscriptionType, Function)}
+     *
+     * @deprecated in favor of {@link #register(SubscriptionType, Function)}
      */
-    @SuppressWarnings("unused")
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default <C extends EventSubCondition, B, E extends EventSubEvent> boolean register(SubscriptionType<C, B, E> type, C condition) {
         return this.register(type, (Function<B, C>) b -> condition);
     }
