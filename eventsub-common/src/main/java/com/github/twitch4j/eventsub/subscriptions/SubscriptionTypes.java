@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
+    public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
     public final ChannelBanType CHANNEL_BAN;
     public final ChannelChatClearType CHANNEL_CHAT_CLEAR;
@@ -77,6 +78,7 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
+                AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
                 CHANNEL_BAN = new ChannelBanType(),
                 CHANNEL_CHAT_CLEAR = new ChannelChatClearType(),
