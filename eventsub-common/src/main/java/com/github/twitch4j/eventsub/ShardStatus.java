@@ -1,7 +1,6 @@
 package com.github.twitch4j.eventsub;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.github.twitch4j.common.annotation.Unofficial;
 
 public enum ShardStatus {
 
@@ -36,9 +35,8 @@ public enum ShardStatus {
     WEBSOCKET_FAILED_PING_PONG,
 
     /**
-     * A websocket conduit shard did not reconnect to a Twitch-specified url upon their request.
+     * The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message..
      */
-    @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
     WEBSOCKET_FAILED_TO_RECONNECT,
 
     /**
