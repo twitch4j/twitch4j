@@ -36,7 +36,7 @@ public class Emote {
     /**
      * The image URLs for the emote.
      * <p>
-     * This is <i>not</i> present for {@link TwitchHelix#getUserEmotes(String, String, String, String)};
+     * This is <i>not</i> present for {@link TwitchHelix#getUserEmotes(String, String, String)};
      * use {@link EmoteList#getPopulatedTemplateUrl(String, Format, Theme, Scale)}.
      */
     @Nullable
@@ -48,7 +48,7 @@ public class Emote {
      * This is <i>not</i> present for {@link TwitchHelix#getGlobalEmotes(String)}.
      * This <i>is</i> present for {@link TwitchHelix#getChannelEmotes(String, String)},
      * {@link TwitchHelix#getEmoteSets(String, Collection)},
-     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
+     * and {@link TwitchHelix#getUserEmotes(String, String, String)}.
      */
     @Nullable
     private String emoteSetId;
@@ -75,7 +75,7 @@ public class Emote {
      * User ID of the broadcaster who owns the emote.
      * <p>
      * This is <i>only</i> present for {@link TwitchHelix#getEmoteSets(String, Collection)}
-     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
+     * and {@link TwitchHelix#getUserEmotes(String, String, String)}.
      */
     @Nullable
     private String ownerId;
@@ -85,7 +85,7 @@ public class Emote {
      * <p>
      * This is <i>only</i> present for {@link TwitchHelix#getChannelEmotes(String, String)}
      * {@link TwitchHelix#getEmoteSets(String, Collection)},
-     * and {@link TwitchHelix#getUserEmotes(String, String, String, String)}.
+     * and {@link TwitchHelix#getUserEmotes(String, String, String)}.
      */
     @Nullable
     private String emoteType;
@@ -150,7 +150,6 @@ public class Emote {
         /**
          * Indicates a channel points reward emote.
          */
-        @Unofficial
         CHANNEL_POINTS,
 
         /**
@@ -161,37 +160,36 @@ public class Emote {
         /**
          * Indicates a global emote.
          */
-        @Unofficial
         GLOBALS,
 
         /**
          * Indicates a hype train emote.
          */
-        @Unofficial
         HYPE_TRAIN,
 
         /**
          * Indicates a limited time emote.
          */
-        @Unofficial
         LIMITED_TIME("limitedtime", "owl2019"),
+
+        /**
+         * No emote type was assigned to this emote.
+         */
+        NONE,
 
         /**
          * Indicates a prime or turbo emote.
          */
-        @Unofficial
         PRIME("prime", "turbo"),
 
         /**
          * Indicates a rewards emote.
          */
-        @Unofficial
         REWARDS("rewards", "megacommerce", "megacheer"),
 
         /**
          * Indicates a smiley emote.
          */
-        @Unofficial
         SMILIES,
 
         /**
@@ -202,7 +200,6 @@ public class Emote {
         /**
          * Indicates a two-factor emote.
          */
-        @Unofficial
         TWO_FACTOR,
 
         /**
