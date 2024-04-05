@@ -3,6 +3,7 @@ package com.github.twitch4j.eventsub.condition;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
@@ -12,6 +13,7 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 @Setter(AccessLevel.PRIVATE)
 @SuperBuilder
 @Jacksonized
+@ToString(callSuper = true)
 public class ModeratorEventSubCondition extends ChannelEventSubCondition {
 
     /**

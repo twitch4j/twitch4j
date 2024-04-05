@@ -2264,7 +2264,6 @@ public interface TwitchHelix {
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_READ
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_MANAGE
      */
-    @ApiStatus.Experimental
     @RequestLine("GET /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&status={status}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UnbanRequestList> getUnbanRequests(
@@ -2289,7 +2288,6 @@ public interface TwitchHelix {
      * @return UnbanRequestList
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_UNBAN_REQUESTS_MANAGE
      */
-    @ApiStatus.Experimental
     @RequestLine("PATCH /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&unban_request_id={unban_request_id}&status={status}&resolution_text={resolution_text}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UnbanRequestList> resolveUnbanRequest(

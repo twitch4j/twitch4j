@@ -66,6 +66,8 @@ public class SubscriptionTypes {
     public final ShoutoutReceiveType SHOUTOUT_RECEIVE_TYPE;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
+    public final UnbanRequestCreateType UNBAN_REQUEST_CREATE;
+    public final UnbanRequestResolveType UNBAN_REQUEST_RESOLVE;
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
     public final UserAuthorizationRevokeType USER_AUTHORIZATION_REVOKE;
     public final UserUpdateType USER_UPDATE;
@@ -129,6 +131,8 @@ public class SubscriptionTypes {
                 SHOUTOUT_RECEIVE_TYPE = new ShoutoutReceiveType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
+                UNBAN_REQUEST_CREATE = new UnbanRequestCreateType(),
+                UNBAN_REQUEST_RESOLVE = new UnbanRequestResolveType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),
                 USER_AUTHORIZATION_REVOKE = new UserAuthorizationRevokeType(),
                 USER_UPDATE = new UserUpdateType()
