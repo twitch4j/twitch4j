@@ -1,7 +1,5 @@
 package com.github.twitch4j.eventsub;
 
-import com.github.twitch4j.common.annotation.Unofficial;
-
 public enum EventSubSubscriptionStatus {
 
     /**
@@ -50,9 +48,8 @@ public enum EventSubSubscriptionStatus {
     BETA_MAINTENANCE,
 
     /**
-     * Twitch revoked your subscription to a chat topic because your chatter user was banned by a moderator of the channel.
+     * The user specified in the Condition object was banned from the broadcaster's chat.
      */
-    @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
     CHAT_USER_BANNED,
 
     /**
@@ -73,9 +70,8 @@ public enum EventSubSubscriptionStatus {
     WEBSOCKET_FAILED_PING_PONG,
 
     /**
-     * A websocket conduit shard did not reconnect after being disconnected.
+     * The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
      */
-    @Unofficial // https://github.com/twitchdev/issues/issues/931#issuecomment-2018532569
     WEBSOCKET_FAILED_TO_RECONNECT,
 
     /**
