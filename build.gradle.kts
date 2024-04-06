@@ -188,7 +188,7 @@ subprojects {
 			if (this is ShadowJar) {
 				archiveClassifier.set("shaded")
 				isEnableRelocation = true
-				relocationPrefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
+				relocationPrefix = "com.github.twitch4j.shaded"
 
 				// support for multi-release jars since we depend upon jackson-core, which leverages FastDoubleParser
 				dependencies {
