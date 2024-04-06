@@ -11,7 +11,7 @@ plugins {
 	id("io.freefair.lombok").version("8.6").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.2").apply(false)
-	id("com.github.johnrengelman.shadow").version("8.1.1").apply(false)
+	id("io.github.goooler.shadow").version("8.1.7").apply(false)
 	id("com.github.gmazzo.buildconfig").version("5.3.5").apply(false)
 }
 
@@ -189,6 +189,16 @@ subprojects {
 				archiveClassifier.set("shaded")
 				isEnableRelocation = true
 				relocationPrefix = "com.github.twitch4j.shaded.${"$version".replace(".", "_")}"
+
+				// support for multi-release jars since we depend upon jackson-core, which leverages FastDoubleParser
+				dependencies {
+					// https://github.com/johnrengelman/shadow/issues/729
+					exclude("META-INF/versions/**/module-info.class")
+				}
+				manifest {
+					// https://github.com/johnrengelman/shadow/issues/449
+					attributes("Multi-Release" to true)
+				}
 			}
 			if (enableManifest) {
 				manifest.from(File(buildDir, "resources/main/META-INF/MANIFEST.MF"))
