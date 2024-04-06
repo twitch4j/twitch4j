@@ -150,48 +150,47 @@ public class Emote {
         /**
          * Indicates a channel points reward emote.
          */
-        @Unofficial
         CHANNEL_POINTS,
 
         /**
          * Indicates a custom follower emote.
+         * Note: subscribers can utilize follower emotes in any channel.
          */
         FOLLOWER,
 
         /**
          * Indicates a global emote.
          */
-        @Unofficial
         GLOBALS,
 
         /**
          * Indicates a hype train emote.
          */
-        @Unofficial
         HYPE_TRAIN,
 
         /**
          * Indicates a limited time emote.
          */
-        @Unofficial
         LIMITED_TIME("limitedtime", "owl2019"),
+
+        /**
+         * No emote type was assigned to this emote.
+         */
+        NONE,
 
         /**
          * Indicates a prime or turbo emote.
          */
-        @Unofficial
         PRIME("prime", "turbo"),
 
         /**
          * Indicates a rewards emote.
          */
-        @Unofficial
         REWARDS("rewards", "megacommerce", "megacheer"),
 
         /**
          * Indicates a smiley emote.
          */
-        @Unofficial
         SMILIES,
 
         /**
@@ -202,7 +201,6 @@ public class Emote {
         /**
          * Indicates a two-factor emote.
          */
-        @Unofficial
         TWO_FACTOR,
 
         /**
