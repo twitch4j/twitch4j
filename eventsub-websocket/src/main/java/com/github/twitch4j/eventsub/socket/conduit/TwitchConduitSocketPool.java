@@ -1,10 +1,9 @@
-package com.github.twitch4j.eventsub.socket;
+package com.github.twitch4j.eventsub.socket.conduit;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.domain.IDisposable;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
-import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.Conduit;
@@ -14,20 +13,19 @@ import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.eventsub.EventSubTransport;
 import com.github.twitch4j.eventsub.EventSubTransportMethod;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
+import com.github.twitch4j.eventsub.socket.IEventSubConduit;
+import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketWelcomedEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import com.github.twitch4j.helix.domain.ShardsInput;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,6 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,11 +47,11 @@ import java.util.stream.Collectors;
  * Sample usage:
  * <pre>
  * {@code
- * IEventSubConduit conduit = TwitchConduitSocketPool.builder()
- *     .clientId("your-client-id")
- *     .clientSecret("your-client-secret")
- *     .poolShards(4) // customizable pool size
- *     .build();
+ * IEventSubConduit conduit = TwitchConduitSocketPool.create(spec -> {
+ *     spec.poolShards(4); // customizable pool size
+ *     spec.clientId("your-client-id");
+ *     spec.clientSecret("your-client-secret");
+ * });
  * conduit.register(SubscriptionTypes.STREAM_ONLINE, b -> b.broadcasterUserId("71092938").build());
  * conduit.getEventManager().onEvent(StreamOnlineEvent.class, System.out::println);
  * }
@@ -62,6 +61,7 @@ import java.util.stream.Collectors;
  * @see <a href="https://dev.twitch.tv/docs/eventsub/handling-conduit-events/">Official Documentation</a>
  */
 @Slf4j
+@SuppressWarnings("unused")
 public final class TwitchConduitSocketPool implements IEventSubConduit {
 
     @NotNull
@@ -93,45 +93,37 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
 
     private final List<TwitchEventSocket> sockets;
 
-    @Builder
-    @SneakyThrows
-    TwitchConduitSocketPool(@Nullable String conduitId, @Nullable Integer totalShardCount, int poolShards, int shardOffset, @Nullable String clientId, @Nullable String clientSecret, @Nullable TwitchHelix helix, @Nullable OAuth2Credential appAccessToken, @Nullable ScheduledThreadPoolExecutor executor, @Nullable EventManager eventManager, @Nullable ProxyConfig proxyConfig, @Nullable Duration socketWelcomeTimeout) {
-        if (poolShards <= 0) throw new IllegalArgumentException("Invalid number of pool shards");
-        if (shardOffset < 0) throw new IllegalArgumentException("Invalid shard offset");
-        if (conduitId == null && totalShardCount != null && totalShardCount < poolShards)
-            throw new IllegalArgumentException("Cannot create more sockets than total shards");
-        if (appAccessToken == null && (clientId == null || clientSecret == null) && helix == null && conduitId == null)
-            throw new IllegalArgumentException("Conduit pool is missing authorization");
+    TwitchConduitSocketPool(@NotNull ConduitSpec spec) throws CreateConduitException, ConduitNotFoundException, ConduitResizeException, ShardTimeoutException, ShardRegistrationException {
+        this.credential = spec.appAccessToken();
+        this.eventManager = EventManagerUtils.validateOrInitializeEventManager(spec.eventManager(), SimpleEventHandler.class);
+        this.shardOffset = spec.shardOffset();
 
-        this.credential = appAccessToken;
-        this.eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, SimpleEventHandler.class);
-        this.shardOffset = shardOffset;
-
-        if (executor == null) {
+        if (spec.executor() == null) {
             String threadPrefix = "twitch4j-conduit-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
             this.executor = ThreadUtils.getDefaultScheduledThreadPoolExecutor(threadPrefix, Runtime.getRuntime().availableProcessors());
             this.shouldCloseExecutor = true;
         } else {
-            this.executor = executor;
+            this.executor = spec.executor();
             this.shouldCloseExecutor = false;
         }
 
-        if (helix == null) {
+        if (spec.helix() == null) {
             this.api = TwitchHelixBuilder.builder()
-                .withClientId(clientId)
-                .withClientSecret(clientSecret)
+                .withClientId(spec.clientId())
+                .withClientSecret(spec.clientSecret())
                 .withDefaultAuthToken(credential)
-                .withProxyConfig(proxyConfig)
+                .withProxyConfig(spec.proxyConfig())
                 .withScheduledThreadPoolExecutor(this.executor)
                 .build();
         } else {
-            this.api = helix;
+            this.api = spec.helix();
         }
 
         // Create conduit if it does not exist
-        String token = appAccessToken != null ? appAccessToken.getAccessToken() : null;
-        if (conduitId == null) {
-            int totalShards = totalShardCount != null ? totalShardCount : poolShards;
+        final int poolShards = spec.poolShards();
+        String token = credential != null ? credential.getAccessToken() : null;
+        if (spec.conduitId() == null) {
+            int totalShards = spec.totalShardCount() != null ? spec.totalShardCount() : poolShards;
             this.shouldDeleteConduit = poolShards >= totalShards;
             try {
                 this.conduitId = api.createConduit(token, totalShards).execute().getConduits().get(0).getId();
@@ -139,15 +131,15 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                 if (shouldCloseExecutor) {
                     this.executor.shutdownNow();
                 }
-                throw new RuntimeException("Failed to create Conduit for pool", e);
+                throw new CreateConduitException(e);
             }
         } else {
-            this.conduitId = conduitId;
+            this.conduitId = spec.conduitId();
             this.shouldDeleteConduit = false;
 
             int totalShards;
-            if (totalShardCount != null) {
-                totalShards = totalShardCount;
+            if (spec.totalShardCount() != null) {
+                totalShards = spec.totalShardCount();
             } else {
                 try {
                     // noinspection OptionalGetWithoutIsPresent
@@ -162,7 +154,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                     if (shouldCloseExecutor) {
                         this.executor.shutdownNow();
                     }
-                    throw new RuntimeException("Could not find existing Conduit for pool with ID: " + conduitId, e);
+                    throw new ConduitNotFoundException(conduitId, e);
                 }
             }
 
@@ -174,7 +166,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                     if (shouldCloseExecutor) {
                         this.executor.shutdownNow();
                     }
-                    throw new RuntimeException("Failed to expand size of Conduit with ID: " + conduitId, e);
+                    throw new ConduitResizeException(conduitId, e);
                 }
             }
         }
@@ -194,10 +186,10 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
         for (int i = 0; i < poolShards; i++) {
             TwitchEventSocket socket = TwitchEventSocket.builder()
                 .api(api)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .defaultToken(appAccessToken)
-                .proxyConfig(proxyConfig)
+                .clientId(spec.clientId())
+                .clientSecret(spec.clientSecret())
+                .defaultToken(spec.appAccessToken())
+                .proxyConfig(spec.proxyConfig())
                 .eventManager(this.eventManager)
                 .taskExecutor(this.executor)
                 .build();
@@ -206,7 +198,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
         }
 
         // Wait for all sockets to be connected
-        long timeout = socketWelcomeTimeout != null ? socketWelcomeTimeout.toMillis() : 15_000L;
+        long timeout = spec.socketWelcomeTimeout() != null ? spec.socketWelcomeTimeout().toMillis() : 15_000L;
         try {
             if (!latch.await(timeout, TimeUnit.MILLISECONDS)) {
                 log.error("Failed to create {} shards", latch.getCount());
@@ -217,7 +209,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             } catch (Exception ex) {
                 log.warn("Failed to clean up conduit pool", ex);
             }
-            throw e;
+            throw new ShardTimeoutException(timeout);
         } finally {
             welcomeTracker.dispose();
         }
@@ -251,7 +243,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             } catch (Exception ex) {
                 log.warn("Failed to clean up conduit pool", ex);
             }
-            throw new RuntimeException("Failed to register shards for Conduit with ID: " + this.conduitId, e);
+            throw new ShardRegistrationException(this.conduitId, e);
         }
     }
 
@@ -333,6 +325,30 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
 
     public int getManagedShardCount() {
         return sockets.size();
+    }
+
+    /**
+     * Creates a managed websocket pool to serve as shards for an EventSub Conduit.
+     * <p>
+     * This pool can be used to create a completely new conduit, or augment an existing conduit.
+     * <p>
+     * Note: Twitch limits each Client ID to five (5) enabled conduits, with up to 20,000 shards per conduit.
+     * Please do <i>not</i> try to create 20,000 websockets from a <b>single</b> server.
+     *
+     * @param spec the specification by which to create a websocket pool for an EventSub Conduit
+     * @return a {@link TwitchConduitSocketPool} instance
+     * @throws NullPointerException       if the passed spec is {@code null}
+     * @throws IllegalArgumentException   if the specified conduit configuration is invalid
+     * @throws CreateConduitException     if {@link TwitchHelix#createConduit(String, int)} fails
+     * @throws ConduitNotFoundException   if a specific Conduit ID was specified, but not found within {@link TwitchHelix#getConduits(String)} when checking the shard count
+     * @throws ConduitResizeException     if {@link TwitchHelix#updateConduit(String, String, int)} fails while resizing the Conduit to accommodate the number of shards in the spec
+     * @throws ShardTimeoutException      if any of the underlying sockets for this pool do not receive session_welcome from Twitch before the timeout in the spec (default: 15 seconds)
+     * @throws ShardRegistrationException if {@link TwitchHelix#updateConduitShards(String, ShardsInput)} fails while registering the created sockets with the Conduit ID
+     * @see <a href="https://dev.twitch.tv/docs/eventsub/handling-conduit-events/">Official Conduits Documentation</a>
+     */
+    @NotNull
+    public static TwitchConduitSocketPool create(@NotNull Consumer<ConduitSpec> spec) throws CreateConduitException, ConduitNotFoundException, ConduitResizeException, ShardTimeoutException, ShardRegistrationException {
+        return new TwitchConduitSocketPool(ConduitSpec.process(spec));
     }
 
 }
