@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.eventsub.socket.IEventSubConduit;
+import com.github.twitch4j.eventsub.socket.conduit.exceptions.ShardTimeoutException;
 import com.github.twitch4j.helix.TwitchHelix;
 import lombok.AccessLevel;
 import lombok.Data;
