@@ -10,15 +10,14 @@ Support:
 Badges:
 
 [![Latest](https://img.shields.io/github/release/twitch4j/twitch4j/all.svg?style=flate&label=latest)](https://search.maven.org/search?q=g:com.github.twitch4j)
-[![pipeline status](https://gitlab.com/twitch4j/twitch4j/badges/master/pipeline.svg)](https://gitlab.com/twitch4j/twitch4j/commits/master)
-[![Docs](https://img.shields.io/badge/documentation-grey.svg?style=flat)](https://twitch4j.github.io/)
-[![Docs](https://img.shields.io/badge/javadoc-brightgreen.svg?style=flat)](https://twitch4j.github.io/javadoc/)
+[![Docs](https://img.shields.io/badge/documentation-github%20pages-8A2BE2)](https://twitch4j.github.io/)
+[![Javadoc](https://javadoc.io/badge/com.github.twitch4j/twitch4j.svg)](https://twitch4j.github.io/javadoc/)
 
 --------
 
 ## A quick note:
 
-This project provides multiple standalone modules you can use to interact with twitch and related services.
+This project implements client modules to interact with all of Twitch's APIs.
 
 ## Quick Start
 
@@ -28,19 +27,26 @@ Check out the [Documentation](https://twitch4j.github.io/getting-started/install
 
 ## Modules
 
-Shared
-* [Event4J](https://github.com/PhilippHeuer/events4j)
-* [Credential Manager](https://github.com/PhilippHeuer/credential-manager)
+**Project**
 
-Project
-* Auth
-* API - Extensions
-* API - Kraken (Deprecated)
-* API - Helix
-* Chat
-* PubSub
-* GraphQL
-* Kotlin
+| Module             | Description                                  |
+|--------------------|----------------------------------------------|
+| chat               | Chat (IRC)                                   |
+| eventsub-common    | EventSub (can be used for Webhook-Transport) |
+| eventsub-websocket | EventSub (WebSocket & Conduits)              |
+| helix              | REST-API                                     |
+| pubsub             | PubSub                                       |
+| graphql            | GraphQL (unofficial)                         |
+| kotlin             | Kotlin Extensions                            |
+
+**Shared**
+
+| Module                                              | Description                        |
+|-----------------------------------------------------|------------------------------------|
+| [cache-api](https://github.com/Xanthic/cache-api)   | In-Memory Cache API                |
+| [event4j](https://github.com/PhilippHeuer/events4j) | Event Publication and Subscription |
+
+> The shared libraries offer standardized functionality in an abstracted manner, allowing you to select from a variety of implementations (or bring your own).
 
 ## Problems
 
