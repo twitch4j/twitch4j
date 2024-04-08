@@ -31,13 +31,13 @@ Check out the [Documentation](https://twitch4j.github.io/getting-started/install
 
 | Module             | Description                                  |
 |--------------------|----------------------------------------------|
-| chat               | Chat                                         |
+| chat               | Chat (IRC)                                   |
 | eventsub-common    | EventSub (can be used for Webhook-Transport) |
-| eventsub-websocket | EventSub (WebSocket-Transport)               |
+| eventsub-websocket | EventSub (WebSocket & Conduits)              |
 | helix              | REST-API                                     |
 | pubsub             | PubSub                                       |
-| graphql            | GraphQL `unofficial`                         |
-| kotlin             | Kotlin Support                               |
+| graphql            | GraphQL (unofficial)                         |
+| kotlin             | Kotlin Extensions                            |
 
 **Shared**
 
