@@ -74,6 +74,7 @@ public class SubscriptionTypes {
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
     public final UserAuthorizationRevokeType USER_AUTHORIZATION_REVOKE;
     public final UserUpdateType USER_UPDATE;
+    public final WhisperReceivedType WHISPER_RECEIVE;
 
     public SubscriptionType<?, ?, ?> getSubscriptionType(String subTypeName, String subTypeVersion) {
         return SUBSCRIPTION_TYPES.get(subTypeName + ':' + subTypeVersion);
@@ -141,7 +142,8 @@ public class SubscriptionTypes {
                 UNBAN_REQUEST_RESOLVE = new UnbanRequestResolveType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),
                 USER_AUTHORIZATION_REVOKE = new UserAuthorizationRevokeType(),
-                USER_UPDATE = new UserUpdateType()
+                USER_UPDATE = new UserUpdateType(),
+                WHISPER_RECEIVE = new WhisperReceivedType()
             ).collect(Collectors.toMap(type -> type.getName() + ':' + type.getVersion(), Function.identity()))
         );
     }
