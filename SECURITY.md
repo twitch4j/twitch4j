@@ -9,7 +9,7 @@ If the project maintainers deem the issue to be particularly significant, a patc
 
 ## Reporting a Vulnerability
 
-Please privately report any vulnerabilities as a [Github Security Advisory](https://github.com/twitch4j/twitch4j/security/advisories/new) (or you can email `security@philippheuer.me`).
+Please privately report any vulnerabilities as a [Github Security Advisory](https://github.com/twitch4j/twitch4j/security/advisories/new) (or you can email `security@philippheuer.me` and `gitprodigy@proton.me`).
 
 We will acknowledge the report within a week and begin investigating.
 If you do not receive this acknowledgement, please nudge us via [Discord](https://discord.gg/FQ5vgW3) or a Github Issue,
