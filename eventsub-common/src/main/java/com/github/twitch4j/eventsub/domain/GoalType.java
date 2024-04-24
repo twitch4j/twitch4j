@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.github.twitch4j.common.annotation.Unofficial;
 
 /**
  * The type of goal.
@@ -44,21 +43,19 @@ public enum GoalType {
     NEW_SUB_COUNT,
 
     /**
-     * Goal for an amount of Bits to be used on the channel.
+     * The goal is to increase the amount of Bits used on the channel.
      *
      * @see <a href="https://twitter.com/TwitchSupport/status/1778470287564058836">Twitch Announcement</a>
      */
-    @Unofficial // https://github.com/twitchdev/issues/issues/939
-    @JsonAlias({ "new_bit", "new_bits" })
+    @JsonAlias("new_bit")
     BITS,
 
     /**
-     * Goal for a number of Cheers to be made on the channel.
+     * The goal is to increase the number of unique Cheerers to Cheer on the channel.
      *
      * @see <a href="https://twitter.com/TwitchSupport/status/1778470287564058836">Twitch Announcement</a>
      */
-    @Unofficial // https://github.com/twitchdev/issues/issues/939
-    @JsonAlias({ "new_cheerer", "new_cheers", "new_cheer" })
+    @JsonAlias("new_cheerer")
     CHEERS,
 
     /**
