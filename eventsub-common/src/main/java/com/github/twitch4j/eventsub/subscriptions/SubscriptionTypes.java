@@ -47,6 +47,8 @@ public class SubscriptionTypes {
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     public final ChannelSubscriptionGiftType CHANNEL_SUBSCRIPTION_GIFT;
     public final ChannelSubscriptionMessageType CHANNEL_SUBSCRIPTION_MESSAGE;
+    public final SuspiciousUserMessageType CHANNEL_SUSPICIOUS_USER_MESSAGE;
+    public final SuspiciousUserUpdateType CHANNEL_SUSPICIOUS_USER_UPDATE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final @Deprecated ChannelUpdateType CHANNEL_UPDATE;
     public final ChannelUpdateV2Type CHANNEL_UPDATE_V2;
@@ -115,6 +117,8 @@ public class SubscriptionTypes {
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 CHANNEL_SUBSCRIPTION_GIFT = new ChannelSubscriptionGiftType(),
                 CHANNEL_SUBSCRIPTION_MESSAGE = new ChannelSubscriptionMessageType(),
+                CHANNEL_SUSPICIOUS_USER_MESSAGE = new SuspiciousUserMessageType(),
+                CHANNEL_SUSPICIOUS_USER_UPDATE = new SuspiciousUserUpdateType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 CHANNEL_UPDATE_V2 = new ChannelUpdateV2Type(),
