@@ -9,15 +9,14 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
  * Stream (LiveStream)
@@ -52,6 +51,7 @@ public class Stream {
     /** Array of community IDs. */
     @Nullable
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private List<UUID> communityIds;
 
     /** Stream type: "live" or "" (in case of error). */
@@ -82,6 +82,7 @@ public class Stream {
      */
     @Nullable
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private List<UUID> tagIds;
 
     /** Indicates if the broadcaster has specified their channel contains mature content that may be inappropriate for younger audiences. */
@@ -111,10 +112,29 @@ public class Stream {
      *
      * @param width  thumbnail width
      * @param height thumbnail height
-     * @return String
+     * @return populated thumbnail url for a specific resolution
      */
-    public String getThumbnailUrl(Integer width, Integer height) {
-        return thumbnailUrl.replaceAll(Pattern.quote("{width}"), width.toString()).replaceAll(Pattern.quote("{height}"), height.toString());
+    public String getThumbnailUrl(int width, int height) {
+        return thumbnailUrl.replace("{width}x{height}", String.format("%dx%d", width, height));
+    }
+
+    /**
+     * @return the template for the thumbnail URL; contains "{width}" and "{height}" placeholders
+     * @apiNote To obtain a populated URL, prefer using the {@link #getThumbnailUrl(int, int)} method
+     */
+    public String getThumbnailUrlTemplate() {
+        return this.thumbnailUrl;
+    }
+
+    /**
+     * @return the thumbnail url template
+     * @deprecated in favor of {@link #getThumbnailUrlTemplate()} or {@link #getThumbnailUrl(int, int)}
+     */
+    @NonNull
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    public String getThumbnailUrl() {
+        return this.thumbnailUrl;
     }
 
     /**
@@ -123,6 +143,7 @@ public class Stream {
      */
     @JsonIgnore
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public Calendar getStartedAt() {
         return TimeUtils.fromInstant(startedAtInstant);
     }
