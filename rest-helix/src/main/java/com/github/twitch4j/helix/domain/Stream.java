@@ -94,9 +94,15 @@ public class Stream {
     @NonNull
     private String language;
 
-    /** Thumbnail URL of the stream. All image URLs have variable width and height. You can replace {width} and {height} with any values to get that size image */
+    /**
+     * A template URL to an image of a frame from the last 5 minutes of the stream.
+     * Contains "{width}" and "{height}" placeholders to obtain the size of the image you want, in pixels.
+     * <p>
+     * To obtain a populated URL, prefer calling {@link #getThumbnailUrl(int, int)} instead.
+     */
     @NonNull
-    private String thumbnailUrl;
+    @JsonProperty("thumbnail_url")
+    private String thumbnailUrlTemplate;
 
     /**
      * Gets the stream uptime based on the start date.
@@ -115,15 +121,7 @@ public class Stream {
      * @return populated thumbnail url for a specific resolution
      */
     public String getThumbnailUrl(int width, int height) {
-        return thumbnailUrl.replace("{width}x{height}", String.format("%dx%d", width, height));
-    }
-
-    /**
-     * @return the template for the thumbnail URL; contains "{width}" and "{height}" placeholders
-     * @apiNote To obtain a populated URL, prefer using the {@link #getThumbnailUrl(int, int)} method
-     */
-    public String getThumbnailUrlTemplate() {
-        return this.thumbnailUrl;
+        return thumbnailUrlTemplate.replace("{width}x{height}", String.format("%dx%d", width, height));
     }
 
     /**
@@ -131,10 +129,11 @@ public class Stream {
      * @deprecated in favor of {@link #getThumbnailUrlTemplate()} or {@link #getThumbnailUrl(int, int)}
      */
     @NonNull
+    @JsonIgnore
     @Deprecated
     @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public String getThumbnailUrl() {
-        return this.thumbnailUrl;
+        return this.thumbnailUrlTemplate;
     }
 
     /**
