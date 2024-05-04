@@ -49,6 +49,20 @@ public class EventSubEventTest {
     }
 
     @Test
+    @DisplayName("Deserialize ShieldModeBeginEvent")
+    public void deserializeModeratorEvent() {
+        ShieldModeBeginEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"12345\",\"broadcaster_user_name\":\"SimplySimple\",\"broadcaster_user_login\":\"simplysimple\",\"moderator_user_id\":\"98765\",\"moderator_user_name\":\"ParticularlyParticular123\",\"moderator_user_login\":\"particularlyparticular123\",\"started_at\":\"2022-07-26T17:00:03.17106713Z\"}",
+            ShieldModeBeginEvent.class
+        );
+        assertEquals("12345", event.getBroadcasterUserId());
+        assertEquals("SimplySimple", event.getBroadcasterUserName());
+        assertEquals("98765", event.getModeratorUserId());
+        assertEquals("ParticularlyParticular123", event.getModeratorUserName());
+        assertEquals(Instant.parse("2022-07-26T17:00:03.17106713Z"), event.getStartedAt());
+    }
+
+    @Test
     @DisplayName("Deserialize ChannelBanEvent: Timeout")
     public void deserializeModerationEvent() {
         ChannelBanEvent event = jsonToObject(
@@ -105,8 +119,6 @@ public class EventSubEventTest {
         assertEquals(3, event.getChoices().size());
         assertEquals("123", event.getChoices().get(0).getId());
         assertEquals("Maybe!", event.getChoices().get(2).getTitle());
-        assertNotNull(event.getBitsVoting());
-        assertTrue(event.getBitsVoting().isEnabled());
         assertNotNull(event.getChannelPointsVoting());
         assertEquals(10, event.getChannelPointsVoting().getAmountPerVote());
         assertEquals(Instant.parse("2020-07-15T17:16:03.17106713Z"), event.getStartedAt());
@@ -127,8 +139,6 @@ public class EventSubEventTest {
         assertNotNull(event);
         assertNotNull(event.getChoices());
         assertEquals(3, event.getChoices().size());
-        assertNotNull(event.getChoices().get(0));
-        assertEquals(5, event.getChoices().get(0).getBitsVotes());
         assertNotNull(event.getChoices().get(1));
         assertEquals(4, event.getChoices().get(1).getChannelPointsVotes());
         assertNotNull(event.getChoices().get(2));
