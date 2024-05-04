@@ -60,6 +60,10 @@ public class CreatorGoal {
      * For example, if a tier-two subscription is worth 2 points, this field is increased by 2, not 1.
      * <p>
      * If type is {@link GoalType#NEW_SUB_COUNT}, this field is increased by 1 for each new subscription.
+     * <p>
+     * If type is {@link GoalType#BITS}, this field is increased by the number of bits cheered.
+     * <p>
+     * If type is {@link GoalType#CHEERS}, this field is increased by 1 for each new cheer.
      *
      * @see #getType()
      */
