@@ -104,7 +104,7 @@ subprojects {
 					version {
 						strictly("[2.15,3-alpha[")
 						// renovate: depName=com.fasterxml.jackson:jackson-bom
-						prefer("2.17.0")
+						prefer("2.17.1")
 					}
 				}
 			}
@@ -133,7 +133,7 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "2.0.13")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.17.0"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.17.1"))
 
 		// Jackson 2.17.0 accidentally exposes bytebuddy (fixed in 2.17.1)
 		components {
@@ -233,9 +233,9 @@ subprojects {
 						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.2.1",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.13",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.17.0",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.17.0",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.17.0",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.17.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.17.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.17.1",
 						"https://javadoc.io/doc/commons-io/commons-io/2.16.1",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.14.0",
 						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.32",
