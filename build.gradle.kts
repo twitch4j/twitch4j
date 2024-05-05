@@ -135,17 +135,6 @@ subprojects {
 		// Jackson BOM
 		api(platform("com.fasterxml.jackson:jackson-bom:2.17.1"))
 
-		// Jackson 2.17.0 accidentally exposes bytebuddy (fixed in 2.17.1)
-		components {
-			withModule("com.fasterxml.jackson.core:jackson-databind") {
-				allVariants {
-					withDependencies {
-						removeAll { it.group == "net.bytebuddy" && it.name == "byte-buddy" }
-					}
-				}
-			}
-		}
-
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.10.2"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
