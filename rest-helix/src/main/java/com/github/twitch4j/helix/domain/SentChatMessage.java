@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class SentChatMessage {
     /**
      * Whether the message passed all checks and was sent.
      */
+    @JsonProperty("is_sent")
     private boolean isSent;
 
     /**
