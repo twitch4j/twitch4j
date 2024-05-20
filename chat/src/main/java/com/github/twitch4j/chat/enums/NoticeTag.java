@@ -362,6 +362,12 @@ public enum NoticeTag {
     MSG_CHANNEL_SUSPENDED,
 
     /**
+     * You are connected to too many chat channels. Please close some existing chat connections to join a new chat.
+     */
+    @Unofficial
+    MSG_CONCURRENT_CHANNEL_LIMIT_REACHED,
+
+    /**
      * Your message was not sent because it is identical to the previous one you sent, less than 30 seconds ago.
      */
     MSG_DUPLICATE,
