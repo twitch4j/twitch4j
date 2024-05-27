@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
+    public final AutomodMessageHoldType AUTOMOD_MESSAGE_HOLD;
+    public final AutomodMessageUpdateType AUTOMOD_MESSAGE_UPDATE;
     public final AutomodSettingsUpdateType AUTOMOD_SETTINGS_UPDATE;
     public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
@@ -69,6 +71,8 @@ public class SubscriptionTypes {
     public final ShoutoutReceiveType SHOUTOUT_RECEIVE_TYPE;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
+    public final UserMessageHoldType USER_MESSAGE_HOLD;
+    public final UserMessageUpdateType USER_MESSAGE_UPDATE;
     public final UnbanRequestCreateType UNBAN_REQUEST_CREATE;
     public final UnbanRequestResolveType UNBAN_REQUEST_RESOLVE;
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
@@ -83,6 +87,8 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
+                AUTOMOD_MESSAGE_HOLD = new AutomodMessageHoldType(),
+                AUTOMOD_MESSAGE_UPDATE = new AutomodMessageUpdateType(),
                 AUTOMOD_SETTINGS_UPDATE = new AutomodSettingsUpdateType(),
                 AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
@@ -138,6 +144,8 @@ public class SubscriptionTypes {
                 SHOUTOUT_RECEIVE_TYPE = new ShoutoutReceiveType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
+                USER_MESSAGE_HOLD  = new UserMessageHoldType(),
+                USER_MESSAGE_UPDATE = new UserMessageUpdateType(),
                 UNBAN_REQUEST_CREATE = new UnbanRequestCreateType(),
                 UNBAN_REQUEST_RESOLVE = new UnbanRequestResolveType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),
