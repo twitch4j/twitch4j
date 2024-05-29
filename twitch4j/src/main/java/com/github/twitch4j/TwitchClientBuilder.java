@@ -438,6 +438,8 @@ public class TwitchClientBuilder {
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
+                .withRedirectUrl(redirectUrl)
+                .withCredentialManager(credentialManager)
                 .withUserAgent(userAgent)
                 .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
@@ -499,7 +501,7 @@ public class TwitchClientBuilder {
                     chatCommandsViaHelix && enableHelix && (chatAccount != null || defaultAuthToken != null) ? new ChatCommandHelixForwarder(
                         helix,
                         chatAccount != null ? chatAccount : defaultAuthToken,
-                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                        credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class).orElse(null),
                         scheduledThreadPoolExecutor,
                         forwardedChatCommandHelixLimitPerChannel
                     ) : null
