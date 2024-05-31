@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,5 +69,14 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      */
     @Nullable
     private String channelPointsCustomRewardId;
+
+    /**
+     * An ID for the type of animation selected as part of an "animate my message" redemption.
+     *
+     * @see MessageType#ANIMATED
+     */
+    @Nullable
+    @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
+    private String channelPointsAnimationId;
 
 }
