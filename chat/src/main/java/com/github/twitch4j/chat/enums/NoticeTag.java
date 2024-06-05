@@ -454,6 +454,12 @@ public enum NoticeTag {
     MSG_VERIFIED_EMAIL,
 
     /**
+     * You received a Warning from a moderator in this channel. Acknowledge the Warning in browser to continue chatting in this channel.
+     */
+    @Unofficial
+    MSG_WARNED,
+
+    /**
      * No help available.
      */
     NO_HELP,
