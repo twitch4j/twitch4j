@@ -108,6 +108,7 @@ public class ChatModerationAction {
     public Optional<String> getReason() {
         switch (getModerationAction()) {
             case BAN:
+            case WARN:
                 if (args != null && args.size() > 1)
                     return Optional.of(args.get(1));
 
@@ -287,6 +288,10 @@ public class ChatModerationAction {
          * Channel exited raid mode
          */
         UNRAID,
+        /**
+         * A moderator warned a user.
+         */
+        WARN,
         /**
          * A user's message was flagged by AutoMod for manual review.
          */
