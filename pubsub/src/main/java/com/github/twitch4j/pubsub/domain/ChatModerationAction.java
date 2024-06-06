@@ -108,13 +108,18 @@ public class ChatModerationAction {
     public Optional<String> getReason() {
         switch (getModerationAction()) {
             case BAN:
-            case WARN:
                 if (args != null && args.size() > 1)
                     return Optional.of(args.get(1));
 
             case TIMEOUT:
                 if (args != null && args.size() > 2)
                     return Optional.of(args.get(2));
+
+            case WARN:
+                if (args != null && args.size() > 1) {
+                    List<String> reasons = args.subList(1, args.size());
+                    return Optional.of(String.join("\n", reasons).trim());
+                }
 
             default:
                 return Optional.empty();
