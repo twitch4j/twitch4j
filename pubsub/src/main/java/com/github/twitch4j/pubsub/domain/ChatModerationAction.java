@@ -298,6 +298,10 @@ public class ChatModerationAction {
          */
         WARN,
         /**
+         * A user acknowledged their warning reason.
+         */
+        ACKNOWLEDGE_WARNING,
+        /**
          * A user's message was flagged by AutoMod for manual review.
          */
         AUTOMOD_MESSAGE_REJECTED("automod_message_rejected"),
