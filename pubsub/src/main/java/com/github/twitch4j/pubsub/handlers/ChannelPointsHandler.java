@@ -38,6 +38,7 @@ class ChannelPointsHandler implements TopicHandler {
         Instant instant = Instant.parse(timestampText);
 
         switch (args.getType()) {
+            case "automatic-reward-redeemed":
             case "reward-redeemed":
                 ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
                 return new RewardRedeemedEvent(instant, redemption);

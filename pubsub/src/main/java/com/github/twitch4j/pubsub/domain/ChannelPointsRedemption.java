@@ -44,4 +44,7 @@ public class ChannelPointsRedemption {
 	@Unofficial
 	private String cursor;
 
+    @Unofficial
+    private RedemptionMetadata redemptionMetadata;
+
 }
