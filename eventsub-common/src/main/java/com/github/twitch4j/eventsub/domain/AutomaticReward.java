@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @Data
@@ -57,21 +56,18 @@ public class AutomaticReward {
         CHOSEN_MODIFIED_SUB_EMOTE_UNLOCK,
 
         /**
-         * "Animate My Message" was redeemed.
+         * Message Effects was redeemed.
          */
-        @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
-        SEND_ANIMATED_MESSAGE,
+        MESSAGE_EFFECT,
 
         /**
-         * Send a gigantified emote was redeemed.
+         * Gigantify an Emote was redeemed.
          */
-        @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
-        SEND_GIGANTIFIED_EMOTE,
+        GIGANTIFY_AN_EMOTE,
 
         /**
-         * Trigger a celebration alert was redeemed.
+         * On-Screen Celebration was redeemed.
          */
-        @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
         CELEBRATION,
 
         /**

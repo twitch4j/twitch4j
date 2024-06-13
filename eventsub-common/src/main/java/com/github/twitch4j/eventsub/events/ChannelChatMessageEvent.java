@@ -71,12 +71,11 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
     private String channelPointsCustomRewardId;
 
     /**
-     * An ID for the type of animation selected as part of an "animate my message" redemption.
+     * An ID for the type of animation selected as part of a "Message Effects" redemption.
      *
-     * @see MessageType#ANIMATED
+     * @see MessageType#POWER_UPS_MESSAGE_EFFECT
      */
     @Nullable
-    @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
     private String channelPointsAnimationId;
 
 }
