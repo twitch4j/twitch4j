@@ -1705,6 +1705,296 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * @param authToken     User access token (scope: channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star) from a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster you want to get guest star settings for.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @return GuestStarSettingsWrapper
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /guest_star/channel_settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSettingsWrapper> getChannelGuestStarSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * @param authToken                User access token (scope: channel:read:guest_star or channel:manage:guest_star) from the broadcaster.
+     * @param broadcasterId            The ID of the broadcaster you want to update Guest Star settings for.
+     * @param regenerateBrowserSources Whether Guest Star should regenerate the auth token associated with the channel’s browser sources,
+     *                                 immediately invalidating all browser sources previously configured in the streaming software.
+     * @param settings                 The updated Guest Star settings.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("PUT /guest_star/channel_settings?broadcaster_id={broadcaster_id}&regenerate_browser_sources={regenerate_browser_sources}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateChannelGuestStarSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("regenerate_browser_sources") Boolean regenerateBrowserSources,
+        GuestStarSettings settings // POJO body
+    );
+
+    /**
+     * Gets information about an ongoing Guest Star session for a particular channel.
+     * <p>
+     * Guests must be either invited or assigned a slot within the session.
+     *
+     * @param authToken     User access token (scope: channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId ID for the user hosting the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /guest_star/session?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> getGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
+     * Programmatically creates a Guest Star session on behalf of the broadcaster.
+     * <p>
+     * Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+     * <p>
+     * Requires phone verification (to avoid 401 Unauthorized response).
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster.
+     * @param broadcasterId The ID of the broadcaster you want to create a Guest Star session for.
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/session?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> createGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
+     * Programmatically ends a Guest Star session on behalf of the broadcaster.
+     * <p>
+     * Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star) from the broadcaster.
+     * @param broadcasterId The ID of the broadcaster you want to end a Guest Star session for.
+     * @param sessionId     ID for the session to end on behalf of the broadcaster.
+     * @return GuestStarSessionList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/session?broadcaster_id={broadcaster_id}&session_id={session_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarSessionList> endGuestStarSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("session_id") String sessionId
+    );
+
+    /**
+     * Provides the caller with a list of pending invites to a Guest Star session,
+     * including the invitee’s ready status while joining the waiting room.
+     *
+     * @param authToken     User access token (scope: channel:read:guest_star, channel:manage:guest_star, moderator:read:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The session ID to query for invite status.
+     * @return GuestStarInviteList
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_READ
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<GuestStarInviteList> getGuestStarInvites(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId
+    );
+
+    /**
+     * Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The session ID for the invite to be sent on behalf of the broadcaster.
+     * @param guestId       Twitch User ID for the guest to invite to the Guest Star session.
+     * @return 204 No Content upon a successful request or 403 Forbidden if the guest was already invited
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> sendGuestStarInvite(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId
+    );
+
+    /**
+     * Revokes a previously sent invite for a Guest Star session.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The ID of the session for the invite to be revoked on behalf of the broadcaster.
+     * @param guestId       Twitch User ID for the guest to revoke the Guest Star session invite from.
+     * @return 204 No Content upon a successful request, or 404 Not Found if no invite exists for specified guest_id
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/invites?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteGuestStarInvite(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId
+    );
+
+    /**
+     * Allows a previously invited user to be assigned a slot within the active Guest Star session, once that guest has indicated they are ready to join.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId     The ID of the Guest Star session in which to assign the slot.
+     * @param guestId       The Twitch User ID corresponding to the guest to assign a slot in the session. This user must already have an invite to this session, and have indicated that they are ready to join.
+     * @param slotId        The slot assignment to give to the user. Must be a numeric identifier between “1” and “N” where N is the max number of slots for the session.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}&slot_id={slot_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> assignGuestStarSlot(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId,
+        @Param("slot_id") String slotId
+    );
+
+    /**
+     * Allows a user to update the assigned slot for a particular user within the active Guest Star session.
+     *
+     * @param authToken         User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId     Required: The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId       Required: The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user_id in the user access token.
+     * @param sessionId         Required: The ID of the Guest Star session in which to update slot settings.
+     * @param sourceSlotId      Required: The slot assignment previously assigned to a user.
+     * @param destinationSlotId Optional: The slot to move this user assignment to. If the destination slot is occupied, the user assigned will be swapped into source_slot_id.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("PATCH /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&source_slot_id={source_slot_id}&destination_slot_id={destination_slot_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateGuestStarSlot(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("source_slot_id") String sourceSlotId,
+        @Param("destination_slot_id") @Nullable String destinationSlotId
+    );
+
+    /**
+     * Allows a caller to remove a slot assignment from a user participating in an active Guest Star session.
+     * This revokes their access to the session immediately and disables their access to publish or subscribe to media within the session.
+     *
+     * @param authToken           User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId       Required: The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId         Required: The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @param sessionId           Required: The ID of the Guest Star session in which to remove the slot assignment.
+     * @param guestId             Required: The Twitch User ID corresponding to the guest to remove from the session.
+     * @param slotId              Required: The slot ID representing the slot assignment to remove from the session.
+     * @param shouldReinviteGuest Optional: Whether the guest should be reinvited to the session, sending them back to the invite queue. Default: false.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /guest_star/slot?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&guest_id={guest_id}&slot_id={slot_id}&should_reinvite_guest={should_reinvite_guest}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> deleteGuestStarSlot(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("guest_id") String guestId,
+        @Param("slot_id") String slotId,
+        @Param("should_reinvite_guest") @Nullable Boolean shouldReinviteGuest
+    );
+
+    /**
+     * Allows a user to update slot settings for a particular guest within a Guest Star session,
+     * such as allowing the user to share audio or video within the call as a host.
+     * <p>
+     * These settings will be broadcasted to all subscribers which control their view of the guest in that slot.
+     * <p>
+     * One or more of the optional parameters to this API can be specified at any time.
+     *
+     * @param authToken     User access token (scope: channel:manage:guest_star or moderator:manage:guest_star) from the broadcaster or a Guest Star moderator.
+     * @param broadcasterId Required: The ID of the broadcaster running the Guest Star session.
+     * @param moderatorId   Required: The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token.
+     * @param sessionId     Required: The ID of the Guest Star session in which to update a slot’s settings.
+     * @param slotId        Required: The slot assignment that has previously been assigned to a user.
+     * @param audioEnabled  Optional: Whether the slot is allowed to share their audio with the rest of the session.
+     * @param videoEnabled  Optional: Whether the slot is allowed to share their video with the rest of the session.
+     * @param live          Optional: Whether the user assigned to this slot is visible/can be heard from any public subscriptions.
+     * @param volume        Optional: Value from 0-100 that controls the audio volume for shared views containing the slot.
+     * @return 204 No Content upon a successful request
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_GUEST_STAR_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_GUEST_STAR_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("PATCH /guest_star/slot_settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&session_id={session_id}&slot_id={slot_id}&is_audio_enabled={is_audio_enabled}&is_video_enabled={is_video_enabled}&is_live={is_live}&volume={volume}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updateGuestStarSlotSettings(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("session_id") String sessionId,
+        @Param("slot_id") String slotId,
+        @Param("is_audio_enabled") @Nullable Boolean audioEnabled,
+        @Param("is_video_enabled") @Nullable Boolean videoEnabled,
+        @Param("is_live") @Nullable Boolean live,
+        @Param("volume") @Nullable Integer volume
+    );
+
+    /**
      * Gets the information of the most recent Hype Train of the given channel ID.
      * After 5 days, if no Hype Train has been active, the endpoint will return an empty response.
      *
