@@ -41,15 +41,10 @@ public class ChannelPointsRedemption {
 	/**
 	 * reward redemption status, will be FULFILLED if a user skips the reward queue, UNFULFILLED otherwise
 	 */
-    @Nullable
 	private String status;
 
     @Nullable
 	@Unofficial
 	private String cursor;
-
-    @Nullable
-    @Unofficial
-    private RedemptionMetadata redemptionMetadata;
 
 }
