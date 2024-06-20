@@ -549,6 +549,8 @@ public interface TwitchHelix {
      * @param broadcasterId Returns all emotes available to the user within the chat owned by the specified broadcaster.
      *                      This includes the Global and Subscriber Emotes the user has access to,
      *                      as well as channel-only specific emotes such as Follower Emotes.
+     *                      If the user specified in user_id is subscribed to the broadcaster specified, their follower emotes
+     *                      will appear in the response body regardless if this query parameter is used.
      * @param cursor        The cursor used to get the next page of results.
      * @return {@link EmoteList}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_USER_EMOTES_READ
@@ -2297,6 +2299,36 @@ public interface TwitchHelix {
         @NotNull @Param("unban_request_id") String unbanRequestId,
         @NotNull @Param("status") UnbanRequestStatus status,
         @Nullable @Param("resolution_text") String resolutionText
+    );
+
+    /**
+     * Warns a user in the specified broadcaster’s chat room,
+     * preventing them from chat interaction until the warning is acknowledged.
+     * <p>
+     * New warnings can be issued to a user when they already have a warning in the channel
+     * (new warning will replace old warning).
+     *
+     * @param authToken     User access token that includes the moderator:manage:warnings scope. Query parameter moderator_id must match the user_id in the user access token.
+     * @param broadcasterId The ID of the channel in which the warning will take effect.
+     * @param moderatorId   The ID of the twitch user who requested the warning.
+     * @param userId        The ID of the twitch user to be warned.
+     * @param reason        A custom reason for the warning. Max: 500 chars.
+     * @return ChatUserWarningWrapper
+     * @apiNote This endpoint is in open beta, and could break without notice.
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /moderation/warnings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"data\":%7B\"user_id\":\"{user_id}\",\"reason\":\"{reason}\"%7D%7D")
+    HystrixCommand<ChatUserWarningWrapper> warnChatUser(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @NotNull @Param("user_id") String userId,
+        @NotNull @Param(value = "reason", expander = JsonStringExpander.class) String reason
     );
 
     /**
