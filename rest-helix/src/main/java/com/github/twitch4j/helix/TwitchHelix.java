@@ -2315,6 +2315,7 @@ public interface TwitchHelix {
      * @param reason        A custom reason for the warning. Max: 500 chars.
      * @return ChatUserWarningWrapper
      * @apiNote This endpoint is in open beta, and could break without notice.
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_WARNINGS_MANAGE
      */
     @ApiStatus.Experimental // in open beta
     @RequestLine("POST /moderation/warnings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
