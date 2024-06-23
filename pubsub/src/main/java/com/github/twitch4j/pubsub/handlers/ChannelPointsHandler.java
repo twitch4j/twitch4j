@@ -3,10 +3,12 @@ package com.github.twitch4j.pubsub.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.AutomaticRewardRedemption;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
 import com.github.twitch4j.pubsub.domain.CommunityGoalContribution;
 import com.github.twitch4j.pubsub.domain.RedemptionProgress;
+import com.github.twitch4j.pubsub.events.AutomaticRewardRedeemedEvent;
 import com.github.twitch4j.pubsub.events.CommunityGoalContributionEvent;
 import com.github.twitch4j.pubsub.events.CustomRewardCreatedEvent;
 import com.github.twitch4j.pubsub.events.CustomRewardDeletedEvent;
@@ -38,6 +40,9 @@ class ChannelPointsHandler implements TopicHandler {
         Instant instant = Instant.parse(timestampText);
 
         switch (args.getType()) {
+            case "automatic-reward-redeemed":
+                AutomaticRewardRedemption autoRedemption = TypeConvert.convertValue(msgData.path("redemption"), AutomaticRewardRedemption.class);
+                return new AutomaticRewardRedeemedEvent(instant, autoRedemption);
             case "reward-redeemed":
                 ChannelPointsRedemption redemption = TypeConvert.convertValue(msgData.path("redemption"), ChannelPointsRedemption.class);
                 return new RewardRedeemedEvent(instant, redemption);

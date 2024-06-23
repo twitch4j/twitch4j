@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.GlobalCooldown;
 import com.github.twitch4j.eventsub.domain.MaxPerUserPerStream;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -17,7 +18,7 @@ public class ChannelPointsReward {
 	private long cost;
 	private Boolean isUserInputRequired;
 	private Boolean isSubOnly;
-	private Image image;
+	private @Nullable Image image;
 	private Image defaultImage;
 	private String backgroundColor;
 	private Boolean isEnabled;
@@ -28,9 +29,9 @@ public class ChannelPointsReward {
 	private String updatedForIndicatorAt;
 	private MaxPerUserPerStream maxPerUserPerStream;
 	private GlobalCooldown globalCooldown;
-	private Integer redemptionsRedeemedCurrentStream;
-	private Instant cooldownExpiresAt;
-    private String templateId;
+	private @Nullable Integer redemptionsRedeemedCurrentStream;
+	private @Nullable Instant cooldownExpiresAt;
+    private @Nullable String templateId;
 
 	@Data
 	public static class Image {

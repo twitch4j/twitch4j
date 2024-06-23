@@ -106,6 +106,36 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
     }
 
     /**
+     * @return whether the message is a "Gigantify an Emote" bits redemption
+     * @apiNote This method is unofficial since the msg-id is not documented in the irc guide.
+     * @see <a href="https://blog.twitch.tv/en/2024/06/12/introducing-power-ups-unleash-special-effects-with-bits/">Twitch Announcement</a>
+     */
+    @Unofficial
+    public boolean hasGiganticEmote() {
+        return StringUtils.equals("gigantified-emote-message", getMessageEvent().getRawTag("msg-id"));
+    }
+
+    /**
+     * @return whether the message is a "Message Effects" bits redemption
+     * @apiNote This method is unofficial since the msg-id is not documented in the irc guide.
+     * @see <a href="https://blog.twitch.tv/en/2024/06/12/introducing-power-ups-unleash-special-effects-with-bits/">Twitch Announcement</a>
+     */
+    @Unofficial
+    public boolean hasMessageEffects() {
+        return StringUtils.equals("animated-message", getMessageEvent().getRawTag("msg-id"));
+    }
+
+    /**
+     * @return returns the animation id associated with the "Message Effects" bits redemption. Possible values include "simmer" and "rainbow-eclipse".
+     * @apiNote This method is unofficial since the tag is not documented in the irc guide.
+     * @see <a href="https://blog.twitch.tv/en/2024/06/12/introducing-power-ups-unleash-special-effects-with-bits/">Twitch Announcement</a>
+     */
+    @Unofficial
+    public Optional<String> getAnimationId() {
+        return getMessageEvent().getTagValue("animation-id");
+    }
+
+    /**
      * Hype Chat Contribution
      *
      * @return the payment information related to this hype chat, if applicable.
