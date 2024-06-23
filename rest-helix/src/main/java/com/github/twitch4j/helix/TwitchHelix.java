@@ -2318,13 +2318,13 @@ public interface TwitchHelix {
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_WARNINGS_MANAGE
      */
     @ApiStatus.Experimental // in open beta
-    @RequestLine("POST /moderation/warnings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
+    @RequestLine("POST /moderation/warnings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers({
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
     @Body("%7B\"data\":%7B\"user_id\":\"{user_id}\",\"reason\":\"{reason}\"%7D%7D")
-    HystrixCommand<ChatUserWarningWrapper> warnChatUser(
+    HystrixCommand<ValueWrapper<ChatUserWarning>> warnChatUser(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
