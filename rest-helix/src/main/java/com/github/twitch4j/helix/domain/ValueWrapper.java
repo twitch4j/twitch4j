@@ -20,6 +20,9 @@ public class ValueWrapper<T> {
      */
     private List<T> data;
 
+    /**
+     * @return the single value contained in the response, or null.
+     */
     public T get() {
         return data != null && !data.isEmpty() ? data.get(0) : null;
     }
