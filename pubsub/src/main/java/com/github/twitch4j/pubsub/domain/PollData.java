@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
@@ -26,7 +27,7 @@ public class PollData {
     private Integer totalVoters;
     private Long remainingDurationMilliseconds;
     private Contributor topContributor;
-    @Deprecated
+    @Getter(onMethod_ = { @Deprecated })
     private Contributor topBitsContributor;
     private Contributor topChannelPointsContributor;
 
@@ -36,7 +37,7 @@ public class PollData {
         private Setting multiChoice;
         private Setting subscriberOnly;
         private Setting subscriberMultiplier;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Setting bitsVotes;
         private Setting channelPointsVotes;
 
@@ -62,7 +63,7 @@ public class PollData {
     @Setter(onMethod_ = { @Deprecated })
     public static class Votes {
         private Long total;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bits;
         private Long channelPoints;
         private Long base;
@@ -71,7 +72,7 @@ public class PollData {
     @Data
     @Setter(onMethod_ = { @Deprecated })
     public static class Tokens {
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bits;
         private Long channelPoints;
     }
@@ -81,7 +82,7 @@ public class PollData {
     public static class Contributor {
         private String userId;
         private String displayName;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bitsContributed;
         private Long channelPointsContributed;
     }

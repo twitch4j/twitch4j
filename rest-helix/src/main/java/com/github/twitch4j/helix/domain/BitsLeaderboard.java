@@ -3,6 +3,7 @@ package com.github.twitch4j.helix.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class BitsLeaderboard {
     @Setter(AccessLevel.PRIVATE)
     private Integer total;
 
-    @Deprecated
+    @Getter(onMethod_ = { @Deprecated })
     private HelixPagination pagination;
 
 }
