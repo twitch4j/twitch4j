@@ -11,6 +11,7 @@ import java.util.List;
  * Bits Leaderboard
  */
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class BitsLeaderboard {
 
     /**
