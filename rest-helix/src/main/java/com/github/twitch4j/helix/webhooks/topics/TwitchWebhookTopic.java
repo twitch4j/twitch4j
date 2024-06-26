@@ -3,6 +3,7 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.webhooks.domain.WebhookNotification;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,6 +12,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 @EqualsAndHashCode
 public abstract class TwitchWebhookTopic<T> {
 

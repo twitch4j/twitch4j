@@ -2,14 +2,19 @@ package com.github.twitch4j.helix.webhooks.topics;
 
 import com.github.twitch4j.helix.domain.FollowList;
 import lombok.Getter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.TreeMap;
 
 /**
  * Notifies when a follows event occurs.
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class FollowsTopic extends TwitchWebhookTopic<FollowList> {
 
     public static final String PATH = "/users/follows";

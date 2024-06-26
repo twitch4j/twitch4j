@@ -5,10 +5,12 @@ import com.github.twitch4j.helix.webhooks.topics.TwitchWebhookTopic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 @Data
 @AllArgsConstructor
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class WebhookRequest {
 
     public static final String MODE_SUBSCRIBE = "subscribe";
