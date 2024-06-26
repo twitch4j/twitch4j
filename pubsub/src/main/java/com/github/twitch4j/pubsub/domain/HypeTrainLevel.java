@@ -1,11 +1,13 @@
 package com.github.twitch4j.pubsub.domain;
 
 import lombok.Data;
+import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class HypeTrainLevel {
     private Integer value;
     private Integer goal;

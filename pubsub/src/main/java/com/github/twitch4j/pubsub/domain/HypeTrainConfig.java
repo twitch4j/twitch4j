@@ -2,10 +2,12 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.List;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class HypeTrainConfig {
     private String channelId;
     private Boolean isEnabled;
@@ -28,6 +30,7 @@ public class HypeTrainConfig {
     private Boolean hasConductorBadges;
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class HypeTrainKickoff {
         private Integer numOfEvents;
         private Integer minPoints;
@@ -35,6 +38,7 @@ public class HypeTrainConfig {
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class ConductorRewards {
         @JsonProperty("BITS")
         private ConductorReward bits;
@@ -43,6 +47,7 @@ public class HypeTrainConfig {
         private ConductorReward subs;
 
         @Data
+        @Setter(onMethod_ = { @Deprecated })
         public static class ConductorReward {
             @JsonProperty("CURRENT")
             private List<RewardType> current;
@@ -51,6 +56,7 @@ public class HypeTrainConfig {
             private List<RewardType> former;
 
             @Data
+            @Setter(onMethod_ = { @Deprecated })
             public static class RewardType {
                 private String type;
                 private String id;
@@ -63,6 +69,7 @@ public class HypeTrainConfig {
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class DifficultySettings {
         @JsonProperty("EASY")
         private List<DifficultySetting> easy;
@@ -80,6 +87,7 @@ public class HypeTrainConfig {
         private List<DifficultySetting> insane;
 
         @Data
+        @Setter(onMethod_ = { @Deprecated })
         public static class DifficultySetting {
             private Integer value;
             private Integer goal;
