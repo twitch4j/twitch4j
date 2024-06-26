@@ -18,6 +18,7 @@ import com.netflix.hystrix.HystrixCommand;
 import feign.Logger;
 import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,8 @@ import static com.github.twitch4j.extensions.compat.ExtensionsTypeConverters.*; 
  * Forwards twitch extensions api calls to the new helix api
  */
 @SuppressWarnings("deprecation")
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public final class TwitchExtensionsCompatibilityLayer implements TwitchExtensions {
 
     private final String clientId;

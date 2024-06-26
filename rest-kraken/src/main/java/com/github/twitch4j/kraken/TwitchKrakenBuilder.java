@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class TwitchKrakenBuilder {
 
     /**
