@@ -1,7 +1,10 @@
 package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.BucketUtils;
@@ -69,6 +72,18 @@ public class TwitchHelixBuilder {
      */
     @With
     private String clientSecret = Twitch4JGlobal.clientSecret;
+
+    /**
+     * Redirect Url
+     */
+    @With
+    private String redirectUrl = "http://localhost";
+
+    /**
+     * Credential Manager
+     */
+    @With
+    private CredentialManager credentialManager = null;
 
     /**
      * User Agent
@@ -173,8 +188,14 @@ public class TwitchHelixBuilder {
         if (apiRateLimit == null)
             apiRateLimit = DEFAULT_BANDWIDTH;
 
+        // Auth
+        if (credentialManager == null) {
+            credentialManager = CredentialManagerBuilder.builder().build();
+        }
+        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl);
+
         // Feign
-        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(clientId, clientSecret, defaultAuthToken);
+        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(credentialManager, clientId, clientSecret, defaultAuthToken);
         TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
         return HystrixFeign.builder()
             .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
