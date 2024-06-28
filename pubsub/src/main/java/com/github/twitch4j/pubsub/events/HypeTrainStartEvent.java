@@ -8,5 +8,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class HypeTrainStartEvent extends TwitchEvent {
+    private final String channelId;
     private final HypeTrainStart data;
 }

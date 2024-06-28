@@ -1,33 +1,64 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class HypeTrainConfig {
-    private String channelId;
-    private Boolean isEnabled;
-    private Boolean isWhitelisted;
-    private HypeTrainKickoff kickoff;
-    private Long cooldownDuration;
-    private Long levelDuration;
+    private String id;
+    private @Deprecated String channelId;
+    private @Deprecated Boolean isEnabled;
+    private @Deprecated Boolean isWhitelisted;
+    private @Deprecated HypeTrainKickoff kickoff;
+    private @Deprecated Long cooldownDuration;
+    private @Deprecated Long levelDuration;
     private String difficulty;
-    // private Object rewardEndDate;
+    @JsonProperty("participationConversionRates")
+    private List<HypeTrainParticipation> conversionRates;
+    @Deprecated
+    @JsonIgnore
     private HypeTrainParticipations participationConversionRates;
-    private HypeTrainParticipations notificationThresholds;
+    private @Deprecated HypeTrainParticipations notificationThresholds;
+    @JsonProperty("difficultySettings")
+    private List<DifficultySetting> difficultySetting;
+    @Deprecated
+    @JsonIgnore
     private DifficultySettings difficultySettings;
+    @JsonProperty("conductorRewards")
+    private List<HypeTrainConductorReward> leaderRewards;
+    @Deprecated
+    @JsonIgnore
     private ConductorRewards conductorRewards;
-    private String calloutEmoteId;
-    private String calloutEmoteToken;
-    private String themeColor;
+    private List<HypeTrainPotentialReward> potentialRewards;
+    private Emote calloutEmote;
+    private @Deprecated String calloutEmoteId;
+    private @Deprecated String calloutEmoteToken;
+    private @Deprecated String themeColor;
+    @JsonProperty("willUseCreatorColor")
     private Boolean useCreatorColor;
-    private String primaryHexColor;
-    private Boolean usePersonalizedSettings;
-    private Boolean hasConductorBadges;
+    private @Nullable String primaryHexColor;
+    private @Deprecated Boolean usePersonalizedSettings;
+    private @Deprecated Boolean hasConductorBadges;
 
     @Data
+    @Setter(AccessLevel.PRIVATE)
+    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+    public static class DifficultySetting {
+        private String difficulty;
+        private int maxLevel;
+    }
+
+    @Data
+    @Deprecated
     public static class HypeTrainKickoff {
         private Integer numOfEvents;
         private Integer minPoints;
@@ -35,6 +66,7 @@ public class HypeTrainConfig {
     }
 
     @Data
+    @Deprecated
     public static class ConductorRewards {
         @JsonProperty("BITS")
         private ConductorReward bits;
@@ -63,6 +95,7 @@ public class HypeTrainConfig {
     }
 
     @Data
+    @Deprecated
     public static class DifficultySettings {
         @JsonProperty("EASY")
         private List<DifficultySetting> easy;

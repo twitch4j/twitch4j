@@ -16,4 +16,5 @@ public class HypeLevelUp {
     @Accessors(fluent = true)
     @JsonProperty("is_boost_train")
     private Boolean isBoostTrain;
+    private HypeTrainStart hypeTrain;
 }
