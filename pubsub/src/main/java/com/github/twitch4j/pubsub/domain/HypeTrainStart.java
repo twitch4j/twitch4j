@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-public class HypeTrainStart {
+public class HypeTrainStart { // TODO(2.0.0): rename to HypeTrainExecution
     @Deprecated
     private String channelId;
     private String id;
@@ -22,6 +22,7 @@ public class HypeTrainStart {
     private HypeTrainParticipations participations;
     @JsonProperty("participations")
     private List<HypeTrainParticipation> contributions;
+    private List<HypeConductor> conductors;
     private HypeTrainProgress progress;
     private Instant startedAt;
     private Instant expiresAt;
