@@ -1,6 +1,7 @@
 package com.github.twitch4j.pubsub.domain;
 
 import com.github.twitch4j.common.util.TypeConvert;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@Tag("unittest")
 class HypeTrainApproachingTest {
 
     @Test
