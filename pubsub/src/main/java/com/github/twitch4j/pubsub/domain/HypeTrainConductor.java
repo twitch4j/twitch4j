@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class HypeTrainConductor {
+    private String id;
     private String source;
     private HypeTrainConductorUser user;
     private HypeTrainParticipations participations;
