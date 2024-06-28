@@ -11,6 +11,7 @@ import java.util.List;
 
 @Data
 public class HypeTrainEnd {
+    private String id;
     @JsonDeserialize(using = MilliInstantDeserializer.class)
     private Instant endedAt;
     private String endingReason;
