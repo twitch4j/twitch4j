@@ -49,7 +49,7 @@ class TrainHandler implements TopicHandler {
                 return new HypeTrainApproachingEvent(approachData);
             case "hype-train-start":
                 final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
-                return new HypeTrainStartEvent(startData);
+                return new HypeTrainStartEvent(lastTopicIdentifier, startData);
             case "hype-train-progression":
                 final HypeProgression progressionData = TypeConvert.convertValue(msgData, HypeProgression.class);
                 return new HypeTrainProgressionEvent(lastTopicIdentifier, progressionData);

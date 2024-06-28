@@ -1,5 +1,6 @@
 package com.github.twitch4j.pubsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.OptionalInt;
 public class HypeTrainParticipation {
     private String source;
     private String action;
+    @JsonAlias("value")
     private int quantity;
 
     public boolean isCheer() {
