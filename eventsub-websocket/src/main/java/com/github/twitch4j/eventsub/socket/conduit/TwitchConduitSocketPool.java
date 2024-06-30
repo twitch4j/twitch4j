@@ -250,6 +250,29 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             }
             throw new ShardRegistrationException(this.conduitId, e);
         }
+
+        // Update shards as the underlying websockets reconnect after transient network issues
+        eventManager.onEvent(EventSocketWelcomedEvent.class, e -> {
+            if (!e.isSessionChanged()) return;
+            int shardIndex = sockets.indexOf(e.getConnection());
+            if (shardIndex < 0) return;
+            String id = String.valueOf(shardIndex + shardOffset);
+            EventSubTransport shardTransport = EventSubTransport.builder()
+                .method(EventSubTransportMethod.WEBSOCKET)
+                .sessionId(e.getSessionId())
+                .build();
+            ConduitShard updatedShard = ConduitShard.builder()
+                .shardId(id)
+                .transport(shardTransport)
+                .build();
+            executor.execute(() -> {
+                try {
+                    api.updateConduitShards(token, new ShardsInput(this.conduitId, Collections.singletonList(updatedShard))).execute();
+                } catch (Exception ex) {
+                    log.warn("Failed to re-associate websocket (ID: {}) with conduit (ID: {}) after reconnect", id, this.conduitId, ex);
+                }
+            });
+        });
     }
 
     @Override
