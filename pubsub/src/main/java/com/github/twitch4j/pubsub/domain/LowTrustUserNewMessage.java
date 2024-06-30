@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class LowTrustUserNewMessage {
 
     /**

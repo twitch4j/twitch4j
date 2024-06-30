@@ -1,16 +1,17 @@
 package com.github.twitch4j.pubsub.domain;
 
 import lombok.Data;
-import org.jetbrains.annotations.ApiStatus;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class HypeTrainLevel {
     private Integer value;
     private Integer goal;
     private List<HypeTrainReward> rewards;
-    @Deprecated // no longer sent after switch to v2 topic
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    @Getter(onMethod_ = { @Deprecated }) // no longer sent after switch to v2 topic
     private Integer impressions;
 }

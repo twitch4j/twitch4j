@@ -2,10 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.github.twitch4j.util.EnumUtil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatModerationAction {

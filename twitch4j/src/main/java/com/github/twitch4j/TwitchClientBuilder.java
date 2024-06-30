@@ -40,6 +40,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -102,6 +103,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableExtensions = false;
 
     /**
@@ -118,6 +120,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableKraken = false;
 
     /**
@@ -127,6 +130,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableTMI = false;
 
     /**
@@ -373,6 +377,7 @@ public class TwitchClientBuilder {
      * @deprecated in favor of withHelperThreadDelay
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public TwitchClientBuilder withHelperThreadRate(long helperThreadDelay) {
         return this.withHelperThreadDelay(helperThreadDelay);
     }

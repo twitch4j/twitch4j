@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Setter;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class PredictionTrigger {
     private String type;
     private String userId;

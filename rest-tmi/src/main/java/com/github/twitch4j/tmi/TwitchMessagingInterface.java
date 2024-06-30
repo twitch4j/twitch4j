@@ -7,6 +7,7 @@ import com.github.twitch4j.tmi.domain.HostList;
 import com.netflix.hystrix.HystrixCommand;
 import feign.Param;
 import feign.RequestLine;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.net.URI;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("DeprecatedIsStillUsed")
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public interface TwitchMessagingInterface {
 
     /**

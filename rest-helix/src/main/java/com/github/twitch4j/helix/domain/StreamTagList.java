@@ -2,6 +2,7 @@ package com.github.twitch4j.helix.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  */
 @Data
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class StreamTagList {
     /**
      * Data

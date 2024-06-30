@@ -16,6 +16,7 @@ import io.github.xanthic.cache.core.CacheApi;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -36,6 +37,7 @@ import java.util.function.BiPredicate;
  * @see #test(TwitchChat, String)
  */
 @Slf4j
+@ApiStatus.Internal
 public final class ChatCommandHelixForwarder implements BiPredicate<TwitchChat, String> {
 
     /**

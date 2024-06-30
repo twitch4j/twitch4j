@@ -3,8 +3,10 @@ package com.github.twitch4j.pubsub.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class VideoPlaybackData {
     /**
      * The type of the video playback event.

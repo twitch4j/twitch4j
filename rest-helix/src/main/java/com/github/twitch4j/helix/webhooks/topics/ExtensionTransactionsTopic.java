@@ -3,13 +3,18 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.domain.ExtensionTransactionList;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.TreeMap;
 
 /**
  * Sends a notification when a new transaction is created for an extension.
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class ExtensionTransactionsTopic extends TwitchWebhookTopic<ExtensionTransactionList> {
 
     public static final String PATH = "/extensions/transactions";

@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.github.twitch4j.util.EnumUtil;
 import lombok.Data;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import java.util.Map;
  */
 @Data
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class FriendshipData {
     private String userId;
     private String targetUserId;

@@ -3,6 +3,7 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.domain.SubscriptionEventList;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.TreeMap;
@@ -13,8 +14,12 @@ import java.util.TreeMap;
  *     <li>A payment has been processed for a subscription or unsubscription.
  *     <li>A user who is subscribed to a broadcaster notifies the broadcaster of their subscription in the chat.
  * </ul>
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class ChannelSubscriptionTopic extends TwitchWebhookTopic<SubscriptionEventList> {
 
     public static final String PATH = "/subscriptions/events";

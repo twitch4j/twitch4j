@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class PredictionResult {
 
     /**

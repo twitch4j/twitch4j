@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Instant;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class Prediction {
     private String id;
     private String eventId;

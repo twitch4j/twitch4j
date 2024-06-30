@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class LowTrustUserTreatmentUpdate {
 
     /**

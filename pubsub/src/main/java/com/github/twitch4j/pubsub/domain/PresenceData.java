@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 @Data
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class PresenceData {
     private String userId;
     private String userLogin;

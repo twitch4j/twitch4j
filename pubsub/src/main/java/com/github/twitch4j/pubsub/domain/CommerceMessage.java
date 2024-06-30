@@ -3,10 +3,12 @@ package com.github.twitch4j.pubsub.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Setter;
 
 import java.util.List;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class CommerceMessage {
 
     /**
@@ -20,6 +22,7 @@ public class CommerceMessage {
     private List<CommerceEmote> emotes;
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class CommerceEmote {
         /**
          * The index in the message where the emote starts

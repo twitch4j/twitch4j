@@ -13,6 +13,7 @@ import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import java.util.Map;
  * @deprecated the Extensions API traditionally uses the decommissioned Kraken API. While the module now forwards calls to Helix, please migrate to using Helix directly as this module will be removed in the future.
  */
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public interface TwitchExtensions {
 
     /**

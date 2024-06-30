@@ -3,14 +3,19 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.domain.ModeratorEventList;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Optional;
 import java.util.TreeMap;
 
 /**
  * Notifies when a broadcaster adds or removes moderators.
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class ModeratorChangeTopic extends TwitchWebhookTopic<ModeratorEventList> {
 
     public static final String PATH = "/moderation/moderators/events";

@@ -8,6 +8,7 @@ import feign.CollectionFormat;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.net.URI;
 import java.time.Instant;
@@ -24,6 +25,7 @@ import java.util.function.Supplier;
  *
  */
 @Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public interface TwitchKraken {
 
     /**

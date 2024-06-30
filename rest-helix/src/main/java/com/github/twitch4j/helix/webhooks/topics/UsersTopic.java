@@ -3,14 +3,19 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.domain.UserList;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.TreeMap;
 
 /**
  * Notifies when a user changes information about his/her profile.
  * This web hook requires the user:read:email OAuth scope, to get notifications of email changes.
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class UsersTopic extends TwitchWebhookTopic<UserList> {
 
     public static final String PATH = "/users";

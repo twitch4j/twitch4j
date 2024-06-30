@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.GlobalCooldown;
 import com.github.twitch4j.eventsub.domain.MaxPerUserPerStream;
 import lombok.Data;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class ChannelPointsReward {
 
 	private String id;
@@ -34,6 +36,7 @@ public class ChannelPointsReward {
     private @Nullable String templateId;
 
 	@Data
+    @Setter(onMethod_ = { @Deprecated })
 	public static class Image {
 		@JsonProperty("url_1x")
 		private String url1x;
@@ -44,6 +47,7 @@ public class ChannelPointsReward {
 	}
 
 	@Data
+    @Setter(onMethod_ = { @Deprecated })
 	public static class MaxPerStream {
 		private Boolean isEnabled;
 		private long maxPerStream;
