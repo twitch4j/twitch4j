@@ -20,6 +20,7 @@ import com.github.twitch4j.eventsub.socket.conduit.exceptions.ConduitResizeExcep
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.CreateConduitException;
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.ShardRegistrationException;
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.ShardTimeoutException;
+import com.github.twitch4j.eventsub.socket.events.ConduitShardReassociationFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketWelcomedEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -270,6 +271,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                     api.updateConduitShards(token, new ShardsInput(this.conduitId, Collections.singletonList(updatedShard))).execute();
                 } catch (Exception ex) {
                     log.warn("Failed to re-associate websocket (ID: {}) with conduit (ID: {}) after reconnect", id, this.conduitId, ex);
+                    eventManager.publish(new ConduitShardReassociationFailureEvent(e.getConnection(), this, id, ex));
                 }
             });
         });
