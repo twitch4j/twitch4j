@@ -3,8 +3,9 @@ package com.github.twitch4j.eventsub.domain.chat;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.EnumSet;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
@@ -23,6 +24,7 @@ public class Emote {
     /**
      * The ID of the broadcaster who owns the emote.
      */
+    @Nullable
     private String ownerId;
 
     /**
@@ -31,7 +33,8 @@ public class Emote {
      * For example, if the emote is available only as a static PNG, the array contains only static.
      * But if the emote is available as a static PNG and an animated GIF, the array contains static and animated.
      */
-    private Set<Format> format;
+    @Nullable
+    private EnumSet<Format> format;
 
     public enum Format {
         /**
