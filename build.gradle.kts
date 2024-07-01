@@ -48,7 +48,7 @@ subprojects {
 	}
 
 	project.extensions.getByType(LombokExtension::class).apply {
-		version.set("1.18.32")
+		version.set("1.18.34")
 		disableConfig.set(true)
 	}
 
@@ -227,7 +227,7 @@ subprojects {
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.17.1",
 						"https://javadoc.io/doc/commons-io/commons-io/2.16.1",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.14.0",
-						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.32",
+						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.34",
 						"https://twitch4j.github.io/javadoc"
 				)
 				locale = "en"
