@@ -452,20 +452,24 @@ public final class TwitchEventSocket implements IEventSubSocket {
         switch (messageType) {
             case SESSION_WELCOME:
                 EventSubSocketInformation socket = payload.getSession();
+                final boolean sessionChanged = !socket.getId().equals(this.websocketId);
                 this.websocketId = socket.getId();
 
                 log.debug("EventSub-WS connection was welcomed at {}", socket.getConnectedAt());
 
-                if (baseUrl.equals(url)) {
-                    // If this is not a reconnect, let's create the eventsub subscriptions
-                    this.onInitialConnection(socket.getId());
-                } else {
-                    subscriptions.values().forEach(sub -> {
-                        if (StringUtils.isBlank(sub.getTransport().getConduitId())) {
-                            // noinspection deprecation
-                            sub.getTransport().setSessionId(websocketId);
-                        }
-                    });
+                if (sessionChanged) {
+                    if (baseUrl.equals(url)) {
+                        // If this is not a reconnect, let's create the eventsub subscriptions
+                        this.onInitialConnection(socket.getId());
+                    } else {
+                        // this branch is never hit because Twitch reuses the session ID after requested reconnects
+                        subscriptions.values().forEach(sub -> {
+                            if (StringUtils.isBlank(sub.getTransport().getConduitId())) {
+                                // noinspection deprecation
+                                sub.getTransport().setSessionId(websocketId);
+                            }
+                        });
+                    }
                 }
 
                 // For reconnects, we can close the old connection now
@@ -476,7 +480,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                 this.url = baseUrl;
 
                 // fire meta event
-                eventManager.publish(new EventSocketWelcomedEvent(this, socket.getId()));
+                eventManager.publish(new EventSocketWelcomedEvent(this, socket.getId(), sessionChanged));
                 break;
 
             case SESSION_KEEPALIVE:
