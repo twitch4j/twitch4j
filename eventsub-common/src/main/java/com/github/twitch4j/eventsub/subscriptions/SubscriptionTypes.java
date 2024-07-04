@@ -50,6 +50,8 @@ public class SubscriptionTypes {
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final @Deprecated ChannelUpdateType CHANNEL_UPDATE;
     public final ChannelUpdateV2Type CHANNEL_UPDATE_V2;
+    public final ChannelVipAddType CHANNEL_VIP_ADD;
+    public final ChannelVipRemoveType CHANNEL_VIP_REMOVE;
     public final ConduitShardDisabledType CONDUIT_SHARD_DISABLED;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
@@ -119,6 +121,8 @@ public class SubscriptionTypes {
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 CHANNEL_UPDATE_V2 = new ChannelUpdateV2Type(),
+                CHANNEL_VIP_ADD = new ChannelVipAddType(),
+                CHANNEL_VIP_REMOVE = new ChannelVipRemoveType(),
                 CONDUIT_SHARD_DISABLED = new ConduitShardDisabledType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
