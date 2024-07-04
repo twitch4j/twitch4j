@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Fragment {
      * Optional: Metadata pertaining to the cheermote.
      */
     @Nullable
+    @JsonAlias("Cheermote")
     private Cheermote cheermote;
 
     /**
