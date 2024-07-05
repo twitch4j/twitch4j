@@ -38,6 +38,7 @@ public enum HandlerRegistry {
             new ChatroomHandler(),
             new CheerbombHandler(),
             new FollowingHandler(),
+            new FollowsHandler(),
             new GiftHandler(),
             new GoalsHandler(),
             new HighlightHandler(),
