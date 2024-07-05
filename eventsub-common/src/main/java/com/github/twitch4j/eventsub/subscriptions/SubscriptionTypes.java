@@ -54,6 +54,8 @@ public class SubscriptionTypes {
     public final ChannelUpdateV2Type CHANNEL_UPDATE_V2;
     public final ChannelVipAddType CHANNEL_VIP_ADD;
     public final ChannelVipRemoveType CHANNEL_VIP_REMOVE;
+    public final @ApiStatus.Experimental BetaChannelWarningAcknowledgeType BETA_CHANNEL_WARNING_ACKNOWLEDGE;
+    public final @ApiStatus.Experimental BetaChannelWarningSendType BETA_CHANNEL_WARNING_SEND;
     public final ConduitShardDisabledType CONDUIT_SHARD_DISABLED;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
@@ -127,6 +129,8 @@ public class SubscriptionTypes {
                 CHANNEL_UPDATE_V2 = new ChannelUpdateV2Type(),
                 CHANNEL_VIP_ADD = new ChannelVipAddType(),
                 CHANNEL_VIP_REMOVE = new ChannelVipRemoveType(),
+                BETA_CHANNEL_WARNING_ACKNOWLEDGE =  new BetaChannelWarningAcknowledgeType(),
+                BETA_CHANNEL_WARNING_SEND = new BetaChannelWarningSendType(),
                 CONDUIT_SHARD_DISABLED = new ConduitShardDisabledType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
