@@ -11,7 +11,7 @@ plugins {
 	id("io.freefair.lombok").version("8.6").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.2").apply(false)
-	id("io.github.goooler.shadow").version("8.1.7").apply(false)
+	id("io.github.goooler.shadow").version("8.1.8").apply(false)
 	id("com.github.gmazzo.buildconfig").version("5.3.5").apply(false)
 }
 
@@ -48,7 +48,7 @@ subprojects {
 	}
 
 	project.extensions.getByType(LombokExtension::class).apply {
-		version.set("1.18.32")
+		version.set("1.18.34")
 		disableConfig.set(true)
 	}
 
@@ -84,10 +84,10 @@ subprojects {
 			api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager", version = "0.3.0")
 
 			// HTTP Client
-			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.2.1")
-			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.2.1")
-			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.2.1")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.2.1")
+			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.3")
+			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.3")
+			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.3")
+			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.3")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
@@ -136,7 +136,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.17.1"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.10.2"))
+		testImplementation(platform("org.junit:junit-bom:5.10.3"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		// - Mocking
 		testImplementation(platform("org.mockito:mockito-bom:5.12.0"))
@@ -216,10 +216,10 @@ subprojects {
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.1",
 						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.3.0",
-						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.2.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.2.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.2.1",
-						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.2.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.3",
+						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.3",
+						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.3",
+						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.3",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.13",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.17.1",
@@ -227,7 +227,7 @@ subprojects {
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.17.1",
 						"https://javadoc.io/doc/commons-io/commons-io/2.16.1",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.14.0",
-						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.32",
+						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.34",
 						"https://twitch4j.github.io/javadoc"
 				)
 				locale = "en"

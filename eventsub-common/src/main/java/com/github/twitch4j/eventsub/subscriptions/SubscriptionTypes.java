@@ -47,9 +47,13 @@ public class SubscriptionTypes {
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     public final ChannelSubscriptionGiftType CHANNEL_SUBSCRIPTION_GIFT;
     public final ChannelSubscriptionMessageType CHANNEL_SUBSCRIPTION_MESSAGE;
+    public final SuspiciousUserMessageType CHANNEL_SUSPICIOUS_USER_MESSAGE;
+    public final SuspiciousUserUpdateType CHANNEL_SUSPICIOUS_USER_UPDATE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final @Deprecated ChannelUpdateType CHANNEL_UPDATE;
     public final ChannelUpdateV2Type CHANNEL_UPDATE_V2;
+    public final ChannelVipAddType CHANNEL_VIP_ADD;
+    public final ChannelVipRemoveType CHANNEL_VIP_REMOVE;
     public final @ApiStatus.Experimental BetaChannelWarningAcknowledgeType BETA_CHANNEL_WARNING_ACKNOWLEDGE;
     public final @ApiStatus.Experimental BetaChannelWarningSendType BETA_CHANNEL_WARNING_SEND;
     public final ConduitShardDisabledType CONDUIT_SHARD_DISABLED;
@@ -118,9 +122,13 @@ public class SubscriptionTypes {
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 CHANNEL_SUBSCRIPTION_GIFT = new ChannelSubscriptionGiftType(),
                 CHANNEL_SUBSCRIPTION_MESSAGE = new ChannelSubscriptionMessageType(),
+                CHANNEL_SUSPICIOUS_USER_MESSAGE = new SuspiciousUserMessageType(),
+                CHANNEL_SUSPICIOUS_USER_UPDATE = new SuspiciousUserUpdateType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 CHANNEL_UPDATE_V2 = new ChannelUpdateV2Type(),
+                CHANNEL_VIP_ADD = new ChannelVipAddType(),
+                CHANNEL_VIP_REMOVE = new ChannelVipRemoveType(),
                 BETA_CHANNEL_WARNING_ACKNOWLEDGE =  new BetaChannelWarningAcknowledgeType(),
                 BETA_CHANNEL_WARNING_SEND = new BetaChannelWarningSendType(),
                 CONDUIT_SHARD_DISABLED = new ConduitShardDisabledType(),

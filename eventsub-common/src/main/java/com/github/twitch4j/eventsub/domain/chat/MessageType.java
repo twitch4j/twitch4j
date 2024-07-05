@@ -1,7 +1,6 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * EventSub equivalent of the {@code msg-id} IRC tag.
@@ -31,16 +30,14 @@ public enum MessageType {
     USER_INTRO,
 
     /**
-     * Channel points were used to animate the chat message.
+     * Bits were used to animate the chat message.
      */
-    @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
-    ANIMATED,
+    POWER_UPS_MESSAGE_EFFECT,
 
     /**
-     * Channel points were used to attach a gigantic emote to the chat message.
+     * Bits were used to send a gigantic emote in chat.
      */
-    @ApiStatus.Experimental // twitch feature is not in production yet (and could be reverted)
-    GIGANTIFIED_EMOTE,
+    POWER_UPS_GIGANTIFIED_EMOTE,
 
     /**
      * An unrecognized message type; please report to our issue tracker.
