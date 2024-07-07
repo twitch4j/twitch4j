@@ -27,14 +27,23 @@ public class TwitchAuth {
      */
     public TwitchAuth(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
         this.credentialManager = credentialManager;
-        registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl);
+        registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl, false);
     }
 
-    public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
+    public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl, boolean useMock) {
         // register the twitch identityProvider
         Optional<TwitchIdentityProvider> ip = credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class);
         if (!ip.isPresent()) {
-            // register
+            if (useMock) {
+                IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl, TwitchIdentityProvider.CLI_MOCK_BASE_URL);
+                try {
+                    credentialManager.registerIdentityProvider(identityProvider);
+                } catch (Exception e) {
+                    log.error("TwitchAuth: Encountered conflicting identity provider!", e);
+                }
+                return;
+            }
+
             IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
             try {
                 credentialManager.registerIdentityProvider(identityProvider);

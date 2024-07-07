@@ -395,7 +395,7 @@ public class TwitchClientBuilder {
         log.debug("TwitchClient: Initializing ErrorTracking ...");
 
         // Module: Auth (registers Twitch Identity Providers)
-        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
+        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl, TwitchHelixBuilder.MOCK_BASE_URL.equals(helixBaseUrl));
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
