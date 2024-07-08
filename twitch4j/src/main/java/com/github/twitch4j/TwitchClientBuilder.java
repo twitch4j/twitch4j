@@ -521,6 +521,10 @@ public class TwitchClientBuilder {
                 .executor(scheduledThreadPoolExecutor)
                 .fallbackToken(defaultAuthToken)
                 .helix(helix)
+                .identityProvider(
+                    credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class)
+                        .orElseGet(() -> new TwitchIdentityProvider(clientId, clientSecret, redirectUrl))
+                )
                 .advancedConfiguration(builder ->
                     builder.proxyConfig(() -> proxyConfig)
                 )
