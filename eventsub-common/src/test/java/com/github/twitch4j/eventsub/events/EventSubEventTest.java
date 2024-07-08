@@ -2,6 +2,7 @@ package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.AutomodCategory;
 import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
 import com.github.twitch4j.eventsub.domain.Contribution;
@@ -484,7 +485,7 @@ public class EventSubEventTest {
         assertEquals("6789", event.getUserId());
         assertEquals("aa72e85e-77f5-4b7b-95e5-1e5efd8d8373", event.getMessageId());
         assertEquals("fuck israel", event.getMessage().getText());
-        assertEquals("racism", event.getCategory());
+        assertEquals(AutomodCategory.RACISM, event.getCategory().getValue());
         assertEquals(1, event.getLevel());
         assertEquals(Instant.parse("2024-05-27T20:33:37.988487508Z"), event.getHeldAt());
         assertNotNull(event.getMessage().getFragments());
@@ -508,7 +509,7 @@ public class EventSubEventTest {
         assertEquals("6789", event.getUserId());
         assertEquals("aa72e85e-77f5-4b7b-95e5-1e5efd8d8373", event.getMessageId());
         assertEquals("fuck israel", event.getMessage().getText());
-        assertEquals("racism", event.getCategory());
+        assertEquals(AutomodCategory.RACISM, event.getCategory().getValue());
         assertEquals(1, event.getLevel());
         assertEquals(Instant.parse("2024-05-27T20:33:37.988487508Z"), event.getHeldAt());
         assertNotNull(event.getMessage().getFragments());

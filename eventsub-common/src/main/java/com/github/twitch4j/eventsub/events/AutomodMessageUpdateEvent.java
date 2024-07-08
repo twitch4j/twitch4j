@@ -1,5 +1,9 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.twitch4j.common.enums.TwitchEnum;
+import com.github.twitch4j.common.util.TwitchEnumDeserializer;
+import com.github.twitch4j.eventsub.domain.AutomodCategory;
 import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
 import com.github.twitch4j.eventsub.domain.chat.Message;
 import lombok.AccessLevel;
@@ -27,7 +31,8 @@ public class AutomodMessageUpdateEvent extends EventSubModerationEvent {
     /**
      * The category of the message offense.
      */
-    private String category;
+    @JsonDeserialize(using = TwitchEnumDeserializer.class)
+    private TwitchEnum<AutomodCategory> category;
 
     /**
      * The level of severity. Measured between 1 to 4.
