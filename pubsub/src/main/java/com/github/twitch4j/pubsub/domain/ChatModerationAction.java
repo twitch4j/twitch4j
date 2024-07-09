@@ -2,7 +2,11 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.github.twitch4j.util.EnumUtil;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
