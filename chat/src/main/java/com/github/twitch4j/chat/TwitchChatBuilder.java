@@ -326,7 +326,7 @@ public class TwitchChatBuilder {
         if (credentialManager == null) {
             credentialManager = CredentialManagerBuilder.builder().build();
         }
-        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, null);
+        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, null, false);
 
         // Register rate limits across the user id contained within the chat token
         final String userId;

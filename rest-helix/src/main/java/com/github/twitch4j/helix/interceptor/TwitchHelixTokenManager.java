@@ -1,5 +1,6 @@
 package com.github.twitch4j.helix.interceptor;
 
+import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import io.github.xanthic.cache.api.Cache;
@@ -9,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,10 +57,12 @@ public final class TwitchHelixTokenManager {
      */
     private volatile OAuth2Credential defaultAuthToken;
 
-    public TwitchHelixTokenManager(String clientId, String clientSecret, OAuth2Credential defaultAuthToken) {
+    @ApiStatus.Internal
+    public TwitchHelixTokenManager(CredentialManager credentialManager, String clientId, String clientSecret, OAuth2Credential defaultAuthToken) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.twitchIdentityProvider = new TwitchIdentityProvider(clientId, clientSecret, null);
+        this.twitchIdentityProvider = credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class)
+            .orElseGet(() -> new TwitchIdentityProvider(clientId, clientSecret, null));
         this.defaultClientId = clientId;
         this.defaultAuthToken = defaultAuthToken;
 

@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Setter(onMethod_ = { @Deprecated })
 public class HypeTrainEnd {
+    private String id;
     @JsonDeserialize(using = MilliInstantDeserializer.class)
     private Instant endedAt;
     private String endingReason;

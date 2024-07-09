@@ -23,4 +23,14 @@ public class EventSocketWelcomedEvent {
      */
     String sessionId;
 
+    /**
+     * Whether the Session ID changed due to the session_welcome handshake.
+     * <p>
+     * If false (i.e., the Session ID did not change),
+     * then the websocket simply reconnected at the request of Twitch (while preserving any subscriptions).
+     * <p>
+     * This field is always true upon the initial connection.
+     */
+    boolean sessionChanged;
+
 }

@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
+    public final AutomodMessageHoldType AUTOMOD_MESSAGE_HOLD;
+    public final AutomodMessageUpdateType AUTOMOD_MESSAGE_UPDATE;
     public final AutomodSettingsUpdateType AUTOMOD_SETTINGS_UPDATE;
     public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
@@ -47,9 +49,15 @@ public class SubscriptionTypes {
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     public final ChannelSubscriptionGiftType CHANNEL_SUBSCRIPTION_GIFT;
     public final ChannelSubscriptionMessageType CHANNEL_SUBSCRIPTION_MESSAGE;
+    public final SuspiciousUserMessageType CHANNEL_SUSPICIOUS_USER_MESSAGE;
+    public final SuspiciousUserUpdateType CHANNEL_SUSPICIOUS_USER_UPDATE;
     public final ChannelUnbanType CHANNEL_UNBAN;
     public final @Deprecated ChannelUpdateType CHANNEL_UPDATE;
     public final ChannelUpdateV2Type CHANNEL_UPDATE_V2;
+    public final ChannelVipAddType CHANNEL_VIP_ADD;
+    public final ChannelVipRemoveType CHANNEL_VIP_REMOVE;
+    public final @ApiStatus.Experimental BetaChannelWarningAcknowledgeType BETA_CHANNEL_WARNING_ACKNOWLEDGE;
+    public final @ApiStatus.Experimental BetaChannelWarningSendType BETA_CHANNEL_WARNING_SEND;
     public final ConduitShardDisabledType CONDUIT_SHARD_DISABLED;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
@@ -69,6 +77,8 @@ public class SubscriptionTypes {
     public final ShoutoutReceiveType SHOUTOUT_RECEIVE_TYPE;
     public final StreamOfflineType STREAM_OFFLINE;
     public final StreamOnlineType STREAM_ONLINE;
+    public final UserMessageHoldType USER_MESSAGE_HOLD;
+    public final UserMessageUpdateType USER_MESSAGE_UPDATE;
     public final UnbanRequestCreateType UNBAN_REQUEST_CREATE;
     public final UnbanRequestResolveType UNBAN_REQUEST_RESOLVE;
     public final UserAuthorizationGrantType USER_AUTHORIZATION_GRANT;
@@ -83,6 +93,8 @@ public class SubscriptionTypes {
     static {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
+                AUTOMOD_MESSAGE_HOLD = new AutomodMessageHoldType(),
+                AUTOMOD_MESSAGE_UPDATE = new AutomodMessageUpdateType(),
                 AUTOMOD_SETTINGS_UPDATE = new AutomodSettingsUpdateType(),
                 AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
@@ -116,9 +128,15 @@ public class SubscriptionTypes {
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 CHANNEL_SUBSCRIPTION_GIFT = new ChannelSubscriptionGiftType(),
                 CHANNEL_SUBSCRIPTION_MESSAGE = new ChannelSubscriptionMessageType(),
+                CHANNEL_SUSPICIOUS_USER_MESSAGE = new SuspiciousUserMessageType(),
+                CHANNEL_SUSPICIOUS_USER_UPDATE = new SuspiciousUserUpdateType(),
                 CHANNEL_UNBAN = new ChannelUnbanType(),
                 CHANNEL_UPDATE = new ChannelUpdateType(),
                 CHANNEL_UPDATE_V2 = new ChannelUpdateV2Type(),
+                CHANNEL_VIP_ADD = new ChannelVipAddType(),
+                CHANNEL_VIP_REMOVE = new ChannelVipRemoveType(),
+                BETA_CHANNEL_WARNING_ACKNOWLEDGE =  new BetaChannelWarningAcknowledgeType(),
+                BETA_CHANNEL_WARNING_SEND = new BetaChannelWarningSendType(),
                 CONDUIT_SHARD_DISABLED = new ConduitShardDisabledType(),
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
@@ -138,6 +156,8 @@ public class SubscriptionTypes {
                 SHOUTOUT_RECEIVE_TYPE = new ShoutoutReceiveType(),
                 STREAM_OFFLINE = new StreamOfflineType(),
                 STREAM_ONLINE = new StreamOnlineType(),
+                USER_MESSAGE_HOLD  = new UserMessageHoldType(),
+                USER_MESSAGE_UPDATE = new UserMessageUpdateType(),
                 UNBAN_REQUEST_CREATE = new UnbanRequestCreateType(),
                 UNBAN_REQUEST_RESOLVE = new UnbanRequestResolveType(),
                 USER_AUTHORIZATION_GRANT = new UserAuthorizationGrantType(),

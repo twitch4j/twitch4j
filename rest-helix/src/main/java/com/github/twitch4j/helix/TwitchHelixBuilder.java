@@ -1,7 +1,10 @@
 package com.github.twitch4j.helix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.philippheuer.credentialmanager.CredentialManager;
+import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.BucketUtils;
@@ -9,11 +12,11 @@ import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.helix.interceptor.CustomRewardEncodeMixIn;
-import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.github.twitch4j.helix.interceptor.TwitchHelixClientIdInterceptor;
 import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
 import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
+import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
 import com.netflix.config.ConfigurationManager;
 import feign.Logger;
 import feign.Request;
@@ -24,7 +27,11 @@ import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import io.github.bucket4j.Bandwidth;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -69,6 +76,18 @@ public class TwitchHelixBuilder {
      */
     @With
     private String clientSecret = Twitch4JGlobal.clientSecret;
+
+    /**
+     * Redirect Url
+     */
+    @With
+    private String redirectUrl = "http://localhost";
+
+    /**
+     * Credential Manager
+     */
+    @With
+    private CredentialManager credentialManager = null;
 
     /**
      * User Agent
@@ -173,8 +192,14 @@ public class TwitchHelixBuilder {
         if (apiRateLimit == null)
             apiRateLimit = DEFAULT_BANDWIDTH;
 
+        // Auth
+        if (credentialManager == null) {
+            credentialManager = CredentialManagerBuilder.builder().build();
+        }
+        TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl, MOCK_BASE_URL.equals(baseUrl));
+
         // Feign
-        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(clientId, clientSecret, defaultAuthToken);
+        TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(credentialManager, clientId, clientSecret, defaultAuthToken);
         TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
         return HystrixFeign.builder()
             .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
