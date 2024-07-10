@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,5 +69,13 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      */
     @Nullable
     private String channelPointsCustomRewardId;
+
+    /**
+     * An ID for the type of animation selected as part of a "Message Effects" redemption.
+     *
+     * @see MessageType#POWER_UPS_MESSAGE_EFFECT
+     */
+    @Nullable
+    private String channelPointsAnimationId;
 
 }

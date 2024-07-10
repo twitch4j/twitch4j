@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatModerationAction {
@@ -114,6 +116,12 @@ public class ChatModerationAction {
             case TIMEOUT:
                 if (args != null && args.size() > 2)
                     return Optional.of(args.get(2));
+
+            case WARN:
+                if (args != null && args.size() > 1) {
+                    List<String> reasons = args.subList(1, args.size());
+                    return Optional.of(String.join("\n", reasons).trim());
+                }
 
             default:
                 return Optional.empty();
@@ -287,6 +295,14 @@ public class ChatModerationAction {
          * Channel exited raid mode
          */
         UNRAID,
+        /**
+         * A moderator warned a user.
+         */
+        WARN,
+        /**
+         * A user acknowledged their warning reason.
+         */
+        ACKNOWLEDGE_WARNING,
         /**
          * A user's message was flagged by AutoMod for manual review.
          */

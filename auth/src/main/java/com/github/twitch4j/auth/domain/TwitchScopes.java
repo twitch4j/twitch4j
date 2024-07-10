@@ -82,6 +82,8 @@ public enum TwitchScopes {
     HELIX_USER_WHISPERS_MANAGE("user:manage:whispers"),
     HELIX_USER_WHISPERS_READ("user:read:whispers"),
     HELIX_VIPS_READ("moderator:read:vips"),
+    HELIX_WARNINGS_MANAGE("moderator:manage:warnings"),
+    HELIX_WARNINGS_READ("moderator:read:warnings"),
     KRAKEN_CHANNEL_CHECK_SUBSCRIPTION("channel_check_subscription"),
     KRAKEN_CHANNEL_COMMERCIAL("channel_commercial"),
     KRAKEN_CHANNEL_EDITOR("channel_editor"),

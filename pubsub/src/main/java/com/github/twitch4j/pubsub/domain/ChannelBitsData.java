@@ -2,12 +2,14 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class ChannelBitsData {
 
     /**
@@ -78,6 +80,7 @@ public class ChannelBitsData {
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class BadgeEntitlement {
         /**
          * The number of bits associated with the previous badge

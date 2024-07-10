@@ -362,6 +362,12 @@ public enum NoticeTag {
     MSG_CHANNEL_SUSPENDED,
 
     /**
+     * You are connected to too many chat channels. Please close some existing chat connections to join a new chat.
+     */
+    @Unofficial
+    MSG_CONCURRENT_CHANNEL_LIMIT_REACHED,
+
+    /**
      * Your message was not sent because it is identical to the previous one you sent, less than 30 seconds ago.
      */
     MSG_DUPLICATE,
@@ -446,6 +452,12 @@ public enum NoticeTag {
      * This room requires a verified email address to chat. Please verify your email at https://www.twitch.tv/settings/profile.
      */
     MSG_VERIFIED_EMAIL,
+
+    /**
+     * You received a Warning from a moderator in this channel. Acknowledge the Warning in browser to continue chatting in this channel.
+     */
+    @Unofficial
+    MSG_WARNED,
 
     /**
      * No help available.

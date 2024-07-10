@@ -10,6 +10,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,27 @@ import java.util.Optional;
 @Slf4j
 public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
+    /**
+     * @see com.github.philippheuer.credentialmanager.domain.IdentityProvider#getProviderName()
+     */
     public static final String PROVIDER_NAME = "twitch";
+
+    /**
+     * @see <a href="https://dev.twitch.tv/docs/authentication/">Official Docs</a>
+     */
+    public static final String OFFICIAL_BASE_URL = "https://id.twitch.tv/oauth2";
+
+    /**
+     * @see <a href="https://github.com/twitchdev/twitch-cli/blob/main/docs/mock-api.md#auth-namespace">Twitch CLI Docs</a>
+     */
+    public static final String CLI_MOCK_BASE_URL = "http://localhost:8080/auth";
+
+    /**
+     * Base URL for Authentication Endpoints
+     *
+     * @see TwitchIdentityProvider#OFFICIAL_BASE_URL
+     */
+    private final String baseUrl;
 
     /**
      * Constructor
@@ -31,9 +52,15 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @param redirectUrl  Redirect Url
      */
     public TwitchIdentityProvider(String clientId, String clientSecret, String redirectUrl) {
-        super(PROVIDER_NAME, "oauth2", clientId, clientSecret, "https://id.twitch.tv/oauth2/authorize", "https://id.twitch.tv/oauth2/token", "https://id.twitch.tv/oauth2/device", redirectUrl, ProxyHelper.selectProxy());
+        this(clientId, clientSecret, redirectUrl, OFFICIAL_BASE_URL);
+    }
+
+    @VisibleForTesting
+    public TwitchIdentityProvider(String clientId, String clientSecret, String redirectUrl, String baseUrl) {
+        super(PROVIDER_NAME, "oauth2", clientId, clientSecret, baseUrl + "/authorize", baseUrl + "/token", baseUrl + "/device", redirectUrl, ProxyHelper.selectProxy());
 
         // configuration
+        this.baseUrl = baseUrl;
         this.tokenEndpointPostType = "QUERY";
         this.scopeSeperator = "+"; // Prevents a URISyntaxException when creating a URI from the authUrl
     }
@@ -52,7 +79,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
 
         // build request
         Request request = new Request.Builder()
-            .url("https://id.twitch.tv/oauth2/validate")
+            .url(baseUrl + "/validate")
             .header("Authorization", "OAuth " + credential.getAccessToken())
             .build();
 
@@ -80,7 +107,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         try {
             // api call
             Request request = new Request.Builder()
-                .url("https://id.twitch.tv/oauth2/validate")
+                .url(baseUrl + "/validate")
                 .header("Authorization", "OAuth " + credential.getAccessToken())
                 .build();
 
@@ -123,7 +150,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
      * @return whether the credential was successfully revoked
      */
     public boolean revokeCredential(OAuth2Credential credential) {
-        HttpUrl url = HttpUrl.parse("https://id.twitch.tv/oauth2/revoke").newBuilder()
+        HttpUrl url = HttpUrl.parse(baseUrl + "/revoke").newBuilder()
             .addQueryParameter("client_id", (String) credential.getContext().getOrDefault("client_id", clientId))
             .addQueryParameter("token", credential.getAccessToken())
             .build();

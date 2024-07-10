@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class PredictionEvent {
     private String id;
     private String channelId;

@@ -10,7 +10,7 @@ import java.util.OptionalInt;
 
 @Unofficial
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class SupportActivityFeedData {
     private String channelId;

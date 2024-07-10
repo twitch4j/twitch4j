@@ -11,7 +11,7 @@ public class ChatDropReason {
     /**
      * Code for why the message was dropped.
      * <p>
-     * For example: "channel_settings", "msg_duplicate", "msg_rejected".
+     * For example: "channel_settings", "msg_duplicate", "msg_rejected", "user_warned".
      */
     private String code;
 

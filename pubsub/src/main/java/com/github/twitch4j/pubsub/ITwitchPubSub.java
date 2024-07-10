@@ -506,6 +506,25 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     /**
+     * Event Listener: Your account follows or unfollows any channel.
+     * <p>
+     * This is <b>not</b> a replacement for {@link #listenForFollowingEvents(OAuth2Credential, String)}.
+     * <p>
+     * Fires {@link com.github.twitch4j.pubsub.events.OutboundFollowPubSubEvent} and
+     * {@link com.github.twitch4j.pubsub.events.OutboundUnfollowPubSubEvent}.
+     * <p>
+     * This is an unofficial topic that does not accept third-party tokens; it could stop working at any time.
+     *
+     * @param credential first-party user token
+     * @param userId the id associated with the token for the user performing follows/unfollows
+     * @return PubSubSubscription
+     */
+    @Unofficial
+    default PubSubSubscription listenForFollows(OAuth2Credential credential, String userId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "follows." + userId);
+    }
+
+    /**
      * @param credential user access token
      * @param userId     user id associated with the token
      * @return PubSubSubscription

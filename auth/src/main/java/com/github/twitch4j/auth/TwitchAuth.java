@@ -2,7 +2,6 @@ package com.github.twitch4j.auth;
 
 import com.github.philippheuer.credentialmanager.CredentialManager;
 import com.github.philippheuer.credentialmanager.domain.IdentityProvider;
-import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +27,15 @@ public class TwitchAuth {
      */
     public TwitchAuth(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
         this.credentialManager = credentialManager;
-        registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl);
+        registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl, false);
     }
 
-    public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl) {
+    public static void registerIdentityProvider(CredentialManager credentialManager, String clientId, String clientSecret, String redirectUrl, boolean useMock) {
         // register the twitch identityProvider
-        Optional<TwitchIdentityProvider> ip = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class);
+        Optional<TwitchIdentityProvider> ip = credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class);
         if (!ip.isPresent()) {
-            // register
-            IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl);
+            String baseUrl = useMock ? TwitchIdentityProvider.CLI_MOCK_BASE_URL : TwitchIdentityProvider.OFFICIAL_BASE_URL;
+            IdentityProvider identityProvider = new TwitchIdentityProvider(clientId, clientSecret, redirectUrl, baseUrl);
             try {
                 credentialManager.registerIdentityProvider(identityProvider);
             } catch (Exception e) {

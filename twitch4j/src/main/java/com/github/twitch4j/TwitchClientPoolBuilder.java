@@ -417,7 +417,7 @@ public class TwitchClientPoolBuilder {
         log.debug("TwitchClientPool: Initializing ErrorTracking ...");
 
         // Module: Auth (registers Twitch Identity Providers)
-        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
+        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl, TwitchHelixBuilder.MOCK_BASE_URL.equals(helixBaseUrl));
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
@@ -462,6 +462,8 @@ public class TwitchClientPoolBuilder {
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
+                .withRedirectUrl(redirectUrl)
+                .withCredentialManager(credentialManager)
                 .withUserAgent(userAgent)
                 .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
@@ -507,7 +509,7 @@ public class TwitchClientPoolBuilder {
             new ChatCommandHelixForwarder(
                 helix,
                 chatAccount != null ? chatAccount : defaultAuthToken,
-                credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class).orElse(null),
                 scheduledThreadPoolExecutor,
                 forwardedChatCommandHelixLimitPerChannel
             ) : null;
@@ -568,6 +570,10 @@ public class TwitchClientPoolBuilder {
                 .executor(scheduledThreadPoolExecutor)
                 .fallbackToken(defaultAuthToken)
                 .helix(helix)
+                .identityProvider(
+                    credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class)
+                        .orElseGet(() -> new TwitchIdentityProvider(clientId, clientSecret, redirectUrl))
+                )
                 .advancedConfiguration(builder ->
                     builder.proxyConfig(() -> proxyConfig)
                 )

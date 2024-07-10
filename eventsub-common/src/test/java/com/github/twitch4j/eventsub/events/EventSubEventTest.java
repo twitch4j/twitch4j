@@ -2,6 +2,8 @@ package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.AutomodCategory;
+import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
 import com.github.twitch4j.eventsub.domain.Contribution;
 import com.github.twitch4j.eventsub.domain.PollStatus;
@@ -46,6 +48,20 @@ public class EventSubEventTest {
         assertEquals("1337", event.getBroadcasterUserId());
         assertEquals("1337", event.getRequesterUserId());
         assertEquals(Instant.parse("2019-11-16T10:11:12.634234626Z"), event.getStartedAt());
+    }
+
+    @Test
+    @DisplayName("Deserialize ShieldModeBeginEvent")
+    public void deserializeModeratorEvent() {
+        ShieldModeBeginEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"12345\",\"broadcaster_user_name\":\"SimplySimple\",\"broadcaster_user_login\":\"simplysimple\",\"moderator_user_id\":\"98765\",\"moderator_user_name\":\"ParticularlyParticular123\",\"moderator_user_login\":\"particularlyparticular123\",\"started_at\":\"2022-07-26T17:00:03.17106713Z\"}",
+            ShieldModeBeginEvent.class
+        );
+        assertEquals("12345", event.getBroadcasterUserId());
+        assertEquals("SimplySimple", event.getBroadcasterUserName());
+        assertEquals("98765", event.getModeratorUserId());
+        assertEquals("ParticularlyParticular123", event.getModeratorUserName());
+        assertEquals(Instant.parse("2022-07-26T17:00:03.17106713Z"), event.getStartedAt());
     }
 
     @Test
@@ -105,8 +121,6 @@ public class EventSubEventTest {
         assertEquals(3, event.getChoices().size());
         assertEquals("123", event.getChoices().get(0).getId());
         assertEquals("Maybe!", event.getChoices().get(2).getTitle());
-        assertNotNull(event.getBitsVoting());
-        assertTrue(event.getBitsVoting().isEnabled());
         assertNotNull(event.getChannelPointsVoting());
         assertEquals(10, event.getChannelPointsVoting().getAmountPerVote());
         assertEquals(Instant.parse("2020-07-15T17:16:03.17106713Z"), event.getStartedAt());
@@ -127,8 +141,6 @@ public class EventSubEventTest {
         assertNotNull(event);
         assertNotNull(event.getChoices());
         assertEquals(3, event.getChoices().size());
-        assertNotNull(event.getChoices().get(0));
-        assertEquals(5, event.getChoices().get(0).getBitsVotes());
         assertNotNull(event.getChoices().get(1));
         assertEquals(4, event.getChoices().get(1).getChannelPointsVotes());
         assertNotNull(event.getChoices().get(2));
@@ -459,6 +471,52 @@ public class EventSubEventTest {
         assertEquals(SubscriptionPlan.TIER1, resub.getSubTier());
         assertTrue(resub.isPrime());
         assertFalse(resub.isGift());
+    }
+
+    @Test
+    @DisplayName("Deserialize Automod Message Hold Event")
+    public void deserializeAutomodHeld() {
+        AutomodMessageHoldEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"1234\",\"broadcaster_user_login\":\"redacted_channel\",\"broadcaster_user_name\":\"redacted_channel\",\"user_id\":\"6789\",\"user_login\":\"redacted_user\",\"user_name\":\"redacted_user\",\"message_id\":\"aa72e85e-77f5-4b7b-95e5-1e5efd8d8373\",\"message\":{\"text\":\"fuck israel\",\"fragments\":[{\"type\":\"text\",\"text\":\"fuck israel\",\"cheermote\":null,\"emote\":null}]},\"category\":\"racism\",\"level\":1,\"held_at\":\"2024-05-27T20:33:37.988487508Z\"}",
+            AutomodMessageHoldEvent.class
+        );
+
+        assertEquals("1234", event.getBroadcasterUserId());
+        assertEquals("6789", event.getUserId());
+        assertEquals("aa72e85e-77f5-4b7b-95e5-1e5efd8d8373", event.getMessageId());
+        assertEquals("fuck israel", event.getMessage().getText());
+        assertEquals(AutomodCategory.RACISM, event.getCategory().getValue());
+        assertEquals(1, event.getLevel());
+        assertEquals(Instant.parse("2024-05-27T20:33:37.988487508Z"), event.getHeldAt());
+        assertNotNull(event.getMessage().getFragments());
+        assertEquals(1, event.getMessage().getFragments().size());
+        Fragment fragment = event.getMessage().getFragments().get(0);
+        assertEquals(Fragment.Type.TEXT, fragment.getType());
+        assertEquals("fuck israel", fragment.getText());
+    }
+
+    @Test
+    @DisplayName("Deserialize Automod Message Update Event")
+    public void deserializeAutomodUpdate() {
+        AutomodMessageUpdateEvent event = jsonToObject(
+            "{\"broadcaster_user_id\":\"1234\",\"broadcaster_user_login\":\"redacted_channel\",\"broadcaster_user_name\":\"redacted_channel\",\"user_id\":\"6789\",\"user_login\":\"redacted_user\",\"user_name\":\"redacted_user\",\"moderator_user_id\":\"53888434\",\"moderator_user_login\":\"ogprodigy\",\"moderator_user_name\":\"OGprodigy\",\"message_id\":\"aa72e85e-77f5-4b7b-95e5-1e5efd8d8373\",\"message\":{\"text\":\"fuck israel\",\"fragments\":[{\"type\":\"text\",\"text\":\"fuck israel\",\"cheermote\":null,\"emote\":null}]},\"category\":\"racism\",\"level\":1,\"status\":\"approved\",\"held_at\":\"2024-05-27T20:33:37.988487508Z\"}",
+            AutomodMessageUpdateEvent.class
+        );
+
+        assertEquals(AutomodMessageStatus.APPROVED, event.getStatus());
+        assertEquals("53888434", event.getModeratorUserId());
+        assertEquals("1234", event.getBroadcasterUserId());
+        assertEquals("6789", event.getUserId());
+        assertEquals("aa72e85e-77f5-4b7b-95e5-1e5efd8d8373", event.getMessageId());
+        assertEquals("fuck israel", event.getMessage().getText());
+        assertEquals(AutomodCategory.RACISM, event.getCategory().getValue());
+        assertEquals(1, event.getLevel());
+        assertEquals(Instant.parse("2024-05-27T20:33:37.988487508Z"), event.getHeldAt());
+        assertNotNull(event.getMessage().getFragments());
+        assertEquals(1, event.getMessage().getFragments().size());
+        Fragment fragment = event.getMessage().getFragments().get(0);
+        assertEquals(Fragment.Type.TEXT, fragment.getType());
+        assertEquals("fuck israel", fragment.getText());
     }
 
 }

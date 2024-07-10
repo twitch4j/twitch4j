@@ -2,6 +2,7 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.github.twitch4j.common.annotation.Unofficial;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class ChannelPointsRedemption {
@@ -34,6 +35,7 @@ public class ChannelPointsRedemption {
 	/**
 	 * (Optional) A string that the user entered if the reward requires input
 	 */
+    @Nullable
 	private String userInput;
 
 	/**
@@ -41,6 +43,7 @@ public class ChannelPointsRedemption {
 	 */
 	private String status;
 
+    @Nullable
 	@Unofficial
 	private String cursor;
 

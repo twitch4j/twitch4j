@@ -30,6 +30,16 @@ public enum MessageType {
     USER_INTRO,
 
     /**
+     * Bits were used to animate the chat message.
+     */
+    POWER_UPS_MESSAGE_EFFECT,
+
+    /**
+     * Bits were used to send a gigantic emote in chat.
+     */
+    POWER_UPS_GIGANTIFIED_EMOTE,
+
+    /**
      * An unrecognized message type; please report to our issue tracker.
      */
     @JsonEnumDefaultValue

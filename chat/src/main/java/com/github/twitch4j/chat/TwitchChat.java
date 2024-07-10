@@ -333,7 +333,7 @@ public class TwitchChat implements ITwitchChat {
         }
 
         this.identityProvider = credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class)
-            .orElse(new TwitchIdentityProvider(null, null, null));
+            .orElseGet(() -> new TwitchIdentityProvider(null, null, null));
 
         // credential validation
         if (this.chatCredential == null) {

@@ -20,6 +20,9 @@ dependencies {
 
 	// Regex
 	api(group = "com.github.tony19", name = "named-regexp")
+
+	// Testing
+	testImplementation(group = "org.reflections", name = "reflections", version = "0.10.2")
 }
 
 base {

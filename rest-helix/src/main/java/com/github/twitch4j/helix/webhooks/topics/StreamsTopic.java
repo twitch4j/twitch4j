@@ -3,13 +3,18 @@ package com.github.twitch4j.helix.webhooks.topics;
 import com.github.twitch4j.helix.domain.StreamList;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.TreeMap;
 
 /**
  * Notifies when a stream changes; e.g., stream goes online or offline, the stream title changes, or the game changes.
+ *
+ * @deprecated Twitch decommissioned this API; please migrate to EventSub
  */
 @Getter
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class StreamsTopic extends TwitchWebhookTopic<StreamList> {
 
     public static final String PATH = "/streams";

@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.enums.SubscriptionType;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.time.Month;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class SubscriptionData {
 
     /**
@@ -59,7 +62,7 @@ public class SubscriptionData {
      * @see SubscriptionData#getCumulativeMonths()
      * @see SubscriptionData#getStreakMonths()
      */
-    @Deprecated
+    @Getter(onMethod_ = { @Deprecated })
     private Integer months;
 
     /**

@@ -49,7 +49,7 @@ class TrainHandler implements TopicHandler {
                 return new HypeTrainApproachingEvent(approachData);
             case "hype-train-start":
                 final HypeTrainStart startData = TypeConvert.convertValue(msgData, HypeTrainStart.class);
-                return new HypeTrainStartEvent(startData);
+                return new HypeTrainStartEvent(lastTopicIdentifier, startData);
             case "hype-train-progression":
                 final HypeProgression progressionData = TypeConvert.convertValue(msgData, HypeProgression.class);
                 return new HypeTrainProgressionEvent(lastTopicIdentifier, progressionData);
@@ -63,6 +63,7 @@ class TrainHandler implements TopicHandler {
                 final HypeTrainConductor conductorData = TypeConvert.convertValue(msgData, HypeTrainConductor.class);
                 return new HypeTrainConductorUpdateEvent(lastTopicIdentifier, conductorData);
             case "hype-train-cooldown-expiration":
+                //noinspection deprecation
                 return new HypeTrainCooldownExpirationEvent(lastTopicIdentifier);
             case "last-x-experiment-event":
                 // note: this isn't a true hype train event (it can be fired with no train active), but twitch hacked together the feature to use the hype pubsub infrastructure

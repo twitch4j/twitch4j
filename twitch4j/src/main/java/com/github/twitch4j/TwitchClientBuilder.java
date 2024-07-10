@@ -40,6 +40,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -102,6 +103,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableExtensions = false;
 
     /**
@@ -118,6 +120,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableKraken = false;
 
     /**
@@ -127,6 +130,7 @@ public class TwitchClientBuilder {
      */
     @With
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enableTMI = false;
 
     /**
@@ -373,6 +377,7 @@ public class TwitchClientBuilder {
      * @deprecated in favor of withHelperThreadDelay
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public TwitchClientBuilder withHelperThreadRate(long helperThreadDelay) {
         return this.withHelperThreadDelay(helperThreadDelay);
     }
@@ -395,7 +400,7 @@ public class TwitchClientBuilder {
         log.debug("TwitchClient: Initializing ErrorTracking ...");
 
         // Module: Auth (registers Twitch Identity Providers)
-        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl);
+        TwitchAuth.registerIdentityProvider(credentialManager, getClientId(), getClientSecret(), redirectUrl, TwitchHelixBuilder.MOCK_BASE_URL.equals(helixBaseUrl));
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
@@ -438,6 +443,8 @@ public class TwitchClientBuilder {
                 .withBaseUrl(helixBaseUrl)
                 .withClientId(clientId)
                 .withClientSecret(clientSecret)
+                .withRedirectUrl(redirectUrl)
+                .withCredentialManager(credentialManager)
                 .withUserAgent(userAgent)
                 .withDefaultAuthToken(defaultAuthToken)
                 .withRequestQueueSize(requestQueueSize)
@@ -499,7 +506,7 @@ public class TwitchClientBuilder {
                     chatCommandsViaHelix && enableHelix && (chatAccount != null || defaultAuthToken != null) ? new ChatCommandHelixForwarder(
                         helix,
                         chatAccount != null ? chatAccount : defaultAuthToken,
-                        credentialManager.getIdentityProviderByName("twitch", TwitchIdentityProvider.class).orElse(null),
+                        credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class).orElse(null),
                         scheduledThreadPoolExecutor,
                         forwardedChatCommandHelixLimitPerChannel
                     ) : null
@@ -519,6 +526,10 @@ public class TwitchClientBuilder {
                 .executor(scheduledThreadPoolExecutor)
                 .fallbackToken(defaultAuthToken)
                 .helix(helix)
+                .identityProvider(
+                    credentialManager.getIdentityProviderByName(TwitchIdentityProvider.PROVIDER_NAME, TwitchIdentityProvider.class)
+                        .orElseGet(() -> new TwitchIdentityProvider(clientId, clientSecret, redirectUrl))
+                )
                 .advancedConfiguration(builder ->
                     builder.proxyConfig(() -> proxyConfig)
                 )
