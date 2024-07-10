@@ -15,10 +15,12 @@ import java.util.List;
 @Setter(onMethod_ = { @Deprecated })
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class HypeTrainStart { // TODO(2.0.0): rename to HypeTrainExecution
+    @Setter
     @Deprecated
     private String channelId;
     private String id;
     private HypeTrainConfig config;
+    @Setter
     @Deprecated
     @JsonIgnore
     private HypeTrainParticipations participations;
@@ -38,6 +40,7 @@ public class HypeTrainStart { // TODO(2.0.0): rename to HypeTrainExecution
     private Boolean isFastMode;
     @Accessors(fluent = true)
     @JsonProperty("is_boost_train")
+    @Setter
     @Deprecated
     private Boolean isBoostTrain;
 }
