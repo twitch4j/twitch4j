@@ -2,12 +2,14 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class HypeTrainApproaching {
     private String channelId;
     private Integer goal;

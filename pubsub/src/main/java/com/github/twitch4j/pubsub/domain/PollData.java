@@ -2,11 +2,14 @@ package com.github.twitch4j.pubsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
+@Setter(onMethod_ = { @Deprecated })
 public class PollData {
     private String pollId;
     private String ownedBy;
@@ -24,20 +27,22 @@ public class PollData {
     private Integer totalVoters;
     private Long remainingDurationMilliseconds;
     private Contributor topContributor;
-    @Deprecated
+    @Getter(onMethod_ = { @Deprecated })
     private Contributor topBitsContributor;
     private Contributor topChannelPointsContributor;
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class PollSettings {
         private Setting multiChoice;
         private Setting subscriberOnly;
         private Setting subscriberMultiplier;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Setting bitsVotes;
         private Setting channelPointsVotes;
 
         @Data
+        @Setter(onMethod_ = { @Deprecated })
         public static class Setting {
             private Boolean isEnabled;
             private Long cost;
@@ -45,6 +50,7 @@ public class PollData {
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class PollChoice {
         private String choiceId;
         private String title;
@@ -54,26 +60,29 @@ public class PollData {
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class Votes {
         private Long total;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bits;
         private Long channelPoints;
         private Long base;
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class Tokens {
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bits;
         private Long channelPoints;
     }
 
     @Data
+    @Setter(onMethod_ = { @Deprecated })
     public static class Contributor {
         private String userId;
         private String displayName;
-        @Deprecated
+        @Getter(onMethod_ = { @Deprecated })
         private Long bitsContributed;
         private Long channelPointsContributed;
     }

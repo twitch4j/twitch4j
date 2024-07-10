@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Data
-@Setter(AccessLevel.NONE)
+@Setter(AccessLevel.PRIVATE)
 public class PredictionOutcome {
     private String id;
     private PredictionColor color;
