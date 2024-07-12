@@ -34,6 +34,7 @@ public enum Action {
     UNMOD,
     APPROVE_UNBAN_REQUEST,
     DENY_UNBAN_REQUEST,
+    WARN,
     @JsonEnumDefaultValue
     UNKNOWN
 }

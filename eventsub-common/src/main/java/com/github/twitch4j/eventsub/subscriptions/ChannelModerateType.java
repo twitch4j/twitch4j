@@ -13,6 +13,7 @@ import com.github.twitch4j.eventsub.events.ChannelModerateEvent;
  *     <li>moderator:read:unban_requests OR moderator:manage:unban_requests</li>
  *     <li>moderator:read:banned_users OR moderator:manage:banned_users</li>
  *     <li>moderator:read:chat_messages OR moderator:manage:chat_messages</li>
+ *     <li>moderator:read:warnings OR moderator:manage:warnings</li>
  *     <li>moderator:read:moderators</li>
  *     <li>moderator:read:vips</li>
  * </ul>
@@ -24,6 +25,7 @@ import com.github.twitch4j.eventsub.events.ChannelModerateEvent;
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_READ
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_MODERATORS_READ
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_VIPS_READ
+ * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_WARNINGS_READ
  */
 public class ChannelModerateType implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, ChannelModerateEvent> {
     @Override
@@ -33,7 +35,7 @@ public class ChannelModerateType implements SubscriptionType<ModeratorEventSubCo
 
     @Override
     public String getVersion() {
-        return "1";
+        return "2";
     }
 
     @Override

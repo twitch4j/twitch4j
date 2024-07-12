@@ -135,4 +135,11 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      */
     private @Nullable UnbanRequest unbanRequest;
 
+    /**
+     * Metadata associated with the warn command.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#WARN}.
+     */
+    private @Nullable Warning warn;
+
 }
