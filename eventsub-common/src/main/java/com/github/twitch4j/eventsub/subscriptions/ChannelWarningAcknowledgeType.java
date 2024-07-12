@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ModeratorEventSubCondition;
 import com.github.twitch4j.eventsub.events.ChannelWarningAcknowledgeEvent;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Sends a notification when a warning is acknowledged by a user.
@@ -10,12 +9,10 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * Must have the moderator:read:warnings or moderator:manage:warnings scope.
  *
- * @apiNote This topic is in public beta, and could break without notice.
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_WARNINGS_MANAGE
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_WARNINGS_READ
  */
-@ApiStatus.Experimental
-public class BetaChannelWarningAcknowledgeType implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, ChannelWarningAcknowledgeEvent> {
+public class ChannelWarningAcknowledgeType implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, ChannelWarningAcknowledgeEvent> {
     @Override
     public String getName() {
         return "channel.warning.acknowledge";
@@ -23,7 +20,7 @@ public class BetaChannelWarningAcknowledgeType implements SubscriptionType<Moder
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "1";
     }
 
     @Override
