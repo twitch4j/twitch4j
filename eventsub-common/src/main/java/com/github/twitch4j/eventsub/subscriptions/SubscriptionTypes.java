@@ -35,6 +35,7 @@ public class SubscriptionTypes {
     public final ChannelGoalBeginType CHANNEL_GOAL_BEGIN;
     public final ChannelGoalProgressType CHANNEL_GOAL_PROGRESS;
     public final ChannelGoalEndType CHANNEL_GOAL_END;
+    public final ChannelModerateType CHANNEL_MODERATE;
     public final ChannelModeratorAddType CHANNEL_MODERATOR_ADD;
     public final ChannelModeratorRemoveType CHANNEL_MODERATOR_REMOVE;
     public final ChannelPointsAutomaticRewardRedemptionAddType CHANNEL_POINTS_AUTOMATIC_REWARD_REDEMPTION_ADD;
@@ -114,6 +115,7 @@ public class SubscriptionTypes {
                 CHANNEL_GOAL_BEGIN = new ChannelGoalBeginType(),
                 CHANNEL_GOAL_PROGRESS = new ChannelGoalProgressType(),
                 CHANNEL_GOAL_END = new ChannelGoalEndType(),
+                CHANNEL_MODERATE = new ChannelModerateType(),
                 CHANNEL_MODERATOR_ADD = new ChannelModeratorAddType(),
                 CHANNEL_MODERATOR_REMOVE = new ChannelModeratorRemoveType(),
                 CHANNEL_POINTS_AUTOMATIC_REWARD_REDEMPTION_ADD = new ChannelPointsAutomaticRewardRedemptionAddType(),
