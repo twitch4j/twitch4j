@@ -8,6 +8,7 @@ import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.BucketUtils;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.common.util.TypeConvert;
 import com.github.twitch4j.helix.domain.CustomReward;
@@ -33,7 +34,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -186,7 +186,7 @@ public class TwitchHelixBuilder {
 
         // Executor for rate limiting
         if (scheduledThreadPoolExecutor == null)
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), 1);
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + CryptoUtils.generateNonce(4), 1);
 
         // Enforce non-null rate limit bandwidth
         if (apiRateLimit == null)

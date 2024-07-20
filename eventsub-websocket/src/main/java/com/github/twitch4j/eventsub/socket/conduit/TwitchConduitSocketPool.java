@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.domain.IDisposable;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.Conduit;
@@ -28,7 +29,6 @@ import com.github.twitch4j.helix.TwitchHelixBuilder;
 import com.github.twitch4j.helix.domain.ShardsInput;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +105,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
         this.shardOffset = spec.shardOffset();
 
         if (spec.executor() == null) {
-            String threadPrefix = "twitch4j-conduit-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+            String threadPrefix = "twitch4j-conduit-pool-" + CryptoUtils.generateNonce(4) + "-eventsub-ws-";
             this.executor = ThreadUtils.getDefaultScheduledThreadPoolExecutor(threadPrefix, Runtime.getRuntime().availableProcessors());
             this.shouldCloseExecutor = true;
         } else {

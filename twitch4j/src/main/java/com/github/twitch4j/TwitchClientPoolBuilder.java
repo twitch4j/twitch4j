@@ -18,6 +18,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.config.ProxyConfig;
 import com.github.twitch4j.common.config.Twitch4JGlobal;
 import com.github.twitch4j.common.util.BucketUtils;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
@@ -48,7 +49,6 @@ import lombok.Setter;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -438,7 +438,7 @@ public class TwitchClientPoolBuilder {
         if (scheduledThreadPoolExecutor == null) {
             if (enableChatPool || enablePubSubPool)
                 poolSize = Math.max(poolSize, Runtime.getRuntime().availableProcessors());
-            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + RandomStringUtils.random(4, true, true), poolSize);
+            scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-" + CryptoUtils.generateNonce(4), poolSize);
         }
 
         // Module: Extensions

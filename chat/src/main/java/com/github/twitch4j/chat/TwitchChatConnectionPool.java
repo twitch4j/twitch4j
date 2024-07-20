@@ -10,12 +10,12 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
 import com.github.twitch4j.common.util.BucketUtils;
 import com.github.twitch4j.common.util.ChatReply;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -53,7 +53,7 @@ import java.util.function.Supplier;
 @SuperBuilder
 public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchChat, String, String, Boolean, TwitchChatBuilder> implements ITwitchChat {
 
-    private final String threadPrefix = "twitch4j-pool-" + RandomStringUtils.random(4, true, true) + "-chat-";
+    private final String threadPrefix = "twitch4j-pool-" + CryptoUtils.generateNonce(4) + "-chat-";
 
     /**
      * Provides a chat account to be used when constructing a new {@link TwitchChat} instance.
@@ -271,7 +271,7 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
             TwitchChatBuilder.builder()
                 .withChatAccount(chatAccount.get())
                 .withEventManager(getConnectionEventManager())
-                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchChat.REQUIRED_THREAD_COUNT))
+                .withScheduledThreadPoolExecutor(getExecutor(threadPrefix + CryptoUtils.generateNonce(4), TwitchChat.REQUIRED_THREAD_COUNT))
                 .withProxyConfig(proxyConfig.get())
                 .withChatRateLimit(chatRateLimit)
                 .withWhisperRateLimit(whisperRateLimit)
