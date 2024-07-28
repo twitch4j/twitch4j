@@ -2,6 +2,7 @@ package com.github.twitch4j.eventsub.socket;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.pool.TwitchModuleConnectionPool;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.experimental.SuperBuilder;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -27,7 +27,7 @@ import java.util.Objects;
 @SuperBuilder
 public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectionPool<TwitchEventSocket, EventSubSubscription, EventSubSubscription, Boolean, TwitchEventSocket.TwitchEventSocketBuilder> implements IEventSubSocket {
 
-    private final String threadPrefix = "twitch4j-unitary-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+    private final String threadPrefix = "twitch4j-unitary-pool-" + CryptoUtils.generateNonce(4) + "-eventsub-ws-";
 
     /**
      * The base url for websocket connections.
@@ -71,7 +71,7 @@ public final class TwitchSingleUserEventSocketPool extends TwitchModuleConnectio
                 .defaultToken(defaultToken)
                 .eventManager(getConnectionEventManager())
                 .proxyConfig(proxyConfig.get())
-                .taskExecutor(getExecutor(threadPrefix + RandomStringUtils.random(4, true, true), TwitchEventSocket.REQUIRED_THREAD_COUNT))
+                .taskExecutor(getExecutor(threadPrefix + CryptoUtils.generateNonce(4), TwitchEventSocket.REQUIRED_THREAD_COUNT))
         ).build();
     }
 

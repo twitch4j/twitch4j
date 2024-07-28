@@ -5,6 +5,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.pool.SubscriptionConnectionPool;
+import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -13,7 +14,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +37,7 @@ import java.util.function.UnaryOperator;
 @Builder
 public final class TwitchEventSocketPool implements IEventSubSocket {
 
-    private final String threadPrefix = "twitch4j-multi-pool-" + RandomStringUtils.random(4, true, true) + "-eventsub-ws-";
+    private final String threadPrefix = "twitch4j-multi-pool-" + CryptoUtils.generateNonce(4) + "-eventsub-ws-";
 
     /**
      * The default {@link EventManager} for this connection pool, if specified.
