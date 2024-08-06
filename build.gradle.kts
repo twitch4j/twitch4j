@@ -248,7 +248,6 @@ subprojects {
 				// hide javadoc warnings (a lot from delombok)
 				addStringOption("Xdoclint:none", "-quiet")
 				if (JavaVersion.current().isJava9Compatible) {
-					// javadoc / html5 support
 					addBooleanOption("html5", true)
 				}
 			}
@@ -284,7 +283,10 @@ tasks.register<Javadoc>("aggregateJavadoc") {
 		group("GraphQL", "com.github.twitch4j.graphql*")
 		group("Extensions API", "com.github.twitch4j.extensions*")
 		group("Kraken API v5 (deprecated)", "com.github.twitch4j.kraken*")
-		addBooleanOption("html5").setValue(true)
+		addStringOption("Xdoclint:none", "-quiet")
+		if (JavaVersion.current().isJava9Compatible) {
+			addBooleanOption("html5", true)
+		}
 	}
 
 	source(subprojects.map { it.tasks.javadoc.get().source })
