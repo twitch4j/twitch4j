@@ -231,6 +231,11 @@ subprojects {
 						"https://twitch4j.github.io/javadoc"
 				)
 				locale = "en"
+
+				// additional javadoc tags
+				addStringOption("tag", "apiNote:a:API Note:")
+				addStringOption("tag", "implSpec:a:Implementation Requirements:")
+				addStringOption("tag", "implNote:a:Implementation Note:")
 			}
 		}
 
