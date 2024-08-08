@@ -233,9 +233,11 @@ subprojects {
 				locale = "en"
 
 				// additional javadoc tags
-				addStringOption("tag", "apiNote:a:API Note:")
-				addStringOption("tag", "implSpec:a:Implementation Requirements:")
-				addStringOption("tag", "implNote:a:Implementation Note:")
+				tags = listOf(
+					"apiNote:a:API Note:",
+					"implSpec:a:Implementation Requirements:",
+					"implNote:a:Implementation Note:"
+				)
 			}
 		}
 
