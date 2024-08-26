@@ -126,7 +126,7 @@ public class ChannelMessageEvent extends AbstractChannelMessageEvent {
     }
 
     /**
-     * @return returns the animation id associated with the "Message Effects" bits redemption. Possible values include "simmer" and "rainbow-eclipse".
+     * @return returns the animation id associated with the "Message Effects" bits redemption. Possible values include "cosmic-abyss", "simmer", and "rainbow-eclipse".
      * @apiNote This method is unofficial since the tag is not documented in the irc guide.
      * @see <a href="https://blog.twitch.tv/en/2024/06/12/introducing-power-ups-unleash-special-effects-with-bits/">Twitch Announcement</a>
      */
