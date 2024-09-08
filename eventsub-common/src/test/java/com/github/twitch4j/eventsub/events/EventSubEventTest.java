@@ -253,6 +253,25 @@ public class EventSubEventTest {
     }
 
     @Test
+    @DisplayName("Deserialize ChannelSharedChatUpdateEvent")
+    public void deserializeSharedChatEvent() {
+        ChannelSharedChatUpdateEvent event = jsonToObject(
+            "{\"session_id\":\"2b64a92a-dbb8-424e-b1c3-304423ba1b6f\",\"broadcaster_user_id\":\"1971641\",\"broadcaster_user_login\":\"streamer\",\"broadcaster_user_name\":\"streamer\"," +
+                "\"host_broadcaster_user_id\":\"1971641\",\"host_broadcaster_user_login\":\"streamer\",\"host_broadcaster_user_name\":\"streamer\"," +
+                "\"participants\":[{\"broadcaster_user_id\":\"1971641\",\"broadcaster_user_name\":\"streamer\",\"broadcaster_user_login\":\"streamer\"},{\"broadcaster_user_id\":\"112233\",\"broadcaster_user_name\":\"streamer33\",\"broadcaster_user_login\":\"streamer33\"},{\"broadcaster_user_id\":\"332211\",\"broadcaster_user_name\":\"streamer11\",\"broadcaster_user_login\":\"streamer11\"}]}",
+            ChannelSharedChatUpdateEvent.class
+        );
+
+        assertEquals("2b64a92a-dbb8-424e-b1c3-304423ba1b6f", event.getSessionId());
+        assertEquals("1971641", event.getBroadcasterUserId());
+        assertEquals("streamer", event.getHostBroadcasterUserLogin());
+        assertNotNull(event.getParticipants());
+        assertEquals(3, event.getParticipants().size());
+        assertEquals("112233", event.getParticipants().get(1).getBroadcasterUserId());
+        assertEquals("332211", event.getParticipants().get(2).getBroadcasterUserId());
+    }
+
+    @Test
     @DisplayName("Deserialize ChannelFollowEvent")
     public void deserializeSimpleUserChannelEvent() {
         ChannelFollowEvent event = jsonToObject(
