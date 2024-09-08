@@ -1293,6 +1293,21 @@ public interface TwitchHelix {
     );
 
     /**
+     * Retrieves the active shared chat session for a channel.
+     *
+     * @param authToken App access token or user access token.
+     * @param broadcasterId The User ID of the channel broadcaster.
+     * @return {@link SharedChatSessionWrapper}
+     */
+    @ApiStatus.Experimental // in open beta
+    @Headers("Authorization: Bearer {token}")
+    @RequestLine("GET /shared_chat/session?broadcaster_id={broadcaster_id}")
+    HystrixCommand<SharedChatSessionWrapper> getSharedChatSession(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
+    /**
      * Gets the Soundtrack track that the broadcaster is playing.
      * <p>
      * If the broadcaster is not playing a track, the endpoint returns HTTP status code 404 Not Found.
