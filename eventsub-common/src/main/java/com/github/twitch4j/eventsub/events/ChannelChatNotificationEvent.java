@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -61,11 +62,71 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private NoticeType noticeType;
 
     /**
+     * The broadcaster user ID of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserId;
+
+    /**
+     * The user name of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserName;
+
+    /**
+     * The login of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserLogin;
+
+    /**
+     * The UUID that identifies the source message from the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceMessageId;
+
+    /**
+     * The list of chat badges for the chatter in the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private List<Badge> sourceBadges;
+
+    /**
      * Information about the sub event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#SUB}.
      */
     @Nullable
     private Subscription sub;
+
+    /**
+     * Information about the sub event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_SUB}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private Subscription sharedChatSub;
 
     /**
      * Information about the resub event.
@@ -75,11 +136,33 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private Resubscription resub;
 
     /**
+     * Information about the resub event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_RESUB}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private Resubscription sharedChatResub;
+
+    /**
      * Information about the gift sub event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#SUB_GIFT}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
      */
     @Nullable
     private SubGift subGift;
+
+    /**
+     * Information about the gift sub event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_SUB_GIFT}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private SubGift sharedChatSubGift;
 
     /**
      * Information about the community gift sub event.
@@ -89,11 +172,31 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private CommunitySubGift communitySubGift;
 
     /**
+     * Information about the community gift sub event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_COMMUNITY_SUB_GIFT}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private CommunitySubGift sharedChatCommunitySubGift;
+
+    /**
      * Information about the community gift paid upgrade event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#GIFT_PAID_UPGRADE}.
      */
     @Nullable
     private GiftPaidUpgrade giftPaidUpgrade;
+
+    /**
+     * Information about the community gift paid upgrade event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_GIFT_PAID_UPGRADE}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private GiftPaidUpgrade sharedChatGiftPaidUpgrade;
 
     /**
      * Information about the Prime gift paid upgrade event.
@@ -103,11 +206,31 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private PrimePaidUpgrade primePaidUpgrade;
 
     /**
+     * Information about the Prime gift paid upgrade event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_PRIME_PAID_UPGRADE}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private PrimePaidUpgrade sharedChatPrimePaidUpgrade;
+
+    /**
      * Information about the raid event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#RAID}.
      */
     @Nullable
     private Raid raid;
+
+    /**
+     * Information about the raid event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_RAID}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private Raid sharedChatRaid;
 
     /**
      * Information about the unraid event.
@@ -124,11 +247,31 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private GiftPayForward payItForward;
 
     /**
+     * Information about the pay it forward event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_PAY_IT_FORWARD}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private GiftPayForward sharedChatPayItForward;
+
+    /**
      * Information about the announcement event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#ANNOUNCEMENT}.
      */
     @Nullable
     private Announcement announcement;
+
+    /**
+     * Information about the announcement event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_ANNOUNCEMENT}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private Announcement sharedChatAnnouncement;
 
     /**
      * Information about the charity donation event.

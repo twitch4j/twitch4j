@@ -78,4 +78,54 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
     @Nullable
     private String channelPointsAnimationId;
 
+    /**
+     * The broadcaster user ID of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserId;
+
+    /**
+     * The user name of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserName;
+
+    /**
+     * The login of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceBroadcasterUserLogin;
+
+    /**
+     * The UUID that identifies the source message from the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private String sourceMessageId;
+
+    /**
+     * The list of chat badges for the chatter in the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    @ApiStatus.Experimental
+    private List<Badge> sourceBadges;
+
 }

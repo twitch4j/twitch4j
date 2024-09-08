@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,11 +78,31 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
     private @Nullable BanTarget ban;
 
     /**
+     * Metadata associated with the ban command.
+     * This field is for an action that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_BAN}.
+     */
+    @ApiStatus.Experimental
+    private @Nullable BanTarget sharedChatBan;
+
+    /**
      * Metadata associated with the unban command.
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#UNBAN}.
      */
     private @Nullable UserTarget unban;
+
+    /**
+     * Metadata associated with the unban command.
+     * This field is for an action that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_UNBAN}.
+     */
+    @ApiStatus.Experimental
+    private @Nullable UserTarget sharedChatUnban;
 
     /**
      * Metadata associated with the timeout command.
@@ -91,11 +112,31 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
     private @Nullable TimeoutTarget timeout;
 
     /**
+     * Metadata associated with the timeout command.
+     * This field is for an action that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_TIMEOUT}.
+     */
+    @ApiStatus.Experimental
+    private @Nullable TimeoutTarget sharedChatTimeout;
+
+    /**
      * Metadata associated with the untimeout command.
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#UNTIMEOUT}.
      */
     private @Nullable UserTarget untimeout;
+
+    /**
+     * Metadata associated with the untimeout command.
+     * This field is for an action that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_UNTIMEOUT}.
+     */
+    @ApiStatus.Experimental
+    private @Nullable UserTarget sharedChatUntimeout;
 
     /**
      * Metadata associated with the raid command.
@@ -117,6 +158,16 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * This is only populated when {@link #getAction()} is {@link Action#DELETE}.
      */
     private @Nullable DeleteTarget delete;
+
+    /**
+     * Metadata associated with the delete command.
+     * This field is for an action that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     * <p>
+     * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_DELETE}.
+     */
+    @ApiStatus.Experimental
+    private @Nullable DeleteTarget sharedChatDelete;
 
     /**
      * Metadata associated with automod terms changes.
