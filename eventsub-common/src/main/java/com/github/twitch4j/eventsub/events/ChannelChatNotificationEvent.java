@@ -148,8 +148,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     /**
      * Information about the gift sub event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#SUB_GIFT}.
-     * This field is for a notice that happened for a channel in a shared chat session
-     * other than the broadcaster in the subscription condition.
      */
     @Nullable
     private SubGift subGift;

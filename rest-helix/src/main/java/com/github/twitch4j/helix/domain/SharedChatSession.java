@@ -29,12 +29,12 @@ public class SharedChatSession {
     private List<SharedChatParticipant> participants;
 
     /**
-     * The UTC date and time (in RFC3339 format) for when the session was created.
+     * The UTC date and time for when the session was created.
      */
     private Instant createdAt;
 
     /**
-     * The UTC date and time (in RFC3339 format) for when the session was last updated.
+     * The UTC date and time for when the session was last updated.
      */
     private Instant updatedAt;
 

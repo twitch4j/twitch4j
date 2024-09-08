@@ -9,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * Authorization: No authorization required.
  */
-@ApiStatus.Experimental // in beta open
+@ApiStatus.Experimental // in open beta
 public class BetaChannelSharedChatBeginType implements SubscriptionType<ChannelEventSubCondition, ChannelEventSubCondition.ChannelEventSubConditionBuilder<?, ?>, ChannelSharedChatBeginEvent> {
     @Override
     public String getName() {

@@ -19,16 +19,22 @@ public abstract class SharedChatEvent extends EventSubChannelEvent {
 
     /**
      * The User ID of the host channel.
+     * <p>
+     * The host may or may not be the same as {@link #getBroadcasterUserId()}.
      */
     private String hostBroadcasterUserId;
 
     /**
      * The username of the host channel.
+     * <p>
+     * The host may or may not be the same as {@link #getBroadcasterUserLogin()}.
      */
     private String hostBroadcasterUserLogin;
 
     /**
      * The display name of the host channel.
+     * <p>
+     * The host may or may not be the same as {@link #getBroadcasterUserName()}.
      */
     private String hostBroadcasterUserName;
 
