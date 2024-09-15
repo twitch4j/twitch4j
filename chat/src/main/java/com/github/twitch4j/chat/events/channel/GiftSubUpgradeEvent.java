@@ -6,6 +6,7 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Called when a user upgrades to a paid subscription from previously being gifted a subscription.
@@ -13,7 +14,15 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class GiftSubUpgradeEvent extends AbstractChannelEvent {
+public class GiftSubUpgradeEvent extends AbstractChannelEvent implements MirrorableEvent {
+
+    /**
+     * Raw Message Event
+     */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    IRCMessageEvent messageEvent;
+
     /**
      * The user that is upgrading their subscription.
      */
@@ -42,6 +51,7 @@ public class GiftSubUpgradeEvent extends AbstractChannelEvent {
     /**
      * Constructor
      *
+     * @param event          the raw message event
      * @param channel        the channel where the event took place
      * @param upgradingUser  the user that is upgrading their subscription
      * @param promoName      the ongoing subscriptions promo, if applicable
@@ -49,8 +59,10 @@ public class GiftSubUpgradeEvent extends AbstractChannelEvent {
      * @param gifterLogin    the login of the user who gifted the subscription, if applicable
      * @param gifterName     the display name of the user who gifted the subscription, if applicable
      */
-    public GiftSubUpgradeEvent(EventChannel channel, EventUser upgradingUser, String promoName, Integer promoGiftTotal, String gifterLogin, String gifterName) {
+    @ApiStatus.Internal
+    public GiftSubUpgradeEvent(IRCMessageEvent event, EventChannel channel, EventUser upgradingUser, String promoName, Integer promoGiftTotal, String gifterLogin, String gifterName) {
         super(channel);
+        this.messageEvent = event;
         this.upgradingUser = upgradingUser;
         this.promoName = promoName;
         this.promoGiftTotal = promoGiftTotal;

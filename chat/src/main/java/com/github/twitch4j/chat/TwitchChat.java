@@ -371,7 +371,7 @@ public class TwitchChat implements ITwitchChat {
         this.eventManager.getServiceMediator().addService("twitch4j-chat", this);
 
         // register event listeners
-        IRCEventHandler ircEventHandler = new IRCEventHandler(this);
+        IRCEventHandler ircEventHandler = new IRCEventHandler(eventManager);
 
         // connect to irc
         connection.connect();
@@ -833,6 +833,11 @@ public class TwitchChat implements ITwitchChat {
      * @param event ChannelMessageEvent
      */
     private void onChannelMessage(ChannelMessageEvent event) {
+        // avoid firing CommandEvent if the message did not originate from the local channel
+        if (event.isMirrored()) {
+            return;
+        }
+
         Optional<String> prefix = Optional.empty();
         Optional<String> commandWithoutPrefix = Optional.empty();
 

@@ -5,6 +5,7 @@ import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,13 +23,15 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
  * The parameters specific to this event are not officially documented.
  */
 @Value
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false)
 @Unofficial
-public class GiftedMultiMonthSubCourtesyEvent extends AbstractChannelEvent {
+public class GiftedMultiMonthSubCourtesyEvent extends AbstractChannelEvent implements MirrorableEvent {
 
     /**
      * Raw message event.
      */
+    @ToString.Exclude
     IRCMessageEvent messageEvent;
 
     /**
