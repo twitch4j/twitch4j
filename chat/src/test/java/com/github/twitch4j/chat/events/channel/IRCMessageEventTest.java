@@ -1,13 +1,23 @@
 package com.github.twitch4j.chat.events.channel;
 
+import com.github.philippheuer.events4j.core.EventManager;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
+import com.github.twitch4j.common.util.EventManagerUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import static com.github.twitch4j.chat.util.MessageParser.parse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -194,6 +204,63 @@ public class IRCMessageEventTest {
         assertEquals(7, event.parseValue().orElse(-1));
         assertEquals(450, event.getEarnedChannelPoints());
         assertEquals("ive done it", event.getUserMessage());
+    }
+
+    @Test
+    @DisplayName("Test that stream together shared chat PRIVMSG is parsed by IRCMessageEvnet and sub-event")
+    @ApiStatus.Experimental
+    void parseSharedChatMessage() {
+        IRCMessageEvent raw = parse("@badge-info=;badges=glitchcon2020/1;color=#00FF7F;display-name=OGprodigy;emotes=;flags=;id=e16cc51a-7fce-4a92-8387-4ac8b7794ee7;mod=0;reply-parent-display-name=OGprodigy;reply-parent-msg-body=@Alca\\soh\\sur\\sright;reply-parent-msg-id=3c231d98-fc47-44a0-81db-be3820102d79;reply-parent-user-id=53888434;reply-parent-user-login=ogprodigy;reply-thread-parent-display-name=Alca;reply-thread-parent-msg-id=c449d446-cd01-4460-b890-ad935f32b92a;reply-thread-parent-user-id=7676884;reply-thread-parent-user-login=alca;room-id=1025594235;source-badge-info=;source-badges=glitchcon2020/1;source-id=0b1e60f3-5990-4b26-94e2-885231614e07;source-room-id=1025597036;subscriber=0;tmi-sent-ts=1726007886662;turbo=0;user-id=53888434;user-type= " +
+            ":ogprodigy!ogprodigy@ogprodigy.tmi.twitch.tv PRIVMSG #shared_chat_test_01 :@OGprodigy test3");
+        assertNotNull(raw);
+        assertEquals("e16cc51a-7fce-4a92-8387-4ac8b7794ee7", raw.getMessageId().orElse(null));
+        assertEquals("7676884", raw.getRawTagString("reply-thread-parent-user-id"));
+
+        ChannelMessageEvent e = new ChannelMessageEvent(raw.getChannel(), raw, raw.getUser(), raw.getMessage().orElse(null));
+        assertTrue(e.isMirrored());
+        assertFalse(e.getSourceNoticeType().isPresent());
+        assertEquals("@OGprodigy test3", e.getMessage());
+        assertEquals("ogprodigy", e.getUser().getName());
+        assertEquals("53888434", e.getUser().getId());
+        assertEquals("shared_chat_test_01", e.getChannel().getName());
+        assertEquals("1025594235", e.getChannel().getId());
+        assertEquals("1025597036", e.getSourceChannelId().orElse(null));
+        assertEquals("0b1e60f3-5990-4b26-94e2-885231614e07", e.getSourceMessageId().orElse(null));
+        assertEquals("@Alca oh ur right", e.getReplyInfo().getMessageBody());
+        assertEquals("c449d446-cd01-4460-b890-ad935f32b92a", e.getReplyInfo().getThreadMessageId());
+        assertEquals("1", e.getSourceBadges().get().get("glitchcon2020"));
+        Map<String, String> badgeInfo = e.getSourceBadgeInfo().orElse(null);
+        assertTrue(badgeInfo == null || badgeInfo.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Test that stream together shared chat USERNOTICE is parsed by IRCMessageEvnet and sub-event")
+    @ApiStatus.Experimental
+    void parseSharedChatNotification() {
+        IRCMessageEvent raw = parse("@badge-info=;badges=staff/1,raging-wolf-helm/1;color=#DAA520;display-name=lahoooo;emotes=;flags=;id=01cd601f-bc3f-49d5-ab4b-136fa9d6ec22;login=lahoooo;mod=0;msg-id=sharedchatnotice;msg-param-color=PRIMARY;room-id=1025597036;source-badge-info=;source-badges=staff/1,moderator/1,bits-leader/1;source-id=4083dadc-9f20-40f9-ba92-949ebf6bc294;source-msg-id=announcement;source-room-id=1025594235;subscriber=0;system-msg=;tmi-sent-ts=1726118378465;user-id=612865661;user-type=staff;vip=0 " +
+            ":tmi.twitch.tv USERNOTICE #shared_chat_test_02 :hi this is an announcement from 1");
+        assertNotNull(raw);
+
+        EventManager eventManager = EventManagerUtils.initializeEventManager(SimpleEventHandler.class);
+        new IRCEventHandler(eventManager);
+
+        List<ModAnnouncementEvent> events = new ArrayList<>(1);
+        eventManager.onEvent(ModAnnouncementEvent.class, events::add);
+
+        eventManager.publish(raw);
+
+        assertEquals(1, events.size());
+        ModAnnouncementEvent e = events.get(0);
+        assertTrue(e.isMirrored());
+        assertEquals("shared_chat_test_02", e.getChannel().getName());
+        assertEquals("1025597036", e.getChannel().getId());
+        assertEquals("1025594235", e.getSourceChannelId().orElse(null));
+        assertEquals("hi this is an announcement from 1", e.getMessage());
+        assertEquals("lahoooo", e.getAnnouncer().getName());
+        assertEquals("612865661", e.getAnnouncer().getId());
+        assertFalse(e.getMessageEvent().getBadges().containsKey("moderator"));
+        Map<String, String> sourceBadges = e.getSourceBadges().orElse(null);
+        assertTrue(sourceBadges != null && sourceBadges.containsKey("moderator"));
     }
 
 }
