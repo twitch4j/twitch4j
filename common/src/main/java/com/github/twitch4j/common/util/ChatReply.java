@@ -54,6 +54,11 @@ public class ChatReply {
     String threadUserLogin;
 
     /**
+     * The display name of the sender of the top-level parent message.
+     */
+    String threadUserName;
+
+    /**
      * Attempts to parse a {@link ChatReply} instance from chat tags.
      *
      * @param tags the message tags associated with a reply.
@@ -72,7 +77,8 @@ public class ChatReply {
             Objects.toString(tags.get("reply-parent-user-login"), null),
             unescapeTagValue(tags.get("reply-parent-display-name")),
             Objects.toString(tags.get("reply-thread-parent-msg-id"), null),
-            Objects.toString(tags.get("reply-thread-parent-user-login"), null)
+            Objects.toString(tags.get("reply-thread-parent-user-login"), null),
+            unescapeTagValue(tags.get("reply-thread-parent-display-name"))
         );
     }
 }
