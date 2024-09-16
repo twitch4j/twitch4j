@@ -171,7 +171,7 @@ public class TwitchUtils {
     private static Set<CommandPermission> getPermissionsFromTags(@Nullable CharSequence badgesTag, String userId, Collection<String> botOwnerIds, @NonNull Map<String, String> badges) {
         // Parse badges tag
         if (badgesTag != null) {
-            badges.putAll(parseBadges(badgesTag.toString()));
+            badges.putAll(parseBadges(badgesTag));
         }
 
         // Check for Permissions
@@ -189,17 +189,24 @@ public class TwitchUtils {
      * @param raw The raw list of tags.
      * @return A key-value map of the tags.
      */
-    public static Map<String, String> parseBadges(String raw) {
-        Map<String, String> map = new HashMap<>();
-        if (StringUtils.isBlank(raw)) return map;
+    public static Map<String, String> parseBadges(CharSequence raw) {
+        if (StringUtils.isEmpty(raw)) return Collections.emptyMap();
 
         // Fix Whitespaces
-        raw = EscapeUtils.unescapeTagValue(raw);
+        String tagValue = EscapeUtils.unescapeTagValue(raw);
 
-        for (String tag : raw.split(",")) {
-            String[] val = tag.split("/", 2);
-            final String key = val[0];
-            String value = (val.length > 1) ? val[1] : null;
+        String[] parts = StringUtils.split(tagValue, ',');
+        Map<String, String> map = new HashMap<>(parts.length * 4 / 3 + 1);
+        for (String tag : parts) {
+            int i = tag.indexOf('/');
+            String key, value;
+            if (i < 0) {
+                key = tag;
+                value = null;
+            } else {
+                key = tag.substring(0, i);
+                value = tag.substring(i + 1);
+            }
             map.put(key, value);
         }
 

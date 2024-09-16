@@ -171,9 +171,7 @@ public class IRCMessageEvent extends TwitchEvent {
     public Map<String, String> getBadgeInfo() {
         Map<String, String> info = badgeInfo;
         if (info != null) return info;
-        return this.badgeInfo = getTagValue("badge-info")
-            .map(TwitchUtils::parseBadges)
-            .orElse(Collections.emptyMap());
+        return this.badgeInfo = TwitchUtils.parseBadges(getRawTag("badge-info"));
     }
 
     /**

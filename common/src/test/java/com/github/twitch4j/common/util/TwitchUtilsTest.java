@@ -20,7 +20,6 @@ class TwitchUtilsTest {
     void badgesParseTest() {
         assertEquals(emptyMap(), parseBadges(null));
         assertEquals(emptyMap(), parseBadges(""));
-        assertEquals(emptyMap(), parseBadges("      "));
 
         assertEquals(singletonMap("subscriber", "15"), parseBadges("subscriber/15"));
         assertEquals(singletonMap("subscriber", "15/3"), parseBadges("subscriber/15/3"));
@@ -33,7 +32,7 @@ class TwitchUtilsTest {
     }
 
     private static <K, V> Map<K, V> mapOf(K key1, V value1, K key2, V value2) {
-        Map<K, V> map = new HashMap<>();
+        Map<K, V> map = new HashMap<>(4);
         map.put(key1, value1);
         map.put(key2, value2);
         return map;
