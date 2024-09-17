@@ -1299,7 +1299,6 @@ public interface TwitchHelix {
      * @param broadcasterId The User ID of the channel broadcaster.
      * @return {@link SharedChatSessionWrapper}
      */
-    @ApiStatus.Experimental // in open beta
     @Headers("Authorization: Bearer {token}")
     @RequestLine("GET /shared_chat/session?broadcaster_id={broadcaster_id}")
     HystrixCommand<SharedChatSessionWrapper> getSharedChatSession(

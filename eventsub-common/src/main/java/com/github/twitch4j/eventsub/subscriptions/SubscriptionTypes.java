@@ -46,9 +46,9 @@ public class SubscriptionTypes {
     public final ChannelPointsCustomRewardRemoveType CHANNEL_POINTS_CUSTOM_REWARD_REMOVE;
     public final ChannelPointsCustomRewardUpdateType CHANNEL_POINTS_CUSTOM_REWARD_UPDATE;
     public final ChannelRaidType CHANNEL_RAID;
-    public final @ApiStatus.Experimental BetaChannelSharedChatBeginType BETA_CHANNEL_SHARED_CHAT_BEGIN;
-    public final @ApiStatus.Experimental BetaChannelSharedChatUpdateType BETA_CHANNEL_SHARED_CHAT_UPDATE;
-    public final @ApiStatus.Experimental BetaChannelSharedChatEndType BETA_CHANNEL_SHARED_CHAT_END;
+    public final ChannelSharedChatBeginType CHANNEL_SHARED_CHAT_BEGIN;
+    public final ChannelSharedChatUpdateType CHANNEL_SHARED_CHAT_UPDATE;
+    public final ChannelSharedChatEndType CHANNEL_SHARED_CHAT_END;
     public final ChannelSubscribeType CHANNEL_SUBSCRIBE;
     public final ChannelSubscriptionEndType CHANNEL_SUBSCRIPTION_END;
     public final ChannelSubscriptionGiftType CHANNEL_SUBSCRIPTION_GIFT;
@@ -129,9 +129,9 @@ public class SubscriptionTypes {
                 CHANNEL_POINTS_CUSTOM_REWARD_REMOVE = new ChannelPointsCustomRewardRemoveType(),
                 CHANNEL_POINTS_CUSTOM_REWARD_UPDATE = new ChannelPointsCustomRewardUpdateType(),
                 CHANNEL_RAID = new ChannelRaidType(),
-                BETA_CHANNEL_SHARED_CHAT_BEGIN = new BetaChannelSharedChatBeginType(),
-                BETA_CHANNEL_SHARED_CHAT_UPDATE = new BetaChannelSharedChatUpdateType(),
-                BETA_CHANNEL_SHARED_CHAT_END = new BetaChannelSharedChatEndType(),
+                CHANNEL_SHARED_CHAT_BEGIN = new ChannelSharedChatBeginType(),
+                CHANNEL_SHARED_CHAT_UPDATE = new ChannelSharedChatUpdateType(),
+                CHANNEL_SHARED_CHAT_END = new ChannelSharedChatEndType(),
                 CHANNEL_SUBSCRIBE = new ChannelSubscribeType(),
                 CHANNEL_SUBSCRIPTION_END = new ChannelSubscriptionEndType(),
                 CHANNEL_SUBSCRIPTION_GIFT = new ChannelSubscriptionGiftType(),
