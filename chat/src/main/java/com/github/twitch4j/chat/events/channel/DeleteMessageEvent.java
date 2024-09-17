@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fired when a single message was deleted over IRC by a moderator via {@code /delete <target-msg-id>}
@@ -13,7 +14,14 @@ import lombok.experimental.Accessors;
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DeleteMessageEvent extends AbstractChannelEvent {
+public class DeleteMessageEvent extends AbstractChannelEvent implements MirrorableEvent {
+
+    /**
+     * The raw message event.
+     */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    IRCMessageEvent messageEvent;
 
     /**
      * The login name of the user whose message was deleted.
@@ -36,8 +44,10 @@ public class DeleteMessageEvent extends AbstractChannelEvent {
     @Accessors(fluent = true)
     boolean wasActionMessage;
 
-    public DeleteMessageEvent(EventChannel channel, String userName, String msgId, String message, boolean wasActionMessage) {
+    @ApiStatus.Internal
+    public DeleteMessageEvent(IRCMessageEvent messageEvent, EventChannel channel, String userName, String msgId, String message, boolean wasActionMessage) {
         super(channel);
+        this.messageEvent = messageEvent;
         this.userName = userName;
         this.msgId = msgId;
         this.message = message;

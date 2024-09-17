@@ -1,7 +1,6 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.common.util.TwitchUtils;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import java.util.Optional;
  *
  * @see <a href="https://dev.twitch.tv/docs/chat/irc/#shared-chat">Official Developer Explanier</a>
  */
-@ApiStatus.Experimental // in open beta
 public interface MirrorableEvent {
 
     /**

@@ -522,7 +522,7 @@ public class IRCEventHandler {
             String message = event.getMessage().orElse("");
             boolean wasActionMessage = message.startsWith("\u0001ACTION ") && message.endsWith("\u0001");
             String trimmedMsg = wasActionMessage ? message.substring("\u0001ACTION ".length(), message.length() - "\u0001".length()) : message;
-            eventManager.publish(new DeleteMessageEvent(channel, userName, msgId, trimmedMsg, wasActionMessage));
+            eventManager.publish(new DeleteMessageEvent(event, channel, userName, msgId, trimmedMsg, wasActionMessage));
             return true;
         }
         return false;
