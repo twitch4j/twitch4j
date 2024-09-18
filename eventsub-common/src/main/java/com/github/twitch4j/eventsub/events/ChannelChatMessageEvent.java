@@ -11,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,7 +84,6 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserId;
 
     /**
@@ -95,7 +93,6 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserName;
 
     /**
@@ -105,7 +102,6 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserLogin;
 
     /**
@@ -115,7 +111,6 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceMessageId;
 
     /**
@@ -125,7 +120,6 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private List<Badge> sourceBadges;
 
 }

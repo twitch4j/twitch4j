@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -68,7 +67,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserId;
 
     /**
@@ -78,7 +76,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserName;
 
     /**
@@ -88,7 +85,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceBroadcasterUserLogin;
 
     /**
@@ -98,7 +94,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private String sourceMessageId;
 
     /**
@@ -108,7 +103,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
      */
     @Nullable
-    @ApiStatus.Experimental
     private List<Badge> sourceBadges;
 
     /**
@@ -125,7 +119,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private Subscription sharedChatSub;
 
     /**
@@ -142,7 +135,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private Resubscription sharedChatResub;
 
     /**
@@ -159,7 +151,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private SubGift sharedChatSubGift;
 
     /**
@@ -176,7 +167,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private CommunitySubGift sharedChatCommunitySubGift;
 
     /**
@@ -193,7 +183,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private GiftPaidUpgrade sharedChatGiftPaidUpgrade;
 
     /**
@@ -210,7 +199,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private PrimePaidUpgrade sharedChatPrimePaidUpgrade;
 
     /**
@@ -227,7 +215,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private Raid sharedChatRaid;
 
     /**
@@ -251,7 +238,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private GiftPayForward sharedChatPayItForward;
 
     /**
@@ -268,7 +254,6 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
      * other than the broadcaster in the subscription condition.
      */
     @Nullable
-    @ApiStatus.Experimental
     private Announcement sharedChatAnnouncement;
 
     /**

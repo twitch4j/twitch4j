@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +83,6 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_BAN}.
      */
-    @ApiStatus.Experimental
     private @Nullable BanTarget sharedChatBan;
 
     /**
@@ -101,7 +99,6 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_UNBAN}.
      */
-    @ApiStatus.Experimental
     private @Nullable UserTarget sharedChatUnban;
 
     /**
@@ -118,7 +115,6 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_TIMEOUT}.
      */
-    @ApiStatus.Experimental
     private @Nullable TimeoutTarget sharedChatTimeout;
 
     /**
@@ -135,7 +131,6 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_UNTIMEOUT}.
      */
-    @ApiStatus.Experimental
     private @Nullable UserTarget sharedChatUntimeout;
 
     /**
@@ -166,7 +161,6 @@ public class ChannelModerateEvent extends EventSubModeratorEvent {
      * <p>
      * This is only populated when {@link #getAction()} is {@link Action#SHARED_CHAT_DELETE}.
      */
-    @ApiStatus.Experimental
     private @Nullable DeleteTarget sharedChatDelete;
 
     /**
