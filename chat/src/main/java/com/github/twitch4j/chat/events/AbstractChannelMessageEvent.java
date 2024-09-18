@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.events;
 
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
+import com.github.twitch4j.chat.events.channel.MirrorableEvent;
 import com.github.twitch4j.chat.events.channel.ReplyableEvent;
 import com.github.twitch4j.chat.flag.AutoModFlag;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +21,7 @@ import java.util.Set;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent implements ReplyableEvent {
+public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent implements ReplyableEvent, MirrorableEvent {
 
     /**
      * RAW Message Event
@@ -53,6 +55,7 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
     @Getter(lazy = true)
     private final String nonce = getMessageEvent().getNonce().orElse(null);
 
+    @ApiStatus.Internal
     public AbstractChannelMessageEvent(EventChannel channel, IRCMessageEvent messageEvent, EventUser user, String message) {
         super(channel);
         this.messageEvent = messageEvent;

@@ -23,14 +23,14 @@ import java.util.Optional;
  * not necessary when the user presses the subscription button.
  */
 @Value
-@Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SubscriptionEvent extends AbstractChannelEvent implements ReplyableEvent {
+public class SubscriptionEvent extends AbstractChannelEvent implements ReplyableEvent, MirrorableEvent {
 
     /**
      * Raw IRC Message Event
      */
+    @ToString.Exclude
     IRCMessageEvent messageEvent;
 
     /**

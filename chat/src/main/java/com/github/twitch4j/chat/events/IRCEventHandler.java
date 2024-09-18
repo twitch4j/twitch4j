@@ -1,7 +1,7 @@
 package com.github.twitch4j.chat.events;
 
+import com.github.philippheuer.events4j.api.IEventManager;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.*;
 import com.github.twitch4j.chat.events.roomstate.*;
@@ -16,6 +16,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Month;
 import java.util.Arrays;
@@ -41,24 +42,18 @@ import static com.github.twitch4j.common.util.TwitchUtils.ANONYMOUS_GIFTER;
 public class IRCEventHandler {
 
     /**
-     * Twitch Client
-     */
-    private final TwitchChat twitchChat;
-
-    /**
      * Event Manager
      */
-    private final EventManager eventManager;
+    private final IEventManager eventManager;
 
     /**
      * Constructor
      *
-     * @param twitchChat The Twitch Chat instance
+     * @param eventManager The event manager
      */
     @ApiStatus.Internal
-    public IRCEventHandler(TwitchChat twitchChat) {
-        this.twitchChat = twitchChat;
-        this.eventManager = twitchChat.getEventManager();
+    public IRCEventHandler(EventManager eventManager) {
+        this.eventManager = eventManager;
 
         // register event handlers
         eventManager.onEvent("twitch4j-chat-event-trigger", IRCMessageEvent.class, this::handle);
@@ -92,7 +87,7 @@ public class IRCEventHandler {
 
     @Unofficial
     public boolean onAnnouncement(IRCMessageEvent event) {
-        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("announcement", event.getRawTag("msg-id"))) {
+        if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equalsIgnoreCase("announcement", getNoticeType(event))) {
             // Load Info
             EventChannel channel = event.getChannel();
             EventUser user = event.getUser();
@@ -215,7 +210,7 @@ public class IRCEventHandler {
      */
     public boolean onChannelSubscription(IRCMessageEvent event) {
         final String msgId;
-        if (event.getCommandType().equals("USERNOTICE") && (msgId = Objects.toString(event.getRawTag("msg-id"), null)) != null) {
+        if (event.getCommandType().equals("USERNOTICE") && (msgId = Objects.toString(getNoticeType(event), null)) != null) {
             EventChannel channel = event.getChannel();
 
             // Resub message for a multi-month gifted subscription
@@ -281,7 +276,7 @@ public class IRCEventHandler {
                 Integer subsGiftedTotal = event.getTagValue("msg-param-sender-count").map(Integer::parseInt).orElse(0);
 
                 // Dispatch Event
-                eventManager.publish(new GiftSubscriptionsEvent(channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
+                eventManager.publish(new GiftSubscriptionsEvent(event, channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
                 return true;
             }
             // Upgrading from a gifted sub
@@ -295,7 +290,7 @@ public class IRCEventHandler {
                 String senderName = event.getTagValue("msg-param-sender-name").orElse(null);
 
                 // Dispatch Event
-                eventManager.publish(new GiftSubUpgradeEvent(channel, user, promoName, giftTotal, senderLogin, senderName));
+                eventManager.publish(new GiftSubUpgradeEvent(event, channel, user, promoName, giftTotal, senderLogin, senderName));
                 return true;
             }
             // Upgrading from a Prime sub to a normal one
@@ -305,7 +300,7 @@ public class IRCEventHandler {
                 SubscriptionPlan subPlan = event.getTagValue("msg-param-sub-plan").map(SubscriptionPlan::fromString).orElse(null);
 
                 // Dispatch Event
-                eventManager.publish(new PrimeSubUpgradeEvent(channel, user, subPlan));
+                eventManager.publish(new PrimeSubUpgradeEvent(event, channel, user, subPlan));
                 return true;
             }
             // Extend Subscription
@@ -356,7 +351,7 @@ public class IRCEventHandler {
      */
     public boolean onPayForward(IRCMessageEvent event) {
         CharSequence msgId;
-        if ("USERNOTICE".equals(event.getCommandType()) && (msgId = event.getRawTag("msg-id")) != null
+        if ("USERNOTICE".equals(event.getCommandType()) && (msgId = getNoticeType(event)) != null
             && (StringUtils.equalsIgnoreCase(msgId, "standardpayforward") || StringUtils.equalsIgnoreCase(msgId,"communitypayforward"))) {
             // Load Info
             EventChannel channel = event.getChannel();
@@ -377,7 +372,7 @@ public class IRCEventHandler {
             EventUser recipient = recipientId != null ? new EventUser(recipientId, recipientName) : null;
 
             // Dispatch Event
-            eventManager.publish(new PayForwardEvent(channel, user, gifter, recipient));
+            eventManager.publish(new PayForwardEvent(event, channel, user, gifter, recipient));
             return true;
         }
         return false;
@@ -397,7 +392,7 @@ public class IRCEventHandler {
      * @param event IRCMessageEvent
      */
     public boolean onRaid(IRCMessageEvent event) {
-        if (event.getCommandType().equals("USERNOTICE") && StringUtils.equalsIgnoreCase("raid", event.getRawTag("msg-id"))) {
+        if (event.getCommandType().equals("USERNOTICE") && StringUtils.equalsIgnoreCase("raid", getNoticeType(event))) {
             EventChannel channel = event.getChannel();
             EventUser raider = event.getUser();
             Integer viewers;
@@ -406,7 +401,7 @@ public class IRCEventHandler {
             } catch (NumberFormatException ex) {
                 viewers = 0;
             }
-            eventManager.publish(new RaidEvent(channel, raider, viewers));
+            eventManager.publish(new RaidEvent(event, channel, raider, viewers));
             return true;
         }
         return false;
@@ -527,7 +522,7 @@ public class IRCEventHandler {
             String message = event.getMessage().orElse("");
             boolean wasActionMessage = message.startsWith("\u0001ACTION ") && message.endsWith("\u0001");
             String trimmedMsg = wasActionMessage ? message.substring("\u0001ACTION ".length(), message.length() - "\u0001".length()) : message;
-            eventManager.publish(new DeleteMessageEvent(channel, userName, msgId, trimmedMsg, wasActionMessage));
+            eventManager.publish(new DeleteMessageEvent(event, channel, userName, msgId, trimmedMsg, wasActionMessage));
             return true;
         }
         return false;
@@ -780,6 +775,15 @@ public class IRCEventHandler {
             return true;
         }
         return false;
+    }
+
+    @Nullable
+    private static CharSequence getNoticeType(IRCMessageEvent userNoticeEvent) {
+        CharSequence value = userNoticeEvent.getRawTag("msg-id");
+        if (StringUtils.equals("sharedchatnotice", value)) {
+            return userNoticeEvent.getRawTag("source-msg-id");
+        }
+        return value;
     }
 
     @NonNull

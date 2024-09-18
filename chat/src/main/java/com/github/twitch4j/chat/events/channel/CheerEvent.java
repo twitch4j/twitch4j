@@ -8,7 +8,6 @@ import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -18,11 +17,10 @@ import java.util.List;
  * This event gets called when a user receives bits.
  */
 @Data
-@Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class CheerEvent extends AbstractChannelEvent implements ReplyableEvent {
+public class CheerEvent extends AbstractChannelEvent implements ReplyableEvent, MirrorableEvent {
 
     /**
      * Raw IRC Message Event

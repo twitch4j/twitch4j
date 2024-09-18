@@ -21,7 +21,7 @@ import org.jetbrains.annotations.ApiStatus;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Unofficial
-public class ModAnnouncementEvent extends AbstractChannelEvent {
+public class ModAnnouncementEvent extends AbstractChannelEvent implements MirrorableEvent {
 
     /**
      * The raw message event.
