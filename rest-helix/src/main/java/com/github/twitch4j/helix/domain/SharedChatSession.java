@@ -3,14 +3,12 @@ package com.github.twitch4j.helix.domain;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
-@ApiStatus.Experimental
 public class SharedChatSession {
 
     /**
