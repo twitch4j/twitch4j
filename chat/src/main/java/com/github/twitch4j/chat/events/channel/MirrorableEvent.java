@@ -14,7 +14,7 @@ import java.util.Optional;
  * Be wary of edge cases when your bot is joined to multiple channels in a single shared chat session.
  * You can obtain the other channels in a shared chat session via {@code TwitchHelix#getSharedChatSession}.
  *
- * @see <a href="https://dev.twitch.tv/docs/chat/irc/#shared-chat">Official Developer Explanier</a>
+ * @see <a href="https://dev.twitch.tv/docs/chat/irc/#shared-chat">Official Developer Explainer</a>
  */
 public interface MirrorableEvent {
 
