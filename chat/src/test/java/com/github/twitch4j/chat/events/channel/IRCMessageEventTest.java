@@ -6,7 +6,6 @@ import com.github.twitch4j.chat.events.IRCEventHandler;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.util.EventManagerUtils;
-import org.jetbrains.annotations.ApiStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -208,7 +207,6 @@ public class IRCMessageEventTest {
 
     @Test
     @DisplayName("Test that stream together shared chat PRIVMSG is parsed by IRCMessageEvnet and sub-event")
-    @ApiStatus.Experimental
     void parseSharedChatMessage() {
         IRCMessageEvent raw = parse("@badge-info=;badges=glitchcon2020/1;color=#00FF7F;display-name=OGprodigy;emotes=;flags=;id=e16cc51a-7fce-4a92-8387-4ac8b7794ee7;mod=0;reply-parent-display-name=OGprodigy;reply-parent-msg-body=@Alca\\soh\\sur\\sright;reply-parent-msg-id=3c231d98-fc47-44a0-81db-be3820102d79;reply-parent-user-id=53888434;reply-parent-user-login=ogprodigy;reply-thread-parent-display-name=Alca;reply-thread-parent-msg-id=c449d446-cd01-4460-b890-ad935f32b92a;reply-thread-parent-user-id=7676884;reply-thread-parent-user-login=alca;room-id=1025594235;source-badge-info=;source-badges=glitchcon2020/1;source-id=0b1e60f3-5990-4b26-94e2-885231614e07;source-room-id=1025597036;subscriber=0;tmi-sent-ts=1726007886662;turbo=0;user-id=53888434;user-type= " +
             ":ogprodigy!ogprodigy@ogprodigy.tmi.twitch.tv PRIVMSG #shared_chat_test_01 :@OGprodigy test3");
@@ -235,7 +233,6 @@ public class IRCMessageEventTest {
 
     @Test
     @DisplayName("Test that stream together shared chat USERNOTICE is parsed by IRCMessageEvnet and sub-event")
-    @ApiStatus.Experimental
     void parseSharedChatNotification() {
         IRCMessageEvent raw = parse("@badge-info=;badges=staff/1,raging-wolf-helm/1;color=#DAA520;display-name=lahoooo;emotes=;flags=;id=01cd601f-bc3f-49d5-ab4b-136fa9d6ec22;login=lahoooo;mod=0;msg-id=sharedchatnotice;msg-param-color=PRIMARY;room-id=1025597036;source-badge-info=;source-badges=staff/1,moderator/1,bits-leader/1;source-id=4083dadc-9f20-40f9-ba92-949ebf6bc294;source-msg-id=announcement;source-room-id=1025594235;subscriber=0;system-msg=;tmi-sent-ts=1726118378465;user-id=612865661;user-type=staff;vip=0 " +
             ":tmi.twitch.tv USERNOTICE #shared_chat_test_02 :hi this is an announcement from 1");
