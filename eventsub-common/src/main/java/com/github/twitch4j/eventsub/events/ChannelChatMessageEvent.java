@@ -11,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,5 +76,50 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      */
     @Nullable
     private String channelPointsAnimationId;
+
+    /**
+     * The broadcaster user ID of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserId;
+
+    /**
+     * The user name of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserName;
+
+    /**
+     * The login of the broadcaster of the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserLogin;
+
+    /**
+     * The UUID that identifies the source message from the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceMessageId;
+
+    /**
+     * The list of chat badges for the chatter in the channel the message was sent from.
+     * <p>
+     * Is null when the message happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private List<Badge> sourceBadges;
 
 }
