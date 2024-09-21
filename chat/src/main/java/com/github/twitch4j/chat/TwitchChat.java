@@ -331,7 +331,7 @@ public class TwitchChat implements ITwitchChat {
         this.perChannelRateLimit = perChannelRateLimit;
         this.validateOnConnect = validateOnConnect;
         this.outboundCommandFilter = outboundCommandFilter != null ? outboundCommandFilter : (c, s) -> false;
-        this.mirroredMessagePolicy = mirroredMessagePolicy != null ? mirroredMessagePolicy : MirroredMessagePolicy.ACCEPT_ALL;
+        this.mirroredMessagePolicy = mirroredMessagePolicy != null ? mirroredMessagePolicy : MirroredMessagePolicy.REJECT_IF_OBSERVED;
         this.joinedToRoomId = joinedToRoomId != null ? joinedToRoomId : channelIdToChannelName::containsKey;
 
         if (observedMessageIds != null || mirroredMessagePolicy != MirroredMessagePolicy.REJECT_IF_OBSERVED) {
