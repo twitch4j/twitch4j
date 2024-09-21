@@ -6,6 +6,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.auth.domain.TwitchScopes;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.enums.CommandSource;
+import com.github.twitch4j.chat.enums.MirroredMessagePolicy;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.enums.TMIConnectionState;
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
@@ -35,7 +36,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -60,6 +63,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @Slf4j
 public class TwitchChat implements ITwitchChat {
@@ -253,6 +257,24 @@ public class TwitchChat implements ITwitchChat {
     private final BiPredicate<TwitchChat, String> outboundCommandFilter;
 
     /**
+     * Mirrored Message Policy
+     */
+    @NotNull
+    private final MirroredMessagePolicy mirroredMessagePolicy;
+
+    /**
+     * Indicates whether a room id has been joined
+     */
+    @NotNull
+    private final Predicate<String> joinedToRoomId;
+
+    /**
+     * Observed message IDs
+     */
+    @Nullable
+    private final Cache<String, Boolean> observedMessageIds;
+
+    /**
      * Constructor
      *
      * @param websocketConnection            WebsocketConnection
@@ -282,8 +304,12 @@ public class TwitchChat implements ITwitchChat {
      * @param validateOnConnect              Whether token should be validated on connect
      * @param wsCloseDelay                   Websocket Close Delay
      * @param outboundCommandFilter          Outbound Command Filter
+     * @param mirroredMessagePolicy          Mirrored Message Policy
+     * @param joinedToRoomId                 Joined Room Predicate
+     * @param observedMessageIds             Cache of Message IDs
      */
-    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter) {
+    @ApiStatus.Internal
+    public TwitchChat(WebsocketConnection websocketConnection, EventManager eventManager, CredentialManager credentialManager, OAuth2Credential chatCredential, String baseUrl, boolean sendCredentialToThirdPartyHost, Collection<String> commandPrefixes, Integer chatQueueSize, Bucket ircMessageBucket, Bucket ircWhisperBucket, Bucket ircJoinBucket, Bucket ircAuthBucket, ScheduledThreadPoolExecutor taskExecutor, long chatQueueTimeout, ProxyConfig proxyConfig, boolean autoJoinOwnChannel, boolean enableMembershipEvents, Collection<String> botOwnerIds, boolean removeChannelOnJoinFailure, int maxJoinRetries, long chatJoinTimeout, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, Bandwidth perChannelRateLimit, boolean validateOnConnect, int wsCloseDelay, BiPredicate<TwitchChat, String> outboundCommandFilter, MirroredMessagePolicy mirroredMessagePolicy, Predicate<String> joinedToRoomId, Cache<String, Boolean> observedMessageIds) {
         this.eventManager = eventManager;
         this.credentialManager = credentialManager;
         this.chatCredential = chatCredential;
@@ -305,6 +331,15 @@ public class TwitchChat implements ITwitchChat {
         this.perChannelRateLimit = perChannelRateLimit;
         this.validateOnConnect = validateOnConnect;
         this.outboundCommandFilter = outboundCommandFilter != null ? outboundCommandFilter : (c, s) -> false;
+        this.mirroredMessagePolicy = mirroredMessagePolicy != null ? mirroredMessagePolicy : MirroredMessagePolicy.ACCEPT_ALL;
+        this.joinedToRoomId = joinedToRoomId != null ? joinedToRoomId : channelIdToChannelName::containsKey;
+
+        if (observedMessageIds != null || mirroredMessagePolicy != MirroredMessagePolicy.REJECT_IF_OBSERVED) {
+            this.observedMessageIds = observedMessageIds;
+        } else {
+            this.observedMessageIds = CacheApi.create(spec -> spec.maxSize(0L));
+            log.warn("Misconfigured message id cache for mirrored chat deduplication");
+        }
 
         // init per channel message buckets by channel name
         this.bucketByChannelName = CacheApi.create(spec -> {
@@ -575,7 +610,11 @@ public class TwitchChat implements ITwitchChat {
                             IRCMessageEvent event = MessageParser.parse(message, channelIdToChannelName, channelNameToChannelId, botOwnerIds);
 
                             if (event != null) {
-                                eventManager.publish(event);
+                                if (shouldPublishEvent(event)) {
+                                    eventManager.publish(event);
+                                } else {
+                                    log.trace("Ignoring mirrored message: {}", event);
+                                }
                             } else {
                                 log.trace("Can't parse {}", message);
                             }
@@ -940,6 +979,29 @@ public class TwitchChat implements ITwitchChat {
 
     private Bucket getChannelMessageBucket(@NotNull String channelName) {
         return bucketByChannelName.computeIfAbsent(channelName.toLowerCase(), k -> BucketUtils.createBucket(perChannelRateLimit));
+    }
+
+    private boolean shouldPublishEvent(IRCMessageEvent candidate) {
+        if (mirroredMessagePolicy == MirroredMessagePolicy.ACCEPT_ALL) {
+            return true;
+        }
+
+        String sourceRoomId = candidate.getRawTagString("source-room-id");
+        if (sourceRoomId == null || sourceRoomId.equals(candidate.getChannelId())) {
+            return true; // message is not mirrored
+        }
+
+        if (mirroredMessagePolicy == MirroredMessagePolicy.REJECT_ALL) {
+            return false;
+        }
+
+        assert mirroredMessagePolicy == MirroredMessagePolicy.REJECT_IF_OBSERVED && observedMessageIds != null;
+        if (joinedToRoomId.test(sourceRoomId)) {
+            return false; // prefer firing event from the source channel
+        }
+
+        String sourceId = candidate.getRawTagString("source-id");
+        return sourceId == null || observedMessageIds.putIfAbsent(sourceId, Boolean.TRUE) == null;
     }
 
 }
