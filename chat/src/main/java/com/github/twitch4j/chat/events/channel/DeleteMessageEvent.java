@@ -14,7 +14,7 @@ import org.jetbrains.annotations.ApiStatus;
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DeleteMessageEvent extends AbstractChannelEvent implements MirrorableEvent {
+public class DeleteMessageEvent extends AbstractChannelEvent {
 
     /**
      * The raw message event.
