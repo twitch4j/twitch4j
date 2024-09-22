@@ -1,9 +1,11 @@
 package com.github.twitch4j.chat;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.chat.enums.MirroredMessagePolicy;
 import com.github.twitch4j.chat.enums.NoticeTag;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.events.channel.ChannelNoticeEvent;
+import com.github.twitch4j.chat.events.channel.ChannelStateEvent;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -13,6 +15,9 @@ import com.github.twitch4j.common.util.ChatReply;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -24,6 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -111,6 +117,22 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Builder.Default
     private IBackoffStrategy connectionBackoffStrategy = null;
+
+    /**
+     * Mirrored Message Policy
+     */
+    @Builder.Default
+    private MirroredMessagePolicy mirroredMessagePolicy = MirroredMessagePolicy.REJECT_IF_OBSERVED;
+
+    /**
+     * Observed message IDs for mirrored chat deduplication purposes
+     */
+    private volatile Cache<String, Boolean> observedMessageIds;
+
+    /**
+     * Channel IDs that are currently joined for mirrored chat deduplication purposes
+     */
+    private final Set<String> joinedRoomIds = ConcurrentHashMap.newKeySet();
 
     @Override
     public boolean sendMessage(String channel, String message, @Nullable Map<String, Object> tags) {
@@ -216,7 +238,17 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
      */
     @Override
     public Boolean unsubscribe(String s) {
-        return super.unsubscribe(s != null ? s.toLowerCase() : null);
+        String key = s != null ? s.toLowerCase() : null;
+        if (mirroredMessagePolicy == MirroredMessagePolicy.REJECT_IF_OBSERVED) {
+            ITwitchChat chat = subscriptions.get(key);
+            if (chat != null) {
+                String roomId = chat.getChannelNameToChannelId().get(key);
+                if (roomId != null) {
+                    joinedRoomIds.remove(roomId);
+                }
+            }
+        }
+        return super.unsubscribe(key);
     }
 
     @Override
@@ -266,6 +298,18 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
     protected TwitchChat createConnection() {
         if (closed.get()) throw new IllegalStateException("Chat socket cannot be created after pool was closed!");
 
+        if (mirroredMessagePolicy == MirroredMessagePolicy.REJECT_IF_OBSERVED && observedMessageIds == null) {
+            synchronized (this) {
+                if (observedMessageIds == null) {
+                    this.observedMessageIds = CacheApi.create(spec -> {
+                        spec.expiryTime(Duration.ofSeconds(10L));
+                        spec.expiryType(ExpiryType.POST_WRITE);
+                        spec.maxSize(2048L);
+                    });
+                }
+            }
+        }
+
         // Instantiate with configuration
         TwitchChat chat = advancedConfiguration.apply(
             TwitchChatBuilder.builder()
@@ -280,7 +324,15 @@ public class TwitchChatConnectionPool extends TwitchModuleConnectionPool<TwitchC
                 .withPerChannelRateLimit(perChannelRateLimit)
                 .withAutoJoinOwnChannel(false) // user will have to manually send a subscribe call to enable whispers. this avoids duplicating whisper events
                 .withConnectionBackoffStrategy(connectionBackoffStrategy)
+                .withJoinedToRoomId(joinedRoomIds::contains)
+                .withMirroredMessagePolicy(mirroredMessagePolicy)
+                .withObservedMessageIds(observedMessageIds)
         ).build();
+
+        // Track joined channels for mirrored message deduplication
+        if (mirroredMessagePolicy == MirroredMessagePolicy.REJECT_IF_OBSERVED) {
+            chat.getEventManager().onEvent(threadPrefix + "room-tracker", ChannelStateEvent.class, e -> joinedRoomIds.add(e.getChannel().getId()));
+        }
 
         // Reclaim channel headroom upon generic join failures
         chat.getEventManager().onEvent(threadPrefix + "join-fail-tracker", ChannelJoinFailureEvent.class, e -> unsubscribe(e.getChannelName()));

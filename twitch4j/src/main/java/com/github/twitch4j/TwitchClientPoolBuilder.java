@@ -12,6 +12,7 @@ import com.github.twitch4j.chat.ITwitchChat;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.chat.TwitchChatConnectionPool;
+import com.github.twitch4j.chat.enums.MirroredMessagePolicy;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.client.websocket.WebsocketConnectionConfig;
 import com.github.twitch4j.common.annotation.Unofficial;
@@ -362,6 +363,12 @@ public class TwitchClientPoolBuilder {
     private Bandwidth forwardedChatCommandHelixLimitPerChannel = TwitchChatLimitHelper.MOD_MESSAGE_LIMIT;
 
     /**
+     * Mirrored Message Policy for the chat module (currently does not apply to eventsub websocket).
+     */
+    @With
+    private MirroredMessagePolicy ircMirroredMessagePolicy = MirroredMessagePolicy.REJECT_IF_OBSERVED;
+
+    /**
      * With a Bot Owner's User ID
      *
      * @param userId the user id
@@ -525,6 +532,7 @@ public class TwitchClientPoolBuilder {
                 .executor(() -> scheduledThreadPoolExecutor)
                 .proxyConfig(() -> proxyConfig)
                 .maxSubscriptionsPerConnection(maxChannelsPerChatInstance)
+                .mirroredMessagePolicy(ircMirroredMessagePolicy)
                 .advancedConfiguration(builder ->
                     builder.withCredentialManager(credentialManager)
                         .withChatQueueSize(chatQueueSize)
@@ -554,6 +562,7 @@ public class TwitchClientPoolBuilder {
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
                 .withMaxJoinRetries(chatMaxJoinRetries)
+                .withMirroredMessagePolicy(ircMirroredMessagePolicy)
                 .withOutboundCommandFilter(forwarder)
                 .setBotOwnerIds(botOwnerIds)
                 .setCommandPrefixes(commandPrefixes)

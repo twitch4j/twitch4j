@@ -8,6 +8,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.auth.TwitchAuth;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.chat.enums.MirroredMessagePolicy;
 import com.github.twitch4j.chat.events.channel.ChannelJoinFailureEvent;
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper;
 import com.github.twitch4j.client.websocket.WebsocketConnection;
@@ -23,6 +24,9 @@ import com.github.twitch4j.common.util.TwitchLimitRegistry;
 import com.github.twitch4j.util.IBackoffStrategy;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.xanthic.cache.api.Cache;
+import io.github.xanthic.cache.api.domain.ExpiryType;
+import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +46,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Twitch Chat
@@ -300,6 +305,26 @@ public class TwitchChatBuilder {
     private BiPredicate<TwitchChat, String> outboundCommandFilter = null;
 
     /**
+     * Mirrored Message Policy
+     */
+    @With
+    private MirroredMessagePolicy mirroredMessagePolicy = MirroredMessagePolicy.REJECT_IF_OBSERVED;
+
+    /**
+     * Predicate that indicates whether the bot has joined a given room id.
+     * Only intended for internal use by twitch4j to power {@link MirroredMessagePolicy}.
+     */
+    @With(onMethod_ = { @ApiStatus.Internal }) // discourage external usage
+    private Predicate<String> joinedToRoomId;
+
+    /**
+     * Cache of message IDs that have been observed.
+     * Only intended for internal use by twitch4j to power {@link MirroredMessagePolicy}.
+     */
+    @With(onMethod_ = { @ApiStatus.Internal }) // discourage external usage
+    private Cache<String, Boolean> observedMessageIds;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Chat Builder
@@ -318,6 +343,14 @@ public class TwitchChatBuilder {
 
         if (scheduledThreadPoolExecutor == null)
             scheduledThreadPoolExecutor = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j-chat-"+ CryptoUtils.generateNonce(4), TwitchChat.REQUIRED_THREAD_COUNT);
+
+        if (mirroredMessagePolicy == MirroredMessagePolicy.REJECT_IF_OBSERVED && observedMessageIds == null) {
+            observedMessageIds = CacheApi.create(spec -> {
+                spec.expiryTime(Duration.ofSeconds(10L));
+                spec.expiryType(ExpiryType.POST_WRITE);
+                spec.maxSize(1024L);
+            });
+        }
 
         // Initialize/Check EventManager
         eventManager = EventManagerUtils.validateOrInitializeEventManager(eventManager, defaultEventHandler);
@@ -357,7 +390,7 @@ public class TwitchChatBuilder {
             perChannelRateLimit = chatRateLimit;
 
         log.debug("TwitchChat: Initializing Module ...");
-        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect, this.wsCloseDelay, this.outboundCommandFilter);
+        return new TwitchChat(this.websocketConnection, this.eventManager, this.credentialManager, this.chatAccount, this.baseUrl, this.sendCredentialToThirdPartyHost, this.commandPrefixes, this.chatQueueSize, this.ircMessageBucket, this.ircWhisperBucket, this.ircJoinBucket, this.ircAuthBucket, this.scheduledThreadPoolExecutor, this.chatQueueTimeout, this.proxyConfig, this.autoJoinOwnChannel, this.enableMembershipEvents, this.botOwnerIds, this.removeChannelOnJoinFailure, this.maxJoinRetries, this.chatJoinTimeout, this.wsPingPeriod, this.connectionBackoffStrategy, this.perChannelRateLimit, this.verifyChatAccountOnReconnect, this.wsCloseDelay, this.outboundCommandFilter, this.mirroredMessagePolicy, this.joinedToRoomId, this.observedMessageIds);
     }
 
     /**
