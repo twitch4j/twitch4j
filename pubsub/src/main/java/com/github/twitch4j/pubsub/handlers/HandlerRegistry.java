@@ -49,6 +49,7 @@ public enum HandlerRegistry {
             new PollsHandler(),
             new PredictionHandler(),
             new RaidHandler(),
+            new SharedChatHandler(),
             new ShieldHandler(),
             new ShoutoutHandler(),
             new TrainHandler(),
