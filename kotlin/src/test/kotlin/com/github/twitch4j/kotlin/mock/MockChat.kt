@@ -3,6 +3,7 @@ package com.github.twitch4j.kotlin.mock
 import com.github.philippheuer.credentialmanager.CredentialManagerBuilder
 import com.github.philippheuer.events4j.core.EventManager
 import com.github.twitch4j.chat.TwitchChat
+import com.github.twitch4j.chat.enums.MirroredMessagePolicy
 import com.github.twitch4j.chat.util.TwitchChatLimitHelper
 import com.github.twitch4j.common.util.ThreadUtils
 
@@ -36,6 +37,9 @@ class MockChat : TwitchChat(
     TwitchChatLimitHelper.MOD_MESSAGE_LIMIT,
     false,
     0,
+    null,
+    MirroredMessagePolicy.ACCEPT_ALL,
+    null,
     null
 ) {
     @Volatile
