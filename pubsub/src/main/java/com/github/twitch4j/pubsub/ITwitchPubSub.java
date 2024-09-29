@@ -350,6 +350,11 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    default PubSubSubscription listenForSharedChatEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "shared-chat-channel-v1." + channelId);
+    }
+
+    @Unofficial
     default PubSubSubscription listenForChannelSubGiftsEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-sub-gifts-v1." + channelId);
     }
