@@ -124,7 +124,7 @@ subprojects {
 		api(group = "org.apache.commons", name = "commons-lang3", version = "3.17.0")
 
 		// Cache BOM
-		api(platform("io.github.xanthic.cache:cache-bom:0.6.1"))
+		api(platform("io.github.xanthic.cache:cache-bom:0.6.2"))
 
 		// Events4J BOM
 		api(platform("com.github.philippheuer.events4j:events4j-bom:0.12.2"))
