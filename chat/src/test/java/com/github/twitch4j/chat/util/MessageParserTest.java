@@ -1,5 +1,9 @@
 package com.github.twitch4j.chat.util;
 
+import com.code_intelligence.jazzer.api.FuzzedDataProvider;
+import com.code_intelligence.jazzer.junit.DictionaryFile;
+import com.code_intelligence.jazzer.junit.FuzzTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -10,6 +14,13 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MessageParserTest {
+
+    @FuzzTest
+    @DictionaryFile(resourcePath = "parser.dict")
+    void fuzzParser(FuzzedDataProvider data) {
+        String input = data.consumeRemainingAsString();
+        Assertions.assertDoesNotThrow(() -> MessageParser.parse(input));
+    }
 
     @Test
     void consumeLines() {

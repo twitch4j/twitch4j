@@ -144,6 +144,8 @@ subprojects {
 		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.2.2")
 		// - Logging
 		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.14")
+		// - Fuzzing
+		testImplementation(group = "com.code-intelligence", name = "jazzer-junit", version = "0.22.1")
 	}
 
 	publishing {
