@@ -200,6 +200,12 @@ subprojects {
 			isReproducibleFileOrder = true
 		}
 
+		withType<Sign>().configureEach {
+			onlyIf {
+				publishToMavenLocal.run { !isPresent || !project.gradle.taskGraph.hasTask(this.get()) }
+			}
+		}
+
 		// compile options
 		withType<JavaCompile> {
 			options.encoding = "UTF-8"
