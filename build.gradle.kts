@@ -69,7 +69,7 @@ subprojects {
 	dependencies {
 		constraints {
 			// Annotations
-			api(group = "org.jetbrains", name = "annotations", version = "26.0.0")
+			api(group = "org.jetbrains", name = "annotations", version = "26.0.1")
 
 			// Apache Commons
 			api(group = "commons-configuration", name = "commons-configuration", version = "1.10")
@@ -209,7 +209,7 @@ subprojects {
 			options {
 				this as StandardJavadocDocletOptions
 				links(
-						"https://javadoc.io/doc/org.jetbrains/annotations/26.0.0",
+						"https://javadoc.io/doc/org.jetbrains/annotations/26.0.1",
 						"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 						"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.10.1",
 						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
