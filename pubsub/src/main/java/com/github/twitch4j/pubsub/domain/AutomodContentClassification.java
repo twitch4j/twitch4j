@@ -37,6 +37,12 @@ public class AutomodContentClassification {
         BULLYING,
 
         /**
+         * Unwelcome comments about someone's appearance, sexual requests or advances, sexual objectification.
+         * Currently available in English only.
+         */
+        SEXUAL_HARASSMENT,
+
+        /**
          * Demonstrating hatred or prejudice based on perceived or actual mental or physical abilities.
          */
         @JsonAlias("ableism")
