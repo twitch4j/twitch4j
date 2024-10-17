@@ -66,7 +66,10 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param userId     The moderator's user id associated with the credential
      * @param channelId  The user id associated with the target channel
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
     default PubSubSubscription listenForAutomodQueueEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "automod-queue." + userId + "." + channelId);
     }
@@ -77,7 +80,11 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential Credential (for target channel id, scope: bits:read)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForBitsBadgeEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-badge-unlocks." + channelId);
     }
@@ -88,7 +95,11 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential Credential (for target channel id, scope: bits:read)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForCheerEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-bits-events-v2." + channelId);
     }
@@ -99,7 +110,11 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential Credential (for targetChannelId, scope: channel_subscriptions)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForSubscriptionEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-subscribe-events-v1." + channelId);
     }
@@ -110,8 +125,11 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential Credential (any)
      * @param channelId  Target Channel Id
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForCommerceEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-commerce-events-v1." + channelId);
     }
@@ -122,7 +140,10 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param credential Credential (for targetUserId, scope: whispers:read)
      * @param userId     Target User Id
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
     default PubSubSubscription listenForWhisperEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "whispers." + userId);
     }
@@ -138,7 +159,10 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param channelId  The channel id to monitor events from.
      * @return PubSubSubscription
      * @see com.github.twitch4j.auth.domain.TwitchScopes#CHAT_CHANNEL_MODERATE
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
     default PubSubSubscription listenForLowTrustUsersEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "low-trust-users." + userId + "." + channelId);
     }
@@ -164,8 +188,10 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param userId     The user id associated with the credential
      * @param channelId  The user id associated with the target channel
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
-    @SuppressWarnings("deprecated")
+    @Deprecated
     default PubSubSubscription listenForModerationEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenForModerationEvents(credential, userId + "." + channelId);
     }
@@ -177,7 +203,10 @@ public interface ITwitchPubSub extends AutoCloseable {
      * @param userId     The user id associated with the credential
      * @param channelId  The user id associated with the target channel
      * @return PubSubSubscription
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission all official PubSub topics on April 14, 2025.
      */
+    @Deprecated
     default PubSubSubscription listenForUserModerationNotificationEvents(OAuth2Credential credential, String userId, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "user-moderation-notifications." + userId + "." + channelId);
     }
@@ -248,6 +277,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForCrowdChantEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "crowd-chant-channel-v1." + channelId);
     }
@@ -361,6 +391,7 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForChannelSquadEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-squad-updates." + channelId);
     }
@@ -416,6 +447,7 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForCelebrationEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "celebration-events-v1." + channelId);
     }
@@ -506,6 +538,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated // https://github.com/twitchdev/issues/issues/843
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForFollowingEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "following." + channelId);
     }
@@ -537,6 +570,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForFriendshipEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "friendship." + userId);
     }
@@ -559,6 +593,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForPresenceEvents(OAuth2Credential credential, String userId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "presence." + userId);
     }
@@ -573,7 +608,7 @@ public interface ITwitchPubSub extends AutoCloseable {
      */
     @Unofficial
     @Deprecated
-    @ApiStatus.ScheduledForRemoval
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForRadioEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "radio-events-v1." + channelId);
     }
@@ -600,6 +635,7 @@ public interface ITwitchPubSub extends AutoCloseable {
 
     @Unofficial
     @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     default PubSubSubscription listenForWatchPartyEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "pv-watch-party-events." + channelId);
     }
