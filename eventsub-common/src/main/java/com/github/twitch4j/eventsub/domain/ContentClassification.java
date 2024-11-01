@@ -40,6 +40,13 @@ public enum ContentClassification {
     MATURE_GAME("MatureGame"),
 
     /**
+     * Discussions or debates about politics or sensitive social issues such as
+     * elections, civic integrity, military conflict, and civil rights in a polarizing manner.
+     */
+    @JsonProperty("DebatedSocialIssuesAndPolitics")
+    POLITICS("DebatedSocialIssuesAndPolitics"),
+
+    /**
      * Prolonged, and repeated use of obscenities, profanities, and vulgarities,
      * especially as a regular part of speech.
      */
