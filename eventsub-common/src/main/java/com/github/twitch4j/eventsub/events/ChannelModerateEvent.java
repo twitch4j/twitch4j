@@ -18,6 +18,30 @@ import org.jetbrains.annotations.Nullable;
 public class ChannelModerateEvent extends EventSubModeratorEvent {
 
     /**
+     * The channel ID in which the action originally occurred.
+     * Is null when the moderator action happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserId;
+
+    /**
+     * The channel login name in which the action originally occurred.
+     * Is null when the moderator action happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserLogin;
+
+    /**
+     * The channel display name in which the action originally occurred.
+     * Is null when the moderator action happens in the same channel as the broadcaster.
+     * Is not null when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster.
+     */
+    @Nullable
+    private String sourceBroadcasterUserName;
+
+    /**
      * The action performed.
      * <p>
      * Note that the following actions do not have any associated metadata:

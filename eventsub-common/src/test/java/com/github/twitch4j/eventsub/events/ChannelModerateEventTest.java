@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unittest")
 class ChannelModerateEventTest {
@@ -131,6 +128,20 @@ class ChannelModerateEventTest {
         assertTrue(event.getUnbanRequest().isApproved());
         assertEquals("OGprodigy", event.getUnbanRequest().getUserName());
         assertEquals("welcome back", event.getUnbanRequest().getModeratorMessage());
+    }
+
+    @Test
+    void deserializeSharedTimeout() {
+        ChannelModerateEvent event = TypeConvert.jsonToObject(
+            "{\"broadcaster_user_id\":\"423374343\",\"broadcaster_user_login\":\"glowillig\",\"broadcaster_user_name\":\"glowillig\",\"source_broadcaster_user_id\":\"41292030\",\"source_broadcaster_user_login\":\"adflynn404\",\"source_broadcaster_user_name\":\"adflynn404\",\"moderator_user_id\":\"424596340\",\"moderator_user_login\":\"quotrok\",\"moderator_user_name\":\"quotrok\",\"action\":\"shared_chat_timeout\",\"followers\":null,\"slow\":null,\"vip\":null,\"unvip\":null,\"warn\":null,\"unmod\":null,\"ban\":null,\"unban\":null,\"timeout\":null,\"untimeout\":null,\"raid\":null,\"unraid\":null,\"delete\":null,\"automod_terms\":null,\"unban_request\":null,\"shared_chat_ban\":null,\"shared_chat_unban\":null,\"shared_chat_timeout\":{\"user_id\":\"141981764\",\"user_login\":\"twitchdev\",\"user_name\":\"TwitchDev\",\"reason\":\"Has never seen the Harry Potter films.\",\"expires_at\":\"2022-03-15T02:00:28Z\"},\"shared_chat_untimeout\":null,\"shared_chat_delete\":null}",
+            ChannelModerateEvent.class
+        );
+        assertEquals(Action.SHARED_CHAT_TIMEOUT, event.getAction());
+        assertNotNull(event.getSharedChatTimeout());
+        assertEquals("423374343", event.getBroadcasterUserId());
+        assertEquals("41292030", event.getSourceBroadcasterUserId());
+        assertEquals("424596340", event.getModeratorUserId());
+        assertEquals("141981764", event.getSharedChatTimeout().getUserId());
     }
 
 }
