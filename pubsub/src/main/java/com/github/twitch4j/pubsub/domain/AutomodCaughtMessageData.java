@@ -41,6 +41,12 @@ public class AutomodCaughtMessageData {
      */
     private Status status;
 
+    /**
+     * The reason for AutoMod catching the message.
+     */
+    @Unofficial
+    private CaughtMessageReason caughtMessageReason;
+
     public enum Status {
         PENDING, @Deprecated APPROVED, ALLOWED, DENIED, EXPIRED, @JsonEnumDefaultValue INVALID
     }

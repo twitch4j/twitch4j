@@ -6,11 +6,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.util.TypeConvert;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,18 @@ import java.util.Map;
 @Data
 @Setter(AccessLevel.PRIVATE)
 public class AutomodCaughtMessage {
+
+    /**
+     * Channel ID where the message was caught.
+     */
+    @Unofficial
+    private String channelId;
+
+    /**
+     * Channel login name where the message was caught.
+     */
+    @Unofficial
+    private String channelLogin;
 
     /**
      * Object containing details about the message.
@@ -85,7 +100,9 @@ public class AutomodCaughtMessage {
          * @return whether this fragment of the message was flagged by AutoMod.
          */
         public boolean isFragmentFlagged() {
-            return getAutomod() != null && getAutomod().getTopics() != null && !getAutomod().getTopics().isEmpty();
+            if (automod == null) return false;
+            if (automod.getTopics() != null && !automod.getTopics().isEmpty()) return true;
+            return automod.isChannelBlockedTerm();
         }
 
         /**
@@ -125,10 +142,36 @@ public class AutomodCaughtMessage {
     @Data
     @Setter(AccessLevel.PRIVATE)
     public static class FragmentFlags {
+        /**
+         * Mapping of the triggered AutoMod categories to the level of the offense.
+         */
+        @Nullable
         private Map<String, Integer> topics;
 
+        /**
+         * Whether AutoMod caught the message for containing a channel-specific blocked term.
+         */
+        @Unofficial
+        @JsonProperty("is_channel_blocked_term")
+        private boolean isChannelBlockedTerm;
+
+        /**
+         * Whether the term is private.
+         */
+        @Unofficial
+        @JsonAlias("isCensored") // twitch deviates from snake case for this field
+        private boolean isCensored;
+
+        /**
+         * @return mapping of the parsed AutoMod categories to the level of the offense.
+         */
         @Unofficial
         public Map<AutomodContentClassification.Category, Integer> getParsedTopics() {
+            if (topics == null) {
+                return isChannelBlockedTerm
+                    ? Collections.singletonMap(AutomodContentClassification.Category.UNKNOWN, 0)
+                    : Collections.emptyMap();
+            }
             return TypeConvert.convertValue(topics, new TypeReference<EnumMap<AutomodContentClassification.Category, Integer>>() {});
         }
     }
@@ -178,6 +221,8 @@ public class AutomodCaughtMessage {
 
         @Data
         @Setter(AccessLevel.PRIVATE)
+        @NoArgsConstructor
+        @AllArgsConstructor
         public static class Badge {
             private String id;
             private String version;

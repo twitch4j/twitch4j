@@ -1,6 +1,7 @@
 package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.TwitchEnum;
 import com.github.twitch4j.common.util.TwitchEnumDeserializer;
 import com.github.twitch4j.eventsub.domain.AutomodCategory;
@@ -42,5 +43,13 @@ public class AutomodMessageHoldEvent extends EventSubUserChannelEvent {
      * The timestamp of when automod saved the message.
      */
     private Instant heldAt;
+
+    /**
+     * @return whether the message was held by AutoMod for containing a channel-specific blocked term
+     */
+    @Unofficial // not officially documented behavior
+    public boolean containsBlockedTerm() {
+        return "invalid".equals(category.getRawValue());
+    }
 
 }
