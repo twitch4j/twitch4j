@@ -1,58 +1,34 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.github.twitch4j.eventsub.domain.Automod;
-import com.github.twitch4j.eventsub.domain.AutomodCaughtReason;
 import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
-import com.github.twitch4j.eventsub.domain.BlockedTermWrapper;
-import com.github.twitch4j.eventsub.domain.chat.Message;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
-
-import java.time.Instant;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
-public class AutomodMessageUpdateV2Event extends EventSubModerationEvent {
+public class AutomodMessageUpdateV2Event extends AutomodMessageEvent implements ModeratorEvent {
 
     /**
-     * The ID of the message that was flagged by automod.
+     * The user ID of the issuer of the moderation action.
      */
-    private String messageId;
+    private String moderatorUserId;
 
     /**
-     * The body of the message.
+     * The user login of the issuer of the moderation action.
      */
-    private Message message;
+    private String moderatorUserLogin;
 
     /**
-     * Whether the message was caught by automod or blocked term usage.
+     * The user name of the issuer of the moderation action.
      */
-    private AutomodCaughtReason reason;
-
-    /**
-     * Optional: If the message was caught by automod, this will be populated.
-     */
-    @Nullable
-    private Automod automod;
-
-    /**
-     * Optional: If the message was caught due to a blocked term, this will be populated.
-     */
-    @Nullable
-    private BlockedTermWrapper blockedTerm;
+    private String moderatorUserName;
 
     /**
      * The message's updated status.
      */
     private AutomodMessageStatus status;
-
-    /**
-     * The timestamp of when automod saved the message.
-     */
-    private Instant heldAt;
 
 }
