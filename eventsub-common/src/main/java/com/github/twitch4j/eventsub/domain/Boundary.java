@@ -23,4 +23,3 @@ public class Boundary {
     private int endPos;
 
 }
-
