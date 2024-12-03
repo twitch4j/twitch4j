@@ -15,7 +15,9 @@ public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
     public final AutomodMessageHoldType AUTOMOD_MESSAGE_HOLD;
+    public final @ApiStatus.Experimental BetaAutomodMessageHoldType BETA_AUTOMOD_MESSAGE_HOLD;
     public final AutomodMessageUpdateType AUTOMOD_MESSAGE_UPDATE;
+    public final @ApiStatus.Experimental BetaAutomodMessageUpdateType BETA_AUTOMOD_MESSAGE_UPDATE;
     public final AutomodSettingsUpdateType AUTOMOD_SETTINGS_UPDATE;
     public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
@@ -98,7 +100,9 @@ public class SubscriptionTypes {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
                 AUTOMOD_MESSAGE_HOLD = new AutomodMessageHoldType(),
+                BETA_AUTOMOD_MESSAGE_HOLD = new BetaAutomodMessageHoldType(),
                 AUTOMOD_MESSAGE_UPDATE = new AutomodMessageUpdateType(),
+                BETA_AUTOMOD_MESSAGE_UPDATE = new BetaAutomodMessageUpdateType(),
                 AUTOMOD_SETTINGS_UPDATE = new AutomodSettingsUpdateType(),
                 AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
