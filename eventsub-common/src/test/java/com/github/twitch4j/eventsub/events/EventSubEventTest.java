@@ -586,6 +586,7 @@ public class EventSubEventTest {
         assertEquals("057712ea-8b19-403c-8a8c-b15b56238eca", term.getTermId());
         assertEquals("CohhCarnage", term.getOwnerBroadcasterUserName());
         assertEquals(new Boundary(0, 5), term.getBoundary());
+        assertEquals(AutomodMessageStatus.DENIED, event.getStatus());
     }
 
 }
