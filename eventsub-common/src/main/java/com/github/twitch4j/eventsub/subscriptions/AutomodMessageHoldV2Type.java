@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ModeratorEventSubCondition;
 import com.github.twitch4j.eventsub.events.AutomodMessageHoldV2Event;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Notifies moderators when AutoMod held a user's message for review.
@@ -15,8 +14,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_MANAGE
  */
-@ApiStatus.Experimental
-public class BetaAutomodMessageHoldType implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, AutomodMessageHoldV2Event> {
+public class AutomodMessageHoldV2Type implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, AutomodMessageHoldV2Event> {
     @Override
     public String getName() {
         return "automod.message.hold";
@@ -24,7 +22,7 @@ public class BetaAutomodMessageHoldType implements SubscriptionType<ModeratorEve
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "2";
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ModeratorEventSubCondition;
 import com.github.twitch4j.eventsub.events.AutomodMessageUpdateV2Event;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Notifies when a message in the AutoMod queue has its status changed.
@@ -15,8 +14,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_AUTOMOD_MANAGE
  */
-@ApiStatus.Experimental
-public class BetaAutomodMessageUpdateType implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, AutomodMessageUpdateV2Event> {
+public class AutomodMessageUpdateV2Type implements SubscriptionType<ModeratorEventSubCondition, ModeratorEventSubCondition.ModeratorEventSubConditionBuilder<?, ?>, AutomodMessageUpdateV2Event> {
     @Override
     public String getName() {
         return "automod.message.update";
@@ -24,7 +22,7 @@ public class BetaAutomodMessageUpdateType implements SubscriptionType<ModeratorE
 
     @Override
     public String getVersion() {
-        return "beta";
+        return "2";
     }
 
     @Override
