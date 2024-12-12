@@ -411,7 +411,7 @@ public class EventSubEventTest {
     public void deserializeComplexHypeTrainEvent() {
         String json = "{\"broadcaster_user_id\":\"1337\",\"broadcaster_user_name\":\"cool_user\",\"level\":2,\"total\":700,\"progress\":200,\"goal\":1000," +
             "\"top_contributions\":[{\"user_id\":\"123\",\"user_name\":\"pogchamp\",\"type\":\"bits\",\"total\":50},{\"user_id\":\"456\",\"user_name\":\"kappa\",\"type\":\"subscription\",\"total\":45}]," +
-            "\"last_contribution\":{\"user_id\":\"123\",\"user_name\":\"pogchamp\",\"type\":\"bits\",\"total\":50},\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"expires_at\":\"2020-07-15T17:16:11.17106713Z\"}";
+            "\"last_contribution\":{\"user_id\":\"123\",\"user_name\":\"pogchamp\",\"type\":\"bits\",\"total\":50},\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"expires_at\":\"2020-07-15T17:16:11.17106713Z\",\"is_golden_kappa_train\":true}";
 
         HypeTrainProgressEvent event = jsonToObject(json, HypeTrainProgressEvent.class);
         assertEquals("1337", event.getBroadcasterUserId());
@@ -427,6 +427,7 @@ public class EventSubEventTest {
         assertEquals(Contribution.Type.BITS, event.getLastContribution().getType());
         assertNotNull(event.getStartedAt());
         assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getExpiresAt());
+        assertTrue(event.isGoldenKappaTrain());
     }
 
     @Test
