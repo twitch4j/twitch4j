@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
@@ -64,6 +65,23 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent implements Mirr
         this.subscriptionPlan = subscriptionPlan;
         this.count = count;
         this.totalCount = totalCount;
+    }
+
+    /**
+     * @return the raw subscription plan
+     * @deprecated in favor of {@link #getTier()}
+     */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
+    public String getSubscriptionPlan() {
+        return subscriptionPlan;
+    }
+
+    /**
+     * @return the tier of the subscription that was gifted
+     */
+    public SubscriptionPlan getTier() {
+        return SubscriptionPlan.fromString(this.subscriptionPlan);
     }
 
 }
