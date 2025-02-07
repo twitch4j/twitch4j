@@ -24,6 +24,7 @@ import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -146,7 +147,11 @@ public class TwitchPubSub implements ITwitchPubSub {
      * @param connectionBackoffStrategy WebSocket Connection Backoff Strategy
      * @param wsCloseDelay              Websocket Close Delay
      * @param fallbackTopicHandler      Fallback Topic Handler
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public TwitchPubSub(WebsocketConnection websocketConnection, EventManager eventManager, ScheduledThreadPoolExecutor taskExecutor, ProxyConfig proxyConfig, Collection<String> botOwnerIds, int wsPingPeriod, IBackoffStrategy connectionBackoffStrategy, int wsCloseDelay, Consumer<PubSubResponsePayload> fallbackTopicHandler) {
         this.eventManager = eventManager;
         this.taskExecutor = taskExecutor;

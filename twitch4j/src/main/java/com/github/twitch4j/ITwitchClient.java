@@ -75,7 +75,11 @@ public interface ITwitchClient extends AutoCloseable {
      * Get PubSub
      *
      * @return ITwitchPubSub
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     ITwitchPubSub getPubSub();
 
     /**
