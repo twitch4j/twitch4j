@@ -1,6 +1,7 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
+import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.common.events.domain.EventChannel;
 import com.github.twitch4j.common.events.domain.EventUser;
@@ -25,27 +26,35 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent implements Mirr
      */
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private IRCMessageEvent messageEvent;
+    IRCMessageEvent messageEvent;
 
     /**
      * Event Target User
      */
-    private EventUser user;
+    EventUser user;
 
     /**
      * The Subscription
      */
-    private String subscriptionPlan;
+    String subscriptionPlan;
 
     /**
      * X subscriptions gifted
      */
-    private Integer count;
+    int count;
 
     /**
      * X subscriptions gifted totally
      */
-    private Integer totalCount;
+    int totalCount;
+
+    /**
+     * A unique identifier that links the community gift event to each individual recipient gifted event.
+     *
+     * @apiNote While this field is undocumented in irc, it is equivalent to the documented eventsub field {@code community_gift_id}.
+     */
+    @Unofficial
+    String giftId;
 
     /**
      * Event Constructor
@@ -58,13 +67,14 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent implements Mirr
      * @param totalCount       The amount the user gifted in total (all time)
      */
     @ApiStatus.Internal
-    public GiftSubscriptionsEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String subscriptionPlan, Integer count, Integer totalCount) {
+    public GiftSubscriptionsEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String subscriptionPlan, int count, int totalCount, String giftId) {
         super(channel);
         this.messageEvent = event;
         this.user = user;
         this.subscriptionPlan = subscriptionPlan;
         this.count = count;
         this.totalCount = totalCount;
+        this.giftId = giftId;
     }
 
     /**
