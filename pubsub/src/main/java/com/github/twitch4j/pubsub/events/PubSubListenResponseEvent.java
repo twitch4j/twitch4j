@@ -31,8 +31,8 @@ public class PubSubListenResponseEvent extends TwitchEvent {
 
     /**
      * @return the listen request associated with this response.
-     * @implNote The current implementation requires unique nonce's across requests (which is the default behavior for the listen methods provided by the library).
-     * @implSpec This method involves an O(n) operation where n <= 50, so it is best to only call it once when needed.
+     * @implNote The current implementation requires unique nonces across requests (which is the default behavior for the listen methods provided by the library).
+     * @implSpec This method involves an O(n) operation, so it is best to only call it once when needed.
      */
     public Optional<PubSubRequest> getListenRequest() {
         return Optional.ofNullable(listenRequestSupplier.get());

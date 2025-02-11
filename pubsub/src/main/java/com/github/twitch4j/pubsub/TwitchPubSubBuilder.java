@@ -14,6 +14,7 @@ import com.github.twitch4j.util.IBackoffStrategy;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,11 +23,16 @@ import java.util.function.Consumer;
 
 /**
  * Twitch PubSub Builder
+ *
+ * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+ * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
  */
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
 public class TwitchPubSubBuilder {
 
     /**
@@ -101,7 +107,11 @@ public class TwitchPubSubBuilder {
      * Initialize the builder
      *
      * @return Twitch PubSub Builder
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public static TwitchPubSubBuilder builder() {
         return new TwitchPubSubBuilder();
     }
@@ -110,7 +120,11 @@ public class TwitchPubSubBuilder {
      * Twitch PubSub Client
      *
      * @return TwitchPubSub
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     public TwitchPubSub build() {
         log.debug("PubSub: Initializing Module ...");
         if (scheduledThreadPoolExecutor == null)

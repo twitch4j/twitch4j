@@ -50,6 +50,7 @@ import lombok.Setter;
 import lombok.With;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -170,14 +171,22 @@ public class TwitchClientPoolBuilder {
 
     /**
      * Enabled: PubSub
+     * @see <a href="https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline">Deprecation Announcement</a>
+     * @deprecated Twitch will decommission PubSub on April 14, 2025, with shutdown windows starting in February.
      */
     @With
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enablePubSub = false;
 
     @With
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private Boolean enablePubSubPool = false;
 
     @With
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
     private int maxTopicsPerPubSubInstance = 50;
 
     /**
