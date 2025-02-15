@@ -70,7 +70,7 @@ public class Poll {
     @Deprecated
     @Accessors(fluent = true)
     @JsonProperty("bits_voting_enabled")
-    private Boolean isBitsVotingEnabled = false;
+    private Boolean isBitsVotingEnabled;
 
     /**
      * Number of Bits required to vote once with Bits. Minimum: 0. Maximum: 10000.

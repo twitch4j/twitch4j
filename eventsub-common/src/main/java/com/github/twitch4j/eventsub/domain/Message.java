@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class Message {
     /**
      * A collection that includes the emote ID and start and end positions for where the emote appears in the text.
      */
+    @Nullable
     private List<Emote> emotes;
 
     @Data
