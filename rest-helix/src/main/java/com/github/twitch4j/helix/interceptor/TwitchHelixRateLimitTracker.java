@@ -18,12 +18,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
 public final class TwitchHelixRateLimitTracker {
+
+    private static final Bandwidth ANNOUNCE_BANDWIDTH = BucketUtils.simple(1, Duration.ofSeconds(2L));
 
     private static final String AUTOMOD_STATUS_MINUTE_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-min";
     private static final String AUTOMOD_STATUS_HOUR_ID = TwitchLimitType.HELIX_AUTOMOD_STATUS_LIMIT + "-hr";
@@ -254,6 +257,11 @@ public final class TwitchHelixRateLimitTracker {
     @NotNull
     Bucket getExtensionPubSubBucket(@NotNull String clientId, @NotNull String channelId) {
         return extensionPubSubBuckets.computeIfAbsent(clientId + ':' + channelId, k -> BucketUtils.createBucket(EXT_PUBSUB_BANDWIDTH));
+    }
+
+    @NotNull
+    Bucket getChatAnnouncementBucket(@NotNull String channelId) {
+        return TwitchLimitRegistry.getInstance().getOrInitializeBucket(channelId, TwitchLimitType.HELIX_ANNOUNCEMENT_LIMIT, Collections.singletonList(ANNOUNCE_BANDWIDTH));
     }
 
     @NotNull

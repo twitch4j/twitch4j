@@ -371,6 +371,8 @@ public interface TwitchHelix {
 
     /**
      * Sends an announcement to the broadcaster’s chat room.
+     * <p>
+     * Rate Limits: One announcement may be sent every 2 seconds.
      *
      * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
      * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.

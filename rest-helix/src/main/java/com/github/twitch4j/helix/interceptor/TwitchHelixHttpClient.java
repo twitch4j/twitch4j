@@ -89,6 +89,15 @@ public class TwitchHelixHttpClient implements Client {
                 return executeAgainstBucket(vipBucket, () -> client.execute(request, options));
         }
 
+        if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/chat/announcements")) {
+            // Obtain the channel id
+            String channelId = getFirstParam("broadcaster_id", request);
+
+            // Conform to endpoint-specific bucket
+            Bucket announceBucket = rateLimitTracker.getChatAnnouncementBucket(channelId);
+            return executeAgainstBucket(announceBucket, () -> client.execute(request, options));
+        }
+
         // Moderation API: Check AutoMod Status has a stricter bucket that applies per channel id
         if (request.httpMethod() == Request.HttpMethod.POST && templatePath.endsWith("/moderation/enforcements/status")) {
             // Obtain the channel id

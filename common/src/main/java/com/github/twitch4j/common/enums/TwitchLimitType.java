@@ -34,7 +34,12 @@ public enum TwitchLimitType {
      *
      * @see <a href="https://discuss.dev.twitch.tv/t/upcoming-changes-to-the-check-automod-status-api-endpoint/38512#rate-limits-2">Twitch Announcement</a>
      */
-    HELIX_AUTOMOD_STATUS_LIMIT("helix-automod_status-limit");
+    HELIX_AUTOMOD_STATUS_LIMIT("helix-automod_status-limit"),
+
+    /**
+     * How fast Chat Announcements can be sent in a given channel.
+     */
+    HELIX_ANNOUNCEMENT_LIMIT("helix-announcement-limit");
 
     /**
      * The identifier for the related bandwidth slot in a bucket for smoother replacement.
