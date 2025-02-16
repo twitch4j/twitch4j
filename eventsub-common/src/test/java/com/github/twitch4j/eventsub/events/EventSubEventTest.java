@@ -3,7 +3,10 @@ package com.github.twitch4j.eventsub.events;
 import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.AutomodCategory;
+import com.github.twitch4j.eventsub.domain.AutomodCaughtReason;
 import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
+import com.github.twitch4j.eventsub.domain.BlockedTerm;
+import com.github.twitch4j.eventsub.domain.Boundary;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
 import com.github.twitch4j.eventsub.domain.Contribution;
 import com.github.twitch4j.eventsub.domain.PollStatus;
@@ -537,6 +540,54 @@ public class EventSubEventTest {
         Fragment fragment = event.getMessage().getFragments().get(0);
         assertEquals(Fragment.Type.TEXT, fragment.getType());
         assertEquals("fuck israel", fragment.getText());
+    }
+
+    @Test
+    public void deserializeAutomodTermHeld() {
+        AutomodMessageHoldV2Event event = jsonToObject(
+            "{\"broadcaster_user_id\":\"26610234\",\"broadcaster_user_login\":\"cohhcarnage\",\"broadcaster_user_name\":\"CohhCarnage\",\"user_id\":\"56410307\",\"user_login\":\"barrycarlyonbot\",\"user_name\":\"BarryCarlyonBot\",\"message_id\":\"613ac277-ba6c-4f21-8d9d-9eb5987d602a\",\"message\":{\"text\":\"!enter\",\"fragments\":[{\"type\":\"text\",\"text\":\"!enter\",\"cheermote\":null,\"emote\":null}]},\"reason\":\"blocked_term\",\"automod\":null,\"blocked_term\":{\"terms_found\":[{\"term_id\":\"057712ea-8b19-403c-8a8c-b15b56238eca\",\"owner_broadcaster_user_id\":\"26610234\",\"owner_broadcaster_user_login\":\"cohhcarnage\",\"owner_broadcaster_user_name\":\"CohhCarnage\",\"boundary\":{\"start_pos\":0,\"end_pos\":5}}]},\"held_at\":\"2024-11-27T19:22:22.704287523Z\"}",
+            AutomodMessageHoldV2Event.class
+        );
+
+        assertEquals("26610234", event.getBroadcasterUserId());
+        assertEquals("56410307", event.getUserId());
+        assertEquals("613ac277-ba6c-4f21-8d9d-9eb5987d602a", event.getMessageId());
+        assertNotNull(event.getMessage());
+        assertEquals("!enter", event.getMessage().getText());
+        assertEquals("!enter", event.getMessage().getFragments().get(0).getText());
+        assertEquals(Instant.parse("2024-11-27T19:22:22.704287523Z"), event.getHeldAt());
+        assertEquals(AutomodCaughtReason.BLOCKED_TERM, event.getReason());
+        assertNotNull(event.getBlockedTerm());
+        assertEquals(1, event.getBlockedTerm().getTermsFound().size());
+        BlockedTerm term = event.getBlockedTerm().getTermsFound().get(0);
+        assertEquals("057712ea-8b19-403c-8a8c-b15b56238eca", term.getTermId());
+        assertEquals("CohhCarnage", term.getOwnerBroadcasterUserName());
+        assertEquals(new Boundary(0, 5), term.getBoundary());
+    }
+
+    @Test
+    public void deserializeAutomodTermUpdate() {
+        AutomodMessageUpdateV2Event event = jsonToObject(
+            "{\"broadcaster_user_id\":\"26610234\",\"broadcaster_user_login\":\"cohhcarnage\",\"broadcaster_user_name\":\"CohhCarnage\",\"user_id\":\"56410307\",\"user_login\":\"barrycarlyonbot\",\"user_name\":\"BarryCarlyonBot\",\"moderator_user_id\":\"15185913\",\"moderator_user_login\":\"barrycarlyon\",\"moderator_user_name\":\"BarryCarlyon\",\"message_id\":\"613ac277-ba6c-4f21-8d9d-9eb5987d602a\",\"message\":{\"text\":\"!enter\",\"fragments\":[{\"type\":\"text\",\"text\":\"!enter\",\"cheermote\":null,\"emote\":null}]},\"reason\":\"blocked_term\",\"automod\":null,\"blocked_term\":{\"terms_found\":[{\"term_id\":\"057712ea-8b19-403c-8a8c-b15b56238eca\",\"owner_broadcaster_user_id\":\"26610234\",\"owner_broadcaster_user_login\":\"cohhcarnage\",\"owner_broadcaster_user_name\":\"CohhCarnage\",\"boundary\":{\"start_pos\":0,\"end_pos\":5}}]},\"status\":\"denied\",\"held_at\":\"2024-11-27T19:22:22.704287523Z\"}",
+            AutomodMessageUpdateV2Event.class
+        );
+
+        assertEquals("cohhcarnage", event.getBroadcasterUserLogin());
+        assertEquals("BarryCarlyonBot", event.getUserName());
+        assertEquals("15185913", event.getModeratorUserId());
+        assertEquals("613ac277-ba6c-4f21-8d9d-9eb5987d602a", event.getMessageId());
+        assertNotNull(event.getMessage());
+        assertEquals("!enter", event.getMessage().getText());
+        assertEquals("!enter", event.getMessage().getFragments().get(0).getText());
+        assertEquals(Instant.parse("2024-11-27T19:22:22.704287523Z"), event.getHeldAt());
+        assertEquals(AutomodCaughtReason.BLOCKED_TERM, event.getReason());
+        assertNotNull(event.getBlockedTerm());
+        assertEquals(1, event.getBlockedTerm().getTermsFound().size());
+        BlockedTerm term = event.getBlockedTerm().getTermsFound().get(0);
+        assertEquals("057712ea-8b19-403c-8a8c-b15b56238eca", term.getTermId());
+        assertEquals("CohhCarnage", term.getOwnerBroadcasterUserName());
+        assertEquals(new Boundary(0, 5), term.getBoundary());
+        assertEquals(AutomodMessageStatus.DENIED, event.getStatus());
     }
 
 }

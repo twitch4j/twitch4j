@@ -14,8 +14,10 @@ import java.util.stream.Stream;
 public class SubscriptionTypes {
     private final Map<String, SubscriptionType<?, ?, ?>> SUBSCRIPTION_TYPES;
 
-    public final AutomodMessageHoldType AUTOMOD_MESSAGE_HOLD;
-    public final AutomodMessageUpdateType AUTOMOD_MESSAGE_UPDATE;
+    public final @Deprecated AutomodMessageHoldType AUTOMOD_MESSAGE_HOLD;
+    public final AutomodMessageHoldV2Type AUTOMOD_MESSAGE_HOLD_V2;
+    public final @Deprecated AutomodMessageUpdateType AUTOMOD_MESSAGE_UPDATE;
+    public final AutomodMessageUpdateV2Type AUTOMOD_MESSAGE_UPDATE_V2;
     public final AutomodSettingsUpdateType AUTOMOD_SETTINGS_UPDATE;
     public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
@@ -98,7 +100,9 @@ public class SubscriptionTypes {
         SUBSCRIPTION_TYPES = Collections.unmodifiableMap(
             Stream.of(
                 AUTOMOD_MESSAGE_HOLD = new AutomodMessageHoldType(),
+                AUTOMOD_MESSAGE_HOLD_V2 = new AutomodMessageHoldV2Type(),
                 AUTOMOD_MESSAGE_UPDATE = new AutomodMessageUpdateType(),
+                AUTOMOD_MESSAGE_UPDATE_V2 = new AutomodMessageUpdateV2Type(),
                 AUTOMOD_SETTINGS_UPDATE = new AutomodSettingsUpdateType(),
                 AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
