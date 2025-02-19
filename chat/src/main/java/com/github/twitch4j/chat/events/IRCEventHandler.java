@@ -272,11 +272,13 @@ public class IRCEventHandler {
                 // Load Info
                 EventUser user = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
-                Integer subsGifted = event.getTagValue("msg-param-mass-gift-count").map(Integer::parseInt).orElse(0);
-                Integer subsGiftedTotal = event.getTagValue("msg-param-sender-count").map(Integer::parseInt).orElse(0);
+                int subsGifted = event.getTagValue("msg-param-mass-gift-count").map(Integer::parseInt).orElse(1);
+                int subsGiftedTotal = event.getTagValue("msg-param-sender-count").map(Integer::parseInt).orElse(1);
+                String giftId = event.getTagValue("msg-param-community-gift-id")
+                    .orElseGet(() -> event.getTagValue("msg-param-origin-id").orElse(null));
 
                 // Dispatch Event
-                eventManager.publish(new GiftSubscriptionsEvent(event, channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal));
+                eventManager.publish(new GiftSubscriptionsEvent(event, channel, user != null ? user : ANONYMOUS_GIFTER, subPlan, subsGifted, subsGiftedTotal, giftId));
                 return true;
             }
             // Upgrading from a gifted sub
