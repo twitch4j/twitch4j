@@ -138,6 +138,7 @@ subprojects {
 		// Test
 		testImplementation(platform("org.junit:junit-bom:5.12.0"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
+		testImplementation(group = "org.junit.platform", name = "junit-platform-launcher")
 		// - Mocking
 		testImplementation(platform("org.mockito:mockito-bom:5.15.2"))
 		// - Await
