@@ -20,6 +20,13 @@ import java.util.function.Consumer;
 @UtilityClass
 public class MessageParser {
 
+    /**
+     * Maximum message length (including tags) that is permitted for parsing (with substantial headroom over the spec).
+     *
+     * @see <a href="https://ircv3.net/specs/extensions/message-tags#size-limit">IRCv3 Specification</a>
+     */
+    private static final int MAX_LENGTH = 10_000;
+
     @Nullable
     @VisibleForTesting
     public IRCMessageEvent parse(@NotNull String rawMessage) {
@@ -30,7 +37,7 @@ public class MessageParser {
     @ApiStatus.Internal
     public IRCMessageEvent parse(@NotNull String raw, @NotNull Map<String, String> channelIdToChannelName, @NotNull Map<String, String> channelNameToChannelId, @Nullable Collection<String> botOwnerIds) {
         final int len = raw.length();
-        if (len == 0) return null;
+        if (len == 0 || len > MAX_LENGTH) return null;
         final char[] chars = raw.toCharArray();
         int i = 0;
 
@@ -44,7 +51,7 @@ public class MessageParser {
         }
 
         // Client
-        if (chars[i] == ':') i++;
+        if (i < len && chars[i] == ':') i++;
         int exclamation = -1;
         int space = -1;
         for (int j = i; j < len; j++) {

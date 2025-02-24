@@ -516,7 +516,13 @@ public class IRCMessageEvent extends TwitchEvent {
 
     private static Instant getEventTime(Map<String, CharSequence> tags) {
         CharSequence ts = tags.get("tmi-sent-ts");
-        return ts != null ? Instant.ofEpochMilli(Long.parseLong(ts.toString())) : Instant.now();
+        if (ts != null) {
+            try {
+                return Instant.ofEpochMilli(Long.parseLong(ts.toString()));
+            } catch (Exception ignored) {
+            }
+        }
+        return Instant.now();
     }
 
 }
