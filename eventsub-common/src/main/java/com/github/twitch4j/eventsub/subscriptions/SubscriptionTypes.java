@@ -20,7 +20,7 @@ public class SubscriptionTypes {
     public final AutomodTermsUpdateType AUTOMOD_TERMS_UPDATE;
     public final ChannelAdBreakBeginType CHANNEL_AD_BREAK_BEGIN;
     public final ChannelBanType CHANNEL_BAN;
-    public final @ApiStatus.Experimental BetaChannelBitsUseType CHANNEL_BITS_USE;
+    public final ChannelBitsUseType CHANNEL_BITS_USE;
     public final ChannelChatClearType CHANNEL_CHAT_CLEAR;
     public final ChannelClearUserMessagesType CHANNEL_CLEAR_USER_MESSAGES;
     public final ChannelChatMessageType CHANNEL_CHAT_MESSAGE;
@@ -104,7 +104,7 @@ public class SubscriptionTypes {
                 AUTOMOD_TERMS_UPDATE = new AutomodTermsUpdateType(),
                 CHANNEL_AD_BREAK_BEGIN = new ChannelAdBreakBeginType(),
                 CHANNEL_BAN = new ChannelBanType(),
-                CHANNEL_BITS_USE = new BetaChannelBitsUseType(),
+                CHANNEL_BITS_USE = new ChannelBitsUseType(),
                 CHANNEL_CHAT_CLEAR = new ChannelChatClearType(),
                 CHANNEL_CLEAR_USER_MESSAGES = new ChannelClearUserMessagesType(),
                 CHANNEL_CHAT_MESSAGE = new ChannelChatMessageType(),
