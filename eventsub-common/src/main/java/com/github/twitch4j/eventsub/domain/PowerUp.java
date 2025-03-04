@@ -5,12 +5,14 @@ import com.github.twitch4j.common.enums.TwitchEnum;
 import com.github.twitch4j.common.util.TwitchEnumDeserializer;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class PowerUp {
 
     /**

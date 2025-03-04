@@ -9,6 +9,7 @@ import com.github.twitch4j.eventsub.domain.chat.Message;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
+@NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ChannelBitsUseEvent extends EventSubUserChannelEvent {
