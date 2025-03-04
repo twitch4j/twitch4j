@@ -19,7 +19,6 @@ public class Emote {
     /**
      * An ID that identifies the emote set that the emote belongs to.
      */
-    @Nullable // for channel.bits.use
     private String emoteSetId;
 
     /**
