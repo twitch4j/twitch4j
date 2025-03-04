@@ -20,12 +20,14 @@ public class AutomaticReward {
     /**
      * The reward cost.
      */
+    @JsonAlias("channel_points")
     private int cost;
 
     /**
      * The emote that was unlocked.
      */
     @Nullable
+    @JsonAlias("emote")
     private SimpleEmote unlockedEmote;
 
     public enum Type {
@@ -57,17 +59,26 @@ public class AutomaticReward {
 
         /**
          * Message Effects was redeemed.
+         *
+         * @deprecated not sent in v2 of channel.channel_points_automatic_reward_redemption.add
          */
+        @Deprecated
         MESSAGE_EFFECT,
 
         /**
          * Gigantify an Emote was redeemed.
+         *
+         * @deprecated not sent in v2 of channel.channel_points_automatic_reward_redemption.add
          */
+        @Deprecated
         GIGANTIFY_AN_EMOTE,
 
         /**
          * On-Screen Celebration was redeemed.
+         *
+         * @deprecated not sent in v2 of channel.channel_points_automatic_reward_redemption.add
          */
+        @Deprecated
         CELEBRATION,
 
         /**

@@ -1,7 +1,7 @@
 package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelEventSubCondition;
-import com.github.twitch4j.eventsub.events.AutomaticRewardRedemptionAddEvent;
+import com.github.twitch4j.eventsub.events.AutomaticRewardRedemptionAddV2Event;
 
 /**
  * This subscription type sends a notification when a viewer has redeemed an automatic channel points reward on the specified channel.
@@ -10,10 +10,8 @@ import com.github.twitch4j.eventsub.events.AutomaticRewardRedemptionAddEvent;
  *
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_REDEMPTIONS_READ
  * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_REDEMPTIONS_MANAGE
- * @deprecated in favor of {@link ChannelPointsAutomaticRewardRedemptionAddV2Type}
  */
-@Deprecated
-public class ChannelPointsAutomaticRewardRedemptionAddType implements SubscriptionType<ChannelEventSubCondition, ChannelEventSubCondition.ChannelEventSubConditionBuilder<?, ?>, AutomaticRewardRedemptionAddEvent> {
+public class ChannelPointsAutomaticRewardRedemptionAddV2Type implements SubscriptionType<ChannelEventSubCondition, ChannelEventSubCondition.ChannelEventSubConditionBuilder<?, ?>, AutomaticRewardRedemptionAddV2Event> {
     @Override
     public String getName() {
         return "channel.channel_points_automatic_reward_redemption.add";
@@ -21,7 +19,7 @@ public class ChannelPointsAutomaticRewardRedemptionAddType implements Subscripti
 
     @Override
     public String getVersion() {
-        return "1";
+        return "2";
     }
 
     @Override
@@ -30,7 +28,7 @@ public class ChannelPointsAutomaticRewardRedemptionAddType implements Subscripti
     }
 
     @Override
-    public Class<AutomaticRewardRedemptionAddEvent> getEventClass() {
-        return AutomaticRewardRedemptionAddEvent.class;
+    public Class<AutomaticRewardRedemptionAddV2Event> getEventClass() {
+        return AutomaticRewardRedemptionAddV2Event.class;
     }
 }
