@@ -2,7 +2,7 @@ package com.github.twitch4j.eventsub.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.AutomaticReward;
-import com.github.twitch4j.eventsub.domain.Message;
+import com.github.twitch4j.eventsub.domain.chat.Message;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,16 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 
-/**
- * @deprecated in favor of {@link AutomaticRewardRedemptionAddV2Event} and {@link AutomaticRewardRedemptionAddV2Event}
- */
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class AutomaticRewardRedemptionAddEvent extends EventSubUserChannelEvent {
+public class AutomaticRewardRedemptionAddV2Event extends EventSubUserChannelEvent {
 
     /**
      * The ID of the Redemption.
@@ -38,13 +34,8 @@ public class AutomaticRewardRedemptionAddEvent extends EventSubUserChannelEvent 
     /**
      * An object that contains the user message and emote information needed to recreate the message.
      */
-    private Message message;
-
-    /**
-     * A string that the user entered if the reward requires input.
-     */
     @Nullable
-    private String userInput;
+    private Message message;
 
     /**
      * The UTC date and time (in RFC3339 format) of when the reward was redeemed.

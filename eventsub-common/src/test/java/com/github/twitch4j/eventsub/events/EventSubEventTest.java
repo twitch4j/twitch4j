@@ -2,6 +2,7 @@ package com.github.twitch4j.eventsub.events;
 
 import com.github.twitch4j.common.enums.AnnouncementColor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.AutomaticReward;
 import com.github.twitch4j.eventsub.domain.AutomodCategory;
 import com.github.twitch4j.eventsub.domain.AutomodCaughtReason;
 import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
@@ -588,6 +589,21 @@ public class EventSubEventTest {
         assertEquals("CohhCarnage", term.getOwnerBroadcasterUserName());
         assertEquals(new Boundary(0, 5), term.getBoundary());
         assertEquals(AutomodMessageStatus.DENIED, event.getStatus());
+    }
+
+    @Test
+    public void deserializeAutomaticRewardRedemption() {
+        AutomaticRewardRedemptionAddV2Event event = jsonToObject(
+            "{\"broadcaster_user_id\":\"12826\",\"broadcaster_user_name\":\"Twitch\",\"broadcaster_user_login\":\"twitch\",\"user_id\":\"141981764\",\"user_name\":\"TwitchDev\",\"user_login\":\"twitchdev\",\"id\":\"f024099a-e0fe-4339-9a0a-a706fb59f353\",\"reward\":{\"type\":\"send_highlighted_message\",\"channel_points\":100,\"emote\":null},\"message\":{\"text\":\"Hello world! VoHiYo\",\"fragments\":[{\"type\":\"text\",\"text\":\"Hello world! \",\"emote\":null},{\"type\":\"emote\",\"text\":\"VoHiYo\",\"emote\":{\"id\":\"81274\"}}]},\"redeemed_at\":\"2024-08-12T21:14:34.260398045Z\"}",
+            AutomaticRewardRedemptionAddV2Event.class
+        );
+
+        assertEquals("f024099a-e0fe-4339-9a0a-a706fb59f353", event.getRedemptionId());
+        assertEquals(AutomaticReward.Type.SEND_HIGHLIGHTED_MESSAGE, event.getReward().getType());
+        assertEquals(100, event.getReward().getCost());
+        assertNotNull(event.getMessage());
+        assertEquals("Hello world! VoHiYo", event.getMessage().getText());
+        assertEquals(Instant.parse("2024-08-12T21:14:34.260398045Z"), event.getRedeemedAt());
     }
 
 }

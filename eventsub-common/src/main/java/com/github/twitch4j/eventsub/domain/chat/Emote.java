@@ -19,6 +19,7 @@ public class Emote {
     /**
      * An ID that identifies the emote set that the emote belongs to.
      */
+    @Nullable // for channel.channel_points_automatic_reward_redemption.add
     private String emoteSetId;
 
     /**
