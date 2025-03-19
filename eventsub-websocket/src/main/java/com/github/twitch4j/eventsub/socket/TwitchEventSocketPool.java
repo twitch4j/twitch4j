@@ -135,6 +135,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         TwitchSingleUserEventSocketPool pool = poolByUserId.computeIfAbsent(userId,
             id -> advancedConfiguration.apply(
                 TwitchSingleUserEventSocketPool.builder()
+                    .maxSubscriptionsPerConnection(TwitchEventSocket.MAX_SUBSCRIPTIONS_PER_SOCKET)
                     .baseUrl(baseUrl)
                     .defaultToken(token)
                     .eventManager(eventManager)
@@ -185,6 +186,29 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
 
         // noinspection resource
         return unsubscribe != null && unsubscribe && poolBySub.remove(wrapped) != null;
+    }
+
+    /**
+     * Removes all EventSub subscriptions (and websockets) associated with the given user token.
+     *
+     * @param credential a user access token with which EventSub subscriptions were created
+     * @return whether subscriptions associated with the specified user were found and removed
+     * @implSpec The user id within the credential, rather than the specific access token, is used for identifying subscriptions to be removed.
+     */
+    @Synchronized
+    public boolean unregisterByUser(@NotNull OAuth2Credential credential) {
+        String userId = getUserId(credential);
+        if (userId == null) return false;
+
+        TwitchSingleUserEventSocketPool pool = poolByUserId.remove(userId);
+        if (pool == null) return false;
+
+        for (EventSubSubscription sub : pool.getSubscriptions()) {
+            poolBySub.remove(SubscriptionWrapper.wrap(sub), pool);
+        }
+
+        pool.close();
+        return true;
     }
 
     @Override
