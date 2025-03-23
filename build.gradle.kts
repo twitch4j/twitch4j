@@ -130,7 +130,7 @@ subprojects {
 		api(platform("com.github.philippheuer.events4j:events4j-bom:0.12.2"))
 
 		// Logging
-		api(group = "org.slf4j", name = "slf4j-api", version = "2.0.16")
+		api(group = "org.slf4j", name = "slf4j-api", version = "2.0.17")
 
 		// Jackson BOM
 		api(platform("com.fasterxml.jackson:jackson-bom:2.18.3"))
@@ -227,7 +227,7 @@ subprojects {
 						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.5",
 						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.5",
 						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.5",
-						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.16",
+						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.18.3",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.18.3",
