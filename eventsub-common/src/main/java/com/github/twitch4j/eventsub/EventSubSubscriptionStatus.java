@@ -1,5 +1,7 @@
 package com.github.twitch4j.eventsub;
 
+import com.github.twitch4j.common.annotation.Unofficial;
+
 public enum EventSubSubscriptionStatus {
 
     /**
@@ -51,6 +53,15 @@ public enum EventSubSubscriptionStatus {
      * The user specified in the Condition object was banned from the broadcaster's chat.
      */
     CHAT_USER_BANNED,
+
+    /**
+     * The <a href="https://twitch4j.github.io/eventsub/conduit/">Conduit</a> containing this subscription was deleted,
+     * which happens if you call {@code TwitchHelix#deleteConduit} or if all shards are disabled for 72 hours.
+     *
+     * @see <a href="https://github.com/twitchdev/issues/issues/1066">Documentation Issue</a>
+     */
+    @Unofficial // not officially documented
+    CONDUIT_DELETED,
 
     /**
      * When you connect to the server, you must create a subscription within 10 seconds or the connection is closed.
