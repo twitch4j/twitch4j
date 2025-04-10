@@ -67,4 +67,21 @@ public class ChatMessage {
     @Nullable
     Boolean forSourceOnly;
 
+    /**
+     * Legacy Constructor
+     *
+     * @param broadcasterId        The ID of the broadcaster whose chat room the message will be sent to.
+     * @param senderId             The ID of the user sending the message.
+     * @param message              The message to send.
+     * @param replyParentMessageId The ID of the chat message being replied to, if any.
+     * @deprecated in favor of {@link ChatMessage#ChatMessage(String, String, String, String, Boolean)} or {@link ChatMessage#builder()}
+     */
+    @Deprecated
+    public ChatMessage(@NotNull String broadcasterId, @NotNull String senderId, @NotNull String message, @Nullable String replyParentMessageId) {
+        this.broadcasterId = broadcasterId;
+        this.senderId = senderId;
+        this.message = message;
+        this.replyParentMessageId = replyParentMessageId;
+    }
+
 }
