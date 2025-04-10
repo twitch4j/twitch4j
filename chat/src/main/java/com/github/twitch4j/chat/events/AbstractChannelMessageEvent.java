@@ -16,6 +16,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -78,6 +79,13 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
     @Unofficial
     public List<AutoModFlag> getFlags() {
         return this.getMessageEvent().getFlags();
+    }
+
+    /**
+     * @return whether a message delivered during a shared chat session is only sent to the source channel.
+     */
+    public Optional<Boolean> isSourceOnly() {
+        return messageEvent.getTagValue("source-only").map(Boolean::parseBoolean);
     }
 
 }

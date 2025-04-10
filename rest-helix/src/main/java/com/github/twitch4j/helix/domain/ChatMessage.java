@@ -50,4 +50,21 @@ public class ChatMessage {
     @Nullable
     String replyParentMessageId;
 
+    /**
+     * Whether the chat message is sent only to the source channel (broadcaster_id) during a shared chat session.
+     * <p>
+     * NOTE: Can only be set when utilizing an App Access Token at the top.
+     * Cannot be specified when a User Access Token is used and will result in a 400 error.
+     * <p>
+     * Has no effect if the message is not sent during a shared chat session.
+     * <p>
+     * Introduced in April 2025, the default is temporarily “false”.
+     * On May 19, 2025 the default value for the for_source_only parameter will be updated to “true”
+     * (i.e. chat messages will be only shared with the source channel by default).
+     * If you prefer to send a chat message to both channels in a shared chat session,
+     * make sure this parameter is explicitly set to “false” in your API request before May 19.
+     */
+    @Nullable
+    Boolean forSourceOnly;
+
 }
