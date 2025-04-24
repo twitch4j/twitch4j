@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.events;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.twitch4j.eventsub.domain.chat.Badge;
 import com.github.twitch4j.eventsub.domain.chat.Cheer;
 import com.github.twitch4j.eventsub.domain.chat.Message;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,5 +123,15 @@ public class ChannelChatMessageEvent extends ChannelChatUserEvent {
      */
     @Nullable
     private List<Badge> sourceBadges;
+
+    /**
+     * Optional: Determines if a message delivered during a shared chat session is only sent to the source channel.
+     * <p>
+     * Has no effect if the message is not sent during a shared chat session.
+     */
+    @Nullable
+    @Accessors(fluent = true)
+    @JsonProperty("is_source_only")
+    private Boolean isSourceOnly;
 
 }
