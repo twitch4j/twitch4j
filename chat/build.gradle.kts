@@ -21,6 +21,7 @@ dependencies {
 	testImplementation(group = "org.mockito", name = "mockito-core")
 	testImplementation(group = "org.mockito", name = "mockito-junit-jupiter")
 	testImplementation(group = "org.awaitility", name = "awaitility")
+	testImplementation(group = "com.code-intelligence", name = "jazzer-junit")
 }
 
 tasks.javadoc {
