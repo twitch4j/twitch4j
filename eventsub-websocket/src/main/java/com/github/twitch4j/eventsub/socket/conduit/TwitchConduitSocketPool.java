@@ -13,7 +13,10 @@ import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.EventSubSubscriptionStatus;
 import com.github.twitch4j.eventsub.EventSubTransport;
 import com.github.twitch4j.eventsub.EventSubTransportMethod;
+import com.github.twitch4j.eventsub.condition.ChannelChatCondition;
+import com.github.twitch4j.eventsub.condition.ChannelEventSubCondition;
 import com.github.twitch4j.eventsub.condition.EventSubCondition;
+import com.github.twitch4j.eventsub.condition.UserEventSubCondition;
 import com.github.twitch4j.eventsub.socket.IEventSubConduit;
 import com.github.twitch4j.eventsub.socket.TwitchEventSocket;
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.ConduitNotFoundException;
@@ -309,8 +312,19 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             id = subscription.getId();
         } else {
             try {
-                // noinspection OptionalGetWithoutIsPresent
-                id = api.getEventSubSubscriptions(token, EventSubSubscriptionStatus.ENABLED, subscription.getType(), null, null, null).execute().getSubscriptions().stream().filter(sub -> conduitId.equals(sub.getTransport().getConduitId())).findAny().map(EventSubSubscription::getId).get();
+                // status, type, user_id are mutually exclusive filters; use the most narrow initial filter available
+                String userId = getUserId(subscription.getCondition());
+                id = api.getEventSubSubscriptions(token, null, userId == null ? subscription.getType() : null, userId, null, null)
+                    .execute()
+                    .getSubscriptions()
+                    .stream()
+                    .filter(sub -> sub.getStatus() == EventSubSubscriptionStatus.ENABLED)
+                    .filter(sub -> subscription.getType().equals(sub.getType()))
+                    .filter(sub -> conduitId.equals(sub.getTransport().getConduitId()))
+                    .filter(sub -> sub.getCondition().equals(subscription.getCondition()))
+                    .findAny()
+                    .map(EventSubSubscription::getId)
+                    .get();
             } catch (Exception e) {
                 log.warn("Specified subscription is not actively registered to this Conduit with ID {}: {}", conduitId, subscription, e);
                 return false;
@@ -379,6 +393,19 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
     @NotNull
     public static TwitchConduitSocketPool create(@NotNull Consumer<ConduitSpec> spec) throws CreateConduitException, ConduitNotFoundException, ConduitResizeException, ShardTimeoutException, ShardRegistrationException {
         return new TwitchConduitSocketPool(ConduitSpec.process(spec));
+    }
+
+    private static String getUserId(EventSubCondition condition) {
+        if (condition instanceof ChannelChatCondition)
+            return ((ChannelChatCondition) condition).getBroadcasterUserId();
+
+        if (condition instanceof ChannelEventSubCondition)
+            return ((ChannelEventSubCondition) condition).getBroadcasterUserId();
+
+        if (condition instanceof UserEventSubCondition)
+            return ((UserEventSubCondition) condition).getUserId();
+
+        return null;
     }
 
 }
