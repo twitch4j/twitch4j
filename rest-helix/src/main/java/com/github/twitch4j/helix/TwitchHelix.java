@@ -901,7 +901,7 @@ public interface TwitchHelix {
      * Use the status, type, and user_id query parameters to filter the list of subscriptions that are returned.
      * The filters are mutually exclusive; the request fails if you specify more than one filter.
      *
-     * @param authToken Required: App Access Token.
+     * @param authToken Required: App Access Token (for Webhook/Conduit) or User Access Token (for WebSocket).
      * @param status    Optional: Include this parameter to filter subscriptions by their status.
      * @param type      Optional: Include this parameter to filter subscriptions by subscription type.
      * @param userId    Optional: Include this parameter to filter subscriptions by user ID in the condition object.
@@ -918,6 +918,20 @@ public interface TwitchHelix {
         @Param("user_id") String userId,
         @Param("after") String after,
         @Param("first") Integer limit
+    );
+
+    /**
+     * Obtains an EventSub Subscription by its ID.
+     *
+     * @param authToken Required: App Access Token (for Webhook/Conduit) or User Access Token (for WebSocket).
+     * @param subscriptionId Required: The subscription ID to query, which must be owned by the client making the request.
+     * @return list containing the single subscription, or empty underlying list if no matching subscription was found.
+     */
+    @RequestLine("GET /eventsub/subscriptions?subscription_id={subscription_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptionById(
+        @Param("token") String authToken,
+        @Param("subscription_id") String subscriptionId
     );
 
     /**
