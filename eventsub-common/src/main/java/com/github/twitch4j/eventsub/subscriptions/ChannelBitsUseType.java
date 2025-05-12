@@ -4,7 +4,7 @@ import com.github.twitch4j.eventsub.condition.ChannelEventSubCondition;
 import com.github.twitch4j.eventsub.events.ChannelBitsUseEvent;
 
 /**
- * Fires when Bits are used on a channel, including Cheers and Power-ups.
+ * Fires when Bits are used on a channel, including Cheers, Power-ups, and Combos.
  * <p>
  * Bits transactions via Twitch Extensions are not included in this subscription type.
  * <p>
