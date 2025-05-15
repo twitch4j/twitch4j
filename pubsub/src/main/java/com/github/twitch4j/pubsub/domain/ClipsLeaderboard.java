@@ -3,12 +3,14 @@ package com.github.twitch4j.pubsub.domain;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
 @Setter(AccessLevel.PRIVATE)
+@ApiStatus.Experimental
 public class ClipsLeaderboard {
     private String type; // e.g., "clips-leaderboard-update"
     private String broadcasterId;
