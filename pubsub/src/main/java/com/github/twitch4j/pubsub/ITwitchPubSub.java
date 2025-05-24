@@ -328,6 +328,12 @@ public interface ITwitchPubSub extends AutoCloseable {
     }
 
     @Unofficial
+    @ApiStatus.Experimental
+    default PubSubSubscription listenForChannelClipsLeaderboardEvents(OAuth2Credential credential, String channelId) {
+        return listenOnTopic(PubSubType.LISTEN, credential, "leaderboard-events-v1.clips-" + channelId);
+    }
+
+    @Unofficial
     @Deprecated
     default PubSubSubscription listenForChannelPrimeGiftStatusEvents(OAuth2Credential credential, String channelId) {
         return listenOnTopic(PubSubType.LISTEN, credential, "channel-prime-gifting-status." + channelId);

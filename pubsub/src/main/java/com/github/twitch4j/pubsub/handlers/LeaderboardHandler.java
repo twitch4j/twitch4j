@@ -2,8 +2,10 @@ package com.github.twitch4j.pubsub.handlers;
 
 import com.github.twitch4j.common.events.TwitchEvent;
 import com.github.twitch4j.common.util.TypeConvert;
+import com.github.twitch4j.pubsub.domain.ClipsLeaderboard;
 import com.github.twitch4j.pubsub.domain.Leaderboard;
 import com.github.twitch4j.pubsub.events.BitsLeaderboardEvent;
+import com.github.twitch4j.pubsub.events.ClipsLeaderboardEvent;
 import com.github.twitch4j.pubsub.events.SubLeaderboardEvent;
 
 class LeaderboardHandler implements TopicHandler {
@@ -14,6 +16,11 @@ class LeaderboardHandler implements TopicHandler {
 
     @Override
     public TwitchEvent apply(Args args) {
+        if (args.getLastTopicPart().startsWith("clips-")) {
+            ClipsLeaderboard clipsLeaderboard = TypeConvert.jsonToObject(args.getRawMessage(), ClipsLeaderboard.class);
+            return new ClipsLeaderboardEvent(clipsLeaderboard);
+        }
+
         Leaderboard leaderboard = TypeConvert.jsonToObject(args.getRawMessage(), Leaderboard.class);
         switch (leaderboard.getIdentifier().getDomain()) {
             case "bits-usage-by-channel-v1":
