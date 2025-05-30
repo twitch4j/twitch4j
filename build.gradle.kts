@@ -136,7 +136,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.19.0"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.12.2"))
+		testImplementation(platform("org.junit:junit-bom:5.13.0"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		testRuntimeOnly(group = "org.junit.platform", name = "junit-platform-launcher")
 		// - Mocking
