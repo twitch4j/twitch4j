@@ -1,5 +1,5 @@
 plugins {
-	kotlin("jvm") version "2.1.21"
+	kotlin("jvm") version "2.2.0"
 	id("org.jetbrains.dokka") version "1.9.20"
 }
 
