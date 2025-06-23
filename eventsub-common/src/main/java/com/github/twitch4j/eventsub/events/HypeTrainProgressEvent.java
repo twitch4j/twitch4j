@@ -15,6 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Deprecated
 public class HypeTrainProgressEvent extends HypeTrainEvent {
 
     /**

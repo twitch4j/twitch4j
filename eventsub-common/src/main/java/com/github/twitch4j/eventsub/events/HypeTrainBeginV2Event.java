@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.github.twitch4j.eventsub.domain.Contribution;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,8 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class HypeTrainBeginEvent extends HypeTrainEvent {
+public class HypeTrainBeginV2Event extends HypeTrainV2Event {
 
     /**
      * The number of points contributed to the hype train at the current level.
@@ -29,14 +27,19 @@ public class HypeTrainBeginEvent extends HypeTrainEvent {
     private Integer goal;
 
     /**
-     * The most recent contribution.
-     */
-    private Contribution lastContribution;
-
-    /**
      * The time at which the hype train expires.
      * The expiration is extended when the hype train reaches a new level.
      */
     private Instant expiresAt;
+
+    /**
+     * The all-time high level this type of Hype Train has reached for this broadcaster.
+     */
+    private int allTimeHighLevel;
+
+    /**
+     * The all-time high total this type of Hype Train has reached for this broadcaster.
+     */
+    private int allTimeHighTotal;
 
 }

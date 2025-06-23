@@ -9,7 +9,10 @@ import com.github.twitch4j.eventsub.events.HypeTrainProgressEvent;
  * Must have channel:read:hype_train scope.
  * <p>
  * EventSub does not make strong assurances about the order of message delivery, so it is possible to receive channel.hype_train.progress before you receive the corresponding channel.hype_train.begin
+ *
+ * @deprecated in favor of {@link HypeTrainProgressV2Type}
  */
+@Deprecated
 public class HypeTrainProgressType implements SubscriptionType<HypeTrainProgressCondition, HypeTrainProgressCondition.HypeTrainProgressConditionBuilder<?, ?>, HypeTrainProgressEvent> {
 
     @Override
