@@ -12,7 +12,7 @@ plugins {
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.3").apply(false)
 	id("com.gradleup.shadow").version("8.3.7").apply(false)
-	id("com.github.gmazzo.buildconfig").version("5.5.4").apply(false)
+	id("com.github.gmazzo.buildconfig").version("5.6.7").apply(false)
 }
 
 group = group
