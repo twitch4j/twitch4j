@@ -21,6 +21,11 @@ import java.util.List;
 public abstract class HypeTrainEvent extends EventSubChannelEvent {
 
     /**
+     * The Hype Train ID.
+     */
+    private String id;
+
+    /**
      * Total points contributed to hype train.
      */
     private Integer total;

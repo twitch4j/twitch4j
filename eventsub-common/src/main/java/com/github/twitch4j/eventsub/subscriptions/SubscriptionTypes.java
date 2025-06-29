@@ -69,9 +69,12 @@ public class SubscriptionTypes {
     public final ConduitShardDisabledType CONDUIT_SHARD_DISABLED;
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
-    public final HypeTrainBeginType HYPE_TRAIN_BEGIN;
-    public final HypeTrainEndType HYPE_TRAIN_END;
-    public final HypeTrainProgressType HYPE_TRAIN_PROGRESS;
+    public final @Deprecated HypeTrainBeginType HYPE_TRAIN_BEGIN;
+    public final @ApiStatus.Experimental HypeTrainBeginV2Type HYPE_TRAIN_BEGIN_V2;
+    public final @Deprecated HypeTrainEndType HYPE_TRAIN_END;
+    public final @ApiStatus.Experimental HypeTrainEndV2Type HYPE_TRAIN_END_V2;
+    public final @Deprecated HypeTrainProgressType HYPE_TRAIN_PROGRESS;
+    public final @ApiStatus.Experimental HypeTrainProgressV2Type HYPE_TRAIN_PROGRESS_V2;
     public final PollBeginType POLL_BEGIN;
     public final PollProgressType POLL_PROGRESS;
     public final PollEndType POLL_END;
@@ -157,8 +160,11 @@ public class SubscriptionTypes {
                 DROP_ENTITLEMENT_GRANT = new DropEntitlementGrantType(),
                 EXTENSION_BITS_TRANSACTION_CREATE = new ExtensionBitsTransactionCreateType(),
                 HYPE_TRAIN_BEGIN = new HypeTrainBeginType(),
+                HYPE_TRAIN_BEGIN_V2 = new HypeTrainBeginV2Type(),
                 HYPE_TRAIN_END = new HypeTrainEndType(),
+                HYPE_TRAIN_END_V2 = new HypeTrainEndV2Type(),
                 HYPE_TRAIN_PROGRESS = new HypeTrainProgressType(),
+                HYPE_TRAIN_PROGRESS_V2 = new HypeTrainProgressV2Type(),
                 POLL_BEGIN = new PollBeginType(),
                 POLL_PROGRESS = new PollProgressType(),
                 POLL_END = new PollEndType(),

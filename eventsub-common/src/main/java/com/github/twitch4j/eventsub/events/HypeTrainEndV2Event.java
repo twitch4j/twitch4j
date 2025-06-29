@@ -14,8 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class HypeTrainEndEvent extends HypeTrainEvent {
+public class HypeTrainEndV2Event extends HypeTrainV2Event {
 
     /**
      * The timestamp at which the hype train ended.

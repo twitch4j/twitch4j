@@ -9,4 +9,5 @@ import lombok.extern.jackson.Jacksonized;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Jacksonized
+@Deprecated
 public class HypeTrainEndCondition extends ChannelEventSubCondition {}

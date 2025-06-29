@@ -1,6 +1,5 @@
 package com.github.twitch4j.eventsub.events;
 
-import com.github.twitch4j.eventsub.domain.Contribution;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,8 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class HypeTrainBeginEvent extends HypeTrainEvent {
+public class HypeTrainProgressV2Event extends HypeTrainV2Event {
 
     /**
      * The number of points contributed to the hype train at the current level.
@@ -27,11 +25,6 @@ public class HypeTrainBeginEvent extends HypeTrainEvent {
      * The number of points required to reach the next level.
      */
     private Integer goal;
-
-    /**
-     * The most recent contribution.
-     */
-    private Contribution lastContribution;
 
     /**
      * The time at which the hype train expires.
