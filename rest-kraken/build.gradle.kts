@@ -1,30 +1,23 @@
 dependencies {
 	// HTTP Client
-	api(group = "io.github.openfeign", name = "feign-okhttp")
-	api(group = "io.github.openfeign", name = "feign-jackson")
-	api(group = "io.github.openfeign", name = "feign-slf4j")
-	api(group = "io.github.openfeign", name = "feign-hystrix")
-	api(group = "commons-configuration", name = "commons-configuration")
+	api(libs.feign.core)
+	api(libs.feign.okhttp)
+	api(libs.feign.jackson)
+	api(libs.feign.slf4j)
+	api(libs.feign.hystrix)
+	api(libs.commons.configuration)
 
 	// Jackson (JSON)
-	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
-	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
+	api(libs.jackson.databind)
+	api(libs.jackson.datatype.jsr310)
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
 }
 
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Kraken Module API <sup>(deprecated)</sup>"
-		windowTitle = "Twitch4J (v${version}) - Kraken Module API"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Kraken Module")
-		description.set("Kraken API dependency")
-	}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - Kraken Module")
+	artifactDescription.set("Kraken API dependency")
+	javadocTitle.set("Twitch4J (v${version}) - Kraken Module API <sup>(deprecated)</sup>")
 }
