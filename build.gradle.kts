@@ -234,7 +234,7 @@ subprojects {
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.19.2",
 						"https://javadoc.io/doc/commons-io/commons-io/2.20.0",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.18.0",
-						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.38",
+						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.42",
 						"https://twitch4j.github.io/javadoc"
 				)
 				locale = "en"
