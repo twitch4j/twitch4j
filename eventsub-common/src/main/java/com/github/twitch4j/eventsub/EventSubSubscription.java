@@ -47,7 +47,6 @@ public class EventSubSubscription {
      */
     @JsonIgnore
     @ToString.Exclude
-    @Getter(onMethod_ = { @JsonIgnore })
     private SubscriptionType<?, ?, ?> type;
 
     /**

@@ -49,7 +49,6 @@ subprojects {
 
 	project.extensions.getByType(LombokExtension::class).apply {
 		version.set("1.18.42")
-		disableConfig.set(true)
 	}
 
 	project.extensions.getByType(JmhParameters::class).apply {
