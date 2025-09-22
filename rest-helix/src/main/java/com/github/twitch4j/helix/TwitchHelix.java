@@ -1779,6 +1779,21 @@ public interface TwitchHelix {
         return this.getHypeTrainEvents(authToken, broadcasterId, limit, after);
     }
 
+    /**
+     * Get the status of a Hype Train for the specified broadcaster.
+     *
+     * @param authToken User access token from the broadcaster (scope: channel:read:hype_train)
+     * @param broadcasterId The User ID of the channel broadcaster.
+     * @return {@link HypeTrainStatusWrapper}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_HYPE_TRAIN_READ
+     */
+    @RequestLine("GET /hypetrain/status?broadcaster_id={broadcaster_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<HypeTrainStatusWrapper> getHypeTrainStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId
+    );
+
     @RequestLine("GET /ingests")
     HystrixCommand<IngestServerList> getIngestServers(URI baseUrl);
 
