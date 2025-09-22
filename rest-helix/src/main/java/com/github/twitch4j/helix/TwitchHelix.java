@@ -1745,9 +1745,11 @@ public interface TwitchHelix {
      * @param limit         Maximum number of objects to return. Maximum: 100. Default: 1. (optional)
      * @param after         Cursor for forward pagination (optional)
      * @return HypeTrainEventList
+     * @deprecated Scheduled for removal on December 4, 2025. Use {@link #getHypeTrainStatus(String, String)} instead.
      */
     @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&after={after}&cursor={after}")
     @Headers("Authorization: Bearer {token}")
+    @Deprecated
     HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
@@ -1766,7 +1768,7 @@ public interface TwitchHelix {
      * @param after         Cursor for forward pagination (optional)
      * @return HypeTrainEventList
      * @see <a href="https://discuss.dev.twitch.tv/t/get-hype-train-events-api-endpoint-id-query-parameter-deprecation/37613">id parameter deprecation announcement</a>
-     * @deprecated Use {@link #getHypeTrainEvents(String, String, Integer, String)} instead (no id argument)
+     * @deprecated Scheduled for removal on December 4, 2025. Use {@link #getHypeTrainStatus(String, String)} instead.
      */
     @Deprecated
     default HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
