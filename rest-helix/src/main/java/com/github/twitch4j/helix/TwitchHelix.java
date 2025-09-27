@@ -1647,6 +1647,32 @@ public interface TwitchHelix {
     }
 
     /**
+     * Provides (temporary) URLs to download the video file(s) for the specified clips.
+     * <p>
+     * When passing a user access token, the user must correspond to the broadcaster or an editor of the channel.
+     * When passing an app access token, the broadcaster (or editor) must have authorized with your client ID including the appropriate scope.
+     * <p>
+     * Rate Limits: Limited to 100 requests per minute (not currently throttled by the library).
+     *
+     * @param authToken     App access token or User access token that includes the editor:manage:clips or channel:manage:clips scope.
+     * @param broadcasterId The ID of the broadcaster you want to download clips for.
+     * @param editorId      The User ID of the editor for the channel you want to download a clip for. If using the broadcaster’s auth token, this is the same as broadcaster_id. This must match the user_id in the user access token.
+     * @param clipIds       The ID that identifies the clip you want to download. Maximum: 10 clips.
+     * @return {@link ClipsDownloadList}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CLIPS_MANAGE
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_EDITOR_CLIPS_MANAGER
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("GET /clips/downloads?broadcaster_id={broadcaster_id}&editor_id={editor_id}&clip_id={clip_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ClipsDownloadList> getClipsDownload(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("editor_id") String editorId,
+        @Param("clip_id") List<String> clipIds
+    );
+
+    /**
      * Gets information about Twitch content classification labels.
      *
      * @param authToken App Access Token or User Access Token.
