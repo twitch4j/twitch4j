@@ -1660,7 +1660,7 @@ public interface TwitchHelix {
      * @param clipIds       The ID that identifies the clip you want to download. Maximum: 10 clips.
      * @return {@link ClipsDownloadList}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CLIPS_MANAGE
-     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_EDITOR_CLIPS_MANAGER
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_EDITOR_CLIPS_MANAGE
      */
     @ApiStatus.Experimental // in open beta
     @RequestLine("GET /clips/downloads?broadcaster_id={broadcaster_id}&editor_id={editor_id}&clip_id={clip_id}")
