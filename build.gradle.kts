@@ -211,6 +211,10 @@ subprojects {
 			options.encoding = "UTF-8"
 		}
 
+		compileTestJava {
+			options.release = 17
+		}
+
 		withType<Javadoc> {
 			options {
 				this as StandardJavadocDocletOptions
