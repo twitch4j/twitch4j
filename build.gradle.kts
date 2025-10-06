@@ -135,7 +135,7 @@ subprojects {
 		api(platform("com.fasterxml.jackson:jackson-bom:2.20.0"))
 
 		// Test
-		testImplementation(platform("org.junit:junit-bom:5.13.4"))
+		testImplementation(platform("org.junit:junit-bom:6.0.0"))
 		testImplementation(group = "org.junit.jupiter", name = "junit-jupiter")
 		testRuntimeOnly(group = "org.junit.platform", name = "junit-platform-launcher")
 		// - Mocking
@@ -209,6 +209,10 @@ subprojects {
 		// compile options
 		withType<JavaCompile> {
 			options.encoding = "UTF-8"
+		}
+
+		compileTestJava {
+			options.release = 17
 		}
 
 		withType<Javadoc> {
