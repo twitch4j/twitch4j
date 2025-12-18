@@ -308,6 +308,13 @@ public class TwitchClientBuilder {
     private ProxyConfig proxyConfig = null;
 
     /**
+     * Whether the chat client should automatically join one's own channel.
+     */
+    @With
+    private boolean chatAutoJoinOwnChannel = true;
+
+
+    /**
      * you can overwrite the feign loglevel to print the full requests + responses if needed
      */
     @With
@@ -513,6 +520,7 @@ public class TwitchClientBuilder {
                 .withBaseUrl(chatServer)
                 .withChatQueueTimeout(chatQueueTimeout)
                 .withProxyConfig(proxyConfig)
+                .withAutoJoinOwnChannel(chatAutoJoinOwnChannel)
                 .withMaxJoinRetries(chatMaxJoinRetries)
                 .withMirroredMessagePolicy(ircMirroredMessagePolicy)
                 .withOutboundCommandFilter(
