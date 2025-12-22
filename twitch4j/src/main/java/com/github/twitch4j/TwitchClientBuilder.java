@@ -313,7 +313,6 @@ public class TwitchClientBuilder {
     @With
     private boolean chatAutoJoinOwnChannel = true;
 
-
     /**
      * you can overwrite the feign loglevel to print the full requests + responses if needed
      */
