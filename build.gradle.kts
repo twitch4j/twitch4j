@@ -7,7 +7,7 @@ import me.champeau.jmh.JmhParameters
 plugins {
 	signing
 	`java-library`
-	`maven-publish`
+	`maven-publish`f
 	id("io.freefair.lombok").version("8.14.2").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.3").apply(false)
@@ -143,7 +143,7 @@ subprojects {
 		// - Await
 		testImplementation(group = "org.awaitility", name = "awaitility", version = "4.3.0")
 		// - Logging
-		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.5.23")
+		testImplementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.16")
 	}
 
 	publishing {
