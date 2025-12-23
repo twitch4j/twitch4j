@@ -7,7 +7,7 @@ import me.champeau.jmh.JmhParameters
 plugins {
 	signing
 	`java-library`
-	`maven-publish`f
+	`maven-publish`
 	id("io.freefair.lombok").version("8.14.2").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.3").apply(false)
