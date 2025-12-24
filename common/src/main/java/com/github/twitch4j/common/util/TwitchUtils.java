@@ -156,6 +156,11 @@ public class TwitchUtils {
                     perms.add(CommandPermission.MODERATOR);
                     break;
 
+                case "lead_moderator":
+                    perms.add(CommandPermission.MODERATOR);
+                    perms.add(CommandPermission.LEAD_MODERATOR);
+                    break;
+
                 case "broadcaster":
                     perms.add(CommandPermission.BROADCASTER);
                     perms.add(CommandPermission.MODERATOR);
