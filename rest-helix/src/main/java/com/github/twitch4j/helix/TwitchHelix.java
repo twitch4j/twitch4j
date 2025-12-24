@@ -1691,7 +1691,6 @@ public interface TwitchHelix {
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHANNEL_CLIPS_MANAGE
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_EDITOR_CLIPS_MANAGE
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("GET /clips/downloads?broadcaster_id={broadcaster_id}&editor_id={editor_id}&clip_id={clip_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<ClipsDownloadList> getClipsDownload(
@@ -1699,6 +1698,33 @@ public interface TwitchHelix {
         @Param("broadcaster_id") String broadcasterId,
         @Param("editor_id") String editorId,
         @Param("clip_id") List<String> clipIds
+    );
+
+    /**
+     * Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel.
+     * <p>
+     * Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
+     *
+     * @param authToken App access token or user access token that includes the editor:manage:clips or channel:manage:clips scope
+     * @param broadcasterId The user ID for the channel you want to create a clip for.
+     * @param editorId The user ID of the editor for the channel you want to create a clip for. If using the broadcaster’s auth token, this is the same as broadcaster_id. This must match the user_id in the user access token.
+     * @param clipTitle The title of the clip.
+     * @param vodId ID of the VOD the user wants to clip.
+     * @param clipEndTimeSeconds Offset in the VOD to create the clip (end time in seconds; must be greater than duration).
+     * @param duration Optional: The length of the clip, in seconds. Precision is 0.1. Defaults to 30. Min: 5 seconds, Max: 60 seconds.
+     * @return {@link CreateClipList}
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /videos/clips?broadcaster_id={broadcaster_id}&editor_id={editor_id}&title={title}&vod_id={vod_id}&vod_offset={vod_offset}&duration={duration}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CreateClipList> createClipFromVOD(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("editor_id") String editorId,
+        @Param("title") String clipTitle,
+        @Param("vod_id") String vodId,
+        @Param("vod_offset") int clipEndTimeSeconds,
+        @Nullable @Param(value = "duration", expander = DeciRoundingExpander.class) Float duration
     );
 
     /**
