@@ -1,6 +1,7 @@
 package com.github.twitch4j.helix;
 
 import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.common.feign.DeciRoundingExpander;
 import com.github.twitch4j.common.feign.JsonStringExpander;
 import com.github.twitch4j.common.feign.ObjectToJsonExpander;
 import com.github.twitch4j.eventsub.EventSubSubscription;
@@ -1566,13 +1567,41 @@ public interface TwitchHelix {
     );
 
     /**
+     * Creates a clip from the broadcaster's stream.
+     * <p>
+     * This API captures up to 90 seconds of the broadcaster’s stream.
+     * The 90 seconds spans the point in the stream from when you called the API.
+     * By default, Twitch publishes up to the last 30 seconds of the 90 seconds window and provides a default title for the clip.
+     * <p>
+     * Creating a clip is an asynchronous process that can take a short amount of time to complete.
+     * If after 15 seconds Get Clips hasn’t returned the clip, assume it failed.
+     *
+     * @param authToken     User access token that includes the clips:edit scope.
+     * @param broadcasterId Required: The ID of the broadcaster whose stream you want to create a clip from.
+     * @param title         Optional: The title of the clip.
+     * @param duration      Optional: The length of the clip in seconds. Possible values range from 5 to 60 inclusively with a precision of 0.1. The default is 30.
+     * @return {@link CreateClipList}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CLIPS_EDIT
+     */
+    @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&title={title}&duration={duration}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<CreateClipList> createClip(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @Nullable @Param("title") String title,
+        @Nullable @Param(value = "duration", expander = DeciRoundingExpander.class) Float duration
+    );
+
+    /**
      * Creates a clip programmatically. This returns both an ID and an edit URL for the new clip.
      *
      * @param authToken     Auth Token
      * @param broadcasterId ID of the stream from which the clip will be made.
-     * @param hasDelay      If false, the clip is captured from the live stream when the API is called; otherwise, a delay is added before the clip is captured (to account for the brief delay between the broadcaster’s stream and the viewer’s experience of that stream). Default: false.
+     * @param hasDelay      This parameter no longer has any effect.
      * @return CreateClip
+     * @deprecated in favor of {@link #createClip(String, String, String, Float)}
      */
+    @Deprecated
     @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&has_delay={has_delay}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CreateClipList> createClip(
