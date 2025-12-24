@@ -109,7 +109,6 @@ public interface TwitchHelix {
      * @param userId    The ID of the user(s) you want to check authorization for. Maximum: 10 IDs.
      * @return {@link UserAuthorizationList}
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("GET /authorization/users?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<UserAuthorizationList> getAuthorizationByUser(
