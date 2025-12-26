@@ -120,7 +120,7 @@ subprojects {
 
 		// Apache Commons
 		api(group = "commons-io", name = "commons-io", version = "2.20.0")
-		api(group = "org.apache.commons", name = "commons-lang3", version = "3.19.0")
+		api(group = "org.apache.commons", name = "commons-lang3", version = "3.20.0")
 
 		// Cache BOM
 		api(platform("io.github.xanthic.cache:cache-bom:0.7.1"))
@@ -236,7 +236,7 @@ subprojects {
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.20.1",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.20",
 						"https://javadoc.io/doc/commons-io/commons-io/2.20.0",
-						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.19.0",
+						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.20.0",
 						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.42",
 						"https://twitch4j.github.io/javadoc"
 				)
