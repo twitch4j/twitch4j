@@ -94,6 +94,11 @@ public enum CommandPermission {
     MODERATOR,
 
     /**
+     * Lead Moderator
+     */
+    LEAD_MODERATOR,
+
+    /**
      * Broadcaster
      */
     BROADCASTER,
