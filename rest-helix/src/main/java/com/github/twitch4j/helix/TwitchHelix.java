@@ -103,6 +103,20 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the authorization scopes that the specified user(s) have granted the application.
+     *
+     * @param authToken App access token
+     * @param userId    The ID of the user(s) you want to check authorization for. Maximum: 10 IDs.
+     * @return {@link UserAuthorizationList}
+     */
+    @RequestLine("GET /authorization/users?user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<UserAuthorizationList> getAuthorizationByUser(
+        @Param("token") String authToken,
+        @Param("user_id") List<String> userId
+    );
+
+    /**
      * Retrieves the list of available Cheermotes, animated emotes to which viewers can assign Bits, to cheer in chat
      *
      * @param authToken Auth Token

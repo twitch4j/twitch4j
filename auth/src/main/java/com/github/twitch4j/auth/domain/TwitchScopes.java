@@ -1,5 +1,7 @@
 package com.github.twitch4j.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum TwitchScopes {
 
     /**
@@ -134,6 +136,7 @@ public enum TwitchScopes {
      *
      * @return string
      */
+    @JsonValue
     public String toString() {
         return this.name;
     }
