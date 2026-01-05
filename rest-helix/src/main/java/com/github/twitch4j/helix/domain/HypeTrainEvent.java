@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
+@Deprecated
 public class HypeTrainEvent {
     /**
      * The distinct ID of the event
