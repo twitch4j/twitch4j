@@ -22,7 +22,7 @@ public class ClipsServiceTest extends AbstractEndpointTest {
     @Disabled
     public void createClipTest() {
         // TestCase
-        CreateClipList clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAccessToken(), "23161357", null).execute();
+        CreateClipList clipData = testUtils.getTwitchHelixClient().createClip(testUtils.getCredential().getAccessToken(), "23161357", null, null).execute();
 
         // Validate
         clipData.getData().forEach(clip -> {
