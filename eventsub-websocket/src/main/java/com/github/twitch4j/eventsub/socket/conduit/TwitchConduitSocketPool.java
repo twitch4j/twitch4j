@@ -4,6 +4,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.api.domain.IDisposable;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.client.websocket.domain.WebsocketConnectionState;
 import com.github.twitch4j.common.util.CryptoUtils;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import com.github.twitch4j.common.util.ThreadUtils;
@@ -21,7 +22,9 @@ import com.github.twitch4j.eventsub.socket.conduit.exceptions.ConduitResizeExcep
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.CreateConduitException;
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.ShardRegistrationException;
 import com.github.twitch4j.eventsub.socket.conduit.exceptions.ShardTimeoutException;
+import com.github.twitch4j.eventsub.socket.domain.SocketCloseReason;
 import com.github.twitch4j.eventsub.socket.events.ConduitShardReassociationFailureEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketClosedByTwitchEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketWelcomedEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.TwitchHelix;
@@ -274,6 +277,20 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                     eventManager.publish(new ConduitShardReassociationFailureEvent(e.getConnection(), this, id, ex));
                 }
             });
+        });
+
+        // another attempt to re-associate a disconnected websocket with the correct shard in the conduit
+        eventManager.onEvent(EventSocketClosedByTwitchEvent.class, e -> {
+            // TwitchEventSocket does not auto-reconnect if TwitchEventSocket#subscriptions was empty
+            if (e.getReason() == SocketCloseReason.CONNECTION_UNUSED && sockets.contains(e.getConnection())) {
+                // try again a minute later
+                executor.schedule(() -> {
+                    WebsocketConnectionState state = e.getConnection().getState();
+                    if (state == WebsocketConnectionState.DISCONNECTED || state == WebsocketConnectionState.DISCONNECTING || state == WebsocketConnectionState.LOST) {
+                        e.getConnection().reconnect();
+                    }
+                }, 1, TimeUnit.MINUTES);
+            }
         });
     }
 
