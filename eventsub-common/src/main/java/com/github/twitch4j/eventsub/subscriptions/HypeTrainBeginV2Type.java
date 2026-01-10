@@ -2,7 +2,6 @@ package com.github.twitch4j.eventsub.subscriptions;
 
 import com.github.twitch4j.eventsub.condition.ChannelEventSubCondition;
 import com.github.twitch4j.eventsub.events.HypeTrainBeginV2Event;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * The channel.hype_train.begin subscription type sends a notification when a Hype Train begins on the specified channel.
