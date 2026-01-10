@@ -70,11 +70,11 @@ public class SubscriptionTypes {
     public final DropEntitlementGrantType DROP_ENTITLEMENT_GRANT;
     public final ExtensionBitsTransactionCreateType EXTENSION_BITS_TRANSACTION_CREATE;
     public final @Deprecated HypeTrainBeginType HYPE_TRAIN_BEGIN;
-    public final @ApiStatus.Experimental HypeTrainBeginV2Type HYPE_TRAIN_BEGIN_V2;
+    public final HypeTrainBeginV2Type HYPE_TRAIN_BEGIN_V2;
     public final @Deprecated HypeTrainEndType HYPE_TRAIN_END;
-    public final @ApiStatus.Experimental HypeTrainEndV2Type HYPE_TRAIN_END_V2;
+    public final HypeTrainEndV2Type HYPE_TRAIN_END_V2;
     public final @Deprecated HypeTrainProgressType HYPE_TRAIN_PROGRESS;
-    public final @ApiStatus.Experimental HypeTrainProgressV2Type HYPE_TRAIN_PROGRESS_V2;
+    public final HypeTrainProgressV2Type HYPE_TRAIN_PROGRESS_V2;
     public final PollBeginType POLL_BEGIN;
     public final PollProgressType POLL_PROGRESS;
     public final PollEndType POLL_END;
