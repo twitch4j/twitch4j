@@ -16,7 +16,6 @@ import com.github.twitch4j.eventsub.events.HypeTrainBeginV2Event;
  * <p>
  * Authorization: Must have channel:read:hype_train scope (from the broadcaster).
  */
-@ApiStatus.Experimental // in open beta
 public class HypeTrainBeginV2Type implements SubscriptionType<ChannelEventSubCondition, ChannelEventSubCondition.ChannelEventSubConditionBuilder<?, ?>, HypeTrainBeginV2Event> {
 
     @Override
