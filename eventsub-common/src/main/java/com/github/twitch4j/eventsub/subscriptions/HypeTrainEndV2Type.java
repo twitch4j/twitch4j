@@ -9,7 +9,6 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * Authorization: Must have channel:read:hype_train scope.
  */
-@ApiStatus.Experimental // in open beta
 public class HypeTrainEndV2Type implements SubscriptionType<ChannelEventSubCondition, ChannelEventSubCondition.ChannelEventSubConditionBuilder<?, ?>, HypeTrainEndV2Event> {
 
     @Override
