@@ -9,7 +9,6 @@ import com.github.twitch4j.eventsub.domain.AutomodMessageStatus;
 import com.github.twitch4j.eventsub.domain.BlockedTerm;
 import com.github.twitch4j.eventsub.domain.Boundary;
 import com.github.twitch4j.eventsub.domain.ContentClassification;
-import com.github.twitch4j.eventsub.domain.Contribution;
 import com.github.twitch4j.eventsub.domain.PollStatus;
 import com.github.twitch4j.eventsub.domain.PredictionColor;
 import com.github.twitch4j.eventsub.domain.PredictionOutcome;
@@ -411,27 +410,27 @@ public class EventSubEventTest {
     }
 
     @Test
-    @DisplayName("Deserialize HypeTrainProgressEvent")
+    @DisplayName("Deserialize HypeTrainProgressV2Event")
     public void deserializeComplexHypeTrainEvent() {
-        String json = "{\"broadcaster_user_id\":\"1337\",\"broadcaster_user_name\":\"cool_user\",\"level\":2,\"total\":700,\"progress\":200,\"goal\":1000," +
-            "\"top_contributions\":[{\"user_id\":\"123\",\"user_name\":\"pogchamp\",\"type\":\"bits\",\"total\":50},{\"user_id\":\"456\",\"user_name\":\"kappa\",\"type\":\"subscription\",\"total\":45}]," +
-            "\"last_contribution\":{\"user_id\":\"123\",\"user_name\":\"pogchamp\",\"type\":\"bits\",\"total\":50},\"started_at\":\"2020-07-15T17:16:03.17106713Z\",\"expires_at\":\"2020-07-15T17:16:11.17106713Z\",\"is_golden_kappa_train\":true}";
+        String json = "{\"id\":\"1b0AsbInCHZW2SQFQkCzqN07Ib2\",\"broadcaster_user_id\":\"1337\",\"broadcaster_user_login\":\"cool_user\",\"broadcaster_user_name\":\"Cool_User\"," +
+            "\"total\":137,\"progress\":137,\"goal\":500,\"top_contributions\":[" +
+            "{\"user_id\":\"123\",\"user_login\":\"pogchamp\",\"user_name\":\"PogChamp\",\"type\":\"bits\",\"total\":50}]," +
+            "\"shared_train_participants\":null,\"level\":1,\"started_at\":\"2020-07-15T17:16:03.17106713Z\"," +
+            "\"expires_at\":\"2020-07-15T17:16:11.17106713Z\",\"is_shared_train\":false,\"type\":\"golden_kappa\"}}";
 
-        HypeTrainProgressEvent event = jsonToObject(json, HypeTrainProgressEvent.class);
+        HypeTrainProgressV2Event event = jsonToObject(json, HypeTrainProgressV2Event.class);
+        assertEquals("1b0AsbInCHZW2SQFQkCzqN07Ib2", event.getId());
         assertEquals("1337", event.getBroadcasterUserId());
-        assertEquals("cool_user", event.getBroadcasterUserName());
-        assertEquals(2, event.getLevel());
-        assertEquals(700, event.getTotal());
-        assertEquals(200, event.getProgress());
-        assertEquals(1000, event.getGoal());
-        assertNotNull(event.getLastContribution());
+        assertEquals("Cool_User", event.getBroadcasterUserName());
+        assertEquals(1, event.getLevel());
+        assertEquals(137, event.getTotal());
+        assertEquals(137, event.getProgress());
+        assertEquals(500, event.getGoal());
         assertNotNull(event.getTopContributions());
-        assertEquals("123", event.getLastContribution().getUserId());
-        assertEquals(50, event.getLastContribution().getTotal());
-        assertEquals(Contribution.Type.BITS, event.getLastContribution().getType());
         assertNotNull(event.getStartedAt());
         assertEquals(Instant.parse("2020-07-15T17:16:11.17106713Z"), event.getExpiresAt());
         assertTrue(event.isGoldenKappaTrain());
+        assertFalse(event.isSharedTrain());
     }
 
     @Test

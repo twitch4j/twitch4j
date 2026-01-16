@@ -32,12 +32,28 @@ public class Contribution {
 
     /**
      * The total contributed.
+     * <p>
+     * If type is bits, total represents the amount of Bits used.
+     * <p>
+     * If type is subscription, total is 500, 1000, or 2500 to represent tier 1, 2, or 3 subscriptions, respectively.
      */
     private Integer total;
 
     public enum Type {
+
+        /**
+         * Bits contributions with Cheering and Power-ups.
+         */
         BITS,
+
+        /**
+         * Subscription activity like subscribing or gifting subscriptions.
+         */
         SUBSCRIPTION,
+
+        /**
+         * Covers other contribution methods not listed.
+         */
         OTHER;
 
         @Override

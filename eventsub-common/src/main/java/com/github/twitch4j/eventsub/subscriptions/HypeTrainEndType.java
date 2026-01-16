@@ -7,7 +7,10 @@ import com.github.twitch4j.eventsub.events.HypeTrainEndEvent;
  * A hype train ends on the specified channel.
  * <p>
  * Must have channel:read:hype_train scope.
+ *
+ * @deprecated in favor of {@link HypeTrainEndV2Type}
  */
+@Deprecated
 public class HypeTrainEndType implements SubscriptionType<HypeTrainEndCondition, HypeTrainEndCondition.HypeTrainEndConditionBuilder<?, ?>, HypeTrainEndEvent> {
 
     @Override
