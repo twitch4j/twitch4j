@@ -52,6 +52,7 @@ public class GiftSubscriptionsEvent extends AbstractChannelEvent implements Mirr
      * A unique identifier that links the community gift event to each individual recipient gifted event.
      *
      * @apiNote While this field is undocumented in irc, it is equivalent to the documented eventsub field {@code community_gift_id}.
+     * @see SubscriptionEvent#getCommunityGiftId()
      */
     @Unofficial
     String giftId;
