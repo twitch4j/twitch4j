@@ -1,7 +1,7 @@
 package com.github.twitch4j.eventsub.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Flags that caused a user to be marked as suspicious.
@@ -18,7 +18,7 @@ public enum SuspiciousType {
      *
      * @see <a href="https://help.twitch.tv/s/article/suspicious-user-controls?language=en_US#what">Official Help Article</a>
      */
-    @JsonProperty("ban_evader")
+    @JsonAlias("ban_evader")
     DETECTED_BAN_EVADER,
 
     /**

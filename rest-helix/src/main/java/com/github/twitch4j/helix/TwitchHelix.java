@@ -2395,6 +2395,52 @@ public interface TwitchHelix {
     );
 
     /**
+     * Adds a suspicious user status to a chatter on the broadcaster’s channel.
+     *
+     * @param authToken     App access token or user access token that includes the moderator:manage:suspicious_users scope.
+     * @param broadcasterId The user ID of the broadcaster, indicating the channel where the status is being applied.
+     * @param moderatorId   The user ID of the moderator who is applying the status.
+     * @param userId        The ID of the user being given the suspicious status.
+     * @param status        The type of suspicious status.
+     * @return {@link SuspiciousUserWrapper}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SUSPICIOUS_USERS_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("POST /moderation/suspicious_users?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers({
+        "Authorization: Bearer {token}",
+        "Content-Type: application/json"
+    })
+    @Body("%7B\"user_id\":\"{user_id}\",\"status\":\"{status}\"%7D")
+    HystrixCommand<SuspiciousUserWrapper> addSuspiciousStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("user_id") String userId,
+        @Param("status") SuspiciousTreatment status
+    );
+
+    /**
+     * Remove a suspicious user status from a chatter on broadcaster's channel.
+     *
+     * @param authToken     App access token or user access token that includes the moderator:manage:suspicious_users scope.
+     * @param broadcasterId The user ID of the broadcaster, indicating the channel where the status is being removed.
+     * @param moderatorId   The user ID of the moderator who is removing the status.
+     * @param userId        The ID of the user having the suspicious status removed.
+     * @return {@link SuspiciousUserWrapper}
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_SUSPICIOUS_USERS_MANAGE
+     */
+    @ApiStatus.Experimental // in open beta
+    @RequestLine("DELETE /moderation/suspicious_users?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<SuspiciousUserWrapper> removeSuspiciousStatus(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("user_id") String userId
+    );
+
+    /**
      * Gets a list of unban requests for a broadcaster’s channel.
      *
      * @param authToken     User access token (scope: moderator:read:unban_requests or moderator:manage:unban_requests) of a channel moderator.

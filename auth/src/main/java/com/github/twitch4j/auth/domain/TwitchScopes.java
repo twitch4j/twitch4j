@@ -67,6 +67,7 @@ public enum TwitchScopes {
     HELIX_SHIELD_MODE_READ("moderator:read:shield_mode"),
     HELIX_SHOUTOUTS_MANAGE("moderator:manage:shoutouts"),
     HELIX_SHOUTOUTS_READ("moderator:read:shoutouts"),
+    HELIX_SUSPICIOUS_USERS_MANAGE("moderator:manage:suspicious_users"),
     HELIX_SUSPICIOUS_USERS_READ("moderator:read:suspicious_users"),
     HELIX_UNBAN_REQUESTS_MANAGE("moderator:manage:unban_requests"),
     HELIX_UNBAN_REQUESTS_READ("moderator:read:unban_requests"),
