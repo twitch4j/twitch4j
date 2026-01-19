@@ -135,6 +135,7 @@ public final class TwitchEventSocketPool implements IEventSubSocket {
         TwitchSingleUserEventSocketPool pool = poolByUserId.computeIfAbsent(userId,
             id -> advancedConfiguration.apply(
                 TwitchSingleUserEventSocketPool.builder()
+                    .maxSubscriptionsPerConnection(TwitchEventSocket.MAX_SUBSCRIPTIONS_PER_SOCKET)
                     .baseUrl(baseUrl)
                     .defaultToken(token)
                     .eventManager(eventManager)
