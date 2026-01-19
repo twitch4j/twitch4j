@@ -240,7 +240,7 @@ public class IRCEventHandler {
                 Integer multiMonthTenure = Integer.parseInt(event.getTagValue("msg-param-multimonth-tenure").orElse("0"));
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), cumulativeMonths, false, null, streak, null, multiMonthDuration, multiMonthTenure, event.getFlags(), null));
                 return true;
             }
             // Receive Gifted Sub
@@ -250,6 +250,7 @@ public class IRCEventHandler {
                 EventUser giftedBy = event.getUser();
                 String subPlan = event.getTagValue("msg-param-sub-plan").get();
                 int subStreak = event.getTagValue("msg-param-months").map(Integer::parseInt).orElse(1);
+                String giftId = event.getTagValue("msg-param-community-gift-id").orElse(null);
 
                 // twitch sometimes returns 0 months for new subs
                 if (subStreak == 0) {
@@ -264,7 +265,7 @@ public class IRCEventHandler {
                 Integer multiMonthTenure = StringUtils.isEmpty(multiTenureParam) ? null : Integer.parseInt(multiTenureParam);
 
                 // Dispatch Event
-                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags()));
+                eventManager.publish(new SubscriptionEvent(event, channel, user, subPlan, event.getMessage(), subStreak, true, giftedBy != null ? giftedBy : ANONYMOUS_GIFTER, 0, giftMonths, giftMonths, multiMonthTenure, event.getFlags(), giftId));
                 return true;
             }
             // Gift X Subs

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.Value;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -70,6 +71,16 @@ public class SubscriptionEvent extends AbstractChannelEvent implements Replyable
     EventUser giftedBy;
 
     /**
+     * The ID of the associated community gift.
+     * Null if not associated with a community gift.
+     *
+     * @see GiftSubscriptionsEvent#getGiftId()
+     */
+    @Nullable
+    @Unofficial // officially documented for eventsub but not IRC
+    String communityGiftId;
+
+    /**
      * Consecutive months subscribed
      */
     Integer subStreak;
@@ -114,8 +125,10 @@ public class SubscriptionEvent extends AbstractChannelEvent implements Replyable
      * @param multiMonthDuration The number of subscription months just purchased
      * @param multiMonthTenure   The length of multi-month subscription tenure that has already been served
      * @param flags              The regions of the message that were flagged by AutoMod.
+     * @param communityGiftId    An optional identifier that links individual subscriptions with a community gift event.
      */
-    public SubscriptionEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths, Integer multiMonthDuration, Integer multiMonthTenure, List<AutoModFlag> flags) {
+    @ApiStatus.Internal
+    public SubscriptionEvent(IRCMessageEvent event, EventChannel channel, EventUser user, String subPlan, Optional<String> message, Integer months, Boolean gifted, EventUser giftedBy, Integer subStreak, Integer giftMonths, Integer multiMonthDuration, Integer multiMonthTenure, List<AutoModFlag> flags, String communityGiftId) {
         super(channel);
         this.messageEvent = event;
         this.user = user;
@@ -124,6 +137,7 @@ public class SubscriptionEvent extends AbstractChannelEvent implements Replyable
         this.months = months;
         this.gifted = gifted;
         this.giftedBy = giftedBy;
+        this.communityGiftId = communityGiftId;
         this.subStreak = subStreak;
         this.giftMonths = giftMonths;
         this.multiMonthDuration = multiMonthDuration;
