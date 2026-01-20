@@ -8,7 +8,7 @@ plugins {
 	signing
 	`java-library`
 	`maven-publish`
-	id("io.freefair.lombok").version("8.14.3").apply(false)
+	id("io.freefair.lombok").version("8.14.4").apply(false)
 	id("com.coditory.manifest").version("0.2.6").apply(false)
 	id("me.champeau.jmh").version("0.7.3").apply(false)
 	id("com.gradleup.shadow").version("8.3.9").apply(false)
