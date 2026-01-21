@@ -102,8 +102,14 @@ subprojects {
 				add("api", dep) {
 					version {
 						strictly("[2.15,3-alpha[")
-						// renovate: depName=com.fasterxml.jackson:jackson-bom
-						prefer("2.20.1")
+
+						if (dep.endsWith("-annotations")) {
+							// renovate: depName=com.fasterxml.jackson.core:jackson-annotations
+							prefer("2.20")
+						} else {
+							// renovate: depName=com.fasterxml.jackson:jackson-bom
+							prefer("2.20.2")
+						}
 					}
 				}
 			}
@@ -132,7 +138,7 @@ subprojects {
 		api(group = "org.slf4j", name = "slf4j-api", version = "2.0.17")
 
 		// Jackson BOM
-		api(platform("com.fasterxml.jackson:jackson-bom:2.20.1"))
+		api(platform("com.fasterxml.jackson:jackson-bom:2.20.2"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:6.0.2"))
@@ -232,8 +238,8 @@ subprojects {
 						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.6",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.20.1",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.20.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.20.2",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.20.2",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.20",
 						"https://javadoc.io/doc/commons-io/commons-io/2.21.0",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.20.0",
