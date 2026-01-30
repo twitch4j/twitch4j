@@ -15,7 +15,7 @@ public enum SuspiciousTreatment {
     /**
      * Messages sent by restricted accounts will be displayed only to the streamer and their moderators.
      */
-    RESTRICT("ACTIVE_MONITORING");
+    RESTRICT("RESTRICTED");
 
     private final String twitchString;
 
