@@ -188,9 +188,9 @@ subprojects {
 						"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 						"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.10.1",
 						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
-						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.2",
-						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.2",
-						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.3.1",
+						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.3",
+						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.3",
+						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.4.0",
 						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.6",
 						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.6",
 						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.6",
@@ -200,7 +200,7 @@ subprojects {
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.0",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.21.0",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.21",
-						"https://javadoc.io/doc/commons-io/commons-io/2.20.0",
+						"https://javadoc.io/doc/commons-io/commons-io/2.21.0",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.20.0",
 						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.42",
 						"https://twitch4j.github.io/javadoc"
