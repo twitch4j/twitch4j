@@ -18,16 +18,33 @@ import com.github.twitch4j.helix.interceptor.TwitchHelixDecoder;
 import com.github.twitch4j.helix.interceptor.TwitchHelixHttpClient;
 import com.github.twitch4j.helix.interceptor.TwitchHelixRateLimitTracker;
 import com.github.twitch4j.helix.interceptor.TwitchHelixTokenManager;
-import com.netflix.config.ConfigurationManager;
+import feign.Feign;
 import feign.Logger;
 import feign.Request;
-import feign.Retryer;
-import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import io.github.bucket4j.Bandwidth;
+import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadConfig;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.feign.FeignDecorators;
+import io.github.resilience4j.feign.Resilience4jFeign;
+import io.github.resilience4j.micrometer.tagged.TaggedBulkheadMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedCircuitBreakerMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedRateLimiterMetrics;
+import io.github.resilience4j.micrometer.tagged.TaggedRetryMetrics;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -144,6 +161,12 @@ public class TwitchHelixBuilder {
     private Bandwidth apiRateLimit = DEFAULT_BANDWIDTH;
 
     /**
+     * Meter Registry
+     */
+    @With
+    private MeterRegistry meterRegistry = null;
+
+    /**
      * Initialize the builder
      *
      * @return Twitch Helix Builder
@@ -160,17 +183,52 @@ public class TwitchHelixBuilder {
     public TwitchHelix build() {
         log.debug("Helix: Initializing Module ...");
 
-        // Hystrix
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", timeout);
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.requestCache.enabled", false);
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.maxQueueSize", getRequestQueueSize());
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.threadpool.default.queueSizeRejectionThreshold", getRequestQueueSize());
+        CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .waitDurationInOpenState(Duration.ofMillis(timeout))
+            .slidingWindowSize(10)
+            .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+            .permittedNumberOfCallsInHalfOpenState(3)
+            .minimumNumberOfCalls(5)
+            .build();
 
-        // Hystrix: Ban/Unban API already has special 429 logic such that circuit breaking is not needed (and just trips on trivial errors like 'user is already banned')
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#banUser(String,String,String,BanUserInput).circuitBreaker.enabled", false);
-        ConfigurationManager.getConfigInstance().setProperty("hystrix.command.TwitchHelix#unbanUser(String,String,String,String).circuitBreaker.enabled", false);
+        CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(circuitBreakerConfig);
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("twitch-helix");
 
-        // Warning
+        RetryConfig retryConfig = RetryConfig.custom()
+            .maxAttempts(3)
+            .waitDuration(Duration.ofMillis(500))
+            .retryOnException(e -> true)
+            .build();
+
+        RetryRegistry retryRegistry = RetryRegistry.of(retryConfig);
+        Retry retry = retryRegistry.retry("twitch-helix");
+
+        int maxConcurrentCalls = requestQueueSize > 0 ? requestQueueSize : 10;
+        BulkheadConfig bulkheadConfig = BulkheadConfig.custom()
+            .maxConcurrentCalls(maxConcurrentCalls)
+            .maxWaitDuration(Duration.ofMillis(timeout))
+            .build();
+
+        BulkheadRegistry bulkheadRegistry = BulkheadRegistry.of(bulkheadConfig);
+        Bulkhead bulkhead = bulkheadRegistry.bulkhead("twitch-helix");
+
+        RateLimiterConfig rateLimiterConfig = RateLimiterConfig.custom()
+            .limitForPeriod(800)
+            .limitRefreshPeriod(Duration.ofSeconds(60))
+            .timeoutDuration(Duration.ofMillis(timeout))
+            .build();
+
+        RateLimiterRegistry rateLimiterRegistry = RateLimiterRegistry.of(rateLimiterConfig);
+        RateLimiter rateLimiter = rateLimiterRegistry.rateLimiter("twitch-helix");
+
+        if (meterRegistry != null) {
+            TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry(circuitBreakerRegistry).bindTo(meterRegistry);
+            TaggedRetryMetrics.ofRetryRegistry(retryRegistry).bindTo(meterRegistry);
+            TaggedBulkheadMetrics.ofBulkheadRegistry(bulkheadRegistry).bindTo(meterRegistry);
+            TaggedRateLimiterMetrics.ofRateLimiterRegistry(rateLimiterRegistry).bindTo(meterRegistry);
+        }
+
         if (logLevel == Logger.Level.HEADERS || logLevel == Logger.Level.FULL) {
             log.warn("Helix: The current feign loglevel will print sensitive information including your access token, please don't share this log!");
         }
@@ -198,10 +256,18 @@ public class TwitchHelixBuilder {
         }
         TwitchAuth.registerIdentityProvider(credentialManager, clientId, clientSecret, redirectUrl, MOCK_BASE_URL.equals(baseUrl));
 
-        // Feign
         TwitchHelixTokenManager tokenManager = new TwitchHelixTokenManager(credentialManager, clientId, clientSecret, defaultAuthToken);
         TwitchHelixRateLimitTracker rateLimitTracker = new TwitchHelixRateLimitTracker(apiRateLimit, tokenManager);
-        return HystrixFeign.builder()
+
+        FeignDecorators decorators = FeignDecorators.builder()
+            .withRetry(retry)
+            .withBulkhead(bulkhead)
+            .withRateLimiter(rateLimiter)
+            .withCircuitBreaker(circuitBreaker)
+            .build();
+
+        return Feign.builder()
+            .addCapability(Resilience4jFeign.capability(decorators))
             .client(new TwitchHelixHttpClient(new OkHttpClient(clientBuilder.build()), scheduledThreadPoolExecutor, tokenManager, rateLimitTracker, timeout))
             .encoder(new JacksonEncoder(serializer))
             .decoder(new TwitchHelixDecoder(mapper, rateLimitTracker))
@@ -210,7 +276,6 @@ public class TwitchHelixBuilder {
             .errorDecoder(new TwitchHelixErrorDecoder(new JacksonDecoder(), rateLimitTracker))
             .requestInterceptor(new TwitchHelixClientIdInterceptor(userAgent, tokenManager))
             .options(new Request.Options(timeout / 3, TimeUnit.MILLISECONDS, timeout, TimeUnit.MILLISECONDS, true))
-            .retryer(new Retryer.Default(500, timeout, 2))
             .decodeVoid()
             .target(TwitchHelix.class, baseUrl);
     }

@@ -6,13 +6,10 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
-import com.github.twitch4j.extensions.TwitchExtensions;
 import com.github.twitch4j.graphql.TwitchGraphQL;
 import com.github.twitch4j.helix.TwitchHelix;
-import com.github.twitch4j.kraken.TwitchKraken;
 import com.github.twitch4j.modules.ModuleLoader;
 import com.github.twitch4j.pubsub.TwitchPubSub;
-import com.github.twitch4j.tmi.TwitchMessagingInterface;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -29,24 +26,9 @@ public class TwitchClient implements ITwitchClient {
     private final EventManager eventManager;
 
     /**
-     * API: Extensions
-     */
-    private final TwitchExtensions extensions;
-
-    /**
      * API: Helix
      */
     private final TwitchHelix helix;
-
-    /**
-     * API: Kraken
-     */
-    private final TwitchKraken kraken;
-
-    /**
-     * API: TMI
-     */
-    private final TwitchMessagingInterface messagingInterface;
 
     /**
      * Chat
@@ -91,10 +73,7 @@ public class TwitchClient implements ITwitchClient {
      * Constructor
      *
      * @param eventManager       EventManager
-     * @param extensions         TwitchExtensions
      * @param helix              TwitchHelix
-     * @param kraken             TwitchKraken
-     * @param messagingInterface TwitchMessagingInterface
      * @param chat               TwitchChat
      * @param pubsub             TwitchPubSub
      * @param graphql            TwitchGraphQL
@@ -104,12 +83,9 @@ public class TwitchClient implements ITwitchClient {
      * @param defaultAuthToken   OAuth2Credential
      */
     @ApiStatus.Internal
-    public TwitchClient(EventManager eventManager, TwitchExtensions extensions, TwitchHelix helix, TwitchKraken kraken, TwitchMessagingInterface messagingInterface, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, IEventSubSocket eventSocket, ScheduledThreadPoolExecutor threadPoolExecutor, CredentialManager credentialManager, OAuth2Credential defaultAuthToken) {
+    public TwitchClient(EventManager eventManager, TwitchHelix helix, TwitchChat chat, TwitchPubSub pubsub, TwitchGraphQL graphql, IEventSubSocket eventSocket, ScheduledThreadPoolExecutor threadPoolExecutor, CredentialManager credentialManager, OAuth2Credential defaultAuthToken) {
         this.eventManager = eventManager;
-        this.extensions = extensions;
         this.helix = helix;
-        this.kraken = kraken;
-        this.messagingInterface = messagingInterface;
         this.chat = chat;
         this.eventSocket = eventSocket;
         this.pubsub = pubsub;
@@ -134,20 +110,6 @@ public class TwitchClient implements ITwitchClient {
     }
 
     /**
-     * Get Extensions
-     *
-     * @return TwitchExtensions
-     */
-    @Deprecated
-    public TwitchExtensions getExtensions() {
-        if (this.extensions == null) {
-            throw new RuntimeException("You have not enabled the Extensions Module! Please check out the documentation on Twitch4J -> Extensions.");
-        }
-
-        return this.extensions;
-    }
-
-    /**
      * Get Helix
      *
      * @return TwitchHelix
@@ -158,34 +120,6 @@ public class TwitchClient implements ITwitchClient {
         }
 
         return this.helix;
-    }
-
-    /**
-     * Get Kraken
-     *
-     * @return TwitchKraken
-     */
-    @Deprecated
-    public TwitchKraken getKraken() {
-        if (this.kraken == null) {
-            throw new RuntimeException("You have not enabled the Kraken Module! Please check out the documentation on Twitch4J -> Kraken.");
-        }
-
-        return this.kraken;
-    }
-
-    /**
-     * Get MessagingInterface (API)
-     *
-     * @return TwitchMessagingInterface
-     */
-    @Unofficial
-    public TwitchMessagingInterface getMessagingInterface() {
-        if (this.messagingInterface == null) {
-            throw new RuntimeException("You have not enabled the Twitch Messaging Interface Module! Please check out the documentation on Twitch4J -> TMI.");
-        }
-
-        return this.messagingInterface;
     }
 
     /**

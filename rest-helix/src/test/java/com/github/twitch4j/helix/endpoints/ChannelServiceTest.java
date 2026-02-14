@@ -22,7 +22,7 @@ public class ChannelServiceTest {
     @Test
     @DisplayName("Get channel editors")
     public void getChannelEditors() {
-        ChannelEditorList resultList = TestUtils.getTwitchHelixClient().getChannelEditors(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID).execute();
+        ChannelEditorList resultList = TestUtils.getTwitchHelixClient().getChannelEditors(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID);
         Assertions.assertNotNull(resultList);
         Assertions.assertNotNull(resultList.getEditors());
     }
@@ -33,7 +33,7 @@ public class ChannelServiceTest {
         List<ChannelInformation> resultList = TestUtils.getTwitchHelixClient().getChannelInformation(
             TestUtils.getCredential().getAccessToken(),
             Collections.singletonList(TWITCH_USER_ID)
-        ).execute().getChannels();
+        ).getChannels();
 
         Assertions.assertFalse(resultList.isEmpty());
     }
@@ -45,7 +45,7 @@ public class ChannelServiceTest {
         TestUtils.getTwitchHelixClient().updateChannelInformation(
             TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID,
             new ChannelInformation().withTitle("Hello world!")
-        ).execute();
+        );
     }
 
     @Test
@@ -56,7 +56,7 @@ public class ChannelServiceTest {
             TestUtils.getCredential().getAccessToken(),
             TWITCH_USER_ID,
             30
-        ).execute();
+        );
     }
 
 }

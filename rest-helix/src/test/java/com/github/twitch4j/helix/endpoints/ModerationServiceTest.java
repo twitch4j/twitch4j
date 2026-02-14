@@ -23,7 +23,6 @@ public class ModerationServiceTest extends AbstractEndpointTest {
     @DisplayName("Get Banned Users")
     public void getBannedUsers() {
         List<BannedUser> results = TestUtils.getTwitchHelixClient().getBannedUsers(TestUtils.getCredential().getAccessToken(), TWITCH_USER_ID, null, null, null, null)
-            .execute()
             .getResults();
 
         Assertions.assertNotNull(results);
@@ -36,7 +35,7 @@ public class ModerationServiceTest extends AbstractEndpointTest {
             TestUtils.getCredential().getAccessToken(),
             TWITCH_USER_ID,
             AutomodEnforceCheckList.builder().message(new AutomodEnforceCheck("Hello world!")).build()
-        ).execute().getStatuses();
+        ).getStatuses();
 
         Assertions.assertNotNull(results);
         Assertions.assertFalse(results.isEmpty());

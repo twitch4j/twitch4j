@@ -31,7 +31,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch user information")
     public void getUsers() {
         // TestCase
-        UserList resultList = testUtils.getTwitchHelixClient().getUsers(null, null, Arrays.asList("twitch4j")).execute();
+        UserList resultList = testUtils.getTwitchHelixClient().getUsers(null, null, Arrays.asList("twitch4j"));
 
         // Test
         assertTrue(resultList.getUsers().size() > 0, "Should at least find one result from the streams method!");
@@ -52,7 +52,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch followers")
     public void getFollowers() {
         // TestCase
-        OutboundFollowing resultList = testUtils.getTwitchHelixClient().getFollowedChannels(testUtils.getCredential().getAccessToken(), twitchUserId, null, 100, null).execute();
+        OutboundFollowing resultList = testUtils.getTwitchHelixClient().getFollowedChannels(testUtils.getCredential().getAccessToken(), twitchUserId, null, 100, null);
 
         // Test
         assertTrue(resultList.getTotal() > 0, "Should at least find one result from the followers method!");
@@ -71,7 +71,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Update the user description")
     public void updateDescription() {
         // TestCase
-        UserList resultList = testUtils.getTwitchHelixClient().updateUser(testUtils.getCredential().getAccessToken(), "Twitch4J IntegrationTest User").execute();
+        UserList resultList = testUtils.getTwitchHelixClient().updateUser(testUtils.getCredential().getAccessToken(), "Twitch4J IntegrationTest User");
     }
 
     /**
@@ -81,7 +81,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Get extension list for a specified user")
     public void getExtensionList() {
         // TestCase
-        ExtensionList resultList = testUtils.getTwitchHelixClient().getUserExtensions(testUtils.getCredential().getAccessToken()).execute();
+        ExtensionList resultList = testUtils.getTwitchHelixClient().getUserExtensions(testUtils.getCredential().getAccessToken());
 
         // Test
         assertTrue(resultList.getExtensions().size() > 0, "Should at least find one result from the followers method!");
@@ -101,7 +101,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @DisplayName("Get the active extensions for a specified user")
     public void getActiveExtensionList() {
         // TestCase
-        ExtensionActiveList resultList = testUtils.getTwitchHelixClient().getUserActiveExtensions(testUtils.getCredential().getAccessToken(), twitchUserId).execute();
+        ExtensionActiveList resultList = testUtils.getTwitchHelixClient().getUserActiveExtensions(testUtils.getCredential().getAccessToken(), twitchUserId);
 
         // Test
         assertTrue(resultList.getData().getActivePanels().size() == 3, "Should always get 3 panels!");
@@ -112,7 +112,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("Get user block list")
     public void getUserBlockList() {
-        BlockedUserList resultList = TestUtils.getTwitchHelixClient().getUserBlockList(TestUtils.getCredential().getAccessToken(), twitchUserId, null, null).execute();
+        BlockedUserList resultList = TestUtils.getTwitchHelixClient().getUserBlockList(TestUtils.getCredential().getAccessToken(), twitchUserId, null, null);
         assertNotNull(resultList);
         assertNotNull(resultList.getBlocks());
     }
@@ -122,7 +122,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @Disabled
     public void blockUser() {
         assertDoesNotThrow(() -> {
-            TestUtils.getTwitchHelixClient().blockUser(TestUtils.getCredential().getAccessToken(), "12427", null, null).execute();
+            TestUtils.getTwitchHelixClient().blockUser(TestUtils.getCredential().getAccessToken(), "12427", null, null);
         });
     }
 
@@ -131,7 +131,7 @@ public class UsersServiceTest extends AbstractEndpointTest {
     @Disabled
     public void unblockUser() {
         assertDoesNotThrow(() -> {
-            TestUtils.getTwitchHelixClient().unblockUser(TestUtils.getCredential().getAccessToken(), "12427").execute();
+            TestUtils.getTwitchHelixClient().unblockUser(TestUtils.getCredential().getAccessToken(), "12427");
         });
     }
 

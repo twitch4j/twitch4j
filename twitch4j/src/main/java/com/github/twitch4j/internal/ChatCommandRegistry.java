@@ -64,7 +64,7 @@ enum ChatCommandRegistry {
 
         BiConsumer<ChatCommandHelixForwarder.CommandArguments, AnnouncementColor> announceHandler = (args, color) -> {
             if (args.getRestOfMessage() == null || args.getRestOfMessage().isEmpty()) return;
-            args.getHelix().sendChatAnnouncement(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), args.getRestOfMessage(), color).execute();
+            args.getHelix().sendChatAnnouncement(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), args.getRestOfMessage(), color);
         };
         m.put("announce", args -> announceHandler.accept(args, AnnouncementColor.PRIMARY));
         m.put("announceblue", args -> announceHandler.accept(args, AnnouncementColor.BLUE));
@@ -84,7 +84,7 @@ enum ChatCommandRegistry {
             public void accept(ChatCommandHelixForwarder.CommandArguments args) {
                 String color = args.getRestOfMessage().startsWith("#") ? args.getRestOfMessage() : HELIX_COLORS_BY_LOWER_CHAT_NAME.get(args.getRestOfMessage().toLowerCase());
                 if (color == null) return;
-                args.getHelix().updateUserChatColor(args.getToken().getAccessToken(), args.getToken().getUserId(), color).execute();
+                args.getHelix().updateUserChatColor(args.getToken().getAccessToken(), args.getToken().getUserId(), color);
             }
 
             @Override
@@ -98,40 +98,40 @@ enum ChatCommandRegistry {
             int length = Integer.parseInt(args.getRestOfMessage());
             length = (length / 30) * 30; // require a multiple of 30 seconds
             length = Math.max(Math.min(length, 180), 30); // clamp to [30, 180]
-            args.getHelix().startCommercial(args.getToken().getAccessToken(), args.getChannelId(), length).execute();
+            args.getHelix().startCommercial(args.getToken().getAccessToken(), args.getChannelId(), length);
         });
 
         BiConsumer<ChatCommandHelixForwarder.CommandArguments, String> deleteHandler = (args, messageId) -> {
             if (messageId != null && messageId.isEmpty()) return;
-            args.getHelix().deleteChatMessages(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), messageId).execute();
+            args.getHelix().deleteChatMessages(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), messageId);
         };
         m.put("clear", args -> deleteHandler.accept(args, null));
         m.put("delete", args -> deleteHandler.accept(args, args.getRestOfMessage()));
 
         ChatCommandHandler unbanHandler = args -> {
             String userId = getId(args.getHelix(), args.getToken(), args.getRestOfMessage(), null);
-            args.getHelix().unbanUser(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), userId).execute();
+            args.getHelix().unbanUser(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), userId);
         };
         m.put("unban", unbanHandler);
         m.put("untimeout", unbanHandler);
 
         m.put("marker", args -> {
             String description = args.getRestOfMessage() != null ? args.getRestOfMessage() : "";
-            args.getHelix().createStreamMarker(args.getToken().getAccessToken(), new Highlight(args.getChannelId(), description)).execute();
+            args.getHelix().createStreamMarker(args.getToken().getAccessToken(), new Highlight(args.getChannelId(), description));
         });
 
         m.put("mod", args -> {
             String targetName = args.getRestOfMessage();
             if (targetName == null || targetName.isEmpty()) return;
             String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
-            args.getHelix().addChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
+            args.getHelix().addChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId);
         });
 
         m.put("unmod", args -> {
             String targetName = args.getRestOfMessage();
             if (targetName == null || targetName.isEmpty()) return;
             String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
-            args.getHelix().removeChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
+            args.getHelix().removeChannelModerator(args.getToken().getAccessToken(), args.getChannelId(), targetId);
         });
 
         m.put("mods", args -> {
@@ -142,7 +142,7 @@ enum ChatCommandRegistry {
             List<Moderator> mods = PaginationUtil.getPaginated(
                 cursor -> {
                     try {
-                        return args.getHelix().getModerators(args.getToken().getAccessToken(), channelId, null, cursor, 100).execute();
+                        return args.getHelix().getModerators(args.getToken().getAccessToken(), channelId, null, cursor, 100);
                     } catch (Exception e) {
                         failure.set(true);
                         getLogger().warn("Failed to query moderators from Helix chat command forwarder", e);
@@ -166,14 +166,14 @@ enum ChatCommandRegistry {
             String targetName = args.getRestOfMessage();
             if (targetName == null || targetName.isEmpty()) return;
             String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
-            args.getHelix().startRaid(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
+            args.getHelix().startRaid(args.getToken().getAccessToken(), args.getChannelId(), targetId);
         });
 
-        m.put("unraid", args -> args.getHelix().cancelRaid(args.getToken().getAccessToken(), args.getChannelId()).execute());
+        m.put("unraid", args -> args.getHelix().cancelRaid(args.getToken().getAccessToken(), args.getChannelId()));
 
         BiConsumer<ChatCommandHelixForwarder.CommandArguments, ChatSettings> roomHandler = (args, settings) -> {
             if (settings == null) return;
-            args.getHelix().updateChatSettings(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), settings).execute();
+            args.getHelix().updateChatSettings(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), settings);
         };
         m.put("emoteonly", args -> roomHandler.accept(args, ChatSettings.builder().isEmoteOnlyMode(true).build()));
         m.put("emoteonlyoff", args -> roomHandler.accept(args, ChatSettings.builder().isEmoteOnlyMode(false).build()));
@@ -224,14 +224,14 @@ enum ChatCommandRegistry {
             String targetName = args.getRestOfMessage();
             if (targetName == null || targetName.isEmpty()) return;
             String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
-            args.getHelix().addChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
+            args.getHelix().addChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId);
         });
 
         m.put("unvip", args -> {
             String targetName = args.getRestOfMessage();
             if (targetName == null || targetName.isEmpty()) return;
             String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
-            args.getHelix().removeChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId).execute();
+            args.getHelix().removeChannelVip(args.getToken().getAccessToken(), args.getChannelId(), targetId);
         });
 
         m.put("vips", args -> {
@@ -242,7 +242,7 @@ enum ChatCommandRegistry {
             List<ChannelVip> vips = PaginationUtil.getPaginated(
                 cursor -> {
                     try {
-                        return args.getHelix().getChannelVips(args.getToken().getAccessToken(), channelId, null, 100, cursor).execute();
+                        return args.getHelix().getChannelVips(args.getToken().getAccessToken(), channelId, null, 100, cursor);
                     } catch (Exception e) {
                         failure.set(true);
                         getLogger().warn("Failed to query VIPs from Helix chat command forwarder", e);
@@ -274,7 +274,7 @@ enum ChatCommandRegistry {
                 String targetName = whisperParts[0];
                 String targetId = getId(args.getHelix(), args.getToken(), targetName, args.getChat().getChannelNameToChannelId().get(targetName.toLowerCase()));
 
-                args.getHelix().sendWhisper(args.getToken().getAccessToken(), args.getToken().getUserId(), targetId, message).execute();
+                args.getHelix().sendWhisper(args.getToken().getAccessToken(), args.getToken().getUserId(), targetId, message);
             }
 
             @Override
@@ -313,7 +313,7 @@ enum ChatCommandRegistry {
         if (cachedId != null) return cachedId;
 
         // Fallback to querying via helix
-        User user = helix.getUsers(token.getAccessToken(), null, Collections.singletonList(name)).execute().getUsers().get(0);
+        User user = helix.getUsers(token.getAccessToken(), null, Collections.singletonList(name)).getUsers().get(0);
         USER_ID_BY_LOGIN_CACHE.put(user.getLogin(), user.getId());
         return user.getId();
     }
@@ -340,7 +340,7 @@ enum ChatCommandRegistry {
                 .reason(reason != null ? reason : "")
                 .duration(duration)
                 .build()
-        ).execute();
+        );
     }
 
     /**

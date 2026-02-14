@@ -5,14 +5,13 @@ import com.github.twitch4j.eventsub.EventSubTransportMethod;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 import com.github.twitch4j.helix.TestUtils;
 import com.github.twitch4j.helix.domain.EventSubSubscriptionList;
-import com.netflix.hystrix.HystrixCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -32,11 +31,11 @@ public class WebhooksServiceTest extends AbstractEndpointTest {
             .secret("twitch4j-is-not-a-good-secret")
             .build();
 
-        HystrixCommand<EventSubSubscriptionList> createCommand = TestUtils.getTwitchHelixClient().createEventSubSubscription(
+        EventSubSubscriptionList createResult = TestUtils.getTwitchHelixClient().createEventSubSubscription(
             System.getenv("APP_ACCESS_TOKEN"),
             SubscriptionTypes.STREAM_ONLINE.prepareSubscription(b -> b.broadcasterUserId(twitchUserId).build(), transport)
         );
-        assertDoesNotThrow(createCommand::execute, "Failed to create EventSub subscription");
+        assertNotNull(createResult, "Failed to create EventSub subscription");
 
         EventSubSubscriptionList subList = TestUtils.getTwitchHelixClient().getEventSubSubscriptions(
             System.getenv("APP_ACCESS_TOKEN"),
@@ -45,7 +44,7 @@ public class WebhooksServiceTest extends AbstractEndpointTest {
             null,
             null,
             null
-        ).execute();
+        );
         assertTrue(subList.getTotal() > 0, "Sub list size was " + subList.getTotal());
     }
 

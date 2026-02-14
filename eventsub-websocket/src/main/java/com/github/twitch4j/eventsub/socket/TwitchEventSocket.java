@@ -30,7 +30,6 @@ import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.TwitchHelixBuilder;
 import com.github.twitch4j.eventsub.socket.domain.SocketPayload;
 import com.github.twitch4j.util.IBackoffStrategy;
-import com.netflix.hystrix.exception.HystrixRuntimeException;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.core.CacheApi;
 import lombok.AccessLevel;
@@ -281,7 +280,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             executor.submit(() -> {
                 if (StringUtils.isNotBlank(sub.getId())) {
                     try {
-                        api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
+                        api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId());
                         eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(sub, this));
                     } catch (Exception e) {
                         log.debug("Failed to delete event socket subscription on close: " + sub, e);
@@ -345,7 +344,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
             if (StringUtils.isNotBlank(sub.getId())) {
                 executor.execute(() -> {
                     try {
-                        api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId()).execute();
+                        api.deleteEventSubSubscription(getAssociatedToken(sub), sub.getId());
                         eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(sub, this));
                     } catch (Exception e) {
                         log.warn("Failed to delete EventSub-WS subscription via Twitch API {}", sub, e);
@@ -396,7 +395,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
                     // clean up subscription pointing at another websocket id (likely dead)
                     if (StringUtils.isNotEmpty(old.getId())) {
                         try {
-                            api.deleteEventSubSubscription(getAuthToken(credential), old.getId()).execute();
+                            api.deleteEventSubSubscription(getAuthToken(credential), old.getId());
                             log.trace("EventSub-WS deleted subscription {}", old);
                             eventManager.publish(new EventSocketDeleteSubscriptionSuccessEvent(old, this));
                         } catch (Exception e) {
@@ -546,7 +545,7 @@ public final class TwitchEventSocket implements IEventSubSocket {
         try {
             SubscriptionWrapper sub = SubscriptionWrapper.wrap(
                 api.createEventSubSubscription(getAuthToken(token), newSub)
-                    .execute()
+
                     .getSubscriptions()
                     .get(0)
             );
@@ -560,15 +559,24 @@ public final class TwitchEventSocket implements IEventSubSocket {
 
             // skip retry on confirmed bad subscriptions
             boolean retry = true;
-            if (avoidRetryFailedSubscription && e instanceof HystrixRuntimeException && e.getCause() instanceof ContextedRuntimeException) {
-                ContextedRuntimeException cause = (ContextedRuntimeException) e.getCause();
-                String status = String.valueOf(cause.getFirstContextValue("errorStatus"));
-                try {
-                    int code = Integer.parseInt(status);
-                    if (code >= 400 && code < 500 && code != 429) {
-                        retry = false;
+            if (avoidRetryFailedSubscription) {
+                ContextedRuntimeException cause;
+                if (e instanceof ContextedRuntimeException) {
+                    cause = (ContextedRuntimeException) e;
+                } else if (e.getCause() instanceof ContextedRuntimeException) {
+                    cause = (ContextedRuntimeException) e.getCause();
+                } else {
+                    cause = null;
+                }
+                if (cause != null) {
+                    String status = String.valueOf(cause.getFirstContextValue("errorStatus"));
+                    try {
+                        int code = Integer.parseInt(status);
+                        if (code >= 400 && code < 500 && code != 429) {
+                            retry = false;
+                        }
+                    } catch (NumberFormatException ignored) {
                     }
-                } catch (NumberFormatException ignored) {
                 }
             }
 

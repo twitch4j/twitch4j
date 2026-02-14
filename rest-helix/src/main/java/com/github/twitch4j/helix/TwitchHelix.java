@@ -12,7 +12,6 @@ import com.github.twitch4j.eventsub.subscriptions.SubscriptionType;
 import com.github.twitch4j.helix.domain.*;
 import com.github.twitch4j.helix.interceptor.EventSubSubscriptionNameExpander;
 import com.github.twitch4j.helix.webhooks.domain.WebhookRequest;
-import com.netflix.hystrix.HystrixCommand;
 import feign.Body;
 import feign.CollectionFormat;
 import feign.Headers;
@@ -67,7 +66,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /analytics/extensions?after={after}&ended_at={ended_at}&first={first}&extension_id={extension_id}&started_at={started_at}&type={type}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionAnalyticsList> getExtensionAnalyticUrl(
+    ExtensionAnalyticsList getExtensionAnalyticUrl(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit,
@@ -93,7 +92,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /analytics/games?after={after}&ended_at={ended_at}&first={first}&game_id={game_id}&started_at={started_at}&type={type}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<GameAnalyticsList> getGameAnalyticUrl(
+    GameAnalyticsList getGameAnalyticUrl(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit,
@@ -112,7 +111,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /authorization/users?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UserAuthorizationList> getAuthorizationByUser(
+    UserAuthorizationList getAuthorizationByUser(
         @Param("token") String authToken,
         @Param("user_id") List<String> userId
     );
@@ -126,7 +125,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /bits/cheermotes?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CheermoteList> getCheermotes(
+    CheermoteList getCheermotes(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -140,7 +139,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /bits/extensions?should_include_all={should_include_all}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionBitsProductList> getExtensionBitsProducts(
+    ExtensionBitsProductList getExtensionBitsProducts(
         @Param("token") String authToken,
         @Param("should_include_all") Boolean includeAll
     );
@@ -160,7 +159,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<ExtensionBitsProductList> updateExtensionBitsProduct(
+    ExtensionBitsProductList updateExtensionBitsProduct(
         @Param("token") String authToken,
         ExtensionBitsProduct product
     );
@@ -177,7 +176,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /bits/leaderboard?count={count}&period={period}&started_at={started_at}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
+    BitsLeaderboard getBitsLeaderboard(
         @Param("token") String authToken,
         @Param("count") Integer count,
         @Param("period") String period,
@@ -197,7 +196,7 @@ public interface TwitchHelix {
      * @deprecated utilize getBitsLeaderboard where count is an Integer
      */
     @Deprecated
-    default HystrixCommand<BitsLeaderboard> getBitsLeaderboard(
+    default BitsLeaderboard getBitsLeaderboard(
         String authToken,
         String count,
         String period,
@@ -222,7 +221,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<CustomRewardList> createCustomReward(
+    CustomRewardList createCustomReward(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         CustomReward newReward
@@ -241,7 +240,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> deleteCustomReward(
+    Void deleteCustomReward(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") String rewardId
@@ -262,7 +261,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channel_points/custom_rewards?broadcaster_id={broadcaster_id}&id={id}&only_manageable_rewards={only_manageable_rewards}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CustomRewardList> getCustomRewards(
+    CustomRewardList getCustomRewards(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") Collection<String> rewardIds,
@@ -286,7 +285,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channel_points/custom_rewards/redemptions?broadcaster_id={broadcaster_id}&reward_id={reward_id}&id={id}&status={status}&sort={sort}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CustomRewardRedemptionList> getCustomRewardRedemption(
+    CustomRewardRedemptionList getCustomRewardRedemption(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("reward_id") String rewardId,
@@ -313,7 +312,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<CustomRewardList> updateCustomReward(
+    CustomRewardList updateCustomReward(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") String rewardId,
@@ -338,7 +337,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"status\":\"{status}\"%7D")
-    HystrixCommand<CustomRewardRedemptionList> updateRedemptionStatus(
+    CustomRewardRedemptionList updateRedemptionStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("reward_id") String rewardId,
@@ -361,7 +360,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /charity/campaigns?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CharityCampaignWrapper> getCharityCampaign(
+    CharityCampaignWrapper getCharityCampaign(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -377,7 +376,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /charity/donations?broadcaster_id={broadcaster_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CharityDonationList> getCharityDonations(
+    CharityDonationList getCharityDonations(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("first") Integer limit,
@@ -403,7 +402,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"message\":\"{message}\",\"color\":\"{color}\"%7D")
-    HystrixCommand<Void> sendChatAnnouncement(
+    Void sendChatAnnouncement(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
@@ -419,13 +418,12 @@ public interface TwitchHelix {
      * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token, which can be a moderator or the broadcaster.
      * @param message       The announcement to make in the broadcaster’s chat room. Announcements are limited to a maximum of 500 characters.
      * @param color         The color used to highlight the announcement.
-     * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
      * @deprecated in favor of {@link #sendChatAnnouncement(String, String, String, String, com.github.twitch4j.common.enums.AnnouncementColor)}
      */
     @Deprecated
-    default HystrixCommand<Void> sendChatAnnouncement(String authToken, String broadcasterId, String moderatorId, String message, AnnouncementColor color) {
-        return sendChatAnnouncement(authToken, broadcasterId, moderatorId, message, color.converted());
+    default void sendChatAnnouncement(String authToken, String broadcasterId, String moderatorId, String message, AnnouncementColor color) {
+        this.sendChatAnnouncement(authToken, broadcasterId, moderatorId, message, color.converted());
     }
 
     /**
@@ -438,7 +436,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/badges?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChatBadgeSetList> getChannelChatBadges(
+    ChatBadgeSetList getChannelChatBadges(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -451,7 +449,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/badges/global")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChatBadgeSetList> getGlobalChatBadges(
+    ChatBadgeSetList getGlobalChatBadges(
         @Param("token") String authToken
     );
 
@@ -471,7 +469,7 @@ public interface TwitchHelix {
     @Unofficial
     @RequestLine("GET /chat/chatters?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChattersList> getChatters(
+    ChattersList getChatters(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -489,7 +487,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/color?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UserChatColorList> getUserChatColor(
+    UserChatColorList getUserChatColor(
         @Param("token") String authToken,
         @NotNull @Param("user_id") List<String> userIds
     );
@@ -508,7 +506,7 @@ public interface TwitchHelix {
      */
     @RequestLine("PUT /chat/color?user_id={user_id}&color={color}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> updateUserChatColor(
+    Void updateUserChatColor(
         @Param("token") String authToken,
         @NotNull @Param("user_id") String userId,
         @NotNull @Param("color") String color
@@ -525,7 +523,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/emotes?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EmoteList> getChannelEmotes(
+    EmoteList getChannelEmotes(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -540,7 +538,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/emotes/global")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EmoteList> getGlobalEmotes(
+    EmoteList getGlobalEmotes(
         @Param("token") String authToken
     );
 
@@ -553,7 +551,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/emotes/set?emote_set_id={emote_set_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EmoteList> getEmoteSets(
+    EmoteList getEmoteSets(
         @Param("token") String authToken,
         @Param("emote_set_id") Collection<String> ids
     );
@@ -574,7 +572,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/emotes/user?user_id={user_id}&broadcaster_id={broadcaster_id}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EmoteList> getUserEmotes(
+    EmoteList getUserEmotes(
         @Param("token") String authToken,
         @NotNull @Param("user_id") String userId,
         @Nullable @Param("broadcaster_id") String broadcasterId,
@@ -599,7 +597,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<SentChatMessageWrapper> sendChatMessage(
+    SentChatMessageWrapper sendChatMessage(
         @Param("token") String authToken,
         ChatMessage message
     );
@@ -620,7 +618,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /chat/shoutouts?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> sendShoutout(
+    Void sendShoutout(
         @Param("token") String authToken,
         @Param("from_broadcaster_id") String fromBroadcasterId,
         @Param("to_broadcaster_id") String toBroadcasterId,
@@ -638,7 +636,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /chat/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChatSettingsWrapper> getChatSettings(
+    ChatSettingsWrapper getChatSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId
@@ -659,7 +657,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<ChatSettingsWrapper> updateChatSettings(
+    ChatSettingsWrapper updateChatSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -680,7 +678,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /entitlements/codes?code={code}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CodeStatusList> getCodeStatus(
+    CodeStatusList getCodeStatus(
         @Param("token") String authToken,
         @Param("code") List<String> code,
         @Param("user_id") Integer userId
@@ -700,7 +698,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("POST /entitlements/codes?code={code}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CodeStatusList> redeemCode(
+    CodeStatusList redeemCode(
         @Param("token") String authToken,
         @Param("code") List<String> code,
         @Param("user_id") Integer userId
@@ -730,7 +728,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /entitlements/drops?id={id}&user_id={user_id}&game_id={game_id}&fulfillment_status={fulfillment_status}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<DropsEntitlementList> getDropsEntitlements(
+    DropsEntitlementList getDropsEntitlements(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
@@ -741,7 +739,7 @@ public interface TwitchHelix {
     );
 
     @Deprecated
-    default HystrixCommand<DropsEntitlementList> getDropsEntitlements(
+    default DropsEntitlementList getDropsEntitlements(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
@@ -764,7 +762,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<UpdatedDropEntitlementsList> updateDropsEntitlements(
+    UpdatedDropEntitlementsList updateDropsEntitlements(
         @Param("token") String authToken,
         UpdateDropEntitlementInput input
     );
@@ -782,7 +780,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"shard_count\":{shard_count}%7D")
-    HystrixCommand<ConduitList> createConduit(
+    ConduitList createConduit(
         @Param("token") String authToken,
         @Param("shard_count") int shardCount
     );
@@ -795,7 +793,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /eventsub/conduits")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ConduitList> getConduits(
+    ConduitList getConduits(
         @Param("token") String authToken
     );
 
@@ -816,7 +814,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"id\":\"{id}\",\"shard_count\":{shard_count}%7D")
-    HystrixCommand<ConduitList> updateConduit(
+    ConduitList updateConduit(
         @Param("token") String authToken,
         @NotNull @Param("id") String conduitId,
         @Param("shard_count") int shardCount
@@ -834,7 +832,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /eventsub/conduits?id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> deleteConduit(
+    Void deleteConduit(
         @Param("token") String authToken,
         @NotNull @Param("id") String conduitId
     );
@@ -850,7 +848,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /eventsub/conduits/shards?conduit_id={conduit_id}&status={status}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ConduitShardList> getConduitShards(
+    ConduitShardList getConduitShards(
         @Param("token") String authToken,
         @NotNull @Param("conduit_id") String conduitId,
         @Nullable @Param("status") ShardStatus status,
@@ -872,7 +870,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<ConduitShardList> updateConduitShards(
+    ConduitShardList updateConduitShards(
         @Param("token") String authToken,
         @NotNull ShardsInput shards
     );
@@ -889,7 +887,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<EventSubSubscriptionList> createEventSubSubscription(
+    EventSubSubscriptionList createEventSubSubscription(
         @Param("token") String authToken,
         EventSubSubscription subscription
     );
@@ -903,7 +901,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /eventsub/subscriptions?id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> deleteEventSubSubscription(
+    Void deleteEventSubSubscription(
         @Param("token") String authToken,
         @Param("id") String subscriptionId
     );
@@ -926,7 +924,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /eventsub/subscriptions?status={status}&type={type}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+    EventSubSubscriptionList getEventSubSubscriptions(
         @Param("token") String authToken,
         @Param("status") EventSubSubscriptionStatus status,
         @Param(value = "type", expander = EventSubSubscriptionNameExpander.class) SubscriptionType<?, ?, ?> type,
@@ -944,7 +942,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /eventsub/subscriptions?subscription_id={subscription_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptionById(
+    EventSubSubscriptionList getEventSubSubscriptionById(
         @Param("token") String authToken,
         @Param("subscription_id") String subscriptionId
     );
@@ -960,7 +958,7 @@ public interface TwitchHelix {
      * @deprecated in favor of {@link #getEventSubSubscriptions(String, EventSubSubscriptionStatus, SubscriptionType, String, String, Integer)}
      */
     @Deprecated
-    default HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptions(
+    default EventSubSubscriptionList getEventSubSubscriptions(
         @Param("token") String authToken,
         @Param("status") EventSubSubscriptionStatus status,
         @Param("after") String after,
@@ -982,7 +980,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Client-Id: {extension_id}"
     })
-    HystrixCommand<ReleasedExtensionList> getExtensions(
+    ReleasedExtensionList getExtensions(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("extension_version") String extensionVersion
@@ -1010,7 +1008,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"text\":\"{text}\"%7D")
-    HystrixCommand<Void> sendExtensionChatMessage(
+    Void sendExtensionChatMessage(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("extension_version") String extensionVersion,
@@ -1035,7 +1033,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Client-Id: {extension_id}"
     })
-    HystrixCommand<ExtensionConfigurationSegmentList> getExtensionConfigurationSegment(
+    ExtensionConfigurationSegmentList getExtensionConfigurationSegment(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("segment") List<ExtensionSegment> segment,
@@ -1059,7 +1057,7 @@ public interface TwitchHelix {
         "Client-Id: {extension_id}",
         "Content-Type: application/json"
     })
-    HystrixCommand<Void> setExtensionConfigurationSegment(
+    Void setExtensionConfigurationSegment(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         ExtensionConfigurationSegmentInput input
@@ -1082,7 +1080,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Client-Id: {extension_id}"
     })
-    HystrixCommand<ExtensionSecretsList> getExtensionSecrets(
+    ExtensionSecretsList getExtensionSecrets(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId
     );
@@ -1103,7 +1101,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Client-Id: {extension_id}"
     })
-    HystrixCommand<ExtensionSecretsList> createExtensionSecret(
+    ExtensionSecretsList createExtensionSecret(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("delay") Integer delay
@@ -1124,7 +1122,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /extensions/live?extension_id={extension_id}&first={first}&after={after}&cursor={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionLiveChannelsList> getExtensionLiveChannels(
+    ExtensionLiveChannelsList getExtensionLiveChannels(
         @Param("token") String authToken,
         @Param("extension_id") String extensionId,
         @Param("first") Integer limit,
@@ -1140,7 +1138,7 @@ public interface TwitchHelix {
         "Content-Type: application/json",
         "Twitch4J-Target: {twitch4j_target}"
     })
-    HystrixCommand<Void> sendExtensionPubSubMessage(
+    Void sendExtensionPubSubMessage(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("twitch4j_target") String target,
@@ -1160,15 +1158,14 @@ public interface TwitchHelix {
      * @param jwtToken    Signed JWT with exp, user_id, role, channel_id, pubsub_perms.send
      * @param extensionId Client ID associated with the Extension.
      * @param input       Details on the message to be sent and its targets.
-     * @return 204 No Content upon a successful request.
      */
-    default HystrixCommand<Void> sendExtensionPubSubMessage(
+    default void sendExtensionPubSubMessage(
         String jwtToken,
         @NotNull String extensionId,
         @NotNull SendPubSubMessageInput input
     ) {
         final String target = input.isGlobalBroadcast() ? SendPubSubMessageInput.GLOBAL_TARGET : input.getBroadcasterId() != null ? input.getBroadcasterId() : input.getTargets().get(0);
-        return this.sendExtensionPubSubMessage(jwtToken, extensionId, target, input);
+        this.sendExtensionPubSubMessage(jwtToken, extensionId, target, input);
     }
 
     /**
@@ -1181,7 +1178,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /extensions/released?extension_id={extension_id}&extension_version={extension_version}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ReleasedExtensionList> getReleasedExtensions(
+    ReleasedExtensionList getReleasedExtensions(
         @Param("token") String authToken,
         @Param("extension_id") String extensionId,
         @Param("extension_version") String extensionVersion
@@ -1214,7 +1211,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"extension_id\":\"{extension_id}\",\"extension_version\":\"{extension_version}\",\"required_configuration\":\"{configuration_version}\",\"configuration_version\":\"{configuration_version}\"%7D")
-    HystrixCommand<Void> setExtensionRequiredConfiguration(
+    Void setExtensionRequiredConfiguration(
         @Param("token") String jwtToken,
         @Param("extension_id") String extensionId,
         @Param("extension_version") String extensionVersion,
@@ -1234,7 +1231,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /extensions/transactions?after={after}&extension_id={extension_id}&first={first}&id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionTransactionList> getExtensionTransactions(
+    ExtensionTransactionList getExtensionTransactions(
         @Param("token") String authToken,
         @Param("extension_id") String extensionId,
         @Param("id") List<String> transactionIds,
@@ -1253,7 +1250,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /search/categories?after={after}&first={first}&query={query}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CategorySearchList> searchCategories(
+    CategorySearchList searchCategories(
         @Param("token") String authToken,
         @Param("query") String query,
         @Param("first") Integer limit,
@@ -1269,7 +1266,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChannelInformationList> getChannelInformation(
+    ChannelInformationList getChannelInformation(
         @Param("token") String authToken,
         @Param("broadcaster_id") List<String> broadcasterIds
     );
@@ -1287,7 +1284,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<Void> updateChannelInformation(
+    Void updateChannelInformation(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         ChannelInformation channelInformation
@@ -1315,7 +1312,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /search/channels?after={after}&first={first}&live_only={live_only}&query={query}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChannelSearchList> searchChannels(
+    ChannelSearchList searchChannels(
         @Param("token") String authToken,
         @Param("query") String query,
         @Param("first") Integer limit,
@@ -1332,7 +1329,7 @@ public interface TwitchHelix {
      */
     @Headers("Authorization: Bearer {token}")
     @RequestLine("GET /shared_chat/session?broadcaster_id={broadcaster_id}")
-    HystrixCommand<SharedChatSessionWrapper> getSharedChatSession(
+    SharedChatSessionWrapper getSharedChatSession(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1351,7 +1348,7 @@ public interface TwitchHelix {
     @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/current_track?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SoundtrackCurrentTrackWrapper> getSoundtrackCurrentTrack(
+    SoundtrackCurrentTrackWrapper getSoundtrackCurrentTrack(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1370,7 +1367,7 @@ public interface TwitchHelix {
     @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/playlist?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SoundtrackPlaylistTracksList> getSoundtrackPlaylist(
+    SoundtrackPlaylistTracksList getSoundtrackPlaylist(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("first") Integer limit,
@@ -1394,7 +1391,7 @@ public interface TwitchHelix {
     @ApiStatus.ScheduledForRemoval
     @RequestLine("GET /soundtrack/playlists?id={id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SoundtrackPlaylistMetadataList> getSoundtrackPlaylists(
+    SoundtrackPlaylistMetadataList getSoundtrackPlaylists(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("first") Integer limit,
@@ -1412,7 +1409,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels/ads?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<AdScheduleWrapper> getAdSchedule(
+    AdScheduleWrapper getAdSchedule(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1433,7 +1430,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /channels/ads/schedule/snooze?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SnoozedAdWrapper> snoozeNextAd(
+    SnoozedAdWrapper snoozeNextAd(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1452,7 +1449,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"broadcaster_id\":\"{broadcaster_id}\",\"length\":{length}%7D")
-    HystrixCommand<CommercialList> startCommercial(
+    CommercialList startCommercial(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("length") Integer length
@@ -1468,7 +1465,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels/editors?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChannelEditorList> getChannelEditors(
+    ChannelEditorList getChannelEditors(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1490,7 +1487,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels/followed?user_id={user_id}&broadcaster_id={broadcaster_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<OutboundFollowing> getFollowedChannels(
+    OutboundFollowing getFollowedChannels(
         @Param("token") String authToken,
         @NotNull @Param("user_id") String userId,
         @Nullable @Param("broadcaster_id") String broadcasterId,
@@ -1517,7 +1514,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels/followers?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<InboundFollowers> getChannelFollowers(
+    InboundFollowers getChannelFollowers(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @Nullable @Param("user_id") String userId,
@@ -1538,7 +1535,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ChannelVipList> getChannelVips(
+    ChannelVipList getChannelVips(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @Nullable @Param("user_id") List<String> userIds,
@@ -1557,7 +1554,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> addChannelVip(
+    Void addChannelVip(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("user_id") String userId
@@ -1574,7 +1571,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /channels/vips?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> removeChannelVip(
+    Void removeChannelVip(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("user_id") String userId
@@ -1599,7 +1596,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&title={title}&duration={duration}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CreateClipList> createClip(
+    CreateClipList createClip(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @Nullable @Param("title") String title,
@@ -1618,7 +1615,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("POST /clips?broadcaster_id={broadcaster_id}&has_delay={has_delay}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CreateClipList> createClip(
+    CreateClipList createClip(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("has_delay") Boolean hasDelay
@@ -1646,7 +1643,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /clips?broadcaster_id={broadcaster_id}&game_id={game_id}&id={id}&after={after}&before={before}&first={first}&started_at={started_at}&ended_at={ended_at}&is_featured={is_featured}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ClipList> getClips(
+    ClipList getClips(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
@@ -1675,7 +1672,7 @@ public interface TwitchHelix {
      * @deprecated in favor of {@link #getClips(String, String, String, List, String, String, Integer, Instant, Instant, Boolean)}
      */
     @Deprecated
-    default HystrixCommand<ClipList> getClips(
+    default ClipList getClips(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("game_id") String gameId,
@@ -1707,7 +1704,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /clips/downloads?broadcaster_id={broadcaster_id}&editor_id={editor_id}&clip_id={clip_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ClipsDownloadList> getClipsDownload(
+    ClipsDownloadList getClipsDownload(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("editor_id") String editorId,
@@ -1731,7 +1728,7 @@ public interface TwitchHelix {
     @ApiStatus.Experimental // in open beta
     @RequestLine("POST /videos/clips?broadcaster_id={broadcaster_id}&editor_id={editor_id}&title={title}&vod_id={vod_id}&vod_offset={vod_offset}&duration={duration}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CreateClipList> createClipFromVOD(
+    CreateClipList createClipFromVOD(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("editor_id") String editorId,
@@ -1753,7 +1750,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /content_classification_labels?locale={locale}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ContentClassificationList> getContentClassificationLabels(
+    ContentClassificationList getContentClassificationLabels(
         @Param("token") String authToken,
         @Param("locale") String locale
     );
@@ -1768,7 +1765,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /entitlements/upload?manifest_id={manifest_id}&type={type}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UploadEntitlementUrlList> createEntitlementUploadUrl(
+    UploadEntitlementUrlList createEntitlementUploadUrl(
         @Param("token") String authToken,
         @Param("manifest_id") String manifestId,
         @Param("type") String type
@@ -1788,7 +1785,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /games?id={id}&name={name}&igdb_id={igdb_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<GameList> getGames(
+    GameList getGames(
         @Param("token") String authToken,
         @Param("id") List<String> id,
         @Param("name") List<String> name,
@@ -1808,7 +1805,7 @@ public interface TwitchHelix {
      * @deprecated in favor of {@link #getGames(String, List, List, List)}; can simply pass null for the new fourth argument
      */
     @Deprecated
-    default HystrixCommand<GameList> getGames(String authToken, List<String> id, List<String> name) {
+    default GameList getGames(String authToken, List<String> id, List<String> name) {
         return getGames(authToken, id, name, null);
     }
 
@@ -1826,7 +1823,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /goals?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<CreatorGoalsList> getCreatorGoals(
+    CreatorGoalsList getCreatorGoals(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -1845,7 +1842,7 @@ public interface TwitchHelix {
     @RequestLine("GET /hypetrain/events?broadcaster_id={broadcaster_id}&first={first}&after={after}&cursor={after}")
     @Headers("Authorization: Bearer {token}")
     @Deprecated
-    HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
+    HypeTrainEventList getHypeTrainEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("first") Integer limit,
@@ -1866,7 +1863,7 @@ public interface TwitchHelix {
      * @deprecated Scheduled for removal on December 4, 2025. Use {@link #getHypeTrainStatus(String, String)} instead.
      */
     @Deprecated
-    default HystrixCommand<HypeTrainEventList> getHypeTrainEvents(
+    default HypeTrainEventList getHypeTrainEvents(
         String authToken,
         String broadcasterId,
         Integer limit,
@@ -1886,20 +1883,20 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /hypetrain/status?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<HypeTrainStatusWrapper> getHypeTrainStatus(
+    HypeTrainStatusWrapper getHypeTrainStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
 
     @RequestLine("GET /ingests")
-    HystrixCommand<IngestServerList> getIngestServers(URI baseUrl);
+    IngestServerList getIngestServers(URI baseUrl);
 
     /**
      * Get Ingest Servers returns a list of endpoints for ingesting live video into Twitch.
      *
      * @return IngestServerList
      */
-    default HystrixCommand<IngestServerList> getIngestServers() {
+    default IngestServerList getIngestServers() {
         return getIngestServers(INGESTS_BASE_URL);
     }
 
@@ -1923,7 +1920,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"user_id\":\"{user_id}\",\"msg_id\":\"{msg_id}\",\"action\":\"{action}\"%7D")
-    HystrixCommand<Void> manageAutoModHeldMessage(
+    Void manageAutoModHeldMessage(
         @Param("token") String authToken,
         @Param("user_id") String moderatorId,
         @Param("msg_id") String messageId,
@@ -1941,7 +1938,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/automod/settings?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<AutoModSettingsWrapper> getAutoModSettings(
+    AutoModSettingsWrapper getAutoModSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId
@@ -1976,7 +1973,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<AutoModSettingsWrapper> updateAutoModSettings(
+    AutoModSettingsWrapper updateAutoModSettings(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -1996,7 +1993,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/banned?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BannedUserList> getBannedUsers(
+    BannedUserList getBannedUsers(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userId,
@@ -2017,7 +2014,7 @@ public interface TwitchHelix {
      * @deprecated in favor of getBannedUsers(String, String, List, String, String, Integer) where the last param is the number of objects to retrieve.
      */
     @Deprecated
-    default HystrixCommand<BannedUserList> getBannedUsers(
+    default BannedUserList getBannedUsers(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userId,
@@ -2042,7 +2039,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /moderation/banned/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BannedEventList> getBannedEvents(
+    BannedEventList getBannedEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userId,
@@ -2069,7 +2066,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"data\":{data}%7D")
-    HystrixCommand<BanUsersList> banUser(
+    BanUsersList banUser(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2088,7 +2085,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /moderation/bans?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> unbanUser(
+    Void unbanUser(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2109,7 +2106,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BlockedTermList> getBlockedTerms(
+    BlockedTermList getBlockedTerms(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2140,7 +2137,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"text\":\"{text}\"%7D")
-    HystrixCommand<BlockedTermList> addBlockedTerm(
+    BlockedTermList addBlockedTerm(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2159,7 +2156,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /moderation/blocked_terms?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> removeBlockedTerm(
+    Void removeBlockedTerm(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2178,7 +2175,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/channels?user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ModeratedChannelList> getModeratedChannels(
+    ModeratedChannelList getModeratedChannels(
         @Param("token") String authToken,
         @Param("user_id") String userId,
         @Param("first") Integer limit,
@@ -2208,7 +2205,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /moderation/chat?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> deleteChatMessages(
+    Void deleteChatMessages(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
@@ -2228,7 +2225,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<AutomodEnforceStatusList> checkAutomodStatus(
+    AutomodEnforceStatusList checkAutomodStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         AutomodEnforceCheckList messages
@@ -2247,7 +2244,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ModeratorList> getModerators(
+    ModeratorList getModerators(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
@@ -2266,7 +2263,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> addChannelModerator(
+    Void addChannelModerator(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("user_id") String userId
@@ -2283,7 +2280,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /moderation/moderators?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> removeChannelModerator(
+    Void removeChannelModerator(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("user_id") String userId
@@ -2300,7 +2297,7 @@ public interface TwitchHelix {
      * @deprecated in favor of getModerators(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
     @Deprecated
-    default HystrixCommand<ModeratorList> getModerators(
+    default ModeratorList getModerators(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
@@ -2324,7 +2321,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine(value = "GET /moderation/moderators/events?broadcaster_id={broadcaster_id}&user_id={user_id}&after={after}&first={first}", collectionFormat = CollectionFormat.CSV)
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ModeratorEventList> getModeratorEvents(
+    ModeratorEventList getModeratorEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
@@ -2344,7 +2341,7 @@ public interface TwitchHelix {
      * @deprecated in favor of getModeratorEvents(String, String, List, String, Integer) where the last param is the number of objects to retrieve.
      */
     @Deprecated
-    default HystrixCommand<ModeratorEventList> getModeratorEvents(
+    default ModeratorEventList getModeratorEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds,
@@ -2365,7 +2362,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/shield_mode?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ShieldModeStatusWrapper> getShieldModeStatus(
+    ShieldModeStatusWrapper getShieldModeStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId
@@ -2387,7 +2384,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"is_active\":{is_active}%7D")
-    HystrixCommand<ShieldModeStatusWrapper> updateShieldModeStatus(
+    ShieldModeStatusWrapper updateShieldModeStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2412,7 +2409,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"user_id\":\"{user_id}\",\"status\":\"{status}\"%7D")
-    HystrixCommand<SuspiciousUserWrapper> addSuspiciousStatus(
+    SuspiciousUserWrapper addSuspiciousStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2433,7 +2430,7 @@ public interface TwitchHelix {
     @ApiStatus.Experimental // in open beta
     @RequestLine("DELETE /moderation/suspicious_users?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SuspiciousUserWrapper> removeSuspiciousStatus(
+    SuspiciousUserWrapper removeSuspiciousStatus(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
@@ -2456,7 +2453,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&status={status}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UnbanRequestList> getUnbanRequests(
+    UnbanRequestList getUnbanRequests(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
@@ -2480,7 +2477,7 @@ public interface TwitchHelix {
      */
     @RequestLine("PATCH /moderation/unban_requests?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&unban_request_id={unban_request_id}&status={status}&resolution_text={resolution_text}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UnbanRequestList> resolveUnbanRequest(
+    UnbanRequestList resolveUnbanRequest(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
@@ -2510,7 +2507,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"data\":%7B\"user_id\":\"{user_id}\",\"reason\":\"{reason}\"%7D%7D")
-    HystrixCommand<ValueWrapper<ChatUserWarning>> warnChatUser(
+    ValueWrapper<ChatUserWarning> warnChatUser(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
@@ -2533,7 +2530,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /polls?broadcaster_id={broadcaster_id}&id={id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<PollsList> getPolls(
+    PollsList getPolls(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") List<String> pollIds,
@@ -2554,7 +2551,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<PollsList> createPoll(
+    PollsList createPoll(
         @Param("token") String authToken,
         Poll poll
     );
@@ -2572,7 +2569,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<PollsList> endPoll(
+    PollsList endPoll(
         @Param("token") String authToken,
         Poll poll
     );
@@ -2590,7 +2587,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /predictions?broadcaster_id={broadcaster_id}&id={id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<PredictionsList> getPredictions(
+    PredictionsList getPredictions(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") List<String> predictionId,
@@ -2611,7 +2608,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<PredictionsList> createPrediction(
+    PredictionsList createPrediction(
         @Param("token") String authToken,
         Prediction prediction
     );
@@ -2632,7 +2629,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<PredictionsList> endPrediction(
+    PredictionsList endPrediction(
         @Param("token") String authToken,
         Prediction prediction
     );
@@ -2650,7 +2647,7 @@ public interface TwitchHelix {
      */
     @RequestLine("POST /raids?from_broadcaster_id={from_broadcaster_id}&to_broadcaster_id={to_broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<RaidRequestList> startRaid(
+    RaidRequestList startRaid(
         @Param("token") String authToken,
         @Param("from_broadcaster_id") String fromBroadcasterId,
         @Param("to_broadcaster_id") String toBroadcasterId
@@ -2667,7 +2664,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /raids?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> cancelRaid(
+    Void cancelRaid(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -2684,7 +2681,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /games/top?after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<GameTopList> getTopGames(
+    GameTopList getTopGames(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -2705,7 +2702,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /schedule?broadcaster_id={broadcaster_id}&id={id}&start_time={start_time}&utc_offset={utc_offset}&first={first}&after={after}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamScheduleResponse> getChannelStreamSchedule(
+    StreamScheduleResponse getChannelStreamSchedule(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") Collection<String> ids,
@@ -2718,7 +2715,7 @@ public interface TwitchHelix {
     @Deprecated
     @SuppressWarnings("DeprecatedIsStillUsed")
     @RequestLine("GET /schedule/icalendar?broadcaster_id={broadcaster_id}")
-    HystrixCommand<Response> getChannelInternetCalendarResponse(
+    Response getChannelInternetCalendarResponse(
         @Param("broadcaster_id") String broadcasterId
     );
 
@@ -2729,7 +2726,7 @@ public interface TwitchHelix {
      * @return iCalendar data is returned according to RFC5545, in a multi-line String.
      */
     default String getChannelInternetCalendar(String broadcasterId) throws IOException {
-        Response response = getChannelInternetCalendarResponse(broadcasterId).execute();
+        Response response = getChannelInternetCalendarResponse(broadcasterId);
         try (InputStream is = response.body().asInputStream()) {
             return IOUtils.toString(is, response.charset());
         }
@@ -2748,7 +2745,7 @@ public interface TwitchHelix {
      */
     @RequestLine("PATCH /schedule/settings?broadcaster_id={broadcaster_id}&is_vacation_enabled={is_vacation_enabled}&vacation_start_time={vacation_start_time}&vacation_end_time={vacation_end_time}&timezone={timezone}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> updateChannelStreamSchedule(
+    Void updateChannelStreamSchedule(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("is_vacation_enabled") Boolean vacationEnabled,
@@ -2770,7 +2767,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<StreamScheduleResponse> createStreamScheduleSegment(
+    StreamScheduleResponse createStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         ScheduleSegmentInput segment
@@ -2790,7 +2787,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<StreamScheduleResponse> updateStreamScheduleSegment(
+    StreamScheduleResponse updateStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") String id,
@@ -2807,7 +2804,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /schedule/segment?broadcaster_id={broadcaster_id}&id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> deleteStreamScheduleSegment(
+    Void deleteStreamScheduleSegment(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") String id
@@ -2831,7 +2828,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams?after={after}&before={before}&first={first}&game_id={game_id}&language={language}&user_id={user_id}&user_login={user_login}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamList> getStreams(
+    StreamList getStreams(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -2858,7 +2855,7 @@ public interface TwitchHelix {
      * @deprecated in favor of getStreams(String, String, String, Integer, List, List, List, List); simply remove the argument for communityId to migrate
      */
     @Deprecated
-    default HystrixCommand<StreamList> getStreams(
+    default StreamList getStreams(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -2887,7 +2884,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams/followed?after={after}&first={first}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamList> getFollowedStreams(
+    StreamList getFollowedStreams(
         @Param("token") String authToken,
         @Param("user_id") String userId,
         @Param("after") String after,
@@ -2903,7 +2900,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams/key?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamKeyList> getStreamKey(
+    StreamKeyList getStreamKey(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -2922,7 +2919,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /tags/streams?after={after}&first={first}&tag_id={tag_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamTagList> getAllStreamTags(
+    StreamTagList getAllStreamTags(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit,
@@ -2941,7 +2938,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /streams/tags?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamTagList> getStreamTags(
+    StreamTagList getStreamTags(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -2964,7 +2961,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"tag_ids\": [{tag_ids}]%7D")
-    HystrixCommand<Void> replaceStreamTags(
+    Void replaceStreamTags(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param(value = "tag_ids", expander = ObjectToJsonExpander.class) List<UUID> tagIds
@@ -2985,7 +2982,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<StreamMarker> createStreamMarker(
+    StreamMarker createStreamMarker(
         @Param("token") String authToken,
         Highlight highlight
     );
@@ -3003,7 +3000,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /streams/markers?after={after}&before={before}&first={first}&user_id={user_id}&video_id={video_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<StreamMarkersList> getStreamMarkers(
+    StreamMarkersList getStreamMarkers(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("before") String before,
@@ -3024,7 +3021,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SubscriptionList> getSubscriptions(
+    SubscriptionList getSubscriptions(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("after") String after,
@@ -3042,7 +3039,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /subscriptions?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SubscriptionList> getSubscriptionsByUser(
+    SubscriptionList getSubscriptionsByUser(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") List<String> userIds
@@ -3064,7 +3061,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /subscriptions/events?broadcaster_id={broadcaster_id}&id={id}&user_id={user_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SubscriptionEventList> getSubscriptionEvents(
+    SubscriptionEventList getSubscriptionEvents(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("id") String id,
@@ -3083,7 +3080,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /subscriptions/user?broadcaster_id={broadcaster_id}&user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<SubscriptionList> checkUserSubscription(
+    SubscriptionList checkUserSubscription(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("user_id") String userId
@@ -3101,7 +3098,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /teams?name={name}&id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<TeamList> getTeams(
+    TeamList getTeams(
         @Param("token") String authToken,
         @Param("name") String name,
         @Param("id") String id
@@ -3116,7 +3113,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /teams/channel?broadcaster_id={broadcaster_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<TeamMembershipList> getChannelTeams(
+    TeamMembershipList getChannelTeams(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId
     );
@@ -3133,7 +3130,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users?id={id}&login={login}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UserList> getUsers(
+    UserList getUsers(
         @Param("token") String authToken,
         @Param("id") List<String> userIds,
         @Param("login") List<String> userNames
@@ -3153,7 +3150,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users/blocks?broadcaster_id={broadcaster_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<BlockedUserList> getUserBlockList(
+    BlockedUserList getUserBlockList(
         @Param("token") String authToken,
         @Param("broadcaster_id") String userId,
         @Param("after") String after,
@@ -3172,7 +3169,7 @@ public interface TwitchHelix {
      */
     @RequestLine("PUT /users/blocks?target_user_id={target_user_id}&source_context={source_context}&reason={reason}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> blockUser(
+    Void blockUser(
         @Param("token") String authToken,
         @Param("target_user_id") String targetUserId,
         @Param("source_context") String sourceContext,
@@ -3189,7 +3186,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /users/blocks?target_user_id={target_user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<Void> unblockUser(
+    Void unblockUser(
         @Param("token") String authToken,
         @Param("target_user_id") String targetUserId
     );
@@ -3218,7 +3215,7 @@ public interface TwitchHelix {
     @Deprecated
     @RequestLine("GET /users/follows?from_id={from_id}&to_id={to_id}&after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<FollowList> getFollowers(
+    FollowList getFollowers(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
         @Param("to_id") String toId,
@@ -3243,7 +3240,7 @@ public interface TwitchHelix {
     })
     @Body("%7B\"from_id\":\"{from_id}\",\"to_id\":\"{to_id}\",\"allow_notifications\":{allow_notifications}%7D")
     @Deprecated
-    HystrixCommand<Void> createFollow(
+    Void createFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
         @Param("to_id") String toId,
@@ -3262,7 +3259,7 @@ public interface TwitchHelix {
     @RequestLine("DELETE /users/follows?from_id={from_id}&to_id={to_id}")
     @Headers("Authorization: Bearer {token}")
     @Deprecated
-    HystrixCommand<Void> deleteFollow(
+    Void deleteFollow(
         @Param("token") String authToken,
         @Param("from_id") String fromId,
         @Param("to_id") String toId
@@ -3280,7 +3277,7 @@ public interface TwitchHelix {
      */
     @RequestLine("PUT /users?description={description}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<UserList> updateUser(
+    UserList updateUser(
         @Param("token") String authToken,
         @Param("description") String description
     );
@@ -3298,7 +3295,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users/extensions/list")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionList> getUserExtensions(
+    ExtensionList getUserExtensions(
         @Param("token") String authToken
     );
 
@@ -3314,7 +3311,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /users/extensions?user_id={user_id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<ExtensionActiveList> getUserActiveExtensions(
+    ExtensionActiveList getUserActiveExtensions(
         @Param("token") String authToken,
         @Param("user_id") String userId
     );
@@ -3332,7 +3329,7 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    HystrixCommand<ExtensionActiveList> updateUserExtensions(
+    ExtensionActiveList updateUserExtensions(
         @Param("token") String authToken,
         ExtensionActiveList extensions
     );
@@ -3365,7 +3362,7 @@ public interface TwitchHelix {
      */
     @RequestLine("GET /videos?id={id}&user_id={user_id}&game_id={game_id}&language={language}&period={period}&sort={sort}&type={type}&after={after}&before={before}&first={first}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<VideoList> getVideos(
+    VideoList getVideos(
         @Param("token") String authToken,
         @Param("id") List<String> id,
         @Param("user_id") String userId,
@@ -3400,7 +3397,7 @@ public interface TwitchHelix {
      * @deprecated in favor of {@link #getVideos(String, List, String, String, String, Video.SearchPeriod, Video.SearchOrder, Video.Type, Integer, String, String)}, which supports multiple video IDs
      */
     @Deprecated
-    default HystrixCommand<VideoList> getVideos(
+    default VideoList getVideos(
         @Param("token") String authToken,
         @Param("id") String id,
         @Param("user_id") String userId,
@@ -3432,7 +3429,7 @@ public interface TwitchHelix {
      */
     @RequestLine("DELETE /videos?id={id}")
     @Headers("Authorization: Bearer {token}")
-    HystrixCommand<DeletedVideoList> deleteVideos(
+    DeletedVideoList deleteVideos(
         @Param("token") String authToken,
         @Param("id") List<String> ids
     );
@@ -3453,7 +3450,7 @@ public interface TwitchHelix {
     @RequestLine("GET /webhooks/subscriptions?after={after}&first={first}")
     @Headers("Authorization: Bearer {token}")
     @Deprecated
-    HystrixCommand<WebhookSubscriptionList> getWebhookSubscriptions(
+    WebhookSubscriptionList getWebhookSubscriptions(
         @Param("token") String authToken,
         @Param("after") String after,
         @Param("first") Integer limit
@@ -3483,7 +3480,7 @@ public interface TwitchHelix {
     @RequestLine("POST /webhooks/hub")
     @Headers({"Authorization: Bearer {token}", "Content-Type: application/json"})
     @Deprecated
-    HystrixCommand<Response> requestWebhookSubscription(
+    Response requestWebhookSubscription(
         WebhookRequest request, // POJO as first arg is assumed by feign to be body if no @Body annotation
         @Param("token") String authToken
     );
@@ -3523,7 +3520,7 @@ public interface TwitchHelix {
         "Content-Type: application/json"
     })
     @Body("%7B\"message\":\"{message}\"%7D")
-    HystrixCommand<Void> sendWhisper(
+    Void sendWhisper(
         @Param("token") String authToken,
         @NotNull @Param("from_user_id") String fromUserId,
         @NotNull @Param("to_user_id") String toUserId,

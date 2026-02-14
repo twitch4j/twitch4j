@@ -38,7 +38,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch information about current live streams")
     public void getStreams() {
         // TestCase
-        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null).execute();
+        StreamList resultList = testUtils.getTwitchHelixClient().getStreams(null, "", "", 5, null, null, null, null);
 
         // Test
         assertTrue(resultList.getStreams().size() > 0, "Should at least find one result from the streams method!");
@@ -53,7 +53,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("Fetch the user's stream key")
     public void getStreamKey() {
-        List<StreamKey> resultList = TestUtils.getTwitchHelixClient().getStreamKey(TestUtils.getCredential().getAccessToken(), twitchUserId).execute().getKeys();
+        List<StreamKey> resultList = TestUtils.getTwitchHelixClient().getStreamKey(TestUtils.getCredential().getAccessToken(), twitchUserId).getKeys();
         Assertions.assertFalse(resultList.isEmpty());
         resultList.forEach(key -> Assertions.assertNotNull(key.getStreamKey()));
     }
@@ -66,7 +66,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @Disabled
     public void getStreamMarkers() {
         // TestCase
-        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, "217359661", "137512364").execute();
+        StreamMarkersList resultList = testUtils.getTwitchHelixClient().getStreamMarkers("", "", "", null, "217359661", "137512364");
 
         // Test
         assertTrue(resultList.getStreamMarkers().size() > 0, "Should at least find one result from the streams metadata method!");
@@ -82,7 +82,7 @@ public class StreamsServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("getIngestServers")
     public void getIngestServers() {
-        IngestServerList serverList = TestUtils.getTwitchHelixClient().getIngestServers().execute();
+        IngestServerList serverList = TestUtils.getTwitchHelixClient().getIngestServers();
         assertNotNull(serverList.getIngests());
         assertFalse(serverList.getIngests().isEmpty());
         assertNotNull(serverList.getIngests().get(0).getName());

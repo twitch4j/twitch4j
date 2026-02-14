@@ -107,7 +107,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     @Nullable
     default User enableStreamEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             User user = users.getUsers().get(0);
@@ -127,7 +127,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default Collection<User> enableStreamEventListener(Iterable<String> channelNames) {
         return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels))
             .map(UserList::getUsers)
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
@@ -141,7 +141,7 @@ public interface IClientHelper extends AutoCloseable {
      * @param channelName Channel Name
      */
     default void disableStreamEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
@@ -157,7 +157,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default void disableStreamEventListener(Iterable<String> channelNames) {
         CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            UserList users = getTwitchHelix().getUsers(null, null, channels);
             users.getUsers().forEach(user -> disableStreamEventListenerForId(user.getId()));
         });
     }
@@ -174,7 +174,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     @Nullable
     default User enableFollowEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             User user = users.getUsers().get(0);
@@ -199,7 +199,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default Collection<User> enableFollowEventListener(Iterable<String> channelNames) {
         return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels))
             .map(UserList::getUsers)
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
@@ -213,7 +213,7 @@ public interface IClientHelper extends AutoCloseable {
      * @param channelName Channel Name
      */
     default void disableFollowEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
@@ -229,7 +229,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default void disableFollowEventListener(Iterable<String> channelNames) {
         CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            UserList users = getTwitchHelix().getUsers(null, null, channels);
             users.getUsers().forEach(user -> disableFollowEventListenerForId(user.getId()));
         });
     }
@@ -253,7 +253,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     @Nullable
     default User enableClipEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             User user = users.getUsers().get(0);
@@ -274,7 +274,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default Collection<User> enableClipEventListener(Iterable<String> channelNames) {
         return CollectionUtils.chunked(channelNames, MAX_LIMIT).stream()
-            .map(channels -> getTwitchHelix().getUsers(null, null, channels).execute())
+            .map(channels -> getTwitchHelix().getUsers(null, null, channels))
             .map(UserList::getUsers)
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
@@ -289,7 +289,7 @@ public interface IClientHelper extends AutoCloseable {
      * @return whether a previously-tracked channel was removed
      */
     default boolean disableClipEventListener(String channelName) {
-        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName)).execute();
+        UserList users = getTwitchHelix().getUsers(null, null, Collections.singletonList(channelName));
 
         if (users.getUsers().size() == 1) {
             return disableClipEventListenerForId(users.getUsers().get(0).getId());
@@ -306,7 +306,7 @@ public interface IClientHelper extends AutoCloseable {
      */
     default void disableClipEventListener(Iterable<String> channelNames) {
         CollectionUtils.chunked(channelNames, MAX_LIMIT).forEach(channels -> {
-            UserList users = getTwitchHelix().getUsers(null, null, channels).execute();
+            UserList users = getTwitchHelix().getUsers(null, null, channels);
             users.getUsers().forEach(user -> disableClipEventListenerForId(user.getId()));
         });
     }

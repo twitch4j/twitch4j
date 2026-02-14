@@ -27,7 +27,6 @@ import com.github.twitch4j.helix.domain.Clip;
 import com.github.twitch4j.helix.domain.ClipList;
 import com.github.twitch4j.helix.domain.Stream;
 import com.github.twitch4j.helix.domain.StreamList;
-import com.netflix.hystrix.HystrixCommand;
 import io.github.xanthic.cache.api.Cache;
 import io.github.xanthic.cache.api.domain.ExpiryType;
 import io.github.xanthic.cache.core.CacheApi;
@@ -188,11 +187,12 @@ public class TwitchClientHelper implements IClientHelper {
         // Tasks
         this.streamStatusEventTask = channels -> {
             // check go live / stream events
-            HystrixCommand<StreamList> hystrixGetAllStreams = twitchHelix.getStreams(null, null, null, channels.size(), null, null, channels, null);
             try {
                 Map<String, Stream> streams = new HashMap<>();
                 channels.forEach(id -> streams.put(id, null));
-                hystrixGetAllStreams.execute().getStreams().forEach(s -> streams.put(s.getUserId(), s));
+                twitchHelix.getStreams(null, null, null, channels.size(), null, null, channels, null)
+                    .getStreams()
+                    .forEach(s -> streams.put(s.getUserId(), s));
                 liveBackoff.get().reset(); // API call was successful
 
                 streams.forEach((userId, stream) -> {
@@ -282,16 +282,11 @@ public class TwitchClientHelper implements IClientHelper {
                     }
                 });
             } catch (Exception ex) {
-                if (hystrixGetAllStreams != null && hystrixGetAllStreams.isFailedExecution()) {
-                    log.trace(hystrixGetAllStreams.getFailedExecutionException().getMessage(), hystrixGetAllStreams.getFailedExecutionException());
-                }
-
                 log.error("Failed to check for Stream Events (Live/Offline/...): " + ex.getMessage());
             }
         };
         this.followerEventTask = channelId -> {
             // check follow events
-            HystrixCommand<InboundFollowers> commandGetFollowers = twitchHelix.getChannelFollowers(null, channelId, null, MAX_LIMIT, null);
             try {
                 ChannelCache currentChannelCache = channelInformation.computeIfAbsent(channelId, s -> new ChannelCache());
                 Instant lastFollowDate = currentChannelCache.getLastFollowCheck();
@@ -299,7 +294,7 @@ public class TwitchClientHelper implements IClientHelper {
                 boolean nextRequestCanBeImmediate = false;
 
                 if (lastFollowDate != null) {
-                    InboundFollowers executionResult = commandGetFollowers.execute();
+                    InboundFollowers executionResult = twitchHelix.getChannelFollowers(null, channelId, null, MAX_LIMIT, null);
                     List<InboundFollow> followList = executionResult.getFollows();
                     followBackoff.get().reset(); // API call was successful
 
@@ -349,10 +344,6 @@ public class TwitchClientHelper implements IClientHelper {
 
                 return nextRequestCanBeImmediate;
             } catch (Exception ex) {
-                if (commandGetFollowers != null && commandGetFollowers.isFailedExecution()) {
-                    log.trace(ex.getMessage(), ex);
-                }
-
                 log.error("Failed to check for Follow Events: " + ex.getMessage());
                 return false;
             }
@@ -646,15 +637,11 @@ public class TwitchClientHelper implements IClientHelper {
     private List<Clip> getClips(String channelId, Instant startedAt, Instant endedAt) {
         return PaginationUtil.getPaginated(
             cursor -> {
-                final HystrixCommand<ClipList> commandGetClips = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt, null);
                 try {
-                    ClipList result = commandGetClips.execute();
+                    ClipList result = twitchHelix.getClips(null, channelId, null, null, cursor, null, MAX_LIMIT, startedAt, endedAt, null);
                     clipBackoff.get().reset(); // successful api call
                     return result;
                 } catch (Exception ex) {
-                    if (commandGetClips != null && commandGetClips.isFailedExecution()) {
-                        log.trace(ex.getMessage(), ex);
-                    }
                     log.error("Failed to check for Clip Events: " + ex.getMessage());
                     clipBackoff.get().get(); // increment failures
                     return null;

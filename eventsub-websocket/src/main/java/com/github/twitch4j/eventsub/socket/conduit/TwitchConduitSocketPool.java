@@ -135,7 +135,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             int totalShards = spec.totalShardCount() != null ? spec.totalShardCount() : poolShards;
             this.shouldDeleteConduit = poolShards >= totalShards;
             try {
-                this.conduitId = api.createConduit(token, totalShards).execute().getConduits().get(0).getId();
+                this.conduitId = api.createConduit(token, totalShards).getConduits().get(0).getId();
             } catch (Exception e) {
                 if (shouldCloseExecutor) {
                     this.executor.shutdownNow();
@@ -152,7 +152,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             } else {
                 try {
                     // noinspection OptionalGetWithoutIsPresent
-                    totalShards = api.getConduits(token).execute()
+                    totalShards = api.getConduits(token)
                         .getConduits()
                         .stream()
                         .filter(c -> conduitId.equals(c.getId()))
@@ -170,7 +170,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             int requiredShards = shardOffset + poolShards;
             if (requiredShards > totalShards) {
                 try {
-                    api.updateConduit(token, conduitId, requiredShards).execute();
+                    api.updateConduit(token, conduitId, requiredShards);
                 } catch (Exception e) {
                     if (shouldCloseExecutor) {
                         this.executor.shutdownNow();
@@ -245,7 +245,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
             .map(t -> ConduitShard.builder().shardId(String.valueOf(shardId.getAndIncrement())).transport(t).build())
             .collect(Collectors.toList());
         try {
-            api.updateConduitShards(token, new ShardsInput(this.conduitId, shards)).execute();
+            api.updateConduitShards(token, new ShardsInput(this.conduitId, shards));
         } catch (Exception e) {
             try {
                 this.close();
@@ -271,7 +271,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
                 .build();
             executor.execute(() -> {
                 try {
-                    api.updateConduitShards(token, new ShardsInput(this.conduitId, Collections.singletonList(updatedShard))).execute();
+                    api.updateConduitShards(token, new ShardsInput(this.conduitId, Collections.singletonList(updatedShard)));
                 } catch (Exception ex) {
                     log.warn("Failed to re-associate websocket (ID: {}) with conduit (ID: {}) after reconnect", id, this.conduitId, ex);
                     eventManager.publish(new ConduitShardReassociationFailureEvent(e.getConnection(), this, id, ex));
@@ -297,7 +297,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
     @Override
     public EventSubSubscription register(@NotNull EventSubSubscription subscription) {
         String token = credential != null ? credential.getAccessToken() : null;
-        return api.createEventSubSubscription(token, subscription.withTransport(transport)).execute().getSubscriptions().get(0);
+        return api.createEventSubSubscription(token, subscription.withTransport(transport)).getSubscriptions().get(0);
     }
 
     @Override
@@ -327,7 +327,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
         } else {
             try {
                 // noinspection OptionalGetWithoutIsPresent
-                id = api.getEventSubSubscriptions(token, EventSubSubscriptionStatus.ENABLED, subscription.getType(), null, null, null).execute().getSubscriptions().stream().filter(sub -> conduitId.equals(sub.getTransport().getConduitId())).findAny().map(EventSubSubscription::getId).get();
+                id = api.getEventSubSubscriptions(token, EventSubSubscriptionStatus.ENABLED, subscription.getType(), null, null, null).getSubscriptions().stream().filter(sub -> conduitId.equals(sub.getTransport().getConduitId())).findAny().map(EventSubSubscription::getId).get();
             } catch (Exception e) {
                 log.warn("Specified subscription is not actively registered to this Conduit with ID {}: {}", conduitId, subscription, e);
                 return false;
@@ -335,7 +335,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
         }
 
         try {
-            api.deleteEventSubSubscription(token, id).execute();
+            api.deleteEventSubSubscription(token, id);
             return true;
         } catch (Exception e) {
             log.warn("Failed to delete EventSub subscription from Conduit with ID {}: {}", conduitId, subscription, e);
@@ -362,7 +362,7 @@ public final class TwitchConduitSocketPool implements IEventSubConduit {
 
         if (shouldDeleteConduit) {
             String token = credential != null ? credential.getAccessToken() : null;
-            api.deleteConduit(token, conduitId).execute();
+            api.deleteConduit(token, conduitId);
         }
 
         if (shouldCloseExecutor) {

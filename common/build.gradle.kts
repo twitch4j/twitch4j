@@ -13,7 +13,6 @@ dependencies {
 	compileOnly(group = "io.github.openfeign", name = "feign-okhttp")
 	compileOnly(group = "io.github.openfeign", name = "feign-jackson")
 	compileOnly(group = "io.github.openfeign", name = "feign-slf4j")
-	compileOnly(group = "io.github.openfeign", name = "feign-hystrix")
 
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")

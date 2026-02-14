@@ -10,7 +10,7 @@ dependencies {
 	api(group = "org.jetbrains", name = "annotations")
 
 	// Hystrix
-	api(group = "com.netflix.hystrix", name = "hystrix-core")
+	api(group = "com.netflix.hystrix", name = "hystrix-core", version = "1.5.18")
 
 	// Caching
 	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")

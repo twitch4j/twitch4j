@@ -30,7 +30,6 @@ public class VideoServiceTest extends AbstractEndpointTest {
     public void getVideos() {
         List<String> ids = Arrays.asList("806178786", "806178788");
         List<Video> videos = TestUtils.getTwitchHelixClient().getVideos(TestUtils.getCredential().getAccessToken(), ids, null, null, null, null, null, null, null, null, null)
-            .execute()
             .getVideos();
         assertNotNull(videos);
         assertEquals(ids.size(), videos.size());
@@ -48,7 +47,7 @@ public class VideoServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch videos by game ID")
     public void getVideosByGame() {
         // TestCase
-        VideoList resultList = TestUtils.getTwitchHelixClient().getVideos(TestUtils.getCredential().getAccessToken(), null, null, overwatchGameId, null, null, null, null, 100, null, null).execute();
+        VideoList resultList = TestUtils.getTwitchHelixClient().getVideos(TestUtils.getCredential().getAccessToken(), null, null, overwatchGameId, null, null, null, null, 100, null, null);
 
         // Test
         assertTrue(resultList.getVideos().size() > 0, "Should at least find one result from the videos method!");
@@ -63,7 +62,7 @@ public class VideoServiceTest extends AbstractEndpointTest {
     @DisplayName("Delete videos")
     @Disabled
     public void deleteVideos() {
-        DeletedVideoList resultList = TestUtils.getTwitchHelixClient().deleteVideos(TestUtils.getCredential().getAccessToken(), Collections.singletonList("806649844")).execute();
+        DeletedVideoList resultList = TestUtils.getTwitchHelixClient().deleteVideos(TestUtils.getCredential().getAccessToken(), Collections.singletonList("806649844"));
         assertNotNull(resultList);
         assertNotNull(resultList.getDeletedVideoIds());
     }

@@ -18,14 +18,14 @@ public class SearchServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("Searches for matching categories")
     public void searchCategories() {
-        List<Game> resultList = TestUtils.getTwitchHelixClient().searchCategories(TestUtils.getCredential().getAccessToken(), "Tech", null, null).execute().getResults();
+        List<Game> resultList = TestUtils.getTwitchHelixClient().searchCategories(TestUtils.getCredential().getAccessToken(), "Tech", null, null).getResults();
         Assertions.assertFalse(resultList.isEmpty());
     }
 
     @Test
     @DisplayName("Searches for matching channels")
     public void searchChannels() {
-        List<ChannelSearchResult> resultList = TestUtils.getTwitchHelixClient().searchChannels(TestUtils.getCredential().getAccessToken(), "twitch4j", 100, null, null).execute().getResults();
+        List<ChannelSearchResult> resultList = TestUtils.getTwitchHelixClient().searchChannels(TestUtils.getCredential().getAccessToken(), "twitch4j", 100, null, null).getResults();
         Assertions.assertFalse(resultList.isEmpty());
     }
 

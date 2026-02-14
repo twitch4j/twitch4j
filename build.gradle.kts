@@ -58,8 +58,8 @@ subprojects {
 
 	// Source Compatibility
 	java {
-		sourceCompatibility = JavaVersion.VERSION_1_8
-		targetCompatibility = JavaVersion.VERSION_1_8
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 		withSourcesJar()
 		withJavadocJar()
 	}
@@ -86,16 +86,12 @@ subprojects {
 			api(group = "io.github.openfeign", name = "feign-slf4j", version = "13.6")
 			api(group = "io.github.openfeign", name = "feign-okhttp", version = "13.6")
 			api(group = "io.github.openfeign", name = "feign-jackson", version = "13.6")
-			api(group = "io.github.openfeign", name = "feign-hystrix", version = "13.6")
 
 			// WebSocket
 			api(group = "com.neovisionaries", name = "nv-websocket-client", version = "2.14")
 
 			// Regex
 			api(group = "com.github.tony19", name = "named-regexp", version = "1.0.0")
-
-			// Hystrix
-			api(group = "com.netflix.hystrix", name = "hystrix-core", version = "1.5.18")
 
 			// rich version declarations
 			listOf("com.fasterxml.jackson.core:jackson-annotations", "com.fasterxml.jackson.core:jackson-core", "com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.datatype:jackson-datatype-jsr310").forEach { dep ->
@@ -114,7 +110,7 @@ subprojects {
 				}
 			}
 
-			listOf("io.github.openfeign:feign-slf4j", "io.github.openfeign:feign-okhttp", "io.github.openfeign:feign-jackson", "io.github.openfeign:feign-hystrix").forEach { dep ->
+			listOf("io.github.openfeign:feign-slf4j", "io.github.openfeign:feign-okhttp", "io.github.openfeign:feign-jackson").forEach { dep ->
 				add("api", dep) {
 					version {
 						// lower bound on accepted feign version; synced with current major version used by twitch4j
@@ -139,6 +135,9 @@ subprojects {
 
 		// Jackson BOM
 		api(platform("com.fasterxml.jackson:jackson-bom:2.21.0"))
+
+		// Resilience4j BOM
+		api(platform("io.github.resilience4j:resilience4j-bom:2.3.0"))
 
 		// Test
 		testImplementation(platform("org.junit:junit-bom:6.0.2"))
@@ -217,10 +216,6 @@ subprojects {
 			options.encoding = "UTF-8"
 		}
 
-		compileTestJava {
-			options.release = 17
-		}
-
 		withType<Javadoc> {
 			options {
 				this as StandardJavadocDocletOptions
@@ -235,7 +230,6 @@ subprojects {
 						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.6",
 						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.6",
 						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.6",
-						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.6",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.0",

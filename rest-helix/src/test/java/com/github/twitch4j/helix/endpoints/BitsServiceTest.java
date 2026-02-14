@@ -24,7 +24,7 @@ public class BitsServiceTest extends AbstractEndpointTest {
     @DisplayName("Fetch the bits leaderboard")
     public void getBitsLeaderboard() {
         // TestCase
-        BitsLeaderboard resultList = testUtils.getTwitchHelixClient().getBitsLeaderboard(testUtils.getCredential().getAccessToken(), 10, "all", null, null).execute();
+        BitsLeaderboard resultList = testUtils.getTwitchHelixClient().getBitsLeaderboard(testUtils.getCredential().getAccessToken(), 10, "all", null, null);
 
         // Test
         assertTrue(resultList.getEntries().size() == 0, "That account can't get bits, so it's always a empty list");
@@ -33,7 +33,7 @@ public class BitsServiceTest extends AbstractEndpointTest {
     @Test
     @DisplayName("Retrieves the list of available Cheermotes")
     public void getCheermotes() {
-        List<Cheermote> resultList = TestUtils.getTwitchHelixClient().getCheermotes(TestUtils.getCredential().getAccessToken(), "12826").execute().getCheermotes();
+        List<Cheermote> resultList = TestUtils.getTwitchHelixClient().getCheermotes(TestUtils.getCredential().getAccessToken(), "12826").getCheermotes();
         Assertions.assertFalse(resultList.isEmpty());
     }
 
