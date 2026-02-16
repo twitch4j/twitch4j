@@ -1,5 +1,5 @@
 [versions]
-configuration-plugin-version = "0.19.0"
+configuration-plugin-version = "0.20.0"
 manifest-plugin-version = "0.2.6"
 jmh-plugin-version = "0.7.3"
 buildconfig-plugin-version = "5.5.4"
