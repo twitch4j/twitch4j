@@ -2,6 +2,8 @@ package com.github.twitch4j.chat.util;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 
+import java.util.Objects;
+
 public class TestUtils {
 
     /**
@@ -10,7 +12,7 @@ public class TestUtils {
      * @return OAuth2Credential
      */
     public static OAuth2Credential getCredential() {
-        return new OAuth2Credential("twitch", System.getenv("TWITCH_AUTH_TOKEN"));
+        return new OAuth2Credential("twitch", Objects.toString(System.getenv("TWITCH_AUTH_TOKEN")));
     }
 
     /**

@@ -1,7 +1,3 @@
-plugins {
-	id("com.gradleup.shadow")
-}
-
 dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
@@ -21,22 +17,15 @@ dependencies {
 	testImplementation(group = "org.awaitility", name = "awaitility")
 }
 
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - PubSub Module")
+	artifactDescription.set("PubSub API dependency")
+	javadocTitle.set("${base.archivesName.get()} (v${project.version})")
+
+	// generate shaded jar
+	shadow.set(true)
+}
+
 base {
 	archivesName.set("twitch4j-pubsub")
-}
-
-tasks {
-	javadoc {
-		options {
-			title = "${base.archivesName.get()} (v${project.version})"
-			windowTitle = "${base.archivesName.get()} (v${project.version})"
-		}
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - PubSub Module")
-		description.set("PubSub API dependency")
-	}
 }

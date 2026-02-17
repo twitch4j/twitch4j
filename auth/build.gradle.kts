@@ -9,16 +9,8 @@ dependencies {
 	api(group = "com.github.philippheuer.credentialmanager", name = "credentialmanager")
 }
 
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Auth Module"
-		windowTitle = "Twitch4J (v${version}) - Auth Module"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J Auth Module")
-		description.set("Authentication dependency")
-	}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J Auth Module")
+	artifactDescription.set("Authentication dependency")
+	javadocTitle.set("Twitch4J (v${version}) - Auth Module")
 }

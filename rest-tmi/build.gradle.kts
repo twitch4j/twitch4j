@@ -14,16 +14,8 @@ dependencies {
 	api(project(":twitch4j-auth"))
 }
 
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Message Interface Module API"
-		windowTitle = "Twitch4J (v${version}) - Message Interface Module API"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Message Interface Module")
-		description.set("Twitch Message Interface API dependency")
-	}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - Message Interface Module")
+	artifactDescription.set("Twitch Message Interface API dependency")
+	javadocTitle.set("Twitch4J (v${version}) - Message Interface Module API <sup>(deprecated)</sup>")
 }

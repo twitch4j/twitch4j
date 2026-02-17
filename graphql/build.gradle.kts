@@ -1,23 +1,31 @@
 // Plugins
 plugins {
-	id("com.apollographql.apollo") version "2.5.14"
+	alias(libs.plugins.apollo.plugin)
 }
 
 // Dependencies
 dependencies {
+	// Annotations
+	api(libs.jetbrains.annotations)
+
 	// GraphQL
-	api(group = "com.apollographql.apollo", name = "apollo-runtime", version = "2.5.14")
-	api(group = "org.jetbrains", name = "annotations")
+	api(libs.apollo.runtime)
 
 	// Hystrix
-	api(group = "com.netflix.hystrix", name = "hystrix-core")
+	api(libs.hystrix.core)
 
 	// Caching
-	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
+	api(libs.xanthic.provider.caffeine3)
 
 	// Twitch4J Modules
 	api(project(":twitch4j-common"))
 	api(project(":twitch4j-auth"))
+}
+
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J GraphQL Module")
+	artifactDescription.set("GraphQL dependency")
+	javadocTitle.set("Twitch4J (v${version}) - GraphQL Module")
 }
 
 tasks {
@@ -28,19 +36,5 @@ tasks {
 	withType<Javadoc> {
 		// Ignore auto-generated files from apollo graphql
 		exclude("com/github/twitch4j/graphql/internal/**")
-	}
-
-	javadoc {
-		options {
-			title = "Twitch4J (v${version}) - GraphQL Module"
-			windowTitle = "Twitch4J (v${version}) - GraphQL Module"
-		}
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J GraphQL Module")
-		description.set("GraphQL dependency")
 	}
 }

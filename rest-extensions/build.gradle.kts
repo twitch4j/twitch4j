@@ -15,16 +15,8 @@ dependencies {
 	api(project(":twitch4j-helix"))
 }
 
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Extensions Module API"
-		windowTitle = "Twitch4J (v${version}) - Extensions Module API"
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Extensions Module")
-		description.set("Extensions API dependency")
-	}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - Extensions Module")
+	artifactDescription.set("Extensions API dependency")
+	javadocTitle.set("Twitch4J (v${version}) - Extensions Module API")
 }

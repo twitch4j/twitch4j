@@ -11,12 +11,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import lombok.extern.slf4j.Slf4j
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
 @ExperimentalCoroutinesApi
-@Slf4j
 @Tag("unittest")
 class ChatExtensionsTest {
 

@@ -1,23 +1,20 @@
-plugins {
-	id("com.gradleup.shadow")
-}
-
 dependencies {
 	// HTTP Client
-	api(group = "io.github.openfeign", name = "feign-okhttp")
-	api(group = "io.github.openfeign", name = "feign-jackson")
-	api(group = "io.github.openfeign", name = "feign-slf4j")
-	api(group = "io.github.openfeign", name = "feign-hystrix")
-	api(group = "commons-configuration", name = "commons-configuration")
-
-	// Rate Limiting
-	api(group = "com.bucket4j", name = "bucket4j_jdk8-core")
+	api(libs.feign.core)
+	api(libs.feign.okhttp)
+	api(libs.feign.jackson)
+	api(libs.feign.slf4j)
+	api(libs.feign.hystrix)
+	api(libs.commons.configuration)
 
 	// Jackson (JSON)
-	api(group = "com.fasterxml.jackson.core", name = "jackson-databind")
+	api(libs.jackson.databind)
+
+	// Rate-limit buckets for registry
+	api(libs.bucket4j.core)
 
 	// Cache
-	api(group = "io.github.xanthic.cache", name = "cache-provider-caffeine")
+	api(libs.xanthic.provider.caffeine3)
 
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))
@@ -25,16 +22,11 @@ dependencies {
 	api(project(":twitch4j-auth"))
 }
 
-tasks.javadoc {
-	options {
-		title = "Twitch4J (v${version}) - Helix Module API"
-		windowTitle = "Twitch4J (v${version}) - Helix Module API"
-	}
-}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - Helix Module")
+	artifactDescription.set("Helix API dependency")
+	javadocTitle.set("Twitch4J (v${version}) - Helix Module API")
 
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Helix Module")
-		description.set("Helix API dependency")
-	}
+	// generate shaded jar
+	shadow.set(true)
 }

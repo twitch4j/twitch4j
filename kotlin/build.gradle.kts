@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-	kotlin("jvm") version "2.3.10"
-	id("org.jetbrains.dokka") version "1.9.20"
+	kotlin("jvm")
 }
 
 dependencies {
@@ -20,47 +17,23 @@ dependencies {
 	testImplementation(project(":twitch4j"))
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-	compilerOptions.jvmTarget = JvmTarget.JVM_1_8
-}
+projectConfiguration {
+	artifactDisplayName.set("Twitch4J API - Kotlin extension functions")
+	artifactDescription.set("Twitch4J Kotlin extension functions")
+	javadocTitle.set("Twitch4J (v${version}) - Kotlin extension functions")
 
-tasks.compileTestKotlin {
-	compilerOptions.jvmTarget = JvmTarget.JVM_17
-}
-
-tasks.javadocJar {
-	from(tasks.dokkaJavadoc)
-}
-
-tasks.dokkaJavadoc {
-	moduleName.set("Twitch4J (v${version}) - Kotlin extension functions")
-
-	dokkaSourceSets {
-		configureEach {
-			jdkVersion.set(8)
-
+	// add source and javadoc links
+	dokka = { dokka ->
+		dokka.dokkaSourceSets.configureEach {
 			sourceLink {
 				localDirectory.set(file("src/main/kotlin"))
-				remoteUrl.set(uri("https://github.com/twitch4j/twitch4j/tree/master/kotlin/src/main/kotlin").toURL())
+				remoteUrl.set(uri("https://github.com/twitch4j/twitch4j/tree/master/kotlin/src/main/kotlin"))
 				remoteLineSuffix.set("#L")
 			}
 
-			externalDocumentationLink {
-				url.set(uri("https://twitch4j.github.io/javadoc/").toURL())
+			externalDocumentationLinks.create("https://twitch4j.github.io/javadoc/") {
+				url.set(uri("https://twitch4j.github.io/javadoc/"))
 			}
 		}
-	}
-}
-
-tasks.javadoc {
-	options {
-		exclude("**/*.kt")
-	}
-}
-
-publishing.publications.withType<MavenPublication> {
-	pom {
-		name.set("Twitch4J API - Kotlin extension functions")
-		description.set("Twitch4J Kotlin extension functions")
 	}
 }
