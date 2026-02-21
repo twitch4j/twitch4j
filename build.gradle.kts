@@ -191,10 +191,10 @@ subprojects {
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.3",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.3",
 						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.4.0",
-						// "https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.8", // blocked by https://github.com/maxcellent/javadoc.io/issues/238
-						// "https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.8", // blocked by https://github.com/maxcellent/javadoc.io/issues/238
-						// "https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.8", // blocked by https://github.com/maxcellent/javadoc.io/issues/238
-						// "https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.8", // blocked by https://github.com/maxcellent/javadoc.io/issues/238
+						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.8.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.8.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.8.1",
+						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.8.1",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.0",
