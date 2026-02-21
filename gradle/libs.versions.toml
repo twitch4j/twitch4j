@@ -2,7 +2,7 @@
 configuration-plugin-version = "0.20.0"
 manifest-plugin-version = "0.2.6"
 jmh-plugin-version = "0.7.3"
-buildconfig-plugin-version = "5.5.4"
+buildconfig-plugin-version = "5.7.1"
 reflections-version = "0.10.2"
 xanthic-version = "0.7.1"
 events4j-version = "0.12.3"
