@@ -155,7 +155,7 @@ subprojects {
 							prefer("2.21")
 						} else {
 							// renovate: depName=com.fasterxml.jackson:jackson-bom
-							prefer("2.21.0")
+							prefer("2.21.1")
 						}
 					}
 				}
@@ -197,8 +197,8 @@ subprojects {
 						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.8.1",
 						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
 						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.0",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.21.0",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.1",
+						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.21.1",
 						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.21",
 						"https://javadoc.io/doc/commons-io/commons-io/2.21.0",
 						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.20.0",
