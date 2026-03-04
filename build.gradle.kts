@@ -184,25 +184,25 @@ subprojects {
 			options {
 				this as StandardJavadocDocletOptions
 				links(
-						"https://javadoc.io/doc/org.jetbrains/annotations/26.1.0",
-						"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
-						"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.10.1",
-						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
-						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.3",
-						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.3",
-						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.4.0",
-						"https://javadoc.io/doc/io.github.openfeign/feign-slf4j/13.9.3",
-						"https://javadoc.io/doc/io.github.openfeign/feign-okhttp/13.9.3",
-						"https://javadoc.io/doc/io.github.openfeign/feign-jackson/13.9.3",
-						"https://javadoc.io/doc/io.github.openfeign/feign-hystrix/13.9.3",
-						"https://javadoc.io/doc/org.slf4j/slf4j-api/2.0.17",
-						"https://javadoc.io/doc/com.neovisionaries/nv-websocket-client/2.14",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/2.21.1",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.21.1",
-						"https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/2.21",
-						"https://javadoc.io/doc/commons-io/commons-io/2.21.0",
-						"https://javadoc.io/doc/org.apache.commons/commons-lang3/3.20.0",
-						"https://javadoc.io/doc/org.projectlombok/lombok/1.18.42",
+						"https://www.javadocs.dev/org.jetbrains/annotations/26.1.0",
+						"https://www.javadocs.dev/commons-configuration/commons-configuration/1.10",
+						"https://www.javadocs.dev/com.bucket4j/bucket4j_jdk8-core/8.10.1",
+						// "https://www.javadocs.dev/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
+						"https://www.javadocs.dev/com.github.philippheuer.events4j/events4j-core/0.12.3",
+						"https://www.javadocs.dev/com.github.philippheuer.events4j/events4j-handler-simple/0.12.3",
+						"https://www.javadocs.dev/com.github.philippheuer.credentialmanager/credentialmanager/0.4.0",
+						"https://www.javadocs.dev/io.github.openfeign/feign-slf4j/13.9.3",
+						"https://www.javadocs.dev/io.github.openfeign/feign-okhttp/13.9.3",
+						"https://www.javadocs.dev/io.github.openfeign/feign-jackson/13.9.3",
+						"https://www.javadocs.dev/io.github.openfeign/feign-hystrix/13.9.3",
+						"https://www.javadocs.dev/org.slf4j/slf4j-api/2.0.17",
+						"https://www.javadocs.dev/com.neovisionaries/nv-websocket-client/2.14",
+						"https://www.javadocs.dev/com.fasterxml.jackson.core/jackson-databind/2.21.1",
+						"https://www.javadocs.dev/com.fasterxml.jackson.core/jackson-core/2.21.1",
+						"https://www.javadocs.dev/com.fasterxml.jackson.core/jackson-annotations/2.21",
+						"https://www.javadocs.dev/commons-io/commons-io/2.21.0",
+						"https://www.javadocs.dev/org.apache.commons/commons-lang3/3.20.0",
+						"https://www.javadocs.dev/org.projectlombok/lombok/1.18.42",
 						"https://twitch4j.github.io/javadoc"
 				)
 			}
