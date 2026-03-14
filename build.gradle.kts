@@ -187,7 +187,7 @@ subprojects {
 						"https://javadoc.io/doc/org.jetbrains/annotations/26.1.0",
 						"https://javadoc.io/doc/commons-configuration/commons-configuration/1.10",
 						"https://javadoc.io/doc/com.bucket4j/bucket4j_jdk8-core/8.10.1",
-						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/4.12.0", // blocked by https://github.com/square/okhttp/issues/6450
+						// "https://javadoc.io/doc/com.squareup.okhttp3/okhttp/5.3.2", // blocked by https://github.com/square/okhttp/issues/6450
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-core/0.12.3",
 						"https://javadoc.io/doc/com.github.philippheuer.events4j/events4j-handler-simple/0.12.3",
 						"https://javadoc.io/doc/com.github.philippheuer.credentialmanager/credentialmanager/0.4.0",
