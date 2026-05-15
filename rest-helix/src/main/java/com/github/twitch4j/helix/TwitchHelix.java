@@ -950,6 +950,22 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets a list of EventSub subscriptions that the client in the access token created.
+     *
+     * @param authToken App access token
+     * @param conduitId Filter subscriptions by conduit ID.
+     * @param after     The cursor used to get the next page of results.
+     * @return {@link EventSubSubscriptionList}
+     */
+    @RequestLine("GET /eventsub/subscriptions?conduit_id={conduit_id}&after={after}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<EventSubSubscriptionList> getEventSubSubscriptionsByConduit(
+        @Param("token") String authToken,
+        @Param("conduit_id") String conduitId,
+        @Param("after") String after
+    );
+
+    /**
      * Get a list of your EventSub subscriptions.
      *
      * @param authToken Required: App Access Token.
