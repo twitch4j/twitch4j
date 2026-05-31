@@ -1,0 +1,1989 @@
+{
+  "workflows": {
+    "Nightly": {
+      "version": "0.11.2",
+      "name": "Nightly",
+      "name_slug": "nightly",
+      "job_timeout": 20,
+      "default_branch": "master",
+      "container_runtime": "podman",
+      "workflow_key": "nightly",
+      "workflow_config": {
+        "type": "nightly",
+        "trigger_manual": true,
+        "trigger_cron": true,
+        "trigger_cron_schedule": "27 0 * * 0",
+        "environment_pattern": "nightly-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "gradle-build [twitch4j]",
+            "slug": "gradle-build-twitch4j",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/gradle-build",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "env": [
+                {
+                  "name": "WRAPPER_VERIFICATION",
+                  "description": "Enable verification of the gradle wrapper"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "javadoc.io:443"
+                },
+                {
+                  "host": "www.javadocs.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {},
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "gradle-test [twitch4j]",
+            "slug": "gradle-test-twitch4j",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/gradle-test",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "jacoco"
+                },
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 4
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "pkg:github-action-runner-image/ubuntu": {
+          "id": "ubuntu",
+          "type": "github-action-runner-image",
+          "version": "24.04"
+        },
+        "pkg:github-action/actions/checkout": {
+          "id": "actions/checkout",
+          "type": "github-action",
+          "version": "v6.0.2",
+          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        },
+        "pkg:github-action/actions/download-artifact": {
+          "id": "actions/download-artifact",
+          "type": "github-action",
+          "version": "v8.0.1",
+          "hash": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c"
+        },
+        "pkg:github-action/actions/upload-artifact": {
+          "id": "actions/upload-artifact",
+          "type": "github-action",
+          "version": "v7.0.1",
+          "hash": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        },
+        "pkg:github-action/step-security/harden-runner": {
+          "id": "step-security/harden-runner",
+          "type": "github-action",
+          "version": "v2.19.4",
+          "hash": "9af89fc71515a100421586dfdb3dc9c984fbf411"
+        },
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.11.2",
+          "hash": "db8a7f49517b227263641057e208ec69be928b88ce0419426248b2da446aa91a",
+          "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS",
+        "SECURITY.md"
+      ]
+    },
+    "Pull Request": {
+      "version": "0.11.2",
+      "name": "Pull Request",
+      "name_slug": "pull-request",
+      "job_timeout": 20,
+      "default_branch": "master",
+      "container_runtime": "podman",
+      "workflow_key": "pull-request",
+      "workflow_config": {
+        "type": "pull-request",
+        "trigger_pull_request": true,
+        "environment_pattern": "pr-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "gradle-build [twitch4j]",
+            "slug": "gradle-build-twitch4j",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/gradle-build",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "env": [
+                {
+                  "name": "WRAPPER_VERIFICATION",
+                  "description": "Enable verification of the gradle wrapper"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "javadoc.io:443"
+                },
+                {
+                  "host": "www.javadocs.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {},
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "gradle-test [twitch4j]",
+            "slug": "gradle-test-twitch4j",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/gradle-test",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "jacoco"
+                },
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 4
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "pkg:github-action-runner-image/ubuntu": {
+          "id": "ubuntu",
+          "type": "github-action-runner-image",
+          "version": "24.04"
+        },
+        "pkg:github-action/actions/checkout": {
+          "id": "actions/checkout",
+          "type": "github-action",
+          "version": "v6.0.2",
+          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        },
+        "pkg:github-action/actions/download-artifact": {
+          "id": "actions/download-artifact",
+          "type": "github-action",
+          "version": "v8.0.1",
+          "hash": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c"
+        },
+        "pkg:github-action/actions/upload-artifact": {
+          "id": "actions/upload-artifact",
+          "type": "github-action",
+          "version": "v7.0.1",
+          "hash": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        },
+        "pkg:github-action/step-security/harden-runner": {
+          "id": "step-security/harden-runner",
+          "type": "github-action",
+          "version": "v2.19.4",
+          "hash": "9af89fc71515a100421586dfdb3dc9c984fbf411"
+        },
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.11.2",
+          "hash": "db8a7f49517b227263641057e208ec69be928b88ce0419426248b2da446aa91a",
+          "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS",
+        "SECURITY.md"
+      ]
+    },
+    "Release": {
+      "version": "0.11.2",
+      "name": "Release",
+      "name_slug": "release",
+      "job_timeout": 20,
+      "default_branch": "master",
+      "container_runtime": "podman",
+      "workflow_key": "release",
+      "workflow_config": {
+        "type": "release",
+        "trigger_manual": true,
+        "trigger_push": true,
+        "trigger_push_tags": [
+          "v[0-9]+.[0-9]+.[0-9]+"
+        ],
+        "environment_pattern": "release-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan",
+          "publish"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "gradle-build [twitch4j]",
+            "slug": "gradle-build-twitch4j",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/gradle-build",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "env": [
+                {
+                  "name": "WRAPPER_VERIFICATION",
+                  "description": "Enable verification of the gradle wrapper"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "javadoc.io:443"
+                },
+                {
+                  "host": "www.javadocs.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {},
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "gradle-test [twitch4j]",
+            "slug": "gradle-test-twitch4j",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/gradle-test",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "jacoco"
+                },
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 4
+          },
+          {
+            "id": "5",
+            "name": "changelog-generate",
+            "slug": "changelog-generate",
+            "stage": "publish",
+            "scope": "project",
+            "action": "builtin://actions/changelog-generate",
+            "run-after": [
+              "gitleaks-scan",
+              "gradle-build-twitch4j",
+              "gradle-test-twitch4j",
+              "semgrep-scan",
+              "trivyfs-scan"
+            ],
+            "run-after-by-name": [
+              "gitleaks-scan",
+              "gradle-build [twitch4j]",
+              "gradle-test [twitch4j]",
+              "semgrep-scan",
+              "trivyfs-scan"
+            ],
+            "access": {
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "changelog"
+                }
+              ]
+            },
+            "order": 5
+          },
+          {
+            "id": "6",
+            "name": "github-release-publish",
+            "slug": "github-release-publish",
+            "stage": "publish",
+            "scope": "project",
+            "action": "builtin://actions/github-release-publish",
+            "run-after": [
+              "changelog-generate",
+              "gitleaks-scan",
+              "gradle-build-twitch4j",
+              "gradle-test-twitch4j",
+              "semgrep-scan",
+              "trivyfs-scan"
+            ],
+            "run-after-by-name": [
+              "changelog-generate",
+              "gitleaks-scan",
+              "gradle-build [twitch4j]",
+              "gradle-test [twitch4j]",
+              "semgrep-scan",
+              "trivyfs-scan"
+            ],
+            "uses-output-of": [
+              "changelog-generate"
+            ],
+            "uses-output-of-by-name": [
+              "changelog-generate"
+            ],
+            "access": {
+              "env": [
+                {
+                  "name": "GITHUB_TOKEN",
+                  "description": "The GitHub token to use for creating the release.",
+                  "required": true
+                }
+              ],
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "releases"
+              ]
+            },
+            "inputs": {
+              "artifacts": [
+                {
+                  "type": "changelog"
+                },
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "outputs": {},
+            "order": 6
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "pkg:github-action-runner-image/ubuntu": {
+          "id": "ubuntu",
+          "type": "github-action-runner-image",
+          "version": "24.04"
+        },
+        "pkg:github-action/actions/checkout": {
+          "id": "actions/checkout",
+          "type": "github-action",
+          "version": "v6.0.2",
+          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        },
+        "pkg:github-action/actions/download-artifact": {
+          "id": "actions/download-artifact",
+          "type": "github-action",
+          "version": "v8.0.1",
+          "hash": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c"
+        },
+        "pkg:github-action/actions/upload-artifact": {
+          "id": "actions/upload-artifact",
+          "type": "github-action",
+          "version": "v7.0.1",
+          "hash": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        },
+        "pkg:github-action/step-security/harden-runner": {
+          "id": "step-security/harden-runner",
+          "type": "github-action",
+          "version": "v2.19.4",
+          "hash": "9af89fc71515a100421586dfdb3dc9c984fbf411"
+        },
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.11.2",
+          "hash": "db8a7f49517b227263641057e208ec69be928b88ce0419426248b2da446aa91a",
+          "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS",
+        "SECURITY.md"
+      ]
+    },
+    "Main": {
+      "version": "0.11.2",
+      "name": "Main",
+      "name_slug": "main",
+      "job_timeout": 20,
+      "default_branch": "master",
+      "container_runtime": "podman",
+      "workflow_key": "main",
+      "workflow_config": {
+        "type": "main",
+        "trigger_manual": true,
+        "trigger_push": true,
+        "trigger_push_branches": [
+          "master"
+        ]
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "gradle-build [twitch4j]",
+            "slug": "gradle-build-twitch4j",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/gradle-build",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "env": [
+                {
+                  "name": "WRAPPER_VERIFICATION",
+                  "description": "Enable verification of the gradle wrapper"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "javadoc.io:443"
+                },
+                {
+                  "host": "www.javadocs.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {},
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "gradle-test [twitch4j]",
+            "slug": "gradle-test-twitch4j",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/gradle-test",
+            "module": "gradle-build-gradle-kts",
+            "module-dir": ".",
+            "access": {
+              "executables": [
+                {
+                  "name": "java",
+                  "constraint": "\u003e= 21.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "repo.maven.apache.org:443"
+                },
+                {
+                  "host": "repo1.maven.org:443"
+                },
+                {
+                  "host": "kotlinlang.org:443"
+                },
+                {
+                  "host": "plugins.gradle.org:443"
+                },
+                {
+                  "host": "plugins-artifacts.gradle.org:443"
+                },
+                {
+                  "host": "services.gradle.org:443"
+                },
+                {
+                  "host": "downloads.gradle.org:443"
+                },
+                {
+                  "host": "jcenter.bintray.com:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "jacoco"
+                },
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "keyserver.ubuntu.com:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "release-assets.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ],
+              "resources": [
+                "security-events"
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                }
+              ]
+            },
+            "order": 4
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "pkg:github-action-runner-image/ubuntu": {
+          "id": "ubuntu",
+          "type": "github-action-runner-image",
+          "version": "24.04"
+        },
+        "pkg:github-action/actions/checkout": {
+          "id": "actions/checkout",
+          "type": "github-action",
+          "version": "v6.0.2",
+          "hash": "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        },
+        "pkg:github-action/actions/download-artifact": {
+          "id": "actions/download-artifact",
+          "type": "github-action",
+          "version": "v8.0.1",
+          "hash": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c"
+        },
+        "pkg:github-action/actions/upload-artifact": {
+          "id": "actions/upload-artifact",
+          "type": "github-action",
+          "version": "v7.0.1",
+          "hash": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+        },
+        "pkg:github-action/step-security/harden-runner": {
+          "id": "step-security/harden-runner",
+          "type": "github-action",
+          "version": "v2.19.4",
+          "hash": "9af89fc71515a100421586dfdb3dc9c984fbf411"
+        },
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.11.2",
+          "hash": "db8a7f49517b227263641057e208ec69be928b88ce0419426248b2da446aa91a",
+          "gpg-fingerprint": "76A4948E69C62589C7B0AB84E414434DF5371FB6"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS",
+        "SECURITY.md"
+      ]
+    }
+  }
+}

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
 @ExperimentalCoroutinesApi
-@Tag("unittest")
+@Tag("integration")
 class ChatExtensionsTest {
 
     @Test
