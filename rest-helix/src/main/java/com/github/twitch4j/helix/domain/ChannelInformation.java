@@ -26,7 +26,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ChannelInformation {
 
     /**
@@ -82,9 +82,8 @@ public class ChannelInformation {
      * A channel may specify a maximum of 10 tags.
      * Each tag is limited to a maximum of 25 characters and may not be an empty string or contain spaces or special characters.
      * Tags are case-insensitive. For readability, consider using camelCasing or PascalCasing.
-     * <p>
-     * For {@link com.github.twitch4j.helix.TwitchHelix#updateChannelInformation(String, String, ChannelInformation)},
-     * setting this to an empty list <a href="https://github.com/twitchdev/issues/issues/708">should</a> result in all tags being removed from the channel.
+     *
+     * @see <a href="https://github.com/twitchdev/issues/issues/708">TwitchDev Issue Report</a> if trying to clear the channel's tags
      */
     private List<String> tags;
 
