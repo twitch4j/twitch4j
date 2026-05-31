@@ -134,13 +134,12 @@ public interface TwitchHelix {
     /**
      * Gets the custom Power-ups that the specified broadcaster created.
      *
-     * @param authToken     User access token with the bits:read scope
+     * @param authToken     User access token from the broadcaster with the bits:read scope
      * @param broadcasterId The ID of the broadcaster whose custom Power-ups you want to get. This ID must match the user ID found in the OAuth token.
      * @param ids           Optional IDs to filter the Power-ups by. Maximum: 50. If none of the IDs were found, the response is 404 Not Found.
      * @return {@link CustomPowerupList}
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_BITS_READ
      */
-    @ApiStatus.Experimental // in open beta
     @RequestLine("GET /bits/custom_power_ups?broadcaster_id={broadcaster_id}&id={id}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<CustomPowerupList> getCustomPowerups(
