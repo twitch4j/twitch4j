@@ -18,6 +18,9 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
+/**
+ * Test class for TwitchChat's channel join retry mechanism, connects to wss://irc-ws.chat.twitch.tv:443.
+ */
 @Tag("integration")
 public class ChatJoinRetryTest {
 
