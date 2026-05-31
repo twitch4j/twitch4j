@@ -18,7 +18,7 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-@Tag("unittest")
+@Tag("integration")
 public class ChatJoinRetryTest {
 
     private static final String FAKE_CHANNEL_NAME = "twitch4jtestchannelthatisnotreall"; // should exceed the max account length to make sure no such account can be created
