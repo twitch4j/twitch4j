@@ -605,6 +605,30 @@ public interface TwitchHelix {
     );
 
     /**
+     * Pins a chat message to the top of the specified broadcaster’s chat room.
+     * <p>
+     * Only one mod-pinned message can be active per channel at a time.
+     * If a mod-pinned message already exists, it is automatically replaced.
+     *
+     * @param authToken       User access token (scope: moderator:manage:chat_messages) or App access token (scopes: moderator:manage:chat_messages, user:bot, channel:bot).
+     * @param broadcasterId   The ID of the broadcaster that owns the chat room.
+     * @param moderatorId     The ID of the broadcaster or a user that has permission to moderate the broadcaster's chat room.
+     * @param messageId       The ID of the message to pin.
+     * @param durationSeconds Optional: The number of seconds the message should be pinned for. Minimum: 30. Maximum: 1800. If not specified, the message will be pinned until the stream ends.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_MANAGE
+     */
+    @RequestLine("PUT /chat/pins?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}&duration_seconds={duration_seconds}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> pinChatMessage(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("message_id") String messageId,
+        @Param("duration_seconds") @Nullable Integer durationSeconds
+    );
+
+    /**
      * Sends a Shoutout to the specified broadcaster.
      * <p>
      * Rate Limits: The broadcaster may send a Shoutout once every 2 minutes.
