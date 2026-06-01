@@ -18,7 +18,10 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-@Tag("unittest")
+/**
+ * Test class for TwitchChat's channel join retry mechanism, connects to wss://irc-ws.chat.twitch.tv:443.
+ */
+@Tag("integration")
 public class ChatJoinRetryTest {
 
     private static final String FAKE_CHANNEL_NAME = "twitch4jtestchannelthatisnotreall"; // should exceed the max account length to make sure no such account can be created
