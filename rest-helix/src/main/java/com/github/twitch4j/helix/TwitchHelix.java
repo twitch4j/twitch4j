@@ -656,6 +656,28 @@ public interface TwitchHelix {
     );
 
     /**
+     * Unpins a pinned chat message from the specified broadcaster's chat room.
+     * <p>
+     * When using an app access token, the broadcaster must authorize the channel:bot scope to your client id and a
+     * moderator (or the broadcaster) must authorize the moderator:manage:chat_messages and user:bot scopes to the client id.
+     *
+     * @param authToken       User access token (scope: moderator:manage:chat_messages) or App access token (scopes: moderator:manage:chat_messages, user:bot, channel:bot).
+     * @param broadcasterId   The ID of the broadcaster that owns the chat room.
+     * @param moderatorId     The ID of the broadcaster or a user that has permission to moderate the broadcaster's chat room.
+     * @param messageId       The ID of the message to unpin.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_MANAGE
+     */
+    @RequestLine("DELETE /chat/pins?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> unpinChatMessage(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("message_id") String messageId
+    );
+
+    /**
      * Sends a Shoutout to the specified broadcaster.
      * <p>
      * Rate Limits: The broadcaster may send a Shoutout once every 2 minutes.
