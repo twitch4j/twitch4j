@@ -605,6 +605,27 @@ public interface TwitchHelix {
     );
 
     /**
+     * Gets the currently pinned message for the specified broadcaster's chat room, including message fragments.
+     * <p>
+     * Only one mod-pinned message can be active per channel at a time.
+     * <p>
+     * When using an app access token, the broadcaster must authorize the channel:bot scope to your client id
+     * and a moderator (or the broadcaster) must authorize the moderator:manage:chat_messages and user:bot scopes.
+     *
+     * @param authToken     User access token (scope: moderator:manage:chat_messages) or App access token (scopes: moderator:manage:chat_messages, user:bot, channel:bot).
+     * @param broadcasterId The ID of the broadcaster that owns the chat room.
+     * @param moderatorId   The ID of the broadcaster or a user that has permission to moderate the broadcaster's chat room.
+     * @return {@link PinnedMessage}
+     */
+    @RequestLine("GET /chat/pins?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<ValueWrapper<PinnedMessage>> getPinnedChatMessage(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId
+    );
+
+    /**
      * Pins a chat message to the top of the specified broadcaster’s chat room.
      * <p>
      * Only one mod-pinned message can be active per channel at a time.
