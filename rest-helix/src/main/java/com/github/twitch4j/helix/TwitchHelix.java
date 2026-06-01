@@ -609,6 +609,9 @@ public interface TwitchHelix {
      * <p>
      * Only one mod-pinned message can be active per channel at a time.
      * If a mod-pinned message already exists, it is automatically replaced.
+     * <p>
+     * When using an app access token, the broadcaster must authorize the channel:bot scope to your client id
+     * and a moderator (or the broadcaster) must authorize the moderator:manage:chat_messages and user:bot scopes.
      *
      * @param authToken       User access token (scope: moderator:manage:chat_messages) or App access token (scopes: moderator:manage:chat_messages, user:bot, channel:bot).
      * @param broadcasterId   The ID of the broadcaster that owns the chat room.
@@ -621,6 +624,30 @@ public interface TwitchHelix {
     @RequestLine("PUT /chat/pins?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}&duration_seconds={duration_seconds}")
     @Headers("Authorization: Bearer {token}")
     HystrixCommand<Void> pinChatMessage(
+        @Param("token") String authToken,
+        @Param("broadcaster_id") String broadcasterId,
+        @Param("moderator_id") String moderatorId,
+        @Param("message_id") String messageId,
+        @Param("duration_seconds") @Nullable Integer durationSeconds
+    );
+
+    /**
+     * Updates the duration of an existing pinned chat message.
+     * <p>
+     * When using an app access token, the broadcaster must authorize the channel:bot scope to your client id
+     * and a moderator (or the broadcaster) must authorize the moderator:manage:chat_messages and user:bot scopes.
+     *
+     * @param authToken       User access token (scope: moderator:manage:chat_messages) or App access token (scopes: moderator:manage:chat_messages, user:bot, channel:bot).
+     * @param broadcasterId   The ID of the broadcaster that owns the chat room.
+     * @param moderatorId     The ID of the broadcaster or a user that has permission to moderate the broadcaster's chat room.
+     * @param messageId       The ID of the message to pin.
+     * @param durationSeconds Optional: The new number of seconds the message should remain pinned, starting from now. Minimum: 30. Maximum: 1800. If not specified, the message will be pinned until the stream ends.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_MESSAGES_MANAGE
+     */
+    @RequestLine("PATCH /chat/pins?broadcaster_id={broadcaster_id}&moderator_id={moderator_id}&message_id={message_id}&duration_seconds={duration_seconds}")
+    @Headers("Authorization: Bearer {token}")
+    HystrixCommand<Void> updatePinnedChatMessage(
         @Param("token") String authToken,
         @Param("broadcaster_id") String broadcasterId,
         @Param("moderator_id") String moderatorId,
