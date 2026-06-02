@@ -264,6 +264,13 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private CharityDonation charityDonation;
 
     /**
+     * Information about the Watch Streak event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#WATCH_STREAK}.
+     */
+    @Nullable
+    private WatchStreak watchStreak;
+
+    /**
      * Information about the bits badge tier event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#BITS_BADGE_TIER}.
      */
