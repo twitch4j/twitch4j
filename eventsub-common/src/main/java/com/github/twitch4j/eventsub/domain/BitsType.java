@@ -1,7 +1,6 @@
 package com.github.twitch4j.eventsub.domain;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
-import org.jetbrains.annotations.ApiStatus;
 
 public enum BitsType {
 
@@ -20,11 +19,20 @@ public enum BitsType {
     POWER_UP,
 
     /**
+     * Channel-specific power-ups.
+     *
+     * @see <a href="https://blog.twitch.tv/en/2026/05/19/new-ways-to-turn-your-community-s-participation-into-earnings/">Marketing Article</a>
+     * @see <a href="https://help.twitch.tv/s/article/power-ups">Official Help Article</a>
+     */
+    CUSTOM_POWER_UP,
+
+    /**
      * An experimental form of bits that triggers animations upon combo levels being reached.
      *
      * @see <a href="https://help.twitch.tv/s/article/combos?language=en_US">Twitch Help Article</a>
+     * @deprecated Twitch removed the combos experiment in late March 2026.
      */
-    @ApiStatus.Experimental
+    @Deprecated
     COMBO,
 
     /**
