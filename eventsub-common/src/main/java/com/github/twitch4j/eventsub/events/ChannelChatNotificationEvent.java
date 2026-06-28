@@ -271,6 +271,22 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private WatchStreak watchStreak;
 
     /**
+     * Information about the modiversary event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#MODIVERSARY}.
+     */
+    @Nullable
+    private Modiversary modiversary;
+
+    /**
+     * Information about the modiversary event.
+     * Null if {@link #getNoticeType()} is not {@link NoticeType#SHARED_CHAT_MODIVERSARY}.
+     * This field is for a notice that happened for a channel in a shared chat session
+     * other than the broadcaster in the subscription condition.
+     */
+    @Nullable
+    private Modiversary sharedChatModiversary;
+
+    /**
      * Information about the bits badge tier event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#BITS_BADGE_TIER}.
      */
