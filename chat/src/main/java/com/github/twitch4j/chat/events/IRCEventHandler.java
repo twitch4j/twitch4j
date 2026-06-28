@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,6 +83,7 @@ public class IRCEventHandler {
         if (onRewardGift(e)) return;
         if (onChannelModChange(e)) return;
         if (onUnraid(e)) return;
+        if (onModiversary(e)) return;
         if (onGiftReceived(e)) return;
     }
 
@@ -771,7 +773,14 @@ public class IRCEventHandler {
         return false;
     }
 
-    @Unofficial
+    public boolean onModiversary(IRCMessageEvent event) {
+        if ("USERNOTICE".equals(event.getCommandType()) && Strings.CS.equals(ModiversaryEvent.USERNOTICE_ID, event.getRawTag("msg-id"))) {
+            eventManager.publish(new ModiversaryEvent(event));
+            return true;
+        }
+        return false;
+    }
+
     private boolean onViewerMilestone(IRCMessageEvent event) {
         if ("USERNOTICE".equals(event.getCommandType()) && StringUtils.equals(ViewerMilestoneEvent.USERNOTICE_ID, event.getRawTag("msg-id"))) {
             eventManager.publish(new ViewerMilestoneEvent(event));
