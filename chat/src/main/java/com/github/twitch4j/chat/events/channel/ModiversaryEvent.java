@@ -10,7 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ModiversaryEvent extends AbstractChannelEvent {
+public class ModiversaryEvent extends AbstractChannelEvent implements MirrorableEvent {
 
     public static String USERNOTICE_ID = "modiversary";
 
