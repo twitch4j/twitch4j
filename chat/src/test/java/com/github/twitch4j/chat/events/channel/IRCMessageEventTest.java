@@ -185,7 +185,6 @@ public class IRCMessageEventTest {
 
     @Test
     @DisplayName("Test that watch-streak viewermilestone USERNOTICE is parsed by IRCMessageEvent and sub-event")
-    @Unofficial
     void parseMilestone() {
         IRCMessageEvent rawEvent = parse("@msg-param-id=11439a09-3c9f-4701-9552-bba21f2028d2;" +
             "rm-received-ts=1700717888176;room-id=39842292;badge-info=subscriber/3;msg-param-category=watch-streak;" +
@@ -203,6 +202,22 @@ public class IRCMessageEventTest {
         assertEquals(7, event.parseValue().orElse(-1));
         assertEquals(450, event.getEarnedChannelPoints());
         assertEquals("ive done it", event.getUserMessage());
+    }
+
+    @Test
+    @DisplayName("Test that modiversary USERNOTICE is parsed by IRCMessageEvent and sub-event")
+    void parseModiversary() {
+        IRCMessageEvent rawEvent = parse("@badge-info=;badges=staff/1,moderator/1;color=#007EFE;" +
+            "display-name=BlueLava;emotes=;flags=;id=5d0a7492-b2c4-441b-be78-8606d16ec5e8;login=bluelava;mod=1;" +
+            "msg-id=modiversary;msg-param-months=108;room-id=141981764;subscriber=0;" +
+            "system-msg=has\\sbeen\\sa\\smoderator\\sfor\\s24\\smonths!;tmi-sent-ts=1780142048673;user-id=135093069;" +
+            "user-type=mod;vip=0 :tmi.twitch.tv USERNOTICE #twitchdev :I'm celebrating my 9 year Mod Anniversary!");
+        assertNotNull(rawEvent);
+        ModiversaryEvent event = new ModiversaryEvent(rawEvent);
+        assertEquals("135093069", event.getModerator().getId());
+        assertEquals("141981764", event.getChannel().getId());
+        assertEquals(108, event.getMonths());
+        assertEquals("I'm celebrating my 9 year Mod Anniversary!", event.getUserMessage());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.github.twitch4j.chat.events.channel;
 
 import com.github.twitch4j.chat.events.AbstractChannelEvent;
-import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.events.domain.EventUser;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,8 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.OptionalInt;
 
 @Value
-@Unofficial
-@ApiStatus.Experimental
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ViewerMilestoneEvent extends AbstractChannelEvent {
