@@ -44,11 +44,18 @@ public class Fragment {
     @Nullable
     private Mention mention;
 
+    /**
+     * Optional: Metadata pertaining to the GIF.
+     */
+    @Nullable
+    private Gif gif;
+
     public enum Type {
         TEXT,
         CHEERMOTE,
         EMOTE,
         MENTION,
+        GIF,
         @JsonEnumDefaultValue
         UNKNOWN
     }
