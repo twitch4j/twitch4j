@@ -106,6 +106,16 @@ public class ChannelChatNotificationEvent extends ChannelChatUserEvent {
     private List<Badge> sourceBadges;
 
     /**
+     * Whether the notification is only sent to the source channel.
+     * <p>
+     * Is null if the notification is not in a shared chat session.
+     */
+    @Nullable
+    @Accessors(fluent = true)
+    @JsonProperty("is_source_only")
+    private Boolean isSourceOnly;
+
+    /**
      * Information about the sub event.
      * Null if {@link #getNoticeType()} is not {@link NoticeType#SUB}.
      */
