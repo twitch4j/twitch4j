@@ -3,7 +3,7 @@ package com.github.twitch4j.chat.events.channel;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.IRCEventHandler;
-import com.github.twitch4j.common.annotation.Unofficial;
+import com.github.twitch4j.chat.util.GifChatTag;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.util.EventManagerUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -273,6 +273,24 @@ public class IRCMessageEventTest {
         assertFalse(e.getMessageEvent().getBadges().containsKey("moderator"));
         Map<String, String> sourceBadges = e.getSourceBadges().orElse(null);
         assertTrue(sourceBadges != null && sourceBadges.containsKey("moderator"));
+    }
+
+    @Test
+    @DisplayName("Test that a PRIVMSG containing gifs is parsed")
+    void parseGifMessage() {
+        IRCMessageEvent raw = parse("@badge-info=subscriber/30;badges=broadcaster/1,subscriber/0,ambassador/1;color=#033700;display-name=BarryCarlyon;emotes=;first-msg=0;flags=" +
+            ";gifs=0-33|joSNxeswxuc74Juo8X|https://media4.giphy.com/media/joSNxeswxuc74Juo8X/giphy.gif?cid=095d7a5dzizsiwgabonagkmigggv8v1spfai91ac3x0dsiy0&ep=v1_gifs_trending&rid=giphy.gif&ct=g" +
+            ";id=401abf17-7e99-45d6-9bdf-43934e839327;mod=0;returning-chatter=0;room-id=15185913;subscriber=1;tmi-sent-ts=1783632907018;turbo=0;user-id=15185913;user-type= " +
+            ":barrycarlyon!barrycarlyon@barrycarlyon.tmi.twitch.tv PRIVMSG #barrycarlyon :[Y A Y Yes GIF by Djemilah Birnie]");
+        assertNotNull(raw);
+
+        ChannelMessageEvent e = new ChannelMessageEvent(raw.getChannel(), raw, raw.getUser(), raw.getMessage().orElse(null));
+        assertNotNull(e);
+        assertEquals(
+            List.of(new GifChatTag(0, 33, "joSNxeswxuc74Juo8X", "https://media4.giphy.com/media/joSNxeswxuc74Juo8X/giphy.gif?cid=095d7a5dzizsiwgabonagkmigggv8v1spfai91ac3x0dsiy0&ep=v1_gifs_trending&rid=giphy.gif&ct=g")),
+            e.getGifs().orElse(null)
+        );
+        assertEquals("[Y A Y Yes GIF by Djemilah Birnie]", e.getMessage());
     }
 
 }
