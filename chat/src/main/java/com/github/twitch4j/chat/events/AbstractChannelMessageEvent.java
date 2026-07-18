@@ -4,6 +4,7 @@ import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
 import com.github.twitch4j.chat.events.channel.MirrorableEvent;
 import com.github.twitch4j.chat.events.channel.ReplyableEvent;
 import com.github.twitch4j.chat.flag.AutoModFlag;
+import com.github.twitch4j.chat.util.GifChatTag;
 import com.github.twitch4j.common.annotation.Unofficial;
 import com.github.twitch4j.common.enums.CommandPermission;
 import com.github.twitch4j.common.events.domain.EventChannel;
@@ -86,6 +87,13 @@ public abstract class AbstractChannelMessageEvent extends AbstractChannelEvent i
      */
     public Optional<Boolean> isSourceOnly() {
         return messageEvent.getTagValue("source-only").map(Boolean::parseBoolean);
+    }
+
+    /**
+     * @return metadata pertaining to the gifs that were used in the message.
+     */
+    public Optional<List<GifChatTag>> getGifs() {
+        return messageEvent.getTagValue("gifs").map(GifChatTag::parseList);
     }
 
 }
