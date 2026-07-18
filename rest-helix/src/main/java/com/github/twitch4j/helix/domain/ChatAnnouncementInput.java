@@ -58,4 +58,13 @@ public class ChatAnnouncementInput {
     @Nullable
     private Boolean forSourceOnly;
 
+    /**
+     * Simple constructor that uses defaults for optional parameters.
+     *
+     * @param message the announcement to make in the broadcaster's room.
+     */
+    public ChatAnnouncementInput(@NotNull String message) {
+        this.message = message;
+    }
+
 }
