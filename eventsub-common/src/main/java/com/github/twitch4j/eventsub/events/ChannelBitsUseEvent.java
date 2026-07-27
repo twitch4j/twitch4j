@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.twitch4j.common.enums.TwitchEnum;
 import com.github.twitch4j.common.util.TwitchEnumDeserializer;
 import com.github.twitch4j.eventsub.domain.BitsType;
+import com.github.twitch4j.eventsub.domain.CustomPowerUp;
 import com.github.twitch4j.eventsub.domain.PowerUp;
 import com.github.twitch4j.eventsub.domain.chat.Message;
 import lombok.AccessLevel;
@@ -45,5 +46,11 @@ public class ChannelBitsUseEvent extends EventSubUserChannelEvent {
      */
     @Nullable
     private PowerUp powerUp;
+
+    /**
+     * Optional: Data about a custom Power-up.
+     */
+    @Nullable
+    private CustomPowerUp customPowerUp;
 
 }
