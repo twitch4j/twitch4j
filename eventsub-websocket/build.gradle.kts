@@ -1,3 +1,7 @@
+plugins {
+	id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
 dependencies {
 	// Twitch4J Modules
 	api(project(":twitch4j-eventsub-common"))

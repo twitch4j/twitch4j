@@ -1,3 +1,7 @@
+plugins {
+	id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
 dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")
