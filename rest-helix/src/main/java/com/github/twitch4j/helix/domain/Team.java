@@ -19,6 +19,7 @@ public class Team {
     /**
      * Users in the specified Team.
      */
+    @Nullable
     private List<TeamUser> users;
 
     /**

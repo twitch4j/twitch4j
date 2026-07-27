@@ -1,6 +1,7 @@
 package com.github.twitch4j.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.twitch4j.util.EnumUtil;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ public enum AnnouncementColor {
     private static final Map<String, AnnouncementColor> MAPPINGS = EnumUtil.buildMapping(AnnouncementColor.values());
 
     @Override
+    @JsonValue
     public String toString() {
         return this.name().toLowerCase();
     }

@@ -9,6 +9,7 @@ import com.github.twitch4j.helix.TwitchHelix;
 import com.github.twitch4j.helix.domain.BanUserInput;
 import com.github.twitch4j.helix.domain.ChannelVip;
 import com.github.twitch4j.helix.domain.ChannelVipList;
+import com.github.twitch4j.helix.domain.ChatAnnouncementInput;
 import com.github.twitch4j.helix.domain.ChatSettings;
 import com.github.twitch4j.helix.domain.Highlight;
 import com.github.twitch4j.helix.domain.Moderator;
@@ -64,7 +65,8 @@ enum ChatCommandRegistry {
 
         BiConsumer<ChatCommandHelixForwarder.CommandArguments, AnnouncementColor> announceHandler = (args, color) -> {
             if (args.getRestOfMessage() == null || args.getRestOfMessage().isEmpty()) return;
-            args.getHelix().sendChatAnnouncement(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), args.getRestOfMessage(), color).execute();
+            ChatAnnouncementInput input = ChatAnnouncementInput.builder().message(args.getRestOfMessage()).color(color).build();
+            args.getHelix().sendChatAnnouncement(args.getToken().getAccessToken(), args.getChannelId(), args.getToken().getUserId(), input).execute();
         };
         m.put("announce", args -> announceHandler.accept(args, AnnouncementColor.PRIMARY));
         m.put("announceblue", args -> announceHandler.accept(args, AnnouncementColor.BLUE));

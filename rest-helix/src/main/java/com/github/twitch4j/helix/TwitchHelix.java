@@ -405,12 +405,29 @@ public interface TwitchHelix {
      * Sends an announcement to the broadcaster’s chat room.
      * <p>
      * Rate Limits: One announcement may be sent every 2 seconds.
+     * <p>
+     * Note: When sending announcements during a Shared Chat session, behaviors differ depending on your authentication token type:
+     * <ul>
+     *     <li>
+     *         When using an App Access Token, announcements will only be sent to the source channel
+     *         (defined by the broadcaster_id parameter) by default.
+     *         Announcements can be sent to all channels by using the for_source_only parameter and setting it to false.
+     *     </li>
+     *     <li>
+     *         When using a User Access Token, announcements will be sent to all channels in the shared chat session,
+     *         including the source channel. This behavior cannot be changed with this token type.
+     *     </li>
+     * </ul>
      *
-     * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
+     * @param authToken     Either: (1) a user access token (from a moderator of the channel) that includes the
+     *                      moderator:manage:announcements scope OR (2) an app access token where the application,
+     *                      through prior authorizations has (a) the moderator:manage:announcements and user:bot scopes
+     *                      for the user represented by the moderator_id in the query parameter, AND
+     *                      (b) the channel:bot scope for the user represented by the broadcaster_id query parameter.
      * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.
-     * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token, which can be a moderator or the broadcaster.
-     * @param message       The announcement to make in the broadcaster’s chat room. Announcements are limited to a maximum of 500 characters.
-     * @param color         The color used to highlight the announcement.
+     * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room,
+     *                      or the broadcaster’s ID if they're sending the announcement.
+     * @param input         The customized announcement payload.
      * @return 204 No Content upon a successful call
      * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
      */
@@ -419,14 +436,38 @@ public interface TwitchHelix {
         "Authorization: Bearer {token}",
         "Content-Type: application/json"
     })
-    @Body("%7B\"message\":\"{message}\",\"color\":\"{color}\"%7D")
     HystrixCommand<Void> sendChatAnnouncement(
+        @Param("token") String authToken,
+        @NotNull @Param("broadcaster_id") String broadcasterId,
+        @NotNull @Param("moderator_id") String moderatorId,
+        @NotNull ChatAnnouncementInput input
+    );
+
+    /**
+     * Sends an announcement to the broadcaster’s chat room.
+     * <p>
+     * Rate Limits: One announcement may be sent every 2 seconds.
+     *
+     * @param authToken     User access token (scope: moderator:manage:announcements) of the broadcaster or a moderator.
+     * @param broadcasterId The ID of the broadcaster that owns the chat room to send the announcement to.
+     * @param moderatorId   The ID of a user who has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the OAuth token, which can be a moderator or the broadcaster.
+     * @param message       The announcement to make in the broadcaster’s chat room. Announcements are limited to a maximum of 500 characters.
+     * @param color         The color used to highlight the announcement.
+     * @return 204 No Content upon a successful call
+     * @see com.github.twitch4j.auth.domain.TwitchScopes#HELIX_CHAT_ANNOUNCEMENTS_MANAGE
+     * @deprecated in favor of {@link #sendChatAnnouncement(String, String, String, ChatAnnouncementInput)}
+     */
+    @Deprecated
+    default HystrixCommand<Void> sendChatAnnouncement(
         @Param("token") String authToken,
         @NotNull @Param("broadcaster_id") String broadcasterId,
         @NotNull @Param("moderator_id") String moderatorId,
         @NotNull @Param(value = "message", expander = JsonStringExpander.class) String message,
         @NotNull @Param("color") com.github.twitch4j.common.enums.AnnouncementColor color
-    );
+    ) {
+        ChatAnnouncementInput input = ChatAnnouncementInput.builder().message(message).color(color).build();
+        return sendChatAnnouncement(authToken, broadcasterId, moderatorId, input);
+    }
 
     /**
      * Sends an announcement to the broadcaster’s chat room.
@@ -876,6 +917,8 @@ public interface TwitchHelix {
 
     /**
      * Updates shard(s) for a conduit.
+     * <p>
+     * You can update up to 100 shards in a single request.
      * <p>
      * NOTE: Shard IDs are indexed starting at 0,
      * so a conduit with a {@code shard_count} of 5 will have shards with IDs 0 through 4.
