@@ -68,13 +68,25 @@ public class ChatMessage {
     Boolean forSourceOnly;
 
     /**
+     * If true, the message will be sent and immediately pinned. Default: false.
+     * <p>
+     * Cannot be combined with reply_parent_message_id or for_source_only.
+     * <p>
+     * When pin is true, additionally requires the moderator:manage:chat_messages scope and the sender must be the broadcaster or a moderator.
+     * <p>
+     * Messages pinned via this endpoint are always pinned for 20 minutes. If the pin fails, the message is not sent.
+     */
+    @Nullable
+    Boolean pin;
+
+    /**
      * Legacy Constructor
      *
      * @param broadcasterId        The ID of the broadcaster whose chat room the message will be sent to.
      * @param senderId             The ID of the user sending the message.
      * @param message              The message to send.
      * @param replyParentMessageId The ID of the chat message being replied to, if any.
-     * @deprecated in favor of {@link ChatMessage#ChatMessage(String, String, String, String, Boolean)} or {@link ChatMessage#builder()}
+     * @deprecated in favor of {@link ChatMessage#ChatMessage(String, String, String, String, Boolean, Boolean)} or {@link ChatMessage#builder()}
      */
     @Deprecated
     public ChatMessage(@NotNull String broadcasterId, @NotNull String senderId, @NotNull String message, @Nullable String replyParentMessageId) {
@@ -82,6 +94,25 @@ public class ChatMessage {
         this.senderId = senderId;
         this.message = message;
         this.replyParentMessageId = replyParentMessageId;
+    }
+
+    /**
+     * Legacy Constructor
+     *
+     * @param broadcasterId        The ID of the broadcaster whose chat room the message will be sent to.
+     * @param senderId             The ID of the user sending the message.
+     * @param message              The message to send.
+     * @param replyParentMessageId The ID of the chat message being replied to, if any.
+     * @param forSourceOnly        Whether the chat message is sent only to the source channel during a shared chat session.
+     * @deprecated in favor of {@link ChatMessage#ChatMessage(String, String, String, String, Boolean, Boolean)} or {@link ChatMessage#builder()}
+     */
+    @Deprecated
+    public ChatMessage(@NotNull String broadcasterId, @NotNull String senderId, @NotNull String message, @Nullable String replyParentMessageId, @Nullable Boolean forSourceOnly) {
+        this.broadcasterId = broadcasterId;
+        this.senderId = senderId;
+        this.message = message;
+        this.replyParentMessageId = replyParentMessageId;
+        this.forSourceOnly = forSourceOnly;
     }
 
 }
