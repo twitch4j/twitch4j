@@ -1,3 +1,7 @@
+plugins {
+	alias(libs.plugins.shadow.plugin)
+}
+
 dependencies {
 	// Jackson (JSON)
 	api(group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310")

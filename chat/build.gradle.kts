@@ -1,3 +1,7 @@
+plugins {
+	alias(libs.plugins.shadow.plugin)
+}
+
 dependencies {
 	// Rate Limiting
 	api(libs.bucket4j.core)

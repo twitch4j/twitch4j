@@ -1,3 +1,7 @@
+plugins {
+	alias(libs.plugins.shadow.plugin)
+}
+
 dependencies {
 	// Twitch4J Modules
 	val thatProject = project

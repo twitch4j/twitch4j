@@ -1,3 +1,7 @@
+plugins {
+	alias(libs.plugins.shadow.plugin)
+}
+
 dependencies {
 	// HTTP Client
 	api(libs.feign.core)
