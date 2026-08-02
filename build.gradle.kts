@@ -3,6 +3,7 @@ import me.champeau.jmh.JmhParameters
 
 plugins {
 	`java-library`
+	alias(libs.plugins.shadow.plugin).apply(false)
 	alias(libs.plugins.manifest.plugin).apply(false)
 	alias(libs.plugins.jmh.plugin).apply(false)
 	alias(libs.plugins.buildconfig.plugin).apply(false)

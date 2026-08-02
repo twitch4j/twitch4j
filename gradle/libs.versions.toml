@@ -1,5 +1,6 @@
 [versions]
 configuration-plugin-version = "0.20.3"
+shadow-plugin-version = "8.3.11"
 manifest-plugin-version = "0.2.6"
 jmh-plugin-version = "0.7.3"
 buildconfig-plugin-version = "5.5.4"
@@ -62,6 +63,7 @@ apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.r
 
 [plugins]
 configuration = { id = "me.philippheuer.configuration", version.ref = "configuration-plugin-version" }
+shadow-plugin = { id = "com.gradleup.shadow", version.ref = "shadow-plugin-version" }
 manifest-plugin = { id = "com.coditory.manifest", version.ref = "manifest-plugin-version" }
 jmh-plugin = { id = "me.champeau.jmh", version.ref = "jmh-plugin-version" }
 buildconfig-plugin = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig-plugin-version" }
