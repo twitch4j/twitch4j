@@ -156,7 +156,7 @@ subprojects {
 							prefer("2.22")
 						} else {
 							// renovate: depName=com.fasterxml.jackson:jackson-bom
-							prefer("2.22.1")
+							prefer("2.22.2")
 						}
 					}
 				}
