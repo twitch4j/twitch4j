@@ -63,6 +63,7 @@ public class TwitchIdentityProvider extends OAuth2IdentityProvider {
         this.baseUrl = baseUrl;
         this.tokenEndpointPostType = "QUERY";
         this.scopeSeparator = "+"; // Prevents a URISyntaxException when creating a URI from the authUrl
+        this.deviceFlowScopeParamName = "scopes"; // Twitch deviates from the RFC
     }
 
     /**
