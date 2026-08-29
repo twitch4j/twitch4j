@@ -1,5 +1,5 @@
 [versions]
-configuration-plugin-version = "0.20.3"
+configuration-plugin-version = "0.20.5"
 shadow-plugin-version = "8.3.11"
 manifest-plugin-version = "0.2.6"
 jmh-plugin-version = "0.7.3"
