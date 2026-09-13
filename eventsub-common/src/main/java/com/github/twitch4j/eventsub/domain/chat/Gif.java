@@ -1,5 +1,6 @@
 package com.github.twitch4j.eventsub.domain.chat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
@@ -11,6 +12,7 @@ public class Gif {
     /**
      * An ID that uniquely identifies this GIF.
      */
+    @JsonProperty("id") // docs were incorrect https://discord.com/channels/504015559252377601/523675960797691915/1544919248881721435
     private String gifId;
 
     /**
