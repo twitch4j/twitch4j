@@ -153,10 +153,10 @@ subprojects {
 
 						if (dep.endsWith("-annotations")) {
 							// renovate: depName=com.fasterxml.jackson.core:jackson-annotations
-							prefer("2.22")
+							prefer("2.23")
 						} else {
 							// renovate: depName=com.fasterxml.jackson:jackson-bom
-							prefer("2.22.4")
+							prefer("2.23.0")
 						}
 					}
 				}
