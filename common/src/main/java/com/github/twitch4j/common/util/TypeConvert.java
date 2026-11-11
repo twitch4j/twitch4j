@@ -39,6 +39,8 @@ public class TypeConvert {
             return objectMapper.readValue(json, valueType);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        } catch (NoSuchFieldError e) {
+            throw new RuntimeException("Deserialization failed: your jackson dependency versions are likely mismatched", e);
         }
     }
 
