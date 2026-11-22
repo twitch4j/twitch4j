@@ -1,7 +1,7 @@
 [versions]
 configuration-plugin-version = "0.20.3"
 shadow-plugin-version = "8.3.11"
-manifest-plugin-version = "0.2.6"
+manifest-plugin-version = "1.1.0"
 jmh-plugin-version = "0.7.3"
 buildconfig-plugin-version = "5.7.1"
 reflections-version = "0.10.2"
